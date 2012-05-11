@@ -1,49 +1,27 @@
-Content-Type: multipart/mixed; boundary="===============2712615806895257925=="
+Content-Type: multipart/mixed; boundary="===============3467158458899867026=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] Using Git Hub for powertop in Linux
-Date: Fri, 13 Dec 2013 10:08:18 -0800
-Message-ID: <49270.10.7.198.57.1386958098.squirrel@linux.intel.com>
-In-Reply-To: F9A26558D30ED241A8204F06F994726025801959@BGSMSX102.gar.corp.intel.com
+From: sahana srinivas <sahanavas at gmail.com>
+Subject: [Powertop] add my mail id to powertop mailing list
+Date: Fri, 11 May 2012 12:24:37 +0530
+Message-ID: <CAJxq5t7SV4d=R9uKePXaZ2pNtddvecAsLQaHZbS4V=Nx7J8W1A@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2712615806895257925==
+--===============3467158458899867026==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+sahanavas(a)gmail.com
 
-> Hi ,
->    I tried to download the latest powertop sources using this command in
-> my linux machine. Can you please point me to the contact for granting
-> me access to the repo?
->
-> git clone git(a)github.com:fer/powertop.git
->
->
->
-> [cid:image001.png(a)01CEF84C.2CA1D790]
->
-> I need to use Git and eclipse to analyze the code structure and the web
-> based interface is not much helpful for this.
-> So can you please point out the steps for integrating gitHub with eclipse?
-> regards
-> Adrip
->
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->
-Hi Adrip,
+--===============3467158458899867026==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
-You can clone powertop on your local linux machine using:
+PGEgaHJlZj0ibWFpbHRvOnNhaGFuYXZhc0BnbWFpbC5jb20iPnNhaGFuYXZhc0BnbWFpbC5jb208
+L2E+PGJyPgo=
 
-git clone git://github.com/fenrus75/powertop.git
-
-Thank you,
-Alexandra.
-
---===============2712615806895257925==--
+--===============3467158458899867026==--
 
