@@ -1,76 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============5771570790719943018=="
+Content-Type: multipart/mixed; boundary="===============1445079483693264683=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Does PowerTop support MHz numbers for Intel Xeon L5410
- CPUs ?
-Date: Mon, 07 Jul 2014 23:18:25 +0900
-Message-ID: <20140707141825.GA955@swordfish>
-In-Reply-To: 53BAA7E6.8070200@linux.intel.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] PowerTOP 2.0 bugs
+Date: Fri, 11 May 2012 09:56:52 -0700
+Message-ID: <4FAD44D4.2070802@linux.intel.com>
+In-Reply-To: CABRT9RBEN=Jz6YuSRbVL+kob7Gb_LXPRhLN2pMq5Dm1wbpoR9A@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5771570790719943018==
+--===============1445079483693264683==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (07/07/14 07:00), Arjan van de Ven wrote:
-> >>Hi,
-> >>
-> >>thanks a lot for your efforts, I appreciate it.
-> >>My co-worker applied your patch and sent me the following output:
-> >>
-> >>   --------------------------------------------------
-> >>/   ./powertop -t 1 --csv
-> >>                                             =E2=8F=8E
-> >>
-> >
-> >thanks! ok, so cpu model 0x17 is not listed as a supported one in
-> >src/cpu/intel_cpus.cpp:intel_cpu_models[] to begin with, and no
-> >C-states are initialized as a result. Let's wait for Intel devs
-> >to add cpu/core/package models and corresponding C-states.
-> >
-> >Alexandra, will you take care of this?
-> >
-> >	-ss
-> >
-> >>Loaded 0 prior measurements
-> >>Cannot load from file /var/cache/powertop/saved_parameters.powertop
-> >>check cpu model 0x17
-> >>ERROR: not supported
-> >>RAPL device for cpu 0
-> >>RAPL device for cpu 0
-> >>check cpu model 0x17
+On 5/11/2012 9:29 AM, Marti Raudsepp wrote:
+> Hi list,
 > =
 
-> so turns out the L5410 is one generation prior to NHM, and does not suppo=
-rt some of the internal MSRs we're using.
-> I'll talk to Alexandra (pending vacations, it's that season) to see what =
-we can do
+> I read that PowerTOP 2.0 was released yesterday, so I decided to give
+> it a run again. First I saw some discrepancy in the CPU usage reported
+> by PowerTOP. So I ran "while true; do openssl speed aes -multi 4;
+> done" to utilize all my 4 CPU cores at 100%. htop displays utilization
+> 4x100% all the time. PowerTOP thinks:
 > =
 
+> Summary: 0.2 wakeups/second,  0.0 GPU ops/second, 0.0 VFS ops/sec and
+> 187.1% CPU use
+> =
 
-not sure that powertop performs any specific MSRs at all, since most of MSR=
-s are
-called correspondingly to c-state flags (has_cXXX), e.g.
+>                Usage       Events/s    Category       Description
+>             1816 ms/s      0.00        Process        openssl speed
+> aes -multi 4
+> =
 
-__init:
-	if (model =3D=3D 0x45 || model =3D=3D0x3D)
-		has_c8c9c10_res =3D 1;
+> The usage numbers are clearly bogus.
 
+hmm we assumed these gaps would go away with the new perfevent library
+(it solved cases we had here at least).
 
-
-and later:
-
-	if (has_c8c9c10_res) {
-		c8_before    =3D get_msr(number, MSR_PKG_C8_RESIDENCY);
-		c9_before    =3D get_msr(number, MSR_PKG_C9_RESIDENCY);
-		c10_before    =3D get_msr(number, MSR_PKG_C10_RESIDENCY);
-	}
-
-	and so on.
-
-	-ss
-
---===============5771570790719943018==--
+--===============1445079483693264683==--
 
