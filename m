@@ -1,67 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============2370131580451541383=="
+Content-Type: multipart/mixed; boundary="===============4514572998743411217=="
 MIME-Version: 1.0
-From: Martin Ziegler <ziegler at email.mathematik.uni-freiburg.de>
-Subject: Re: [Powertop] segmentation fault when shutting down
-Date: Thu, 08 May 2014 23:55:01 +0200
-Message-ID: <alpine.DEB.2.10.1405082357180.28961@zertz.mathematik.uni-freiburg.de>
-In-Reply-To: 63496.10.24.17.174.1399585288.squirrel@linux.intel.com
+From: Vinicius Costa Gomes <vcgomes at gmail.com>
+Subject: [Powertop] [PATCH] Fix trying to use libnl-2.0 when only libnl-3.0 is
+ installed
+Date: Sat, 12 May 2012 12:50:16 -0300
+Message-ID: <1336837816-9884-1-git-send-email-vcgomes@gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2370131580451541383==
+--===============4514572998743411217==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-I use debian/testing. I will try a bisection.
+From: Vinicius Costa Gomes <vinicius.gomes(a)openbossa.org>
 
-Regards
-Martin
+When using libnl-3.0 we need to link with libnl-genl also, if not, we
+get a lot of undefined symbols.
+---
+ configure.ac |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Am Do 08 Mai 2014 14:41:00 CET schrieb Alexandra Yates:
+diff --git a/configure.ac b/configure.ac
+index 2d56684..3579b6e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -56,7 +56,7 @@ PKG_CHECK_MODULES([LIBZ], [zlib],[],[
+ =
 
->
->> When shutting down powertop segfaults:
->>
->>
->> ioctl(1, SNDCTL_TMR_TIMEBASE or TCGETS, {B38400 opost isig icanon echo
->> ...}) =3D 0
->> ioctl(1, SNDCTL_TMR_STOP or TCSETSW, {B38400 opost isig icanon -echo ...=
-})
->> =3D 0
->> ioctl(1, SNDCTL_TMR_TIMEBASE or TCGETS, {B38400 opost isig icanon -echo
->> ...}) =3D 0
->> ioctl(1, SNDCTL_TMR_TIMEBASE or TCGETS, {B38400 opost isig icanon -echo
->> ...}) =3D 0
->> ioctl(1, SNDCTL_TMR_STOP or TCSETSW, {B38400 opost isig icanon echo ...})
->> =3D 0
->> ioctl(1, SNDCTL_TMR_TIMEBASE or TCGETS, {B38400 opost isig icanon echo
->> ...}) =3D 0
->> --- SIGSEGV (Segmentation fault) @ 0 (0) ---
->> +++ killed by SIGSEGV +++
->>
->>
->> This occured on v2.6-rc2 and on kernels 3.13,3.14,3.15-rc4
->>
->> Regards
->>
->> (Martin Ziegler)
->>
->> _______________________________________________
->> PowerTop mailing list
->> PowerTop(a)lists.01.org
->> https://lists.01.org/mailman/listinfo/powertop
->>
->
-> This is interesting, I tested PowerTOP v2.6-rc2 on Linux Kernel 3.13.7,
-> 3.14.2, 3.15.0-rc3. On Ubuntu 14.04 in four different platforms and I
-> can't reproducer the segmentation faults you are seen.
->
-> what distribution are you running?
->
-> Thank you,
-> Alexandra.
->
+ has_libnl_ver=3D0
+ PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [
+-	AC_SEARCH_LIBS([nl_socket_alloc], [nl], [has_libnl_ver=3D2], [
++	AC_SEARCH_LIBS([nl_socket_alloc], [libnl-2.0], [has_libnl_ver=3D2], [
+ 		     PKG_CHECK_MODULES([LIBNL], [libnl-3.0 libnl-genl-3.0], [has_libnl_v=
+er=3D3],
+ 				       [AC_SEARCH_LIBS([nl_socket_alloc], [nl-3 nl-genl-3], [has_libnl=
+_ver=3D3], [], [])])
+ 	], [])
+-- =
 
---===============2370131580451541383==--
+1.7.10.1
+
+
+--===============4514572998743411217==--
 
