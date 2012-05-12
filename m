@@ -1,79 +1,25 @@
-Content-Type: multipart/mixed; boundary="===============6087412345869824626=="
+Content-Type: multipart/mixed; boundary="===============2764488726724340596=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH 1/2] Fix build with C++11 support enabled
-Date: Mon, 14 May 2012 10:29:08 -0700
-Message-ID: <4FB140E4.2040600@linux.intel.com>
-In-Reply-To: 3068026.LgSXzsabzU@intelfx-laptop
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Fix trying to use libnl-2.0 when only
+ libnl-3.0 is installed
+Date: Sat, 12 May 2012 15:05:59 -0700
+Message-ID: <4FAEDEC7.3020309@linux.intel.com>
+In-Reply-To: alpine.LNX.2.01.1205122353410.19371@frira.vanv.qr
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6087412345869824626==
+--===============2764488726724340596==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Thank you for the patch.
--Chris
+> =
 
-On 05/13/2012 02:49 AM, Ivan Shapovalov wrote:
-> In particular, usage of __DATE__ in main.cpp is now recognized as a
-> user-defined literal, so an additional whitespace is required separating
-> the string and __DATE__.
->
-> Also, typeof (which was a GNU extension) is now replaced by decltype,
-> so perf/perf_bundle.cpp has been modified.
-> The preprocessor is used to tell whether we are compiling in C++11 mode
-> or not and select the keyword accordingly.
-> ---
->   src/main.cpp             |    2 +-
->   src/perf/perf_bundle.cpp |    8 ++++++++
->   2 files changed, 9 insertions(+), 1 deletion(-)
->
-> diff --git a/src/main.cpp b/src/main.cpp
-> index e168fa4..433fea6 100644
-> --- a/src/main.cpp
-> +++ b/src/main.cpp
-> @@ -80,7 +80,7 @@ static const struct option long_options[] =3D
->
->   static void print_version()
->   {
-> -	printf(_("Powertop version" POWERTOP_VERSION ", compiled on "__DATE__ "=
-\n"));
-> +	printf(_("Powertop version" POWERTOP_VERSION ", compiled on " __DATE__ =
-"\n"));
->   }
->
->   static bool set_refresh_timeout()
-> diff --git a/src/perf/perf_bundle.cpp b/src/perf/perf_bundle.cpp
-> index fc677f5..38e1e91 100644
-> --- a/src/perf/perf_bundle.cpp
-> +++ b/src/perf/perf_bundle.cpp
-> @@ -38,6 +38,10 @@
->
->   #include "../cpu/cpu.h"
->
-> +#if defined(__GXX_EXPERIMENTAL_CXX0X__) || (__cplusplus>=3D 201103L)
-> +# define USE_DECLTYPE
-> +#endif
-> +
->   class perf_bundle_event: public perf_event
->   {
->   public:
-> @@ -58,7 +62,11 @@ void perf_bundle_event::handle_event(struct perf_event=
-_header *header, void *coo
->   	buffer =3D (unsigned char *)malloc(header->size);
->   	memcpy(buffer, header, header->size);
->
-> +#ifdef USE_DECLTYPE
-> +	vector =3D (decltype(vector))cookie;
-> +#else
->   	vector =3D (typeof(vector))cookie;
-> +#endif
->   	vector->push_back(buffer);
->   }
->
+> (Why even bother with libnl1 and libnl2 anyway? They are obsolete.)
 
+as long as latest Fedora, Debian and Ubuntu have the current one, I
+wouldn't mind just ditching support for the old ones...
 
---===============6087412345869824626==--
+--===============2764488726724340596==--
 
