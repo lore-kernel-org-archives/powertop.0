@@ -1,78 +1,84 @@
-Content-Type: multipart/mixed; boundary="===============2524979907998313584=="
+Content-Type: multipart/mixed; boundary="===============7944557612398499653=="
 MIME-Version: 1.0
-From: Mukherjee, Adrip <adrip.mukherjee at intel.com>
-Subject: [Powertop] SAS document for PowerTop 2.5
-Date: Wed, 11 Dec 2013 06:19:25 +0000
-Message-ID: <F9A26558D30ED241A8204F06F994726025800DD9@BGSMSX102.gar.corp.intel.com>
+From: Ivan Shapovalov <intelfx100 at gmail.com>
+Subject: [Powertop] [PATCH 1/2] Fix build with C++11 support enabled
+Date: Sun, 13 May 2012 13:49:59 +0400
+Message-ID: <3068026.LgSXzsabzU@intelfx-laptop>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2524979907998313584==
+--===============7944557612398499653==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi ,
-        I am looking to understand the architecture for powertop code base.=
- Can someone please let me know if there is any software architecture spec =
-document available for this.
+In particular, usage of __DATE__ in main.cpp is now recognized as a
+user-defined literal, so an additional whitespace is required separating
+the string and __DATE__.
 
-regards
-Adrip
+Also, typeof (which was a GNU extension) is now replaced by decltype,
+so perf/perf_bundle.cpp has been modified.
+The preprocessor is used to tell whether we are compiling in C++11 mode
+or not and select the keyword accordingly.
+---
+ src/main.cpp             |    2 +-
+ src/perf/perf_bundle.cpp |    8 ++++++++
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/src/main.cpp b/src/main.cpp
+index e168fa4..433fea6 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -80,7 +80,7 @@ static const struct option long_options[] =3D
+ =
+
+ static void print_version()
+ {
+-	printf(_("Powertop version" POWERTOP_VERSION ", compiled on "__DATE__ "\n=
+"));
++	printf(_("Powertop version" POWERTOP_VERSION ", compiled on " __DATE__ "\=
+n"));
+ }
+ =
+
+ static bool set_refresh_timeout()
+diff --git a/src/perf/perf_bundle.cpp b/src/perf/perf_bundle.cpp
+index fc677f5..38e1e91 100644
+--- a/src/perf/perf_bundle.cpp
++++ b/src/perf/perf_bundle.cpp
+@@ -38,6 +38,10 @@
+ =
+
+ #include "../cpu/cpu.h"
+ =
+
++#if defined(__GXX_EXPERIMENTAL_CXX0X__) || (__cplusplus >=3D 201103L)
++# define USE_DECLTYPE
++#endif
++
+ class perf_bundle_event: public perf_event
+ {
+ public:
+@@ -58,7 +62,11 @@ void perf_bundle_event::handle_event(struct perf_event_h=
+eader *header, void *coo
+ 	buffer =3D (unsigned char *)malloc(header->size);
+ 	memcpy(buffer, header, header->size);
+ =
+
++#ifdef USE_DECLTYPE
++	vector =3D (decltype(vector))cookie;
++#else
+ 	vector =3D (typeof(vector))cookie;
++#endif
+ 	vector->push_back(buffer);
+ }
+ =
+
+-- =
+
+1.7.10.2
 
 
---===============2524979907998313584==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
 
-PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
-bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
-YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
-cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
-VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
-bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
-ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTUgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
-PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseToiQ2Ft
-YnJpYSBNYXRoIjsKCXBhbm9zZS0xOjIgNCA1IDMgNSA0IDYgMyAyIDQ7fQpAZm9udC1mYWNlCgl7
-Zm9udC1mYW1pbHk6Q2FsaWJyaTsKCXBhbm9zZS0xOjIgMTUgNSAyIDIgMiA0IDMgMiA0O30KQGZv
-bnQtZmFjZQoJe2ZvbnQtZmFtaWx5OkNvbnNvbGFzOwoJcGFub3NlLTE6MiAxMSA2IDkgMiAyIDQg
-MyAyIDQ7fQpAZm9udC1mYWNlCgl7Zm9udC1mYW1pbHk6IkZyZWVzdHlsZSBTY3JpcHQiOwoJcGFu
-b3NlLTE6MyA4IDQgMiAzIDIgNSAxMSA0IDQ7fQovKiBTdHlsZSBEZWZpbml0aW9ucyAqLwpwLk1z
-b05vcm1hbCwgbGkuTXNvTm9ybWFsLCBkaXYuTXNvTm9ybWFsCgl7bWFyZ2luOjBjbTsKCW1hcmdp
-bi1ib3R0b206LjAwMDFwdDsKCWZvbnQtc2l6ZToxMS4wcHQ7Cglmb250LWZhbWlseToiQ2FsaWJy
-aSIsInNhbnMtc2VyaWYiOwoJbXNvLWZhcmVhc3QtbGFuZ3VhZ2U6RU4tVVM7fQphOmxpbmssIHNw
-YW4uTXNvSHlwZXJsaW5rCgl7bXNvLXN0eWxlLXByaW9yaXR5Ojk5OwoJY29sb3I6IzA1NjNDMTsK
-CXRleHQtZGVjb3JhdGlvbjp1bmRlcmxpbmU7fQphOnZpc2l0ZWQsIHNwYW4uTXNvSHlwZXJsaW5r
-Rm9sbG93ZWQKCXttc28tc3R5bGUtcHJpb3JpdHk6OTk7Cgljb2xvcjojOTU0RjcyOwoJdGV4dC1k
-ZWNvcmF0aW9uOnVuZGVybGluZTt9CnNwYW4uRW1haWxTdHlsZTE3Cgl7bXNvLXN0eWxlLXR5cGU6
-cGVyc29uYWwtY29tcG9zZTsKCWZvbnQtZmFtaWx5OkNvbnNvbGFzOwoJY29sb3I6d2luZG93dGV4
-dDt9Ci5Nc29DaHBEZWZhdWx0Cgl7bXNvLXN0eWxlLXR5cGU6ZXhwb3J0LW9ubHk7Cglmb250LWZh
-bWlseToiQ2FsaWJyaSIsInNhbnMtc2VyaWYiOwoJbXNvLWZhcmVhc3QtbGFuZ3VhZ2U6RU4tVVM7
-fQpAcGFnZSBXb3JkU2VjdGlvbjEKCXtzaXplOjYxMi4wcHQgNzkyLjBwdDsKCW1hcmdpbjo3Mi4w
-cHQgNzIuMHB0IDcyLjBwdCA3Mi4wcHQ7fQpkaXYuV29yZFNlY3Rpb24xCgl7cGFnZTpXb3JkU2Vj
-dGlvbjE7fQotLT48L3N0eWxlPjwhLS1baWYgZ3RlIG1zbyA5XT48eG1sPgo8bzpzaGFwZWRlZmF1
-bHRzIHY6ZXh0PSJlZGl0IiBzcGlkbWF4PSIxMDI2IiAvPgo8L3htbD48IVtlbmRpZl0tLT48IS0t
-W2lmIGd0ZSBtc28gOV0+PHhtbD4KPG86c2hhcGVsYXlvdXQgdjpleHQ9ImVkaXQiPgo8bzppZG1h
-cCB2OmV4dD0iZWRpdCIgZGF0YT0iMSIgLz4KPC9vOnNoYXBlbGF5b3V0PjwveG1sPjwhW2VuZGlm
-XS0tPgo8L2hlYWQ+Cjxib2R5IGxhbmc9IkVOLUlOIiBsaW5rPSIjMDU2M0MxIiB2bGluaz0iIzk1
-NEY3MiI+CjxkaXYgY2xhc3M9IldvcmRTZWN0aW9uMSI+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxz
-cGFuIHN0eWxlPSJmb250LXNpemU6MTIuMHB0O2ZvbnQtZmFtaWx5OkNvbnNvbGFzIj5IaSAsPG86
-cD48L286cD48L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iZm9u
-dC1zaXplOjEyLjBwdDtmb250LWZhbWlseTpDb25zb2xhcyI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IEkgYW0gbG9va2luZyB0byB1bmRlcnN0YW5kIHRoZSBhcmNo
-aXRlY3R1cmUgZm9yIHBvd2VydG9wIGNvZGUgYmFzZS4gQ2FuIHNvbWVvbmUgcGxlYXNlIGxldCBt
-ZSBrbm93IGlmIHRoZXJlIGlzIGFueSBzb2Z0d2FyZSBhcmNoaXRlY3R1cmUgc3BlYyBkb2N1bWVu
-dCBhdmFpbGFibGUgZm9yIHRoaXMuCjxvOnA+PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1z
-b05vcm1hbCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMi4wcHQ7Zm9udC1mYW1pbHk6Q29uc29s
-YXMiPjxvOnA+Jm5ic3A7PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNw
-YW4gc3R5bGU9ImZvbnQtc2l6ZToxNi4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7RnJlZXN0eWxlIFNj
-cmlwdCZxdW90Ozttc28tZmFyZWFzdC1sYW5ndWFnZTpFTi1JTiI+cmVnYXJkczxvOnA+PC9vOnA+
-PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZTox
-Ni4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7RnJlZXN0eWxlIFNjcmlwdCZxdW90Ozttc28tZmFyZWFz
-dC1sYW5ndWFnZTpFTi1JTiI+QWRyaXA8bzpwPjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJN
-c29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8L2Rpdj4KPC9ib2R5Pgo8L2h0bWw+Cg==
-
---===============2524979907998313584==--
+--===============7944557612398499653==--
 
