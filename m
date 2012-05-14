@@ -1,65 +1,108 @@
-Content-Type: multipart/mixed; boundary="===============8674342080841709441=="
+Content-Type: multipart/mixed; boundary="===============3790995355922450950=="
 MIME-Version: 1.0
-From: Rick "Zero_Chaos" Farina <zerochaos at gentoo.org>
-Subject: Re: [Powertop] Gentoo: v2.6.1 breaks packaging traditions
-Date: Fri, 30 May 2014 19:10:16 -0400
-Message-ID: <53890FD8.6050806@gentoo.org>
-In-Reply-To: 53890020.7080901@linux.intel.com
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] PowerTOP 2.0 bugs
+Date: Mon, 14 May 2012 15:05:20 -0700
+Message-ID: <4FB181A0.9020803@linux.intel.com>
+In-Reply-To: CABRT9RBEN=Jz6YuSRbVL+kob7Gb_LXPRhLN2pMq5Dm1wbpoR9A@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8674342080841709441==
+--===============3790995355922450950==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+On 05/11/2012 09:29 AM, Marti Raudsepp wrote:
+> Hi list,
+>
+> I read that PowerTOP 2.0 was released yesterday, so I decided to give
+> it a run again. First I saw some discrepancy in the CPU usage reported
+> by PowerTOP. So I ran "while true; do openssl speed aes -multi 4;
+> done" to utilize all my 4 CPU cores at 100%. htop displays utilization
+> 4x100% all the time. PowerTOP thinks:
+Can you please tell me what system, processors and distro (and version) =
 
-On 05/30/2014 06:03 PM, Arjan van de Ven wrote:
->>
->> Are there any plans to remedy this?
-> =
+you are running?
+Also are you running in a VM by chance?
 
-> I'll work with Alexandra to get a good release out, probably on Monday
-> =
+> Summary: 0.2 wakeups/second,  0.0 GPU ops/second, 0.0 VFS ops/sec and
+> 187.1% CPU use
+>
+>                 Usage       Events/s    Category       Description
+>              1816 ms/s      0.00        Process        openssl speed
+> aes -multi 4
+>
+> The usage numbers are clearly bogus.
+Why do you think theyt
+> Then I remembered that I already reported some bugs about the PowerTOP
+> 2.0 beta release I tested in January 2011:
+>
+> On Thu, Jan 13, 2011 at 9:14 PM, Marti Raudsepp<marti(a)juffo.org>  wrote:
+>> First, I also see an empty "Idle stats" screen, as reported by Ian
+>> Kumlien earlier. Old PowerTOP didn't report idle state statistics
+>> either, but at least it had an explanatory message.
+> "Idle stats page" is still empty:
+>
+>           Package   |            CPU 0
+>                     |            CPU 1
+>                     |            CPU 2
+>                     |            CPU 3
+>
+>> Fourth, the "Frequency stats" screen starts up showing good numbers,
+>> but after the first refresh, all per-core numbers turn bogus. For each
+>> core, the percentages always add up to 1895% !
+> Still occurs, but now the magic constant is always 1961.1%
+>
+>             Package |            CPU 0
+> Idle         0.0%   | Idle         0.6%
+>   800 MHz     0.0%   |  800 MHz     0.4%
+> 3.00 GHz   100.0%   | 3.00 GHz   1960.1%
+> 1.80 GHz     0.0%   | 2.31 GHz     0.0%
+> 2.31 GHz     0.0%   |
+>
+>                     |            CPU 1
+>                     | Idle         2.6%
+>                     |  800 MHz     0.3%
+>                     | 3.00 GHz   1958.1%
+>                     | 2.31 GHz     0.0%
+>                     |
+>
+>                     |            CPU 2
+>                     | Idle         2.0%
+>                     |  800 MHz     0.3%
+>                     | 3.00 GHz   1958.8%
+>                     | 1.80 GHz     0.0%
+>                     | 2.31 GHz     0.0%
+>
+>                     |            CPU 3
+>                     | Idle         1.9%
+>                     |  800 MHz     0.2%
+>                     | 3.00 GHz   1958.7%
+>                     | 1.80 GHz     0.3%
+>                     | 2.31 GHz     0.0%
+>
+> Can anyone remind me why do you do beta releases and why should users
+> spend their time reporting bugs?
+Your bug was not ignored, it was not seen before release during our =
 
-2.6 is in gentoo already (since the day of release) and the fixes in
-2.6.1 were pretty minor so I didn't bother to package it.  If upstream
-wants to release a working 2.6.2 tarball or something that's great.
+testing.
+I have spent three hours testing this bug using your test case above, =
 
-It keeps occurring so I feel inclined to mention it, please run make
-clean first.
+and am not seeing the issue.
+So it may very well be there is an hardware corner case I need to track =
 
-Thanks,
-Zero
-> =
+down. Which is why I asked the above questions.
 
+-Chris
+>
+> Regards,
+> Marti
 > _______________________________________________
 > PowerTop mailing list
 > PowerTop(a)lists.01.org
 > https://lists.01.org/mailman/listinfo/powertop
-> =
 
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQIcBAEBAgAGBQJTiQ/YAAoJEKXdFCfdEflKW/cQAK5d8fU8d+IDSFEdKkqMjtTM
-EMUJe3XxqhO/J7wR/2uO1HsUDz4aHraHDSKgcUV5RPetJjbtBri3n5eJlue3r1PI
-sB4spPC5eH7pARJrGF7ZJXBBJXSt8151Cy3Pihk1H/kkSYgfAiPJOk0IW1dnvYE2
-ttYUb/C515gDK16WPZbMmmQ0nwnGIobd63A0J6dUtdDxl7uxN7YzJG8CWrwx4Rfh
-xQb1hJSWAbT/rgDTwAPL3MM0Yxn7eJdnkAxC9GYGcQMzYfxV6/Jqb4qjxjPx3Jy2
-2PygbmqY+M1q5hjTRplsRJyxPVqkHUEY4sQ0uHJDR0kS0TpoVPV0htPDtjtJQ/I/
-Jd1RZRwFA2O4T3s6Pjo+tTYfnCGR1gSaPhSTLihadc64Omef2sitUh+KjLK/JCkx
-pd/AMzKSfID2GBTGXqJnWzx7MTFWeAB84W7Fb3XLNCrR4meDrarvnKhj8nulm6Lp
-KE5TWVW8rXN77YixWSz6UqoEpGuAzXbtWnZh2R9LsHKXTVUzybfESfqI4ySoGR2n
-xHwOEuxrZ7MrZW7jEFBM2xBltNCXPdLfDulmus2b3d2Z2fr8OtiKzTXw/kfcJKnu
-7Vssl8+Z+TYpiyQ297Ta2QCkVRy+oAVnyo+umrDo8IgdZqouWRPqvHe+Z34qD+yC
-HTAHBkNus92Sa3OHIGwQ
-=3Djmov
------END PGP SIGNATURE-----
-
---===============8674342080841709441==--
+--===============3790995355922450950==--
 
