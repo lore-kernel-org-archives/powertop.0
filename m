@@ -1,46 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============4514572998743411217=="
+Content-Type: multipart/mixed; boundary="===============6087412345869824626=="
 MIME-Version: 1.0
-From: Vinicius Costa Gomes <vcgomes at gmail.com>
-Subject: [Powertop] [PATCH] Fix trying to use libnl-2.0 when only libnl-3.0 is
- installed
-Date: Sat, 12 May 2012 12:50:16 -0300
-Message-ID: <1336837816-9884-1-git-send-email-vcgomes@gmail.com>
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [PATCH 1/2] Fix build with C++11 support enabled
+Date: Mon, 14 May 2012 10:29:08 -0700
+Message-ID: <4FB140E4.2040600@linux.intel.com>
+In-Reply-To: 3068026.LgSXzsabzU@intelfx-laptop
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4514572998743411217==
+--===============6087412345869824626==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Vinicius Costa Gomes <vinicius.gomes(a)openbossa.org>
+Thank you for the patch.
+-Chris
 
-When using libnl-3.0 we need to link with libnl-genl also, if not, we
-get a lot of undefined symbols.
----
- configure.ac |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 05/13/2012 02:49 AM, Ivan Shapovalov wrote:
+> In particular, usage of __DATE__ in main.cpp is now recognized as a
+> user-defined literal, so an additional whitespace is required separating
+> the string and __DATE__.
+>
+> Also, typeof (which was a GNU extension) is now replaced by decltype,
+> so perf/perf_bundle.cpp has been modified.
+> The preprocessor is used to tell whether we are compiling in C++11 mode
+> or not and select the keyword accordingly.
+> ---
+>   src/main.cpp             |    2 +-
+>   src/perf/perf_bundle.cpp |    8 ++++++++
+>   2 files changed, 9 insertions(+), 1 deletion(-)
+>
+> diff --git a/src/main.cpp b/src/main.cpp
+> index e168fa4..433fea6 100644
+> --- a/src/main.cpp
+> +++ b/src/main.cpp
+> @@ -80,7 +80,7 @@ static const struct option long_options[] =3D
+>
+>   static void print_version()
+>   {
+> -	printf(_("Powertop version" POWERTOP_VERSION ", compiled on "__DATE__ "=
+\n"));
+> +	printf(_("Powertop version" POWERTOP_VERSION ", compiled on " __DATE__ =
+"\n"));
+>   }
+>
+>   static bool set_refresh_timeout()
+> diff --git a/src/perf/perf_bundle.cpp b/src/perf/perf_bundle.cpp
+> index fc677f5..38e1e91 100644
+> --- a/src/perf/perf_bundle.cpp
+> +++ b/src/perf/perf_bundle.cpp
+> @@ -38,6 +38,10 @@
+>
+>   #include "../cpu/cpu.h"
+>
+> +#if defined(__GXX_EXPERIMENTAL_CXX0X__) || (__cplusplus>=3D 201103L)
+> +# define USE_DECLTYPE
+> +#endif
+> +
+>   class perf_bundle_event: public perf_event
+>   {
+>   public:
+> @@ -58,7 +62,11 @@ void perf_bundle_event::handle_event(struct perf_event=
+_header *header, void *coo
+>   	buffer =3D (unsigned char *)malloc(header->size);
+>   	memcpy(buffer, header, header->size);
+>
+> +#ifdef USE_DECLTYPE
+> +	vector =3D (decltype(vector))cookie;
+> +#else
+>   	vector =3D (typeof(vector))cookie;
+> +#endif
+>   	vector->push_back(buffer);
+>   }
+>
 
-diff --git a/configure.ac b/configure.ac
-index 2d56684..3579b6e 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -56,7 +56,7 @@ PKG_CHECK_MODULES([LIBZ], [zlib],[],[
- =
 
- has_libnl_ver=3D0
- PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [
--	AC_SEARCH_LIBS([nl_socket_alloc], [nl], [has_libnl_ver=3D2], [
-+	AC_SEARCH_LIBS([nl_socket_alloc], [libnl-2.0], [has_libnl_ver=3D2], [
- 		     PKG_CHECK_MODULES([LIBNL], [libnl-3.0 libnl-genl-3.0], [has_libnl_v=
-er=3D3],
- 				       [AC_SEARCH_LIBS([nl_socket_alloc], [nl-3 nl-genl-3], [has_libnl=
-_ver=3D3], [], [])])
- 	], [])
--- =
-
-1.7.10.1
-
-
---===============4514572998743411217==--
+--===============6087412345869824626==--
 
