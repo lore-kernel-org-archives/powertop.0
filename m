@@ -1,48 +1,236 @@
-Content-Type: multipart/mixed; boundary="===============2239651695330014339=="
+Content-Type: multipart/mixed; boundary="===============7295139480658992591=="
 MIME-Version: 1.0
-From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: Re: [Powertop] [PATCH] Get rid of ncurses' TRUE and FALSE
-Date: Wed, 18 Jul 2012 17:21:19 +0400
-Message-ID: <5006B84F.7020104@samsung.com>
-In-Reply-To: 5006B615.1000305@linux.intel.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: [Powertop] [PATCH] factor out powertop_init() function [was
+ "Segmentation fault occurs with --calibrate"]
+Date: Thu, 17 May 2012 19:44:58 +0300
+Message-ID: <20120517164458.GA3486@swordfish>
+In-Reply-To: 3231880.1xuGnurXlG@penguin
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2239651695330014339==
+--===============7295139480658992591==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Arjan van de Ven wrote:
-> On 7/18/2012 2:17 AM, Igor Zhbanov wrote:
->> Get rid of TRUE and FALSE ncurses' defines used for boolean variables
->> initialization. This fix also helps build without ncurses support.
-> while I appreciate going to C++ true/false, building without ncurses
-> isn't really a goal.
-> (even on android, building ncurses is easy, and it does make the tool SO
-> much more useful)
-It is not good that C++ code depends on TRUE/FALSE defines
-(defined in ncurses.h) in functions that are not related to ncurses.
+[PATCH] factor out powertop_init() function
 
-P.S. I have merged Intel's and Linaro's repositories and will send patches =
-for
-review soon. I don't know why but Linaro wants to build PowerTOP without nc=
-urses.
-So I will send a patch that makes ncurses and libpci dependencies condition=
-al.
+Factor out powertop_init() function to perform basic initialization on
+powertop start up.
 
--- =
+Commit 057d6126eb6329c86b29a2e0219c0d0e49a84191 moved init after
+commandline options parsing. However, in some cases we need it before
+parsing, e.g. -- calibration.
 
-Best regards,
-Igor Zhbanov,
-Expert Software Engineer,
-phone: +7 (495) 797 25 00 ext 3806
-e-mail: i.zhbanov(a)samsung.com
+Reported-by: Lekensteyn <lekensteyn(a)gmail.com>
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
 
-ASWG, Moscow R&D center, Samsung Electronics
-12 Dvintsev street, building 1
-127018, Moscow, Russian Federation
+---
+
+ src/main.cpp |  110 +++++++++++++++++++++++++++++++-----------------------=
+----
+ 1 file changed, 58 insertions(+), 52 deletions(-)
+
+diff --git a/src/main.cpp b/src/main.cpp
+index 433fea6..b5720f0 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -280,15 +280,68 @@ static void checkroot() {
+ 	}
+ 	=
+
+ }
+-int main(int argc, char **argv)
++
++static void powertop_init(void)
+ {
++	static char initialized =3D 0;
+ 	int ret;
++	struct statfs st_fs;
++
++	if (initialized)
++		return;
++
++	checkroot(); =
+
++	ret =3D system("/sbin/modprobe cpufreq_stats > /dev/null 2>&1");
++	ret =3D system("/sbin/modprobe msr > /dev/null 2>&1");
++	statfs("/sys/kernel/debug", &st_fs);
++
++	if (st_fs.f_type !=3D (long) DEBUGFS_MAGIC) {
++		if (access("/bin/mount", X_OK) =3D=3D 0) {
++			ret =3D system("/bin/mount -t debugfs debugfs /sys/kernel/debug > /dev/=
+null 2>&1");
++		} else {
++			ret =3D system("mount -t debugfs debugfs /sys/kernel/debug > /dev/null =
+2>&1");
++		}
++		if (ret !=3D 0) {
++			printf(_("Failed to mount debugfs!\n"));
++			printf(_("exiting...\n"));
++			exit(EXIT_FAILURE);
++		}
++	}
++
++	srand(time(NULL));
++
++	if (access("/var/cache/", W_OK) =3D=3D 0)
++		mkdir("/var/cache/powertop", 0600);
++	else
++		mkdir("/data/local/powertop", 0600);
++
++	load_results("saved_results.powertop");
++	load_parameters("saved_parameters.powertop");
++
++	enumerate_cpus();
++	create_all_devices();
++	detect_power_meters();
++
++	register_parameter("base power", 100, 0.5);
++	register_parameter("cpu-wakeups", 39.5);
++	register_parameter("cpu-consumption", 1.56);
++	register_parameter("gpu-operations", 0.5576);
++	register_parameter("disk-operations-hard", 0.2);
++	register_parameter("disk-operations", 0.0);
++	register_parameter("xwakes", 0.1);
++
++	load_board_params();
++	initialized =3D 1;
++}
++
++
++int main(int argc, char **argv)
++{
+ 	int option_index;
+ 	int c;
+ 	bool wantreport =3D FALSE;
+ 	char filename[4096];
+ 	int  iterations =3D 1;
+-	struct statfs st_fs;
+ =
+
+ #ifndef DISABLE_TRYCATCH
+ 	set_new_handler(out_of_memory);
+@@ -322,6 +375,7 @@ int main(int argc, char **argv)
+ 				break;
+ =
+
+ 			case 'c':
++				powertop_init();
+ 				calibrate();
+ 				break;
+ =
+
+@@ -350,48 +404,8 @@ int main(int argc, char **argv)
+ 				break;
+ 		}
+ 	}
+-	=
+
+-	checkroot(); =
+
+-	ret =3D system("/sbin/modprobe cpufreq_stats > /dev/null 2>&1");
+-	ret =3D system("/sbin/modprobe msr > /dev/null 2>&1");
+-
+-	statfs("/sys/kernel/debug", &st_fs);
+-	if (st_fs.f_type !=3D (long) DEBUGFS_MAGIC) {
+-		if (access("/bin/mount", X_OK) =3D=3D 0) {
+-			ret =3D system("/bin/mount -t debugfs debugfs /sys/kernel/debug > /dev/=
+null 2>&1");
+-		} else {
+-			ret =3D system("mount -t debugfs debugfs /sys/kernel/debug > /dev/null =
+2>&1");
+-		}
+-		if (ret !=3D 0) {
+-			printf(_("Failed to mount debugfs!\n"));
+-			printf(_("exiting...\n"));
+-			exit(EXIT_FAILURE);
+-		}
+-	}
+-
+-	srand(time(NULL));
+-
+-	if (access("/var/cache/", W_OK) =3D=3D 0)
+-		mkdir("/var/cache/powertop", 0600);
+-	else
+-		mkdir("/data/local/powertop", 0600);
+ =
+
+-	load_results("saved_results.powertop");
+-	load_parameters("saved_parameters.powertop");
+-
+-	enumerate_cpus();
+-	create_all_devices();
+-	detect_power_meters();
+-
+-	register_parameter("base power", 100, 0.5);
+-	register_parameter("cpu-wakeups", 39.5);
+-	register_parameter("cpu-consumption", 1.56);
+-	register_parameter("gpu-operations", 0.5576);
+-	register_parameter("disk-operations-hard", 0.2);
+-	register_parameter("disk-operations", 0.0);
+-	register_parameter("xwakes", 0.1);
+-
+-	load_board_params();
++	powertop_init();
+ =
+
+ 	if (wantreport)
+ 		 report(time_out, iterations, filename);
+@@ -399,8 +413,6 @@ int main(int argc, char **argv)
+ 	if (debug_learning)
+ 		printf("Learning debugging enabled\n");
+ =
+
+-
+-
+ 	learn_parameters(250, 0);
+ 	save_parameters("saved_parameters.powertop");
+ =
+
+@@ -412,7 +424,6 @@ int main(int argc, char **argv)
+ 		exit(0);
+ 	}
+ =
+
+-
+ 	/* first one is short to not let the user wait too long */
+ 	init_display();
+ 	one_measurement(1);
+@@ -420,11 +431,9 @@ int main(int argc, char **argv)
+ 	tuning_update_display();
+ 	show_tab(0);
+ =
+
+-
+-
+ 	while (!leave_powertop) {
+-		one_measurement(time_out);
+ 		show_cur_tab();
++		one_measurement(time_out);
+ 		learn_parameters(15, 0);
+ 	}
+ #ifndef DISABLE_NCURSES
+@@ -432,7 +441,6 @@ int main(int argc, char **argv)
+ #endif
+ 	printf(_("Leaving PowerTOP\n"));
+ =
+
+-
+ 	end_process_data();
+ 	clear_process_data();
+ 	end_cpu_data();
+@@ -450,6 +458,4 @@ int main(int argc, char **argv)
+ 	clear_all_cpus();
+ =
+
+ 	return 0;
+-
+-
+ }
 
 
---===============2239651695330014339==--
+
+--===============7295139480658992591==--
 
