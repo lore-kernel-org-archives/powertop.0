@@ -1,72 +1,64 @@
-Content-Type: multipart/mixed; boundary="===============6969063245364258640=="
+Content-Type: multipart/mixed; boundary="===============4251086009694596083=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [bugreport] crash on powertop --debug --html=file.html
-Date: Sun, 01 Jul 2012 21:13:51 +0300
-Message-ID: <20120701181351.GD4770@swordfish>
-In-Reply-To: 201207011546.20680.dl9pf@gmx.de
+From: Lekensteyn <lekensteyn at gmail.com>
+Subject: [Powertop] Segmentation fault occurs with --calibrate
+Date: Thu, 17 May 2012 17:48:13 +0200
+Message-ID: <3231880.1xuGnurXlG@penguin>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6969063245364258640==
+--===============4251086009694596083==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (07/01/12 15:46), Jan-Simon M=C3=B6ller wrote:
-> Am Mittwoch, 27. Juni 2012, 18:32:42 schrieb Sergey Senozhatsky:
-> > =
+Hi,
 
-> > Could you please run
-> > =
+With the new Powertop 2.0, `powertop --calibrate` segfaults. Debugging outp=
+ut =
 
-> >  valgrind --tool=3Dmemcheck --leak-check=3Dfull --show-reachable=3Dyes
-> > --leak-resolution=3Dhigh --track-origins=3Dyes -v
-> > --log-file=3D./powertop-memcheck powertop --debug --html=3Dfile.html
-> > =
+is attached:
 
-> > and provide powertop-memcheck file?
-> > =
+> Starting program: /tmp/powertop-2.0/src/powertop --calibrate
+> [Thread debugging using libthread_db enabled]
+> Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+> Starting PowerTOP power estimate calibration =
 
-> > =
-
-> > 	-ss
+> Calibrating idle
 > =
 
-> Attached.
+> Program received signal SIGSEGV, Segmentation fault.
+> perf_bundle::start (this=3D0x0) at perf/perf_bundle.cpp:180
+> 180             for (i =3D 0; i < events.size(); i++) {
+> (gdb) bt
+> #0  perf_bundle::start (this=3D0x0) at perf/perf_bundle.cpp:180
+> #1  0x000000000040f9b0 in start_cpu_measurement () at cpu/cpu.cpp:297
+> #2  0x0000000000442655 in one_measurement (seconds=3D15) at main.cpp:182
+> #3  0x000000000043f4c2 in idle_calibration () at calibrate/calibrate.cpp:=
+423
+> #4  calibrate () at calibrate/calibrate.cpp:466
+> #5  0x000000000040665f in main (argc=3D2, argv=3D0x7fffffffe718) at main.=
+cpp:325
+> (gdb) up
+> #1  0x000000000040f9b0 in start_cpu_measurement () at cpu/cpu.cpp:297
+> 297             perf_events->start()
+> (gdb) print perf_events
+> $5 =3D (perf_bundle *) 0x0
 
-Thanks, I'll take a look.
+The order of processing seems flawed. Immediately during argument processin=
+g, =
 
-Meanwhile, could you please try the following patch?
+calibrate() is called. But start_cpu_measurement requires some initializati=
+on =
 
----
+which is done by enumerate_cpus() in the main() function after arguments =
 
- src/devlist.cpp | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+processing. You know your code better, so I'll gratefully wait for your =
 
-diff --git a/src/devlist.cpp b/src/devlist.cpp
-index 93f2081..9f06b92 100644
---- a/src/devlist.cpp
-+++ b/src/devlist.cpp
-@@ -146,11 +146,12 @@ void collect_open_devices(void)
- 				if (!dev)
- 					continue;
- 				dev->pid =3D strtoull(entry->d_name, NULL, 10);
--				strncpy(dev->device, link, 251);
-+				strncpy(dev->device, link, 250);
-+				dev->device[251] =3D 0x00;
- 				sprintf(filename, "/proc/%s/comm", entry->d_name);
--				strncpy(dev->comm, read_sysfs_string("/proc/%s/comm", entry->d_name).c=
-_str(), 31);
-+				strncpy(dev->comm, read_sysfs_string("/proc/%s/comm", entry->d_name).c=
-_str(), 30);
-+				dev->comm[31] =3D 0x00;
- 				target->push_back(dev);
--
- 			}
- 		}
- 		closedir(dir2);
+patches.
 
+Thanks,
+Peter
 
---===============6969063245364258640==--
+--===============4251086009694596083==--
 
