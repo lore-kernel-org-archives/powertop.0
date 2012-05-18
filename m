@@ -1,83 +1,125 @@
-Content-Type: multipart/mixed; boundary="===============3810126042403218802=="
+Content-Type: multipart/mixed; boundary="===============4954405129536238886=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] Wrong common field name in GFX Wakeups event
-Date: Tue, 17 Jul 2012 15:10:12 -0700
-Message-ID: <5005E2C4.1050204@linux.intel.com>
-In-Reply-To: 4FFD1A0C.90704@samsung.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: [Powertop] [PATCH] catch fstream exceptions in lib routines
+Date: Fri, 18 May 2012 13:17:39 +0300
+Message-ID: <20120518101739.GB3074@swordfish>
+In-Reply-To: 6002814.JjpEWR9aH8@penguin
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3810126042403218802==
+--===============4954405129536238886==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 07/10/2012 11:15 PM, Igor Zhbanov wrote:
-> Hello!
->
-> I have found that PowerTOP doesn't displays values in "GFX Wakeups/s" =
+[PATCH] catch fstream exceptions in lib routines
 
-> column.
-> It is because of wrong event field name the handle_trace_point() method
-> expects to find in a trace event.
->
-> Here is the patch:
-> --8<--Cut-here-----------------------------------------------------------=
------ =
+Catch possible fstream and traits_type exceptions in lib.
 
->
-> diff -purN powertop/src/process/do_process.cpp =
+Reported-by: Lekensteyn <lekensteyn(a)gmail.com>
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
 
-> powertop-new/src/process/do_process.cpp
-> --- powertop/src/process/do_process.cpp    2012-07-05 =
+---
 
-> 13:06:16.080258858 +0400
-> +++ powertop-new/src/process/do_process.cpp    2012-07-06 =
+ src/lib.cpp |   54 +++++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 39 insertions(+), 15 deletions(-)
 
-> 13:31:14.382651388 +0400
-> @@ -340,7 +340,7 @@ void perf_process_bundle::handle_trace_p
->          int flags;
->          int pid;
->
-> -        ret =3D pevent_get_common_field_val(NULL, event, =
+diff --git a/src/lib.cpp b/src/lib.cpp
+index 53638dd..bcd809f 100644
+--- a/src/lib.cpp
++++ b/src/lib.cpp
+@@ -172,8 +172,13 @@ void write_sysfs(const string &filename, const string =
+&value)
+ 	file.open(filename.c_str(), ios::out);
+ 	if (!file)
+ 		return;
+-	file << value;
+-	file.close();
++	try =
 
-> "flags",&rec,&val, 0);
-> +        ret =3D pevent_get_common_field_val(NULL, event, =
++	{
++		file << value;
++		file.close();
++	} catch (std::exception &exc) {
++		return;
++	}
+ }
+ =
 
-> "common_flags",&rec,&val, 0);
->          if (ret<  0)
->              return;
->          flags =3D (int)val;
-> @@ -625,7 +625,7 @@ void perf_process_bundle::handle_trace_p
->          class power_consumer *consumer =3D NULL;
->          int flags;
->
-> -        ret =3D pevent_get_common_field_val(NULL, event, =
+ int read_sysfs(const string &filename, bool *ok)
+@@ -187,10 +192,17 @@ int read_sysfs(const string &filename, bool *ok)
+ 			*ok =3D false;
+ 		return 0;
+ 	}
+-	file >> i;
++	try
++	{
++		file >> i;
++		if (ok)
++			*ok =3D true;
++	} catch (std::exception &exc) {
++		if (ok)
++			*ok =3D "false";
++		i =3D 0;
++	}
+ 	file.close();
+-	if (ok)
+-		*ok =3D true;
+ 	return i;
+ }
+ =
 
-> "flags",&rec,&val, 0);
-> +        ret =3D pevent_get_common_field_val(NULL, event, =
+@@ -203,11 +215,17 @@ string read_sysfs_string(const string &filename)
+ 	file.open(filename.c_str(), ios::in);
+ 	if (!file)
+ 		return "";
+-	file.getline(content, 4096);
+-	file.close();
+-	c =3D strchr(content, '\n');
+-	if (c)
+-		*c =3D 0;
++	try
++	{
++		file.getline(content, 4096);
++		file.close();
++		c =3D strchr(content, '\n');
++		if (c)
++			*c =3D 0;
++	} catch (std::exception &exc) {
++		file.close();
++		return "";
++	}
+ 	return content;
+ }
+ =
 
-> "common_flags",&rec,&val, 0);
->          if (ret<  0)
->              return;
->          flags =3D (int)val;
-> --8<---------------------------------------------------------------------=
------ =
+@@ -224,11 +242,17 @@ string read_sysfs_string(const char *format, const ch=
+ar *param)
+ 	file.open(filename, ios::in);
+ 	if (!file)
+ 		return "";
+-	file.getline(content, 4096);
+-	file.close();
+-	c =3D strchr(content, '\n');
+-	if (c)
+-		*c =3D 0;
++	try
++	{
++		file.getline(content, 4096);
++		file.close();
++		c =3D strchr(content, '\n');
++		if (c)
++			*c =3D 0;
++	} catch (std::exception &exc) {
++		file.close();
++		return "";
++	}
+ 	return content;
+ }
+ =
 
->
->
-> Thank you.
->
->
->
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
-Your patch has been merged.
-Thank you,
 
 
---===============3810126042403218802==--
+--===============4954405129536238886==--
 
