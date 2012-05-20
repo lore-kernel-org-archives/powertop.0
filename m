@@ -1,118 +1,231 @@
-Content-Type: multipart/mixed; boundary="===============1157030172969043369=="
+Content-Type: multipart/mixed; boundary="===============3147012444997768919=="
 MIME-Version: 1.0
-From: Paul Menzel <paulepanter at users.sourceforge.net>
-Subject: Re: [Powertop] csstoh shell-script for cross-compiling PowerTOP
-Date: Wed, 11 Jul 2012 13:46:21 +0200
-Message-ID: <1342007181.4108.38.camel@mattotaupa>
-In-Reply-To: 4FFD3D99.5030400@samsung.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] segfault on Sheevaplug (ARM Kirkwood)
+Date: Mon, 21 May 2012 00:57:46 +0300
+Message-ID: <20120520215746.GA3585@swordfish>
+In-Reply-To: 1337511718.10611.YahooMailNeo@web160306.mail.bf1.yahoo.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1157030172969043369==
+--===============3147012444997768919==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Am Mittwoch, den 11.07.2012, 12:47 +0400 schrieb Igor Zhbanov:
-> Here is the formatted version of the patch:
-
-Thanks, unfortunately something is incomplete.
-
->  From 06ee265b637bd75e2147631f49454c2c82be827e Mon Sep 17 00:00:00 2001
-> From: Igor Zhbanov<i.zhbanov(a)samsung.com>
-> Date: Wed, 11 Jul 2012 12:44:39 +0400
-> Subject: [PATCH] csstoh shell-script for cross-compiling PowerTOP
+On (05/20/12 04:01), Rui DaCosta wrote:
+>    Thanks,
+>    this has gotten past the issue. I now get:
+>    PowerTOP v2.0 needs the kernel to support the 'perf' subsystem
+>    as well as support for trace points in the kernel:
 > =
 
-> I have tried to build PowerTOP for ARM with a cross-compiler. But PowerTOP
-> uses internal csstoh utility that converts powertop.css to powertoh.h
-> for inclusion in *.cpp source files.
+>    CONFIG_PERF_EVENTS=3Dy
+>    CONFIG_PERF_COUNTERS=3Dy
+>    CONFIG_TRACEPOINTS=3Dy
+>    CONFIG_TRACING=3Dy
 > =
 
-> When you use the cross-compiler (without making complicated rules
-> in the Makefile) this utility will be compiled for ARM platform too.
-> And you cannot run it on x86 build host.
+>    all these except CONFIG_PERF_COUNTERS are already set, so i'll need to=
+ see
+>    if i can get a kernel built with that option on.
+>
+
+>
+>    Will this patch make it into trunk?
+>
+
+Well, it depends. The patch itself is quite innocent -- assuming default
+number of processors being 1 instead of -1 will not do any harm. Of course,
+such default value could be considered as debugging friendly, yet segfault
+is still no good.
+
+We'll see what project owners think about that.
+
+	-ss
+
+>    Many thanks.
 > =
 
-> To solve this issue (and because of simplicity of the utility)
-> I have rewritten it in a shell script.
-> ---
->   .gitignore      |    1 -
->   src/Makefile.am |    7 ++-----
->   2 files changed, 2 insertions(+), 6 deletions(-)
-
-Git does not know about your new file `csstoh.sh` yet.
-
-    $ git add src/csstoh.sh # explicitly needed, because the file is not ye=
-t tracked
-    $ git commit --amend -a
-    $ git format-patch -1
-
-> diff --git a/.gitignore b/.gitignore
-> index 5534072..35f0df6 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -39,7 +39,6 @@ po/*.gmo
->   po/stamp-po
->   src/powertop
->   src/css.h
-> -src/csstoh
->   src/Makefile.in
->   src/.deps/
->   src/Makefile
-> diff --git a/src/Makefile.am b/src/Makefile.am
-> index c77b2aa..15e5feb 100644
-> --- a/src/Makefile.am
-> +++ b/src/Makefile.am
-> @@ -1,9 +1,6 @@
->   AUTOMAKE_OPTIONS =3D subdir-objects
->   ACLOCAL_AMFLAGS =3D -I ../m4
+>    =E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80
 > =
 
-> -noinst_PROGRAMS =3D csstoh
-> -csstoh_SOURCES =3D csstoh.c
-> -
->   sbin_PROGRAMS =3D powertop
->   nodist_powertop_SOURCES =3D css.h
+>    From: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+>    To: Rui DaCosta <ruidc(a)yahoo.com>
+>    Cc: Arjan van de Ven <arjan(a)linux.intel.com>; Chris Ferron
+>    <chris.e.ferron(a)linux.intel.com>; powertop(a)lists.01.org
+>    Sent: Sunday, 20 May 2012, 11:34
+>    Subject: Re: [Powertop] segfault on Sheevaplug (ARM Kirkwood)
+>    On (05/20/12 02:19), Rui DaCosta wrote:
+>    > Sure and thanks,
+>    > (v1.13 worked fine btw)
+>    > Processor=C2=A0=C2=A0=C2=A0 : Feroceon 88FR131 rev 1 (v5l)
+>    > BogoMIPS=C2=A0=C2=A0=C2=A0 : 1191.11
+>    > Features=C2=A0=C2=A0=C2=A0 : swp half thumb fastmult edsp
+>    > CPU implementer=C2=A0=C2=A0=C2=A0 : 0x56
+>    > CPU architecture: 5TE
+>    > CPU variant=C2=A0=C2=A0=C2=A0 : 0x2
+>    > CPU part=C2=A0=C2=A0=C2=A0 : 0x131
+>    > CPU revision=C2=A0=C2=A0=C2=A0 : 1
+>    >
+>    > Hardware=C2=A0=C2=A0=C2=A0 : Marvell SheevaPlug Reference Board
+>    > Revision=C2=A0=C2=A0=C2=A0 : 0000
+>    > Serial=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 : 0000000000000000
+>    >
+>    >
 > =
 
-> @@ -44,6 +41,6 @@ AM_LDFLAGS =3D $(LIBS) $(NCURSES_LIBS) $(PCIUTILS_LIBS)=
- $(LIBNL_LIBS) $(LIBZ_LIBS)
+>    Thanks,
 > =
 
->   BUILT_SOURCES =3D css.h
->   CLEANFILES =3D css.h
-> -css.h: csstoh powertop.css
-> -	./csstoh powertop.css css.h
-> +css.h: powertop.css
-> +	$(SHELL) ./csstoh.sh powertop.css css.h
+>    Well, that's the problem. Current cpu info parser doesn't understand y=
+our
+>    cpuinfo format. It awaits for sane values on special places. For examp=
+le,
+>    word
+>    "processor" should be followed by a number, not model name.
 > =
 
-> -- =
+>    =C2=A0=C2=A0=C2=A0 processor=C2=A0=C2=A0=C2=A0 : 2
+>    =C2=A0=C2=A0=C2=A0 vendor_id=C2=A0=C2=A0=C2=A0 : GenuineIntel
+>    =C2=A0=C2=A0=C2=A0 cpu family=C2=A0=C2=A0=C2=A0 : 6
+>    =C2=A0=C2=A0=C2=A0 model=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 : 37
+>    =C2=A0=C2=A0=C2=A0 bogomips=C2=A0=C2=A0=C2=A0 : 4522.66
+> =
 
-> 1.7.5.4
+>    while cpuinfo on your system is totally different.
+> =
 
+>    the following is untested patch (I'm a bit skeptical) plus I don't have
+>    ARM device for testing.
+> =
 
-Thanks,
+>    ---
+> =
 
-Paul
+>    src/cpu/cpu.cpp |=C2=A0 26 ++++++++++++++------------
+>    1 file changed, 14 insertions(+), 12 deletions(-)
+> =
 
+>    diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+>    index 09d4a2d..143e18c 100644
+>    --- a/src/cpu/cpu.cpp
+>    +++ b/src/cpu/cpu.cpp
+>    @@ -225,7 +225,7 @@ void enumerate_cpus(void)
+>    =C2=A0=C2=A0=C2=A0 ifstream file;
+>    =C2=A0=C2=A0=C2=A0 char line[1024];
+> =
 
-PS: In the license header the copyright year is missing if I am not
-mistaken.
-PPS: Is that also the right license header? Probably you just copied it
-from some existing file. So it should be fine.
+>    -=C2=A0=C2=A0=C2=A0 int number =3D -1;
+>    +=C2=A0=C2=A0=C2=A0 int number =3D 1;
+>    =C2=A0=C2=A0=C2=A0 char vendor[128];
+>    =C2=A0=C2=A0=C2=A0 int family =3D 0;
+>    =C2=A0=C2=A0=C2=A0 int model =3D 0;
+>    @@ -236,7 +236,6 @@ void enumerate_cpus(void)
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 return;
+> =
 
---===============1157030172969043369==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
+>    =C2=A0=C2=A0=C2=A0 while (file) {
+>    -
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 file.getline(line, sizeof(line));
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (strncmp(line, "vendor_id\t",=
+10) =3D=3D 0) {
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 char *c;
+>    @@ -247,42 +246,45 @@ void enumerate_cpus(void)
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 =C2=A0=C2=A0=C2=A0 c++;
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 strncpy(vendor,c, 127);
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (strncmp(line, "processor\t"=
+,10) =3D=3D 0) {
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 } else if (strncmp(line, "proce=
+ssor\t",10) =3D=3D 0) {
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 char *c;
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 c =3D strchr(=
+line, ':');
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (c) {
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 c++;
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 number =3D strtoull(c, NULL, 10);
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (strncmp(line, "cpu family\t=
+",11) =3D=3D 0) {
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 } else if (strncmp(line, "Proce=
+ssor\t",10) =3D=3D 0) {
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 char *c;
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 c =3D strchr=
+(line, ':');
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (c) {
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 c++;
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 if (*c =3D=3D ' ')
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 =C2=A0=C2=A0=C2=A0 c++;
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 strncpy(vendor, c, 127);
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }=C2=A0 else if (strncmp(line, =
+"cpu family\t",11) =3D=3D 0) {
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 char *c;
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 c =3D strchr(=
+line, ':');
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (c) {
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 c++;
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 family =3D strtoull(c, NULL, 10);
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (strncmp(line, "model\t",6) =
+=3D=3D 0) {
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 } else if (strncmp(line, "model=
+\t",6) =3D=3D 0) {
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 char *c;
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 c =3D strchr(=
+line, ':');
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (c) {
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 c++;
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 model =3D strtoull(c, NULL, 10);
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (strncasecmp(line, "bogomips=
+\t", 9) =3D=3D 0) {
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 } else if (strncasecmp(line, "b=
+ogomips\t", 9) =3D=3D 0) {
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 handle_one_cp=
+u(number, vendor, family, model);
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 set_max_cpu(n=
+umber);
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    =C2=A0=C2=A0=C2=A0 }
+> =
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
-L0xpbnV4KQoKaUVZRUFCRUNBQVlGQWsvOVo0MEFDZ2tRUFgxYUsyd09IVmhKbmdDZEVKQ1dGMFdw
-dS9IYm96NkxUd0l6N3lxaApWMWNBblJLRTZtVVkvUzlqTzNISHFFcnRJTXhlMG1ZcAo9QkRWdAot
-LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
+>    -
+>    =C2=A0=C2=A0=C2=A0 file.close();
+> =
 
---===============1157030172969043369==--
+>    =C2=A0=C2=A0=C2=A0 perf_events =3D new perf_power_bundle();
+>    -
+>    =C2=A0=C2=A0=C2=A0 if (!perf_events->add_event("power:cpu_idle")){
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 perf_events->add_event("power:po=
+wer_start");
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 perf_events->add_event("power:po=
+wer_end");
+
+--===============3147012444997768919==--
 
