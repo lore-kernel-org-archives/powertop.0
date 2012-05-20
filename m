@@ -1,66 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============6303433799264818423=="
+Content-Type: multipart/mixed; boundary="===============2861211928677778968=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] PowerTop Hungarian (HU_hu) translation
-Date: Tue, 29 May 2012 10:59:09 -0700
-Message-ID: <4FC50E6D.1020706@linux.intel.com>
-In-Reply-To: 4FC466F6.3000400@freemail.hu
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] segfault on Sheevaplug (ARM Kirkwood)
+Date: Mon, 21 May 2012 01:17:20 +0300
+Message-ID: <20120520221720.GC3585@swordfish>
+In-Reply-To: 1337542376.55788.YahooMailNeo@web160303.mail.bf1.yahoo.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6303433799264818423==
+--===============2861211928677778968==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 05/28/2012 11:04 PM, N=C3=A9meth M=C3=A1rton wrote:
-> Hi Patrick,
-> Patrick McCarty wrote:
->> On Mon, May 28, 2012 at 09:39:38AM +0200, N=C3=A9meth M=C3=A1rton wrote:
->>> I have given up fighting with Transifex tool. I have downloaded the .pot
->>> file and made the Hungarian translation offline, see the attached file.
->> If a language team doesn't already exist for a particular project,
->> project maintainers must first approve the request to create the team.
->>
->> I just approved the Hungarian team for PowerTOP, so you should be able
->> to upload your translations now.  If not, let us know.
-> Thanks. I had to correct some syntax mistakes catched by "msgfmt -c" befo=
-re
-> I could upload the translation. Now it is there.
->
-> It seems that I was confused because of the workflow was not clear for me.
-> It has more steps than just take one .pot file, translate and send back
-> the result.
-I should have been more clear on this, so sorry for the confusion.
-To be honest one of the reasons to host a project on transifex, is so =
+On (05/20/12 12:32), Rui DaCosta wrote:
+> =
 
-the localization and internationalization community can help/monitor.
-Really PowerTOP as a Transifex project is really its own, and I don't =
-
-intended to do much more then
-      - Uploading updated POT files when reasonable
-      - Downloading PO files that are 100%
-
-The localization and internationalization effort on Transifex as a =
-
-project will be managed by Marge Foster and Patrick McCarty.
-The powertop(a)lists.01.org list is still a good place post even for this =
-
-subject, as I will try to help, and Patrick also monitors.
-
-Thanks for the effort, as translations reach 100% you will start to see =
-
-them updated in the PowerTOP git repo.
-
--Chris
+>    it was pointed out to me that=C2=A0 CONFIG_PERF_COUNTERS has been supe=
+rseded by
+>    PERF_EVENTS since 2.6.32 =C2=A0- see bottom section of
+>    http://cateee.net/lkddb/web-lkddb/PERF_COUNTERS.html
+>    so is=C2=A0 CONFIG_PERF_COUNTERS really required?
+> =
 
 
+Could you please try the following patch?
 
->
-> Regards,
->
-> 	M=C3=A1rton N=C3=A9meth
+---
+
+ src/perf/perf.cpp |    3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/perf/perf.cpp b/src/perf/perf.cpp
+index ce9ae6a..09ca390 100644
+--- a/src/perf/perf.cpp
++++ b/src/perf/perf.cpp
+@@ -48,6 +48,9 @@
+ #ifdef __alpha__
+ #include <asm-generic/unistd.h>
+ #endif
++#ifdef __arm__
++#include <asm-generic/unistd.h>
++#endif
+ =
+
+ #include "perf.h"
+ #include "../lib.h"
 
 
---===============6303433799264818423==--
+--===============2861211928677778968==--
 
