@@ -1,300 +1,250 @@
-Content-Type: multipart/mixed; boundary="===============2022177654850250370=="
+Content-Type: multipart/mixed; boundary="===============3885474422511816801=="
 MIME-Version: 1.0
-From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: [Powertop] [PATCH] Make ncurses dependency optional
-Date: Wed, 18 Jul 2012 18:54:27 +0400
-Message-ID: <1342623267-30567-1-git-send-email-i.zhbanov@samsung.com>
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] segfault on Sheevaplug (ARM Kirkwood)
+Date: Mon, 21 May 2012 01:05:54 +0300
+Message-ID: <20120520220554.GB3585@swordfish>
+In-Reply-To: 1337542376.55788.YahooMailNeo@web160303.mail.bf1.yahoo.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2022177654850250370==
+--===============3885474422511816801==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Make ncurses dependency optional. Provide --without-ncurses option
-to configure.
----
- configure.ac               |    6 +++++-
- src/cpu/cpu.cpp            |    3 +++
- src/display.cpp            |    7 +++++++
- src/display.h              |    3 +++
- src/lib.cpp                |    7 +++++++
- src/main.cpp               |    2 ++
- src/process/do_process.cpp |    7 +++++++
- src/tuning/tuning.cpp      |    5 +++++
- 8 files changed, 39 insertions(+), 1 deletions(-)
+On (05/20/12 12:32), Rui DaCosta wrote:
+> =
 
-diff --git a/configure.ac b/configure.ac
-index ff4cdea..084056f 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -45,7 +45,11 @@ AC_FUNC_REALLOC
- AC_FUNC_STRTOD
- AC_CHECK_FUNCS([fdatasync getpagesize gettimeofday memmove memset mkdir mu=
-nmap pow realpath regcomp select setlocale socket sqrt strcasecmp strchr st=
-rdup strerror strncasecmp strstr strtoul strtoull])
- =
+>    it was pointed out to me that=C2=A0 CONFIG_PERF_COUNTERS has been supe=
+rseded by
+>    PERF_EVENTS since 2.6.32 =C2=A0- see bottom section of
+>    http://cateee.net/lkddb/web-lkddb/PERF_COUNTERS.html
+>    so is=C2=A0 CONFIG_PERF_COUNTERS really required?
+>
 
--AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], AC_MSG_ERROR([ncurses is =
-required but was not found]), [])
-+AC_ARG_WITH([ncurses], AS_HELP_STRING([--without-ncurses], [Disable ncurse=
-s support]))
-+AS_IF([test "x$with_ncurses" =3D "xno"], [
-+	AC_DEFINE([DISABLE_NCURSES], [1], [Disable ncurses support])], [
-+	AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [],
-+		AC_MSG_ERROR([ncurses is required but was not found]), [])])
- =
+Does perf tool work for you?
 
- PKG_CHECK_MODULES([PCIUTILS], [libpci],[],[
- 	AC_SEARCH_LIBS([pci_get_dev], [pci], [], AC_MSG_ERROR([libpci is required=
- but was not found]), [])
-diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-index 941bcff..1c66740 100644
---- a/src/cpu/cpu.cpp
-+++ b/src/cpu/cpu.cpp
-@@ -22,12 +22,15 @@
-  * Authors:
-  *	Arjan van de Ven <arjan(a)linux.intel.com>
-  */
-+#include "../../config.h"
- #include <iostream>
- #include <fstream>
- #include <vector>
- #include <string.h>
- #include <stdlib.h>
-+#ifndef DISABLE_NCURSES
- #include <ncurses.h>
-+#endif /* !DISABLE_NCURSES */
- =
-
- #include "cpu.h"
- #include "cpudevice.h"
-diff --git a/src/display.cpp b/src/display.cpp
-index caa66d0..75d347f 100644
---- a/src/display.cpp
-+++ b/src/display.cpp
-@@ -22,10 +22,13 @@
-  * Authors:
-  *	Arjan van de Ven <arjan(a)linux.intel.com>
-  */
-+#include "../config.h"
- #include "display.h"
- #include "lib.h"
- =
-
-+#ifndef DISABLE_NCURSES
- #include <ncurses.h>
-+#endif /* !DISABLE_NCURSES */
- =
+	-ss
 
  =
 
- #include <vector>
-@@ -85,7 +88,11 @@ void reset_display(void)
- 	echo();
- 	nocbreak();
- =
+>    =E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80
+> =
 
-+#ifndef NCURSES_NOMACROS
- 	resetterm();
-+#else /* NCURSES_NOMACROS */
-+	reset_shell_mode();
-+#endif /* NCURSES_NOMACROS */
- }
- =
+>    From: Rui DaCosta <ruidc(a)yahoo.com>
+>    To: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+>    Cc: Arjan van de Ven <arjan(a)linux.intel.com>; Chris Ferron
+>    <chris.e.ferron(a)linux.intel.com>; "powertop(a)lists.01.org"
+>    <powertop(a)lists.01.org>
+>    Sent: Sunday, 20 May 2012, 13:01
+>    Subject: Re: [Powertop] segfault on Sheevaplug (ARM Kirkwood)
+>    Thanks,
+>    this has gotten past the issue. I now get:
+>    PowerTOP v2.0 needs the kernel to support the 'perf' subsystem
+>    as well as support for trace points in the kernel:
+> =
 
- =
+>    CONFIG_PERF_EVENTS=3Dy
+>    CONFIG_PERF_COUNTERS=3Dy
+>    CONFIG_TRACEPOINTS=3Dy
+>    CONFIG_TRACING=3Dy
+> =
 
-diff --git a/src/display.h b/src/display.h
-index e0f66a3..67c191a 100644
---- a/src/display.h
-+++ b/src/display.h
-@@ -26,9 +26,12 @@
- #define __INCLUDE_GUARD_DISPLAY_H_
- =
+>    all these except CONFIG_PERF_COUNTERS are already set, so i'll need to=
+ see
+>    if i can get a kernel built with that option on.
+>    Will this patch make it into trunk?
+>    Many thanks.
+> =
 
- =
+>    =E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80
+> =
 
-+#include "../config.h"
- #include <map>
- #include <string>
-+#ifndef DISABLE_NCURSES
- #include <ncurses.h>
-+#endif /* !DISABLE_NCURSES */
- =
+>    From: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+>    To: Rui DaCosta <ruidc(a)yahoo.com>
+>    Cc: Arjan van de Ven <arjan(a)linux.intel.com>; Chris Ferron
+>    <chris.e.ferron(a)linux.intel.com>; powertop(a)lists.01.org
+>    Sent: Sunday, 20 May 2012, 11:34
+>    Subject: Re: [Powertop] segfault on Sheevaplug (ARM Kirkwood)
+>    On (05/20/12 02:19), Rui DaCosta wrote:
+>    > Sure and thanks,
+>    > (v1.13 worked fine btw)
+>    > Processor=C2=A0=C2=A0=C2=A0 : Feroceon 88FR131 rev 1 (v5l)
+>    > BogoMIPS=C2=A0=C2=A0=C2=A0 : 1191.11
+>    > Features=C2=A0=C2=A0=C2=A0 : swp half thumb fastmult edsp
+>    > CPU implementer=C2=A0=C2=A0=C2=A0 : 0x56
+>    > CPU architecture: 5TE
+>    > CPU variant=C2=A0=C2=A0=C2=A0 : 0x2
+>    > CPU part=C2=A0=C2=A0=C2=A0 : 0x131
+>    > CPU revision=C2=A0=C2=A0=C2=A0 : 1
+>    >
+>    > Hardware=C2=A0=C2=A0=C2=A0 : Marvell SheevaPlug Reference Board
+>    > Revision=C2=A0=C2=A0=C2=A0 : 0000
+>    > Serial=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 : 0000000000000000
+>    >
+>    >
+> =
 
- using namespace std;
- =
+>    Thanks,
+> =
 
-diff --git a/src/lib.cpp b/src/lib.cpp
-index 0f87e48..26b8c0e 100644
---- a/src/lib.cpp
-+++ b/src/lib.cpp
-@@ -23,6 +23,7 @@
-  *	Arjan van de Ven <arjan(a)linux.intel.com>
-  *	Peter Anvin
-  */
-+#include "../config.h"
- #include <map>
- #include <string.h>
- #include <iostream>
-@@ -55,7 +56,9 @@ extern "C" {
- #endif
- #include <limits>
- #include <math.h>
-+#ifndef DISABLE_NCURSES
- #include <ncurses.h>
-+#endif /* !DISABLE_NCURSES */
- =
+>    Well, that's the problem. Current cpu info parser doesn't understand y=
+our
+>    cpuinfo format. It awaits for sane values on special places. For examp=
+le,
+>    word
+>    "processor" should be followed by a number, not model name.
+> =
 
- static int kallsyms_read =3D 0;
- =
+>    =C2=A0=C2=A0=C2=A0 processor=C2=A0=C2=A0=C2=A0 : 2
+>    =C2=A0=C2=A0=C2=A0 vendor_id=C2=A0=C2=A0=C2=A0 : GenuineIntel
+>    =C2=A0=C2=A0=C2=A0 cpu family=C2=A0=C2=A0=C2=A0 : 6
+>    =C2=A0=C2=A0=C2=A0 model=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 : 37
+>    =C2=A0=C2=A0=C2=A0 bogomips=C2=A0=C2=A0=C2=A0 : 4522.66
+> =
 
-@@ -260,8 +263,10 @@ void format_watts(double W, char *buffer, unsigned int=
- len)
- 		sprintf(buffer, _("    0 mW"));
- =
+>    while cpuinfo on your system is totally different.
+> =
 
- #ifndef DISABLE_NCURSES
-+#ifndef DISABLE_WSTRING
- 	while (mbstowcs(NULL,buffer,0) < len)
- 		strcat(buffer, " ");
-+#endif /* DISABLE_WSTRING */
- #endif
- }
- =
+>    the following is untested patch (I'm a bit skeptical) plus I don't have
+>    ARM device for testing.
+> =
 
-@@ -418,6 +423,7 @@ void process_directory(const char *d_name, callback fn)
- 	closedir(dir);
- }
- =
+>    ---
+> =
 
-+#ifndef DISABLE_NCURSES
- int get_user_input(char *buf, unsigned sz)
- {
- 	fflush(stdout);
-@@ -429,3 +435,4 @@ int get_user_input(char *buf, unsigned sz)
- 	/* to distinguish between getnstr error and empty line */
- 	return ret || strlen(buf);
- }
-+#endif /* DISABLE_NCURSES */
-diff --git a/src/main.cpp b/src/main.cpp
-index 7a1b976..8f096c9 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -86,6 +86,7 @@ static void print_version()
- 	printf(_("PowerTOP version" POWERTOP_VERSION ", compiled on " __DATE__ "\=
-n"));
- }
- =
+>    src/cpu/cpu.cpp |=C2=A0 26 ++++++++++++++------------
+>    1 file changed, 14 insertions(+), 12 deletions(-)
+> =
 
-+#ifndef DISABLE_NCURSES
- static bool set_refresh_timeout()
- {
- 	static char buf[4];
-@@ -99,6 +100,7 @@ static bool set_refresh_timeout()
- 	time_out =3D time;
- 	return 1;
- }
-+#endif /* !DISABLE_NCURSES */
- =
+>    diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+>    index 09d4a2d..143e18c 100644
+>    --- a/src/cpu/cpu.cpp
+>    +++ b/src/cpu/cpu.cpp
+>    @@ -225,7 +225,7 @@ void enumerate_cpus(void)
+>    =C2=A0=C2=A0=C2=A0 ifstream file;
+>    =C2=A0=C2=A0=C2=A0 char line[1024];
+> =
 
- static void print_usage()
- {
-diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
-index 731fe3e..6c7950b 100644
---- a/src/process/do_process.cpp
-+++ b/src/process/do_process.cpp
-@@ -22,6 +22,7 @@
-  * Authors:
-  *	Arjan van de Ven <arjan(a)linux.intel.com>
-  */
-+#include "../../config.h"
- #include "process.h"
- #include "interrupt.h"
- #include "timer.h"
-@@ -37,7 +38,9 @@
- =
+>    -=C2=A0=C2=A0=C2=A0 int number =3D -1;
+>    +=C2=A0=C2=A0=C2=A0 int number =3D 1;
+>    =C2=A0=C2=A0=C2=A0 char vendor[128];
+>    =C2=A0=C2=A0=C2=A0 int family =3D 0;
+>    =C2=A0=C2=A0=C2=A0 int model =3D 0;
+>    @@ -236,7 +236,6 @@ void enumerate_cpus(void)
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 return;
+> =
 
- #include <stdio.h>
- #include <string.h>
-+#ifndef DISABLE_NCURSES
- #include <ncurses.h>
-+#endif /* !DISABLE_NCURSES */
- =
+>    =C2=A0=C2=A0=C2=A0 while (file) {
+>    -
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 file.getline(line, sizeof(line));
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (strncmp(line, "vendor_id\t",=
+10) =3D=3D 0) {
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 char *c;
+>    @@ -247,42 +246,45 @@ void enumerate_cpus(void)
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 =C2=A0=C2=A0=C2=A0 c++;
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 strncpy(vendor,c, 127);
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (strncmp(line, "processor\t"=
+,10) =3D=3D 0) {
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 } else if (strncmp(line, "proce=
+ssor\t",10) =3D=3D 0) {
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 char *c;
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 c =3D strchr(=
+line, ':');
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (c) {
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 c++;
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 number =3D strtoull(c, NULL, 10);
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (strncmp(line, "cpu family\t=
+",11) =3D=3D 0) {
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 } else if (strncmp(line, "Proce=
+ssor\t",10) =3D=3D 0) {
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 char *c;
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 c =3D strchr=
+(line, ':');
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (c) {
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 c++;
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 if (*c =3D=3D ' ')
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 =C2=A0=C2=A0=C2=A0 c++;
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 strncpy(vendor, c, 127);
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }=C2=A0 else if (strncmp(line, =
+"cpu family\t",11) =3D=3D 0) {
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 char *c;
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 c =3D strchr(=
+line, ':');
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (c) {
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 c++;
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 family =3D strtoull(c, NULL, 10);
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (strncmp(line, "model\t",6) =
+=3D=3D 0) {
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 } else if (strncmp(line, "model=
+\t",6) =3D=3D 0) {
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 char *c;
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 c =3D strchr(=
+line, ':');
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (c) {
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 c++;
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 model =3D strtoull(c, NULL, 10);
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (strncasecmp(line, "bogomips=
+\t", 9) =3D=3D 0) {
+>    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 } else if (strncasecmp(line, "b=
+ogomips\t", 9) =3D=3D 0) {
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 handle_one_cp=
+u(number, vendor, family, model);
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 set_max_cpu(n=
+umber);
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>    =C2=A0=C2=A0=C2=A0 }
+> =
 
- #include "../perf/perf_bundle.h"
- #include "../perf/perf_event.h"
-@@ -858,7 +861,9 @@ void process_update_display(void)
- 		if (!show_power)
- 			strcpy(power, "          ");
- 		sprintf(name, "%s", all_power[i]->type());
-+#ifndef DISABLE_WSTRING
- 		while (mbstowcs(NULL,name,0) < 14) strcat(name, " ");
-+#endif /* !DISABLE_WSTRING */
- =
+>    -
+>    =C2=A0=C2=A0=C2=A0 file.close();
+> =
 
- =
+>    =C2=A0=C2=A0=C2=A0 perf_events =3D new perf_power_bundle();
+>    -
+>    =C2=A0=C2=A0=C2=A0 if (!perf_events->add_event("power:cpu_idle")){
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 perf_events->add_event("power:po=
+wer_start");
+>    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 perf_events->add_event("power:po=
+wer_end");
 
- 		if (all_power[i]->events() =3D=3D 0 && all_power[i]->usage() =3D=3D 0 &&=
- all_power[i]->Witts() =3D=3D 0)
-@@ -871,7 +876,9 @@ void process_update_display(void)
- 			else
- 				sprintf(usage, "%5i%s", (int)all_power[i]->usage(), all_power[i]->usag=
-e_units());
- 		}
-+#ifndef DISABLE_WSTRING
- 		while (mbstowcs(NULL,usage,0) < 14) strcat(usage, " ");
-+#endif /* !DISABLE_WSTRING */
- 		sprintf(events, "%5.1f", all_power[i]->events());
- 		if (!all_power[i]->show_events())
- 			events[0] =3D 0;
-diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
-index 1a90417..2e1981b 100644
---- a/src/tuning/tuning.cpp
-+++ b/src/tuning/tuning.cpp
-@@ -23,11 +23,14 @@
-  *	Arjan van de Ven <arjan(a)linux.intel.com>
-  */
- =
-
-+#include "../../config.h"
- #include <algorithm>
- =
-
- #include <stdio.h>
- #include <string.h>
-+#ifndef DISABLE_NCURSES
- #include <ncurses.h>
-+#endif /* !DISABLE_NCURSES */
- =
-
- =
-
- #include "tuning.h"
-@@ -182,12 +185,14 @@ static bool tunables_sort(class tunable * i, class tu=
-nable * j)
- 	return false;
- }
- =
-
-+#ifndef DISABLE_NCURSES
- void tuning_window::window_refresh()
- {
- 	clear_tuning();
- 	should_clear =3D TRUE;
- 	init_tuning();
- }
-+#endif /* !DISABLE_NCURSES */
- =
-
- static void sort_tunables(void)
- {
--- =
-
-1.7.5.4
-
-
---===============2022177654850250370==--
+--===============3885474422511816801==--
 
