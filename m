@@ -1,33 +1,130 @@
-Content-Type: multipart/mixed; boundary="===============7009360584652469452=="
+Content-Type: multipart/mixed; boundary="===============3662246219560847580=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] power usage in watts is not displayed
-Date: Fri, 29 Jun 2012 11:10:00 -0700
-Message-ID: <4FEDEF78.2030601@linux.intel.com>
-In-Reply-To: CAOqk0e_Ni=uoMKAF-u1n+zAEy4_0uMDPfHe=iHAOCzY1TupzLQ@mail.gmail.com
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] catch fstream exceptions in lib routines (v2)
+Date: Mon, 21 May 2012 12:20:33 -0700
+Message-ID: <4FBA9581.8080903@linux.intel.com>
+In-Reply-To: 20120518111804.GD3074@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7009360584652469452==
+--===============3662246219560847580==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 6/29/2012 9:47 AM, Srikanth Grama Ramaprasad wrote:
-> Dear Sir/Madam,
-> =
+patch accepted by hand merge from v1.
+Thanks
+-Chris
 
-> I am trying to install powerTop on my PC as I need to know the per
-> process power consumption.
-> I have the Ubuntu 11.10 installed on my PC.
-> I installed the package available in Ubuntu Synaptic Package Manger
-> but the power consumption in watts is not displayed.
-> I get the message "no ACPI power usage estimate available".
-> Is there any configuration settings that I am missing ?
 
-not all computers have a BIOS where the BIOS reports the battery
-discharge rate to the operating system..... there's not a lot we can do
-about that.
+On 05/18/2012 04:18 AM, Sergey Senozhatsky wrote:
+> [PATCH] catch fstream exceptions in lib routines (v2)
+>
+> Catch possible fstream and traits_type exceptions in lib.
+>
+> V2: Thanks to Peter, he pointed to silly typo I've done in V1.
+>
+> Reported-and-tested-by: Lekensteyn<lekensteyn(a)gmail.com>
+> Signed-off-by: Sergey Senozhatsky<sergey.senozhatsky(a)gmail.com>
+>
+> ---
+>
+>   src/lib.cpp |   54 +++++++++++++++++++++++++++++++++++++++-------------=
+--
+>   1 file changed, 39 insertions(+), 15 deletions(-)
+>
+> diff --git a/src/lib.cpp b/src/lib.cpp
+> index 53638dd..0c2c1f1 100644
+> --- a/src/lib.cpp
+> +++ b/src/lib.cpp
+> @@ -172,8 +172,13 @@ void write_sysfs(const string&filename, const string=
+&value)
+>   	file.open(filename.c_str(), ios::out);
+>   	if (!file)
+>   		return;
+> -	file<<  value;
+> -	file.close();
+> +	try
+> +	{
+> +		file<<  value;
+> +		file.close();
+> +	} catch (std::exception&exc) {
+> +		return;
+> +	}
+>   }
+>
+>   int read_sysfs(const string&filename, bool *ok)
+> @@ -187,10 +192,17 @@ int read_sysfs(const string&filename, bool *ok)
+>   			*ok =3D false;
+>   		return 0;
+>   	}
+> -	file>>  i;
+> +	try
+> +	{
+> +		file>>  i;
+> +		if (ok)
+> +			*ok =3D true;
+> +	} catch (std::exception&exc) {
+> +		if (ok)
+> +			*ok =3D false;
+> +		i =3D 0;
+> +	}
+>   	file.close();
+> -	if (ok)
+> -		*ok =3D true;
+>   	return i;
+>   }
+>
+> @@ -203,11 +215,17 @@ string read_sysfs_string(const string&filename)
+>   	file.open(filename.c_str(), ios::in);
+>   	if (!file)
+>   		return "";
+> -	file.getline(content, 4096);
+> -	file.close();
+> -	c =3D strchr(content, '\n');
+> -	if (c)
+> -		*c =3D 0;
+> +	try
+> +	{
+> +		file.getline(content, 4096);
+> +		file.close();
+> +		c =3D strchr(content, '\n');
+> +		if (c)
+> +			*c =3D 0;
+> +	} catch (std::exception&exc) {
+> +		file.close();
+> +		return "";
+> +	}
+>   	return content;
+>   }
+>
+> @@ -224,11 +242,17 @@ string read_sysfs_string(const char *format, const =
+char *param)
+>   	file.open(filename, ios::in);
+>   	if (!file)
+>   		return "";
+> -	file.getline(content, 4096);
+> -	file.close();
+> -	c =3D strchr(content, '\n');
+> -	if (c)
+> -		*c =3D 0;
+> +	try
+> +	{
+> +		file.getline(content, 4096);
+> +		file.close();
+> +		c =3D strchr(content, '\n');
+> +		if (c)
+> +			*c =3D 0;
+> +	} catch (std::exception&exc) {
+> +		file.close();
+> +		return "";
+> +	}
+>   	return content;
+>   }
+>
+>
 
---===============7009360584652469452==--
+
+--===============3662246219560847580==--
 
