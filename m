@@ -1,125 +1,59 @@
-Content-Type: multipart/mixed; boundary="===============4954405129536238886=="
+Content-Type: multipart/mixed; boundary="===============3502207203345455476=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: [Powertop] [PATCH] catch fstream exceptions in lib routines
-Date: Fri, 18 May 2012 13:17:39 +0300
-Message-ID: <20120518101739.GB3074@swordfish>
-In-Reply-To: 6002814.JjpEWR9aH8@penguin
+From: Lekensteyn <lekensteyn at gmail.com>
+Subject: Re: [Powertop] PowerTop configure fails on BeagleBone/Ubuntu
+Date: Mon, 21 May 2012 23:18:38 +0200
+Message-ID: <2542186.R8oUcZDn0B@penguin>
+In-Reply-To: 4FBA9ED9.9000903@bouwens.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4954405129536238886==
+--===============3502207203345455476==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-[PATCH] catch fstream exceptions in lib routines
+On Monday 21 May 2012 22:00:25 Bram Bouwens wrote:
+> On 05/21/2012 06:47 PM, Lekensteyn wrote:
+> > On Monday 21 May 2012 16:56:20 Bram Bouwens wrote:
+> >> checking for strtoull... yes
+> >> checking for library containing delwin... -lncurses
+> >> ./configure: line 19020: syntax error near unexpected token `PCIUTILS,'
+> >> ./configure: line 19020: `PKG_CHECK_MODULES(PCIUTILS, libpci,,'
+> > =
 
-Catch possible fstream and traits_type exceptions in lib.
+> > You need to install the pkg-config package.
+> =
 
-Reported-by: Lekensteyn <lekensteyn(a)gmail.com>
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+> No, that's present.
+Have you re-executed autogen.sh after installing pkg-config?
 
----
+> >> though I see something unexpected with the PCI bus:
+> >> =
 
- src/lib.cpp |   54 +++++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 39 insertions(+), 15 deletions(-)
+> >> root(a)omap:~/powertop-2.0# ls /proc/bus/pci
+> >> ls: cannot access /proc/bus/pci: No such file or directory
+> > =
 
-diff --git a/src/lib.cpp b/src/lib.cpp
-index 53638dd..bcd809f 100644
---- a/src/lib.cpp
-+++ b/src/lib.cpp
-@@ -172,8 +172,13 @@ void write_sysfs(const string &filename, const string =
-&value)
- 	file.open(filename.c_str(), ios::out);
- 	if (!file)
- 		return;
--	file << value;
--	file.close();
-+	try =
+> > Not sure if there is a kernel config missing, does /sys/bus/pci/ exists?
+> =
 
-+	{
-+		file << value;
-+		file.close();
-+	} catch (std::exception &exc) {
-+		return;
-+	}
- }
- =
+> That isn't there either. Just checked under Angstrom too, it simply isn't
+> there; the message is slightly different though:
+> =
 
- int read_sysfs(const string &filename, bool *ok)
-@@ -187,10 +192,17 @@ int read_sysfs(const string &filename, bool *ok)
- 			*ok =3D false;
- 		return 0;
- 	}
--	file >> i;
-+	try
-+	{
-+		file >> i;
-+		if (ok)
-+			*ok =3D true;
-+	} catch (std::exception &exc) {
-+		if (ok)
-+			*ok =3D "false";
-+		i =3D 0;
-+	}
- 	file.close();
--	if (ok)
--		*ok =3D true;
- 	return i;
- }
- =
+> checking for PCIUTILS... no
+> checking for library containing pci_get_dev... no
+> configure: error: libpci is required but was not found
+> =
 
-@@ -203,11 +215,17 @@ string read_sysfs_string(const string &filename)
- 	file.open(filename.c_str(), ios::in);
- 	if (!file)
- 		return "";
--	file.getline(content, 4096);
--	file.close();
--	c =3D strchr(content, '\n');
--	if (c)
--		*c =3D 0;
-+	try
-+	{
-+		file.getline(content, 4096);
-+		file.close();
-+		c =3D strchr(content, '\n');
-+		if (c)
-+			*c =3D 0;
-+	} catch (std::exception &exc) {
-+		file.close();
-+		return "";
-+	}
- 	return content;
- }
- =
+> And opkg can't find a package for it....
+No idea on this, sorry. Perhaps you can crosscompile it? (no experience on =
 
-@@ -224,11 +242,17 @@ string read_sysfs_string(const char *format, const ch=
-ar *param)
- 	file.open(filename, ios::in);
- 	if (!file)
- 		return "";
--	file.getline(content, 4096);
--	file.close();
--	c =3D strchr(content, '\n');
--	if (c)
--		*c =3D 0;
-+	try
-+	{
-+		file.getline(content, 4096);
-+		file.close();
-+		c =3D strchr(content, '\n');
-+		if (c)
-+			*c =3D 0;
-+	} catch (std::exception &exc) {
-+		file.close();
-+		return "";
-+	}
- 	return content;
- }
- =
+doing it with powertop though)
 
+Regards,
+Peter
 
-
---===============4954405129536238886==--
+--===============3502207203345455476==--
 
