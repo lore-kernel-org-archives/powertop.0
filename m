@@ -1,86 +1,117 @@
-Content-Type: multipart/mixed; boundary="===============8703418772588891514=="
+Content-Type: multipart/mixed; boundary="===============0376108131947547159=="
 MIME-Version: 1.0
-From: Rajagopal Venkat <rajagopal.venkat at linaro.org>
-Subject: Re: [Powertop] [PATCH v2] conditionally disable pci if not supported
-Date: Mon, 25 Jun 2012 22:04:16 +0530
-Message-ID: <CA+Z25wWdE=FYXpTqcyebk4hwJpjvz9BodfrH__Tn1D47jgEj1Q@mail.gmail.com>
-In-Reply-To: 4FE88C14.1040005@linux.intel.com
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [Discuss] [PATCH] iw: handle HAVE_LIBNL20 properly
+Date: Mon, 21 May 2012 12:19:46 -0700
+Message-ID: <4FBA9552.7050402@linux.intel.com>
+In-Reply-To: 20120518135416.GE3074@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8703418772588891514==
+--===============0376108131947547159==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 25 June 2012 21:34, Arjan van de Ven <arjan(a)linux.intel.com> wrote:
+patch accepted
+thanks
+-Chris
 
-> On 6/25/2012 9:00 AM, Rajagopal Venkat wrote:
->
-> <no commit message .. why? one sentence is cheap>
->
-> Ok. Taken care.
 
+On 05/18/2012 06:54 AM, Sergey Senozhatsky wrote:
+> On (05/18/12 15:40), N=C3=A9meth M=C3=A1rton wrote:
+>> Doesn't compile either:
+>>
+>> gcc -DHAVE_CONFIG_H -I. -I..  -D_FORTIFY_SOURCE=3D2        -g -O2 -MT tu=
+ning/powertop-iw.o -MD -MP -MF tuning/.deps/powertop-iw.Tpo -c -o tuning/po=
+wertop-iw.o
+>> `test -f 'tuning/iw.c' || echo './'`tuning/iw.c
+>> tuning/iw.c: In function =E2=80=98set_power_save=E2=80=99:
+>> tuning/iw.c:130: error: storage size of =E2=80=98ps_state=E2=80=99 isn=
+=E2=80=99t known
+>> tuning/iw.c:132: error: =E2=80=98NL80211_PS_DISABLED=E2=80=99 undeclared=
+ (first use in this function)
+>> tuning/iw.c:132: error: (Each undeclared identifier is reported only once
+>> tuning/iw.c:132: error: for each function it appears in.)
+>> tuning/iw.c:134: error: =E2=80=98NL80211_PS_ENABLED=E2=80=99 undeclared =
+(first use in this function)
+>> tuning/iw.c:136: error: =E2=80=98NL80211_ATTR_PS_STATE=E2=80=99 undeclar=
+ed (first use in this function)
+>> tuning/iw.c: In function =E2=80=98print_power_save_handler=E2=80=99:
+>> tuning/iw.c:152: error: =E2=80=98NL80211_ATTR_PS_STATE=E2=80=99 undeclar=
+ed (first use in this function)
+>> tuning/iw.c:156: error: =E2=80=98NL80211_PS_ENABLED=E2=80=99 undeclared =
+(first use in this function)
+>> tuning/iw.c:159: error: =E2=80=98NL80211_PS_DISABLED=E2=80=99 undeclared=
+ (first use in this function)
+>> tuning/iw.c: In function =E2=80=98__handle_cmd=E2=80=99:
+>> tuning/iw.c:227: error: =E2=80=98NL80211_CMD_GET_POWER_SAVE=E2=80=99 und=
+eclared (first use in this function)
+>> tuning/iw.c:230: error: =E2=80=98NL80211_CMD_SET_POWER_SAVE=E2=80=99 und=
+eclared (first use in this function)
+>> make[3]: *** [tuning/powertop-iw.o] Error 1
+>> make[3]: Leaving directory `/mnt/store/nmarci/src/powertop/powertop2/pow=
+ertop/src'
+>> make[2]: *** [all] Error 2
+>> make[2]: Leaving directory `/mnt/store/nmarci/src/powertop/powertop2/pow=
+ertop/src'
+>> make[1]: *** [all-recursive] Error 1
+>> make[1]: Leaving directory `/mnt/store/nmarci/src/powertop/powertop2/pow=
+ertop'
+>> make: *** [all] Error 2
+>>
+>> Looks like I have a linux/nl80211.h installed on my system which doesn't=
+ contain
+>> NL80211_PS_ENABLED, NL80211_PS_DISABLED, NL80211_ATTR_PS_STATE, NL80211_=
+CMD_GET_POWER_SAVE
+>> and NL80211_CMD_SET_POWER_SAVE. These were added by commit
+>> http://git.kernel.org/?p=3Dlinux/kernel/git/torvalds/linux-2.6.git;a=3Dc=
+ommitdiff;h=3Dffb9eb3d8b450c22bbbc688c6b630141ac476fd9
+>>
+>> The header file src/tuning/nl80211.h in powertop repository seems to be =
+a newer one.
+>>
+> Hm.. In that case solution is simple.
 >
-> >
-> > diff --git a/src/lib.h b/src/lib.h
-> > index 588c023..d354151 100644
-> > --- a/src/lib.h
-> > +++ b/src/lib.h
-> > @@ -30,6 +30,10 @@
-> >  #endif
-> >  #include <stdint.h>
-> >
-> > +#if HAVE_CONFIG_H
-> > +#include "config.h"
-> > +#endif
-> > +
-> >  #ifndef DISABLE_I18N
-> >  #define _(STRING)    gettext(STRING)
-> >  #else
-> >
 >
+> ---
 >
+>   src/tuning/iw.c |    1 +
+>   src/tuning/iw.h |    6 ------
+>   2 files changed, 1 insertion(+), 6 deletions(-)
 >
-> ok this chunk I do not understand;
-> the rest of your patch looks very reasonable.
-> why is config.h inside an if ?
+> diff --git a/src/tuning/iw.c b/src/tuning/iw.c
+> index aeba3fd..68eb6dc 100644
+> --- a/src/tuning/iw.c
+> +++ b/src/tuning/iw.c
+> @@ -39,6 +39,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SO=
+FTWARE.
+>   #include<unistd.h>
+>   #include<stdbool.h>
+>
+> +#include "nl80211.h"
+>   #include<netlink/genl/genl.h>
+>   #include<netlink/genl/family.h>
+>   #include<netlink/genl/ctrl.h>
+> diff --git a/src/tuning/iw.h b/src/tuning/iw.h
+> index acf132d..6ea5a3d 100644
+> --- a/src/tuning/iw.h
+> +++ b/src/tuning/iw.h
+> @@ -33,12 +33,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS S=
+OFTWARE.
+>   */
+>
+>   #include<stdbool.h>
+> -#include<netlink/netlink.h>
+> -#include<netlink/genl/genl.h>
+> -#include<netlink/genl/family.h>
+> -#include<netlink/genl/ctrl.h>
+> -
+> -#include<linux/nl80211.h>
+>
+>   #define ETH_ALEN 6
 >
 
-config.h is auto generated by autoconf and is not applicable for Android
-build.
-Yes. it should be wrapped in ifdef.
 
---===============8703418772588891514==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
-
-PGJyPjxicj48ZGl2IGNsYXNzPSJnbWFpbF9xdW90ZSI+T24gMjUgSnVuZSAyMDEyIDIxOjM0LCBB
-cmphbiB2YW4gZGUgVmVuIDxzcGFuIGRpcj0ibHRyIj4mbHQ7PGEgaHJlZj0ibWFpbHRvOmFyamFu
-QGxpbnV4LmludGVsLmNvbSIgdGFyZ2V0PSJfYmxhbmsiPmFyamFuQGxpbnV4LmludGVsLmNvbTwv
-YT4mZ3Q7PC9zcGFuPiB3cm90ZTo8YnI+PGJsb2NrcXVvdGUgY2xhc3M9ImdtYWlsX3F1b3RlIiBz
-dHlsZT0ibWFyZ2luOjAgMCAwIC44ZXg7Ym9yZGVyLWxlZnQ6MXB4ICNjY2Mgc29saWQ7cGFkZGlu
-Zy1sZWZ0OjFleCI+Ck9uIDYvMjUvMjAxMiA5OjAwIEFNLCBSYWphZ29wYWwgVmVua2F0IHdyb3Rl
-Ojxicj4KPGJyPgombHQ7bm8gY29tbWl0IG1lc3NhZ2UgLi4gd2h5PyBvbmUgc2VudGVuY2UgaXMg
-Y2hlYXAmZ3Q7PGJyPgo8ZGl2IGNsYXNzPSJpbSI+PGJyPjwvZGl2PjwvYmxvY2txdW90ZT48ZGl2
-Pk9rLiBUYWtlbiBjYXJlLiA8YnI+PC9kaXY+PGJsb2NrcXVvdGUgY2xhc3M9ImdtYWlsX3F1b3Rl
-IiBzdHlsZT0ibWFyZ2luOjBwdCAwcHQgMHB0IDAuOGV4O2JvcmRlci1sZWZ0OjFweCBzb2xpZCBy
-Z2IoMjA0LDIwNCwyMDQpO3BhZGRpbmctbGVmdDoxZXgiPjxkaXYgY2xhc3M9ImltIj4KPGJyPgom
-Z3Q7PGJyPgomZ3Q7IGRpZmYgLS1naXQgYS9zcmMvbGliLmggYi9zcmMvbGliLmg8YnI+CiZndDsg
-aW5kZXggNTg4YzAyMy4uZDM1NDE1MSAxMDA2NDQ8YnI+CiZndDsgLS0tIGEvc3JjL2xpYi5oPGJy
-PgomZ3Q7ICsrKyBiL3NyYy9saWIuaDxicj4KJmd0OyBAQCAtMzAsNiArMzAsMTAgQEA8YnI+CiZn
-dDsgoCNlbmRpZjxicj4KJmd0OyCgI2luY2x1ZGUgJmx0O3N0ZGludC5oJmd0Ozxicj4KJmd0Ozxi
-cj4KJmd0OyArI2lmIEhBVkVfQ09ORklHX0g8YnI+CiZndDsgKyNpbmNsdWRlICZxdW90O2NvbmZp
-Zy5oJnF1b3Q7PGJyPgomZ3Q7ICsjZW5kaWY8YnI+CiZndDsgKzxicj4KJmd0OyCgI2lmbmRlZiBE
-SVNBQkxFX0kxOE48YnI+CiZndDsgoCNkZWZpbmUgXyhTVFJJTkcpIKAgoGdldHRleHQoU1RSSU5H
-KTxicj4KJmd0OyCgI2Vsc2U8YnI+CiZndDs8YnI+Cjxicj4KPGJyPgo8YnI+CjwvZGl2Pm9rIHRo
-aXMgY2h1bmsgSSBkbyBub3QgdW5kZXJzdGFuZDs8YnI+CnRoZSByZXN0IG9mIHlvdXIgcGF0Y2gg
-bG9va3MgdmVyeSByZWFzb25hYmxlLjxicj4Kd2h5IGlzIGNvbmZpZy5oIGluc2lkZSBhbiBpZiA/
-PGJyPgo8L2Jsb2NrcXVvdGU+PC9kaXY+PGJyPmNvbmZpZy5oIGlzIGF1dG8gZ2VuZXJhdGVkIGJ5
-IGF1dG9jb25mIGFuZCBpcyBub3QgYXBwbGljYWJsZSBmb3IgQW5kcm9pZCBidWlsZC48YnI+WWVz
-LiBpdCBzaG91bGQgYmUgd3JhcHBlZCBpbiBpZmRlZi48YnI+Cg==
-
---===============8703418772588891514==--
+--===============0376108131947547159==--
 
