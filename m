@@ -1,99 +1,110 @@
-Content-Type: multipart/mixed; boundary="===============9180694022624975487=="
+Content-Type: multipart/mixed; boundary="===============1510191157941623230=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Get rid of ncurses' TRUE and FALSE
-Date: Wed, 18 Jul 2012 15:02:30 -0700
-Message-ID: <50073276.5030604@linux.intel.com>
-In-Reply-To: 1342603045-25492-1-git-send-email-i.zhbanov@samsung.com
+From: Magnus Fromreide <magfr at lysator.liu.se>
+Subject: [Powertop] [PATCH 3/3] Remove some unused variables
+Date: Mon, 21 May 2012 20:20:20 +0000
+Message-ID: <1337631510.2616.2.camel@sara>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============9180694022624975487==
+--===============1510191157941623230==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 07/18/2012 02:17 AM, Igor Zhbanov wrote:
-> Get rid of TRUE and FALSE ncurses' defines used for boolean variables
-> initialization. This fix also helps build without ncurses support.
-> ---
->   src/main.cpp          |    6 +++---
->   src/tuning/tuning.cpp |    6 +++---
->   2 files changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/src/main.cpp b/src/main.cpp
-> index 7a1b976..9f53b46 100644
-> --- a/src/main.cpp
-> +++ b/src/main.cpp
-> @@ -354,7 +354,7 @@ int main(int argc, char **argv)
->   {
->   	int option_index;
->   	int c;
-> -	bool wantreport =3D FALSE;
-> +	bool wantreport =3D false;
->   	char filename[4096];
->   	char workload[4096] =3D {0,};
->   	int  iterations =3D 1;
-> @@ -396,7 +396,7 @@ int main(int argc, char **argv)
->   				break;
->   =
+Signed-off-by: Magnus Fromreide <magfr(a)lysator.liu.se>
+---
+ src/calibrate/calibrate.cpp |    6 ------
+ src/tuning/runtime.cpp      |    2 --
+ src/tuning/tuningusb.cpp    |    2 --
+ 3 files changed, 10 deletions(-)
 
->   			case 'h': /* html report */
-> -				wantreport =3D TRUE;
-> +				wantreport =3D true;
->   				reporttype =3D 1;
->   				sprintf(filename, "%s", optarg ? optarg : "PowerTOP.html" );
->   				break;
-> @@ -417,7 +417,7 @@ int main(int argc, char **argv)
->   				break;
->   				=
+diff --git a/src/calibrate/calibrate.cpp b/src/calibrate/calibrate.cpp
+index 7dd8a5f..cf00fcf 100644
+--- a/src/calibrate/calibrate.cpp
++++ b/src/calibrate/calibrate.cpp
+@@ -145,8 +145,6 @@ static void find_all_rfkill(void)
+ 	if (!dir)
+ 		return;
+ 	while (1) {
+-		ifstream file;
+-
+ 		entry =3D readdir(dir);
+ =
 
->   			case 'C': /* csv report*/
-> -				wantreport =3D TRUE;
-> +				wantreport =3D true;
->   				reporttype =3D 0;
->   				sprintf(filename, "%s", optarg ? optarg : "PowerTOP.csv");
->   				break;
-> diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
-> index 1a90417..865d986 100644
-> --- a/src/tuning/tuning.cpp
-> +++ b/src/tuning/tuning.cpp
-> @@ -43,7 +43,7 @@
->   #include "../lib.h"
->   =
+ 		if (!entry)
+@@ -190,8 +188,6 @@ static void find_backlight(void)
+ 	if (!dir)
+ 		return;
+ 	while (1) {
+-		ifstream file;
+-
+ 		entry =3D readdir(dir);
+ =
 
->   static void sort_tunables(void);
-> -static bool should_clear =3D FALSE;
-> +static bool should_clear =3D false;
->   =
+ 		if (!entry)
+@@ -232,8 +228,6 @@ static void find_scsi_link(void)
+ 	if (!dir)
+ 		return;
+ 	while (1) {
+-		ifstream file;
+-
+ 		entry =3D readdir(dir);
+ =
 
->   #ifndef DISABLE_NCURSES
->   class tuning_window: public tab_window {
-> @@ -103,7 +103,7 @@ static void __tuning_update_display(int cursor_pos)
->   		return;
->   =
+ 		if (!entry)
+diff --git a/src/tuning/runtime.cpp b/src/tuning/runtime.cpp
+index 8f428e6..b57d53e 100644
+--- a/src/tuning/runtime.cpp
++++ b/src/tuning/runtime.cpp
+@@ -83,7 +83,6 @@ runtime_tunable::runtime_tunable(const char *path, const =
+char *bus, const char *
+ =
 
->   	if (should_clear) {
-> -		should_clear =3D FALSE;
-> +		should_clear =3D false;
->   		wclear(win);
->   	}
->   =
+ int runtime_tunable::good_bad(void)
+ {
+-	ifstream file;
+ 	string content;
+ =
 
-> @@ -185,7 +185,7 @@ static bool tunables_sort(class tunable * i, class tu=
-nable * j)
->   void tuning_window::window_refresh()
->   {
->   	clear_tuning();
-> -	should_clear =3D TRUE;
-> +	should_clear =3D true;
->   	init_tuning();
->   }
->   =
+ 	content =3D read_sysfs_string(runtime_path);
+@@ -131,7 +130,6 @@ void add_runtime_tunables(const char *bus)
+ 	if (!dir)
+ 		return;
+ 	while (1) {
+-		ifstream file;
+ 		class runtime_tunable *runtime;
+ =
 
-Your patch has been merged
-Thank You
+ 		entry =3D readdir(dir);
+diff --git a/src/tuning/tuningusb.cpp b/src/tuning/tuningusb.cpp
+index b483ce2..74bbacf 100644
+--- a/src/tuning/tuningusb.cpp
++++ b/src/tuning/tuningusb.cpp
+@@ -81,7 +81,6 @@ usb_tunable::usb_tunable(const char *path, const char *na=
+me) : tunable("", 0.9,
+ =
+
+ int usb_tunable::good_bad(void)
+ {
+-	ifstream file;
+ 	string content;
+ =
+
+ 	content =3D read_sysfs_string(usb_path);
+@@ -127,7 +126,6 @@ void add_usb_tunables(void)
+ 	if (!dir)
+ 		return;
+ 	while (1) {
+-		ifstream file;
+ 		class usb_tunable *usb;
+ =
+
+ 		entry =3D readdir(dir);
+-- =
+
+1.7.10
 
 
---===============9180694022624975487==--
+--===============1510191157941623230==--
 
