@@ -1,46 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============2749979697343467555=="
+Content-Type: multipart/mixed; boundary="===============4468825174953274641=="
 MIME-Version: 1.0
-From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: [Powertop] [PATCH] Remove unneded zlib dependency
-Date: Wed, 18 Jul 2012 18:54:58 +0400
-Message-ID: <1342623298-30628-1-git-send-email-i.zhbanov@samsung.com>
+From: Magnus Fromreide <magfr at lysator.liu.se>
+Subject: [Powertop] [PATCH 1/3] Remove unknown symbol
+Date: Mon, 21 May 2012 21:39:47 +0200
+Message-ID: <1337631427.2616.0.camel@sara>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2749979697343467555==
+--===============4468825174953274641==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Remove unneded zlib dependency from configure.ac
+Nothing sets the symbol NCURES_LIBS and NCURSES_LIBS is already in the link
+line, so this patch removes the misspelled version.
+
+Signed-off-by: Magnus Fromreide <magfr(a)lysator.liu.se>
 ---
- configure.ac |    3 ---
- 1 files changed, 0 insertions(+), 3 deletions(-)
+ src/Makefile.am |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/configure.ac b/configure.ac
-index ff4cdea..4b3d027 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -50,9 +50,6 @@ AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], AC_MSG_E=
-RROR([ncurses is requir
- PKG_CHECK_MODULES([PCIUTILS], [libpci],[],[
- 	AC_SEARCH_LIBS([pci_get_dev], [pci], [], AC_MSG_ERROR([libpci is required=
- but was not found]), [])
- ]) =
-
--PKG_CHECK_MODULES([LIBZ], [zlib],[],[
--	AC_SEARCH_LIBS([deflate], [z], [], AC_MSG_ERROR([zlib is required but was=
- not found]), [])
--]) =
-
+diff --git a/src/Makefile.am b/src/Makefile.am
+index b396691..e26c8bc 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -40,7 +40,7 @@ powertop_CPPFLAGS =3D -D_FORTIFY_SOURCE=3D2 $(NCURSES_CFL=
+AGS) $(PCIUTILS_CFLAGS) $(L
  =
 
- has_libnl_ver=3D0
- PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [
+ powertop_LDADD =3D ../pevent/libparseevent.la
+ =
+
+-AM_LDFLAGS =3D $(LIBS) $(NCURSES_LIBS) $(PCIUTILS_LIBS) $(LIBNL_LIBS) $(LI=
+BZ_LIBS) $(NCURES_LIBS) $(PTHREAD_LIBS)  $(RESOLV_LIBS)
++AM_LDFLAGS =3D $(LIBS) $(NCURSES_LIBS) $(PCIUTILS_LIBS) $(LIBNL_LIBS) $(LI=
+BZ_LIBS) $(PTHREAD_LIBS)  $(RESOLV_LIBS)
+ =
+
+ BUILT_SOURCES =3D css.h
+ CLEANFILES =3D css.h
 -- =
 
-1.7.5.4
+1.7.10
 
 
---===============2749979697343467555==--
+--===============4468825174953274641==--
 
