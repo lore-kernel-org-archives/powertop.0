@@ -1,53 +1,106 @@
-Content-Type: multipart/mixed; boundary="===============3359756681283785021=="
+Content-Type: multipart/mixed; boundary="===============5244717814499129877=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Fix typo in the translation file hu_HU.po
-Date: Tue, 24 Jul 2012 09:33:30 -0700
-Message-ID: <500ECE5A.2060807@linux.intel.com>
-In-Reply-To: 1343119508-12969-1-git-send-email-i.zhbanov@samsung.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] segfault on Sheevaplug (ARM Kirkwood)
+Date: Wed, 23 May 2012 00:23:43 +0300
+Message-ID: <20120522212343.GA1215@swordfish>
+In-Reply-To: 1337715350.2334.YahooMailNeo@web160306.mail.bf1.yahoo.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3359756681283785021==
+--===============5244717814499129877==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 07/24/2012 01:45 AM, Igor Zhbanov wrote:
-> Fix typo in the translation file hu_HU.po causing build errors.
-> ---
->   po/hu_HU.po |    2 +-
->   1 files changed, 1 insertions(+), 1 deletions(-)
->
-> diff --git a/po/hu_HU.po b/po/hu_HU.po
-> index 0d817e2..1af051d 100644
-> --- a/po/hu_HU.po
-> +++ b/po/hu_HU.po
-> @@ -553,7 +553,7 @@ msgstr "El=C5=91k=C3=A9sz=C3=BCl=C3=A9s a m=C3=A9r=C3=
-=A9sek elv=C3=A9gz=C3=A9s=C3=A9hez\n"
->   #: src/main.cpp:255
->   #, c-format
->   msgid "Taking %d measurement(s) for a duration of %d second(s) each.\n"
-> -msgstr "%d darab, egyenk=C3=A9nt %d m=C3=A1sodperces m=C3=A9r=C3=A9s k=
-=C3=A9sz=C3=ADt=C3=A9se.\\n"
-> +msgstr "%d darab, egyenk=C3=A9nt %d m=C3=A1sodperces m=C3=A9r=C3=A9s k=
-=C3=A9sz=C3=ADt=C3=A9se.\n"
->   =
+On (05/22/12 12:35), Rui DaCosta wrote:
+> =
 
->   #: src/main.cpp:278
->   #, c-format
+>    thanks, same result:
+>    PowerTOP v2.0 needs the kernel to support the 'perf' subsystem
+>    as well as support for trace points in the kernel:
+> =
+
+>    CONFIG_PERF_EVENTS=3Dy
+>    CONFIG_PERF_COUNTERS=3Dy
+>    CONFIG_TRACEPOINTS=3Dy
+>    CONFIG_TRACING=3Dy
 >
 >
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
-Thanks for the translation work, but all translations are managed by =
 
-transifex and its cominity, then pull into powertop.
-see archive: http://lists.01.org/pipermail/powertop/2012-May/000080.html
+Hm...
+Could you please tell the number of '__NR_perf_event_open' syscall in your
+unistd.h?
 
 
+	-ss
 
---===============3359756681283785021==--
+
+>    Regards,
+>    Rui
+> =
+
+>    =E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80
+> =
+
+>    From: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+>    To: Rui DaCosta <ruidc(a)yahoo.com>
+>    Cc: Arjan van de Ven <arjan(a)linux.intel.com>; Chris Ferron
+>    <chris.e.ferron(a)linux.intel.com>; "powertop(a)lists.01.org"
+>    <powertop(a)lists.01.org>
+>    Sent: Monday, 21 May 2012, 0:17
+>    Subject: Re: [Powertop] segfault on Sheevaplug (ARM Kirkwood)
+>    On (05/20/12 12:32), Rui DaCosta wrote:
+>    >
+>    >=C2=A0 =C2=A0 it was pointed out to me that=C2=A0 CONFIG_PERF_COUNTER=
+S has been
+>    superseded by
+>    >=C2=A0 =C2=A0 PERF_EVENTS since 2.6.32 =C2=A0- see bottom section of
+>    >=C2=A0 =C2=A0 [1]http://cateee.net/lkddb/web-lkddb/PERF_COUNTERS.html
+>    >=C2=A0 =C2=A0 so is=C2=A0 CONFIG_PERF_COUNTERS really required?
+>    >
+> =
+
+>    Could you please try the following patch?
+> =
+
+>    ---
+> =
+
+>    src/perf/perf.cpp |=C2=A0 =C2=A0 3 +++
+>    1 file changed, 3 insertions(+)
+> =
+
+>    diff --git a/src/perf/perf.cpp b/src/perf/perf.cpp
+>    index ce9ae6a..09ca390 100644
+>    --- a/src/perf/perf.cpp
+>    +++ b/src/perf/perf.cpp
+>    @@ -48,6 +48,9 @@
+>    #ifdef __alpha__
+>    #include <asm-generic/unistd.h>
+>    #endif
+>    +#ifdef __arm__
+>    +#include <asm-generic/unistd.h>
+>    +#endif
+> =
+
+>    #include "perf.h"
+>    #include "../lib.h"
+> =
+
+> References
+> =
+
+>    Visible links
+>    1. http://cateee.net/lkddb/web-lkddb/PERF_COUNTERS.html
+
+--===============5244717814499129877==--
 
