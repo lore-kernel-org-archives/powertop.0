@@ -1,46 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============2144715453992646390=="
+Content-Type: multipart/mixed; boundary="===============2934631926206019180=="
 MIME-Version: 1.0
 From: Magnus Fromreide <magfr at lysator.liu.se>
-Subject: Re: [Powertop] csstoh shell-script for cross-compiling PowerTOP
-Date: Wed, 11 Jul 2012 08:56:04 +0200
-Message-ID: <1341989764.2654.2.camel@sara>
-In-Reply-To: 4FFD1A7B.2000105@samsung.com
+Subject: [Powertop] [PATCH 2/2] stdbool.h is not needed in C++
+Date: Sat, 26 May 2012 06:34:19 +0200
+Message-ID: <1338014363.2512.1.camel@sara>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2144715453992646390==
+--===============2934631926206019180==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2012-07-11 at 10:17 +0400, Igor Zhbanov wrote:
-> Hello!
-> =
+Signed-off-by: Magnus Fromreide <magfr(a)lysator.liu.se>
+---
+ src/lib.cpp |    1 -
+ 1 file changed, 1 deletion(-)
 
-> I have tried to build PowerTOP for ARM with a cross-compiler. But PowerTOP
-> uses internal csstoh utility that converts powertop.css to powertoh.h
-> for inclusion in *.cpp source files.
-> =
+diff --git a/src/lib.cpp b/src/lib.cpp
+index 33f835f..ad24eac 100644
+--- a/src/lib.cpp
++++ b/src/lib.cpp
+@@ -32,7 +32,6 @@
+ #include <string>
+ #include <ctype.h>
+ #include <stdio.h>
+-#include <stdbool.h>
+ #include <math.h>
+ #include <stdlib.h>
+ =
 
-> When you use the cross-compiler (without making complicated rules
-> in the Makefile) this utility will be compiled for ARM platform too.
-> And you cannot run it on x86 build host.
-> =
+-- =
 
-> To solve this issue (and because of simplicity of the utility)
-> I have rewritten it in a shell script.
-
-Why /bin/bash?
-
-The script doesn't depend on any bashisms so /bin/sh should be enough,
-right?
-
-Why all the games with chmod?
-$(SHELL) csstoh.sh powertop.css css.h
-should also run the script correctly, shouldn't it?
-
-/MF
+1.7.10
 
 
---===============2144715453992646390==--
+--===============2934631926206019180==--
 
