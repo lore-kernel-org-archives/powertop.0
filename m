@@ -1,45 +1,72 @@
-Content-Type: multipart/mixed; boundary="===============3603809068535195672=="
+Content-Type: multipart/mixed; boundary="===============4237443863432910089=="
 MIME-Version: 1.0
-From: Bram Bouwens <bram at bouwens.org>
-Subject: Re: [Powertop] PowerTop configure fails on BeagleBone/Ubuntu
-Date: Mon, 21 May 2012 22:00:25 +0200
-Message-ID: <4FBA9ED9.9000903@bouwens.org>
-In-Reply-To: 9051790.o9vOvIeput@penguin
+From: Magnus Fromreide <magfr at lysator.liu.se>
+Subject: [Powertop] [PATCH 1/2] Remove the unused stringless class
+Date: Sat, 26 May 2012 06:26:24 +0200
+Message-ID: <1338014310.2512.0.camel@sara>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3603809068535195672==
+--===============4237443863432910089==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 05/21/2012 06:47 PM, Lekensteyn wrote:
-> On Monday 21 May 2012 16:56:20 Bram Bouwens wrote:
->> checking for strtoull... yes
->> checking for library containing delwin... -lncurses
->> ./configure: line 19020: syntax error near unexpected token `PCIUTILS,'
->> ./configure: line 19020: `PKG_CHECK_MODULES(PCIUTILS, libpci,,'
-> You need to install the pkg-config package.
+Signed-off-by: Magnus Fromreide <magfr(a)lysator.liu.se>
+---
+ src/lib.cpp |    7 -------
+ src/lib.h   |    6 ------
+ 2 files changed, 13 deletions(-)
 
-No, that's present.
->
->> though I see something unexpected with the PCI bus:
->>
->> root(a)omap:~/powertop-2.0# ls /proc/bus/pci
->> ls: cannot access /proc/bus/pci: No such file or directory
-> Not sure if there is a kernel config missing, does /sys/bus/pci/ exists?
+diff --git a/src/lib.cpp b/src/lib.cpp
+index 0c2c1f1..33f835f 100644
+--- a/src/lib.cpp
++++ b/src/lib.cpp
+@@ -158,13 +158,6 @@ void set_max_cpu(int cpu)
+ }
+ =
 
-That isn't there either. Just checked under Angstrom too, it simply isn't t=
-here;
-the message is slightly different though:
+ =
 
-checking for PCIUTILS... no
-checking for library containing pci_get_dev... no
-configure: error: libpci is required but was not found
+-bool stringless::operator()(const char * const & lhs, const char * const &=
+ rhs) const
+-{
+-	if (strcmp(lhs, rhs) < 0)
+-		return true;
+-	return false;
+-}
+-
+ void write_sysfs(const string &filename, const string &value)
+ {
+ 	ofstream file;
+diff --git a/src/lib.h b/src/lib.h
+index d555ebd..588c023 100644
+--- a/src/lib.h
++++ b/src/lib.h
+@@ -49,12 +49,6 @@ extern char *hz_to_human(unsigned long hz, char *buffer,=
+ int digits =3D 2);
+ =
 
-And opkg can't find a package for it....
+ extern const char *kernel_function(uint64_t address);
+ =
 
-Bram
+-class stringless
+-{
+-public:
+-	bool operator()(const char * const & lhs, const char * const & rhs) const=
+ ;
+-};
+-
+ =
 
---===============3603809068535195672==--
+ =
+
+ =
+
+-- =
+
+1.7.10
+
+
+--===============4237443863432910089==--
 
