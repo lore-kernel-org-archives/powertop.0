@@ -1,45 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============9004299113707093574=="
+Content-Type: multipart/mixed; boundary="===============1164213917879823922=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Remove unneded zlib dependency
-Date: Wed, 18 Jul 2012 15:02:44 -0700
-Message-ID: <50073284.8090005@linux.intel.com>
-In-Reply-To: 1342623298-30628-1-git-send-email-i.zhbanov@samsung.com
+From: Andreas Mohr <andi at lisas.de>
+Subject: [Powertop] autoconf madness, AGAIN
+Date: Mon, 28 May 2012 18:55:54 +0200
+Message-ID: <20120528165554.GA22853@rhlx01.hs-esslingen.de>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============9004299113707093574==
+--===============1164213917879823922==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 07/18/2012 07:54 AM, Igor Zhbanov wrote:
-> Remove unneded zlib dependency from configure.ac
-> ---
->   configure.ac |    3 ---
->   1 files changed, 0 insertions(+), 3 deletions(-)
->
-> diff --git a/configure.ac b/configure.ac
-> index ff4cdea..4b3d027 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -50,9 +50,6 @@ AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], AC_MSG=
-_ERROR([ncurses is requir
->   PKG_CHECK_MODULES([PCIUTILS], [libpci],[],[
->   	AC_SEARCH_LIBS([pci_get_dev], [pci], [], AC_MSG_ERROR([libpci is requi=
-red but was not found]), [])
->   ])
-> -PKG_CHECK_MODULES([LIBZ], [zlib],[],[
-> -	AC_SEARCH_LIBS([deflate], [z], [], AC_MSG_ERROR([zlib is required but w=
-as not found]), [])
-> -])
->   =
+[resend - mail to deprecated list power(a)bughost.org did not make it to li=
+st]
 
->   has_libnl_ver=3D0
->   PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [
+Hi,
 
-Your patch has been merged
-Thank You
+[trying to test current fenrus75 powertop master]
 
---===============9004299113707093574==--
+it seems whenever I'm forced to build an autoconf-based app,
+there's a >>> 50% chance of ending up something like that:
+
+| autoreconf: running: aclocal -I m4
+| configure.ac:4: error: Autoconf version 2.68 or higher is required
+| configure.ac:4: the top level
+| autom4te: /usr/bin/m4 failed with exit status: 63
+| aclocal: /usr/bin/autom4te failed with exit status: 63
+| autoreconf: aclocal failed with exit status: 63
+
+(or choose one of the almost universal "unknown macro ..."
+or something else errors instead)
+
+
+I'm running Debian stable (MEPIS 11.0) here, with the following package
+deals of the day:
+
+$ apt-cache search autoconf
+...
+autoconf - automatic configure script builder
+autoconf2.13 - automatic configure script builder (obsolete version)
+autoconf2.59 - automatic configure script builder (obsolete version)
+autoconf2.64 - automatic configure script builder (obsolete version)
+
+
+What does that tell us? That's a truly impressive list of versionitis
+workaround options for a supposedly universally applicable build environmen=
+t.
+Yet even that massive list is miraculously unable to fulfill the
+"version requirements of the day" that powertop (or some other
+autoconf-based software) exhibits.
+
+IMHO that means that powertop's autoconf version requirements
+are too aggressive and should be fixed. ESPECIALLY since even the newest
+autoconf release is only one version number newer than this requirement.
+I could try to work on that if this is
+"something that is deemed worthy of fixing".
+
+Thanks,
+
+Andreas Mohr
+
+P.S.: full disclosure: more active on the CMake side of development -
+which in certain areas isn't always rosy either though ;)
+
+--===============1164213917879823922==--
 
