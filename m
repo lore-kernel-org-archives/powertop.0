@@ -1,61 +1,30 @@
-Content-Type: multipart/mixed; boundary="===============1711244084387629789=="
+Content-Type: multipart/mixed; boundary="===============1877867285056366811=="
 MIME-Version: 1.0
-From: Magnus Fromreide <magfr at lysator.liu.se>
-Subject: [Powertop] [PATCH 2/3] Remove redundant inclusion of -O2 -g in
- powertop_CXXFLAGS
-Date: Mon, 21 May 2012 21:46:26 +0200
-Message-ID: <1337631481.2616.1.camel@sara>
+From: Marti Raudsepp <marti at juffo.org>
+Subject: Re: [Powertop] PowerTOP 2.0 bugs
+Date: Fri, 01 Jun 2012 23:05:43 +0300
+Message-ID: <CABRT9RA++V6tLPwt0aDxKXGCC6PV=kzJkDXpFGi9Urf+6MPbxA@mail.gmail.com>
+In-Reply-To: 4FC91EC9.4030201@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1711244084387629789==
+--===============1877867285056366811==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-When building a program then program_CXXFLAGS replaces AM_CXXFLAGS and
-CXXFLAGS is appended to it, this is the reason for the double -O2 -g options
-when building the powertop binary.
+On Fri, Jun 1, 2012 at 10:58 PM, Chris Ferron
+<chris.e.ferron(a)linux.intel.com> wrote:
+> I didn't forget about the problem, but like I stated in previously I didn=
+'t
+> have access to non Intel hardware.
 
-This patch removes the extra -O2 -g and returns the control of the optimiza=
-tion
-and debug flags to CXXFLAGS as one would expect.
+As I demonstrated, I can reproduce the problem on my Intel laptop and
+also an Intel server. I don't know why you're having trouble
+reproducing it, but the CPU vendor is not the problem.
 
-Please note that the default value of CXXFLAGS is -O2 -g if the compiler
-supports it.
+Regards,
+Marti
 
-Signed-off-by: Magnus Fromreide <magfr(a)lysator.liu.se>
----
- src/Makefile.am |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/src/Makefile.am b/src/Makefile.am
-index e26c8bc..3e8294a 100644
---- a/src/Makefile.am
-+++ b/src/Makefile.am
-@@ -33,7 +33,7 @@ powertop_SOURCES =3D parameters/persistent.cpp parameters=
-/learn.cpp parameters/par
- 		main.cpp css.h powertop.css
- =
-
- =
-
--powertop_CXXFLAGS =3D -O2 -g -fno-omit-frame-pointer -fstack-protector -Wa=
-ll -Wshadow -Wformat -I/usr/include/ $(NCURSES_CFLAGS) $(PCIUTILS_CFLAGS) $=
-(LIBNL_CFLAGS) $(GLIB2_CFLAGS)
-+powertop_CXXFLAGS =3D -fno-omit-frame-pointer -fstack-protector -Wall -Wsh=
-adow -Wformat -I/usr/include/ $(NCURSES_CFLAGS) $(PCIUTILS_CFLAGS) $(LIBNL_=
-CFLAGS) $(GLIB2_CFLAGS)
- =
-
- =
-
- powertop_CPPFLAGS =3D -D_FORTIFY_SOURCE=3D2 $(NCURSES_CFLAGS) $(PCIUTILS_C=
-FLAGS) $(LIBNL_CFLAGS) $(GLIB2_CFLAGS) $(LIBZ_CFLAGS)
--- =
-
-1.7.10
-
-
---===============1711244084387629789==--
+--===============1877867285056366811==--
 
