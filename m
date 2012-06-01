@@ -1,64 +1,104 @@
-Content-Type: multipart/mixed; boundary="===============4251086009694596083=="
+Content-Type: multipart/mixed; boundary="===============0209406919344834865=="
 MIME-Version: 1.0
-From: Lekensteyn <lekensteyn at gmail.com>
-Subject: [Powertop] Segmentation fault occurs with --calibrate
-Date: Thu, 17 May 2012 17:48:13 +0200
-Message-ID: <3231880.1xuGnurXlG@penguin>
+From: =?utf-8?q?N=C3=A9meth_M=C3=A1rton_=3Cnm127_at_freemail=2Ehu=3E?=
+Subject: Re: [Powertop] PowerTOP: _("Cannot load from file")
+Date: Fri, 01 Jun 2012 09:23:14 +0200
+Message-ID: <4FC86DE2.1050807@freemail.hu>
+In-Reply-To: 4FC79170.9060804@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4251086009694596083==
+--===============0209406919344834865==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi Chris,
+Chris Ferron wrote:
+> On 05/30/2012 09:53 PM, N=C3=A9meth M=C3=A1rton wrote:
+>> Hi Chris,
+>>
+>> I have seen in commit 0e9374d27bfa51b885ee3fe69fbb3b12bdae3600 that
+>> the last space of the "Cannot load from file " was removed. This results
+>> even in English the following output:
+>>
+>> Cannot load from file/var/cache/powertop/saved_parameters.powertop
+>>
+>> One solution would be something like this:
+>>
+>>    cout<<  _("Cannot load from file")<<  " "<<  pathname<<  "\n";
+> Good input thank you. I am still learning about the difficulty's in =
 
-With the new Powertop 2.0, `powertop --calibrate` segfaults. Debugging outp=
-ut =
+> translation on internationalization.
+> I will make some adjustments from your input.
 
-is attached:
+See the attached patch what I really ment.
 
-> Starting program: /tmp/powertop-2.0/src/powertop --calibrate
-> [Thread debugging using libthread_db enabled]
-> Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
-> Starting PowerTOP power estimate calibration =
+Otherwise it could be also better as I described:
 
-> Calibrating idle
-> =
+>> However, in Hungarian this sentence is difficult to translate because of
+>> the word order. For example the natural translation of the following
+>> English sentence would be:
+>>
+>>    English: Cannot load from file foo.bar
+>>    Hungarian: Nem lehetett a foo.bar f=C3=A1jlb=C3=B3l bet=C3=B6lteni
+>>
+>> As you can see in this case it would be better to use the %s format stri=
+ng
+>> for printing pathname because this gives better flexibility for the tran=
+slator
+>> to place the pathname string in natural place in a translated sentence.
+>>
+>> Regards,
+>>
+>> 	M=C3=A1rton N=C3=A9meth
 
-> Program received signal SIGSEGV, Segmentation fault.
-> perf_bundle::start (this=3D0x0) at perf/perf_bundle.cpp:180
-> 180             for (i =3D 0; i < events.size(); i++) {
-> (gdb) bt
-> #0  perf_bundle::start (this=3D0x0) at perf/perf_bundle.cpp:180
-> #1  0x000000000040f9b0 in start_cpu_measurement () at cpu/cpu.cpp:297
-> #2  0x0000000000442655 in one_measurement (seconds=3D15) at main.cpp:182
-> #3  0x000000000043f4c2 in idle_calibration () at calibrate/calibrate.cpp:=
-423
-> #4  calibrate () at calibrate/calibrate.cpp:466
-> #5  0x000000000040665f in main (argc=3D2, argv=3D0x7fffffffe718) at main.=
-cpp:325
-> (gdb) up
-> #1  0x000000000040f9b0 in start_cpu_measurement () at cpu/cpu.cpp:297
-> 297             perf_events->start()
-> (gdb) print perf_events
-> $5 =3D (perf_bundle *) 0x0
+From: M=C3=A1rton N=C3=A9meth <nm127(a)freemail.hu>
 
-The order of processing seems flawed. Immediately during argument processin=
-g, =
+Fix space between localized string and pathname.
 
-calibrate() is called. But start_cpu_measurement requires some initializati=
-on =
+Signed-off-by: M=C3=A1rton N=C3=A9meth <nm127(a)freemail.hu>
+---
+diff --git a/src/parameters/persistent.cpp b/src/parameters/persistent.cpp
+index 47b8824..553cccb 100644
+--- a/src/parameters/persistent.cpp
++++ b/src/parameters/persistent.cpp
+@@ -43,7 +43,7 @@ void save_all_results(const char *filename)
 
-which is done by enumerate_cpus() in the main() function after arguments =
+ 	file.open(pathname, ios::out);
+ 	if (!file) {
+-		cout << _("Cannot save to file ") << pathname << "\n";
++		cout << _("Cannot save to file") << " " << pathname << "\n";
+ 		return;
+ 	}
+ 	for (i =3D 0; i < past_results.size(); i++) {
+@@ -75,7 +75,7 @@ void load_results(const char *filename)
 
-processing. You know your code better, so I'll gratefully wait for your =
+ 	file.open(pathname, ios::in);
+ 	if (!file) {
+-		cout << _("Cannot load from file ") << pathname << "\n";
++		cout << _("Cannot load from file") << " " << pathname << "\n";
+ 		return;
+ 	}
 
-patches.
+@@ -137,7 +137,7 @@ void save_parameters(const char *filename)
 
-Thanks,
-Peter
+ 	file.open(pathname, ios::out);
+ 	if (!file) {
+-		cout << _("Cannot save to file ")<< " "<< pathname << "\n";
++		cout << _("Cannot save to file") << " " << pathname << "\n";
+ 		return;
+ 	}
 
---===============4251086009694596083==--
+@@ -162,7 +162,7 @@ void load_parameters(const char *filename)
+
+ 	file.open(pathname, ios::in);
+ 	if (!file) {
+-		cout << _("Cannot load from file ")<< " "<< pathname << "\n";
++		cout << _("Cannot load from file") << " " << pathname << "\n";
+ 		return;
+ 	}
+
+
+--===============0209406919344834865==--
 
