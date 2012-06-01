@@ -1,68 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============1164213917879823922=="
+Content-Type: multipart/mixed; boundary="===============6944422236546472402=="
 MIME-Version: 1.0
-From: Andreas Mohr <andi at lisas.de>
-Subject: [Powertop] autoconf madness, AGAIN
-Date: Mon, 28 May 2012 18:55:54 +0200
-Message-ID: <20120528165554.GA22853@rhlx01.hs-esslingen.de>
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] PowerTOP 2.0 bugs
+Date: Fri, 01 Jun 2012 12:58:01 -0700
+Message-ID: <4FC91EC9.4030201@linux.intel.com>
+In-Reply-To: CABRT9RB4rQR1rUjf-Yw4AUFYhk1QGUY_62GBwzcnBy=oV4ZXAw@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1164213917879823922==
+--===============6944422236546472402==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-[resend - mail to deprecated list power(a)bughost.org did not make it to li=
-st]
+On 06/01/2012 09:37 AM, Marti Raudsepp wrote:
+>> On Tue, May 15, 2012 at 8:29 PM, Chris Ferron<chris.e.ferron(a)linux.int=
+el.com>  wrote:
+>>> OK, lets start with bug 1. It seem there is a definite issues with non-=
+intel
+>>> processors.
+> On Thu, May 17, 2012 at 12:04 AM, Marti Raudsepp<marti(a)juffo.org>  wrot=
+e:
+>> Any other info I can provide?
+> Ping? Any updates on this?
+I didn't forget about the problem, but like I stated in previously I =
 
-Hi,
+didn't have access to non Intel hardware. I have ordered a non-intel =
 
-[trying to test current fenrus75 powertop master]
+laptop specificity to work on this issue, but until I get hardware this =
 
-it seems whenever I'm forced to build an autoconf-based app,
-there's a >>> 50% chance of ending up something like that:
-
-| autoreconf: running: aclocal -I m4
-| configure.ac:4: error: Autoconf version 2.68 or higher is required
-| configure.ac:4: the top level
-| autom4te: /usr/bin/m4 failed with exit status: 63
-| aclocal: /usr/bin/autom4te failed with exit status: 63
-| autoreconf: aclocal failed with exit status: 63
-
-(or choose one of the almost universal "unknown macro ..."
-or something else errors instead)
-
-
-I'm running Debian stable (MEPIS 11.0) here, with the following package
-deals of the day:
-
-$ apt-cache search autoconf
-...
-autoconf - automatic configure script builder
-autoconf2.13 - automatic configure script builder (obsolete version)
-autoconf2.59 - automatic configure script builder (obsolete version)
-autoconf2.64 - automatic configure script builder (obsolete version)
+issue will have to sit on the back burner. I should have the system soon.
+-Chris
 
 
-What does that tell us? That's a truly impressive list of versionitis
-workaround options for a supposedly universally applicable build environmen=
-t.
-Yet even that massive list is miraculously unable to fulfill the
-"version requirements of the day" that powertop (or some other
-autoconf-based software) exhibits.
+>
+> Regards,
+> Marti
 
-IMHO that means that powertop's autoconf version requirements
-are too aggressive and should be fixed. ESPECIALLY since even the newest
-autoconf release is only one version number newer than this requirement.
-I could try to work on that if this is
-"something that is deemed worthy of fixing".
 
-Thanks,
-
-Andreas Mohr
-
-P.S.: full disclosure: more active on the CMake side of development -
-which in certain areas isn't always rosy either though ;)
-
---===============1164213917879823922==--
+--===============6944422236546472402==--
 
