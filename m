@@ -1,38 +1,114 @@
-Content-Type: multipart/mixed; boundary="===============1013463044687110231=="
+Content-Type: multipart/mixed; boundary="===============2642824668946148875=="
 MIME-Version: 1.0
-From: Thomas Spura <thomas.spura at googlemail.com>
-Subject: Re: [Powertop] PowerTop Hungarian (HU_hu) translation
-Date: Tue, 29 May 2012 13:00:47 +0200
-Message-ID: <CAE4GLsvRh1p7VVSpzcNPzQ5g7jMeqRbgEgnOJzauHmQxGWvJ8w@mail.gmail.com>
-In-Reply-To: 4FC466F6.3000400@freemail.hu
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] PowerTOP: _("Cannot load from file")
+Date: Fri, 01 Jun 2012 13:06:31 -0700
+Message-ID: <4FC920C7.5070609@linux.intel.com>
+In-Reply-To: 4FC86DE2.1050807@freemail.hu
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1013463044687110231==
+--===============2642824668946148875==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 29, 2012 at 8:04 AM, N=C3=A9meth M=C3=A1rton <nm127(a)freemail.=
-hu> wrote:
->> I just approved the Hungarian team for PowerTOP, so you should be able
->> to upload your translations now. =C2=A0If not, let us know.
+On 06/01/2012 12:23 AM, N=C3=A9meth M=C3=A1rton wrote:
+> Hi Chris,
+> Chris Ferron wrote:
+>> On 05/30/2012 09:53 PM, N=C3=A9meth M=C3=A1rton wrote:
+>>> Hi Chris,
+>>>
+>>> I have seen in commit 0e9374d27bfa51b885ee3fe69fbb3b12bdae3600 that
+>>> the last space of the "Cannot load from file " was removed. This results
+>>> even in English the following output:
+>>>
+>>> Cannot load from file/var/cache/powertop/saved_parameters.powertop
+>>>
+>>> One solution would be something like this:
+>>>
+>>>     cout<<   _("Cannot load from file")<<   ""<<   pathname<<   "\n";
+>> Good input thank you. I am still learning about the difficulty's in
+>> translation on internationalization.
+>> I will make some adjustments from your input.
+> See the attached patch what I really ment.
 >
-> Thanks. I had to correct some syntax mistakes catched by "msgfmt -c" befo=
-re
-> I could upload the translation. Now it is there.
+> Otherwise it could be also better as I described:
+ah ok.
+So you would rather see translatable strings that look like this?
+
+"PCI Device %s has no runtime power management"
+
+or in this case
+
+"Cannot load from file %s"
+?
+
+-Chris
+
+>>> However, in Hungarian this sentence is difficult to translate because of
+>>> the word order. For example the natural translation of the following
+>>> English sentence would be:
+>>>
+>>>     English: Cannot load from file foo.bar
+>>>     Hungarian: Nem lehetett a foo.bar f=C3=A1jlb=C3=B3l bet=C3=B6lteni
+>>>
+>>> As you can see in this case it would be better to use the %s format str=
+ing
+>>> for printing pathname because this gives better flexibility for the tra=
+nslator
+>>> to place the pathname string in natural place in a translated sentence.
+>>>
+>>> Regards,
+>>>
+>>> 	M=C3=A1rton N=C3=A9meth
+> From: M=C3=A1rton N=C3=A9meth<nm127(a)freemail.hu>
 >
-> It seems that I was confused because of the workflow was not clear for me.
-> It has more steps than just take one .pot file, translate and send back
-> the result.
+> Fix space between localized string and pathname.
+>
+> Signed-off-by: M=C3=A1rton N=C3=A9meth<nm127(a)freemail.hu>
+> ---
+> diff --git a/src/parameters/persistent.cpp b/src/parameters/persistent.cpp
+> index 47b8824..553cccb 100644
+> --- a/src/parameters/persistent.cpp
+> +++ b/src/parameters/persistent.cpp
+> @@ -43,7 +43,7 @@ void save_all_results(const char *filename)
+>
+>   	file.open(pathname, ios::out);
+>   	if (!file) {
+> -		cout<<  _("Cannot save to file ")<<  pathname<<  "\n";
+> +		cout<<  _("Cannot save to file")<<  " "<<  pathname<<  "\n";
+>   		return;
+>   	}
+>   	for (i =3D 0; i<  past_results.size(); i++) {
+> @@ -75,7 +75,7 @@ void load_results(const char *filename)
+>
+>   	file.open(pathname, ios::in);
+>   	if (!file) {
+> -		cout<<  _("Cannot load from file ")<<  pathname<<  "\n";
+> +		cout<<  _("Cannot load from file")<<  " "<<  pathname<<  "\n";
+>   		return;
+>   	}
+>
+> @@ -137,7 +137,7 @@ void save_parameters(const char *filename)
+>
+>   	file.open(pathname, ios::out);
+>   	if (!file) {
+> -		cout<<  _("Cannot save to file ")<<  ""<<  pathname<<  "\n";
+> +		cout<<  _("Cannot save to file")<<  " "<<  pathname<<  "\n";
+>   		return;
+>   	}
+>
+> @@ -162,7 +162,7 @@ void load_parameters(const char *filename)
+>
+>   	file.open(pathname, ios::in);
+>   	if (!file) {
+> -		cout<<  _("Cannot load from file ")<<  ""<<  pathname<<  "\n";
+> +		cout<<  _("Cannot load from file")<<  " "<<  pathname<<  "\n";
+>   		return;
+>   	}
+>
 
-I usually translate online, so there is no need to download it and
-then upload it again.
-It's quite handy, when you don't need to care about the syntax of the
-.po file and can just translate it.
 
-Greetings,
-    Tom
-
---===============1013463044687110231==--
+--===============2642824668946148875==--
 
