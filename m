@@ -1,132 +1,128 @@
-Content-Type: multipart/mixed; boundary="===============5605982987496273134=="
+Content-Type: multipart/mixed; boundary="===============1260641494336758947=="
 MIME-Version: 1.0
-From: Rajagopal Venkat <rajagopal.venkat at linaro.org>
-Subject: [Powertop] [PATCH v3] conditionally disable pci if not supported
-Date: Mon, 25 Jun 2012 22:44:13 +0530
-Message-ID: <1340644453-9135-1-git-send-email-rajagopal.venkat@linaro.org>
+From: =?utf-8?q?N=C3=A9meth_M=C3=A1rton_=3Cnm127_at_freemail=2Ehu=3E?=
+Subject: Re: [Powertop] PowerTOP: _("Cannot load from file")
+Date: Wed, 06 Jun 2012 07:38:07 +0200
+Message-ID: <4FCEECBF.4020300@freemail.hu>
+In-Reply-To: 4FC920C7.5070609@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5605982987496273134==
+--===============1260641494336758947==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-disable pci if not supported by host platform. When
-libpci is not found, define a macro which will be
-used for conditional compilation.
+Chris Ferron wrote:
+> On 06/01/2012 12:23 AM, N=C3=A9meth M=C3=A1rton wrote:
+>> Hi Chris,
+>> Chris Ferron wrote:
+>>> On 05/30/2012 09:53 PM, N=C3=A9meth M=C3=A1rton wrote:
+>>>> Hi Chris,
+>>>>
+>>>> I have seen in commit 0e9374d27bfa51b885ee3fe69fbb3b12bdae3600 that
+>>>> the last space of the "Cannot load from file " was removed. This resul=
+ts
+>>>> even in English the following output:
+>>>>
+>>>> Cannot load from file/var/cache/powertop/saved_parameters.powertop
+>>>>
+>>>> One solution would be something like this:
+>>>>
+>>>>     cout<<   _("Cannot load from file")<<   ""<<   pathname<<   "\n";
+>>> Good input thank you. I am still learning about the difficulty's in
+>>> translation on internationalization.
+>>> I will make some adjustments from your input.
+>> See the attached patch what I really ment.
+>>
+>> Otherwise it could be also better as I described:
+> ah ok.
+> So you would rather see translatable strings that look like this?
+> =
 
-Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
----
- configure.ac |    5 +++--
- src/lib.cpp  |   20 ++++++++++++++++++--
- src/lib.h    |    5 +++++
- 3 files changed, 26 insertions(+), 4 deletions(-)
+> "PCI Device %s has no runtime power management"
+> =
 
-diff --git a/configure.ac b/configure.ac
-index 4da4eea..3cbc7b0 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -48,8 +48,9 @@ AC_CHECK_FUNCS([fdatasync getpagesize gettimeofday memmov=
-e memset mkdir munmap p
- AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], AC_MSG_ERROR([ncurses is =
-required but was not found]), [])
- =
+> or in this case
+> =
 
- PKG_CHECK_MODULES([PCIUTILS], [libpci],[],[
--	AC_SEARCH_LIBS([pci_get_dev], [pci], [], AC_MSG_ERROR([libpci is required=
- but was not found]), [])
--]) =
+> "Cannot load from file %s"
+> ?
 
-+	AC_SEARCH_LIBS([pci_get_dev], [pci], [], AC_DEFINE([HAVE_NO_PCI],[1],[Def=
-ine if pci is not supported]), [])
-+])
-+
- PKG_CHECK_MODULES([LIBZ], [zlib],[],[
- 	AC_SEARCH_LIBS([deflate], [z], [], AC_MSG_ERROR([zlib is required but was=
- not found]), [])
- ]) =
-
-diff --git a/src/lib.cpp b/src/lib.cpp
-index 0f87e48..77e49a2 100644
---- a/src/lib.cpp
-+++ b/src/lib.cpp
-@@ -35,11 +35,13 @@
- #include <math.h>
- #include <stdlib.h>
- =
-
-+#include "lib.h"
-+
-+#ifndef HAVE_NO_PCI
- extern "C" {
- #include <pci/pci.h>
- }
--
--#include "lib.h"
-+#endif
- =
-
- #include <stdio.h>
- #include <stdint.h>
-@@ -266,6 +268,7 @@ void format_watts(double W, char *buffer, unsigned int =
-len)
- }
- =
-
- =
-
-+#ifndef HAVE_NO_PCI
- static struct pci_access *pci_access;
- =
-
- char *pci_id_to_name(uint16_t vendor, uint16_t device, char *buffer, int l=
-en)
-@@ -290,6 +293,19 @@ void end_pci_access(void)
- 		pci_free_name_list(pci_access);
- }
- =
-
-+#else
-+
-+char *pci_id_to_name(uint16_t vendor, uint16_t device, char *buffer, int l=
-en)
-+{
-+	return NULL;
-+}
-+
-+void end_pci_access(void)
-+{
-+}
-+
-+#endif /* HAVE_NO_PCI */
-+
- int utf_ok =3D -1;
- =
-
- =
-
-diff --git a/src/lib.h b/src/lib.h
-index 588c023..7093b7f 100644
---- a/src/lib.h
-+++ b/src/lib.h
-@@ -30,6 +30,11 @@
- #endif
- #include <stdint.h>
- =
-
-+/* Include only for Automake builds */
-+#ifdef HAVE_CONFIG_H
-+#include "config.h"
-+#endif
-+
- #ifndef DISABLE_I18N
- #define _(STRING)    gettext(STRING)
- #else
--- =
-
-1.7.9.5
+Yes, I think it is better translatable.
 
 
---===============5605982987496273134==--
+>>>> However, in Hungarian this sentence is difficult to translate because =
+of
+>>>> the word order. For example the natural translation of the following
+>>>> English sentence would be:
+>>>>
+>>>>     English: Cannot load from file foo.bar
+>>>>     Hungarian: Nem lehetett a foo.bar f=C3=A1jlb=C3=B3l bet=C3=B6lteni
+>>>>
+>>>> As you can see in this case it would be better to use the %s format st=
+ring
+>>>> for printing pathname because this gives better flexibility for the tr=
+anslator
+>>>> to place the pathname string in natural place in a translated sentence.
+>>>>
+>>>> Regards,
+>>>>
+>>>> 	M=C3=A1rton N=C3=A9meth
+>> From: M=C3=A1rton N=C3=A9meth<nm127(a)freemail.hu>
+>>
+>> Fix space between localized string and pathname.
+>>
+>> Signed-off-by: M=C3=A1rton N=C3=A9meth<nm127(a)freemail.hu>
+>> ---
+>> diff --git a/src/parameters/persistent.cpp b/src/parameters/persistent.c=
+pp
+>> index 47b8824..553cccb 100644
+>> --- a/src/parameters/persistent.cpp
+>> +++ b/src/parameters/persistent.cpp
+>> @@ -43,7 +43,7 @@ void save_all_results(const char *filename)
+>>
+>>   	file.open(pathname, ios::out);
+>>   	if (!file) {
+>> -		cout<<  _("Cannot save to file ")<<  pathname<<  "\n";
+>> +		cout<<  _("Cannot save to file")<<  " "<<  pathname<<  "\n";
+>>   		return;
+>>   	}
+>>   	for (i =3D 0; i<  past_results.size(); i++) {
+>> @@ -75,7 +75,7 @@ void load_results(const char *filename)
+>>
+>>   	file.open(pathname, ios::in);
+>>   	if (!file) {
+>> -		cout<<  _("Cannot load from file ")<<  pathname<<  "\n";
+>> +		cout<<  _("Cannot load from file")<<  " "<<  pathname<<  "\n";
+>>   		return;
+>>   	}
+>>
+>> @@ -137,7 +137,7 @@ void save_parameters(const char *filename)
+>>
+>>   	file.open(pathname, ios::out);
+>>   	if (!file) {
+>> -		cout<<  _("Cannot save to file ")<<  ""<<  pathname<<  "\n";
+>> +		cout<<  _("Cannot save to file")<<  " "<<  pathname<<  "\n";
+>>   		return;
+>>   	}
+>>
+>> @@ -162,7 +162,7 @@ void load_parameters(const char *filename)
+>>
+>>   	file.open(pathname, ios::in);
+>>   	if (!file) {
+>> -		cout<<  _("Cannot load from file ")<<  ""<<  pathname<<  "\n";
+>> +		cout<<  _("Cannot load from file")<<  " "<<  pathname<<  "\n";
+>>   		return;
+>>   	}
+>>
+> =
+
+> =
+
+> =
+
+
+
+--===============1260641494336758947==--
 
