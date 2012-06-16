@@ -1,57 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============0501267359242610211=="
+Content-Type: multipart/mixed; boundary="===============1788177401225697670=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] configure: First try to use libnl-3,
- then libnl-2, then libnl-1
-Date: Mon, 30 Jul 2012 09:08:54 -0700
-Message-ID: <5016B196.6000505@linux.intel.com>
-In-Reply-To: 1343656511-25137-1-git-send-email-i.zhbanov@samsung.com
+From: Magnus Fromreide <magfr at lysator.liu.se>
+Subject: [Powertop] Please revert the workload patch
+Date: Sat, 16 Jun 2012 13:16:53 +0200
+Message-ID: <1339845413.2673.1.camel@sara>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0501267359242610211==
+--===============1788177401225697670==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 07/30/2012 06:55 AM, Igor Zhbanov wrote:
-> Change search order for libnl in configure.ac:
-> first try to use libnl-3, then libnl-2, then libnl-1.
-> ---
->   configure.ac |   13 +++++++------
->   1 files changed, 7 insertions(+), 6 deletions(-)
->
-> diff --git a/configure.ac b/configure.ac
-> index 3f5775f..552626c 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -53,12 +53,13 @@ PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=3D=
-1],[
->    =
+Hello.
 
->   =
+Could you please revert the workload patch
+(b45a38317777678b94cdf4cc81896e3a66db68bd) as it seems to try to
+execute some random memory. When powertop is started as
 
->   has_libnl_ver=3D0
-> -PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [
-> -	AC_SEARCH_LIBS([nl_socket_alloc], [nl], [has_libnl_ver=3D2], [
-> -		     PKG_CHECK_MODULES([LIBNL], [libnl-3.0 libnl-genl-3.0], [has_libnl=
-_ver=3D3],
-> -				       [AC_SEARCH_LIBS([nl_socket_alloc], [nl-3 nl-genl-3], [has_lib=
-nl_ver=3D3], [], [])])
-> -	], [])
-> -])
-> +PKG_CHECK_MODULES([LIBNL], [libnl-3.0 libnl-genl-3.0], [
-> +	has_libnl_ver=3D3], [
-> +	AC_SEARCH_LIBS([nl_socket_alloc], [nl-3 nl-genl-3], [
-> +		has_libnl_ver=3D3], [
-> +		AC_SEARCH_LIBS([nl_socket_alloc], [nl], [
-> +			has_libnl_ver=3D2], [
-> +			PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [])])])])
->   if (test "$has_libnl_ver" -eq 0); then
->   	AC_MSG_ERROR(libnl is required but not found)
->   fi
-Patch merged
-Thank You
+./powertop
 
---===============0501267359242610211==--
+I see the following stack trace:
+
+Breakpoint 1, system (line=3D0x7fffffffd440 "\020\020i") at pt-system.c:29
+29      pt-system.c: No such file or directory.
+(gdb) where
+#0  system (line=3D0x7fffffffd440 "\020\020i") at pt-system.c:29
+#1  0x0000000000456933 in one_measurement (seconds=3D20, workload=3D0x7ffff=
+fffd440 "\020\020i") at main.cpp:190
+#2  0x00000000004572c2 in main (argc=3D1, argv=3D0x7fffffffe538) at main.cp=
+p:455
+(gdb) =
+
+
+This shows up as a powertop beeing nonresponsive, flashing the
+display excessively and warning about not managing to run the program.
+
+/MF
+
+
+
+--===============1788177401225697670==--
 
