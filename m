@@ -1,54 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============7859447081580206576=="
+Content-Type: multipart/mixed; boundary="===============4542466648276962448=="
 MIME-Version: 1.0
-From: Bram Bouwens <bram at bouwens.org>
-Subject: [Powertop] PowerTop configure fails on BeagleBone/Ubuntu
-Date: Mon, 21 May 2012 16:56:20 +0200
-Message-ID: <4FBA5794.60107@bouwens.org>
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] Please revert the workload patch
+Date: Mon, 18 Jun 2012 09:43:02 -0700
+Message-ID: <4FDF5A96.9010009@linux.intel.com>
+In-Reply-To: 4FDF4717.8040707@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7859447081580206576==
+--===============4542466648276962448==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi!
+Hi Magnus,
+     Sorry about that, that patch was lost in the shuffle. All patches =
 
-I'm trying to build powertop-2.0 on a BeagleBone running Ubuntu:
+have now been applied upstream, and all should now be well.
+-Chris
 
-root(a)omap:~/powertop-2.0# uname -a
-Linux omap 3.2.0-psp7 #1 Fri Apr 13 04:55:05 UTC 2012 armv7l armv7l armv7l =
-GNU/Linux
+On 06/18/2012 08:19 AM, Dirk Brandewie wrote:
+> Hi Magnus,
+>
+> This patch should fix your problem.  I will work with Chris to get it
+> pushed out.
+>
+> BTW could not find the commit you quoted
+>
+> --Dirk
+>
+> diff --git a/src/main.cpp b/src/main.cpp
+> index 880d745..c57c984 100644
+> --- a/src/main.cpp
+> +++ b/src/main.cpp
+> @@ -452,7 +452,7 @@ int main(int argc, char **argv)
+>
+>      while (!leave_powertop) {
+>          show_cur_tab();
+> -        one_measurement(time_out, workload);
+> +        one_measurement(time_out, NULL);
+>          learn_parameters(15, 0);
+>      }
+>  #ifndef DISABLE_NCURSES
 
-but I get an error in the ./configure stage:
 
-checking for strtoull... yes
-checking for library containing delwin... -lncurses
-./configure: line 19020: syntax error near unexpected token `PCIUTILS,'
-./configure: line 19020: `PKG_CHECK_MODULES(PCIUTILS, libpci,,'
-
-I do have the pci utils I think:
-
-root(a)omap:~/powertop-2.0# dpkg --list | egrep -i pci
-ii  libpci-dev                      1:3.1.8-2ubuntu5                 Linux =
-PCI Utilities (development files)
-ii  libpci3                         1:3.1.8-2ubuntu5                 Linux =
-PCI Utilities (shared library)
-ii  libpciaccess0                   0.12.902-1                       Generi=
-c PCI access library for X
-ii  pciutils                        1:3.1.8-2ubuntu5                 Linux =
-PCI Utilities
-
-though I see something unexpected with the PCI bus:
-
-root(a)omap:~/powertop-2.0# ls /proc/bus/pci
-ls: cannot access /proc/bus/pci: No such file or directory
-
-I'm not sure this board has a PCI bus, actually.
-
-How should I proceed?
-
-Bram
-
---===============7859447081580206576==--
+--===============4542466648276962448==--
 
