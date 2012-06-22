@@ -1,40 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============5958689474116166781=="
+Content-Type: multipart/mixed; boundary="===============8201778534776810786=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Device list sort function bug
-Date: Wed, 11 Jul 2012 10:33:42 +0300
-Message-ID: <20120711073342.GA3081@swordfish>
-In-Reply-To: 4FFD1904.7040804@samsung.com
+From: Rajagopal Venkat <rajagopal.venkat at linaro.org>
+Subject: [Powertop] [PATCH] fix cpuidle state name parsing
+Date: Sat, 23 Jun 2012 00:08:46 +0530
+Message-ID: <1340390327-2836-1-git-send-email-rajagopal.venkat@linaro.org>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5958689474116166781==
+--===============8201778534776810786==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (07/11/12 10:11), Igor Zhbanov wrote:
-> =
+parse cpuidle C state based on sysfs file entry(stateX)
+instead of state name/description
 
-> Sometimes PowerTOP dies with a Segmentation Fault while generating
-> the report. Little investigation shown that it dies while sorting
-> the device list. The problem is that comparison function devlist_sort
-> is incorrect.
-> =
+Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
+---
+ src/cpu/abstract_cpu.cpp |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> The function should return true if first argument "preceeds" second.
-> But when strcmp() is used, it can return -1, 0 and 1. So both -1 and 1
-> values are silently converted to true, which is wrong. It confuses the so=
-rt()
-> function and it crosses boundary of array.
-> =
+diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
+index cd4eba0..72969fc 100644
+--- a/src/cpu/abstract_cpu.cpp
++++ b/src/cpu/abstract_cpu.cpp
+@@ -147,7 +147,7 @@ void abstract_cpu::insert_cstate(const char *linux_name=
+, const char *human_name,
+ 	strcpy(state->linux_name, linux_name);
+ 	strcpy(state->human_name, human_name);
+ =
+
+-	c =3D human_name;
++	c =3D linux_name;
+ 	while (*c) {
+ 		if (strcmp(linux_name, "active")=3D=3D0) {
+ 			state->line_level =3D LEVEL_C0;
+-- =
+
+1.7.9.5
 
 
-Jan, could you please test this one?
-
-Thanks in advance,
-
-	-ss
-
---===============5958689474116166781==--
+--===============8201778534776810786==--
 
