@@ -1,139 +1,132 @@
-Content-Type: multipart/mixed; boundary="===============1586908691462992451=="
+Content-Type: multipart/mixed; boundary="===============5605982987496273134=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] catch fstream exceptions in lib routines (v2)
-Date: Tue, 22 May 2012 00:05:51 +0300
-Message-ID: <20120521210551.GA27971@swordfish>
-In-Reply-To: 4FBA9581.8080903@linux.intel.com
+From: Rajagopal Venkat <rajagopal.venkat at linaro.org>
+Subject: [Powertop] [PATCH v3] conditionally disable pci if not supported
+Date: Mon, 25 Jun 2012 22:44:13 +0530
+Message-ID: <1340644453-9135-1-git-send-email-rajagopal.venkat@linaro.org>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1586908691462992451==
+--===============5605982987496273134==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (05/21/12 12:20), Chris Ferron wrote:
-> =
+disable pci if not supported by host platform. When
+libpci is not found, define a macro which will be
+used for conditional compilation.
 
-> patch accepted by hand merge from v1.
-> Thanks
-> -Chris
->
-
-Thank you.
-
-	-ss
-
-> =
-
-> On 05/18/2012 04:18 AM, Sergey Senozhatsky wrote:
-> >[PATCH] catch fstream exceptions in lib routines (v2)
-> >
-> >Catch possible fstream and traits_type exceptions in lib.
-> >
-> >V2: Thanks to Peter, he pointed to silly typo I've done in V1.
-> >
-> >Reported-and-tested-by: Lekensteyn<lekensteyn(a)gmail.com>
-> >Signed-off-by: Sergey Senozhatsky<sergey.senozhatsky(a)gmail.com>
-> >
-> >---
-> >
-> >  src/lib.cpp |   54 +++++++++++++++++++++++++++++++++++++++------------=
+Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
 ---
-> >  1 file changed, 39 insertions(+), 15 deletions(-)
-> >
-> >diff --git a/src/lib.cpp b/src/lib.cpp
-> >index 53638dd..0c2c1f1 100644
-> >--- a/src/lib.cpp
-> >+++ b/src/lib.cpp
-> >@@ -172,8 +172,13 @@ void write_sysfs(const string&filename, const strin=
-g&value)
-> >  	file.open(filename.c_str(), ios::out);
-> >  	if (!file)
-> >  		return;
-> >-	file<<  value;
-> >-	file.close();
-> >+	try
-> >+	{
-> >+		file<<  value;
-> >+		file.close();
-> >+	} catch (std::exception&exc) {
-> >+		return;
-> >+	}
-> >  }
-> >
-> >  int read_sysfs(const string&filename, bool *ok)
-> >@@ -187,10 +192,17 @@ int read_sysfs(const string&filename, bool *ok)
-> >  			*ok =3D false;
-> >  		return 0;
-> >  	}
-> >-	file>>  i;
-> >+	try
-> >+	{
-> >+		file>>  i;
-> >+		if (ok)
-> >+			*ok =3D true;
-> >+	} catch (std::exception&exc) {
-> >+		if (ok)
-> >+			*ok =3D false;
-> >+		i =3D 0;
-> >+	}
-> >  	file.close();
-> >-	if (ok)
-> >-		*ok =3D true;
-> >  	return i;
-> >  }
-> >
-> >@@ -203,11 +215,17 @@ string read_sysfs_string(const string&filename)
-> >  	file.open(filename.c_str(), ios::in);
-> >  	if (!file)
-> >  		return "";
-> >-	file.getline(content, 4096);
-> >-	file.close();
-> >-	c =3D strchr(content, '\n');
-> >-	if (c)
-> >-		*c =3D 0;
-> >+	try
-> >+	{
-> >+		file.getline(content, 4096);
-> >+		file.close();
-> >+		c =3D strchr(content, '\n');
-> >+		if (c)
-> >+			*c =3D 0;
-> >+	} catch (std::exception&exc) {
-> >+		file.close();
-> >+		return "";
-> >+	}
-> >  	return content;
-> >  }
-> >
-> >@@ -224,11 +242,17 @@ string read_sysfs_string(const char *format, const=
- char *param)
-> >  	file.open(filename, ios::in);
-> >  	if (!file)
-> >  		return "";
-> >-	file.getline(content, 4096);
-> >-	file.close();
-> >-	c =3D strchr(content, '\n');
-> >-	if (c)
-> >-		*c =3D 0;
-> >+	try
-> >+	{
-> >+		file.getline(content, 4096);
-> >+		file.close();
-> >+		c =3D strchr(content, '\n');
-> >+		if (c)
-> >+			*c =3D 0;
-> >+	} catch (std::exception&exc) {
-> >+		file.close();
-> >+		return "";
-> >+	}
-> >  	return content;
-> >  }
-> >
-> >
->=20
+ configure.ac |    5 +++--
+ src/lib.cpp  |   20 ++++++++++++++++++--
+ src/lib.h    |    5 +++++
+ 3 files changed, 26 insertions(+), 4 deletions(-)
 
---===============1586908691462992451==--
+diff --git a/configure.ac b/configure.ac
+index 4da4eea..3cbc7b0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -48,8 +48,9 @@ AC_CHECK_FUNCS([fdatasync getpagesize gettimeofday memmov=
+e memset mkdir munmap p
+ AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], AC_MSG_ERROR([ncurses is =
+required but was not found]), [])
+ =
+
+ PKG_CHECK_MODULES([PCIUTILS], [libpci],[],[
+-	AC_SEARCH_LIBS([pci_get_dev], [pci], [], AC_MSG_ERROR([libpci is required=
+ but was not found]), [])
+-]) =
+
++	AC_SEARCH_LIBS([pci_get_dev], [pci], [], AC_DEFINE([HAVE_NO_PCI],[1],[Def=
+ine if pci is not supported]), [])
++])
++
+ PKG_CHECK_MODULES([LIBZ], [zlib],[],[
+ 	AC_SEARCH_LIBS([deflate], [z], [], AC_MSG_ERROR([zlib is required but was=
+ not found]), [])
+ ]) =
+
+diff --git a/src/lib.cpp b/src/lib.cpp
+index 0f87e48..77e49a2 100644
+--- a/src/lib.cpp
++++ b/src/lib.cpp
+@@ -35,11 +35,13 @@
+ #include <math.h>
+ #include <stdlib.h>
+ =
+
++#include "lib.h"
++
++#ifndef HAVE_NO_PCI
+ extern "C" {
+ #include <pci/pci.h>
+ }
+-
+-#include "lib.h"
++#endif
+ =
+
+ #include <stdio.h>
+ #include <stdint.h>
+@@ -266,6 +268,7 @@ void format_watts(double W, char *buffer, unsigned int =
+len)
+ }
+ =
+
+ =
+
++#ifndef HAVE_NO_PCI
+ static struct pci_access *pci_access;
+ =
+
+ char *pci_id_to_name(uint16_t vendor, uint16_t device, char *buffer, int l=
+en)
+@@ -290,6 +293,19 @@ void end_pci_access(void)
+ 		pci_free_name_list(pci_access);
+ }
+ =
+
++#else
++
++char *pci_id_to_name(uint16_t vendor, uint16_t device, char *buffer, int l=
+en)
++{
++	return NULL;
++}
++
++void end_pci_access(void)
++{
++}
++
++#endif /* HAVE_NO_PCI */
++
+ int utf_ok =3D -1;
+ =
+
+ =
+
+diff --git a/src/lib.h b/src/lib.h
+index 588c023..7093b7f 100644
+--- a/src/lib.h
++++ b/src/lib.h
+@@ -30,6 +30,11 @@
+ #endif
+ #include <stdint.h>
+ =
+
++/* Include only for Automake builds */
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
++
+ #ifndef DISABLE_I18N
+ #define _(STRING)    gettext(STRING)
+ #else
+-- =
+
+1.7.9.5
+
+
+--===============5605982987496273134==--
 
