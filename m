@@ -1,96 +1,127 @@
-Content-Type: multipart/mixed; boundary="===============1721820805232429422=="
+Content-Type: multipart/mixed; boundary="===============2042438095639280199=="
 MIME-Version: 1.0
-From: Paul Menzel <paulepanter at users.sourceforge.net>
-Subject: Re: [Powertop] Device list sort function bug
-Date: Wed, 11 Jul 2012 09:52:00 +0200
-Message-ID: <1341993120.4108.7.camel@mattotaupa>
-In-Reply-To: 4FFD1904.7040804@samsung.com
+From: Rajagopal Venkat <rajagopal.venkat at linaro.org>
+Subject: [Powertop] [PATCH v2] conditionally disable pci if not supported
+Date: Mon, 25 Jun 2012 21:30:41 +0530
+Message-ID: <1340640041-27358-1-git-send-email-rajagopal.venkat@linaro.org>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1721820805232429422==
+--===============2042438095639280199==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Dear Igor,
+Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
+---
+ configure.ac |    5 +++--
+ src/lib.cpp  |   20 ++++++++++++++++++--
+ src/lib.h    |    4 ++++
+ 3 files changed, 25 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4da4eea..3cbc7b0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -48,8 +48,9 @@ AC_CHECK_FUNCS([fdatasync getpagesize gettimeofday memmov=
+e memset mkdir munmap p
+ AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], AC_MSG_ERROR([ncurses is =
+required but was not found]), [])
+ =
+
+ PKG_CHECK_MODULES([PCIUTILS], [libpci],[],[
+-	AC_SEARCH_LIBS([pci_get_dev], [pci], [], AC_MSG_ERROR([libpci is required=
+ but was not found]), [])
+-]) =
+
++	AC_SEARCH_LIBS([pci_get_dev], [pci], [], AC_DEFINE([HAVE_NO_PCI],[1],[Def=
+ine if pci is not supported]), [])
++])
++
+ PKG_CHECK_MODULES([LIBZ], [zlib],[],[
+ 	AC_SEARCH_LIBS([deflate], [z], [], AC_MSG_ERROR([zlib is required but was=
+ not found]), [])
+ ]) =
+
+diff --git a/src/lib.cpp b/src/lib.cpp
+index 0f87e48..77e49a2 100644
+--- a/src/lib.cpp
++++ b/src/lib.cpp
+@@ -35,11 +35,13 @@
+ #include <math.h>
+ #include <stdlib.h>
+ =
+
++#include "lib.h"
++
++#ifndef HAVE_NO_PCI
+ extern "C" {
+ #include <pci/pci.h>
+ }
+-
+-#include "lib.h"
++#endif
+ =
+
+ #include <stdio.h>
+ #include <stdint.h>
+@@ -266,6 +268,7 @@ void format_watts(double W, char *buffer, unsigned int =
+len)
+ }
+ =
+
+ =
+
++#ifndef HAVE_NO_PCI
+ static struct pci_access *pci_access;
+ =
+
+ char *pci_id_to_name(uint16_t vendor, uint16_t device, char *buffer, int l=
+en)
+@@ -290,6 +293,19 @@ void end_pci_access(void)
+ 		pci_free_name_list(pci_access);
+ }
+ =
+
++#else
++
++char *pci_id_to_name(uint16_t vendor, uint16_t device, char *buffer, int l=
+en)
++{
++	return NULL;
++}
++
++void end_pci_access(void)
++{
++}
++
++#endif /* HAVE_NO_PCI */
++
+ int utf_ok =3D -1;
+ =
+
+ =
+
+diff --git a/src/lib.h b/src/lib.h
+index 588c023..d354151 100644
+--- a/src/lib.h
++++ b/src/lib.h
+@@ -30,6 +30,10 @@
+ #endif
+ #include <stdint.h>
+ =
+
++#if HAVE_CONFIG_H
++#include "config.h"
++#endif
++
+ #ifndef DISABLE_I18N
+ #define _(STRING)    gettext(STRING)
+ #else
+-- =
+
+1.7.9.5
 
 
-thank you for your patches!
-
-
-Am Mittwoch, den 11.07.2012, 10:11 +0400 schrieb Igor Zhbanov:
-
-> Sometimes PowerTOP dies with a Segmentation Fault while generating
-> the report. Little investigation shown that it dies while sorting
-> the device list. The problem is that comparison function devlist_sort
-> is incorrect.
-> =
-
-> The function should return true if first argument "preceeds" second.
-> But when strcmp() is used, it can return -1, 0 and 1. So both -1 and 1
-> values are silently converted to true, which is wrong. It confuses the so=
-rt()
-> function and it crosses boundary of array.
-> =
-
-> Here is the patch:
-> --8<--Cut-here-----------------------------------------------------------=
------
-> diff -purN powertop-il/src/devlist.cpp powertop-il-fix/src/devlist.cpp
-> --- powertop-il/src/devlist.cpp	2012-07-03 17:00:50.000000000 +0400
-> +++ powertop-il-fix/src/devlist.cpp	2012-07-03 20:01:05.896232845 +0400
-> @@ -273,7 +273,7 @@ static bool devlist_sort(struct devuser
->   	if (i->pid !=3D j->pid)
->   		return i->pid<  j->pid;
-> =
-
-> -	return strcmp(i->device, j->device);
-> +	return (strcmp(i->device, j->device)<  0);
->   }
-> =
-
->   static const char *dev_class(int line)
-> --8<---------------------------------------------------------------------=
------
-
-Nice find!
-
-To decrease work for the maintainers, could you please send patches
-formatted by `git format-patch`? After that you can either use `git
-send-email` or copy the output into Seamonkey=E2=80=99s new message window.
-
-        $ git clone git://github.com/fenrus75/powertop.git
-        $ cd powertop
-        $ git config --global user.name "Igor Zhbanov"
-        $ git config --global user.email i.zhbanov(a)samsung.com
-        $ git checkout -b sort-fix # new branch for each fix
-        $ # apply your change
-        $ git commit -a # enter a nice commit message \
-        you should be able to use your great ones from your messages
-        $ git format-patch -1
-
-Then maintainers can just apply it using the following command.
-
-    $ git am yourmessagewithpatch.mbox
-
-If you need more help with Git, just ask.
-
-
-Thanks,
-
-Paul
-
---===============1721820805232429422==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
-L0xpbnV4KQoKaUVZRUFCRUNBQVlGQWsvOU1LQUFDZ2tRUFgxYUsyd09IVmd0V3dDZmYzSXRzdzBT
-YVd6VFdXejFtTitKTlRibApKVDBBb0lmalNoaXdxRWFtNG5keUVjaEg1bjJLeE10Zgo9bVFNTAot
-LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
-
---===============1721820805232429422==--
+--===============2042438095639280199==--
 
