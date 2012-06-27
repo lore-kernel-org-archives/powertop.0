@@ -1,31 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============6926369673642541342=="
+Content-Type: multipart/mixed; boundary="===============7555277246377902798=="
 MIME-Version: 1.0
-From: Marti Raudsepp <marti at juffo.org>
-Subject: Re: [Powertop] PowerTOP 2.0 bugs
-Date: Fri, 01 Jun 2012 19:37:40 +0300
-Message-ID: <CABRT9RB4rQR1rUjf-Yw4AUFYhk1QGUY_62GBwzcnBy=oV4ZXAw@mail.gmail.com>
-In-Reply-To: CABRT9RCxvdDgsf+-hqryrD+Ft7DPdJmBs55PORT6kPPyeEBNHw@mail.gmail.com
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] prevent jump on uninitialized value
+Date: Wed, 27 Jun 2012 11:20:00 -0700
+Message-ID: <4FEB4ED0.2090303@linux.intel.com>
+In-Reply-To: 20120627081714.GC2996@swordfish.datadirect.datadirectnet.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6926369673642541342==
+--===============7555277246377902798==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-> On Tue, May 15, 2012 at 8:29 PM, Chris Ferron <chris.e.ferron(a)linux.int=
-el.com> wrote:
->> OK, lets start with bug 1. It seem there is a definite issues with non-i=
-ntel
->> processors.
+patch applied
+Thanks
+-C
 
-On Thu, May 17, 2012 at 12:04 AM, Marti Raudsepp <marti(a)juffo.org> wrote:
-> Any other info I can provide?
+On 06/27/2012 01:17 AM, Sergey Senozhatsky wrote:
+> workload is getting 'initialized' with stack garbage,
+> so later conditional check of !workload[0] in report()
+> is invalid.
+>
+> Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+>
+> ---
+>
+>   src/main.cpp | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/src/main.cpp b/src/main.cpp
+> index d8e2a47..7a1b976 100644
+> --- a/src/main.cpp
+> +++ b/src/main.cpp
+> @@ -356,7 +356,7 @@ int main(int argc, char **argv)
+>   	int c;
+>   	bool wantreport =3D FALSE;
+>   	char filename[4096];
+> -	char workload[4096];
+> +	char workload[4096] =3D {0,};
+>   	int  iterations =3D 1;
+>   =
 
-Ping? Any updates on this?
+>   #ifndef DISABLE_TRYCATCH
+>
 
-Regards,
-Marti
 
---===============6926369673642541342==--
+
+--===============7555277246377902798==--
 
