@@ -1,43 +1,83 @@
-Content-Type: multipart/mixed; boundary="===============0718367527607390799=="
+Content-Type: multipart/mixed; boundary="===============0973438576614578715=="
 MIME-Version: 1.0
-From: =?utf-8?q?Jan-Simon_M=C3=B6ller_=3Cdl9pf_at_gmx=2Ede=3E?=
-Subject: Re: [Powertop] Device list sort function bug
-Date: Wed, 11 Jul 2012 16:43:23 +0200
-Message-ID: <201207111643.23770.dl9pf@gmx.de>
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH] remove -Werror from AM_INIT_AUTOMAKE
+Date: Wed, 27 Jun 2012 07:20:09 +0300
+Message-ID: <20120627042009.GA2996@swordfish.datadirect.datadirectnet.com>
+In-Reply-To: 1339972214-18301-1-git-send-email-moben@exherbo.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0718367527607390799==
+--===============0973438576614578715==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Am Mittwoch, 11. Juli 2012, 09:33:42 schrieb Sergey Senozhatsky:
-> On (07/11/12 10:11), Igor Zhbanov wrote:
-> > Sometimes PowerTOP dies with a Segmentation Fault while generating
-> > the report. Little investigation shown that it dies while sorting
-> > the device list. The problem is that comparison function devlist_sort
-> > is incorrect.
-> > =
-
-> > The function should return true if first argument "preceeds" second.
-> > But when strcmp() is used, it can return -1, 0 and 1. So both -1 and 1
-> > values are silently converted to true, which is wrong. It confuses the
-> > sort() function and it crosses boundary of array.
+On (06/18/12 00:30), Benedikt Morbach wrote:
+> While this is nice while developing, it may cause
+> various problems with distributed tarballs.
 > =
 
-> Jan, could you please test this one?
+> A new automake version could add a warning, causing errors for distributi=
+ons
+> and users, who might need to patch configure.ac and thus run autoreconf.
 > =
 
-> Thanks in advance,
+> For example, we hit an error where a third party package (gettext) uses
+> functionality (AM_PROG_MKDIR_P) which is deprecated in newer automake ver=
+sions(1.12.1),
+> causing the powertop build to fail.
 > =
 
-> 	-ss
+> Since the problem lies elsewhere, it is stupid to fail for this while bui=
+lding powertop
+> ---
+>  configure.ac |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> =
 
-Confirmed. Fixes the crash & works here.
+> diff --git a/configure.ac b/configure.ac
+> index 4da4eea..ff4cdea 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -3,7 +3,7 @@
+>  =
 
-Acked-by: Jan-Simon Moeller <dl9pf(a)gmx.de>
+>  AC_PREREQ([2.68])
+>  AC_INIT([powertop], [2.0], [powertop(a)lists.01.org])
+> -AM_INIT_AUTOMAKE([-Wall -Werror foreign ])
+> +AM_INIT_AUTOMAKE([-Wall foreign ])
+>  AC_LANG([C++])
+>  AC_CONFIG_FILES([Makefile src/Makefile pevent/Makefile po/Makefile.in do=
+c/Makefile])
+>  AC_CONFIG_SRCDIR([src/main.cpp])
+> =
 
 
---===============0718367527607390799==--
+Well,
+This looks helpful.
+
+I just hit that guy
+
+	automake-1.12: warnings are treated as errors
+	configure.ac:14: warning: The 'AM_PROG_MKDIR_P' macro is deprecated, and w=
+ill soon be removed.
+	configure.ac:14: You should use the Autoconf-provided 'AC_PROG_MKDIR_P' ma=
+cro instead,
+	configure.ac:14: and use '$(MKDIR_P)' instead of '$(mkdir_p)'in your Makef=
+ile.am files.
+	make: *** [Makefile.in] Error 1
+
+according to lists, they are aware of this.
+
+So, how about pushing that one?
+
+
+
+	Tested-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+
+
+	-ss
+
+--===============0973438576614578715==--
 
