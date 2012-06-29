@@ -1,44 +1,37 @@
-Content-Type: multipart/mixed; boundary="===============5248069999520878557=="
+Content-Type: multipart/mixed; boundary="===============7342343760619100072=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: [Powertop] [PATCH 1/4] Use AM_SILENT_RULES
-Date: Sun, 05 Aug 2012 10:09:56 -0700
-Message-ID: <501EA8E4.4030207@linux.intel.com>
+From: Srikanth Grama Ramaprasad <sgramara at buffalo.edu>
+Subject: [Powertop] power usage in watts is not displayed
+Date: Fri, 29 Jun 2012 12:47:23 -0400
+Message-ID: <CAOqk0e_Ni=uoMKAF-u1n+zAEy4_0uMDPfHe=iHAOCzY1TupzLQ@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5248069999520878557==
+--===============7342343760619100072==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
->From 20f2a40280847d3f0f8e9cfe8ff565638b3bb923 Mon Sep 17 00:00:00 2001
-From: Arjan van de Ven <arjan(a)linux.intel.com>
-Date: Sun, 5 Aug 2012 09:55:42 -0700
-Subject: [PATCH 1/4] Use AM_SILENT_RULES
+Dear Sir/Madam,
 
-AM_SILENT_RULES makes the output for "make" much more readable; it also
-allows us to see warnings much more clearly.
----
- configure.ac |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+I am trying to install powerTop on my PC as I need to know the per
+process power consumption.
+I have the Ubuntu 11.10 installed on my PC.
+I installed the package available in Ubuntu Synaptic Package Manger
+but the power consumption in watts is not displayed.
+I get the message "no ACPI power usage estimate available".
+Is there any configuration settings that I am missing ?
 
-diff --git a/configure.ac b/configure.ac
-index 552626c..d675616 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -11,6 +11,7 @@ AC_CONFIG_MACRO_DIR([m4])
- AC_CONFIG_HEADERS([config.h])
- GETTEXT_PACKAGE=3Dpowertop
- AC_SUBST(GETTEXT_PACKAGE)
-+AM_SILENT_RULES([yes])
- AM_GNU_GETTEXT([external])
- AM_GNU_GETTEXT_VERSION([0.18])
+Could you please tell me on which version of the kernel is powerTop support=
+ed ?
 
--- =
+Also in the readme file it says "The patches in the patches/
+sub-directory are required for PowerTOP to function fully." but I was
+not able to find this directory in the tar.bz2.
+Could you please also tell me where I will find the patches directory ?
 
-1.7.7.6
+Thanking you,
+Srikanth
 
-
---===============5248069999520878557==--
+--===============7342343760619100072==--
 
