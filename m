@@ -1,52 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============9077204308919166679=="
+Content-Type: multipart/mixed; boundary="===============7009360584652469452=="
 MIME-Version: 1.0
-From: Magnus Fromreide <magfr at lysator.liu.se>
-Subject: Re: [Powertop] [PATCH 1/2] Make it possible to include parse-events.h
- before libc headers.
-Date: Wed, 25 Jul 2012 21:26:10 +0200
-Message-ID: <1343244370.6440.4.camel@sara>
-In-Reply-To: 50103074.5020703@linux.intel.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] power usage in watts is not displayed
+Date: Fri, 29 Jun 2012 11:10:00 -0700
+Message-ID: <4FEDEF78.2030601@linux.intel.com>
+In-Reply-To: CAOqk0e_Ni=uoMKAF-u1n+zAEy4_0uMDPfHe=iHAOCzY1TupzLQ@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============9077204308919166679==
+--===============7009360584652469452==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2012-07-25 at 10:44 -0700, Chris Ferron wrote:
-> On 07/23/2012 11:03 PM, Magnus Fromreide wrote:
-> > The __unused macro interferes with the glibc and is in a reserved names=
-pace
-> > so it should be renamed.
-> > Additionally the __ununsed macro is used from just one implementation f=
-ile so
-> > the macro is moved there.
-> >
-> > Signed-off-by: Magnus Fromreide <magfr(a)lysator.liu.se>
-> >   =
+On 6/29/2012 9:47 AM, Srikanth Grama Ramaprasad wrote:
+> Dear Sir/Madam,
+> =
 
-> >   =
+> I am trying to install powerTop on my PC as I need to know the per
+> process power consumption.
+> I have the Ubuntu 11.10 installed on my PC.
+> I installed the package available in Ubuntu Synaptic Package Manger
+> but the power consumption in watts is not displayed.
+> I get the message "no ACPI power usage estimate available".
+> Is there any configuration settings that I am missing ?
 
-> I will forward this on to Steve Rostedt. pevent code is not actually =
+not all computers have a BIOS where the BIOS reports the battery
+discharge rate to the operating system..... there's not a lot we can do
+about that.
 
-> strictly part of the powertop src, it is just temporarily being built as =
-
-> part of the project so powertop can take advantage of it early.
-
-Thanks. I found no contact information for pevent but it feels like an
-imported library.
-
-> That said, it may not be a good fit for the grand scheme.
-> Which reminds me I need to push a readme explaining this.
-
-I am looking forward to it.
-
-Patch 2/2 depends on this, should I prepare an alternate version that
-doesn't trigger the bug in the pevent headers?
-
-/MF
-
-
---===============9077204308919166679==--
+--===============7009360584652469452==--
 
