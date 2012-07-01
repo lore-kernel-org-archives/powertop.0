@@ -1,49 +1,47 @@
-Content-Type: multipart/mixed; boundary="===============5198931295637278098=="
+Content-Type: multipart/mixed; boundary="===============5941364015871529890=="
 MIME-Version: 1.0
-From: Colin Ian King <colin.king at canonical.com>
-Subject: [Powertop] questions concerning powertop --calibrate output
-Date: Fri, 08 Jun 2012 13:48:29 +0100
-Message-ID: <4FD1F49D.6070506@canonical.com>
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] Core temperature above threshold
+Date: Sun, 01 Jul 2012 07:31:09 -0700
+Message-ID: <4FF05F2D.9000904@linux.intel.com>
+In-Reply-To: CADiUXRwivWFAshemVrd4PnKNz3MoPak341jiRovkV0yYaPXe9w@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5198931295637278098==
+--===============5941364015871529890==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On 7/1/2012 6:58 AM, mammar wrote:
+> Hi,
+> =
 
-When running 'sudo powertop --calibrate' I observe that it is =
+> I have Dell Inspiron N5010( Intel(R) Core(TM) i3 CPU M 350 @ 2.27GHz )
+> with Fedora 16 installed on it.
+> Here is what uname -a says
+> =
 
-calibrating idle, disk usage, backlight, CPU, USB devices and so forth. =
+> Linux ma-laptop 3.1.9-1.fc16.x86_64 #1 SMP Fri Jan 13 16:37:42 UTC 2012
+> x86_64 x86_64 x86_64 GNU/Linux
+> =
 
-  At the end of the calibration process powertop dumps out a table =
+> From past some days, my cpu cores tempruatre goes above the limits and
+> causes my laptop to shutdown...Following is the message i got when start
+> the laptop after shutdown due to core temprature
+> =
 
-headed "Parameter state". Couple of questions about this table:
+> Jun 25 12:38:33 ma-laptop kernel: [10444.383370] CPU3: Core temperature
+> above threshold, cpu clock throttled (total events =3D 1)
+> Jun 25 12:38:33 ma-laptop kernel: [10444.383374] CPU1: Core temperature
+> above threshold, cpu clock throttled (total events =3D 1)
+> =
 
-1. What does the "Value" column refer to, and what units are they being =
+> Anyone have any idea about this issue? How to solve this issue?
 
-measured in? I'm trying to figure out the significance of these values.
+these symptoms are almost always a sign of a not well functioning fan
 
-I believe that the rows are sorted on name order and the following =
+if you have one of those cans of compressed air, try blowing it out...
 
-number in parentheses refers to the internal index number of this =
-
-device. At first I thought this number had some deeper significance.
-
-2. At the end of the table there are values annotated as "Score", =
-
-"Guess" and "Actual".  Again, what are these referring to?
-
-3. At the end of the calibration process has powertop tuned the system =
-
-to a more "optimal" power configuration?
-
-Thanks for any insight,
-
-Colin
-
-
---===============5198931295637278098==--
+--===============5941364015871529890==--
 
