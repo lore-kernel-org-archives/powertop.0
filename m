@@ -1,98 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============6102961682804443489=="
+Content-Type: multipart/mixed; boundary="===============2144715453992646390=="
 MIME-Version: 1.0
-From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: [Powertop] [PATCH] Get rid of ncurses' TRUE and FALSE
-Date: Wed, 18 Jul 2012 13:17:25 +0400
-Message-ID: <1342603045-25492-1-git-send-email-i.zhbanov@samsung.com>
+From: Magnus Fromreide <magfr at lysator.liu.se>
+Subject: Re: [Powertop] csstoh shell-script for cross-compiling PowerTOP
+Date: Wed, 11 Jul 2012 08:56:04 +0200
+Message-ID: <1341989764.2654.2.camel@sara>
+In-Reply-To: 4FFD1A7B.2000105@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6102961682804443489==
+--===============2144715453992646390==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Get rid of TRUE and FALSE ncurses' defines used for boolean variables
-initialization. This fix also helps build without ncurses support.
----
- src/main.cpp          |    6 +++---
- src/tuning/tuning.cpp |    6 +++---
- 2 files changed, 6 insertions(+), 6 deletions(-)
+On Wed, 2012-07-11 at 10:17 +0400, Igor Zhbanov wrote:
+> Hello!
+> =
 
-diff --git a/src/main.cpp b/src/main.cpp
-index 7a1b976..9f53b46 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -354,7 +354,7 @@ int main(int argc, char **argv)
- {
- 	int option_index;
- 	int c;
--	bool wantreport =3D FALSE;
-+	bool wantreport =3D false;
- 	char filename[4096];
- 	char workload[4096] =3D {0,};
- 	int  iterations =3D 1;
-@@ -396,7 +396,7 @@ int main(int argc, char **argv)
- 				break;
- =
+> I have tried to build PowerTOP for ARM with a cross-compiler. But PowerTOP
+> uses internal csstoh utility that converts powertop.css to powertoh.h
+> for inclusion in *.cpp source files.
+> =
 
- 			case 'h': /* html report */
--				wantreport =3D TRUE;
-+				wantreport =3D true;
- 				reporttype =3D 1;
- 				sprintf(filename, "%s", optarg ? optarg : "PowerTOP.html" );
- 				break;
-@@ -417,7 +417,7 @@ int main(int argc, char **argv)
- 				break;
- 				=
+> When you use the cross-compiler (without making complicated rules
+> in the Makefile) this utility will be compiled for ARM platform too.
+> And you cannot run it on x86 build host.
+> =
 
- 			case 'C': /* csv report*/
--				wantreport =3D TRUE;
-+				wantreport =3D true;
- 				reporttype =3D 0;
- 				sprintf(filename, "%s", optarg ? optarg : "PowerTOP.csv");
- 				break;
-diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
-index 1a90417..865d986 100644
---- a/src/tuning/tuning.cpp
-+++ b/src/tuning/tuning.cpp
-@@ -43,7 +43,7 @@
- #include "../lib.h"
- =
+> To solve this issue (and because of simplicity of the utility)
+> I have rewritten it in a shell script.
 
- static void sort_tunables(void);
--static bool should_clear =3D FALSE;
-+static bool should_clear =3D false;
- =
+Why /bin/bash?
 
- #ifndef DISABLE_NCURSES
- class tuning_window: public tab_window {
-@@ -103,7 +103,7 @@ static void __tuning_update_display(int cursor_pos)
- 		return;
- =
+The script doesn't depend on any bashisms so /bin/sh should be enough,
+right?
 
- 	if (should_clear) {
--		should_clear =3D FALSE;
-+		should_clear =3D false;
- 		wclear(win);
- 	}
- =
+Why all the games with chmod?
+$(SHELL) csstoh.sh powertop.css css.h
+should also run the script correctly, shouldn't it?
 
-@@ -185,7 +185,7 @@ static bool tunables_sort(class tunable * i, class tuna=
-ble * j)
- void tuning_window::window_refresh()
- {
- 	clear_tuning();
--	should_clear =3D TRUE;
-+	should_clear =3D true;
- 	init_tuning();
- }
- =
-
--- =
-
-1.7.5.4
+/MF
 
 
---===============6102961682804443489==--
+--===============2144715453992646390==--
 
