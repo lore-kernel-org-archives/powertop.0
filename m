@@ -1,33 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============0350888059441101342=="
+Content-Type: multipart/mixed; boundary="===============5995444057947190378=="
 MIME-Version: 1.0
-From: Lekensteyn <lekensteyn at gmail.com>
-Subject: Re: [Powertop] PowerTop configure fails on BeagleBone/Ubuntu
-Date: Mon, 21 May 2012 18:47:08 +0200
-Message-ID: <9051790.o9vOvIeput@penguin>
-In-Reply-To: 4FBA5794.60107@bouwens.org
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] csstoh shell-script for cross-compiling PowerTOP
+Date: Wed, 11 Jul 2012 10:36:26 +0300
+Message-ID: <20120711073626.GB3081@swordfish>
+In-Reply-To: 4FFD282E.6080105@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0350888059441101342==
+--===============5995444057947190378==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Monday 21 May 2012 16:56:20 Bram Bouwens wrote:
-> checking for strtoull... yes
-> checking for library containing delwin... -lncurses
-> ./configure: line 19020: syntax error near unexpected token `PCIUTILS,'
-> ./configure: line 19020: `PKG_CHECK_MODULES(PCIUTILS, libpci,,'
-You need to install the pkg-config package.
-
-> though I see something unexpected with the PCI bus:
+On (07/11/12 11:15), Igor Zhbanov wrote:
+> Here is the new version:
 > =
 
-> root(a)omap:~/powertop-2.0# ls /proc/bus/pci
-> ls: cannot access /proc/bus/pci: No such file or directory
-Not sure if there is a kernel config missing, does /sys/bus/pci/ exists?
+> --8<--Cut-here-----------------------------------------------------------=
+-----
+>
 
-Peter
+Hello,
 
---===============0350888059441101342==--
+Igor, could you please inline patch as "git diff -u -p" output, not as atta=
+chment.
+
+Thanks,
+	-ss
+
+--===============5995444057947190378==--
 
