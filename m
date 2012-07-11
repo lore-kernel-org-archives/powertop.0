@@ -1,66 +1,132 @@
-Content-Type: multipart/mixed; boundary="===============2335413765727524459=="
+Content-Type: multipart/mixed; boundary="===============3718933256845246407=="
 MIME-Version: 1.0
 From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: [Powertop] hrtimer events are not properly added -- is this bug or
- feature?
-Date: Tue, 24 Jul 2012 11:24:07 +0400
-Message-ID: <500E4D97.5040902@samsung.com>
+Subject: [Powertop] [PATCH] csstoh shell-script for cross-compiling PowerTOP
+Date: Wed, 11 Jul 2012 16:49:06 +0400
+Message-ID: <1342010946-19003-1-git-send-email-i.zhbanov@samsung.com>
+In-Reply-To: 1342007181.4108.38.camel@mattotaupa
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2335413765727524459==
+--===============3718933256845246407==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello!
+It was impossible to build PowerTOP for ARM with a cross-compiler
+because PowerTOP uses internal csstoh utility that converts
+powertop.css to powertoh.h for inclusion in *.cpp source files.
 
-In the function start_process_measurement() in the file src/process/do_proc=
-ess.cpp
-events are added to perf_bundle:
-		perf_events->add_event("irq:softirq_entry");
-		perf_events->add_event("irq:softirq_exit");
-		perf_events->add_event("timer:timer_expire_entry");
-		perf_events->add_event("timer:timer_expire_exit");
-		perf_events->add_event("hrtimer_expire_entry");		/* !!! */
-		perf_events->add_event("hrtimer_expire_exit");		/* !!! */
-		if (!perf_events->add_event("power:cpu_idle")){
-			perf_events->add_event("power:power_start");
-			perf_events->add_event("power:power_end");
-		}
+When you use the cross-compiler (without making complicated rules
+in the Makefile) this utility will be compiled for ARM platform too.
+And you cannot run it on x86 build host.
 
-As you may see all events are prefixed with the subsystem name.
-All but hrtimer_expire_entry and hrtimer_expire_exit. And without "timer:" =
-prefix
-these events are never catched.
+To solve this issue I have rewritten it in a shell script.
+---
+ .gitignore      |    1 -
+ src/Makefile.am |    7 ++-----
+ src/csstoh.sh   |   44 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 46 insertions(+), 6 deletions(-)
+ create mode 100644 src/csstoh.sh
 
-So I have added this prefix and see that events are intercepted as needed.
-But event parser complains about wrong event format:
-   unknown op '{'
-   failed to read event print fmt for hrtimer_expire_entry
+diff --git a/.gitignore b/.gitignore
+index 5534072..35f0df6 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -39,7 +39,6 @@ po/*.gmo
+ po/stamp-po
+ src/powertop
+ src/css.h
+-src/csstoh
+ src/Makefile.in
+ src/.deps/
+ src/Makefile
+diff --git a/src/Makefile.am b/src/Makefile.am
+index c77b2aa..15e5feb 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -1,9 +1,6 @@
+ AUTOMAKE_OPTIONS =3D subdir-objects
+ ACLOCAL_AMFLAGS =3D -I ../m4 =
 
-It seems that event parser can't handle square bracket in print format for =
-the event:
-print fmt: "hrtimer=3D%p function=3D%pf now=3D%llu", REC->hrtimer, REC->fun=
-ction, (unsigned long long)(((ktime_t) { .tv64 =3D REC->now }).tv64)
+ =
 
-So is the absence of "timer:" prefix a bug or a commenting of non-working c=
-ase?
+-noinst_PROGRAMS =3D csstoh
+-csstoh_SOURCES =3D csstoh.c =
 
-Thank you.
+-
+ sbin_PROGRAMS =3D powertop
+ nodist_powertop_SOURCES =3D css.h
+ =
 
+@@ -44,6 +41,6 @@ AM_LDFLAGS =3D $(LIBS) $(NCURSES_LIBS) $(PCIUTILS_LIBS) $=
+(LIBNL_LIBS) $(LIBZ_LIBS)
+ =
+
+ BUILT_SOURCES =3D css.h
+ CLEANFILES =3D css.h
+-css.h: csstoh powertop.css
+-	./csstoh powertop.css css.h
++css.h: powertop.css
++	$(SHELL) ./csstoh.sh powertop.css css.h
+ =
+
+diff --git a/src/csstoh.sh b/src/csstoh.sh
+new file mode 100644
+index 0000000..cc9ad3f
+--- /dev/null
++++ b/src/csstoh.sh
+@@ -0,0 +1,44 @@
++#!/bin/sh
++#
++# This program file is free software; you can redistribute it and/or modif=
+y it
++# under the terms of the GNU General Public License as published by the
++# Free Software Foundation; version 2 of the License.
++#
++# This program is distributed in the hope that it will be useful, but WITH=
+OUT
++# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
++# for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program in a file named COPYING; if not, write to the
++# Free Software Foundation, Inc,
++# 51 Franklin Street, Fifth Floor,
++# Boston, MA 02110-1301 USA
++# or just google for it.
++#
++# Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
++
++if [ $# -lt 2 ]; then
++	echo "Usage: csstoh.sh cssfile header.h"
++	exit 1
++fi
++
++if [ ! -r $1 ]; then
++	echo "Can't find file $1"
++	exit 1
++fi
++
++if ! echo -n >$2; then
++	echo "Can't open file $2 for writing."
++	exit 1
++fi
++
++echo "#ifndef __INCLUDE_GUARD_CCS_H" >> $2
++echo "#define __INCLUDE_GUARD_CCS_H" >> $2
++echo >> $2
++echo "const char css[] =3D " >> $2
++
++sed -r 's/^(.*)$/\t\"\1\\n\"/' $1 >> $2
++
++echo ";" >> $2
++echo "#endif" >> $2
 -- =
 
-Best regards,
-Igor Zhbanov,
-Expert Software Engineer,
-phone: +7 (495) 797 25 00 ext 3806
-e-mail: i.zhbanov(a)samsung.com
-
-ASWG, Moscow R&D center, Samsung Electronics
-12 Dvintsev street, building 1
-127018, Moscow, Russian Federation
+1.7.5.4
 
 
---===============2335413765727524459==--
+--===============3718933256845246407==--
 
