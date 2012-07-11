@@ -1,128 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============0664710068379736856=="
+Content-Type: multipart/mixed; boundary="===============5958689474116166781=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] catch fstream exceptions in lib routines (v2)
-Date: Fri, 18 May 2012 14:18:04 +0300
-Message-ID: <20120518111804.GD3074@swordfish>
-In-Reply-To: 1403259.dDrcVdOxix@penguin
+Subject: Re: [Powertop] Device list sort function bug
+Date: Wed, 11 Jul 2012 10:33:42 +0300
+Message-ID: <20120711073342.GA3081@swordfish>
+In-Reply-To: 4FFD1904.7040804@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0664710068379736856==
+--===============5958689474116166781==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+On (07/11/12 10:11), Igor Zhbanov wrote:
+> =
 
-[PATCH] catch fstream exceptions in lib routines (v2)
+> Sometimes PowerTOP dies with a Segmentation Fault while generating
+> the report. Little investigation shown that it dies while sorting
+> the device list. The problem is that comparison function devlist_sort
+> is incorrect.
+> =
 
-Catch possible fstream and traits_type exceptions in lib.
-
-V2: Thanks to Peter, he pointed to silly typo I've done in V1.
-
-Reported-and-tested-by: Lekensteyn <lekensteyn(a)gmail.com>
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
-
----
-
- src/lib.cpp |   54 +++++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 39 insertions(+), 15 deletions(-)
-
-diff --git a/src/lib.cpp b/src/lib.cpp
-index 53638dd..0c2c1f1 100644
---- a/src/lib.cpp
-+++ b/src/lib.cpp
-@@ -172,8 +172,13 @@ void write_sysfs(const string &filename, const string =
-&value)
- 	file.open(filename.c_str(), ios::out);
- 	if (!file)
- 		return;
--	file << value;
--	file.close();
-+	try =
-
-+	{
-+		file << value;
-+		file.close();
-+	} catch (std::exception &exc) {
-+		return;
-+	}
- }
- =
-
- int read_sysfs(const string &filename, bool *ok)
-@@ -187,10 +192,17 @@ int read_sysfs(const string &filename, bool *ok)
- 			*ok =3D false;
- 		return 0;
- 	}
--	file >> i;
-+	try
-+	{
-+		file >> i;
-+		if (ok)
-+			*ok =3D true;
-+	} catch (std::exception &exc) {
-+		if (ok)
-+			*ok =3D false;
-+		i =3D 0;
-+	}
- 	file.close();
--	if (ok)
--		*ok =3D true;
- 	return i;
- }
- =
-
-@@ -203,11 +215,17 @@ string read_sysfs_string(const string &filename)
- 	file.open(filename.c_str(), ios::in);
- 	if (!file)
- 		return "";
--	file.getline(content, 4096);
--	file.close();
--	c =3D strchr(content, '\n');
--	if (c)
--		*c =3D 0;
-+	try
-+	{
-+		file.getline(content, 4096);
-+		file.close();
-+		c =3D strchr(content, '\n');
-+		if (c)
-+			*c =3D 0;
-+	} catch (std::exception &exc) {
-+		file.close();
-+		return "";
-+	}
- 	return content;
- }
- =
-
-@@ -224,11 +242,17 @@ string read_sysfs_string(const char *format, const ch=
-ar *param)
- 	file.open(filename, ios::in);
- 	if (!file)
- 		return "";
--	file.getline(content, 4096);
--	file.close();
--	c =3D strchr(content, '\n');
--	if (c)
--		*c =3D 0;
-+	try
-+	{
-+		file.getline(content, 4096);
-+		file.close();
-+		c =3D strchr(content, '\n');
-+		if (c)
-+			*c =3D 0;
-+	} catch (std::exception &exc) {
-+		file.close();
-+		return "";
-+	}
- 	return content;
- }
- =
+> The function should return true if first argument "preceeds" second.
+> But when strcmp() is used, it can return -1, 0 and 1. So both -1 and 1
+> values are silently converted to true, which is wrong. It confuses the so=
+rt()
+> function and it crosses boundary of array.
+> =
 
 
+Jan, could you please test this one?
 
---===============0664710068379736856==--
+Thanks in advance,
+
+	-ss
+
+--===============5958689474116166781==--
 
