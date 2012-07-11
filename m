@@ -1,250 +1,136 @@
-Content-Type: multipart/mixed; boundary="===============3885474422511816801=="
+Content-Type: multipart/mixed; boundary="===============1230633295655670214=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] segfault on Sheevaplug (ARM Kirkwood)
-Date: Mon, 21 May 2012 01:05:54 +0300
-Message-ID: <20120520220554.GB3585@swordfish>
-In-Reply-To: 1337542376.55788.YahooMailNeo@web160303.mail.bf1.yahoo.com
+From: Paul Menzel <paulepanter at users.sourceforge.net>
+Subject: Re: [Powertop] Device list sort function bug
+Date: Wed, 11 Jul 2012 10:57:26 +0200
+Message-ID: <1341997046.4108.18.camel@mattotaupa>
+In-Reply-To: 4FFD3661.7020202@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3885474422511816801==
+--===============1230633295655670214==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (05/20/12 12:32), Rui DaCosta wrote:
+Dear Igor,
+
+
+thank you for following my advise. Some more minor suggestions are
+inlined but until the maintainers ask for further changes you do not
+need to take any further actions.
+
+
+Am Mittwoch, den 11.07.2012, 12:16 +0400 schrieb Igor Zhbanov:
+> So here is the formatted version:
+
+Normally when sending patches no introduction or email style formalities
+(like greeting and so on) are needed.
+
+If you want to use them put them at the top and separate them from the
+patch using
+
+---- 8< ----- >8 ----
+
+so that `git am --scissors` strips the email text off automatically.
+
+>  From 5d284137a6035bab65717fbacd98423b96d862cf Mon Sep 17 00:00:00 2001
+> From: Igor Zhbanov<i.zhbanov(a)samsung.com>
+
+SeaMonkey and some Thunderbird versions seem to have a bug deleting a
+space before =C2=BB<=C2=AB.
+
+But if your email account you sending the message from is the same as
+the commit author of the patch you can also delete that line.
+
+> Date: Wed, 11 Jul 2012 12:08:21 +0400
+> Subject: [PATCH] Device list sort function bug
+
+You can copy the text after =C2=BBSubject: =C2=AB into the email message su=
+bject
+line. Then your message automatically has the =C2=BBPATCH=C2=AB tag.
+
+> Sometimes PowerTOP dies with a Segmentation Fault while generating
+> the report. Little investigation shown that it dies while sorting
+> the device list. The problem is that comparison function devlist_sort
+> is incorrect.
 > =
 
->    it was pointed out to me that=C2=A0 CONFIG_PERF_COUNTERS has been supe=
-rseded by
->    PERF_EVENTS since 2.6.32 =C2=A0- see bottom section of
->    http://cateee.net/lkddb/web-lkddb/PERF_COUNTERS.html
->    so is=C2=A0 CONFIG_PERF_COUNTERS really required?
->
+> The function should return true if first argument "preceeds" second.
+> But when strcmp() is used, it can return -1, 0 and 1. So both -1 and 1
+> values are silently converted to true, which is wrong. It confuses the so=
+rt()
+> function and it crosses boundary of array.
+> ---
 
-Does perf tool work for you?
+Some comments not meant for the commit message, like what changed in
+patch iterations go after the --- line and Git will ignore them.
 
-	-ss
-
- =
-
->    =E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80
+>   src/devlist.cpp |    2 +-
+>   1 files changed, 1 insertions(+), 1 deletions(-)
 > =
 
->    From: Rui DaCosta <ruidc(a)yahoo.com>
->    To: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
->    Cc: Arjan van de Ven <arjan(a)linux.intel.com>; Chris Ferron
->    <chris.e.ferron(a)linux.intel.com>; "powertop(a)lists.01.org"
->    <powertop(a)lists.01.org>
->    Sent: Sunday, 20 May 2012, 13:01
->    Subject: Re: [Powertop] segfault on Sheevaplug (ARM Kirkwood)
->    Thanks,
->    this has gotten past the issue. I now get:
->    PowerTOP v2.0 needs the kernel to support the 'perf' subsystem
->    as well as support for trace points in the kernel:
+> diff --git a/src/devlist.cpp b/src/devlist.cpp
+> index 93f2081..cd5b5d8 100644
+> --- a/src/devlist.cpp
+> +++ b/src/devlist.cpp
+> @@ -273,7 +273,7 @@ static bool devlist_sort(struct devuser * i, struct d=
+evuser * j)
+>   	if (i->pid !=3D j->pid)
+>   		return i->pid<  j->pid;
 > =
 
->    CONFIG_PERF_EVENTS=3Dy
->    CONFIG_PERF_COUNTERS=3Dy
->    CONFIG_TRACEPOINTS=3Dy
->    CONFIG_TRACING=3Dy
+> -	return strcmp(i->device, j->device);
+> +	return (strcmp(i->device, j->device)<  0);
+>   }
 > =
 
->    all these except CONFIG_PERF_COUNTERS are already set, so i'll need to=
- see
->    if i can get a kernel built with that option on.
->    Will this patch make it into trunk?
->    Many thanks.
-> =
+>   static const char *dev_class(int line)
+> -- =
 
->    =E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80
-> =
+> 1.7.5.4
 
->    From: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
->    To: Rui DaCosta <ruidc(a)yahoo.com>
->    Cc: Arjan van de Ven <arjan(a)linux.intel.com>; Chris Ferron
->    <chris.e.ferron(a)linux.intel.com>; powertop(a)lists.01.org
->    Sent: Sunday, 20 May 2012, 11:34
->    Subject: Re: [Powertop] segfault on Sheevaplug (ARM Kirkwood)
->    On (05/20/12 02:19), Rui DaCosta wrote:
->    > Sure and thanks,
->    > (v1.13 worked fine btw)
->    > Processor=C2=A0=C2=A0=C2=A0 : Feroceon 88FR131 rev 1 (v5l)
->    > BogoMIPS=C2=A0=C2=A0=C2=A0 : 1191.11
->    > Features=C2=A0=C2=A0=C2=A0 : swp half thumb fastmult edsp
->    > CPU implementer=C2=A0=C2=A0=C2=A0 : 0x56
->    > CPU architecture: 5TE
->    > CPU variant=C2=A0=C2=A0=C2=A0 : 0x2
->    > CPU part=C2=A0=C2=A0=C2=A0 : 0x131
->    > CPU revision=C2=A0=C2=A0=C2=A0 : 1
->    >
->    > Hardware=C2=A0=C2=A0=C2=A0 : Marvell SheevaPlug Reference Board
->    > Revision=C2=A0=C2=A0=C2=A0 : 0000
->    > Serial=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 : 0000000000000000
->    >
->    >
-> =
+Just delete the quote next time if you are not citing it in any way [1].
 
->    Thanks,
-> =
+> Jan-Simon M=C3=B6ller wrote:
+> > Yes, in an hour or so.
+> > Best,
+> > JS
+> > Am Mittwoch, 11. Juli 2012, 09:33:42 schrieb Sergey Senozhatsky:
+> >> On (07/11/12 10:11), Igor Zhbanov wrote:
+> >>> Sometimes PowerTOP dies with a Segmentation Fault while generating
+> >>> the report. Little investigation shown that it dies while sorting
+> >>> the device list. The problem is that comparison function devlist_sort
+> >>> is incorrect.
+> >>>
+> >>> The function should return true if first argument "preceeds" second.
+> >>> But when strcmp() is used, it can return -1, 0 and 1. So both -1 and 1
+> >>> values are silently converted to true, which is wrong. It confuses the
+> >>> sort() function and it crosses boundary of array.
+> >> Jan, could you please test this one?
+> >>
+> >> Thanks in advance,
+> >>
+> >> 	-ss
 
->    Well, that's the problem. Current cpu info parser doesn't understand y=
-our
->    cpuinfo format. It awaits for sane values on special places. For examp=
-le,
->    word
->    "processor" should be followed by a number, not model name.
-> =
 
->    =C2=A0=C2=A0=C2=A0 processor=C2=A0=C2=A0=C2=A0 : 2
->    =C2=A0=C2=A0=C2=A0 vendor_id=C2=A0=C2=A0=C2=A0 : GenuineIntel
->    =C2=A0=C2=A0=C2=A0 cpu family=C2=A0=C2=A0=C2=A0 : 6
->    =C2=A0=C2=A0=C2=A0 model=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 : 37
->    =C2=A0=C2=A0=C2=A0 bogomips=C2=A0=C2=A0=C2=A0 : 4522.66
-> =
+Thanks again,
 
->    while cpuinfo on your system is totally different.
-> =
+Paul
 
->    the following is untested patch (I'm a bit skeptical) plus I don't have
->    ARM device for testing.
-> =
 
->    ---
-> =
+[1] http://en.opensuse.org/openSUSE:Mailing_list_netiquette
 
->    src/cpu/cpu.cpp |=C2=A0 26 ++++++++++++++------------
->    1 file changed, 14 insertions(+), 12 deletions(-)
-> =
+--===============1230633295655670214==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="signature.asc"
 
->    diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
->    index 09d4a2d..143e18c 100644
->    --- a/src/cpu/cpu.cpp
->    +++ b/src/cpu/cpu.cpp
->    @@ -225,7 +225,7 @@ void enumerate_cpus(void)
->    =C2=A0=C2=A0=C2=A0 ifstream file;
->    =C2=A0=C2=A0=C2=A0 char line[1024];
-> =
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
+L0xpbnV4KQoKaUVZRUFCRUNBQVlGQWsvOVAvWUFDZ2tRUFgxYUsyd09IVmdFVFFDZmFwanUrZm5Q
+Y0VEa3lFRG5WTjVhcU9XSAo4L1FBbjBpb3hFODdjKzVjZXl6bVhvUXdVYWQ5TzJSLwo9dlpsMgot
+LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
 
->    -=C2=A0=C2=A0=C2=A0 int number =3D -1;
->    +=C2=A0=C2=A0=C2=A0 int number =3D 1;
->    =C2=A0=C2=A0=C2=A0 char vendor[128];
->    =C2=A0=C2=A0=C2=A0 int family =3D 0;
->    =C2=A0=C2=A0=C2=A0 int model =3D 0;
->    @@ -236,7 +236,6 @@ void enumerate_cpus(void)
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 return;
-> =
-
->    =C2=A0=C2=A0=C2=A0 while (file) {
->    -
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 file.getline(line, sizeof(line));
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (strncmp(line, "vendor_id\t",=
-10) =3D=3D 0) {
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 char *c;
->    @@ -247,42 +246,45 @@ void enumerate_cpus(void)
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
-=C2=A0 =C2=A0=C2=A0=C2=A0 c++;
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
-=C2=A0 strncpy(vendor,c, 127);
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
->    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
->    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (strncmp(line, "processor\t"=
-,10) =3D=3D 0) {
->    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 } else if (strncmp(line, "proce=
-ssor\t",10) =3D=3D 0) {
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 char *c;
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 c =3D strchr(=
-line, ':');
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (c) {
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
-=C2=A0 c++;
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
-=C2=A0 number =3D strtoull(c, NULL, 10);
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
->    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
->    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (strncmp(line, "cpu family\t=
-",11) =3D=3D 0) {
->    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 } else if (strncmp(line, "Proce=
-ssor\t",10) =3D=3D 0) {
->    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 char *c;
->    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 c =3D strchr=
-(line, ':');
->    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (c) {
->    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
-=C2=A0 c++;
->    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
-=C2=A0 if (*c =3D=3D ' ')
->    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
-=C2=A0 =C2=A0=C2=A0=C2=A0 c++;
->    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
-=C2=A0 strncpy(vendor, c, 127);
->    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
->    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }=C2=A0 else if (strncmp(line, =
-"cpu family\t",11) =3D=3D 0) {
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 char *c;
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 c =3D strchr(=
-line, ':');
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (c) {
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
-=C2=A0 c++;
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
-=C2=A0 family =3D strtoull(c, NULL, 10);
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
->    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
->    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (strncmp(line, "model\t",6) =
-=3D=3D 0) {
->    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 } else if (strncmp(line, "model=
-\t",6) =3D=3D 0) {
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 char *c;
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 c =3D strchr(=
-line, ':');
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (c) {
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
-=C2=A0 c++;
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
-=C2=A0 model =3D strtoull(c, NULL, 10);
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
->    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
->    -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (strncasecmp(line, "bogomips=
-\t", 9) =3D=3D 0) {
->    +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 } else if (strncasecmp(line, "b=
-ogomips\t", 9) =3D=3D 0) {
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 handle_one_cp=
-u(number, vendor, family, model);
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 set_max_cpu(n=
-umber);
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
->    =C2=A0=C2=A0=C2=A0 }
-> =
-
->    -
->    =C2=A0=C2=A0=C2=A0 file.close();
-> =
-
->    =C2=A0=C2=A0=C2=A0 perf_events =3D new perf_power_bundle();
->    -
->    =C2=A0=C2=A0=C2=A0 if (!perf_events->add_event("power:cpu_idle")){
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 perf_events->add_event("power:po=
-wer_start");
->    =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 perf_events->add_event("power:po=
-wer_end");
-
---===============3885474422511816801==--
+--===============1230633295655670214==--
 
