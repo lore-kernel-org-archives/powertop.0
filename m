@@ -1,32 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============8407687981627050835=="
+Content-Type: multipart/mixed; boundary="===============2254187062977315391=="
 MIME-Version: 1.0
-From: Kok, Auke-jan H <auke-jan.h.kok at intel.com>
-Subject: Re: [Powertop] autoconf madness, AGAIN
-Date: Mon, 28 May 2012 17:03:42 +0000
-Message-ID: <CABsxX9+doHqLvq15LHB5vNGAVdX9yhh014VPEaCOHADiwwSvrw@mail.gmail.com>
-In-Reply-To: 20120528165554.GA22853@rhlx01.hs-esslingen.de
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] Display all P-states in HTML-report
+Date: Thu, 12 Jul 2012 03:54:01 +0300
+Message-ID: <20120712005401.GA3311@swordfish.datadirect.datadirectnet.com>
+In-Reply-To: 4FFD3BE0.9090803@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8407687981627050835==
+--===============2254187062977315391==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 28, 2012 at 4:55 PM, Andreas Mohr <andi(a)lisas.de> wrote:
-> IMHO that means that powertop's autoconf version requirements
-> are too aggressive and should be fixed. ESPECIALLY since even the newest
-> autoconf release is only one version number newer than this requirement.
-> I could try to work on that if this is
-> "something that is deemed worthy of fixing".
+On (07/11/12 12:40), Igor Zhbanov wrote:
+>
+> +	unsigned int i, pstates_num;
+> +
+> +	for (i =3D 0, pstates_num =3D 0; i<  all_cpus.size(); i++)
+> +		if (all_cpus[i]&&  all_cpus[i]->pstates.size()>  pstates_num)
+> +			pstates_num =3D all_cpus[i]->pstates.size();
+> =
 
-Andreas,
 
-all we did was start with `autoscan` and never looked at the version field
-from that on. Have you tried just modifying the configure.ac version
-requirement and running with e.g. 2.64?
+nack
 
-Auke
+That will not work correctly, I'm afraid.
 
---===============8407687981627050835==--
+pstates_num initialized with stack garbage and is free to have value (e.g. =
+0x7fffffff)
+which will never satisfy "all_cpus[i]->pstates.size()>  pstates_num" condit=
+ion.
+In that case our loop will spin "0x7fffffff - actual_pstates_number" useles=
+s cycles.
+
+
+
+BTW, could you please put white space before operators and remove extra one=
+ after?
+
+E.g.
+
+    "all_cpus[i] && all_cpus[i]->pstates.size() > pstates_num"
+
+vs.
+
+    "all_cpus[i]&&  all_cpus[i]->pstates.size()>  pstates_num"
+               ^^^^^^                          ^^^^^
+
+	-ss
+
+--===============2254187062977315391==--
 
