@@ -1,49 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============3567138775183568866=="
+Content-Type: multipart/mixed; boundary="===============2327422745627828042=="
 MIME-Version: 1.0
-From: Richard Neill <rn214 at richardneill.org>
-Subject: Re: [Powertop] Wishlist: print the commands executed by 'toggle
- tunables'
-Date: Tue, 17 Jul 2012 20:13:33 +0100
-Message-ID: <5005B95D.90007@richardneill.org>
-In-Reply-To: mailman.29.1342551681.1280.powertop@lists.01.org
+From: Stefan Weil <sw at weilnetz.de>
+Subject: [Powertop] [PATCH] ccstoh: Don't return success if something went
+ wrong
+Date: Thu, 12 Jul 2012 22:41:43 +0200
+Message-ID: <1342125703-23323-1-git-send-email-sw@weilnetz.de>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3567138775183568866==
+--===============2327422745627828042==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Dear All,
+exit(0) is the same as returning EXIT_SUCCESS which is a bad
+idea after a severe failure. It will for example result in
+wrong behaviour of make (make won't stop after such failures).
 
-I wonder if I might make a request for a new feature for powertop.
+Returning EXIT_FAILURE fixes this.
 
-When I run it, I can toggle various tunable options from within the =
+Signed-off-by: Stefan Weil <sw(a)weilnetz.de>
+---
+ src/csstoh.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Powertop interface. As I understand it, the effect of these to invoke an =
+diff --git a/src/csstoh.c b/src/csstoh.c
+index e6b1dcf..28858f5 100644
+--- a/src/csstoh.c
++++ b/src/csstoh.c
+@@ -40,12 +40,12 @@ int main(int argc, char **argv)
+ 	in =3D fopen(argv[1], "rm");
+ 	if (!in) {
+ 		printf("Failed to open input file %s (%s) \n", argv[1], strerror(errno));
+-		exit(0);
++		return EXIT_FAILURE;
+ 	}
+ 	out =3D fopen(argv[2], "wm");
+ 	if (!out) {
+ 		printf("Failed to open output file %s (%s) \n", argv[1], strerror(errno)=
+);
+-		exit(0);
++		return EXIT_FAILURE;
+ 	}
+ =
 
-underlying system command such as:
-   echo value > /sys/device/power/something
+ 	fprintf(out, "#ifndef __INCLUDE_GUARD_CCS_H\n");
+-- =
 
-But powertop never actually tells me what these commands are. This means =
-
-I can't easily append them to my own startup scripts, or make them =
-
-persistent across reboots.
-
-So my wish is as follows:
-
-When powertop actually modifies the system, it should print the =
-
-commands, to stderr, when it exits.
-
-Thanks very much,
-
-Richard
+1.7.10
 
 
-
-P.S. Powertop 2.0 also has no manpage. May I recommend help2man.
-
---===============3567138775183568866==--
+--===============2327422745627828042==--
 
