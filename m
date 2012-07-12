@@ -1,117 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============0822048512255469898=="
+Content-Type: multipart/mixed; boundary="===============3665009399697014143=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH 1/2] Make it possible to include parse-events.h
- before libc headers.
-Date: Wed, 25 Jul 2012 10:44:20 -0700
-Message-ID: <50103074.5020703@linux.intel.com>
-In-Reply-To: 1343209431.2554.0.camel@sara
+From: Paul Menzel <paulepanter at users.sourceforge.net>
+Subject: Re: [Powertop] [PATCH] Fix crash on Linux ARM hosts
+Date: Thu, 12 Jul 2012 22:18:15 +0200
+Message-ID: <1342124295.4283.16.camel@mattotaupa>
+In-Reply-To: 4FFF2DED.3020604@weilnetz.de
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0822048512255469898==
+--===============3665009399697014143==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 07/23/2012 11:03 PM, Magnus Fromreide wrote:
-> The __unused macro interferes with the glibc and is in a reserved namespa=
-ce
-> so it should be renamed.
-> Additionally the __ununsed macro is used from just one implementation fil=
-e so
-> the macro is moved there.
->
-> Signed-off-by: Magnus Fromreide <magfr(a)lysator.liu.se>
-> ---
->   pevent/parse-events.c |   12 +++++++++---
->   pevent/parse-events.h |    4 ----
->   2 files changed, 9 insertions(+), 7 deletions(-)
->
-> diff --git a/pevent/parse-events.c b/pevent/parse-events.c
-> index 58716e9..c039698 100644
-> --- a/pevent/parse-events.c
-> +++ b/pevent/parse-events.c
-> @@ -37,6 +37,10 @@
->   =
+Am Donnerstag, den 12.07.2012, 22:05 +0200 schrieb Stefan Weil:
 
->   #include "parse-events.h"
->   =
+[=E2=80=A6]
 
-> +#ifndef pevent_unused
-> +#define pevent_unused __attribute__ ((unused))
-> +#endif
-> +
->   static const char *input_buf;
->   static unsigned long long input_buf_ptr;
->   static unsigned long long input_buf_siz;
-> @@ -1777,7 +1781,7 @@ process_op(struct event_format *event, struct print=
-_arg *arg, char **tok)
->   }
->   =
+> It takes a while until0it is built, because my new Raspberry PI is so
+> terribly slow.
 
->   static enum event_type
-> -process_entry(struct event_format *event __unused, struct print_arg *arg,
-> +process_entry(struct event_format *event pevent_unused, struct print_arg=
- *arg,
->   	      char **tok)
->   {
->   	enum event_type type;
-> @@ -2350,7 +2354,8 @@ process_paren(struct event_format *event, struct pr=
-int_arg *arg, char **tok)
->   =
+Cross-compiling should solve that. ;-) OpenEmbedded or even some Debian
+tools should do the trick.
 
->   =
 
->   static enum event_type
-> -process_str(struct event_format *event __unused, struct print_arg *arg, =
-char **tok)
-> +process_str(struct event_format *event pevent_unused, struct print_arg *=
-arg,
-> +	    char **tok)
->   {
->   	enum event_type type;
->   	char *token;
-> @@ -3500,7 +3505,8 @@ static void free_args(struct print_arg *args)
->   }
->   =
+Thanks,
 
->   static char *
-> -get_bprint_format(void *data, int size __unused, struct event_format *ev=
-ent)
-> +get_bprint_format(void *data, int size pevent_unused,
-> +		  struct event_format *event)
->   {
->   	struct pevent *pevent =3D event->pevent;
->   	unsigned long long addr;
-> diff --git a/pevent/parse-events.h b/pevent/parse-events.h
-> index 5d5d195..124aa1b 100644
-> --- a/pevent/parse-events.h
-> +++ b/pevent/parse-events.h
-> @@ -27,10 +27,6 @@
->   #include <stdarg.h>
->   #include <regex.h>
->   =
+Paul
 
-> -#ifndef __unused
-> -#define __unused __attribute__ ((unused))
-> -#endif
-> -
->   /* ----------------------- trace_seq ----------------------- */
->   =
 
->   =
+[1] http://www.openembedded.org/
 
-I will forward this on to Steve Rostedt. pevent code is not actually =
+--===============3665009399697014143==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="signature.asc"
 
-strictly part of the powertop src, it is just temporarily being built as =
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
+L0xpbnV4KQoKaUVZRUFCRUNBQVlGQWsvL01RY0FDZ2tRUFgxYUsyd09IVmp3ZUFDZ2lLT2NlV3hs
+ZWMvc3pUelo0SjZGbUxIaQpMN29Bb0lobXNubUtsa2FuRHlOMHlGZjJsdGVTaEhEcAo9V3k2OAot
+LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
 
-part of the project so powertop can take advantage of it early. That =
-
-said, it may not be a good fit for the grand scheme.
-Which reminds me I need to push a readme explaining this.
-
--Chris
-
---===============0822048512255469898==--
+--===============3665009399697014143==--
 
