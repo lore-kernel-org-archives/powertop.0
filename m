@@ -1,107 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============7114116058116685888=="
+Content-Type: multipart/mixed; boundary="===============8543035603859613858=="
 MIME-Version: 1.0
-From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: [Powertop] Display all P-states in HTML-report
-Date: Wed, 11 Jul 2012 10:13:46 +0400
-Message-ID: <4FFD199A.2020409@samsung.com>
+From: Stefan Weil <sw at weilnetz.de>
+Subject: Re: [Powertop] [PATCH] Fix crash on Linux ARM hosts
+Date: Thu, 12 Jul 2012 22:24:36 +0200
+Message-ID: <4FFF3284.6030209@weilnetz.de>
+In-Reply-To: 1342124295.4283.16.camel@mattotaupa
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7114116058116685888==
+--===============8543035603859613858==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello!
+Am 12.07.2012 22:18, schrieb Paul Menzel:
+> Am Donnerstag, den 12.07.2012, 22:05 +0200 schrieb Stefan Weil:
+>
+> [=E2=80=A6]
+>
+>> It takes a while until0it is built, because my new Raspberry PI is so
+>> terribly slow.
+>
+> Cross-compiling should solve that. ;-) OpenEmbedded or even some Debian
+> tools should do the trick.
+>
+>
+> Thanks,
+>
+> Paul
+>
+>
+> [1] http://www.openembedded.org/
 
-On Arm processors there are more than 10 P-states. On my device there are 12
-p-states with different frequency. But PowerTOP displays only 10. And it
-doesn't display states (11 and 12) where the phone spends most of the time.
+Well, it's finished now and it works better than before:
 
-I suppose that was because of console mode of PowerTOP, when there are limi=
-ted
-number of lines on the console. But in the case of HTML-report this should
-not be a problem.
+PowerTOP 2.0      Overview   Idle stats   Frequency stats   Device =
 
-Here is the patch that counts the number of found P-states and displays all
-of them.
+stats   Tunables
 
---8<--Cut here-------------------------------------------------------------=
----
-diff -purN -X dontdiff-powertop powertop-intel/config.h powertop/config.h
-diff -purN -X dontdiff-powertop powertop-intel/src/cpu/cpu.cpp powertop/src=
-/cpu/cpu.cpp
---- powertop-intel/src/cpu/cpu.cpp	2012-07-05 13:06:16.000000000 +0400
-+++ powertop/src/cpu/cpu.cpp	2012-07-05 18:43:19.704809327 +0400
-@@ -618,6 +618,11 @@ void report_display_cpu_pstates(void)
-  	unsigned int package, core, cpu;
-  	int line;
-  	class abstract_cpu *_package, * _core, * _cpu;
-+	unsigned int i, pstates_num;
-+
-+	for (i =3D 0, pstates_num =3D 0; i<  all_cpus.size(); i++)
-+		if (all_cpus[i]&&  all_cpus[i]->pstates.size()>  pstates_num)
-+			pstates_num =3D all_cpus[i]->pstates.size();
+Summary: 0,0 wakeups/second,  0,0 GPU ops/seconds, 0,0 VFS ops/sec and =
 
-  	if ((!reportout.csv_report)&&(!reportout.http_report))
-  		return;
-@@ -644,7 +649,7 @@ void report_display_cpu_pstates(void)
-  			if (!_core)
-  				continue;
+22,4% CPU use
 
--			for (line =3D LEVEL_HEADER; line<  10; line++) {
-+			for (line =3D LEVEL_HEADER; line<  (int)pstates_num; line++) {
-  				int first =3D 1;
+                 Usage       Events/s    Category       Description
+              62,5 ms/s      0,00        Process        make all
+              56,8 ms/s      0,00        Process        bash
+              18,5 ms/s      0,00        Process        -bash
+...
 
-  				if (!_package->has_pstate_level(line))
---8<-----------------------------------------------------------------------=
----
+Obviously the wakeup rate is wrong, but the CPU use value is good.
 
-The same issue may affect the function report_display_cpu_cstates()
-but I'm not sure that CPUs with more than 10 C-states exists.
+- sw
 
-The same code is in the function impl_w_display_cpu_states(), but that
-function is used in console mode only.
+PS. Patch follows.
 
-Thank you.
-
--- =
-
-Best regards,
-Igor Zhbanov,
-Expert Software Engineer,
-phone: +7 (495) 797 25 00 ext 3806
-e-mail: i.zhbanov(a)samsung.com
-
-ASWG, Moscow R&D center, Samsung Electronics
-12 Dvintsev street, building 1
-127018, Moscow, Russian Federation
-
-
---===============7114116058116685888==
-Content-Type: text/x-diff
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="04-powertop-fix02.diff"
-
-ZGlmZiAtcHVyTiAtWCBkb250ZGlmZi1wb3dlcnRvcCBwb3dlcnRvcC1pbnRlbC9jb25maWcuaCBw
-b3dlcnRvcC9jb25maWcuaApkaWZmIC1wdXJOIC1YIGRvbnRkaWZmLXBvd2VydG9wIHBvd2VydG9w
-LWludGVsL3NyYy9jcHUvY3B1LmNwcCBwb3dlcnRvcC9zcmMvY3B1L2NwdS5jcHAKLS0tIHBvd2Vy
-dG9wLWludGVsL3NyYy9jcHUvY3B1LmNwcAkyMDEyLTA3LTA1IDEzOjA2OjE2LjAwMDAwMDAwMCAr
-MDQwMAorKysgcG93ZXJ0b3Avc3JjL2NwdS9jcHUuY3BwCTIwMTItMDctMDUgMTg6NDM6MTkuNzA0
-ODA5MzI3ICswNDAwCkBAIC02MTgsNiArNjE4LDExIEBAIHZvaWQgcmVwb3J0X2Rpc3BsYXlfY3B1
-X3BzdGF0ZXModm9pZCkKIAl1bnNpZ25lZCBpbnQgcGFja2FnZSwgY29yZSwgY3B1OwogCWludCBs
-aW5lOwogCWNsYXNzIGFic3RyYWN0X2NwdSAqX3BhY2thZ2UsICogX2NvcmUsICogX2NwdTsKKwl1
-bnNpZ25lZCBpbnQgaSwgcHN0YXRlc19udW07CisKKwlmb3IgKGkgPSAwLCBwc3RhdGVzX251bSA9
-IDA7IGkgPCBhbGxfY3B1cy5zaXplKCk7IGkrKykKKwkJaWYgKGFsbF9jcHVzW2ldICYmIGFsbF9j
-cHVzW2ldLT5wc3RhdGVzLnNpemUoKSA+IHBzdGF0ZXNfbnVtKQorCQkJcHN0YXRlc19udW0gPSBh
-bGxfY3B1c1tpXS0+cHN0YXRlcy5zaXplKCk7CiAKIAlpZiAoKCFyZXBvcnRvdXQuY3N2X3JlcG9y
-dCkmJighcmVwb3J0b3V0Lmh0dHBfcmVwb3J0KSkKIAkJcmV0dXJuOwpAQCAtNjQ0LDcgKzY0OSw3
-IEBAIHZvaWQgcmVwb3J0X2Rpc3BsYXlfY3B1X3BzdGF0ZXModm9pZCkKIAkJCWlmICghX2NvcmUp
-CiAJCQkJY29udGludWU7CiAKLQkJCWZvciAobGluZSA9IExFVkVMX0hFQURFUjsgbGluZSA8IDEw
-OyBsaW5lKyspIHsKKwkJCWZvciAobGluZSA9IExFVkVMX0hFQURFUjsgbGluZSA8IChpbnQpcHN0
-YXRlc19udW07IGxpbmUrKykgewogCQkJCWludCBmaXJzdCA9IDE7CiAKIAkJCQlpZiAoIV9wYWNr
-YWdlLT5oYXNfcHN0YXRlX2xldmVsKGxpbmUpKQo=
-
---===============7114116058116685888==--
+--===============8543035603859613858==--
 
