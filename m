@@ -1,83 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============0973438576614578715=="
+Content-Type: multipart/mixed; boundary="===============1172219968133527516=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] remove -Werror from AM_INIT_AUTOMAKE
-Date: Wed, 27 Jun 2012 07:20:09 +0300
-Message-ID: <20120627042009.GA2996@swordfish.datadirect.datadirectnet.com>
-In-Reply-To: 1339972214-18301-1-git-send-email-moben@exherbo.org
+From: Richard Neill <rn214 at richardneill.org>
+Subject: Re: [Powertop] Wishlist: print the commands executed by 'toggle
+ tunables'
+Date: Tue, 17 Jul 2012 21:11:26 +0100
+Message-ID: <5005C6EE.8030001@richardneill.org>
+In-Reply-To: 5005C09E.7030309@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0973438576614578715==
+--===============1172219968133527516==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (06/18/12 00:30), Benedikt Morbach wrote:
-> While this is nice while developing, it may cause
-> various problems with distributed tarballs.
-> =
 
-> A new automake version could add a warning, causing errors for distributi=
-ons
-> and users, who might need to patch configure.ac and thus run autoreconf.
-> =
+>> When I run it, I can toggle various tunable options from within the
+>> Powertop interface. As I understand it, the effect of these to invoke an
+>> underlying system command such as:
+>>    echo value > /sys/device/power/something
 
-> For example, we hit an error where a third party package (gettext) uses
-> functionality (AM_PROG_MKDIR_P) which is deprecated in newer automake ver=
-sions(1.12.1),
-> causing the powertop build to fail.
-> =
+>
+> on the normal screen, there is not really enough real estate to put the
+> full command there.
+> however, if you run the --html report, it will give you these commands!
+>
+> (the html page has a lot more space to put stuff)
+>
 
-> Since the problem lies elsewhere, it is stupid to fail for this while bui=
-lding powertop
-> ---
->  configure.ac |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> =
+Dear Arjan,
 
-> diff --git a/configure.ac b/configure.ac
-> index 4da4eea..ff4cdea 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -3,7 +3,7 @@
->  =
+Thanks for your reply - that is indeed helpful.
 
->  AC_PREREQ([2.68])
->  AC_INIT([powertop], [2.0], [powertop(a)lists.01.org])
-> -AM_INIT_AUTOMAKE([-Wall -Werror foreign ])
-> +AM_INIT_AUTOMAKE([-Wall foreign ])
->  AC_LANG([C++])
->  AC_CONFIG_FILES([Makefile src/Makefile pevent/Makefile po/Makefile.in do=
-c/Makefile])
->  AC_CONFIG_SRCDIR([src/main.cpp])
-> =
+I see what you mean that there is less space on the ncurses gui. But =
+
+using the html report is rather "non-discoverable".
+
+For maximum friendliness, might I suggest:
+
+1. When the user exits the ncurses gui, a log of the commands that were =
+
+actually invoked should be printed to stderr.
+
+2. The command that was just run could perhaps be put into the status =
+
+bar at the bottom of the ncurses gui?
+
+Thanks
+
+Richard
 
 
-Well,
-This looks helpful.
-
-I just hit that guy
-
-	automake-1.12: warnings are treated as errors
-	configure.ac:14: warning: The 'AM_PROG_MKDIR_P' macro is deprecated, and w=
-ill soon be removed.
-	configure.ac:14: You should use the Autoconf-provided 'AC_PROG_MKDIR_P' ma=
-cro instead,
-	configure.ac:14: and use '$(MKDIR_P)' instead of '$(mkdir_p)'in your Makef=
-ile.am files.
-	make: *** [Makefile.in] Error 1
-
-according to lists, they are aware of this.
-
-So, how about pushing that one?
-
-
-
-	Tested-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
-
-
-	-ss
-
---===============0973438576614578715==--
+--===============1172219968133527516==--
 
