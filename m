@@ -1,51 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============7555277246377902798=="
+Content-Type: multipart/mixed; boundary="===============3567138775183568866=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] prevent jump on uninitialized value
-Date: Wed, 27 Jun 2012 11:20:00 -0700
-Message-ID: <4FEB4ED0.2090303@linux.intel.com>
-In-Reply-To: 20120627081714.GC2996@swordfish.datadirect.datadirectnet.com
+From: Richard Neill <rn214 at richardneill.org>
+Subject: Re: [Powertop] Wishlist: print the commands executed by 'toggle
+ tunables'
+Date: Tue, 17 Jul 2012 20:13:33 +0100
+Message-ID: <5005B95D.90007@richardneill.org>
+In-Reply-To: mailman.29.1342551681.1280.powertop@lists.01.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7555277246377902798==
+--===============3567138775183568866==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-patch applied
-Thanks
--C
+Dear All,
 
-On 06/27/2012 01:17 AM, Sergey Senozhatsky wrote:
-> workload is getting 'initialized' with stack garbage,
-> so later conditional check of !workload[0] in report()
-> is invalid.
->
-> Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
->
-> ---
->
->   src/main.cpp | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/src/main.cpp b/src/main.cpp
-> index d8e2a47..7a1b976 100644
-> --- a/src/main.cpp
-> +++ b/src/main.cpp
-> @@ -356,7 +356,7 @@ int main(int argc, char **argv)
->   	int c;
->   	bool wantreport =3D FALSE;
->   	char filename[4096];
-> -	char workload[4096];
-> +	char workload[4096] =3D {0,};
->   	int  iterations =3D 1;
->   =
+I wonder if I might make a request for a new feature for powertop.
 
->   #ifndef DISABLE_TRYCATCH
->
+When I run it, I can toggle various tunable options from within the =
+
+Powertop interface. As I understand it, the effect of these to invoke an =
+
+underlying system command such as:
+   echo value > /sys/device/power/something
+
+But powertop never actually tells me what these commands are. This means =
+
+I can't easily append them to my own startup scripts, or make them =
+
+persistent across reboots.
+
+So my wish is as follows:
+
+When powertop actually modifies the system, it should print the =
+
+commands, to stderr, when it exits.
+
+Thanks very much,
+
+Richard
 
 
 
---===============7555277246377902798==--
+P.S. Powertop 2.0 also has no manpage. May I recommend help2man.
+
+--===============3567138775183568866==--
 
