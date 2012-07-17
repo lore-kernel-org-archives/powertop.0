@@ -1,48 +1,47 @@
-Content-Type: multipart/mixed; boundary="===============4212030280129094339=="
+Content-Type: multipart/mixed; boundary="===============3415762806112246382=="
 MIME-Version: 1.0
-From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: Re: [Powertop] [PATCH] Make ncurses dependency optional
-Date: Thu, 19 Jul 2012 10:26:57 +0400
-Message-ID: <5007A8B1.9090404@samsung.com>
-In-Reply-To: 5006D6FF.7090804@linux.intel.com
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Fix out-of-tree builds
+Date: Tue, 17 Jul 2012 15:07:14 -0700
+Message-ID: <5005E212.1050306@linux.intel.com>
+In-Reply-To: 1342126710-26497-1-git-send-email-sw@weilnetz.de
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4212030280129094339==
+--===============3415762806112246382==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Arjan van de Ven wrote:
-> On 7/18/2012 7:54 AM, Igor Zhbanov wrote:
->> Make ncurses dependency optional. Provide --without-ncurses option
->> to configure.
-> I'm sorry but this patch is disgusting;
-> PowerTOP uses ncurses. Really.
+On 07/12/2012 01:58 PM, Stefan Weil wrote:
+> Out-of-tree builds are a very useful feature which should be supported
+> by all programs which use GNU automake and the configure / make build.
 >
-> crapping ifdefs all over the codebase to pretend it does not, we're just
-> really not going to do that this way.
-I agree that lots of #ifdefs are ugly. But some mobile platforms doesn't
-have ncurses. And is is not convenient to run PowerTOP via terminal on it.
-Sometimes HTML-report is all that we need. So I try to make possible to bui=
-ld
-PowerTOP without ncurses. Linaro's version does the same except that they
-just provide -DDISABLE_NCURSES to make without any configure options.
+> For powertop, only a very small fix was needed to make it work.
+> Without that fix, powertop.css is not found when a build is not
+> started from the source tree, so csstoh fails and creates no css.h.
+>
+> Signed-off-by: Stefan Weil <sw(a)weilnetz.de>
+> ---
+>   src/Makefile.am |    2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/src/Makefile.am b/src/Makefile.am
+> index c77b2aa..23625a2 100644
+> --- a/src/Makefile.am
+> +++ b/src/Makefile.am
+> @@ -45,5 +45,5 @@ AM_LDFLAGS =3D $(LIBS) $(NCURSES_LIBS) $(PCIUTILS_LIBS)=
+ $(LIBNL_LIBS) $(LIBZ_LIBS)
+>   BUILT_SOURCES =3D css.h
+>   CLEANFILES =3D css.h
+>   css.h: csstoh powertop.css
+> -	./csstoh powertop.css css.h
+> +	./csstoh "$(srcdir)"/powertop.css css.h
+>   =
 
-Thank you.
-
--- =
-
-Best regards,
-Igor Zhbanov,
-Expert Software Engineer,
-phone: +7 (495) 797 25 00 ext 3806
-e-mail: i.zhbanov(a)samsung.com
-
-ASWG, Moscow R&D center, Samsung Electronics
-12 Dvintsev street, building 1
-127018, Moscow, Russian Federation
+Your patch has been merged.
+Thank you,
 
 
---===============4212030280129094339==--
+--===============3415762806112246382==--
 
