@@ -1,104 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============0209406919344834865=="
+Content-Type: multipart/mixed; boundary="===============5907084471324795387=="
 MIME-Version: 1.0
-From: =?utf-8?q?N=C3=A9meth_M=C3=A1rton_=3Cnm127_at_freemail=2Ehu=3E?=
-Subject: Re: [Powertop] PowerTOP: _("Cannot load from file")
-Date: Fri, 01 Jun 2012 09:23:14 +0200
-Message-ID: <4FC86DE2.1050807@freemail.hu>
-In-Reply-To: 4FC79170.9060804@linux.intel.com
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] ccstoh: Don't return success if something went
+ wrong
+Date: Tue, 17 Jul 2012 15:07:26 -0700
+Message-ID: <5005E21E.2040302@linux.intel.com>
+In-Reply-To: 1342125703-23323-1-git-send-email-sw@weilnetz.de
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0209406919344834865==
+--===============5907084471324795387==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Chris,
-Chris Ferron wrote:
-> On 05/30/2012 09:53 PM, N=C3=A9meth M=C3=A1rton wrote:
->> Hi Chris,
->>
->> I have seen in commit 0e9374d27bfa51b885ee3fe69fbb3b12bdae3600 that
->> the last space of the "Cannot load from file " was removed. This results
->> even in English the following output:
->>
->> Cannot load from file/var/cache/powertop/saved_parameters.powertop
->>
->> One solution would be something like this:
->>
->>    cout<<  _("Cannot load from file")<<  " "<<  pathname<<  "\n";
-> Good input thank you. I am still learning about the difficulty's in =
+On 07/12/2012 01:41 PM, Stefan Weil wrote:
+> exit(0) is the same as returning EXIT_SUCCESS which is a bad
+> idea after a severe failure. It will for example result in
+> wrong behaviour of make (make won't stop after such failures).
+>
+> Returning EXIT_FAILURE fixes this.
+>
+> Signed-off-by: Stefan Weil <sw(a)weilnetz.de>
+> ---
+>   src/csstoh.c |    4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/src/csstoh.c b/src/csstoh.c
+> index e6b1dcf..28858f5 100644
+> --- a/src/csstoh.c
+> +++ b/src/csstoh.c
+> @@ -40,12 +40,12 @@ int main(int argc, char **argv)
+>   	in =3D fopen(argv[1], "rm");
+>   	if (!in) {
+>   		printf("Failed to open input file %s (%s) \n", argv[1], strerror(errn=
+o));
+> -		exit(0);
+> +		return EXIT_FAILURE;
+>   	}
+>   	out =3D fopen(argv[2], "wm");
+>   	if (!out) {
+>   		printf("Failed to open output file %s (%s) \n", argv[1], strerror(err=
+no));
+> -		exit(0);
+> +		return EXIT_FAILURE;
+>   	}
+>   =
 
-> translation on internationalization.
-> I will make some adjustments from your input.
-
-See the attached patch what I really ment.
-
-Otherwise it could be also better as I described:
-
->> However, in Hungarian this sentence is difficult to translate because of
->> the word order. For example the natural translation of the following
->> English sentence would be:
->>
->>    English: Cannot load from file foo.bar
->>    Hungarian: Nem lehetett a foo.bar f=C3=A1jlb=C3=B3l bet=C3=B6lteni
->>
->> As you can see in this case it would be better to use the %s format stri=
-ng
->> for printing pathname because this gives better flexibility for the tran=
-slator
->> to place the pathname string in natural place in a translated sentence.
->>
->> Regards,
->>
->> 	M=C3=A1rton N=C3=A9meth
-
-From: M=C3=A1rton N=C3=A9meth <nm127(a)freemail.hu>
-
-Fix space between localized string and pathname.
-
-Signed-off-by: M=C3=A1rton N=C3=A9meth <nm127(a)freemail.hu>
----
-diff --git a/src/parameters/persistent.cpp b/src/parameters/persistent.cpp
-index 47b8824..553cccb 100644
---- a/src/parameters/persistent.cpp
-+++ b/src/parameters/persistent.cpp
-@@ -43,7 +43,7 @@ void save_all_results(const char *filename)
-
- 	file.open(pathname, ios::out);
- 	if (!file) {
--		cout << _("Cannot save to file ") << pathname << "\n";
-+		cout << _("Cannot save to file") << " " << pathname << "\n";
- 		return;
- 	}
- 	for (i =3D 0; i < past_results.size(); i++) {
-@@ -75,7 +75,7 @@ void load_results(const char *filename)
-
- 	file.open(pathname, ios::in);
- 	if (!file) {
--		cout << _("Cannot load from file ") << pathname << "\n";
-+		cout << _("Cannot load from file") << " " << pathname << "\n";
- 		return;
- 	}
-
-@@ -137,7 +137,7 @@ void save_parameters(const char *filename)
-
- 	file.open(pathname, ios::out);
- 	if (!file) {
--		cout << _("Cannot save to file ")<< " "<< pathname << "\n";
-+		cout << _("Cannot save to file") << " " << pathname << "\n";
- 		return;
- 	}
-
-@@ -162,7 +162,7 @@ void load_parameters(const char *filename)
-
- 	file.open(pathname, ios::in);
- 	if (!file) {
--		cout << _("Cannot load from file ")<< " "<< pathname << "\n";
-+		cout << _("Cannot load from file") << " " << pathname << "\n";
- 		return;
- 	}
+>   	fprintf(out, "#ifndef __INCLUDE_GUARD_CCS_H\n");
+Your patch has been merged.
+Thank you,
 
 
---===============0209406919344834865==--
+--===============5907084471324795387==--
 
