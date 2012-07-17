@@ -1,63 +1,83 @@
-Content-Type: multipart/mixed; boundary="===============4155432574739324856=="
+Content-Type: multipart/mixed; boundary="===============3810126042403218802=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] Fix crash on Linux ARM hosts
-Date: Thu, 12 Jul 2012 23:17:30 +0300
-Message-ID: <20120712201730.GB2981@swordfish.datadirect.datadirectnet.com>
-In-Reply-To: 4FFF2DED.3020604@weilnetz.de
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] Wrong common field name in GFX Wakeups event
+Date: Tue, 17 Jul 2012 15:10:12 -0700
+Message-ID: <5005E2C4.1050204@linux.intel.com>
+In-Reply-To: 4FFD1A0C.90704@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4155432574739324856==
+--===============3810126042403218802==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (07/12/12 22:05), Stefan Weil wrote:
-> >We had this before. I would rather prefer default CPU number
-> >to be 1, instead of -1.
-> >
-> >Discussion:
-> >http://lists.01.org/pipermail/powertop/2012-May/000055.html
-> >http://lists.01.org/pipermail/powertop/2012-May/000073.html
-> >
-> >
-> >And the patch is:
-> >http://lists.01.org/pipermail/powertop/2012-May/000052.html
-> >
-> >Chris, did you have a chance to take a look on this one?
-> >
-> >	-ss
-> >
-> Thanks for the pointers to the previous mails - I had searched
-> the archive and bug trackers but did not notice them.
-> =
-
-> The default CPU number should be 0, not 1, because
-> that seems to be a common value for other architectures
-> with only one CPU.
+On 07/10/2012 11:15 PM, Igor Zhbanov wrote:
+> Hello!
 >
+> I have found that PowerTOP doesn't displays values in "GFX Wakeups/s" =
 
-Good point.
- =
+> column.
+> It is because of wrong event field name the handle_trace_point() method
+> expects to find in a trace event.
+>
+> Here is the patch:
+> --8<--Cut-here-----------------------------------------------------------=
+----- =
 
-> My patch only sets it to -1 to avoid any use of it (it could
-> also be set to any negative value).
-> =
+>
+> diff -purN powertop/src/process/do_process.cpp =
 
-> I'm just preparing a 2nd patch on top of this one which
-> adds ARM support. It should also fix any other architecture
-> which does not use "processor\t:" (there are several of them
-> according to the Linux source code). It takes a while until
-> it is built, because my new Raspberry PI is so terribly slow.
-> =
+> powertop-new/src/process/do_process.cpp
+> --- powertop/src/process/do_process.cpp    2012-07-05 =
 
-> =
+> 13:06:16.080258858 +0400
+> +++ powertop-new/src/process/do_process.cpp    2012-07-06 =
+
+> 13:31:14.382651388 +0400
+> @@ -340,7 +340,7 @@ void perf_process_bundle::handle_trace_p
+>          int flags;
+>          int pid;
+>
+> -        ret =3D pevent_get_common_field_val(NULL, event, =
+
+> "flags",&rec,&val, 0);
+> +        ret =3D pevent_get_common_field_val(NULL, event, =
+
+> "common_flags",&rec,&val, 0);
+>          if (ret<  0)
+>              return;
+>          flags =3D (int)val;
+> @@ -625,7 +625,7 @@ void perf_process_bundle::handle_trace_p
+>          class power_consumer *consumer =3D NULL;
+>          int flags;
+>
+> -        ret =3D pevent_get_common_field_val(NULL, event, =
+
+> "flags",&rec,&val, 0);
+> +        ret =3D pevent_get_common_field_val(NULL, event, =
+
+> "common_flags",&rec,&val, 0);
+>          if (ret<  0)
+>              return;
+>          flags =3D (int)val;
+> --8<---------------------------------------------------------------------=
+----- =
+
+>
+>
+> Thank you.
+>
+>
+>
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+Your patch has been merged.
+Thank you,
 
 
-Great.
-
-	-ss
-
---===============4155432574739324856==--
+--===============3810126042403218802==--
 
