@@ -1,39 +1,27 @@
-Content-Type: multipart/mixed; boundary="===============2934631926206019180=="
+Content-Type: multipart/mixed; boundary="===============3359654109805694104=="
 MIME-Version: 1.0
-From: Magnus Fromreide <magfr at lysator.liu.se>
-Subject: [Powertop] [PATCH 2/2] stdbool.h is not needed in C++
-Date: Sat, 26 May 2012 06:34:19 +0200
-Message-ID: <1338014363.2512.1.camel@sara>
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Get rid of ncurses' TRUE and FALSE
+Date: Wed, 18 Jul 2012 06:11:49 -0700
+Message-ID: <5006B615.1000305@linux.intel.com>
+In-Reply-To: 1342603045-25492-1-git-send-email-i.zhbanov@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2934631926206019180==
+--===============3359654109805694104==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Magnus Fromreide <magfr(a)lysator.liu.se>
----
- src/lib.cpp |    1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/src/lib.cpp b/src/lib.cpp
-index 33f835f..ad24eac 100644
---- a/src/lib.cpp
-+++ b/src/lib.cpp
-@@ -32,7 +32,6 @@
- #include <string>
- #include <ctype.h>
- #include <stdio.h>
--#include <stdbool.h>
- #include <math.h>
- #include <stdlib.h>
- =
-
--- =
-
-1.7.10
+On 7/18/2012 2:17 AM, Igor Zhbanov wrote:
+> Get rid of TRUE and FALSE ncurses' defines used for boolean variables
+> initialization. This fix also helps build without ncurses support.
 
 
---===============2934631926206019180==--
+while I appreciate going to C++ true/false, building without ncurses
+isn't really a goal.
+(even on android, building ncurses is easy, and it does make the tool SO
+much more useful)
+
+--===============3359654109805694104==--
 
