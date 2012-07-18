@@ -1,42 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============5372523798567715939=="
+Content-Type: multipart/mixed; boundary="===============2749979697343467555=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] building on Fedora 17
-Date: Thu, 19 Jul 2012 19:13:39 -0700
-Message-ID: <5008BED3.30802@linux.intel.com>
-In-Reply-To: 04DD5571759C064D967CF1D07D73B6284909C331@fmsmsx109.amr.corp.intel.com
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: [Powertop] [PATCH] Remove unneded zlib dependency
+Date: Wed, 18 Jul 2012 18:54:58 +0400
+Message-ID: <1342623298-30628-1-git-send-email-i.zhbanov@samsung.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5372523798567715939==
+--===============2749979697343467555==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 7/19/2012 4:45 PM, Howard, James D wrote:
-> I downloaded PowerTop ver. 2.0 and attempted to build it with:
->    ./autogen.sh
-> then
->    ./configure
-> The configure script is not finding "LIBNL" and nl_socket_alloc.
-> =
+Remove unneded zlib dependency from configure.ac
+---
+ configure.ac |    3 ---
+ 1 files changed, 0 insertions(+), 3 deletions(-)
 
-> My Fedora 17 installation seems to have libnl and the looked-for symbol:
->    $ rpm -qa | grep libnl
->    libnl3-3.2.7-1.fc17.x86_64
->    libnl-1.1-15.fc17.x86_64
-> And, nl_socket_alloc is defined in (at least) the 64-bit library /usr/lib=
-64/libnl-3.so.200:
->    $ nm --dynamic /usr/lib64/libnl-3.so.200 | grep nl_socket_alloc
->    00000039c360f740 T nl_socket_alloc
->    00000039c360f6d0 T nl_socket_alloc_cb
-> =
+diff --git a/configure.ac b/configure.ac
+index ff4cdea..4b3d027 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -50,9 +50,6 @@ AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], AC_MSG_E=
+RROR([ncurses is requir
+ PKG_CHECK_MODULES([PCIUTILS], [libpci],[],[
+ 	AC_SEARCH_LIBS([pci_get_dev], [pci], [], AC_MSG_ERROR([libpci is required=
+ but was not found]), [])
+ ]) =
 
-> Is this something that the Fedora 17 distribution has changed in the libn=
-l naming string -- again?
+-PKG_CHECK_MODULES([LIBZ], [zlib],[],[
+-	AC_SEARCH_LIBS([deflate], [z], [], AC_MSG_ERROR([zlib is required but was=
+ not found]), [])
+-]) =
 
-do you have the -devel package of these, so that you have the headers ?
+ =
+
+ has_libnl_ver=3D0
+ PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [
+-- =
+
+1.7.5.4
 
 
---===============5372523798567715939==--
+--===============2749979697343467555==--
 
