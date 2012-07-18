@@ -1,50 +1,98 @@
-Content-Type: multipart/mixed; boundary="===============4112993796020157462=="
+Content-Type: multipart/mixed; boundary="===============6102961682804443489=="
 MIME-Version: 1.0
-From: Magnus Fromreide <magfr at lysator.liu.se>
-Subject: Re: [Powertop] [PATCH] Get rid of ncurses' TRUE and FALSE
-Date: Mon, 23 Jul 2012 09:31:33 +0200
-Message-ID: <1343028693.3103.4.camel@sara>
-In-Reply-To: 500CF009.908@samsung.com
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: [Powertop] [PATCH] Get rid of ncurses' TRUE and FALSE
+Date: Wed, 18 Jul 2012 13:17:25 +0400
+Message-ID: <1342603045-25492-1-git-send-email-i.zhbanov@samsung.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4112993796020157462==
+--===============6102961682804443489==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2012-07-23 at 10:32 +0400, Igor Zhbanov wrote:
-> Hi Chris!
-> Thank you for your answer.
-> =
+Get rid of TRUE and FALSE ncurses' defines used for boolean variables
+initialization. This fix also helps build without ncurses support.
+---
+ src/main.cpp          |    6 +++---
+ src/tuning/tuning.cpp |    6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-> Chris Ferron wrote:
-> > On 07/20/2012 12:06 AM, Igor Zhbanov wrote:
-> >>
-> >> Linaro has made only few commits after forking from mainline.
-> >>
-> >> They are:
-> >>
-> >> 1) adding __NR_perf_event_open define
-> > Please insure this is fresh code authored by you and detailed if you =
+diff --git a/src/main.cpp b/src/main.cpp
+index 7a1b976..9f53b46 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -354,7 +354,7 @@ int main(int argc, char **argv)
+ {
+ 	int option_index;
+ 	int c;
+-	bool wantreport =3D FALSE;
++	bool wantreport =3D false;
+ 	char filename[4096];
+ 	char workload[4096] =3D {0,};
+ 	int  iterations =3D 1;
+@@ -396,7 +396,7 @@ int main(int argc, char **argv)
+ 				break;
+ =
 
-> > submit, and I will be happy to take it.
-> Yes, this is just a system call number copied from unistd.h for ARM =
+ 			case 'h': /* html report */
+-				wantreport =3D TRUE;
++				wantreport =3D true;
+ 				reporttype =3D 1;
+ 				sprintf(filename, "%s", optarg ? optarg : "PowerTOP.html" );
+ 				break;
+@@ -417,7 +417,7 @@ int main(int argc, char **argv)
+ 				break;
+ 				=
 
-> platform.
-> Without it PowerTOP will not know what system call number =
+ 			case 'C': /* csv report*/
+-				wantreport =3D TRUE;
++				wantreport =3D true;
+ 				reporttype =3D 0;
+ 				sprintf(filename, "%s", optarg ? optarg : "PowerTOP.csv");
+ 				break;
+diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
+index 1a90417..865d986 100644
+--- a/src/tuning/tuning.cpp
++++ b/src/tuning/tuning.cpp
+@@ -43,7 +43,7 @@
+ #include "../lib.h"
+ =
 
-> __NR_perf_event_open has on ARM.
+ static void sort_tunables(void);
+-static bool should_clear =3D FALSE;
++static bool should_clear =3D false;
+ =
 
-Why can't it take __NR_perf_event_open from the libc headers?
-That is, why can't the whole ifdef under /* some people have stale
-headers */ go?
+ #ifndef DISABLE_NCURSES
+ class tuning_window: public tab_window {
+@@ -103,7 +103,7 @@ static void __tuning_update_display(int cursor_pos)
+ 		return;
+ =
 
-Powertop is rather demanding with regards to the environment anyhow and
-magic constants are never fun.
+ 	if (should_clear) {
+-		should_clear =3D FALSE;
++		should_clear =3D false;
+ 		wclear(win);
+ 	}
+ =
 
-/MF
+@@ -185,7 +185,7 @@ static bool tunables_sort(class tunable * i, class tuna=
+ble * j)
+ void tuning_window::window_refresh()
+ {
+ 	clear_tuning();
+-	should_clear =3D TRUE;
++	should_clear =3D true;
+ 	init_tuning();
+ }
+ =
+
+-- =
+
+1.7.5.4
 
 
---===============4112993796020157462==--
+--===============6102961682804443489==--
 
