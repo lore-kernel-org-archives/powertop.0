@@ -1,57 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============7465365932980844948=="
+Content-Type: multipart/mixed; boundary="===============4761075344343323050=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] remove -Werror from AM_INIT_AUTOMAKE
-Date: Wed, 27 Jun 2012 11:19:23 -0700
-Message-ID: <4FEB4EAB.7020408@linux.intel.com>
-In-Reply-To: 1339972214-18301-1-git-send-email-moben@exherbo.org
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: [Powertop] [PATCH] Add support to store boardname in /data directory
+Date: Wed, 18 Jul 2012 18:53:24 +0400
+Message-ID: <1342623204-30480-1-git-send-email-i.zhbanov@samsung.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7465365932980844948==
+--===============4761075344343323050==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Patch applied
-Thank You
+Add support to store boardname in /data directory.
+This patch is based on Linaro's changes.
+---
+ src/main.cpp |   15 +++++++++++----
+ 1 files changed, 11 insertions(+), 4 deletions(-)
 
-On 06/17/2012 03:30 PM, Benedikt Morbach wrote:
-> While this is nice while developing, it may cause
-> various problems with distributed tarballs.
->
-> A new automake version could add a warning, causing errors for distributi=
-ons
-> and users, who might need to patch configure.ac and thus run autoreconf.
->
-> For example, we hit an error where a third party package (gettext) uses
-> functionality (AM_PROG_MKDIR_P) which is deprecated in newer automake ver=
-sions(1.12.1),
-> causing the powertop build to fail.
->
-> Since the problem lies elsewhere, it is stupid to fail for this while bui=
-lding powertop
-> ---
->   configure.ac |    2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/configure.ac b/configure.ac
-> index 4da4eea..ff4cdea 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -3,7 +3,7 @@
->   =
+diff --git a/src/main.cpp b/src/main.cpp
+index 7a1b976..8a68533 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -240,12 +240,19 @@ static void load_board_params()
+ 	string boardname;
+ 	char filename[4096];
+ =
 
->   AC_PREREQ([2.68])
->   AC_INIT([powertop], [2.0], [powertop(a)lists.01.org])
-> -AM_INIT_AUTOMAKE([-Wall -Werror foreign ])
-> +AM_INIT_AUTOMAKE([-Wall foreign ])
->   AC_LANG([C++])
->   AC_CONFIG_FILES([Makefile src/Makefile pevent/Makefile po/Makefile.in d=
-oc/Makefile])
->   AC_CONFIG_SRCDIR([src/main.cpp])
+-	boardname =3D read_sysfs_string("/etc/boardname");
++	if (access("/etc/boardname", R_OK) =3D=3D 0) {
++		boardname =3D read_sysfs_string("/etc/boardname");
+ =
+
+-	if (boardname.length() < 2)
+-		return;
++		if (boardname.length() < 2)
++			return;
+ =
+
+-	sprintf(filename, "/var/cache/powertop/saved_parameters.powertop.%s", boa=
+rdname.c_str());
++		sprintf(filename,
++			"/var/cache/powertop/saved_parameters.powertop.%s",
++			boardname.c_str());
++	} else if (access("/data", R_OK) =3D=3D 0)
++		sprintf(filename,"saved_parameters.powertop");
++	else
++		return;
+ =
+
+ 	if (access(filename, R_OK))
+ 		return;
+-- =
+
+1.7.5.4
 
 
-
---===============7465365932980844948==--
+--===============4761075344343323050==--
 
