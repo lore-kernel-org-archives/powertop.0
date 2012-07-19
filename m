@@ -1,29 +1,36 @@
-Content-Type: multipart/mixed; boundary="===============0953647506944629610=="
+Content-Type: multipart/mixed; boundary="===============3192992314177864571=="
 MIME-Version: 1.0
-From: Magnus Fromreide <magfr at lysator.liu.se>
-Subject: Re: [Powertop] [PATCH 1/2] Make it possible to include parse-events.h
- before libc headers.
-Date: Sat, 28 Jul 2012 19:27:18 +0200
-Message-ID: <1343496438.2664.3.camel@sara>
-In-Reply-To: 5011C02D.80805@linux.intel.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Report accurate wakeup numbers for
+ hyper-threaded CPU
+Date: Thu, 19 Jul 2012 08:15:30 -0700
+Message-ID: <50082492.4080801@linux.intel.com>
+In-Reply-To: 5007A4C7.6080209@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0953647506944629610==
+--===============3192992314177864571==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2012-07-26 at 15:09 -0700, Chris Ferron wrote:
-> Maybe, but wait a day, you inspired me to completely update and rebase =
+On 7/18/2012 11:10 PM, Igor Zhbanov wrote:
+> Arjan van de Ven wrote:
+>> On 7/18/2012 7:53 AM, Igor Zhbanov wrote:
+>>> This is the commit 0f7e6dd0ab7b1b02ef7e55749d6a34d6801c3973 from
+>>> Linaro's
+>>> PowerTOP repository.
+>> that's great.
+>>
+>> it's also wrong ;-(
+> I just trying to merge Linaro's changes. There are only about 10 commits.
+> The most notable is this.
+> =
 
-> the pevent code.
+> Is it wrong or useless? Could it be fixed or it is better to drop it?
 
-Could you please remove the traceevent/.deps directory  and all the .Plo
-files in it as they are regenerated each time the library is built?
-
-/MF
+drop; it's factually  not correct.
 
 
---===============0953647506944629610==--
+--===============3192992314177864571==--
 
