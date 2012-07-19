@@ -1,43 +1,63 @@
-Content-Type: multipart/mixed; boundary="===============7873968119300752927=="
+Content-Type: multipart/mixed; boundary="===============2973283355246360424=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] segfault on Sheevaplug (ARM Kirkwood)
-Date: Sun, 20 May 2012 12:05:01 +0300
-Message-ID: <20120520090501.GA3515@swordfish>
-In-Reply-To: 1337503302.67870.YahooMailNeo@web160301.mail.bf1.yahoo.com
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Get rid of ncurses' TRUE and FALSE
+Date: Thu, 19 Jul 2012 13:20:19 -0700
+Message-ID: <50086C03.4000001@linux.intel.com>
+In-Reply-To: 5006B84F.7020104@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7873968119300752927==
+--===============2973283355246360424==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (05/20/12 01:41), Rui DaCosta wrote:
->    I get the following segfault running 2.0 from unmodified source and
->    default build options in Arch Linux ARM:
->    Linux alarm 3.1.10-10-ARCH #1 PREEMPT Thu May 10 02:00:37 UTC 2012
->    armv5tel GNU/Linux
->    Cannot load from file /var/cache/powertop/saved_results.powertop
->    Cannot load from file /var/cache/powertop/saved_parameters.powertop
->    Segmentation fault
->    trace is:
->    #0 handle_one_cpu (model=3D0, family=3D0, vendor=3D0xbeffcf8c "",
->    number=3D4294967295)
+On 07/18/2012 06:21 AM, Igor Zhbanov wrote:
+> Arjan van de Ven wrote:
+>> On 7/18/2012 2:17 AM, Igor Zhbanov wrote:
+>>> Get rid of TRUE and FALSE ncurses' defines used for boolean variables
+>>> initialization. This fix also helps build without ncurses support.
+>> while I appreciate going to C++ true/false, building without ncurses
+>> isn't really a goal.
+>> (even on android, building ncurses is easy, and it does make the tool SO
+>> much more useful)
+> It is not good that C++ code depends on TRUE/FALSE defines
+> (defined in ncurses.h) in functions that are not related to ncurses.
+>
+> P.S. I have merged Intel's and Linaro's repositories and will send =
 
-weird and overflowed input.
-could you please provide your /proc/cpuinfo output?
+> patches for
+> review soon. I don't know why but Linaro wants to build PowerTOP =
 
-	-ss
+> without ncurses.
+> So I will send a patch that makes ncurses and libpci dependencies =
 
->    at cpu/cpu.cpp:210
->    #1 enumerate_cpus () at cpu/cpu.cpp:276
->    #2 0x000495d8 in main (argc=3D1, argv=3D0xbefffcc4) at main.cpp:382
->    please let me know if there's anything else I can provide to assist.
->    Regards,
->    RuiDC
+> conditional.
+>
+
+     Please do not merge Intel's and Linaro repositories and send =
+
+patches for what comes of it.
+If the Linaro maintainers want to do an upstream merge or if =
+
+contributors of Linaro want to upstream
+patches they have authored then great.
+Submitting patches based on other peoples work is not agreeable to me. I =
+
+will not take patches that
+I even suspect isn't from the original authors, and or without the =
+
+authors consent. Do not just merge code bases
+and generate patches based on the diff, and send it to the list. They =
+
+will not be taken.
+
+-Chris Ferron
 
 
 
---===============7873968119300752927==--
+
+
+--===============2973283355246360424==--
 
