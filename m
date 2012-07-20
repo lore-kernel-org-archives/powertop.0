@@ -1,43 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============7696502687847612650=="
+Content-Type: multipart/mixed; boundary="===============1785699460969818875=="
 MIME-Version: 1.0
-From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: [Powertop] [PATCH] Add __NR_perf_event_open system call number for
- ARM platform
-Date: Wed, 18 Jul 2012 18:52:32 +0400
-Message-ID: <1342623152-30390-1-git-send-email-i.zhbanov@samsung.com>
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Relaxed autoconf version restriction for
+ scratchbox build
+Date: Fri, 20 Jul 2012 10:27:34 -0700
+Message-ID: <50099506.4010601@linux.intel.com>
+In-Reply-To: 1342767160-22667-1-git-send-email-i.zhbanov@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7696502687847612650==
+--===============1785699460969818875==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Add __NR_perf_event_open system call number for ARM platform.
----
- src/perf/perf_event.h |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+On 07/19/2012 11:52 PM, Igor Zhbanov wrote:
+> Relaxed autoconf version restriction for scratchbox build.
+> PowerTOP successfully builds with 2.67 version of Autotools.
+> ---
+>   configure.ac |    2 +-
+>   1 files changed, 1 insertions(+), 1 deletions(-)
+>
+> diff --git a/configure.ac b/configure.ac
+> index 4b3d027..e1e670a 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -1,7 +1,7 @@
+>   #                                               -*- Autoconf -*-
+>   # Process this file with autoconf to produce a configure script.
+>   =
 
-diff --git a/src/perf/perf_event.h b/src/perf/perf_event.h
-index 01fd065..c2113eb 100644
---- a/src/perf/perf_event.h
-+++ b/src/perf/perf_event.h
-@@ -51,6 +51,9 @@
- #if __x86_64__
- #define __NR_perf_event_open	298
- #endif
-+#if __arm__
-+#define __NR_perf_event_open	364
-+#endif
- #endif
- =
+> -AC_PREREQ([2.68])
+> +AC_PREREQ([2.67])
+>   AC_INIT([powertop], [2.0], [powertop(a)lists.01.org])
+>   AM_INIT_AUTOMAKE([-Wall foreign ])
+>   AC_LANG([C++])
+What is the problem? Why do you need to do this? What is the benefit to =
 
- =
-
--- =
-
-1.7.5.4
+the PowerTOP project?
 
 
---===============7696502687847612650==--
+--===============1785699460969818875==--
 
