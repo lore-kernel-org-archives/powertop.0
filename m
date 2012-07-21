@@ -1,122 +1,71 @@
-Content-Type: multipart/mixed; boundary="===============8478185276512608020=="
+Content-Type: multipart/mixed; boundary="===============0067772797243332468=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] PowerTOP 2.0 bugs
-Date: Tue, 15 May 2012 10:29:20 -0700
-Message-ID: <4FB29270.60008@linux.intel.com>
-In-Reply-To: CABRT9RDdKghGM67oP6awBXDoF8mvxg9w0xib7u6yyxiNDpSxNA@mail.gmail.com
+From: Paul Menzel <paulepanter at users.sourceforge.net>
+Subject: Re: [Powertop] [PATCH] Relaxed autoconf version restriction for
+ scratchbox build
+Date: Sat, 21 Jul 2012 23:16:41 +0200
+Message-ID: <1342905401.4237.2.camel@mattotaupa>
+In-Reply-To: 50099506.4010601@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8478185276512608020==
+--===============0067772797243332468==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 05/14/2012 04:11 PM, Marti Raudsepp wrote:
-> On Tue, May 15, 2012 at 1:05 AM, Chris Ferron
-> <chris.e.ferron(a)linux.intel.com>  wrote:
->> Can you please tell me what system, processors and distro (and version) =
-you
->> are running?
->> Also are you running in a VM by chance?
-> No VM, physical hardware. Arch Linux (testing repos enabled), kernel
-> 3.3.5, x86_64.
->
-> Bug #1 occurs on my desktop (AMD Phenom II X4 965) as well as laptop
-> (Intel Core i5-560M)
-OK, lets start with bug 1. It seem there is a definite issues with =
-
-non-intel processors.
-Problem is I am having a hard time getting my hands on a non-intel based =
-
-system.
-Second part of my thoughts is you are seeing a issues wiht you AMD, but =
-
-you Core i5
-may look similar but actually i suspect is not incorrect. From you =
-
-example for bug 1, I am assumeing by what I am seeing that you took =
-
-those numbers from your AMD system.
-The reason this is important to define, is there is different code paths =
-
-for Intel and non-intel processors, so getting comparable data between =
-
-them is important. In other words there are three general areas where is =
-
-issue could be happening, and if you are actually seeing the same issue =
-
-on both processors then it points to the only 1 point that is shard in =
-
-this area.
-
-In regards to your Intel system. You could be seeing more the 100% of =
-
-cpus. This is the measurement of the cpus not the package. I don't have =
-
-the full data sheet for your CPU, but you may see up to 400% as your =
-
-system has 2cores with two threads each. 400% of the cpu =3D 100% of the =
-
-package.
-  You may also see such number while looking at Frequency and C0 active. =
-
-For instance 100% would indicate that you are pegged at the Stamped rate =
-
-(which is not the max for an Intel processor). over 100% indicates the =
-
-the freq governor is running the processor higher then the stamped rate. =
-
-So for instance the stamped rate on my i7 is 3.4GHz, and in turbo mode I =
-
-can see the rates at 3.5GHz to 3.8GHz at times. So at ~3.5GHz I would =
-
-see 102.5% as C0 active as it's about ~2.2 to 2.5% per bin of 100Hz.
-
-At this point I think for Bug1, this is an issue with the "last_stamp" =
-
-not getting zeroed out, and the effective freq measurements. It could be =
-
-something as simple as below, but like I said I haven't gotten a AMD =
-
-system to work with.
-
-Could you reproduce Bug 1 and send me the data for each Processor, and =
-
-if you feel so inclined maybe play with the changes below on you AMD =
-
-system.
-
-Thanks
-Chris
+Dear Chris,
 
 
+Am Freitag, den 20.07.2012, 10:27 -0700 schrieb Chris Ferron:
+> On 07/19/2012 11:52 PM, Igor Zhbanov wrote:
+> > Relaxed autoconf version restriction for scratchbox build.
+> > PowerTOP successfully builds with 2.67 version of Autotools.
+> > ---
+> >   configure.ac |    2 +-
+> >   1 files changed, 1 insertions(+), 1 deletions(-)
+> >
+> > diff --git a/configure.ac b/configure.ac
+> > index 4b3d027..e1e670a 100644
+> > --- a/configure.ac
+> > +++ b/configure.ac
+> > @@ -1,7 +1,7 @@
+> >   #                                               -*- Autoconf -*-
+> >   # Process this file with autoconf to produce a configure script.
+> >   =
 
-diff --git a/src/cpu/cpu_linux.cpp b/src/cpu/cpu_linux.cpp
-index ab37d57..8aa9772 100644
---- a/src/cpu/cpu_linux.cpp
-+++ b/src/cpu/cpu_linux.cpp
-@@ -59,6 +59,8 @@ void cpu_linux::measurement_start(void)
+> > -AC_PREREQ([2.68])
+> > +AC_PREREQ([2.67])
+> >   AC_INIT([powertop], [2.0], [powertop(a)lists.01.org])
+> >   AM_INIT_AUTOMAKE([-Wall foreign ])
+> >   AC_LANG([C++])
+> What is the problem? Why do you need to do this? What is the benefit to =
 
-         abstract_cpu::measurement_start();
+> the PowerTOP project?
 
-+       last_stamp =3D 0;
-+
-         len =3D sprintf(filename, =
+Hm, the commit message says it all if you know what Scratchbox [1] is.
 
-"/sys/devices/system/cpu/cpu%i/cpuidle", number);
-
-         dir =3D opendir(filename);
-@@ -365,6 +367,7 @@ void cpu_linux::change_effective_frequency(uint64_t =
-
-time, uint64_t frequency)
-
-         effective_frequency =3D frequency;
-         last_stamp =3D time;
-+       abstract_cpu::change_effective_frequency(time, frequency);
-  }
+I guess Scratchbox only includes Autoconf 2.67 so PowerTOP does not
+build out of the box with Scratchbox.
 
 
---===============8478185276512608020==--
+Thanks,
+
+Paul
+
+
+[1] http://www.elinux.org/Toolchains#Scratchbox
+
+--===============0067772797243332468==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="signature.asc"
+
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
+L0xpbnV4KQoKaUVZRUFCRUNBQVlGQWxBTEhEa0FDZ2tRUFgxYUsyd09IVmlCV0FDZmNmWHl5UFF1
+VjF0UEZCT0x2UjhtaVdtOAo2MGtBbjMrL09VWGhMUHNuSEdmR2pqNHEyWmlJdERwUgo9N2FNcQot
+LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
+
+--===============0067772797243332468==--
 
