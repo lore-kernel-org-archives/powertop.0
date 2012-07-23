@@ -1,56 +1,37 @@
-Content-Type: multipart/mixed; boundary="===============5617943452418547256=="
+Content-Type: multipart/mixed; boundary="===============6841489056667455550=="
 MIME-Version: 1.0
-From: Magnus Fromreide <magfr at lysator.liu.se>
-Subject: Re: [Powertop] Please revert the workload patch
-Date: Mon, 18 Jun 2012 22:59:00 +0200
-Message-ID: <1340053140.5088.1.camel@sara>
-In-Reply-To: 4FDF5A96.9010009@linux.intel.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Get rid of ncurses' TRUE and FALSE
+Date: Mon, 23 Jul 2012 06:23:57 -0700
+Message-ID: <500D506D.8060204@linux.intel.com>
+In-Reply-To: 1343028693.3103.4.camel@sara
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5617943452418547256==
+--===============6841489056667455550==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2012-06-18 at 09:43 -0700, Chris Ferron wrote:
-> Hi Magnus,
->      Sorry about that, that patch was lost in the shuffle. All patches =
+On 7/23/2012 12:31 AM, Magnus Fromreide wrote:
 
-> have now been applied upstream, and all should now be well.
-> -Chris
+>> Without it PowerTOP will not know what system call number =
 
-Yes, this is fixed in the current head version.
-
-/MF
-
-> On 06/18/2012 08:19 AM, Dirk Brandewie wrote:
-> > Hi Magnus,
-> >
-> > This patch should fix your problem.  I will work with Chris to get it
-> > pushed out.
-> >
-> > BTW could not find the commit you quoted
-> >
-> > --Dirk
-> >
-> > diff --git a/src/main.cpp b/src/main.cpp
-> > index 880d745..c57c984 100644
-> > --- a/src/main.cpp
-> > +++ b/src/main.cpp
-> > @@ -452,7 +452,7 @@ int main(int argc, char **argv)
-> >
-> >      while (!leave_powertop) {
-> >          show_cur_tab();
-> > -        one_measurement(time_out, workload);
-> > +        one_measurement(time_out, NULL);
-> >          learn_parameters(15, 0);
-> >      }
-> >  #ifndef DISABLE_NCURSES
+>> __NR_perf_event_open has on ARM.
 > =
 
+> Why can't it take __NR_perf_event_open from the libc headers?
+> That is, why can't the whole ifdef under /* some people have stale
+> headers */ go?
+> =
+
+> Powertop is rather demanding with regards to the environment anyhow and
+> magic constants are never fun.
+
+100% agreed; I briefly talked to Chris on Friday based on this patch and
+that is the conclusion we came to as well.
 
 
 
---===============5617943452418547256==--
+--===============6841489056667455550==--
 
