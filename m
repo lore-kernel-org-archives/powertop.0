@@ -1,104 +1,105 @@
-Content-Type: multipart/mixed; boundary="===============1525672302713242339=="
+Content-Type: multipart/mixed; boundary="===============7553489452017689754=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH 3/3] Remove some unused variables
-Date: Mon, 21 May 2012 15:16:02 -0700
-Message-ID: <4FBABEA2.4080006@linux.intel.com>
-In-Reply-To: 1337631510.2616.2.camel@sara
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: Re: [Powertop] [PATCH] Get rid of ncurses' TRUE and FALSE
+Date: Mon, 23 Jul 2012 10:32:41 +0400
+Message-ID: <500CF009.908@samsung.com>
+In-Reply-To: 50099626.6060106@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1525672302713242339==
+--===============7553489452017689754==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-patch applied
-Thank You
--Chris
+Hi Chris!
+Thank you for your answer.
 
-On 04/22/2012 06:12 AM, Magnus Fromreide wrote:
-> Signed-off-by: Magnus Fromreide<magfr(a)lysator.liu.se>
-> ---
->   src/calibrate/calibrate.cpp |    6 ------
->   src/tuning/runtime.cpp      |    2 --
->   src/tuning/tuningusb.cpp    |    2 --
->   3 files changed, 10 deletions(-)
->
-> diff --git a/src/calibrate/calibrate.cpp b/src/calibrate/calibrate.cpp
-> index 7dd8a5f..cf00fcf 100644
-> --- a/src/calibrate/calibrate.cpp
-> +++ b/src/calibrate/calibrate.cpp
-> @@ -145,8 +145,6 @@ static void find_all_rfkill(void)
->   	if (!dir)
->   		return;
->   	while (1) {
-> -		ifstream file;
-> -
->   		entry =3D readdir(dir);
->
->   		if (!entry)
-> @@ -190,8 +188,6 @@ static void find_backlight(void)
->   	if (!dir)
->   		return;
->   	while (1) {
-> -		ifstream file;
-> -
->   		entry =3D readdir(dir);
->
->   		if (!entry)
-> @@ -232,8 +228,6 @@ static void find_scsi_link(void)
->   	if (!dir)
->   		return;
->   	while (1) {
-> -		ifstream file;
-> -
->   		entry =3D readdir(dir);
->
->   		if (!entry)
-> diff --git a/src/tuning/runtime.cpp b/src/tuning/runtime.cpp
-> index 8f428e6..b57d53e 100644
-> --- a/src/tuning/runtime.cpp
-> +++ b/src/tuning/runtime.cpp
-> @@ -83,7 +83,6 @@ runtime_tunable::runtime_tunable(const char *path, cons=
-t char *bus, const char *
->
->   int runtime_tunable::good_bad(void)
->   {
-> -	ifstream file;
->   	string content;
->
->   	content =3D read_sysfs_string(runtime_path);
-> @@ -131,7 +130,6 @@ void add_runtime_tunables(const char *bus)
->   	if (!dir)
->   		return;
->   	while (1) {
-> -		ifstream file;
->   		class runtime_tunable *runtime;
->
->   		entry =3D readdir(dir);
-> diff --git a/src/tuning/tuningusb.cpp b/src/tuning/tuningusb.cpp
-> index b483ce2..74bbacf 100644
-> --- a/src/tuning/tuningusb.cpp
-> +++ b/src/tuning/tuningusb.cpp
-> @@ -81,7 +81,6 @@ usb_tunable::usb_tunable(const char *path, const char *=
-name) : tunable("", 0.9,
->
->   int usb_tunable::good_bad(void)
->   {
-> -	ifstream file;
->   	string content;
->
->   	content =3D read_sysfs_string(usb_path);
-> @@ -127,7 +126,6 @@ void add_usb_tunables(void)
->   	if (!dir)
->   		return;
->   	while (1) {
-> -		ifstream file;
->   		class usb_tunable *usb;
->
->   		entry =3D readdir(dir);
+Chris Ferron wrote:
+> On 07/20/2012 12:06 AM, Igor Zhbanov wrote:
+>> Anyway, that's all major Linaro's changes.
+> I understand you don't see the severity of the issue. But I must =
+
+> insist that no more third party submittal.
+>> There are small minor changes to Android.mk, but it is not suitable =
+
+>> for mainline.
+> Please insure this is fresh code authored by you if you submit, and I =
+
+> will be happy to take it.
+No, that code is not mine. I even doesn't build PowerTOP for Android.
+>>
+>> Linaro has made only few commits after forking from mainline.
+>>
+>> They are:
+>>
+>> 1) adding __NR_perf_event_open define
+> Please insure this is fresh code authored by you and detailed if you =
+
+> submit, and I will be happy to take it.
+Yes, this is just a system call number copied from unistd.h for ARM =
+
+platform.
+Without it PowerTOP will not know what system call number =
+
+__NR_perf_event_open has on ARM.
+>>
+>> 2) building without libpci
+> Done
+>> 3) wrong fix for hyper-threading cpu
+> Not needed
+>> 4) set default variable for TERM and TERMINFO variables
+> Please insure this is fresh code authored by you if you submit, and I =
+
+> will be happy to take it.
+I don't need it for my builds. It was from Linaro's commits. I don't =
+
+even send it to list.
+>>
+>> 5) some changes in Android.mk
+> See above
+Same as above.
+>> 6) change boardname code.
+> I will have a fix for this today 7/20/12 PST
+Same as above.
+>>
+>> That's all. So the git trees in the fact almost the same.
+>>
+>> And now for successful build for ARM devices only two things left:
+>>
+>> 1) Define __NR_perf_event_open for ARM
+>> 2) Change csstoh build rules so that will be built with a cross-compiler
+>> or replace it with a shell script.
+> Shell Script will not be considered, other solutions will be considered.
+I saw suggestion to use HOSTCC variable to compile csstoh.c for build =
+
+platform
+but I don't know automake good enough to modify it so, that after =
+
+running autotools
+rules for building csstoh will contain HOSTCC instead of CC. I don't know
+how to combine HOSTCC and noinst.
+
+If you now good guide for writing automakes for building with a =
+
+cross-compiler,
+please tell me.
+
+Once again, thank you for your response.
+
+-- =
+
+Best regards,
+Igor Zhbanov,
+Expert Software Engineer,
+phone: +7 (495) 797 25 00 ext 3806
+e-mail: i.zhbanov(a)samsung.com
+
+ASWG, Moscow R&D center, Samsung Electronics
+12 Dvintsev street, building 1
+127018, Moscow, Russian Federation
 
 
---===============1525672302713242339==--
+--===============7553489452017689754==--
 
