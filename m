@@ -1,46 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============2517914139307310900=="
+Content-Type: multipart/mixed; boundary="===============4112993796020157462=="
 MIME-Version: 1.0
-From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: [Powertop] [PATCH] Fix typo in the translation file hu_HU.po
-Date: Tue, 24 Jul 2012 12:45:08 +0400
-Message-ID: <1343119508-12969-1-git-send-email-i.zhbanov@samsung.com>
+From: Magnus Fromreide <magfr at lysator.liu.se>
+Subject: Re: [Powertop] [PATCH] Get rid of ncurses' TRUE and FALSE
+Date: Mon, 23 Jul 2012 09:31:33 +0200
+Message-ID: <1343028693.3103.4.camel@sara>
+In-Reply-To: 500CF009.908@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2517914139307310900==
+--===============4112993796020157462==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Fix typo in the translation file hu_HU.po causing build errors.
----
- po/hu_HU.po |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Mon, 2012-07-23 at 10:32 +0400, Igor Zhbanov wrote:
+> Hi Chris!
+> Thank you for your answer.
+> =
 
-diff --git a/po/hu_HU.po b/po/hu_HU.po
-index 0d817e2..1af051d 100644
---- a/po/hu_HU.po
-+++ b/po/hu_HU.po
-@@ -553,7 +553,7 @@ msgstr "El=EF=BF=BD=EF=BF=BDk=EF=BF=BD=EF=BF=BDsz=EF=BF=
-=BD=EF=BF=BDl=EF=BF=BD=EF=BF=BDs a m=EF=BF=BD=EF=BF=BDr=EF=BF=BD=EF=BF=BDse=
-k elv=EF=BF=BD=EF=BF=BDgz=EF=BF=BD=EF=BF=BDs=EF=BF=BD=EF=BF=BDhez\n"
- #: src/main.cpp:255
- #, c-format
- msgid "Taking %d measurement(s) for a duration of %d second(s) each.\n"
--msgstr "%d darab, egyenk=EF=BF=BD=EF=BF=BDnt %d m=EF=BF=BD=EF=BF=BDsodperc=
-es m=EF=BF=BD=EF=BF=BDr=EF=BF=BD=EF=BF=BDs k=EF=BF=BD=EF=BF=BDsz=EF=BF=BD=
-=EF=BF=BDt=EF=BF=BD=EF=BF=BDse.\\n"
-+msgstr "%d darab, egyenk=EF=BF=BD=EF=BF=BDnt %d m=EF=BF=BD=EF=BF=BDsodperc=
-es m=EF=BF=BD=EF=BF=BDr=EF=BF=BD=EF=BF=BDs k=EF=BF=BD=EF=BF=BDsz=EF=BF=BD=
-=EF=BF=BDt=EF=BF=BD=EF=BF=BDse.\n"
- =
+> Chris Ferron wrote:
+> > On 07/20/2012 12:06 AM, Igor Zhbanov wrote:
+> >>
+> >> Linaro has made only few commits after forking from mainline.
+> >>
+> >> They are:
+> >>
+> >> 1) adding __NR_perf_event_open define
+> > Please insure this is fresh code authored by you and detailed if you =
 
- #: src/main.cpp:278
- #, c-format
--- =
+> > submit, and I will be happy to take it.
+> Yes, this is just a system call number copied from unistd.h for ARM =
 
-1.7.5.4
+> platform.
+> Without it PowerTOP will not know what system call number =
+
+> __NR_perf_event_open has on ARM.
+
+Why can't it take __NR_perf_event_open from the libc headers?
+That is, why can't the whole ifdef under /* some people have stale
+headers */ go?
+
+Powertop is rather demanding with regards to the environment anyhow and
+magic constants are never fun.
+
+/MF
 
 
---===============2517914139307310900==--
+--===============4112993796020157462==--
 
