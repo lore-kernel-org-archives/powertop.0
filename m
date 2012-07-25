@@ -1,129 +1,77 @@
-Content-Type: multipart/mixed; boundary="===============2930596276474324890=="
+Content-Type: multipart/mixed; boundary="===============6889761002814463474=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] Fix crash on Linux ARM hosts
-Date: Thu, 12 Jul 2012 22:45:45 +0300
-Message-ID: <20120712194545.GA2981@swordfish.datadirect.datadirectnet.com>
-In-Reply-To: 1342118464-18397-1-git-send-email-sw@weilnetz.de
+From: Magnus Fromreide <magfr at lysator.liu.se>
+Subject: [Powertop] [PATCH 2/2] Move some includes to the implementation in
+ order to reduce their scope.
+Date: Wed, 25 Jul 2012 07:12:25 +0200
+Message-ID: <1343209456.2554.1.camel@sara>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2930596276474324890==
+--===============6889761002814463474==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (07/12/12 20:41), Stefan Weil wrote:
-> /proc/cpuinfo on ARM hosts is different and resulted
-> in a call of handle_one_cpu() with number =3D=3D -1
-> which finally raised a SIGSEGV crash (noticed on
-> Debian Wheezy for ARM).
-> =
+Signed-off-by: Magnus Fromreide <magfr(a)lysator.liu.se>
+---
+ src/perf/perf.cpp     |    5 ++++-
+ src/perf/perf_event.h |    4 ----
+ 2 files changed, 4 insertions(+), 5 deletions(-)
 
-> Fix this by testing the value of "number".
-> =
-
-> After number was used, it is now reset to -1 just to make
-> sure that the new test also works for a potential 2nd cpu
-> with unexpected information in /proc/cpuinfo.
-> =
-
-> Signed-off-by: Stefan Weil <sw(a)weilnetz.de>
-> ---
->
-
-
-Hello,
-
-We had this before. I would rather prefer default CPU number
-to be 1, instead of -1.
-
-Discussion:
-http://lists.01.org/pipermail/powertop/2012-May/000055.html
-http://lists.01.org/pipermail/powertop/2012-May/000073.html
-
-
-And the patch is:
-http://lists.01.org/pipermail/powertop/2012-May/000052.html
+diff --git a/src/perf/perf.cpp b/src/perf/perf.cpp
+index 102e224..9a30e9f 100644
+--- a/src/perf/perf.cpp
++++ b/src/perf/perf.cpp
+@@ -23,6 +23,8 @@
+  *	Arjan van de Ven <arjan(a)linux.intel.com>
+  */
  =
 
++#include "perf.h"
++
+ #include <iostream>
+ #include <fstream>
+ =
 
-Chris, did you have a chance to take a look on this one?
+@@ -35,11 +37,12 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sys/ioctl.h>
++#include <linux/ioctl.h>
++#include <sys/syscall.h>
+ =
+
+ #include <fcntl.h>
+ =
+
+ #include "perf_event.h"
+-#include "perf.h"
+ #include "../lib.h"
+ #include "../display.h"
+ =
+
+diff --git a/src/perf/perf_event.h b/src/perf/perf_event.h
+index 92a38b8..a28a570 100644
+--- a/src/perf/perf_event.h
++++ b/src/perf/perf_event.h
+@@ -39,10 +39,6 @@
+ #define _LINUX_PERF_EVENT_H
+ =
+
+ #include <linux/types.h>
+-#include <linux/ioctl.h>
+-#include <asm/byteorder.h>
+-#include <sys/syscall.h>
+-
+ =
+
+ /*
+  * User-space ABI bits:
+-- =
+
+1.7.10.4
 
 
-	-ss
-
-
-> Please note that even with this patch, powertop on ARM will
-> only work partially: handle_one_cpu() is never called,
-> so there is no cpu information.
-> =
-
-> For ARM hosts with a single core cpu (the most common case),
-> using a case insensitive compare for 'processor' would work.
-> =
-
-> This is my /proc/cpuinfo:
-> =
-
-> Processor	: ARMv6-compatible processor rev 7 (v6l)
-> BogoMIPS	: 697.95
-> Features	: swp half thumb fastmult vfp edsp java tls =
-
-> CPU implementer	: 0x41
-> CPU architecture: 7
-> CPU variant	: 0x0
-> CPU part	: 0xb76
-> CPU revision	: 7
-> =
-
-> Hardware	: BCM2708
-> Revision	: 0002
-> Serial		: 00000000e16a63c5
-> =
-
-> For multicore cpus, a better 2nd patch is needed.
-> If anybody has a /proc/cpuinfo of that kind, please tell me
-> the format - otherwise I'll have to look in the Linux source.
-> =
-
-> Regards,
-> Stefan Weil
-> =
-
->  src/cpu/cpu.cpp |    7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> =
-
-> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-> index 4096835..d08bdcd 100644
-> --- a/src/cpu/cpu.cpp
-> +++ b/src/cpu/cpu.cpp
-> @@ -271,8 +271,11 @@ void enumerate_cpus(void)
->  			}
->  		}
->  		if (strncasecmp(line, "bogomips\t", 9) =3D=3D 0) {
-> -			handle_one_cpu(number, vendor, family, model);
-> -			set_max_cpu(number);
-> +			if (number >=3D 0) {
-> +				handle_one_cpu(number, vendor, family, model);
-> +				set_max_cpu(number);
-> +				number =3D -1;
-> +			}
->  		}
->  	}
->  =
-
-> -- =
-
-> 1.7.10
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============2930596276474324890==--
+--===============6889761002814463474==--
 
