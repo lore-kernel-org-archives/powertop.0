@@ -1,56 +1,53 @@
-Content-Type: multipart/mixed; boundary="===============5907084471324795387=="
+Content-Type: multipart/mixed; boundary="===============8599519789486285146=="
 MIME-Version: 1.0
 From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] ccstoh: Don't return success if something went
- wrong
-Date: Tue, 17 Jul 2012 15:07:26 -0700
-Message-ID: <5005E21E.2040302@linux.intel.com>
-In-Reply-To: 1342125703-23323-1-git-send-email-sw@weilnetz.de
+Subject: Re: [Powertop] [PATCH 1/2] Make it possible to include parse-events.h
+ before libc headers.
+Date: Thu, 26 Jul 2012 15:09:49 -0700
+Message-ID: <5011C02D.80805@linux.intel.com>
+In-Reply-To: 1343244370.6440.4.camel@sara
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5907084471324795387==
+--===============8599519789486285146==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 07/12/2012 01:41 PM, Stefan Weil wrote:
-> exit(0) is the same as returning EXIT_SUCCESS which is a bad
-> idea after a severe failure. It will for example result in
-> wrong behaviour of make (make won't stop after such failures).
->
-> Returning EXIT_FAILURE fixes this.
->
-> Signed-off-by: Stefan Weil <sw(a)weilnetz.de>
-> ---
->   src/csstoh.c |    4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/src/csstoh.c b/src/csstoh.c
-> index e6b1dcf..28858f5 100644
-> --- a/src/csstoh.c
-> +++ b/src/csstoh.c
-> @@ -40,12 +40,12 @@ int main(int argc, char **argv)
->   	in =3D fopen(argv[1], "rm");
->   	if (!in) {
->   		printf("Failed to open input file %s (%s) \n", argv[1], strerror(errn=
-o));
-> -		exit(0);
-> +		return EXIT_FAILURE;
->   	}
->   	out =3D fopen(argv[2], "wm");
->   	if (!out) {
->   		printf("Failed to open output file %s (%s) \n", argv[1], strerror(err=
-no));
-> -		exit(0);
-> +		return EXIT_FAILURE;
->   	}
->   =
+On 07/25/2012 12:26 PM, Magnus Fromreide wrote:
+> On Wed, 2012-07-25 at 10:44 -0700, Chris Ferron wrote:
+>> On 07/23/2012 11:03 PM, Magnus Fromreide wrote:
+>>> The __unused macro interferes with the glibc and is in a reserved names=
+pace
+>>> so it should be renamed.
+>>> Additionally the __ununsed macro is used from just one implementation f=
+ile so
+>>> the macro is moved there.
+>>>
+>>> Signed-off-by: Magnus Fromreide <magfr(a)lysator.liu.se>
+>>>    =
 
->   	fprintf(out, "#ifndef __INCLUDE_GUARD_CCS_H\n");
-Your patch has been merged.
-Thank you,
+>>>    =
+
+>> I will forward this on to Steve Rostedt. pevent code is not actually
+>> strictly part of the powertop src, it is just temporarily being built as
+>> part of the project so powertop can take advantage of it early.
+> Thanks. I found no contact information for pevent but it feels like an
+> imported library.
+>
+>> That said, it may not be a good fit for the grand scheme.
+>> Which reminds me I need to push a readme explaining this.
+> I am looking forward to it.
+>
+> Patch 2/2 depends on this, should I prepare an alternate version that
+> doesn't trigger the bug in the pevent headers?
+Maybe, but wait a day, you inspired me to completely update and rebase =
+
+the pevent code.
+>
+> /MF
+>
 
 
---===============5907084471324795387==--
+--===============8599519789486285146==--
 
