@@ -1,53 +1,29 @@
-Content-Type: multipart/mixed; boundary="===============8599519789486285146=="
+Content-Type: multipart/mixed; boundary="===============0953647506944629610=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
+From: Magnus Fromreide <magfr at lysator.liu.se>
 Subject: Re: [Powertop] [PATCH 1/2] Make it possible to include parse-events.h
  before libc headers.
-Date: Thu, 26 Jul 2012 15:09:49 -0700
-Message-ID: <5011C02D.80805@linux.intel.com>
-In-Reply-To: 1343244370.6440.4.camel@sara
+Date: Sat, 28 Jul 2012 19:27:18 +0200
+Message-ID: <1343496438.2664.3.camel@sara>
+In-Reply-To: 5011C02D.80805@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8599519789486285146==
+--===============0953647506944629610==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 07/25/2012 12:26 PM, Magnus Fromreide wrote:
-> On Wed, 2012-07-25 at 10:44 -0700, Chris Ferron wrote:
->> On 07/23/2012 11:03 PM, Magnus Fromreide wrote:
->>> The __unused macro interferes with the glibc and is in a reserved names=
-pace
->>> so it should be renamed.
->>> Additionally the __ununsed macro is used from just one implementation f=
-ile so
->>> the macro is moved there.
->>>
->>> Signed-off-by: Magnus Fromreide <magfr(a)lysator.liu.se>
->>>    =
+On Thu, 2012-07-26 at 15:09 -0700, Chris Ferron wrote:
+> Maybe, but wait a day, you inspired me to completely update and rebase =
 
->>>    =
+> the pevent code.
 
->> I will forward this on to Steve Rostedt. pevent code is not actually
->> strictly part of the powertop src, it is just temporarily being built as
->> part of the project so powertop can take advantage of it early.
-> Thanks. I found no contact information for pevent but it feels like an
-> imported library.
->
->> That said, it may not be a good fit for the grand scheme.
->> Which reminds me I need to push a readme explaining this.
-> I am looking forward to it.
->
-> Patch 2/2 depends on this, should I prepare an alternate version that
-> doesn't trigger the bug in the pevent headers?
-Maybe, but wait a day, you inspired me to completely update and rebase =
+Could you please remove the traceevent/.deps directory  and all the .Plo
+files in it as they are regenerated each time the library is built?
 
-the pevent code.
->
-> /MF
->
+/MF
 
 
---===============8599519789486285146==--
+--===============0953647506944629610==--
 
