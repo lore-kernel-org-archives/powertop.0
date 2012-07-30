@@ -1,68 +1,29 @@
-Content-Type: multipart/mixed; boundary="===============3302960740586767732=="
+Content-Type: multipart/mixed; boundary="===============0635983359872526381=="
 MIME-Version: 1.0
 From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] Device list sort function bug
-Date: Tue, 17 Jul 2012 15:09:28 -0700
-Message-ID: <5005E298.3010105@linux.intel.com>
-In-Reply-To: 4FFD1904.7040804@samsung.com
+Subject: Re: [Powertop] [PATCH 1/2] Make it possible to include parse-events.h
+ before libc headers.
+Date: Mon, 30 Jul 2012 09:08:26 -0700
+Message-ID: <5016B17A.4070005@linux.intel.com>
+In-Reply-To: 1343496438.2664.3.camel@sara
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3302960740586767732==
+--===============0635983359872526381==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 07/10/2012 11:11 PM, Igor Zhbanov wrote:
-> Hello!
+On 07/28/2012 10:27 AM, Magnus Fromreide wrote:
+> On Thu, 2012-07-26 at 15:09 -0700, Chris Ferron wrote:
+>> Maybe, but wait a day, you inspired me to completely update and rebase
+>> the pevent code.
+> Could you please remove the traceevent/.deps directory  and all the .Plo
+> files in it as they are regenerated each time the library is built?
 >
-> Sometimes PowerTOP dies with a Segmentation Fault while generating
-> the report. Little investigation shown that it dies while sorting
-> the device list. The problem is that comparison function devlist_sort
-> is incorrect.
+> /MF
 >
-> The function should return true if first argument "preceeds" second.
-> But when strcmp() is used, it can return -1, 0 and 1. So both -1 and 1
-> values are silently converted to true, which is wrong. It confuses the =
+Done
 
-> sort()
-> function and it crosses boundary of array.
->
-> Here is the patch:
-> --8<--Cut-here-----------------------------------------------------------=
------ =
-
->
-> diff -purN powertop-il/src/devlist.cpp powertop-il-fix/src/devlist.cpp
-> --- powertop-il/src/devlist.cpp    2012-07-03 17:00:50.000000000 +0400
-> +++ powertop-il-fix/src/devlist.cpp    2012-07-03 20:01:05.896232845 =
-
-> +0400
-> @@ -273,7 +273,7 @@ static bool devlist_sort(struct devuser
->      if (i->pid !=3D j->pid)
->          return i->pid<  j->pid;
->
-> -    return strcmp(i->device, j->device);
-> +    return (strcmp(i->device, j->device)<  0);
->  }
->
->  static const char *dev_class(int line)
-> --8<---------------------------------------------------------------------=
------ =
-
->
->
-> Thank you.
->
->
->
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
-Your patch has been merged.
-Thank you,
-
-
---===============3302960740586767732==--
+--===============0635983359872526381==--
 
