@@ -1,52 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============2861211928677778968=="
+Content-Type: multipart/mixed; boundary="===============0501267359242610211=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] segfault on Sheevaplug (ARM Kirkwood)
-Date: Mon, 21 May 2012 01:17:20 +0300
-Message-ID: <20120520221720.GC3585@swordfish>
-In-Reply-To: 1337542376.55788.YahooMailNeo@web160303.mail.bf1.yahoo.com
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] configure: First try to use libnl-3,
+ then libnl-2, then libnl-1
+Date: Mon, 30 Jul 2012 09:08:54 -0700
+Message-ID: <5016B196.6000505@linux.intel.com>
+In-Reply-To: 1343656511-25137-1-git-send-email-i.zhbanov@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2861211928677778968==
+--===============0501267359242610211==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (05/20/12 12:32), Rui DaCosta wrote:
-> =
+On 07/30/2012 06:55 AM, Igor Zhbanov wrote:
+> Change search order for libnl in configure.ac:
+> first try to use libnl-3, then libnl-2, then libnl-1.
+> ---
+>   configure.ac |   13 +++++++------
+>   1 files changed, 7 insertions(+), 6 deletions(-)
+>
+> diff --git a/configure.ac b/configure.ac
+> index 3f5775f..552626c 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -53,12 +53,13 @@ PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=3D=
+1],[
+>    =
 
->    it was pointed out to me that=C2=A0 CONFIG_PERF_COUNTERS has been supe=
-rseded by
->    PERF_EVENTS since 2.6.32 =C2=A0- see bottom section of
->    http://cateee.net/lkddb/web-lkddb/PERF_COUNTERS.html
->    so is=C2=A0 CONFIG_PERF_COUNTERS really required?
-> =
+>   =
 
+>   has_libnl_ver=3D0
+> -PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [
+> -	AC_SEARCH_LIBS([nl_socket_alloc], [nl], [has_libnl_ver=3D2], [
+> -		     PKG_CHECK_MODULES([LIBNL], [libnl-3.0 libnl-genl-3.0], [has_libnl=
+_ver=3D3],
+> -				       [AC_SEARCH_LIBS([nl_socket_alloc], [nl-3 nl-genl-3], [has_lib=
+nl_ver=3D3], [], [])])
+> -	], [])
+> -])
+> +PKG_CHECK_MODULES([LIBNL], [libnl-3.0 libnl-genl-3.0], [
+> +	has_libnl_ver=3D3], [
+> +	AC_SEARCH_LIBS([nl_socket_alloc], [nl-3 nl-genl-3], [
+> +		has_libnl_ver=3D3], [
+> +		AC_SEARCH_LIBS([nl_socket_alloc], [nl], [
+> +			has_libnl_ver=3D2], [
+> +			PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [])])])])
+>   if (test "$has_libnl_ver" -eq 0); then
+>   	AC_MSG_ERROR(libnl is required but not found)
+>   fi
+Patch merged
+Thank You
 
-Could you please try the following patch?
-
----
-
- src/perf/perf.cpp |    3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/src/perf/perf.cpp b/src/perf/perf.cpp
-index ce9ae6a..09ca390 100644
---- a/src/perf/perf.cpp
-+++ b/src/perf/perf.cpp
-@@ -48,6 +48,9 @@
- #ifdef __alpha__
- #include <asm-generic/unistd.h>
- #endif
-+#ifdef __arm__
-+#include <asm-generic/unistd.h>
-+#endif
- =
-
- #include "perf.h"
- #include "../lib.h"
-
-
---===============2861211928677778968==--
+--===============0501267359242610211==--
 
