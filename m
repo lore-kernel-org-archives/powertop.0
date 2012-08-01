@@ -1,54 +1,30 @@
-Content-Type: multipart/mixed; boundary="===============1881642083746996153=="
+Content-Type: multipart/mixed; boundary="===============5742516676819675302=="
 MIME-Version: 1.0
 From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] PowerTOP: _("Cannot load from file")
-Date: Thu, 31 May 2012 08:42:40 -0700
-Message-ID: <4FC79170.9060804@linux.intel.com>
-In-Reply-To: 4FC6F94B.4060401@freemail.hu
+Subject: [Powertop] [Announcement] version 2.1 string freeze
+Date: Wed, 01 Aug 2012 15:05:55 -0700
+Message-ID: <49272.10.255.175.113.1343858755.squirrel@linux.jf.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1881642083746996153==
+--===============5742516676819675302==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 05/30/2012 09:53 PM, N=C3=A9meth M=C3=A1rton wrote:
-> Hi Chris,
->
-> I have seen in commit 0e9374d27bfa51b885ee3fe69fbb3b12bdae3600 that
-> the last space of the "Cannot load from file " was removed. This results
-> even in English the following output:
->
-> Cannot load from file/var/cache/powertop/saved_parameters.powertop
->
-> One solution would be something like this:
->
->    cout<<  _("Cannot load from file")<<  " "<<  pathname<<  "\n";
-Good input thank you. I am still learning about the difficulty's in =
+Greetings,
+    Its been awhile since the 2.0 release of PowerTOP now, and we are
+getting ready to push the 2.1 release. Before we start the process of
+branching, final code push and release, I want to call a string freeze
+for Wednesday August 8th. Translations is still in its infancy, but
+never the less, we should freeze string before the final push for a
+release. I will be sending out a separate announcement shortly of the
+2.1 release schedule, but I wanted to give people a heads up now about
+the string freeze.
 
-translation on internationalization.
-I will make some adjustments from your input.
 Thanks
--Chris
-
-> However, in Hungarian this sentence is difficult to translate because of
-> the word order. For example the natural translation of the following
-> English sentence would be:
->
->    English: Cannot load from file foo.bar
->    Hungarian: Nem lehetett a foo.bar f=C3=A1jlb=C3=B3l bet=C3=B6lteni
->
-> As you can see in this case it would be better to use the %s format string
-> for printing pathname because this gives better flexibility for the trans=
-lator
-> to place the pathname string in natural place in a translated sentence.
->
-> Regards,
->
-> 	M=C3=A1rton N=C3=A9meth
->
+Chris Ferron
 
 
---===============1881642083746996153==--
+--===============5742516676819675302==--
 
