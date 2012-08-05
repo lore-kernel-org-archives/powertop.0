@@ -1,47 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============3415762806112246382=="
+Content-Type: multipart/mixed; boundary="===============5248069999520878557=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Fix out-of-tree builds
-Date: Tue, 17 Jul 2012 15:07:14 -0700
-Message-ID: <5005E212.1050306@linux.intel.com>
-In-Reply-To: 1342126710-26497-1-git-send-email-sw@weilnetz.de
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: [Powertop] [PATCH 1/4] Use AM_SILENT_RULES
+Date: Sun, 05 Aug 2012 10:09:56 -0700
+Message-ID: <501EA8E4.4030207@linux.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3415762806112246382==
+--===============5248069999520878557==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 07/12/2012 01:58 PM, Stefan Weil wrote:
-> Out-of-tree builds are a very useful feature which should be supported
-> by all programs which use GNU automake and the configure / make build.
->
-> For powertop, only a very small fix was needed to make it work.
-> Without that fix, powertop.css is not found when a build is not
-> started from the source tree, so csstoh fails and creates no css.h.
->
-> Signed-off-by: Stefan Weil <sw(a)weilnetz.de>
-> ---
->   src/Makefile.am |    2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/src/Makefile.am b/src/Makefile.am
-> index c77b2aa..23625a2 100644
-> --- a/src/Makefile.am
-> +++ b/src/Makefile.am
-> @@ -45,5 +45,5 @@ AM_LDFLAGS =3D $(LIBS) $(NCURSES_LIBS) $(PCIUTILS_LIBS)=
- $(LIBNL_LIBS) $(LIBZ_LIBS)
->   BUILT_SOURCES =3D css.h
->   CLEANFILES =3D css.h
->   css.h: csstoh powertop.css
-> -	./csstoh powertop.css css.h
-> +	./csstoh "$(srcdir)"/powertop.css css.h
->   =
+>From 20f2a40280847d3f0f8e9cfe8ff565638b3bb923 Mon Sep 17 00:00:00 2001
+From: Arjan van de Ven <arjan(a)linux.intel.com>
+Date: Sun, 5 Aug 2012 09:55:42 -0700
+Subject: [PATCH 1/4] Use AM_SILENT_RULES
 
-Your patch has been merged.
-Thank you,
+AM_SILENT_RULES makes the output for "make" much more readable; it also
+allows us to see warnings much more clearly.
+---
+ configure.ac |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 552626c..d675616 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -11,6 +11,7 @@ AC_CONFIG_MACRO_DIR([m4])
+ AC_CONFIG_HEADERS([config.h])
+ GETTEXT_PACKAGE=3Dpowertop
+ AC_SUBST(GETTEXT_PACKAGE)
++AM_SILENT_RULES([yes])
+ AM_GNU_GETTEXT([external])
+ AM_GNU_GETTEXT_VERSION([0.18])
+
+-- =
+
+1.7.7.6
 
 
---===============3415762806112246382==--
+--===============5248069999520878557==--
 
