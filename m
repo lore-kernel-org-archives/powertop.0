@@ -1,74 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============5562328951443887020=="
+Content-Type: multipart/mixed; boundary="===============1612922706607110588=="
 MIME-Version: 1.0
-From: Rajagopal Venkat <rajagopal.venkat at linaro.org>
-Subject: Re: [Powertop] [PATCH 1/2] Updates to support Android platform
-Date: Tue, 18 Sep 2012 11:23:29 +0530
-Message-ID: <CA+Z25wVQO-a7Rqjh+XA0iAb04sNoRE8bd2H0UBXtjjrM-b5KuA@mail.gmail.com>
-In-Reply-To: 1347945791.3210.9.camel@sara
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [PATCH 2/4] Make the "which C state line" logic better
+Date: Mon, 06 Aug 2012 06:22:18 -0700
+Message-ID: <501FC50A.2060503@linux.intel.com>
+In-Reply-To: CA+Z25wXQKuTpwh-0Y2VFqZW2+zDiAveXhrqwvQrztXN=Kb+hZg@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5562328951443887020==
+--===============1612922706607110588==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 18 September 2012 10:53, Magnus Fromreide <magfr(a)lysator.liu.se> wrote:
-> On Tue, 2012-09-18 at 09:54 +0530, Rajagopal Venkat wrote:
->> On 17 September 2012 21:58, Chris Ferron <chris.e.ferron(a)linux.intel.c=
-om> wrote:
->> > On 09/17/2012 07:34 AM, Rajagopal Venkat wrote:
->> >>
->> >>     #include "devices/device.h"
->> >> diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
->> >> index eaef7f1..c9d6b0b 100644
->> >> --- a/src/process/do_process.cpp
->> >> +++ b/src/process/do_process.cpp
->> >> @@ -869,7 +869,7 @@ void process_update_display(void)
->> >>                 if (!show_power)
->> >>                         strcpy(power, "          ");
->> >>                 sprintf(name, "%s", all_power[i]->type());
->> >> -               while (mbstowcs(NULL,name,0) < 14) strcat(name, " ");
->> >> +               while (mbstowcs(NULL,name,20) < 14) strcat(name, " ");
->> >>
->> >
->> > mbstowcs(NULL,name,0) is a test. return will be count. while catches t=
-he
->> > error.
->>
->> Agree. The Android bionic libc version of mbstowcs always returns zero if
->> max(third parameter) is zero, resulting in infinite loop.
->
-> Have you reported the bug in the library to Google? If the first
-> argument is NULL posix says the third argument should be ignored.
+On 8/6/2012 12:19 AM, Rajagopal Venkat wrote:
+> =
 
-I don't see bionic libc claiming to be posix compliant.
->
-> What happens if 'name' is more than 20 characters? It shouldn't affect
-> this use of mbstowcs but there might be others.
->
->> I believe this change should not cause any adverse effect on current beh=
-avior.
->> The mbstowcs would stop parsing source string when it encounters null-ch=
-aracter
->> or max len. Atleast I didn't observe any change in return value(count).
->
-> It shouldn't change the behaviour since mbstowcs is required to ignore
-> it's third argument if the first argument is NULL.
-As there is no change in current behaviour. Can this be considered for
-supporting
-Android?
+> On 5 August 2012 22:43, Arjan van de Ven <arjan(a)linux.intel.com <mailto=
+:arjan(a)linux.intel.com>> wrote:
+> =
 
->
-> /MF
->
+>     From 2e88a61859db0592707d1a0a35e33408a0327951 Mon Sep 17 00:00:00 2001
+>     From: Arjan van de Ven <arjan(a)linux.intel.com <mailto:arjan(a)linux=
+.intel.com>>
+>     Date: Sun, 5 Aug 2012 09:57:49 -0700
+>     Subject: [PATCH 2/4] Make the "which C state line" logic better
+> =
+
+>     the ARM guys complained that their human-readable C state names didn'=
+t have
+>     numbers in them, and that as a result, the output is all messed up.
+>     Using the "linux_name" instead is only a partial solution; it messes =
+up the x86
+>     side of the logic.
+> =
+
+>  =
+
+> I fail to understand how using "linux_name" for parsing C states would me=
+ss up
+> x86 logic. Each supported C state will have corresponding 'stateX' direct=
+ory
+> (linux_name) which contain numbers in them. Also there are few hard coded
+> states in intel_cpus.cpp file, in which linux_name contains numbers in th=
+em
+> as well. In both the cases linux_name contains numbers and hence safe to
+> parse. Please let me know if I am missing something here.
+
+it contains numbers, but not the right ones
+so on x86, the package, core and cpu states do not line up properly if I on=
+ly use linux_name.
+(e.g. package C6 and core C6 are on a different line than CPU C6)
+with this patch that is kept correctly, while hopefully also fixing your is=
+sue.
 
 
 
--- =
-
-Regards,
-Rajagopal
-
---===============5562328951443887020==--
+--===============1612922706607110588==--
 
