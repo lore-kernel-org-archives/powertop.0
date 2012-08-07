@@ -1,345 +1,63 @@
-Content-Type: multipart/mixed; boundary="===============5096045722373087109=="
+Content-Type: multipart/mixed; boundary="===============4524302365896767653=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] PowerTOP UI navigation enhancement.
-Date: Tue, 11 Sep 2012 10:07:57 -0700
-Message-ID: <504F6FED.5070605@linux.intel.com>
-In-Reply-To: 20120911165542.GB2955@swordfish.minsk.epam.com
+From: Rajagopal Venkat <rajagopal.venkat at linaro.org>
+Subject: [Powertop] Suspecting incorrect if check during powertop init
+Date: Tue, 07 Aug 2012 16:24:55 +0530
+Message-ID: <CA+Z25wVQkpQx-_JfHJJZVD_7vhzf4u=T78Jg7PfVBqXUZY8n2A@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5096045722373087109==
+--===============4524302365896767653==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 09/11/2012 09:55 AM, Sergey Senozhatsky wrote:
-> On (09/11/12 09:39), Chris Ferron wrote:
->> This patch add more ui navigation features allowing for the scrolling
->> of PowerTop content for each tab. This is done by controlling the
->> location of the winpad, and refreshing the terminal window when
->> needed. To do this, the navigation keys have been updated as follows.
->>
->> "Arrow Keys" now scroll the tab windows
->> "Page up/down" scroll tab windows up and down
->> "TAB" cycles the next window tab
->> "SHIFT+TAB" cycles the previous window tab
->> "ENTER" toggles tunables
->> "SPACE BAR" toggles tunables
->> "r KEY" refresh results and resets view of tab window.
->>
->> Known issues:
->> There is no handler for terminal re-sizing. The workaround is to use
->> "r KEY" to refresh if terminal windows size is changed mid session.
->> ---
->>   src/cpu/abstract_cpu.cpp |  1 -
->>   src/display.cpp          | 98
->> ++++++++++++++++++++++++++++++++++--------------
->>   src/display.h            | 13 ++++++-
->>   src/main.cpp             | 17 ++++++---
->>   4 files changed, 93 insertions(+), 36 deletions(-)
->>
->>
->> diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
->> index 8b4c650..ca6901c 100644
->> --- a/src/cpu/abstract_cpu.cpp
->> +++ b/src/cpu/abstract_cpu.cpp
->> @@ -422,7 +422,6 @@ void abstract_cpu::validate(void)
->>   =
+Hi,
 
->>   		if (children[i]) {
->>   			if (my_time !=3D children[i]->total_pstate_time())
->> -				printf("My (%i) time %llu is not the same as child (%i) time %llu\n=
-",
->>   					first_cpu,
->>   					(unsigned long long)my_time,
->>   					children[i]->number,
->
-> not sure this will compile.
->
->
-> 	-ss
-Crap thanks, v2 on the way.
--C
+Recently a patch[1] is applied to remove boardname support from powertop.
+This commit adds few lines of code to powertop_init(), to initialize two
+global variables. I suspect, if condition is not correct and is suppose
+to be as follows. Is that intentional?
 
->
->> diff --git a/src/display.cpp b/src/display.cpp
->> index f48b53f..6a119bc 100644
->> --- a/src/display.cpp
->> +++ b/src/display.cpp
->> @@ -95,7 +95,7 @@ static int current_tab;
->>   =
-
->>   void show_tab(unsigned int tab)
->>   {
->> -	WINDOW *win;
->> +	class tab_window *win;
->>   	unsigned int i;
->>   	int tab_pos =3D 17;
->>   	const char *c;
->> @@ -145,11 +145,11 @@ void show_tab(unsigned int tab)
->>   	wrefresh(tab_bar);
->>   	wrefresh(bottom_line);
->>   =
-
->> -	win =3D get_ncurses_win(tab_names[tab]);
->> +	win =3D tab_windows[tab_names[tab]];
->>   	if (!win)
->>   		return;
->>   =
-
->> -	prefresh(win, 0, 0, 1, 0, LINES - 3, COLS - 1);
->> +	prefresh(win->win, win->ypad_pos, win->xpad_pos, 1, 0, LINES - 3, COLS=
- - 1);
->>   }
->>   =
-
->>   WINDOW *get_ncurses_win(const char *name)
->> @@ -185,42 +185,41 @@ WINDOW *get_ncurses_win(const string &name)
->>   	return get_ncurses_win(name.c_str());
->>   }
->>   =
-
->> -
->> -void show_next_tab(void)
->> +void show_prev_tab(void)
->>   {
->> -	class tab_window *w;
->> +       class tab_window *w;
->>   =
-
->> -	if (!display)
->> -		return;
->> +       if (!display)
->> +               return;
->> +       w =3D tab_windows[tab_names[current_tab]];
->> +       if (w)
->> +               w->hide();
->>   =
-
->> -	w =3D tab_windows[tab_names[current_tab]];
->> -	if (w)
->> -		w->hide();
->> +       current_tab --;
->> +       if (current_tab < 0)
->> +               current_tab =3D tab_names.size() - 1;
->>   =
-
->> -	current_tab ++;
->> -	if (current_tab >=3D (int)tab_names.size())
->> -		current_tab =3D 0;
->> -
->> -	w =3D tab_windows[tab_names[current_tab]];
->> -	if (w)
->> -		w->expose();
->> +       w =3D tab_windows[tab_names[current_tab]];
->> +       if (w)
->> +               w->expose();
->>   =
-
->> -	show_tab(current_tab);
->> +       show_tab(current_tab);
->>   }
->>   =
-
->> -void show_prev_tab(void)
->> +void show_next_tab(void)
->>   {
->>   	class tab_window *w;
->>   =
-
->>   	if (!display)
->>   		return;
->> +
->>   	w =3D tab_windows[tab_names[current_tab]];
->>   	if (w)
->>   		w->hide();
->>   =
-
->> -	current_tab --;
->> -	if (current_tab < 0)
->> -		current_tab =3D tab_names.size() - 1;
->> +	current_tab ++;
->> +	if (current_tab >=3D (int)tab_names.size())
->> +		current_tab =3D 0;
->>   =
-
->>   	w =3D tab_windows[tab_names[current_tab]];
->>   	if (w)
->> @@ -241,8 +240,16 @@ void cursor_down(void)
->>   	class tab_window *w;
->>   =
-
->>   	w =3D tab_windows[tab_names[current_tab]];
->> -	if (w)
->> -		w->cursor_down();
->> +	if (w) {
->> +		if (tab_names[current_tab] =3D=3D "Tunables") {
->> +	                if ((w->cursor_pos + 7) >=3D LINES) {
->> +				prefresh(w->win, ++w->ypad_pos, w->xpad_pos, 1, 0, LINES - 3, COLS =
-- 1);
->> +			}			=
-
->> +				w->cursor_down();
->> +		} else {
->> +			prefresh(w->win, ++w->ypad_pos, w->xpad_pos, 1, 0, LINES - 3, COLS -=
- 1);
->> +		}
->> +	}
->>   =
-
->>   	show_cur_tab();
->>   }
->> @@ -253,12 +260,45 @@ void cursor_up(void)
->>   =
-
->>   	w =3D tab_windows[tab_names[current_tab]];
->>   =
-
->> -	if (w)
->> -		w->cursor_up();
->> -
->> +	if (w) {
->> +		w->cursor_up();
->> +		if(w->ypad_pos > 0) {
->> +	                if (tab_names[current_tab] =3D=3D "Tunables") {
->> +        	               prefresh(w->win, --w->ypad_pos, w->xpad_pos, 1,=
- 0, LINES - 3, COLS - 1);
->> +	                } else {
->> +        	               prefresh(w->win, --w->ypad_pos, w->xpad_pos, 1,=
- 0, LINES - 3, COLS - 1);
->> +	                }
->> +		}
->> +	}
->> +	=
-
->>   	show_cur_tab();
->>   }
->>   =
-
->> +void cursor_left(void)
->> +{
->> +        class tab_window *w;
->> +
->> +	w =3D tab_windows[tab_names[current_tab]];
->> +	=
-
->> +	if (w) {			=
-
->> +		if (w->xpad_pos > 0) {
->> +			prefresh(w->win, w->ypad_pos,--w->xpad_pos, 1, 0, LINES - 3, COLS - =
-1);
->> +		}
->> +	}
->> +}
->> +
->> +void cursor_right(void)
->> +{
->> +        class tab_window *w;
->> +
->> +	w =3D tab_windows[tab_names[current_tab]];
->> +
->> +	if (w) {
->> +		prefresh(w->win, w->ypad_pos, ++w->xpad_pos, 1, 0, LINES - 3, COLS - =
-1);
->> +	}
->> +	=
-
->> +}
->> +
->>   void cursor_enter(void)
->>   {
->>   	class tab_window *w;
->> @@ -279,6 +319,8 @@ void window_refresh()
->>   	w =3D tab_windows[tab_names[current_tab]];
->>   =
-
->>   	if (w) {
->> +		w->ypad_pos =3D 0;
->> +		w->xpad_pos =3D 0;
->>   		w->window_refresh();
->>   		w->repaint();
->>   	}
->> diff --git a/src/display.h b/src/display.h
->> index 33aaae1..00887aa 100644
->> --- a/src/display.h
->> +++ b/src/display.h
->> @@ -41,6 +41,8 @@ extern void show_prev_tab(void);
->>   extern void show_cur_tab(void);
->>   extern void cursor_up(void);
->>   extern void cursor_down(void);
->> +extern void cursor_right(void);
->> +extern void cursor_left(void);
->>   extern void cursor_enter(void);
->>   extern void window_refresh(void);
->>   =
-
->> @@ -48,10 +50,17 @@ class tab_window {
->>   public:
->>   	int cursor_pos;
->>   	int cursor_max;
->> +	int xpad_pos, ypad_pos;
->>   	WINDOW *win;
->>   =
-
->> -	virtual void cursor_down(void) { if (cursor_pos < cursor_max ) cursor_=
-pos++; repaint(); } ;
->> -	virtual void cursor_up(void) { if (cursor_pos > 0) cursor_pos--; repai=
-nt(); };
->> +	virtual void cursor_down(void) {
->> +		if (cursor_pos < cursor_max ) cursor_pos++; repaint();
->> +	} ;
->> +	virtual void cursor_up(void) {
->> +		if (cursor_pos > 0) cursor_pos--; repaint();
->> +	};
->> +	virtual void cursor_left(void) { };
->> +	virtual void cursor_right(void) { };
->>   =
-
->>   	virtual void cursor_enter(void) { };
->>   	virtual void window_refresh() { };
->> diff --git a/src/main.cpp b/src/main.cpp
->> index cf47b4e..edc4147 100644
->> --- a/src/main.cpp
->> +++ b/src/main.cpp
->> @@ -135,22 +135,29 @@ static void do_sleep(int seconds)
->>   		halfdelay(delta * 10);
->>   =
-
->>   		c =3D getch();
->> -
->> +		printf("c (%i)", c);
->>   		switch (c) {
->> -		case KEY_NPAGE:
->> +		case 353:
->> +			show_prev_tab();
->> +			break;
->> +		case 9:
->> +			show_next_tab();
->> +			break;
->>   		case KEY_RIGHT:
->> -			show_next_tab();
->> +			cursor_right();
->>   			break;
->> -		case KEY_PPAGE:
->>   		case KEY_LEFT:
->> -			show_prev_tab();
->> +			cursor_left();
->>   			break;
->> +		case KEY_NPAGE:
->>   		case KEY_DOWN:
->>   			cursor_down();
->>   			break;
->> +		case KEY_PPAGE:
->>   		case KEY_UP:
->>   			cursor_up();
->>   			break;
->> +		case 32:
->>   		case 10:
->>   			cursor_enter();
->>   			break;
->>
+        if (access("/var/cache/powertop/saved_parameters.powertop", R_OK)
+=3D=3D 0 ||
+            access("/data/local/powertop/saved_parameters.powertop", R_OK)
+=3D=3D 0) {
+                global_fixed_parameters =3D 1;
+                global_power_override =3D 1;
+        }
 
 
---===============5096045722373087109==--
+[1] commit 1c7b4b999cb172b59833f829ab7b95fab11d7a00<https://github.com/fenr=
+us75/powertop/commit/1c7b4b999cb172b59833f829ab7b95fab11d7a00>
+-- =
+
+Regards,
+Rajagopal
+
+--===============4524302365896767653==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+SGksPGJyPjxicj5SZWNlbnRseSBhIHBhdGNoPHNwYW4gY2xhc3M9InNoYS1ibG9jayI+PHNwYW4g
+Y2xhc3M9InNoYSBqcy1zZWxlY3RhYmxlLXRleHQiPjwvc3Bhbj48L3NwYW4+WzFdIGlzIGFwcGxp
+ZWQgdG8gcmVtb3ZlIGJvYXJkbmFtZSBzdXBwb3J0IGZyb20gcG93ZXJ0b3AuPGJyPlRoaXMgY29t
+bWl0IGFkZHMgZmV3IGxpbmVzIG9mIGNvZGUgdG8gcG93ZXJ0b3BfaW5pdCgpLCB0byBpbml0aWFs
+aXplIHR3bzxicj4KZ2xvYmFsIHZhcmlhYmxlcy4gSSBzdXNwZWN0LCBpZiBjb25kaXRpb24gaXMg
+bm90IGNvcnJlY3QgYW5kIGlzIHN1cHBvc2U8YnI+dG8gYmUgYXMgZm9sbG93cy4gSXMgdGhhdCBp
+bnRlbnRpb25hbD88YnI+oDxicj6goKCgoKCgIGlmIChhY2Nlc3MoJnF1b3Q7L3Zhci9jYWNoZS9w
+b3dlcnRvcC9zYXZlZF9wYXJhbWV0ZXJzLnBvd2VydG9wJnF1b3Q7LCBSX09LKSA9PSAwIHx8PGJy
+PqCgoKCgoKCgoKCgIGFjY2VzcygmcXVvdDsvZGF0YS9sb2NhbC9wb3dlcnRvcC9zYXZlZF9wYXJh
+bWV0ZXJzLnBvd2VydG9wJnF1b3Q7LCBSX09LKSA9PSAwKSB7PGJyPgqgoKCgoKCgoKCgoKCgoKAg
+Z2xvYmFsX2ZpeGVkX3BhcmFtZXRlcnMgPSAxOzxicj6goKCgoKCgoKCgoKCgoKAgZ2xvYmFsX3Bv
+d2VyX292ZXJyaWRlID0gMTs8YnI+oKCgoKCgoCB9PGJyPqA8YnI+PGJyPlsxXSBjb21taXQgPGEg
+aHJlZj0iaHR0cHM6Ly9naXRodWIuY29tL2ZlbnJ1czc1L3Bvd2VydG9wL2NvbW1pdC8xYzdiNGI5
+OTljYjE3MmI1OTgzM2Y4MjlhYjdiOTVmYWIxMWQ3YTAwIj48c3BhbiBjbGFzcz0ic2hhLWJsb2Nr
+Ij48c3BhbiBjbGFzcz0ic2hhIGpzLXNlbGVjdGFibGUtdGV4dCI+MWM3YjRiOTk5Y2IxNzJiNTk4
+MzNmODI5YWI3Yjk1ZmFiMTFkN2EwMDwvc3Bhbj48L3NwYW4+PC9hPjxicj4KLS0gPGJyPlJlZ2Fy
+ZHMsPGJyPlJhamFnb3BhbDxicj48YnI+Cg==
+
+--===============4524302365896767653==--
 
