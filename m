@@ -1,42 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============3112635495737634746=="
+Content-Type: multipart/mixed; boundary="===============8589475158207274351=="
 MIME-Version: 1.0
-From: Namhyung Kim <namhyung at gmail.com>
-Subject: Re: [Powertop] [PATCH 1/2] perf_bundle: Check memory allocation
- failure
-Date: Tue, 18 Sep 2012 23:33:44 +0900
-Message-ID: <1347978824.1771.4.camel@leonhard>
-In-Reply-To: 50588442.7040404@linux.intel.com
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] Suspecting incorrect if check during powertop init
+Date: Tue, 07 Aug 2012 09:25:49 -0700
+Message-ID: <5021418D.2060609@linux.intel.com>
+In-Reply-To: 502117EA.3090506@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3112635495737634746==
+--===============8589475158207274351==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-2012-09-18 (=ED=99=94), 07:25 -0700, Arjan van de Ven:
-> On 9/18/2012 7:21 AM, Namhyung Kim wrote:
-> > Check return value of malloc/strdup not to make NULL dereferences.
-> =
+On 08/07/2012 06:28 AM, Arjan van de Ven wrote:
+> On 8/7/2012 3:54 AM, Rajagopal Venkat wrote:
+>> Hi,
+>>
+>> Recently a patch[1] is applied to remove boardname support from powertop.
+>> This commit adds few lines of code to powertop_init(), to initialize two
+>> global variables. I suspect, if condition is not correct and is suppose
+>> to be as follows. Is that intentional?
+>>   =
 
-> I don't mind these patches; they are clean code
-> =
+>>          if (access("/var/cache/powertop/saved_parameters.powertop", R_O=
+K) =3D=3D 0 ||
+>>              access("/data/local/powertop/saved_parameters.powertop", R_=
+OK) =3D=3D 0) {
+>>                  global_fixed_parameters =3D 1;
+>>                  global_power_override =3D 1;
+>>          }
+>>   =
 
-> however, one of the core userspace developers at work basically said "we =
-don't check for malloc NULL in userspace;
-> if that ever happens the system is so screwed up anyway that you just can=
-not continue".
+> both are wrong
+> the whole snippet that assigns these two globals needs to go.
+>
+> the logic used to be that you could do a boardname override, which would =
+lock system parameters in place
+> and stop the learning logic
+> (say, if provided by a manufacturer)
+>
+> with the boardname stuff gone, those parameters shouldn't be set like this
+>
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+Thanks for the catch. I have pushed the fix.
+-C
 
-Thanks for the quick reply. :)
 
-Basically I agree with you.  But even in that case it'd be better
-letting a user know about current situation somehow rather than just
-segfault.  Maybe by replacing them to xmalloc or so?
-
-Thanks,
-Namhyung
-
-
-
---===============3112635495737634746==--
+--===============8589475158207274351==--
 
