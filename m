@@ -1,63 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============1433320072586690224=="
+Content-Type: multipart/mixed; boundary="===============5997265425209800920=="
 MIME-Version: 1.0
-From: viresh kumar <viresh.kumar at linaro.org>
-Subject: [Powertop] Query: Weird Output values: Percentage over 100%
-Date: Wed, 29 Aug 2012 13:39:53 +0530
-Message-ID: <CAOh2x==gOcSqWZhEn0iX5Es=cjByYHVe0_gM3WhaKtsjhvXfFg@mail.gmail.com>
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] Suspecting incorrect if check during powertop init
+Date: Tue, 07 Aug 2012 06:28:10 -0700
+Message-ID: <502117EA.3090506@linux.intel.com>
+In-Reply-To: CA+Z25wVQkpQx-_JfHJJZVD_7vhzf4u=T78Jg7PfVBqXUZY8n2A@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1433320072586690224==
+--===============5997265425209800920==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On 8/7/2012 3:54 AM, Rajagopal Venkat wrote:
+> Hi,
+> =
 
-I am noticing something strange in powertop reports.
-When i run powertop with following parameters:
+> Recently a patch[1] is applied to remove boardname support from powertop.
+> This commit adds few lines of code to powertop_init(), to initialize two
+> global variables. I suspect, if condition is not correct and is suppose
+> to be as follows. Is that intentional?
+>  =
 
-powertop -t 120 --html
-
-I see following in summary section
-
-Power Consumption Summary
-
-0.1 wakeups/second, 0.0 GPU ops/second, 0.0 VFS ops/sec, 0.0 GFX
-wakes/sec and 5375.4% CPU use
-
-Usage	Events/s	Category	Description
-2693%	 0.07	Timer	tick_sched_timer
-2680%	 0.00	Timer	ehci_watchdog
-0.6%	 0.00	Interrupt	[7] sched(softirq)
-0.2%	 0.00	Interrupt	[1] timer(softirq)
-0.2%	 0.00	Interrupt	[29] twd
-0.1%	 0.00	kWork	pm_runtime_work
-0.1%	 0.00	Timer	led_heartbeat_function
-0.1%	 0.00	Interrupt	[9] RCU(softirq)
-0.1%	 0.00	Interrupt	[57] OMAP DISPC
-0.1%	 0.00	Process	rsyslogd -c5
+>         if (access("/var/cache/powertop/saved_parameters.powertop", R_OK)=
+ =3D=3D 0 ||
+>             access("/data/local/powertop/saved_parameters.powertop", R_OK=
+) =3D=3D 0) {
+>                 global_fixed_parameters =3D 1;
+>                 global_power_override =3D 1;
+>         }
+>  =
 
 
-How is percentage over 100 %...
+both are wrong
+the whole snippet that assigns these two globals needs to go.
 
-System Info:
+the logic used to be that you could do a boardname override, which would lo=
+ck system parameters in place
+and stop the learning logic
+(say, if provided by a manufacturer)
 
-PowerTOP Version	v2.0
-Kernel Version	Linux version 3.4.0-01820-gcc96f22
-(viresh(a)blr-linut-001) (gcc version 4.7.1 20120514 (prerelease)
-(crosstool-NG linaro-1.13.1-2012.05-20120523 - Linaro GCC 2012.05) )
-#5 SMP PREEMPT Tue Aug 28 12:44:52 IST 2012
-System Name	=
-
-CPU Information	2x
-OS Information	=
+with the boardname stuff gone, those parameters shouldn't be set like this
 
 
-Running on ARM: Panda Board.
-
---
-viresh
-
---===============1433320072586690224==--
+--===============5997265425209800920==--
 
