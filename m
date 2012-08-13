@@ -1,29 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============2442270196787820287=="
+Content-Type: multipart/mixed; boundary="===============1455187769673351821=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] report: Try /etc/lsb-release for OS information
-Date: Thu, 20 Sep 2012 17:01:51 +0200
-Message-ID: <505B2FDF.3000804@linux.intel.com>
-In-Reply-To: 1348153109-2991-1-git-send-email-namhyung@gmail.com
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: [Powertop] [PATCH] Fix screen DPMS support detection
+Date: Mon, 13 Aug 2012 20:41:32 +0400
+Message-ID: <1344876092-13807-1-git-send-email-i.zhbanov@samsung.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2442270196787820287==
+--===============1455187769673351821==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 9/20/2012 4:58 PM, Namhyung Kim wrote:
-> Ubuntu doesn't provide /etc/{system,redhat,os}-release but
-> /etc/lsb-release file.  Since it's present on any LSB (Linux Standard
-> Base) compliant distributions, it'd better to try to read it.
+Consider DPMS disabled when we can't open /sys/class/drm/card0 directory.
+---
+ src/devices/backlight.cpp |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-it's obsolete though
-everyone has moved (or is moving) to /etc/os-release, which is a freedeskto=
-p standard
-and has pretty decent semantics...
+diff --git a/src/devices/backlight.cpp b/src/devices/backlight.cpp
+index b8c9147..c0219f3 100644
+--- a/src/devices/backlight.cpp
++++ b/src/devices/backlight.cpp
+@@ -84,7 +84,7 @@ static int dpms_screen_on(void)
+ =
+
+ 	dir =3D opendir("/sys/class/drm/card0");
+ 	if (!dir)
+-		return 1;
++		return 0;
+ 	while (1) {
+ 		entry =3D readdir(dir);
+ 		if (!entry)
+-- =
+
+1.7.5.4
 
 
-
---===============2442270196787820287==--
+--===============1455187769673351821==--
 
