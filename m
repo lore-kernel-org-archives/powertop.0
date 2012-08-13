@@ -1,77 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============2523389195166092291=="
+Content-Type: multipart/mixed; boundary="===============0593126901265635111=="
 MIME-Version: 1.0
 From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH v2] Fix string null termination and SIGABRT
- from glibc
-Date: Wed, 26 Sep 2012 10:13:45 -0700
-Message-ID: <506337C9.1090807@linux.intel.com>
-In-Reply-To: 20120926141939.GB3014@swordfish
+Subject: Re: [Powertop] [PATCH] Fix backlight usage reporting when backlight
+ control is not supported
+Date: Mon, 13 Aug 2012 10:33:53 -0700
+Message-ID: <50293A81.6050607@linux.intel.com>
+In-Reply-To: 1344876549-13923-1-git-send-email-i.zhbanov@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2523389195166092291==
+--===============0593126901265635111==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 09/26/2012 07:19 AM, Sergey Senozhatsky wrote:
-> On (09/26/12 16:12), Mikko Rapeli wrote:
->> According to http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D682388
->> the string is not null terminated when too much data is read.
->>
->> This patch fixes the crashes on my system.
->> ---
->>   src/process/process.cpp |    3 ++-
->>   1 file changed, 2 insertions(+), 1 deletion(-)
->>
-> LGTM, thanks!
+On 08/13/2012 09:49 AM, Igor Zhbanov wrote:
+> On PC file /sys/class/backlight/.../max_brightness can contain 0
+> when backlight control is not supported. Added check helps to avoid
+> dividing by zero and printing NaN.
+> ---
+>   src/devices/backlight.cpp |    3 +++
+>   1 files changed, 3 insertions(+), 0 deletions(-)
 >
-> 	-ss
+> diff --git a/src/devices/backlight.cpp b/src/devices/backlight.cpp
+> index b8c9147..82cb1e0 100644
+> --- a/src/devices/backlight.cpp
+> +++ b/src/devices/backlight.cpp
+> @@ -145,6 +145,9 @@ double backlight::utilization(void)
+>   {
+>   	double p;
 >   =
 
-Your patch has been merged.
-Thank You
--C
+> +	if (max_level =3D=3D 0)
+> +		return 0.0;
+> +
+>   	p =3D 100.0 * (end_level + start_level) / 2 / max_level;
+>   	return p;
+>   }
+Igor,
+    Thank you for the patches, but in the future please send like =
 
->> diff --git a/src/process/process.cpp b/src/process/process.cpp
->> index 71f81b6..34dc68d 100644
->> --- a/src/process/process.cpp
->> +++ b/src/process/process.cpp
->> @@ -86,7 +86,7 @@ static void cmdline_to_string(char *str)
->>   =
+patches in series and be more verbose in your commit messages.
 
->>   process::process(const char *_comm, int _pid, int _tid) : power_consum=
-er()
->>   {
->> -	char line[4096];
->> +	char line[4097];
->>   	ifstream file;
->>   =
-
->>   	strcpy(comm, _comm);
->> @@ -103,6 +103,7 @@ process::process(const char *_comm, int _pid, int _t=
-id) : power_consumer()
->>   		file.open(line);
->>   		while (file) {
->>   			file.getline(line, 4096);
->> +			line[4096] =3D '\0';
->>   			if (strstr(line, "Tgid")) {
->>   				char *c;
->>   				c =3D strchr(line, ':');
->> -- =
-
->> 1.7.10.4
->>
->> _______________________________________________
->> PowerTop mailing list
->> PowerTop(a)lists.01.org
->> https://lists.01.org/mailman/listinfo/powertop
->>
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
+Thanks
+Chris Ferron
 
 
---===============2523389195166092291==--
+--===============0593126901265635111==--
 
