@@ -1,50 +1,29 @@
-Content-Type: multipart/mixed; boundary="===============1609336556731696675=="
+Content-Type: multipart/mixed; boundary="===============4688512387048778098=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Query: Weird Output values: Percentage over 100%
-Date: Tue, 04 Sep 2012 15:37:45 +0300
-Message-ID: <20120904123745.GA2993@swordfish>
-In-Reply-To: 5045AE2A.7000302@samsung.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Fix screen DPMS support detection
+Date: Mon, 13 Aug 2012 09:43:11 -0700
+Message-ID: <50292E9F.40009@linux.intel.com>
+In-Reply-To: 1344876092-13807-1-git-send-email-i.zhbanov@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1609336556731696675==
+--===============4688512387048778098==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (09/04/12 11:30), Igor Zhbanov wrote:
-> Arjan van de Ven wrote:
-> =
+On 8/13/2012 9:41 AM, Igor Zhbanov wrote:
+> Consider DPMS disabled when we can't open /sys/class/drm/card0 directory.
 
-> >shouldn't... the buffers are quite large....
-> =
+if you don't have a graphics card with proper driver...
+there's nothing we can do and pretending that DPMS is disabled sounds like =
+a mostly bad idea
+on first sight
 
-> By the way, I just curious, why events processing are limited to 5000?
-> I mean the PowerTOP has f half-megabyte buffer for each type of events
-> but wishes to process only 5000 even if data is there?
-> =
-
-> void perf_event::process(void *cookie)
-> {
-> ...
-> 	while (pc->data_tail !=3D pc->data_head && i++ < 5000) {
-> ...
-> =
-
-> In the case of many cores sched:switch will be fired at least CONFIG_HZ *=
- nr_cpus
-> times per second (as I understand), and that could easily be larger than =
-5000.
-> Especially when we measuring for several seconds.
-> =
+what is behind the idea of assuming it disabled ???
 
 
-good spot.
-Also interested if we will fit all perf samples on (e.g.) loaded 64 core sy=
-stem.
 
-	-ss
-
---===============1609336556731696675==--
+--===============4688512387048778098==--
 
