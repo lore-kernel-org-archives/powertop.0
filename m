@@ -1,60 +1,61 @@
-Content-Type: multipart/mixed; boundary="===============8913019181012556123=="
+Content-Type: multipart/mixed; boundary="===============6840584912356253373=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [Warning fixes 1/6] if 0/endif out unused function
- dbg_printf_pevent_info
-Date: Sat, 25 Aug 2012 12:26:51 +0300
-Message-ID: <20120825092651.GA3444@swordfish>
-In-Reply-To: 20120824173217.DE322DFFDB@linda.rhrk.uni-kl.de
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: Re: [Powertop] [PATCH] Fix screen DPMS support detection
+Date: Mon, 13 Aug 2012 20:52:28 +0400
+Message-ID: <502930CC.5070204@samsung.com>
+In-Reply-To: 50292E9F.40009@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8913019181012556123==
+--===============6840584912356253373==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (08/24/12 18:48), Joerg Mayer wrote:
-> Is someone intending to use it or should it be removed instead?
-> =
+Hi Arjan,
 
-> Signed-off-by: Joerg Mayer <jmpt(a)loplof.de>
-> =
+Please look at my next patch too. I try to get rid of things like:
+-2147483648%, "Display backlight",
 
-> diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
-> index cb7c672..3db5331 100644
-> --- a/src/process/do_process.cpp
-> +++ b/src/process/do_process.cpp
-> @@ -186,6 +186,7 @@ int dont_blame_me(char *comm)
->  	return 0;
->  }
->  =
+The problem is that on some architectures max_brightness is 0. And you =
 
-> +#if 0
->  static void dbg_printf_pevent_info(struct event_format *event, struct pe=
-vent_record *rec)
->  {
->  	static struct trace_seq s;
-> @@ -198,6 +199,7 @@ static void dbg_printf_pevent_info(struct event_forma=
-t *event, struct pevent_rec
->  	fprintf(stderr, "%.*s", s.len, s.buffer);
->  	trace_seq_destroy(&s);
->  }
-> +#endif
->  =
+can find
+division by zero and getting NaNs in backlight code. So I try to fix it =
 
->  static char * get_pevent_field_str(void *trace, struct event_format *eve=
-nt, struct format_field *field)
->  {
-> -- =
+not to use incorrect
+values when DPMS is disabled or backlight control is not supported.
+
+Arjan van de Ven wrote:
+> On 8/13/2012 9:41 AM, Igor Zhbanov wrote:
+>> Consider DPMS disabled when we can't open /sys/class/drm/card0 directory.
+> if you don't have a graphics card with proper driver...
+> there's nothing we can do and pretending that DPMS is disabled sounds lik=
+e a mostly bad idea
+> on first sight
+>
+> what is behind the idea of assuming it disabled ???
+>
+>
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>
 
 
-This one could be helpful for debugging. Let's remove it, since the appropr=
-iate place
-for this sort of routines is within pevent, to my mind.
+-- =
+
+Best regards,
+Igor Zhbanov,
+Expert Software Engineer,
+phone: +7 (495) 797 25 00 ext 3806
+e-mail: i.zhbanov(a)samsung.com
+
+ASWG, Moscow R&D center, Samsung Electronics
+12 Dvintsev street, building 1
+127018, Moscow, Russian Federation
 
 
-	-ss
-
---===============8913019181012556123==--
+--===============6840584912356253373==--
 
