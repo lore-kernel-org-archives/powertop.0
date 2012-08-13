@@ -1,56 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============0524192749033632727=="
+Content-Type: multipart/mixed; boundary="===============8092377173872492410=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] abstract_cpu: do not call total_pstate_time()
- in validate()
-Date: Thu, 13 Sep 2012 08:19:00 -0700
-Message-ID: <5051F964.6090103@linux.intel.com>
-In-Reply-To: 20120913124129.GA4894@swordfish.minsk.epam.com
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: [Powertop] [PATCH] Fix backlight usage reporting when backlight
+ control is not supported
+Date: Mon, 13 Aug 2012 20:49:09 +0400
+Message-ID: <1344876549-13923-1-git-send-email-i.zhbanov@samsung.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0524192749033632727==
+--===============8092377173872492410==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 09/13/2012 05:41 AM, Sergey Senozhatsky wrote:
->   abstract_cpu: do not call total_pstate_time() in validate()
->
-> Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
->
-> ---
->
->   src/cpu/abstract_cpu.cpp | 7 +------
->   1 file changed, 1 insertion(+), 6 deletions(-)
->
-> diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
-> index ebdc510..386d981 100644
-> --- a/src/cpu/abstract_cpu.cpp
-> +++ b/src/cpu/abstract_cpu.cpp
-> @@ -414,15 +414,10 @@ uint64_t abstract_cpu::total_pstate_time(void)
->   void abstract_cpu::validate(void)
->   {
->   	unsigned int i;
-> -	uint64_t my_time;
-> -
-> -	my_time =3D total_pstate_time();
->   =
+On PC file /sys/class/backlight/.../max_brightness can contain 0
+when backlight control is not supported. Added check helps to avoid
+dividing by zero and printing NaN.
+---
+ src/devices/backlight.cpp |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
->   	for (i =3D 0; i < children.size(); i++) {
-> -
-> -		if (children[i]) {
-> +		if (children[i])
->   			children[i]->validate();
-> -		}
->   	}
->   }
->   =
+diff --git a/src/devices/backlight.cpp b/src/devices/backlight.cpp
+index b8c9147..82cb1e0 100644
+--- a/src/devices/backlight.cpp
++++ b/src/devices/backlight.cpp
+@@ -145,6 +145,9 @@ double backlight::utilization(void)
+ {
+ 	double p;
+ =
 
-Your patch has been applied.
-Thank You
--C
++	if (max_level =3D=3D 0)
++		return 0.0;
++
+ 	p =3D 100.0 * (end_level + start_level) / 2 / max_level;
+ 	return p;
+ }
+-- =
+
+1.7.5.4
 
 
---===============0524192749033632727==--
+--===============8092377173872492410==--
 
