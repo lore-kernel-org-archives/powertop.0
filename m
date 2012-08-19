@@ -1,50 +1,53 @@
-Content-Type: multipart/mixed; boundary="===============0593126901265635111=="
+Content-Type: multipart/mixed; boundary="===============6190196665402044347=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Fix backlight usage reporting when backlight
- control is not supported
-Date: Mon, 13 Aug 2012 10:33:53 -0700
-Message-ID: <50293A81.6050607@linux.intel.com>
-In-Reply-To: 1344876549-13923-1-git-send-email-i.zhbanov@samsung.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: [Powertop] [PATCH] do not implement get_user_input() in
+ DISABLE_NCURSES builds
+Date: Mon, 20 Aug 2012 00:57:34 +0300
+Message-ID: <20120819215734.GA3137@swordfish>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0593126901265635111==
+--===============6190196665402044347==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 08/13/2012 09:49 AM, Igor Zhbanov wrote:
-> On PC file /sys/class/backlight/.../max_brightness can contain 0
-> when backlight control is not supported. Added check helps to avoid
-> dividing by zero and printing NaN.
-> ---
->   src/devices/backlight.cpp |    3 +++
->   1 files changed, 3 insertions(+), 0 deletions(-)
->
-> diff --git a/src/devices/backlight.cpp b/src/devices/backlight.cpp
-> index b8c9147..82cb1e0 100644
-> --- a/src/devices/backlight.cpp
-> +++ b/src/devices/backlight.cpp
-> @@ -145,6 +145,9 @@ double backlight::utilization(void)
->   {
->   	double p;
->   =
+do not implement get_user_input() in DISABLE_NCURSES builds
 
-> +	if (max_level =3D=3D 0)
-> +		return 0.0;
-> +
->   	p =3D 100.0 * (end_level + start_level) / 2 / max_level;
->   	return p;
->   }
-Igor,
-    Thank you for the patches, but in the future please send like =
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
 
-patches in series and be more verbose in your commit messages.
+---
 
-Thanks
-Chris Ferron
+ src/lib.cpp | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
+diff --git a/src/lib.cpp b/src/lib.cpp
+index 77e49a2..ddb0b5c 100644
+--- a/src/lib.cpp
++++ b/src/lib.cpp
+@@ -436,12 +436,16 @@ void process_directory(const char *d_name, callback f=
+n)
+ =
 
---===============0593126901265635111==--
+ int get_user_input(char *buf, unsigned sz)
+ {
++	int ret =3D 0;
++#ifndef DISABLE_NCURSES
+ 	fflush(stdout);
+ 	echo();
+ 	/* Upon successful completion, these functions return OK. Otherwise, they=
+ return ERR. */
+-	int ret =3D getnstr(buf, sz);
++	ret =3D getnstr(buf, sz);
+ 	noecho();
+ 	fflush(stdout);
+ 	/* to distinguish between getnstr error and empty line */
+-	return ret || strlen(buf);
++	ret |=3D strlen(buf);
++#endif
++	return ret;
+ }
+
+--===============6190196665402044347==--
 
