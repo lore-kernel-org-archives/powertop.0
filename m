@@ -1,86 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============0480222678334903547=="
+Content-Type: multipart/mixed; boundary="===============2087500190073315631=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH 1/2] perf: Pass 0 as a third argument to ioctl
- on perf_fd
-Date: Mon, 17 Sep 2012 02:17:30 +0300
-Message-ID: <20120916231730.GB3092@swordfish>
-In-Reply-To: 1347805051-2889-1-git-send-email-namhyung@gmail.com
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] do not implement get_user_input() in
+ DISABLE_NCURSES builds
+Date: Mon, 20 Aug 2012 08:18:59 -0700
+Message-ID: <50325563.6040605@linux.intel.com>
+In-Reply-To: 20120820094917.GB3137@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0480222678334903547==
+--===============2087500190073315631==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (09/16/12 23:17), Namhyung Kim wrote:
-> The third argument of PERF_EVENT_IOC_{ENABLE,DISABLE} ioctl is a flag
-> to determine whether the command should be applied to group members.
-> Since the powertop doesn't use the event grouping feature, it'd better
-> passing 0 as a third argument explicitly.
+On 08/20/2012 02:49 AM, Sergey Senozhatsky wrote:
+> On (08/19/12 17:40), Arjan van de Ven wrote:
+>> On 8/19/2012 2:57 PM, Sergey Senozhatsky wrote:
+>>> do not implement get_user_input() in DISABLE_NCURSES builds
+>> no offence.. but this ifdef madness needs to stop.
+>>
+>> right now, powertop uses ncurses.
+>>
+>> either we want to make it optional, but then this stuff needs to get a l=
+ot more modular,
+>> or we just declare that you need ncurses.
+>> I'm very much leaning towards the later fwiw...
+>>
+> I agree, and actually I don't like this patch (ifdef stuff also affects p=
+atches I'm currently
+> working on). it's rather hard to tell how many people will be affected by=
+ #2 decision, but we
+> can tell the number for #1 case.
 >
+> DISABLE_NCURSES is not that nasty in overall, since it just disables some=
+ application features,
+> comparing to, for example, DISABLE_TRYCATCH, which disables standard lang=
+uage features for very
+> much non-obvious reason for someone with no embedded background.
+>
+> that said, it'll be nice if we forbid DISABLE_NCURSES, but we'll still ha=
+ve ifdefs in
+> code because of decisions different people made (like no ncurses in some =
+distros or incomplete/buggy
+> programming language support).
+>
+>
+> 	-ss
+The only reason we allowed DISABLE_NCURSES in the first place, was to =
 
-[..]
-   <+629>:	mov    -0x88(%rbp),%rax
-   <+636>:	mov    0x8(%rax),%eax
-   <+639>:	mov    $0x2400,%esi
-   <+644>:	mov    %eax,%edi
-   <+646>:	mov    $0x0,%eax
-   <+651>:	callq  0x404460 <ioctl(a)plt>
-[..]
+support android. If we don't want to support android out of the box, we =
 
-agree, let's pass 0 explicitly to perf_ioctl():
+can start removing the crude and android can patch PowerTOP within their =
 
-3307
-3308         if (flags & PERF_IOC_FLAG_GROUP)
-3309                 perf_event_for_each(event, func);
-3310         else
-3311                 perf_event_for_each_child(event, func);
-3312 =
+distro if they wanted.
+
+All other ifdef's need to be scrutinized.
+-C
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
 
 
-
-
-good catch, thank you!
-
-
-	-ss
-
- =
-
-> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
-> ---
->  src/perf/perf.cpp |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> =
-
-> diff --git a/src/perf/perf.cpp b/src/perf/perf.cpp
-> index 69f1da3..c8ba7a8 100644
-> --- a/src/perf/perf.cpp
-> +++ b/src/perf/perf.cpp
-> @@ -128,7 +128,7 @@ void perf_event::create_perf_event(char *eventname, i=
-nt _cpu)
->  		return;
->  	}
->  =
-
-> -	ret =3D ioctl(perf_fd, PERF_EVENT_IOC_ENABLE);
-> +	ret =3D ioctl(perf_fd, PERF_EVENT_IOC_ENABLE, 0);
->  =
-
->  	if (ret < 0) {
->  		fprintf(stderr, "failed to enable perf \n");
-> @@ -210,7 +210,7 @@ void perf_event::start(void)
->  void perf_event::stop(void)
->  {
->  	int ret;
-> -	ret =3D ioctl(perf_fd, PERF_EVENT_IOC_DISABLE);
-> +	ret =3D ioctl(perf_fd, PERF_EVENT_IOC_DISABLE, 0);
->  	if (ret)
->  		cout << "stop failing\n";
->  }
->=20
-
---===============0480222678334903547==--
+--===============2087500190073315631==--
 
