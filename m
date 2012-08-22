@@ -1,40 +1,169 @@
-Content-Type: multipart/mixed; boundary="===============4662595263035584547=="
+Content-Type: multipart/mixed; boundary="===============7690496166095949276=="
 MIME-Version: 1.0
-From: Joerg Mayer <jmpt at loplof.de>
-Subject: Re: [Powertop] [Warning fixes 5/6] Fix warning: warning: this decimal
- constant is unsigned only in ISO C90 [enabled by default] by explicitely
- declaring the value as UL
-Date: Fri, 24 Aug 2012 23:54:33 +0200
-Message-ID: <20120824215433.GB29623@rhrk.uni-kl.de>
-In-Reply-To: 04DD5571759C064D967CF1D07D73B628490BBEF1@fmsmsx110.amr.corp.intel.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: [Powertop] [PATCH] tuninig: resize scaling support (v1)
+Date: Thu, 23 Aug 2012 01:47:03 +0300
+Message-ID: <20120822224702.GA20639@swordfish.minsk.epam.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4662595263035584547==
+--===============7690496166095949276==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 24, 2012 at 08:18:58PM +0000, Howard, James D wrote:
-> A change was suggested in .../cpu.cpp at or near line 975, explicitly add=
-ing the "UL" suffix to the decimal integer literal:
->      4294967295   -->   4294967295UL
-> Is that the right thing to do?  This is "ULONG_MAX" (for machines with 32=
--bit "word" size).  Would it be more correct to use the identifier ULONG_MA=
-X?  In modern #include files, <limits.h> (for example) correctly provides t=
-he "UL" suffix.
+tuninig: resize scaling support v1
 
-If __WORDSIZE is 32 on all architectures that powertop will run on,
-then yes, we should use ULONG_MAX instead. I will have to find out about
-WORDSIZE on 64 bit architectures, as I'm still on a 32 bit system.
+Initial version of terminal window resize support for tuning tab.
+Supports both X and Y scalings:
+-- X scaling: truncation (*)
+* tunable result and description strings are now stored in dynamic
+array, limited in size to current window X (mod MAX_LEN).
 
-On sytems with __WORDSIZE of 64 bits ULONG_MAX is 18446744073709551615UL.
-
-But that's something I will look at after a night's sleep.
-
-Ciao
-     J=C3=B6rg
+-- Y scaling: paging and scrolling
 
 
---===============4662595263035584547==--
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+
+---
+
+ src/tuning/tuning.cpp | 87 +++++++++++++++++++++++++++++++++++------------=
+----
+ 1 file changed, 60 insertions(+), 27 deletions(-)
+
+diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
+index 4893597..541e9e0 100644
+--- a/src/tuning/tuning.cpp
++++ b/src/tuning/tuning.cpp
+@@ -28,7 +28,7 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <ncurses.h>
+-
++#include <math.h>
+ =
+
+ #include "tuning.h"
+ #include "tuningsysfs.h"
+@@ -79,48 +79,81 @@ void initialize_tuning(void)
+ 	create_tab("Tunables", _("Tunables"), w, _(" <ESC> Exit | <Enter> Toggle =
+tunable | <r> Window refresh"));
+ =
+
+ 	init_tuning();
+-
+ 	w->cursor_max =3D all_tunables.size() - 1;
+ }
+ =
+
++#define XINDENT	3
++#define YINDENT	4
++#define MAX_LEN	4096
+ =
+
++static void redraw_window(WINDOW *win, int begin, int end, int cursor_pos)
++{
++	int x, y, i;
++	getmaxyx(stdscr, y, x);
++	=
+
++	wclrtoeol(win);
++	wmove(win, 1, 0);
++	x %=3D MAX_LEN;
++
++	for (y =3D 0, i =3D begin; i < end; i++, y++) {
++		char truncate =3D 0;
++		size_t sz =3D 0;
++		char line[x + 1];
++		if ((int)(y) !=3D cursor_pos) {
++			wattrset(win, A_NORMAL);
++			sz =3D snprintf(line, x, "   ");
++		} else {
++			wattrset(win, A_REVERSE);
++			sz =3D snprintf(line, x, ">> ");
++		}
++		sz +=3D snprintf(line + sz, x, "%s", all_tunables[i]->result_string());
++		while (sz < 12)
++			sz +=3D snprintf(line + sz, x, " ");
++		sz +=3D snprintf(line + sz, x, "%s", all_tunables[i]->description());
++		if ((int)sz > x - XINDENT)
++			truncate =3D 1;
++		while ((int)sz < x - XINDENT)
++			sz +=3D snprintf(line + sz, x, " ");
++		if (truncate)
++			sz +=3D snprintf(line + x - XINDENT - 1, x, "~\n");
++		else
++			sz +=3D snprintf(line + sz, x, "\n");
++
++		waddnstr(win, line, sz);
++	}
++}
+ =
+
+ static void __tuning_update_display(int cursor_pos)
+ {
++	static int last_frame_nr =3D 0;
++	int x, y, begin, end, frame_nr;
+ 	WINDOW *win;
+-	unsigned int i;
+-
++        =
+
+ 	win =3D get_ncurses_win("Tunables");
+-
+ 	if (!win)
+ 		return;
++	getmaxyx(stdscr, y, x);
++
++	y -=3D YINDENT;
++	frame_nr =3D ceil(cursor_pos / y);
++	end =3D (frame_nr + 1) * y;
++	if (end > (int)all_tunables.size())
++		end =3D all_tunables.size();
++
++	begin =3D frame_nr * y;
++	/* actual cursor position is frame-dependent */
++	cursor_pos -=3D frame_nr * y;
++	if (frame_nr !=3D last_frame_nr)
++		should_clear =3D TRUE;
++	last_frame_nr =3D frame_nr;
+ =
+
+ 	if (should_clear) {
+-		should_clear =3D false;
++		should_clear =3D FALSE;
+ 		wclear(win);
+ 	}
+ =
+
+-	wmove(win, 2,0);
+-
+-	for (i =3D 0; i < all_tunables.size(); i++) {
+-		char res[128];
+-		char desc[4096];
+-		strcpy(res, all_tunables[i]->result_string());
+-		strcpy(desc, all_tunables[i]->description());
+-		while (strlen(res) < 12)
+-			strcat(res, " ");
+-
+-		while (strlen(desc) < 103)
+-			strcat(desc, " ");
+-		if ((int)i !=3D cursor_pos) {
+-			wattrset(win, A_NORMAL);
+-			wprintw(win, "   ");
+-		} else {
+-			wattrset(win, A_REVERSE);
+-			wprintw(win, ">> ");
+-		}
+-		wprintw(win, "%s  %s\n", _(res), _(desc));
+-	}
++	redraw_window(win, begin, end, cursor_pos);
++	wnoutrefresh(win);
+ }
+ =
+
+ void tuning_update_display(void)
+
+
+--===============7690496166095949276==--
 
