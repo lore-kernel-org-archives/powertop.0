@@ -1,36 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============1066409744848051068=="
+Content-Type: multipart/mixed; boundary="===============4975894427682506514=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] PowerTOP Community Meeting
-Date: Thu, 06 Sep 2012 16:05:52 +0300
-Message-ID: <20120906130433.GA3040@swordfish>
-In-Reply-To: 50476A14.2000701@linux.intel.com
+From: Joerg Mayer <jmpt at loplof.de>
+Subject: [Powertop] [CLI fixes 4/5] -V (version) does not take an argument,
+ whether optional or not.
+Date: Thu, 23 Aug 2012 23:32:33 +0200
+Message-ID: <20120824150836.4FFDAE00D1@linda.rhrk.uni-kl.de>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1066409744848051068==
+--===============4975894427682506514==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (09/05/12 08:04), Chris Ferron wrote:
-> >Hi,
-> >Currently NYC, NY. From next tuesday: Minsk, Belarus.
-> >Never tried g+, though, I guess I'd prefer g+ hangout.
-> >
-> Ok Got you down. What time in your day is good for you? I want to
-> make sure it is also convenient for you.
-> =
+Signed-off-by: Joerg Mayer <jmpt(a)loplof.de>
+
+diff --git a/src/main.cpp b/src/main.cpp
+index c310cb2..80d7597 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -343,7 +343,7 @@ int main(int argc, char **argv)
+ 	textdomain (PACKAGE);
+ =
+
+ 	while (1) { /* parse commandline options */
+-		c =3D getopt_long (argc, argv, "ch:C:i:t:uV:w:q", long_options, &option_=
+index);
++		c =3D getopt_long (argc, argv, "ch:C:i:t:uVw:q", long_options, &option_i=
+ndex);
+ 		/* Detect the end of the options. */
+ 		if (c =3D=3D -1)
+ 			break;
+-- =
+
+1.7.7
 
 
-Hi,
-It depends how time critical this meeting is. If we need to meet
-this week then it'll catch me somewehere in the city. next week,
-starting from monday, I'll be available from 10am your time (which
-is I believe from 8pm BY time).
-
-
-	-ss
-
---===============1066409744848051068==--
+--===============4975894427682506514==--
 
