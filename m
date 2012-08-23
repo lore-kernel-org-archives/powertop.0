@@ -1,55 +1,64 @@
-Content-Type: multipart/mixed; boundary="===============8198209151512458095=="
+Content-Type: multipart/mixed; boundary="===============1472374336652057754=="
 MIME-Version: 1.0
-From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: Re: [Powertop] [PATCH] Fix screen DPMS support detection
-Date: Tue, 14 Aug 2012 10:11:49 +0400
-Message-ID: <5029EC25.3080101@samsung.com>
-In-Reply-To: 50293AD3.6020900@linux.intel.com
+From: Joerg Mayer <jmpt at loplof.de>
+Subject: [Powertop] [CLI fixes 3/5] Fix spelling of command line argument
+ --quite to --quiet. Add a manpage entry for --quiet, which was missing.
+Date: Thu, 23 Aug 2012 23:29:49 +0200
+Message-ID: <20120824150836.4E29EDFFDC@linda.rhrk.uni-kl.de>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8198209151512458095==
+--===============1472374336652057754==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On my desktop PC running Ubuntu 11.10 with 3.0.0-24-generic-pae kernel
-I have /sys/class/backlight/eeepc-wmi symbolic link pointing to
-/sys/devices/platform/eeepc-wmi/backlight/eeepc-wmi
+Signed-off-by: Joerg Mayer <jmpt(a)loplof.de>
 
-My PC is non an EEEPC. Perhaps Linux kernel wrongly detects type of =
+diff --git a/doc/powertop.8 b/doc/powertop.8
+index 8020d4e..8a70076 100644
+--- a/doc/powertop.8
++++ b/doc/powertop.8
+@@ -46,6 +46,9 @@ sent to others to help diagnose power issues.
+ \fB\-\-iteration[\fR=3D\fIiterations\fR]
+ number of times to run each test.
+ .TP
++\fB\-\-quiet
++ supress stderr output.
++.TP
+ \fB\-\-time[\fR=3D\fIseconds\fR]
+ generate a report for a specified number of seconds.
+ .TP
+diff --git a/src/main.cpp b/src/main.cpp
+index 8714daf..c310cb2 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -77,7 +77,7 @@ static const struct option long_options[] =3D
+ 	{"time", optional_argument, NULL, 't'},
+ 	{"iteration", optional_argument, NULL, 'i'},
+ 	{"workload", optional_argument, NULL, 'w'},
+-	{"quite", optional_argument, NULL, 'q'},
++	{"quiet", optional_argument, NULL, 'q'},
+ 	{NULL, 0, NULL, 0}
+ };
+ =
 
-hardware,
-I don't know. I just have a PC with an LCD monitor.
-
-P.S.
-By the way, when I use the default mobile kernel without needed CONFIG_s =
-
-I have
-several more division by zero since PowerTOP uses default value of 0 to =
-
-lot's of variables.
-But since that CONFIG_s are required to run PowerTOP I have not reported it.
-
-Arjan van de Ven wrote:
-> On 8/13/2012 9:52 AM, Igor Zhbanov wr
->> The problem is that on some architectures max_brightness is 0.
-> oooof that's bad
-> yes we shouldn't do divide by zero
->
-> but what kind of platform has a max brightness of 0 ?????
+@@ -112,7 +112,7 @@ static void print_usage()
+ 	printf("--time%s \t %s\n",_("[=3Dseconds]"), _("generate a report for 'x'=
+ seconds"));
+ 	printf("--iteration%s\n", _("[=3Diterations] number of times to run each =
+test"));
+ 	printf("--workload%s \t %s\n", _("[=3Dworkload]"), _("file to execute for=
+ workload"));
+-	printf("--quite \t %s\n", _("supress stderr output"));
++	printf("--quiet \t\t %s\n", _("supress stderr output"));
+ 	printf("--help \t\t\t %s\n",_("print this help menu"));
+ 	printf("\n");
+ 	printf("%s\n\n",_("For more help please refer to the README"));
 -- =
 
-Best regards,
-Igor Zhbanov,
-Expert Software Engineer,
-phone: +7 (495) 797 25 00 ext 3806
-e-mail: i.zhbanov(a)samsung.com
-
-ASWG, Moscow R&D center, Samsung Electronics
-12 Dvintsev street, building 1
-127018, Moscow, Russian Federation
+1.7.7
 
 
---===============8198209151512458095==--
+--===============1472374336652057754==--
 
