@@ -1,63 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============2253136277143962835=="
+Content-Type: multipart/mixed; boundary="===============8485303866200059230=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Powertop doesn't detects sleeping ARM cores
-Date: Thu, 20 Sep 2012 12:14:33 +0300
-Message-ID: <20120920091433.GA3237@swordfish.minsk.epam.com>
-In-Reply-To: 505AD2D0.10505@samsung.com
+From: Joerg Mayer <jmpt at loplof.de>
+Subject: [Powertop] [CLI fixes 2/5] Reorder arguments alphabetically Spelling
+ fix levesl to levels
+Date: Thu, 23 Aug 2012 23:24:34 +0200
+Message-ID: <20120824150836.4D7CBDFFDB@linda.rhrk.uni-kl.de>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2253136277143962835==
+--===============8485303866200059230==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (09/20/12 12:24), Igor Zhbanov wrote:
-> Chris Ferron wrote:
-> =
+Signed-off-by: Joerg Mayer <jmpt(a)loplof.de>
 
-> Now I'm looking for solution. But I see now only four ways:
-> =
+diff --git a/doc/powertop.8 b/doc/powertop.8
+index e8ec5fd..8020d4e 100644
+--- a/doc/powertop.8
++++ b/doc/powertop.8
+@@ -14,19 +14,19 @@ experiment with various power management settings. When=
+ invoking powertop
+ without arguments powertop starts in interactive mode.
+ .SH OPTIONS
+ .TP
+-\fB\-\-csv[\fR=3D\fIFILENAME\fR]
+-generate a CSV report. If a filename is not specified then the
+-default name "powertop.csv" is used. The CSV report can be
+-used for reporting and data analysis.
+-.TP
+ \fB\-\-calibrate
+ runs powertop in calibration mode. When running on battery, powertop
+ can track power consumption as well as system activity. When there
+ are enough measurements, powertop can start to report power estimates. One
+ can get more accurate estimates by using this option to enable a
+-calibration cycle. This will cycle through various display levesl and USB
++calibration cycle. This will cycle through various display levels and USB
+ device activities and workloads.
+ .TP
++\fB\-\-csv[\fR=3D\fIFILENAME\fR]
++generate a CSV report. If a filename is not specified then the
++default name "powertop.csv" is used. The CSV report can be
++used for reporting and data analysis.
++.TP
+ \fB\-\-debug
+  run in "debug" mode.
+ .TP
+-- =
 
-> 1) Develop another kernel mechanism for providing information about all a=
-vailable
->    CPUs and cores. Or ask the kernel authors not to remove offline cores =
-from
->    /proc/cpuinfo and their information files from /sys/.../cpu/.
-
-procps (e.g. top utility) use sysconf _SC_NPROCESSORS_CONF/_SC_NPROCESSORS_=
-ONLN for
-that purpose.
-
-https://www.gnu.org/software/libc/manual/html_node/Processor-Resources.html
+1.7.7
 
 
-	-ss
-
-> 2) Scan /sys/.../cpu for all CPUs and temporarily wake it up to gather in=
-formation.
-> 3) Ask the user to run PowerTOP on a heavy loaded system for the first ti=
-me
->    (or wake up all CPUs by the PowerTOP) and store collected CPU informat=
-ion somewhere
->    in /var/cache/powertop and reuse it on later runs.
-> 4) Don't just sleep in a main cycle, but scan /sys/.../cpu for new CPUs t=
-o appear.
->    (Perhaps there could be something like D-Bus or netlink notification w=
-hen a core
->     brought online -- I don't know about it).
-> =
-
-> At your personal view, what way fits better in the PowerTOP project?
-> =
-
-> P.S. This may be the case for x86 CPUs too. I have disable CPU2 by writing
-> to /sys/devices/system/cpu2/online, and the PowerTOP sees only CPU0, CPU1=
-, and CPU3.
-> Although default PC's CPU governor as I know doesn't turn off CPUs freque=
-ntly.
->=20
-
---===============2253136277143962835==--
+--===============8485303866200059230==--
 
