@@ -1,68 +1,131 @@
-Content-Type: multipart/mixed; boundary="===============6427216426917542470=="
+Content-Type: multipart/mixed; boundary="===============4267815852782270371=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] [PATCH v2 1/2] Updates to support Android platform
-Date: Tue, 25 Sep 2012 08:11:25 +0200
-Message-ID: <50614B0D.3040409@linux.intel.com>
-In-Reply-To: CA+Z25wV9QXDp9zmaoQrxXUh6VGMBs0Rb3=tNd-xnT50HPz2Uqg@mail.gmail.com
+From: Joerg Mayer <jmpt at loplof.de>
+Subject: [Powertop] [PATCH] Fixes to manpage and command line handling
+Date: Thu, 23 Aug 2012 20:05:16 +0200
+Message-ID: <20120823180516.GA30340@rhrk.uni-kl.de>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6427216426917542470==
+--===============4267815852782270371==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 9/25/2012 7:34 AM, Rajagopal Venkat wrote:
->> On 09/24/2012 06:28 AM, Rajagopal Venkat wrote:
->>>
->>> This patch adds following minor changes to prepare powertop
->>> to support Android platform.
->>>
->>> - Add missing HAVE_CONFIG_H conditional check.
->>> - remove un-used ethtool_cmd_speed_set and ethtool_cmd_speed
->>> functions.
->>> - Minimize dependency on exception handling in catch blocks.
->>>
->>> These changes will not affect powertop functionality.
->>>
->>> Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
+Hello,
 
+I just decided to play with powertop again. So git pull, find out the repo
+has moved etcetc.
 
->>
-> As discussed in first patch set, android doesn't support exception
-> handling. This
+I found a few cosmetic things within the first 5 minutes of use which I
+decided to provide a fix for.
 
-where is this in your commit log?
+Please apply if it is acceptable, otherwise let me know how to improve it.
 
-> is the reason powertop had DISABLE_TRYCATCH conditional macro which is
-> removed in recent commit.
+Thanks
+    J=C3=B6rg
+--
+Joerg Mayer                                           <jmayer(a)loplof.de>
+We are stuck with technology when what we really want is just stuff that
+works. Some say that should read Microsoft instead of technology.
 
-Android being braindead about the C++ language should be it's own patch, no=
-t snuck in as part of another change.
+--===============4267815852782270371==
+Content-Type: text/x-diff
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="powertop-usage.patch"
 
+U2lnbmVkLW9mZi1ieTogSm9lcmcgTWF5ZXIgPGptYXllckBsb3Bsb2YuZGU+CgpNYWtlIHVzYWdl
+IGFuZCBwcm9ncmFtIGJlaGF2aW91ciBhIGJpdCBtb3JlIGNvbnNpc3RlbnQuIEFsc28KZml4IHNv
+bWUgdHB5b3MsIG9uZSBvZiB0aGVtIGNvbW1hbiBsaW5lIHJlbGV2YW50OgoKIC0gYWxwaGFiZXRp
+Y2FsbHkgc29ydCBlbnRyaWVzIGluIHBvd2VydG9wLjggKG1hbnBhZ2UpCiAtIGFkZCBoZWxwIGZv
+ciAtLXF1aWV0IChzZWUgYmVsb3cpCiAtIGNoYW5nZSB0aGUgZGVmYXVsdCBmaWxlIG5hbWVzIHRv
+IG1hdGNoIHRob3NlIGluIHRoZSBtYW5wYWdlCiAtIGZpeCBhIHR5cG8KIC0gcHJpbnQgcnVudGlt
+ZSBoZWxwIHdpdGggb25lIG1vcmUgdGFiIGZvciBxdWlldCAoc2VlIGJlbG93KQogLSByZW5hbWUg
+Y29tbWFuZCBsaW5lIG9wdGlvbiBxdWl0ZSB0byBxdWlldAogLSByZW1vdmUgdHJhaWxpbmcgd2hp
+dGVzcGFjZSBpbiBtYWluLmNwcAoKZGlmZiAtLWdpdCBhL2RvYy9wb3dlcnRvcC44IGIvZG9jL3Bv
+d2VydG9wLjgKaW5kZXggZThlYzVmZC4uOGE3MDA3NiAxMDA2NDQKLS0tIGEvZG9jL3Bvd2VydG9w
+LjgKKysrIGIvZG9jL3Bvd2VydG9wLjgKQEAgLTE0LDE5ICsxNCwxOSBAQCBleHBlcmltZW50IHdp
+dGggdmFyaW91cyBwb3dlciBtYW5hZ2VtZW50IHNldHRpbmdzLiBXaGVuIGludm9raW5nIHBvd2Vy
+dG9wCiB3aXRob3V0IGFyZ3VtZW50cyBwb3dlcnRvcCBzdGFydHMgaW4gaW50ZXJhY3RpdmUgbW9k
+ZS4KIC5TSCBPUFRJT05TCiAuVFAKLVxmQlwtXC1jc3ZbXGZSPVxmSUZJTEVOQU1FXGZSXQotZ2Vu
+ZXJhdGUgYSBDU1YgcmVwb3J0LiBJZiBhIGZpbGVuYW1lIGlzIG5vdCBzcGVjaWZpZWQgdGhlbiB0
+aGUKLWRlZmF1bHQgbmFtZSAicG93ZXJ0b3AuY3N2IiBpcyB1c2VkLiBUaGUgQ1NWIHJlcG9ydCBj
+YW4gYmUKLXVzZWQgZm9yIHJlcG9ydGluZyBhbmQgZGF0YSBhbmFseXNpcy4KLS5UUAogXGZCXC1c
+LWNhbGlicmF0ZQogcnVucyBwb3dlcnRvcCBpbiBjYWxpYnJhdGlvbiBtb2RlLiBXaGVuIHJ1bm5p
+bmcgb24gYmF0dGVyeSwgcG93ZXJ0b3AKIGNhbiB0cmFjayBwb3dlciBjb25zdW1wdGlvbiBhcyB3
+ZWxsIGFzIHN5c3RlbSBhY3Rpdml0eS4gV2hlbiB0aGVyZQogYXJlIGVub3VnaCBtZWFzdXJlbWVu
+dHMsIHBvd2VydG9wIGNhbiBzdGFydCB0byByZXBvcnQgcG93ZXIgZXN0aW1hdGVzLiBPbmUKIGNh
+biBnZXQgbW9yZSBhY2N1cmF0ZSBlc3RpbWF0ZXMgYnkgdXNpbmcgdGhpcyBvcHRpb24gdG8gZW5h
+YmxlIGEKLWNhbGlicmF0aW9uIGN5Y2xlLiBUaGlzIHdpbGwgY3ljbGUgdGhyb3VnaCB2YXJpb3Vz
+IGRpc3BsYXkgbGV2ZXNsIGFuZCBVU0IKK2NhbGlicmF0aW9uIGN5Y2xlLiBUaGlzIHdpbGwgY3lj
+bGUgdGhyb3VnaCB2YXJpb3VzIGRpc3BsYXkgbGV2ZWxzIGFuZCBVU0IKIGRldmljZSBhY3Rpdml0
+aWVzIGFuZCB3b3JrbG9hZHMuCiAuVFAKK1xmQlwtXC1jc3ZbXGZSPVxmSUZJTEVOQU1FXGZSXQor
+Z2VuZXJhdGUgYSBDU1YgcmVwb3J0LiBJZiBhIGZpbGVuYW1lIGlzIG5vdCBzcGVjaWZpZWQgdGhl
+biB0aGUKK2RlZmF1bHQgbmFtZSAicG93ZXJ0b3AuY3N2IiBpcyB1c2VkLiBUaGUgQ1NWIHJlcG9y
+dCBjYW4gYmUKK3VzZWQgZm9yIHJlcG9ydGluZyBhbmQgZGF0YSBhbmFseXNpcy4KKy5UUAogXGZC
+XC1cLWRlYnVnCiAgcnVuIGluICJkZWJ1ZyIgbW9kZS4KIC5UUApAQCAtNDYsNiArNDYsOSBAQCBz
+ZW50IHRvIG90aGVycyB0byBoZWxwIGRpYWdub3NlIHBvd2VyIGlzc3Vlcy4KIFxmQlwtXC1pdGVy
+YXRpb25bXGZSPVxmSWl0ZXJhdGlvbnNcZlJdCiBudW1iZXIgb2YgdGltZXMgdG8gcnVuIGVhY2gg
+dGVzdC4KIC5UUAorXGZCXC1cLXF1aWV0Cisgc3VwcmVzcyBzdGRlcnIgb3V0cHV0LgorLlRQCiBc
+ZkJcLVwtdGltZVtcZlI9XGZJc2Vjb25kc1xmUl0KIGdlbmVyYXRlIGEgcmVwb3J0IGZvciBhIHNw
+ZWNpZmllZCBudW1iZXIgb2Ygc2Vjb25kcy4KIC5UUApkaWZmIC0tZ2l0IGEvc3JjL21haW4uY3Bw
+IGIvc3JjL21haW4uY3BwCmluZGV4IDEzOWI1MTQuLmJkYjg3Y2MgMTAwNjQ0Ci0tLSBhL3NyYy9t
+YWluLmNwcAorKysgYi9zcmMvbWFpbi5jcHAKQEAgLTc3LDcgKzc3LDcgQEAgc3RhdGljIGNvbnN0
+IHN0cnVjdCBvcHRpb24gbG9uZ19vcHRpb25zW10gPQogCXsidGltZSIsIG9wdGlvbmFsX2FyZ3Vt
+ZW50LCBOVUxMLCAndCd9LAogCXsiaXRlcmF0aW9uIiwgb3B0aW9uYWxfYXJndW1lbnQsIE5VTEws
+ICdpJ30sCiAJeyJ3b3JrbG9hZCIsIG9wdGlvbmFsX2FyZ3VtZW50LCBOVUxMLCAndyd9LAotCXsi
+cXVpdGUiLCBvcHRpb25hbF9hcmd1bWVudCwgTlVMTCwgJ3EnfSwKKwl7InF1aWV0Iiwgb3B0aW9u
+YWxfYXJndW1lbnQsIE5VTEwsICdxJ30sCiAJe05VTEwsIDAsIE5VTEwsIDB9CiB9OwogCkBAIC0x
+MTIsNyArMTEyLDcgQEAgc3RhdGljIHZvaWQgcHJpbnRfdXNhZ2UoKQogCXByaW50ZigiLS10aW1l
+JXMgXHQgJXNcbiIsXygiWz1zZWNvbmRzXSIpLCBfKCJnZW5lcmF0ZSBhIHJlcG9ydCBmb3IgJ3gn
+IHNlY29uZHMiKSk7CiAJcHJpbnRmKCItLWl0ZXJhdGlvbiVzXG4iLCBfKCJbPWl0ZXJhdGlvbnNd
+IG51bWJlciBvZiB0aW1lcyB0byBydW4gZWFjaCB0ZXN0IikpOwogCXByaW50ZigiLS13b3JrbG9h
+ZCVzIFx0ICVzXG4iLCBfKCJbPXdvcmtsb2FkXSIpLCBfKCJmaWxlIHRvIGV4ZWN1dGUgZm9yIHdv
+cmtsb2FkIikpOwotCXByaW50ZigiLS1xdWl0ZSBcdCAlc1xuIiwgXygic3VwcmVzcyBzdGRlcnIg
+b3V0cHV0IikpOworCXByaW50ZigiLS1xdWlldCBcdFx0ICVzXG4iLCBfKCJzdXByZXNzIHN0ZGVy
+ciBvdXRwdXQiKSk7CiAJcHJpbnRmKCItLWhlbHAgXHRcdFx0ICVzXG4iLF8oInByaW50IHRoaXMg
+aGVscCBtZW51IikpOwogCXByaW50ZigiXG4iKTsKIAlwcmludGYoIiVzXG5cbiIsXygiRm9yIG1v
+cmUgaGVscCBwbGVhc2UgcmVmZXIgdG8gdGhlIFJFQURNRSIpKTsKQEAgLTIzNyw3ICsyMzcsNyBA
+QCB2b2lkIHJlcG9ydChpbnQgdGltZSwgY2hhciAqd29ya2xvYWQsIGludCBpdGVyYXRpb25zLCBj
+aGFyICpmaWxlKQogCWZwcmludGYoc3RkZXJyLCBfKCJQcmVwYXJpbmcgdG8gdGFrZSBtZWFzdXJl
+bWVudHNcbiIpKTsKIAl1dGZfb2sgPSAwOwogCW9uZV9tZWFzdXJlbWVudCgxLCBOVUxMKTsKLQkK
+KwogCWlmICghd29ya2xvYWRbMF0pCiAJICBmcHJpbnRmKHN0ZGVyciwgXygiVGFraW5nICVkIG1l
+YXN1cmVtZW50KHMpIGZvciBhIGR1cmF0aW9uIG9mICVkIHNlY29uZChzKSBlYWNoLlxuIiksaXRl
+cmF0aW9ucyx0aW1lKTsKIAllbHNlCkBAIC0yNjAsNyArMjYwLDcgQEAgdm9pZCByZXBvcnQoaW50
+IHRpbWUsIGNoYXIgKndvcmtsb2FkLCBpbnQgaXRlcmF0aW9ucywgY2hhciAqZmlsZSkKIH0KIAog
+c3RhdGljIHZvaWQgY2hlY2tyb290KCkgewotCWludCB1aWQ7IAorCWludCB1aWQ7CiAJdWlkID0g
+Z2V0dWlkKCk7CiAKIAlpZiAodWlkICE9IDApIHsKQEAgLTI2OCw3ICsyNjgsNyBAQCBzdGF0aWMg
+dm9pZCBjaGVja3Jvb3QoKSB7CiAJCXByaW50ZihfKCJleGl0aW5nLi4uXG4iKSk7CiAJCWV4aXQo
+RVhJVF9GQUlMVVJFKTsKIAl9Ci0JCisKIH0KIAogc3RhdGljIHZvaWQgcG93ZXJ0b3BfaW5pdCh2
+b2lkKQpAQCAtMjgwLDcgKzI4MCw3IEBAIHN0YXRpYyB2b2lkIHBvd2VydG9wX2luaXQodm9pZCkK
+IAlpZiAoaW5pdGlhbGl6ZWQpCiAJCXJldHVybjsKIAotCWNoZWNrcm9vdCgpOyAKKwljaGVja3Jv
+b3QoKTsKIAlyZXQgPSBzeXN0ZW0oIi9zYmluL21vZHByb2JlIGNwdWZyZXFfc3RhdHMgPiAvZGV2
+L251bGwgMj4mMSIpOwogCXJldCA9IHN5c3RlbSgiL3NiaW4vbW9kcHJvYmUgbXNyID4gL2Rldi9u
+dWxsIDI+JjEiKTsKIAlzdGF0ZnMoIi9zeXMva2VybmVsL2RlYnVnIiwgJnN0X2ZzKTsKQEAgLTM0
+Myw3ICszNDMsNyBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpCiAJdGV4dGRvbWFp
+biAoUEFDS0FHRSk7CiAKIAl3aGlsZSAoMSkgeyAvKiBwYXJzZSBjb21tYW5kbGluZSBvcHRpb25z
+ICovCi0JCWMgPSBnZXRvcHRfbG9uZyAoYXJnYywgYXJndiwgImNoOkM6aTp0OnVWOnc6cSIsIGxv
+bmdfb3B0aW9ucywgJm9wdGlvbl9pbmRleCk7CisJCWMgPSBnZXRvcHRfbG9uZyAoYXJnYywgYXJn
+diwgImNoOkM6aTp0OnVWdzpxIiwgbG9uZ19vcHRpb25zLCAmb3B0aW9uX2luZGV4KTsKIAkJLyog
+RGV0ZWN0IHRoZSBlbmQgb2YgdGhlIG9wdGlvbnMuICovCiAJCWlmIChjID09IC0xKQogCQkJYnJl
+YWs7CkBAIC0zNTUsNyArMzU1LDcgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KQog
+CQkJCWJyZWFrOwogCiAJCQljYXNlICdlJzogLyogRXh0ZWNoIHBvd2VyIGFuYWx5emVyIHN1cHBv
+cnQgKi8KLQkJCQljaGVja3Jvb3QoKTsgCisJCQkJY2hlY2tyb290KCk7CiAJCQkJZXh0ZWNoX3Bv
+d2VyX21ldGVyKG9wdGFyZyA/IG9wdGFyZyA6ICIvZGV2L3R0eVVTQjAiKTsKIAkJCQlicmVhazsK
+IAkJCWNhc2UgJ3UnOgpAQCAtMzcxLDcgKzM3MSw3IEBAIGludCBtYWluKGludCBhcmdjLCBjaGFy
+ICoqYXJndikKIAkJCWNhc2UgJ2gnOiAvKiBodG1sIHJlcG9ydCAqLwogCQkJCXdhbnRyZXBvcnQg
+PSB0cnVlOwogCQkJCXJlcG9ydHR5cGUgPSAxOwotCQkJCXNwcmludGYoZmlsZW5hbWUsICIlcyIs
+IG9wdGFyZyA/IG9wdGFyZyA6ICJQb3dlclRPUC5odG1sIiApOworCQkJCXNwcmludGYoZmlsZW5h
+bWUsICIlcyIsIG9wdGFyZyA/IG9wdGFyZyA6ICJwb3dlcnRvcC5odG1sIiApOwogCQkJCWJyZWFr
+OwogCiAJCQljYXNlICd0JzoKQEAgLTM4OCwxMSArMzg4LDExIEBAIGludCBtYWluKGludCBhcmdj
+LCBjaGFyICoqYXJndikKIAkJCWNhc2UgJ3EnOgogCQkJCWZyZW9wZW4oIi9kZXYvbnVsbCIsICJh
+Iiwgc3RkZXJyKTsKIAkJCQlicmVhazsKLQkJCQkKKwogCQkJY2FzZSAnQyc6IC8qIGNzdiByZXBv
+cnQqLwogCQkJCXdhbnRyZXBvcnQgPSB0cnVlOwogCQkJCXJlcG9ydHR5cGUgPSAwOwotCQkJCXNw
+cmludGYoZmlsZW5hbWUsICIlcyIsIG9wdGFyZyA/IG9wdGFyZyA6ICJQb3dlclRPUC5jc3YiKTsK
+KwkJCQlzcHJpbnRmKGZpbGVuYW1lLCAiJXMiLCBvcHRhcmcgPyBvcHRhcmcgOiAicG93ZXJ0b3Au
+Y3N2Iik7CiAJCQkJYnJlYWs7CiAJCQljYXNlICc/JzogLyogVW5rbm93biBvcHRpb24gKi8KIAkJ
+CQkvKiBnZXRvcHRfbG9uZyBhbHJlYWR5IHByaW50ZWQgYW4gZXJyb3IgbWVzc2FnZS4gKi8K
 
-> =
-
-> The patch 2/2 adds stubs for exception handling
-> =
-
-> #define try           if (true)
-> #define catch(x)      if (false)
-> =
-
-> With this, fprintf(stderr, "%s\n", c.what()); in catch block throws
-> undefined reference
-> to c. So added message instead of c.what().
-> =
-
-> Any better ways of adding stubs are welcome.
-
-#define try(x)   if (true) { x;
-#define catch(x) } else
-
-?
-
-
---===============6427216426917542470==--
+--===============4267815852782270371==--
 
