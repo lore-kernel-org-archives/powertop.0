@@ -1,41 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============5530697421990130282=="
+Content-Type: multipart/mixed; boundary="===============2657727478152795341=="
 MIME-Version: 1.0
-From: Joerg Mayer <jmpt at loplof.de>
-Subject: Re: [Powertop] [Warning fixes 2/6] Build with -Wno-unused-result for
- now, it seems at least some of these cases are intentional (see ml discussion)
-Date: Sat, 25 Aug 2012 09:29:44 +0200
-Message-ID: <20120825072944.GD29623@rhrk.uni-kl.de>
-In-Reply-To: 5037BFC9.3080305@linux.intel.com
+From: Kok, Auke-jan H <auke-jan.h.kok at intel.com>
+Subject: Re: [Powertop] [PATCH] Fixes to manpage and command line handling
+Date: Thu, 23 Aug 2012 11:53:50 -0700
+Message-ID: <CABsxX9JUTvr7R3zt7omX3_JYqVHAxCcYxJGV8bq8-yta+W-_Bg@mail.gmail.com>
+In-Reply-To: 20120823180516.GA30340@rhrk.uni-kl.de
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5530697421990130282==
+--===============2657727478152795341==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 24, 2012 at 10:54:17AM -0700, Chris Ferron wrote:
-> On 08/24/2012 10:38 AM, Magnus Fromreide wrote:
-> >On Fri, 2012-08-24 at 18:53 +0200, Joerg Mayer wrote:
-> >>Note: Is this this flag supported on all compilers?
-> >Please don't.
-> >
-> >If you really mean to ignore the result values then the canonical thing
-> >to do is to cast them to (void)
-> Agreed. Also really don't want this as some of the results that are
-> being ignored should really be fixed. Meaning wrapped in error
-> handling.
+On Thu, Aug 23, 2012 at 11:05 AM, Joerg Mayer <jmpt(a)loplof.de> wrote:
+> Hello,
+>
+> I just decided to play with powertop again. So git pull, find out the repo
+> has moved etcetc.
+>
+> I found a few cosmetic things within the first 5 minutes of use which I
+> decided to provide a fix for.
+>
+> Please apply if it is acceptable, otherwise let me know how to improve it.
 
-OK, I expected this part of the patch series to be controversial - so just
-skip it.
+could you split these up into functionally different patches? e.g. one
+for whitespace, one for man page changes, and one for the getopt()
+fixes?
 
-Thanks
-    J=C3=B6rg
--- =
+Auke
 
-Joerg Mayer                                           <jmayer(a)loplof.de>
-We are stuck with technology when what we really want is just stuff that
-works. Some say that should read Microsoft instead of technology.
-
---===============5530697421990130282==--
+--===============2657727478152795341==--
 
