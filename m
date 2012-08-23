@@ -1,72 +1,173 @@
-Content-Type: multipart/mixed; boundary="===============0184277502418064441=="
+Content-Type: multipart/mixed; boundary="===============7285385686263995553=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] tuninig: resize scaling support (v1)
-Date: Tue, 11 Sep 2012 09:40:48 -0700
-Message-ID: <504F6990.2070500@linux.intel.com>
-In-Reply-To: 20120823205337.GB3065@swordfish.minsk.epam.com
+From: Joerg Mayer <jmpt at loplof.de>
+Subject: [Powertop] [PATCH 1/4] Remove trailing whitespace
+Date: Thu, 23 Aug 2012 23:20:13 +0200
+Message-ID: <20120823215418.50D6CDFFDC@linda.rhrk.uni-kl.de>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0184277502418064441==
+--===============7285385686263995553==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 08/23/2012 01:53 PM, Sergey Senozhatsky wrote:
-> On (08/23/12 09:57), Chris Ferron wrote:
->> So this may be nice for the tuning tab, but we have an overall issue
->> with other tabs as well.
->> Maybe we should change the controls around, and just move the pad.
->> That way we could scroll all tabs and not have to truncate strings.
->> ?
->> -Chris
->>
-> That was the first one in a upcoming series of patches.
-> Because we have separate display logic on every tab, I was moving in a
-> direction of teaching each tabs honour resize.
->
->
->> Maybe we should change the controls around, and just move the pad.
->> That way we could scroll all tabs and not have to truncate strings.
-> Sorry, I'm not sure I got this one, could you please elaborate?
->
-> We can't avaoid string truncation (unless we introduce support for horizo=
-ntal
-> scrolling as well) when X becomes smaller than the longest string in tab
-> (we actually can just ignore it and print beyond the sceen, but I think t=
-he
-> common behaviour in that case is to let user notice that text has been tr=
-uncated
-> via ~ for example). I don't know what to do with C, P states tab when we =
-only
-> have space for "Package" and "Core", or when half of currently required X=
- space for
-> "Frequency stats" tab is available -- dynamic re-arrange looks a bit comp=
-lex at
-> the moment.
->
-> As of Y scroll, well, we can come up with a common interface:
-> -- for tab w/ cursor
-> scrolling happens on every n*Y cursor position, because cursor step is 1.
->
-> -- for tab w/o cursor
-> scroling happens every cursor step (which is Y in this case).
->
-> Schematically, what we need is a common method which will tell the number
-> of lines particular tab is going to print, flag that indecates cursor step
-> and common method (similar to one that used in tuning tab) to print tab
-> content from BEGIN position to END (BEGIN and END depends on current fram=
-e).
->
->
-> 	-ss
-I just sent a patch attachment as "PowerTOP UI navigation enhancement". =
 
-Check it out???
-Sorry for the slow response.
--Chris
+Signed-off-by: Joerg Mayer <jmpt(a)loplof.de>
+---
+ src/display.cpp |    2 +-
+ src/display.h   |    2 +-
+ src/lib.cpp     |    2 +-
+ src/main.cpp    |   12 ++++++------
+ src/report.cpp  |    6 +++---
+ 5 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/src/display.cpp b/src/display.cpp
+index e17745d..f48b53f 100644
+--- a/src/display.cpp
++++ b/src/display.cpp
+@@ -275,7 +275,7 @@ void cursor_enter(void)
+ void window_refresh()
+ {
+ 	class tab_window *w;
+-	=
+
++
+ 	w =3D tab_windows[tab_names[current_tab]];
+ =
+
+ 	if (w) {
+diff --git a/src/display.h b/src/display.h
+index 72f771a..33aaae1 100644
+--- a/src/display.h
++++ b/src/display.h
+@@ -60,7 +60,7 @@ public:
+ 	virtual void expose(void) { cursor_pos =3D 0; repaint();};
+ 	virtual void hide(void) { };
+ =
+
+-	virtual ~tab_window() =
+
++	virtual ~tab_window()
+ 	{
+ 		delwin(win);
+ 		win =3D NULL;
+diff --git a/src/lib.cpp b/src/lib.cpp
+index 8753421..9838c0b 100644
+--- a/src/lib.cpp
++++ b/src/lib.cpp
+@@ -164,7 +164,7 @@ void write_sysfs(const string &filename, const string &=
+value)
+ 	file.open(filename.c_str(), ios::out);
+ 	if (!file)
+ 		return;
+-	try =
+
++	try
+ 	{
+ 		file << value;
+ 		file.close();
+diff --git a/src/main.cpp b/src/main.cpp
+index 139b514..8714daf 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -237,7 +237,7 @@ void report(int time, char *workload, int iterations, c=
+har *file)
+ 	fprintf(stderr, _("Preparing to take measurements\n"));
+ 	utf_ok =3D 0;
+ 	one_measurement(1, NULL);
+-	=
+
++
+ 	if (!workload[0])
+ 	  fprintf(stderr, _("Taking %d measurement(s) for a duration of %d second=
+(s) each.\n"),iterations,time);
+ 	else
+@@ -260,7 +260,7 @@ void report(int time, char *workload, int iterations, c=
+har *file)
+ }
+ =
+
+ static void checkroot() {
+-	int uid; =
+
++	int uid;
+ 	uid =3D getuid();
+ =
+
+ 	if (uid !=3D 0) {
+@@ -268,7 +268,7 @@ static void checkroot() {
+ 		printf(_("exiting...\n"));
+ 		exit(EXIT_FAILURE);
+ 	}
+-	=
+
++
+ }
+ =
+
+ static void powertop_init(void)
+@@ -280,7 +280,7 @@ static void powertop_init(void)
+ 	if (initialized)
+ 		return;
+ =
+
+-	checkroot(); =
+
++	checkroot();
+ 	ret =3D system("/sbin/modprobe cpufreq_stats > /dev/null 2>&1");
+ 	ret =3D system("/sbin/modprobe msr > /dev/null 2>&1");
+ 	statfs("/sys/kernel/debug", &st_fs);
+@@ -355,7 +355,7 @@ int main(int argc, char **argv)
+ 				break;
+ =
+
+ 			case 'e': /* Extech power analyzer support */
+-				checkroot(); =
+
++				checkroot();
+ 				extech_power_meter(optarg ? optarg : "/dev/ttyUSB0");
+ 				break;
+ 			case 'u':
+@@ -388,7 +388,7 @@ int main(int argc, char **argv)
+ 			case 'q':
+ 				freopen("/dev/null", "a", stderr);
+ 				break;
+-				=
+
++
+ 			case 'C': /* csv report*/
+ 				wantreport =3D true;
+ 				reporttype =3D 0;
+diff --git a/src/report.cpp b/src/report.cpp
+index af4b89b..fcb2e22 100644
+--- a/src/report.cpp
++++ b/src/report.cpp
+@@ -190,12 +190,12 @@ void init_report_output(char *filename_str, int itera=
+tions)
+ 	memset(&stamp, 0, sizeof(time_t));
+ 	stamp=3Dtime(NULL);
+ 	strftime(datestr, sizeof(datestr), "%Y%m%d-%H%M%S", localtime(&stamp));
+-	=
+
++
+ 	if (iterations !=3D 1)
+-		sprintf(reportout.filename, "%s-%s.%s", =
+
++		sprintf(reportout.filename, "%s-%s.%s",
+ 			file_prefix, datestr,file_postfix);
+ 	else
+-		sprintf(reportout.filename, "%s.%s", =
+
++		sprintf(reportout.filename, "%s.%s",
+ 			file_prefix, file_postfix);
+ =
+
+ 	if (reporttype) {
+-- =
+
+1.7.7
 
 
---===============0184277502418064441==--
+--===============7285385686263995553==--
 
