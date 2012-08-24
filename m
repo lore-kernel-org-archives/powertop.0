@@ -1,48 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============5997265425209800920=="
+Content-Type: multipart/mixed; boundary="===============2633697389967739385=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] Suspecting incorrect if check during powertop init
-Date: Tue, 07 Aug 2012 06:28:10 -0700
-Message-ID: <502117EA.3090506@linux.intel.com>
-In-Reply-To: CA+Z25wVQkpQx-_JfHJJZVD_7vhzf4u=T78Jg7PfVBqXUZY8n2A@mail.gmail.com
+From: Joerg Mayer <jmpt at loplof.de>
+Subject: [Powertop] [CLI fixes 0/5] Fixes to make command line handling and
+ manpage consistent
+Date: Fri, 24 Aug 2012 16:57:46 +0200
+Message-ID: <20120824150836.4A9FDE00C7@linda.rhrk.uni-kl.de>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5997265425209800920==
+--===============2633697389967739385==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 8/7/2012 3:54 AM, Rajagopal Venkat wrote:
-> Hi,
-> =
+Split the big patch from last time into one per functional change
+as requested.
 
-> Recently a patch[1] is applied to remove boardname support from powertop.
-> This commit adds few lines of code to powertop_init(), to initialize two
-> global variables. I suspect, if condition is not correct and is suppose
-> to be as follows. Is that intentional?
->  =
+If there's more to improve, please let me know (or apply those parts that
+you like and I'll improve the rest).
 
->         if (access("/var/cache/powertop/saved_parameters.powertop", R_OK)=
- =3D=3D 0 ||
->             access("/data/local/powertop/saved_parameters.powertop", R_OK=
-) =3D=3D 0) {
->                 global_fixed_parameters =3D 1;
->                 global_power_override =3D 1;
->         }
->  =
+My previous attempts to send this went into moderation as my attempt to
+automate the sending of the patches were not 100% clean. They haven't been
+rejected but neither have they appeared on the list, so sorry if there
+appear duplicates later on.
+
+Joerg Mayer (5):
+  Remove trailing whitespace
+  Reorder arguments alphabetically     Spelling fix levesl to levels
+  Fix spelling of command line argument --quite to --quiet.     Add a
+    manpage entry for --quiet, which was missing.
+  -V (version) does not take an argument, whether optional or not.
+  Fix spelling of default names to match manpage.
+
+ doc/powertop.8  |   15 +++++++++------
+ src/display.cpp |    2 +-
+ src/display.h   |    2 +-
+ src/lib.cpp     |    2 +-
+ src/main.cpp    |   22 +++++++++++-----------
+ src/report.cpp  |    6 +++---
+ 6 files changed, 26 insertions(+), 23 deletions(-)
+
+-- =
+
+1.7.7
 
 
-both are wrong
-the whole snippet that assigns these two globals needs to go.
-
-the logic used to be that you could do a boardname override, which would lo=
-ck system parameters in place
-and stop the learning logic
-(say, if provided by a manufacturer)
-
-with the boardname stuff gone, those parameters shouldn't be set like this
-
-
---===============5997265425209800920==--
+--===============2633697389967739385==--
 
