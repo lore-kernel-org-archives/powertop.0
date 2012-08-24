@@ -1,63 +1,53 @@
-Content-Type: multipart/mixed; boundary="===============4524302365896767653=="
+Content-Type: multipart/mixed; boundary="===============1026696474835832363=="
 MIME-Version: 1.0
-From: Rajagopal Venkat <rajagopal.venkat at linaro.org>
-Subject: [Powertop] Suspecting incorrect if check during powertop init
-Date: Tue, 07 Aug 2012 16:24:55 +0530
-Message-ID: <CA+Z25wVQkpQx-_JfHJJZVD_7vhzf4u=T78Jg7PfVBqXUZY8n2A@mail.gmail.com>
+From: Joerg Mayer <jmpt at loplof.de>
+Subject: [Powertop] [Warning fixes 2/6] Build with -Wno-unused-result for now,
+ it seems at least some of these cases are intentional (see ml
+ discussion)
+Date: Fri, 24 Aug 2012 18:53:13 +0200
+Message-ID: <20120824173217.DE8C4DFFDC@linda.rhrk.uni-kl.de>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4524302365896767653==
+--===============1026696474835832363==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Note: Is this this flag supported on all compilers?
 
-Recently a patch[1] is applied to remove boardname support from powertop.
-This commit adds few lines of code to powertop_init(), to initialize two
-global variables. I suspect, if condition is not correct and is suppose
-to be as follows. Is that intentional?
+Signed-off-by: Joerg Mayer <jmpt(a)loplof.de>
 
-        if (access("/var/cache/powertop/saved_parameters.powertop", R_OK)
-=3D=3D 0 ||
-            access("/data/local/powertop/saved_parameters.powertop", R_OK)
-=3D=3D 0) {
-                global_fixed_parameters =3D 1;
-                global_power_override =3D 1;
-        }
+diff --git a/src/Makefile.am b/src/Makefile.am
+index d233d85..ec70bc4 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -33,8 +33,9 @@ powertop_SOURCES =3D parameters/persistent.cpp parameters=
+/learn.cpp parameters/par
+ 		main.cpp css.h powertop.css cpu/intel_gpu.cpp
+ =
 
+ =
 
-[1] commit 1c7b4b999cb172b59833f829ab7b95fab11d7a00<https://github.com/fenr=
-us75/powertop/commit/1c7b4b999cb172b59833f829ab7b95fab11d7a00>
+-powertop_CXXFLAGS =3D -fno-omit-frame-pointer -fstack-protector -Wall -Wsh=
+adow -Wformat $(NCURSES_CFLAGS) $(PCIUTILS_CFLAGS) $(LIBNL_CFLAGS) $(GLIB2_=
+CFLAGS)
+-
++powertop_CXXFLAGS =3D \
++	-fno-omit-frame-pointer -fstack-protector -Wall -Wshadow -Wformat -Wno-un=
+used-result \
++	$(NCURSES_CFLAGS) $(PCIUTILS_CFLAGS) $(LIBNL_CFLAGS) $(GLIB2_CFLAGS)
+ =
+
+ powertop_CPPFLAGS =3D -D_FORTIFY_SOURCE=3D2 $(NCURSES_CFLAGS) $(PCIUTILS_C=
+FLAGS) $(LIBNL_CFLAGS) $(GLIB2_CFLAGS) $(LIBZ_CFLAGS) -DLOCALEDIR=3D\"$(loc=
+aledir)\"
+ =
+
 -- =
 
-Regards,
-Rajagopal
+1.7.7
 
---===============4524302365896767653==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
 
-SGksPGJyPjxicj5SZWNlbnRseSBhIHBhdGNoPHNwYW4gY2xhc3M9InNoYS1ibG9jayI+PHNwYW4g
-Y2xhc3M9InNoYSBqcy1zZWxlY3RhYmxlLXRleHQiPjwvc3Bhbj48L3NwYW4+WzFdIGlzIGFwcGxp
-ZWQgdG8gcmVtb3ZlIGJvYXJkbmFtZSBzdXBwb3J0IGZyb20gcG93ZXJ0b3AuPGJyPlRoaXMgY29t
-bWl0IGFkZHMgZmV3IGxpbmVzIG9mIGNvZGUgdG8gcG93ZXJ0b3BfaW5pdCgpLCB0byBpbml0aWFs
-aXplIHR3bzxicj4KZ2xvYmFsIHZhcmlhYmxlcy4gSSBzdXNwZWN0LCBpZiBjb25kaXRpb24gaXMg
-bm90IGNvcnJlY3QgYW5kIGlzIHN1cHBvc2U8YnI+dG8gYmUgYXMgZm9sbG93cy4gSXMgdGhhdCBp
-bnRlbnRpb25hbD88YnI+oDxicj6goKCgoKCgIGlmIChhY2Nlc3MoJnF1b3Q7L3Zhci9jYWNoZS9w
-b3dlcnRvcC9zYXZlZF9wYXJhbWV0ZXJzLnBvd2VydG9wJnF1b3Q7LCBSX09LKSA9PSAwIHx8PGJy
-PqCgoKCgoKCgoKCgIGFjY2VzcygmcXVvdDsvZGF0YS9sb2NhbC9wb3dlcnRvcC9zYXZlZF9wYXJh
-bWV0ZXJzLnBvd2VydG9wJnF1b3Q7LCBSX09LKSA9PSAwKSB7PGJyPgqgoKCgoKCgoKCgoKCgoKAg
-Z2xvYmFsX2ZpeGVkX3BhcmFtZXRlcnMgPSAxOzxicj6goKCgoKCgoKCgoKCgoKAgZ2xvYmFsX3Bv
-d2VyX292ZXJyaWRlID0gMTs8YnI+oKCgoKCgoCB9PGJyPqA8YnI+PGJyPlsxXSBjb21taXQgPGEg
-aHJlZj0iaHR0cHM6Ly9naXRodWIuY29tL2ZlbnJ1czc1L3Bvd2VydG9wL2NvbW1pdC8xYzdiNGI5
-OTljYjE3MmI1OTgzM2Y4MjlhYjdiOTVmYWIxMWQ3YTAwIj48c3BhbiBjbGFzcz0ic2hhLWJsb2Nr
-Ij48c3BhbiBjbGFzcz0ic2hhIGpzLXNlbGVjdGFibGUtdGV4dCI+MWM3YjRiOTk5Y2IxNzJiNTk4
-MzNmODI5YWI3Yjk1ZmFiMTFkN2EwMDwvc3Bhbj48L3NwYW4+PC9hPjxicj4KLS0gPGJyPlJlZ2Fy
-ZHMsPGJyPlJhamFnb3BhbDxicj48YnI+Cg==
-
---===============4524302365896767653==--
+--===============1026696474835832363==--
 
