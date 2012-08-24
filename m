@@ -1,39 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============3208557377541849702=="
+Content-Type: multipart/mixed; boundary="===============6366888087038351134=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH 0/4] Fix a few minor typos.
-Date: Mon, 24 Sep 2012 08:52:45 -0700
-Message-ID: <506081CD.6010403@linux.intel.com>
-In-Reply-To: 1348338789-16252-1-git-send-email-colin.king@canonical.com
+From: Joerg Mayer <jmpt at loplof.de>
+Subject: [Powertop] [Warning fixes 5/6] Fix warning: warning: this decimal
+ constant is unsigned only in ISO C90 [enabled by default] by explicitely
+ declaring the value as UL
+Date: Fri, 24 Aug 2012 19:21:13 +0200
+Message-ID: <20120824173217.E3127E00D3@linda.rhrk.uni-kl.de>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3208557377541849702==
+--===============6366888087038351134==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 09/22/2012 11:33 AM, Colin King wrote:
-> From: Colin Ian King <colin.king(a)canonical.com>
->
-> Just a few minor spelling mistakes/typos that need fixing.
->
-> Colin Ian King (4):
->    main: Fix type in print_usage
->    cpu: abstract_cpu: Fix typo in comment
->    process: do_process: Fix typo in handle_trace_point
->    tuning/nl80211.h: Fix a few minor typos in comments.
->
->   src/cpu/abstract_cpu.cpp   |    2 +-
->   src/main.cpp               |    2 +-
->   src/process/do_process.cpp |    2 +-
->   src/tuning/nl80211.h       |    6 +++---
->   4 files changed, 6 insertions(+), 6 deletions(-)
->
-Your patches have been merged.
-Thank You,
--C
+Signed-off-by: Joerg Mayer <jmpt(a)loplof.de>
+
+diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+index 368d3dd..c3f0c79 100644
+--- a/src/cpu/cpu.cpp
++++ b/src/cpu/cpu.cpp
+@@ -975,7 +975,7 @@ void perf_power_bundle::handle_trace_point(void *trace,=
+ int cpunr, uint64_t time
+                         exit(-1);
+                 }
+ =
+
+-		if (val =3D=3D 4294967295)
++		if (val =3D=3D 4294967295UL)
+ 			cpu->go_unidle(time);
+ 		else
+ 			cpu->go_idle(time);
+-- =
+
+1.7.7
 
 
---===============3208557377541849702==--
+--===============6366888087038351134==--
 
