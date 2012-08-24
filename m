@@ -1,52 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============1754348871950392485=="
+Content-Type: multipart/mixed; boundary="===============6696492247179630970=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Support for printing report in text format in
- powertop2.x
-Date: Thu, 30 Aug 2012 19:12:34 +0300
-Message-ID: <20120830161234.GA3131@swordfish>
-In-Reply-To: 503F0AC8.20602@samsung.com
+From: Joerg Mayer <jmpt at loplof.de>
+Subject: [Powertop] [Warning fixes 1/6] if 0/endif out unused function
+ dbg_printf_pevent_info
+Date: Fri, 24 Aug 2012 18:48:31 +0200
+Message-ID: <20120824173217.DE322DFFDB@linda.rhrk.uni-kl.de>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1754348871950392485==
+--===============6696492247179630970==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (08/30/12 10:40), Igor Zhbanov wrote:
-> Hi Sergey.
->
+Is someone intending to use it or should it be removed instead?
 
-Hello Igor,
+Signed-off-by: Joerg Mayer <jmpt(a)loplof.de>
+
+diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
+index cb7c672..3db5331 100644
+--- a/src/process/do_process.cpp
++++ b/src/process/do_process.cpp
+@@ -186,6 +186,7 @@ int dont_blame_me(char *comm)
+ 	return 0;
+ }
  =
 
-> Sergey Senozhatsky wrote:
-> =
++#if 0
+ static void dbg_printf_pevent_info(struct event_format *event, struct peve=
+nt_record *rec)
+ {
+ 	static struct trace_seq s;
+@@ -198,6 +199,7 @@ static void dbg_printf_pevent_info(struct event_format =
+*event, struct pevent_rec
+ 	fprintf(stderr, "%.*s", s.len, s.buffer);
+ 	trace_seq_destroy(&s);
+ }
++#endif
+ =
 
-> >no offense, but do we actually need that kind of flexibility?
-> I don't know whether the project needs that kind of flexibility but I sup=
-pose
-> that some general framework could lead to two things:
-> 1) Avoid doubling the code for printing in CSV and HTML lines.
-> 2) Allows to easily produce correct CSV and HTML files that can be succes=
-sfully validated.
-> =
+ static char * get_pevent_field_str(void *trace, struct event_format *event=
+, struct format_field *field)
+ {
+-- =
 
-
-yes, good points.
-
-so, now we have two proposals for reworks:
-UI rework and generalization (scaling, scrolilng, etc.) and proposal for re=
-porting
-system generalization and rework, and the latter one is priority (if we sti=
-ck to
-it) --  it's rather hard to depend on UI and pretty easy on output file for=
-mat, thus
-format changes should be done as soon as possible.
+1.7.7
 
 
-	-ss
-
---===============1754348871950392485==--
+--===============6696492247179630970==--
 
