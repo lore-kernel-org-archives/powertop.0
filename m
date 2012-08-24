@@ -1,60 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============7272875308006166632=="
+Content-Type: multipart/mixed; boundary="===============8167466898571144760=="
 MIME-Version: 1.0
-From: Rajagopal Venkat <rajagopal.venkat at linaro.org>
-Subject: Re: [Powertop] [PATCH] Fix timer and work perf events timestamp
- tracing
-Date: Wed, 05 Sep 2012 22:49:32 +0530
-Message-ID: <CA+Z25wXvAWioKXqkrN9kQwwG_9J52B6HSRR0XPobmvKjUh-Q2A@mail.gmail.com>
-In-Reply-To: 5047872C.1090608@linux.intel.com
+From: Joerg Mayer <jmpt at loplof.de>
+Subject: [Powertop] [Warning fixes 0/6] Fix or disable some warings
+Date: Fri, 24 Aug 2012 19:29:09 +0200
+Message-ID: <20120824173217.DB586E00C7@linda.rhrk.uni-kl.de>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7272875308006166632==
+--===============8167466898571144760==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 5 September 2012 22:39, Arjan van de Ven <arjan(a)linux.intel.com> wrote:
-> On 9/5/2012 9:56 AM, Rajagopal Venkat wrote:
->>> measure1:
->>> ev3.start
->>> ev1.end  <<<<<
->>
->> evX.end  <<<<<
->> These events are causing numbers to go wrong.
->
-> but out of a 20 second window.. this is a tiny tiny window...
-> if you see 100.1% I'd buy this reasoning.
-> but you're seeing much more than that.
+Mostly warning fixes. If you don't like some of them feel free to ignore,
+otherwise either provide feedback or apply.
 
-How about generating a report for 1sec duration?
-Since timestamp itself is added to accumulated_runtime, the usage
-percentage is really dependent on event end timestamp value.
+Oh, and no more trailing whitespace in two more directories
 
->
->
->>>
->>> if so, then we're loosing events, which is no good. reporting less than=
- 100%
->>> is ok, but reporting less than real is not.
->>
->> I did thought of it. Yes, agree that, we are loosing events for which
->> start timestamp
->
-> we can't lose those!
-> those are the events that give us the initial CPU frequency in the window=
- etc....
->
+Joerg Mayer (6):
+  if 0/endif out unused function dbg_printf_pevent_info
+  Build with -Wno-unused-result for now, it seems at least some of
+    these     cases are intentional (see ml discussion)
+  Remove trailing whitespace
+  Fix warning:     warning: this decimal constant is unsigned only in
+    ISO C90 [enabled by default]     by explicitely declaring the value
+    as UL
+  Fix warning:     warning: this decimal constant is unsigned only in
+    ISO C90 [enabled by default]     by explicitely declaring the value
+    as UL
+  Remove trailing whitespace in the cpu/ and process/ subdirs.
 
-Yes agree. I will submit the next version patch considering those events end
-timestamp relative to first_stamp(src/process/do_process.cpp).
-
-
+ src/Makefile.am            |    9 +++++----
+ src/cpu/abstract_cpu.cpp   |    4 ++--
+ src/cpu/cpu.cpp            |   12 ++++++------
+ src/cpu/intel_cpus.h       |    2 +-
+ src/cpu/intel_gpu.cpp      |    8 ++++----
+ src/process/do_process.cpp |   16 +++++++++-------
+ src/process/timer.cpp      |    2 +-
+ 7 files changed, 28 insertions(+), 25 deletions(-)
 
 -- =
 
-Regards,
-Rajagopal
+1.7.7
 
---===============7272875308006166632==--
+
+--===============8167466898571144760==--
 
