@@ -1,49 +1,29 @@
-Content-Type: multipart/mixed; boundary="===============5598058750607580166=="
+Content-Type: multipart/mixed; boundary="===============1154397476984585619=="
 MIME-Version: 1.0
-From: Colin King <colin.king at canonical.com>
-Subject: [Powertop] [PATCH 3/4] process: do_process: Fix typo in
- handle_trace_point
-Date: Sat, 22 Sep 2012 19:33:08 +0100
-Message-ID: <1348338789-16252-4-git-send-email-colin.king@canonical.com>
-In-Reply-To: 1348338789-16252-1-git-send-email-colin.king@canonical.com
+From: Magnus Fromreide <magfr at lysator.liu.se>
+Subject: Re: [Powertop] [Warning fixes 2/6] Build with -Wno-unused-result for
+ now, it seems at least some of these cases are intentional (see ml discussion)
+Date: Fri, 24 Aug 2012 19:38:07 +0200
+Message-ID: <1345829887.2831.1.camel@sara>
+In-Reply-To: 20120824173217.DE8C4DFFDC@linda.rhrk.uni-kl.de
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5598058750607580166==
+--===============1154397476984585619==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Colin Ian King <colin.king(a)canonical.com>
+On Fri, 2012-08-24 at 18:53 +0200, Joerg Mayer wrote:
+> Note: Is this this flag supported on all compilers?
 
-fucntion =3D=3D> function
+Please don't.
 
-Signed-off-by: Colin Ian King <colin.king(a)canonical.com>
----
- src/process/do_process.cpp |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+If you really mean to ignore the result values then the canonical thing
+to do is to cast them to (void)
 
-diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
-index eaef7f1..238ae59 100644
---- a/src/process/do_process.cpp
-+++ b/src/process/do_process.cpp
-@@ -451,7 +451,7 @@ void perf_process_bundle::handle_trace_point(void *trac=
-e, int cpu, uint64_t time
- =
-
- 		ret =3D pevent_get_field_val(NULL, event, "function", &rec, &val, 0);
- 		if (ret < 0) {
--			fprintf(stderr, "timer_expire_entry event returned no fucntion value?\n=
-");
-+			fprintf(stderr, "timer_expire_entry event returned no function value?\n=
-");
- 			return;
- 		}
- 		function =3D (uint64_t)val;
--- =
-
-1.7.10.4
+/MF
 
 
---===============5598058750607580166==--
+--===============1154397476984585619==--
 
