@@ -1,118 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============8300813918421743639=="
+Content-Type: multipart/mixed; boundary="===============4662595263035584547=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Support for printing report in text format in
- powertop2.x
-Date: Thu, 30 Aug 2012 00:15:24 +0300
-Message-ID: <20120829211524.GA3157@swordfish>
-In-Reply-To: 503DBDBC.1020801@samsung.com
+From: Joerg Mayer <jmpt at loplof.de>
+Subject: Re: [Powertop] [Warning fixes 5/6] Fix warning: warning: this decimal
+ constant is unsigned only in ISO C90 [enabled by default] by explicitely
+ declaring the value as UL
+Date: Fri, 24 Aug 2012 23:54:33 +0200
+Message-ID: <20120824215433.GB29623@rhrk.uni-kl.de>
+In-Reply-To: 04DD5571759C064D967CF1D07D73B628490BBEF1@fmsmsx110.amr.corp.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8300813918421743639==
+--===============4662595263035584547==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (08/29/12 10:59), Igor Zhbanov wrote:
-> Hi everyone!
-> =
+On Fri, Aug 24, 2012 at 08:18:58PM +0000, Howard, James D wrote:
+> A change was suggested in .../cpu.cpp at or near line 975, explicitly add=
+ing the "UL" suffix to the decimal integer literal:
+>      4294967295   -->   4294967295UL
+> Is that the right thing to do?  This is "ULONG_MAX" (for machines with 32=
+-bit "word" size).  Would it be more correct to use the identifier ULONG_MA=
+X?  In modern #include files, <limits.h> (for example) correctly provides t=
+he "UL" suffix.
 
-> Viresh Kumar wrote:
-> =
+If __WORDSIZE is 32 on all architectures that powertop will run on,
+then yes, we should use ULONG_MAX instead. I will have to find out about
+WORDSIZE on 64 bit architectures, as I'm still on a 32 bit system.
 
-> >I have following test case, i need to capture data using powertop
-> >for some time and then analyse it.
-> >
-> >There are two formats in which this is done as of today
-> >- html
-> >- csv
-> >
-> >I believe we must also have a plain text version for it. Any cons
-> >of that?
-> =
+On sytems with __WORDSIZE of 64 bits ULONG_MAX is 18446744073709551615UL.
 
-> I agree with that. Also I think that report system with many places like:
-> =
+But that's something I will look at after a night's sleep.
 
-> if (html)
-> 	printf(something);
-> else
-> 	printf(nearly-the-same);
-> =
-
-> that needs to be redesigned. I use something like CSV-generator in my
-> yet to be merged MALI GPU support patch because generated CVS's doesn't
-> conform to any CSV standards: there are no quotes for empty values,
-> also quote symbols are not escaped inside the values. Commas are not esca=
-ped too. So it is impossible to parse generated CSV's with
-> traditional parsers.
->
-
-thanks a lot for reporting.
+Ciao
+     J=C3=B6rg
 
 
-> I think that we could design generalized reporting system that could
-> output data in any desired format (HTML, CSV and probably TXT).
->
-
-
-no offense, but do we actually need that kind of flexibility?
-
-
-	-ss
-
- =
-
-> Since all results are contained inside the tables, that system could have=
- interface like
-> create_report(type);
-> report.add_table(...);
-> report.add_column_name(const char *name, bool last_in_line =3D false);
-> report.add_column_val(const char *value, bool last_in_line =3D false);
-> report.get_result();
-> =
-
-> Now there are a lots of code like that:
-> =
-
-> if (reporttype)
-> 	fprintf(reportout.http_report,
-> 		"<tr class=3D\"%s\"><td class=3D\"process_power\">%s</td><td class=3D\"=
-process_power\">%s</td><td class=3D\"process_power\">%s</td><td>%s</td><td>=
-%s</td></tr>\n",
-> 		process_class(lines), power, usage, events, name, pretty_print(all_powe=
-r[i]->description(), descr, 128));
-> else
-> 	fprintf(reportout.csv_report,
-> 		"%s,%s,%s,%s,%s \n",
-> 		power, usage, events, name, pretty_print(all_power[i]->description(), d=
-escr, 128));
-> =
-
-> I think that we could separate CSV/HTML generation code from processing l=
-ogic. What you think?
-> =
-
-> -- =
-
-> Best regards,
-> Igor Zhbanov,
-> Expert Software Engineer,
-> phone: +7 (495) 797 25 00 ext 3806
-> e-mail: i.zhbanov(a)samsung.com
-> =
-
-> ASWG, Moscow R&D center, Samsung Electronics
-> 12 Dvintsev street, building 1
-> 127018, Moscow, Russian Federation
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============8300813918421743639==--
+--===============4662595263035584547==--
 
