@@ -1,59 +1,37 @@
-Content-Type: multipart/mixed; boundary="===============4397129799219676998=="
+Content-Type: multipart/mixed; boundary="===============0340028529531302536=="
 MIME-Version: 1.0
-From: Joerg Mayer <jmpt at loplof.de>
-Subject: [Powertop] [PATCH 2/4] Reorder arguments alphabetically Spelling fix
- levesl to levels
-Date: Thu, 23 Aug 2012 23:24:34 +0200
-Message-ID: <20120823215423.29821DFFDC@linda.rhrk.uni-kl.de>
+From: Viresh Kumar <viresh.linux at gmail.com>
+Subject: [Powertop] Support for printing report in text format in powertop2.x
+Date: Wed, 29 Aug 2012 11:46:01 +0530
+Message-ID: <CAOh2x=nmJYnz1JT=m8KUU=Lj9iRn__Xt-uua9RReqfioXn+gOw@mail.gmail.com>
+In-Reply-To: CAOh2x==-Vu-9W86D+RHwVi6aA5rtWinhS1s-j9ckw0tn1LWrQw@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4397129799219676998==
+--===============0340028529531302536==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Hi Guys,
 
-Signed-off-by: Joerg Mayer <jmpt(a)loplof.de>
----
- doc/powertop.8 |   12 ++++++------
- 1 files changed, 6 insertions(+), 6 deletions(-)
+I have following test case, i need to capture data using powertop
+for some time and then analyse it.
 
-diff --git a/doc/powertop.8 b/doc/powertop.8
-index e8ec5fd..8020d4e 100644
---- a/doc/powertop.8
-+++ b/doc/powertop.8
-@@ -14,19 +14,19 @@ experiment with various power management settings. When=
- invoking powertop
- without arguments powertop starts in interactive mode.
- .SH OPTIONS
- .TP
--\fB\-\-csv[\fR=3D\fIFILENAME\fR]
--generate a CSV report. If a filename is not specified then the
--default name "powertop.csv" is used. The CSV report can be
--used for reporting and data analysis.
--.TP
- \fB\-\-calibrate
- runs powertop in calibration mode. When running on battery, powertop
- can track power consumption as well as system activity. When there
- are enough measurements, powertop can start to report power estimates. One
- can get more accurate estimates by using this option to enable a
--calibration cycle. This will cycle through various display levesl and USB
-+calibration cycle. This will cycle through various display levels and USB
- device activities and workloads.
- .TP
-+\fB\-\-csv[\fR=3D\fIFILENAME\fR]
-+generate a CSV report. If a filename is not specified then the
-+default name "powertop.csv" is used. The CSV report can be
-+used for reporting and data analysis.
-+.TP
- \fB\-\-debug
-  run in "debug" mode.
- .TP
--- =
+There are two formats in which this is done as of today
+- html
+- csv
 
-1.7.7
+I believe we must also have a plain text version for it. Any cons
+of that?
 
+Without changing much of code, we can simply use html2text
+at the end of program to create default file Powertop.txt.
 
---===============4397129799219676998==--
+Thanks for your inputs.
+
+--
+viresh
+
+--===============0340028529531302536==--
 
