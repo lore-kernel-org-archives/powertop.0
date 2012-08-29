@@ -1,67 +1,88 @@
-Content-Type: multipart/mixed; boundary="===============1071388973231748583=="
+Content-Type: multipart/mixed; boundary="===============3010554928942317471=="
 MIME-Version: 1.0
-From: Colin King <colin.king at canonical.com>
-Subject: [Powertop] [PATCH 4/4] tuning/nl80211.h: Fix a few minor typos in
- comments.
-Date: Sat, 22 Sep 2012 19:33:09 +0100
-Message-ID: <1348338789-16252-5-git-send-email-colin.king@canonical.com>
-In-Reply-To: 1348338789-16252-1-git-send-email-colin.king@canonical.com
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: Re: [Powertop] Support for printing report in text format in
+ powertop2.x
+Date: Wed, 29 Aug 2012 10:59:08 +0400
+Message-ID: <503DBDBC.1020801@samsung.com>
+In-Reply-To: CAOh2x=nmJYnz1JT=m8KUU=Lj9iRn__Xt-uua9RReqfioXn+gOw@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1071388973231748583==
+--===============3010554928942317471==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Colin Ian King <colin.king(a)canonical.com>
+Hi everyone!
 
-descripton =3D=3D> description
-pased =3D=3D> passed
-inital =3D=3D> initial
+Viresh Kumar wrote:
 
-Signed-off-by: Colin Ian King <colin.king(a)canonical.com>
----
- src/tuning/nl80211.h |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+> I have following test case, i need to capture data using powertop
+> for some time and then analyse it.
+>
+> There are two formats in which this is done as of today
+> - html
+> - csv
+>
+> I believe we must also have a plain text version for it. Any cons
+> of that?
 
-diff --git a/src/tuning/nl80211.h b/src/tuning/nl80211.h
-index b37148a..e4a8839 100644
---- a/src/tuning/nl80211.h
-+++ b/src/tuning/nl80211.h
-@@ -839,7 +839,7 @@ enum nl80211_commands {
-  *	This can be used to mask out antennas which are not attached or should
-  *	not be used for receiving. If an antenna is not selected in this bitmap
-  *	the hardware should not be configured to receive on this antenna.
-- *	For a more detailed descripton see @NL80211_ATTR_WIPHY_ANTENNA_TX.
-+ *	For a more detailed description see @NL80211_ATTR_WIPHY_ANTENNA_TX.
-  *
-  * @NL80211_ATTR_MCAST_RATE: Multicast tx rate (in 100 kbps) for IBSS
-  *
-@@ -1367,7 +1367,7 @@ enum nl80211_bitrate_attr {
-  *	802.11 country information element with regulatory information it
-  *	thinks we should consider. cfg80211 only processes the country
-  *	code from the IE, and relies on the regulatory domain information
-- *	structure pased by userspace (CRDA) from our wireless-regdb.
-+ *	structure passed by userspace (CRDA) from our wireless-regdb.
-  *	If a channel is enabled but the country code indicates it should
-  *	be disabled we disable the channel and re-enable it upon disassociation.
-  */
-@@ -1545,7 +1545,7 @@ enum nl80211_mntr_flags {
-  * @NL80211_MESHCONF_RETRY_TIMEOUT: specifies the initial retry timeout in
-  * millisecond units, used by the Peer Link Open message
-  *
-- * @NL80211_MESHCONF_CONFIRM_TIMEOUT: specifies the inital confirm timeout=
-, in
-+ * @NL80211_MESHCONF_CONFIRM_TIMEOUT: specifies the initial confirm timeou=
-t, in
-  * millisecond units, used by the peer link management to close a peer link
-  *
-  * @NL80211_MESHCONF_HOLDING_TIMEOUT: specifies the holding timeout, in
+I agree with that. Also I think that report system with many places like:
+
+if (html)
+	printf(something);
+else
+	printf(nearly-the-same);
+
+that needs to be redesigned. I use something like CSV-generator in my
+yet to be merged MALI GPU support patch because generated CVS's doesn't
+conform to any CSV standards: there are no quotes for empty values,
+also quote symbols are not escaped inside the values. Commas are not escape=
+d too. So it is impossible to parse generated CSV's with
+traditional parsers.
+
+I think that we could design generalized reporting system that could
+output data in any desired format (HTML, CSV and probably TXT).
+
+Since all results are contained inside the tables, that system could have i=
+nterface like
+create_report(type);
+report.add_table(...);
+report.add_column_name(const char *name, bool last_in_line =3D false);
+report.add_column_val(const char *value, bool last_in_line =3D false);
+report.get_result();
+
+Now there are a lots of code like that:
+
+if (reporttype)
+	fprintf(reportout.http_report,
+		"<tr class=3D\"%s\"><td class=3D\"process_power\">%s</td><td class=3D\"pr=
+ocess_power\">%s</td><td class=3D\"process_power\">%s</td><td>%s</td><td>%s=
+</td></tr>\n",
+		process_class(lines), power, usage, events, name, pretty_print(all_power[=
+i]->description(), descr, 128));
+else
+	fprintf(reportout.csv_report,
+		"%s,%s,%s,%s,%s \n",
+		power, usage, events, name, pretty_print(all_power[i]->description(), des=
+cr, 128));
+
+I think that we could separate CSV/HTML generation code from processing log=
+ic. What you think?
+
 -- =
 
-1.7.10.4
+Best regards,
+Igor Zhbanov,
+Expert Software Engineer,
+phone: +7 (495) 797 25 00 ext 3806
+e-mail: i.zhbanov(a)samsung.com
+
+ASWG, Moscow R&D center, Samsung Electronics
+12 Dvintsev street, building 1
+127018, Moscow, Russian Federation
 
 
---===============1071388973231748583==--
+--===============3010554928942317471==--
 
