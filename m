@@ -1,136 +1,62 @@
-Content-Type: multipart/mixed; boundary="===============3714663147440604069=="
+Content-Type: multipart/mixed; boundary="===============6281871476134313447=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH v2 1/2] Updates to support Android platform
-Date: Mon, 24 Sep 2012 08:57:34 -0700
-Message-ID: <506082EE.5080602@linux.intel.com>
-In-Reply-To: 1348493284-9375-1-git-send-email-rajagopal.venkat@linaro.org
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: Re: [Powertop] Support for printing report in text format in
+ powertop2.x
+Date: Wed, 29 Aug 2012 18:40:45 +0400
+Message-ID: <503E29ED.8050803@samsung.com>
+In-Reply-To: 503E26F1.1000408@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3714663147440604069==
+--===============6281871476134313447==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 09/24/2012 06:28 AM, Rajagopal Venkat wrote:
-> This patch adds following minor changes to prepare powertop
-> to support Android platform.
+Arjan van de Ven wrote:
+> On 8/28/2012 11:16 PM, Viresh Kumar wrote:
+>> Hi Guys,
+>>
+>> I have following test case, i need to capture data using powertop
+>> for some time and then analyse it.
+>>
+>> There are two formats in which this is done as of today
+>> - html
+>> - csv
+> the CSV format is there for automatic (machine) analysis
 >
-> - Add missing HAVE_CONFIG_H conditional check.
-> - remove un-used ethtool_cmd_speed_set and ethtool_cmd_speed
-> functions.
-> - Minimize dependency on exception handling in catch blocks.
->
-> These changes will not affect powertop functionality.
->
-> Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
-> ---
->   src/devices/ahci.cpp    |  4 ++--
->   src/devices/alsa.cpp    |  4 ++--
->   src/devices/network.cpp | 16 ----------------
->   src/main.cpp            |  2 ++
->   4 files changed, 6 insertions(+), 20 deletions(-)
->
-> diff --git a/src/devices/ahci.cpp b/src/devices/ahci.cpp
-> index 1fe39c7..67ce06e 100644
-> --- a/src/devices/ahci.cpp
-> +++ b/src/devices/ahci.cpp
-> @@ -170,7 +170,7 @@ void ahci::start_measurement(void)
->   		file.close();
->   	}
->   	catch (std::ios_base::failure &c) {
-> -		fprintf(stderr, "%s\n", c.what());
-> +		fprintf(stderr, "Failed to start measurement for ahci device\n");
-adding addition message here is acceptable, but eliminating the =
+> is that not good enough for some reason ?
+It is good. But it is bad-formatted, so no one standard parser could parse =
+it.
+It contains unquoted empty values like , , ,
+Also it doesn't escape double quote symbols inside the values.
 
-information from the catches error is not.
+It doesn't escape commas inside the values. This is especially important fo=
+r some locales
+where comma is used as decimal separator in floating-point numbers. So I pr=
+efer to run PowerTOP
+like this:
+LC_NUMERIC=3Den ./powertop ...
 
->   	}
->   =
+It doesn't escape space characters inside the values.
+It lefts hanging commas in the end of the string.
+Etc.
 
->   }
-> @@ -203,7 +203,7 @@ void ahci::end_measurement(void)
->   		file.close();
->   	}
->   	catch (std::ios_base::failure &c) {
-> -		fprintf(stderr, "%s\n", c.what());
-> +		fprintf(stderr, "Failed to end measurement for ahci device\n");
->   	}
->   	if (end_active < start_active)
->   		end_active =3D start_active;
-> diff --git a/src/devices/alsa.cpp b/src/devices/alsa.cpp
-> index 4f5d3f9..a67780c 100644
-> --- a/src/devices/alsa.cpp
-> +++ b/src/devices/alsa.cpp
-> @@ -104,7 +104,7 @@ void alsa::start_measurement(void)
->   		file.close();
->   	}
->   	catch (std::ios_base::failure &c) {
-> -		fprintf(stderr, "%s\n", c.what());
-> +		fprintf(stderr, "Failed to start measurement for alsa device\n");
->   	}
->   }
->   =
+So the CSV-report of the PowerTOP doesn't conform to any CSV standards.
 
-> @@ -130,7 +130,7 @@ void alsa::end_measurement(void)
->   		file.close();
->   	}
->   	catch (std::ios_base::failure &c) {
-> -		fprintf(stderr, "%s\n", c.what());
-> +		fprintf(stderr, "Failed to end measurement for alsa device\n");
->   	}
->   =
+-- =
 
->   	p =3D (end_active - start_active) / (0.001 + end_active + end_inactive=
- - start_active - start_inactive) * 100.0;
-> diff --git a/src/devices/network.cpp b/src/devices/network.cpp
-> index b8a5c9c..ed9d7aa 100644
-> --- a/src/devices/network.cpp
-> +++ b/src/devices/network.cpp
-> @@ -55,22 +55,6 @@ extern "C" {
->   =
+Best regards,
+Igor Zhbanov,
+Expert Software Engineer,
+phone: +7 (495) 797 25 00 ext 3806
+e-mail: i.zhbanov(a)samsung.com
 
->   static map<string, class network *> nics;
->   =
-
-> -#ifdef DISABLE_TRYCATCH
-> -
-> -static inline void ethtool_cmd_speed_set(struct ethtool_cmd *ep,
-> -						__u32 speed)
-> -{
-> -
-> -	ep->speed =3D (__u16)speed;
-> -	ep->speed_hi =3D (__u16)(speed >> 16);
-> -}
-> -
-> -static inline __u32 ethtool_cmd_speed(struct ethtool_cmd *ep)
-> -{
-> -	return (ep->speed_hi << 16) | ep->speed;
-> -}
-> -
-> -#endif
->   =
-
->   static void do_proc_net_dev(void)
->   {
-> diff --git a/src/main.cpp b/src/main.cpp
-> index 1815075..dc49dba 100644
-> --- a/src/main.cpp
-> +++ b/src/main.cpp
-> @@ -42,7 +42,9 @@
->   #include "perf/perf.h"
->   #include "perf/perf_bundle.h"
->   #include "lib.h"
-> +#ifdef HAVE_CONFIG_H
->   #include "../config.h"
-> +#endif
->   =
-
->   =
-
->   #include "devices/device.h"
+ASWG, Moscow R&D center, Samsung Electronics
+12 Dvintsev street, building 1
+127018, Moscow, Russian Federation
 
 
---===============3714663147440604069==--
+--===============6281871476134313447==--
 
