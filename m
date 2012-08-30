@@ -1,42 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============0890836116898663704=="
+Content-Type: multipart/mixed; boundary="===============6032805302849489371=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] Powertop doesn't detects sleeping ARM cores
-Date: Thu, 20 Sep 2012 12:42:34 +0200
-Message-ID: <505AF31A.4000400@linux.intel.com>
-In-Reply-To: 505AF291.4000308@samsung.com
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: Re: [Powertop] Support for printing report in text format in
+ powertop2.x
+Date: Thu, 30 Aug 2012 10:40:08 +0400
+Message-ID: <503F0AC8.20602@samsung.com>
+In-Reply-To: 20120829211524.GA3157@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0890836116898663704==
+--===============6032805302849489371==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 9/20/2012 12:40 PM, Igor Zhbanov wrote:
-> But is it correct to consider ARM core to be offline when it is just in W=
-FI state?
+Hi Sergey.
 
-nope
+Sergey Senozhatsky wrote:
 
-for all intents and purposes, the cpu is still there.
+> no offense, but do we actually need that kind of flexibility?
+I don't know whether the project needs that kind of flexibility but I suppo=
+se
+that some general framework could lead to two things:
+1) Avoid doubling the code for printing in CSV and HTML lines.
+2) Allows to easily produce correct CSV and HTML files that can be successf=
+ully validated.
 
-in an idle state, the cpu logically is there, and ready to resume execution=
- if needed...
-that's the definition of idle ;-)
+Thank you.
 
-offline is where the administrator takes a cpu out of circulation.
+-- =
 
-neither specifies any physical hardware state... in fact offline is usually=
- implemented as an idle state, at
-least on x86. the semantics for how to get back are different (system auton=
-omous versus administrator)
+Best regards,
+Igor Zhbanov,
+Expert Software Engineer,
+phone: +7 (495) 797 25 00 ext 3806
+e-mail: i.zhbanov(a)samsung.com
 
-now, quite possible some ARM platforms abuse this and don't implement somet=
-hing as "idle" but as "offline" instead.
-that sounds not very smart to me.
-
+ASWG, Moscow R&D center, Samsung Electronics
+12 Dvintsev street, building 1
+127018, Moscow, Russian Federation
 
 
---===============0890836116898663704==--
+--===============6032805302849489371==--
 
