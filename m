@@ -1,56 +1,66 @@
-Content-Type: multipart/mixed; boundary="===============9139339401808654069=="
+Content-Type: multipart/mixed; boundary="===============3207561504549830431=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] Powertop doesn't detects sleeping ARM cores
-Date: Wed, 19 Sep 2012 08:15:59 -0700
-Message-ID: <5059E1AF.3010000@linux.intel.com>
-In-Reply-To: 505981D3.7010403@samsung.com
+From: viresh kumar <viresh.kumar at linaro.org>
+Subject: Re: [Powertop] Query: Weird Output values: Percentage over 100%
+Date: Mon, 03 Sep 2012 12:24:25 +0530
+Message-ID: <CAOh2x=m_tWKcnGzOFpxSpr-+6qOozuJyVZkxpHDDQ3a6oc34hA@mail.gmail.com>
+In-Reply-To: CAOh2x==gOcSqWZhEn0iX5Es=cjByYHVe0_gM3WhaKtsjhvXfFg@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============9139339401808654069==
+--===============3207561504549830431==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 09/19/2012 01:26 AM, Igor Zhbanov wrote:
+Ping!!
+
+On Wed, Aug 29, 2012 at 1:39 PM, viresh kumar <viresh.kumar(a)linaro.org> w=
+rote:
 > Hi,
 >
-> Here is some notes to my previous post.
+> I am noticing something strange in powertop reports.
+> When i run powertop with following parameters:
 >
-> I mean that only online cores are shown in /proc/cpuinfo.
-> So the PowerTOP doesn't count currently offline ones.
-> And you must run the PowerTOP on a heavy loaded system
-> to let the PowerTOP see all CPU cores.
+> powertop -t 120 --html
 >
-> Therefore it is impossible to run the PowerTOP before starting
-> of heavy application to get information about all CPU cores.
+> I see following in summary section
 >
-> Probably the PowerTOP could cache CPU information in some file,
-> so it will be possible to register trace events for all cores.
+> Power Consumption Summary
 >
-Off hand I don't have a good solution to help your ARM story. Your notes =
+> 0.1 wakeups/second, 0.0 GPU ops/second, 0.0 VFS ops/sec, 0.0 GFX
+> wakes/sec and 5375.4% CPU use
+>
+> Usage   Events/s        Category        Description
+> 2693%    0.07   Timer   tick_sched_timer
+> 2680%    0.00   Timer   ehci_watchdog
+> 0.6%     0.00   Interrupt       [7] sched(softirq)
+> 0.2%     0.00   Interrupt       [1] timer(softirq)
+> 0.2%     0.00   Interrupt       [29] twd
+> 0.1%     0.00   kWork   pm_runtime_work
+> 0.1%     0.00   Timer   led_heartbeat_function
+> 0.1%     0.00   Interrupt       [9] RCU(softirq)
+> 0.1%     0.00   Interrupt       [57] OMAP DISPC
+> 0.1%     0.00   Process rsyslogd -c5
+>
+>
+> How is percentage over 100 %...
+>
+> System Info:
+>
+> PowerTOP Version        v2.0
+> Kernel Version  Linux version 3.4.0-01820-gcc96f22
+> (viresh(a)blr-linut-001) (gcc version 4.7.1 20120514 (prerelease)
+> (crosstool-NG linaro-1.13.1-2012.05-20120523 - Linaro GCC 2012.05) )
+> #5 SMP PREEMPT Tue Aug 28 12:44:52 IST 2012
+> System Name
+> CPU Information 2x
+> OS Information
+>
+> Running on ARM: Panda Board.
+>
+> --
+> viresh
 
-are interesting and I agree this is something that ARM is going to need. =
-
-Do you have a complete solution you would like to purpose? I assume you =
-
-have done some hacking to get around this, but if you have taken that =
-
-and tuned it i suggest purposing the change. If you find a solution that =
-
-doesn't digress the Architectures, and corrects the ARM story then =
-
-please submit patches. I would be interested in seeing what you have =
-
-come up with.
-
-I will try and look for a general solution, are there any other ARM =
-
-advocates on this list who would like to chime in?
-
--C
-
-
---===============9139339401808654069==--
+--===============3207561504549830431==--
 
