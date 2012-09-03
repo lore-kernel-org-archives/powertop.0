@@ -1,38 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============6039053962897413270=="
+Content-Type: multipart/mixed; boundary="===============1172383015870714046=="
 MIME-Version: 1.0
-From: Magnus Fromreide <magfr at lysator.liu.se>
-Subject: Re: [Powertop] [PATCH 1/2] Updates to support Android platform
-Date: Tue, 18 Sep 2012 07:43:13 +0200
-Message-ID: <1347946993.3210.21.camel@sara>
-In-Reply-To: CA+Z25wVqtYcSq_rQHThD7mqxHXSWPkZRK1xfrZWCMdxahrLSxw@mail.gmail.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] Query: Weird Output values: Percentage over 100%
+Date: Mon, 03 Sep 2012 11:05:54 -0700
+Message-ID: <5044F182.8010407@linux.intel.com>
+In-Reply-To: 20120903175750.GB3062@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6039053962897413270==
+--===============1172383015870714046==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2012-09-18 at 09:20 +0530, Rajagopal Venkat wrote:
-> On 17 September 2012 21:29, Arjan van de Ven <arjan(a)linux.intel.com> wr=
-ote:
-> >
-> >
-> Android doesn't support C++ exception handling. Here is the Android offic=
-ial
-> answer [1]. This is the reason for having DISABLE_TRYCATCH macro in
-> powertop code which were removed in recent commit.
+On 9/3/2012 10:57 AM, Sergey Senozhatsky wrote:
+> On (09/03/12 10:37), Arjan van de Ven wrote:
+>>>> Running on ARM: Panda Board.
+>>
+>> I wonder if the perf data is somehow incorrect on your platform.
+>> powertop depends on correct timestamps for example.
+>>
+>>
 > =
 
-> [1] https://groups.google.com/forum/?fromgroups=3D#!topic/android-ndk/idt=
-n7R-_ZFA
+> I was thinking about this. Could it be possible that we lose
+> some perf samples? E.g. we have start, but no end timestamps.
 
-That reference is two years old and it ends with a note that they will
-try to enable exception handling for user space programs. Have anything
-happened on that part in these last two years?
-
-/MF
+shouldn't... the buffers are quite large....
 
 
---===============6039053962897413270==--
+--===============1172383015870714046==--
 
