@@ -1,140 +1,82 @@
-Content-Type: multipart/mixed; boundary="===============0649689410787203697=="
+Content-Type: multipart/mixed; boundary="===============2653753975508650708=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] Fix timer and work perf events timestamp
- tracing
-Date: Wed, 05 Sep 2012 15:44:58 +0300
-Message-ID: <20120905124458.GA16664@swordfish>
-In-Reply-To: 1346840555-18457-1-git-send-email-rajagopal.venkat@linaro.org
+Subject: Re: [Powertop] Query: Weird Output values: Percentage over 100%
+Date: Mon, 03 Sep 2012 20:20:41 +0300
+Message-ID: <20120903172041.GA3062@swordfish>
+In-Reply-To: CAOh2x=m_tWKcnGzOFpxSpr-+6qOozuJyVZkxpHDDQ3a6oc34hA@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0649689410787203697==
+--===============2653753975508650708==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On (09/03/12 12:24), viresh kumar wrote:
+> Ping!!
+> =
 
-On (09/05/12 15:52), Rajagopal Venkat wrote:
-> Incorrect timer and work perf events timestamp tracing is one
-> of the reason for reporting usage over 100%. This patch will
-> resolve the issue by
-> - rejecting the events for which entry timestamp is not recorded.
+> On Wed, Aug 29, 2012 at 1:39 PM, viresh kumar <viresh.kumar(a)linaro.org>=
+ wrote:
+> > Hi,
+> >
+> > I am noticing something strange in powertop reports.
+> > When i run powertop with following parameters:
+> >
+> > powertop -t 120 --html
+> >
+> > I see following in summary section
+> >
+> > Power Consumption Summary
+> >
+> > 0.1 wakeups/second, 0.0 GPU ops/second, 0.0 VFS ops/sec, 0.0 GFX
+> > wakes/sec and 5375.4% CPU use
+> >
+> > Usage   Events/s        Category        Description
+> > 2693%    0.07   Timer   tick_sched_timer
+> > 2680%    0.00   Timer   ehci_watchdog
+> > 0.6%     0.00   Interrupt       [7] sched(softirq)
+> > 0.2%     0.00   Interrupt       [1] timer(softirq)
+> > 0.2%     0.00   Interrupt       [29] twd
+> > 0.1%     0.00   kWork   pm_runtime_work
+> > 0.1%     0.00   Timer   led_heartbeat_function
+> > 0.1%     0.00   Interrupt       [9] RCU(softirq)
+> > 0.1%     0.00   Interrupt       [57] OMAP DISPC
+> > 0.1%     0.00   Process rsyslogd -c5
+> >
+> >
 
-how is that possible?
-do you mean erasing between measurements?
-
-
-schematically:
-
-measure0:
-
-ev1.start
-ev2.start
-ev2.end
-
-processing
-clear
-
-
-measure1:
-ev3.start
-ev1.end  <<<<<
-ev3.end
-
-processing
-clear
-
-
-if so, then we're loosing events, which is no good. reporting less than 100%
-is ok, but reporting less than real is not.
+Hi, sorry, =
 
 
-p.s.
-I'll try to check emails, but most probably will be off-line most of the da=
-y.
+well, we've seen this one before. the reasons are still unclear.
 
 	-ss
 
 
-> Currently these events exit timestamp itself is considered as
-> usage period resulting in over 100% usage.
-> - clearing event timestamps from global map at the end of each
-> measurement to avoid collision with earlier recorded timestamps.
-> =
-
-> Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
-> ---
->  src/process/timer.cpp | 5 ++++-
->  src/process/work.cpp  | 5 ++++-
->  2 files changed, 8 insertions(+), 2 deletions(-)
-> =
-
-> diff --git a/src/process/timer.cpp b/src/process/timer.cpp
-> index 8917490..db074c4 100644
-> --- a/src/process/timer.cpp
-> +++ b/src/process/timer.cpp
-> @@ -79,7 +79,8 @@ uint64_t timer::done(uint64_t time, uint64_t timer_stru=
-ct)
->  {
->  	int64_t delta;
->  =
-
-> -	if (running_since[timer_struct] > time)
-> +	if (running_since.find(timer_struct) =3D=3D running_since.end() ||
-> +			running_since[timer_struct] > time)
->  		return 0;
->  =
-
->  	delta =3D time - running_since[timer_struct];
-> @@ -147,6 +148,8 @@ void clear_timers(void)
->  		all_timers.erase(it);
->  		it =3D all_timers.begin();
->  	}
-> +
-> +	running_since.clear();
->  }
->  =
-
->  bool timer::is_deferred(void)
-> diff --git a/src/process/work.cpp b/src/process/work.cpp
-> index 82f13a2..e436643 100644
-> --- a/src/process/work.cpp
-> +++ b/src/process/work.cpp
-> @@ -56,7 +56,8 @@ uint64_t work::done(uint64_t time, uint64_t work_struct)
->  {
->  	int64_t delta;
->  =
-
-> -	if (running_since[work_struct] > time)
-> +	if (running_since.find(work_struct) =3D=3D running_since.end() ||
-> +			running_since[work_struct] > time)
->  		return 0;
->  =
-
->  	delta =3D time - running_since[work_struct];
-> @@ -102,6 +103,8 @@ void clear_work(void)
->  		all_work.erase(it);
->  		it =3D all_work.begin();
->  	}
-> +
-> +	running_since.clear();
->  }
->  =
-
->  =
-
-> -- =
-
-> 1.7.11.3
-> =
-
+> > How is percentage over 100 %...
+> >
+> > System Info:
+> >
+> > PowerTOP Version        v2.0
+> > Kernel Version  Linux version 3.4.0-01820-gcc96f22
+> > (viresh(a)blr-linut-001) (gcc version 4.7.1 20120514 (prerelease)
+> > (crosstool-NG linaro-1.13.1-2012.05-20120523 - Linaro GCC 2012.05) )
+> > #5 SMP PREEMPT Tue Aug 28 12:44:52 IST 2012
+> > System Name
+> > CPU Information 2x
+> > OS Information
+> >
+> > Running on ARM: Panda Board.
+> >
+> > --
+> > viresh
 > _______________________________________________
 > PowerTop mailing list
 > PowerTop(a)lists.01.org
 > https://lists.01.org/mailman/listinfo/powertop
 >=20
 
---===============0649689410787203697==--
+--===============2653753975508650708==--
 
