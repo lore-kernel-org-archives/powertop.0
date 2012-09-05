@@ -1,54 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============6606587124330864365=="
+Content-Type: multipart/mixed; boundary="===============3441857747546985584=="
 MIME-Version: 1.0
-From: Mikko Rapeli <mikko.rapeli at iki.fi>
-Subject: [Powertop] [PATCH v2] Fix string null termination and SIGABRT from
- glibc
-Date: Wed, 26 Sep 2012 16:12:30 +0200
-Message-ID: <1348668750-15870-1-git-send-email-mikko.rapeli@iki.fi>
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Fix timer and work perf events timestamp
+ tracing
+Date: Wed, 05 Sep 2012 10:09:00 -0700
+Message-ID: <5047872C.1090608@linux.intel.com>
+In-Reply-To: CA+Z25wUBxT1oCmRujQ6_nzbdSUvEmfVXoy=gxjo0Jgj-VsYxUQ@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6606587124330864365==
+--===============3441857747546985584==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-According to http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D682388
-the string is not null terminated when too much data is read.
+On 9/5/2012 9:56 AM, Rajagopal Venkat wrote:
+>> measure1:
+>> ev3.start
+>> ev1.end  <<<<<
+> =
 
-This patch fixes the crashes on my system.
----
- src/process/process.cpp |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> evX.end  <<<<<
+> These events are causing numbers to go wrong.
 
-diff --git a/src/process/process.cpp b/src/process/process.cpp
-index 71f81b6..34dc68d 100644
---- a/src/process/process.cpp
-+++ b/src/process/process.cpp
-@@ -86,7 +86,7 @@ static void cmdline_to_string(char *str)
- =
-
- process::process(const char *_comm, int _pid, int _tid) : power_consumer()
- {
--	char line[4096];
-+	char line[4097];
- 	ifstream file;
- =
-
- 	strcpy(comm, _comm);
-@@ -103,6 +103,7 @@ process::process(const char *_comm, int _pid, int _tid)=
- : power_consumer()
- 		file.open(line);
- 		while (file) {
- 			file.getline(line, 4096);
-+			line[4096] =3D '\0';
- 			if (strstr(line, "Tgid")) {
- 				char *c;
- 				c =3D strchr(line, ':');
--- =
-
-1.7.10.4
+but out of a 20 second window.. this is a tiny tiny window...
+if you see 100.1% I'd buy this reasoning.
+but you're seeing much more than that.
 
 
---===============6606587124330864365==--
+>>
+>> if so, then we're loosing events, which is no good. reporting less than =
+100%
+>> is ok, but reporting less than real is not.
+> =
+
+> I did thought of it. Yes, agree that, we are loosing events for which
+> start timestamp
+
+we can't lose those!
+those are the events that give us the initial CPU frequency in the window e=
+tc....
+
+
+--===============3441857747546985584==--
 
