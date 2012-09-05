@@ -1,37 +1,89 @@
-Content-Type: multipart/mixed; boundary="===============3357047098080219411=="
+Content-Type: multipart/mixed; boundary="===============0702551150736041937=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [Warning fixes 2/6] Build with -Wno-unused-result for
- now, it seems at least some of these cases are intentional (see ml discussion)
-Date: Fri, 24 Aug 2012 10:54:17 -0700
-Message-ID: <5037BFC9.3080305@linux.intel.com>
-In-Reply-To: 1345829887.2831.1.camel@sara
+From: Rajagopal Venkat <rajagopal.venkat at linaro.org>
+Subject: [Powertop] [PATCH] Fix timer and work perf events timestamp tracing
+Date: Wed, 05 Sep 2012 15:52:34 +0530
+Message-ID: <1346840555-18457-1-git-send-email-rajagopal.venkat@linaro.org>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3357047098080219411==
+--===============0702551150736041937==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 08/24/2012 10:38 AM, Magnus Fromreide wrote:
-> On Fri, 2012-08-24 at 18:53 +0200, Joerg Mayer wrote:
->> Note: Is this this flag supported on all compilers?
-> Please don't.
->
-> If you really mean to ignore the result values then the canonical thing
-> to do is to cast them to (void)
-Agreed. Also really don't want this as some of the results that are =
+Incorrect timer and work perf events timestamp tracing is one
+of the reason for reporting usage over 100%. This patch will
+resolve the issue by
+- rejecting the events for which entry timestamp is not recorded.
+Currently these events exit timestamp itself is considered as
+usage period resulting in over 100% usage.
+- clearing event timestamps from global map at the end of each
+measurement to avoid collision with earlier recorded timestamps.
 
-being ignored should really be fixed. Meaning wrapped in error handling.
->
-> /MF
->
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
+Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
+---
+ src/process/timer.cpp | 5 ++++-
+ src/process/work.cpp  | 5 ++++-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/src/process/timer.cpp b/src/process/timer.cpp
+index 8917490..db074c4 100644
+--- a/src/process/timer.cpp
++++ b/src/process/timer.cpp
+@@ -79,7 +79,8 @@ uint64_t timer::done(uint64_t time, uint64_t timer_struct)
+ {
+ 	int64_t delta;
+ =
+
+-	if (running_since[timer_struct] > time)
++	if (running_since.find(timer_struct) =3D=3D running_since.end() ||
++			running_since[timer_struct] > time)
+ 		return 0;
+ =
+
+ 	delta =3D time - running_since[timer_struct];
+@@ -147,6 +148,8 @@ void clear_timers(void)
+ 		all_timers.erase(it);
+ 		it =3D all_timers.begin();
+ 	}
++
++	running_since.clear();
+ }
+ =
+
+ bool timer::is_deferred(void)
+diff --git a/src/process/work.cpp b/src/process/work.cpp
+index 82f13a2..e436643 100644
+--- a/src/process/work.cpp
++++ b/src/process/work.cpp
+@@ -56,7 +56,8 @@ uint64_t work::done(uint64_t time, uint64_t work_struct)
+ {
+ 	int64_t delta;
+ =
+
+-	if (running_since[work_struct] > time)
++	if (running_since.find(work_struct) =3D=3D running_since.end() ||
++			running_since[work_struct] > time)
+ 		return 0;
+ =
+
+ 	delta =3D time - running_since[work_struct];
+@@ -102,6 +103,8 @@ void clear_work(void)
+ 		all_work.erase(it);
+ 		it =3D all_work.begin();
+ 	}
++
++	running_since.clear();
+ }
+ =
+
+ =
+
+-- =
+
+1.7.11.3
 
 
---===============3357047098080219411==--
+--===============0702551150736041937==--
 
