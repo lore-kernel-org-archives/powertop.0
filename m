@@ -1,61 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============6840584912356253373=="
+Content-Type: multipart/mixed; boundary="===============5048462324183525570=="
 MIME-Version: 1.0
-From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: Re: [Powertop] [PATCH] Fix screen DPMS support detection
-Date: Mon, 13 Aug 2012 20:52:28 +0400
-Message-ID: <502930CC.5070204@samsung.com>
-In-Reply-To: 50292E9F.40009@linux.intel.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Fix timer and work perf events timestamp
+ tracing
+Date: Wed, 05 Sep 2012 10:22:32 -0700
+Message-ID: <50478A58.5020704@linux.intel.com>
+In-Reply-To: CA+Z25wXvAWioKXqkrN9kQwwG_9J52B6HSRR0XPobmvKjUh-Q2A@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6840584912356253373==
+--===============5048462324183525570==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Arjan,
+On 9/5/2012 10:19 AM, Rajagopal Venkat wrote:
+> On 5 September 2012 22:39, Arjan van de Ven <arjan(a)linux.intel.com> wro=
+te:
+>> On 9/5/2012 9:56 AM, Rajagopal Venkat wrote:
+>>>> measure1:
+>>>> ev3.start
+>>>> ev1.end  <<<<<
+>>>
+>>> evX.end  <<<<<
+>>> These events are causing numbers to go wrong.
+>>
+>> but out of a 20 second window.. this is a tiny tiny window...
+>> if you see 100.1% I'd buy this reasoning.
+>> but you're seeing much more than that.
+> =
 
-Please look at my next patch too. I try to get rid of things like:
--2147483648%, "Display backlight",
+> How about generating a report for 1sec duration?
 
-The problem is that on some architectures max_brightness is 0. And you =
-
-can find
-division by zero and getting NaNs in backlight code. So I try to fix it =
-
-not to use incorrect
-values when DPMS is disabled or backlight control is not supported.
-
-Arjan van de Ven wrote:
-> On 8/13/2012 9:41 AM, Igor Zhbanov wrote:
->> Consider DPMS disabled when we can't open /sys/class/drm/card0 directory.
-> if you don't have a graphics card with proper driver...
-> there's nothing we can do and pretending that DPMS is disabled sounds lik=
-e a mostly bad idea
-> on first sight
->
-> what is behind the idea of assuming it disabled ???
->
->
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->
+even for 1 second... still it's miniscule compared to this whole 1 second
+the amount of setup/teardown time just is not that huge.
 
 
--- =
 
-Best regards,
-Igor Zhbanov,
-Expert Software Engineer,
-phone: +7 (495) 797 25 00 ext 3806
-e-mail: i.zhbanov(a)samsung.com
-
-ASWG, Moscow R&D center, Samsung Electronics
-12 Dvintsev street, building 1
-127018, Moscow, Russian Federation
-
-
---===============6840584912356253373==--
+--===============5048462324183525570==--
 
