@@ -1,67 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============8757466950438909204=="
+Content-Type: multipart/mixed; boundary="===============1673651462852662879=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] Some more NaNs in report when CONFIG_TRACING is not
- enabled
-Date: Fri, 17 Aug 2012 09:34:05 -0700
-Message-ID: <502E727D.7040306@linux.intel.com>
-In-Reply-To: 502E3048.6020401@samsung.com
+From: Viresh Kumar <viresh.linux at gmail.com>
+Subject: Re: [Powertop] [PATCH] Fix timer and work perf events timestamp
+ tracing
+Date: Wed, 05 Sep 2012 16:58:50 +0530
+Message-ID: <CAOh2x=m_KLU9rho-DvT5sz0MW5ZRswxTuTQt2=+i4brd1OyjjA@mail.gmail.com>
+In-Reply-To: 1346840555-18457-1-git-send-email-rajagopal.venkat@linaro.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8757466950438909204==
+--===============1673651462852662879==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 08/17/2012 04:51 AM, Igor Zhbanov wrote:
-> Hello!
->
-> When you run the PowerTOP on the kernel with CONFIG_TRACING disabled,
-> you will get several NaNs (not a number) in the report. PowerTOP =
+On Wed, Sep 5, 2012 at 3:52 PM, Rajagopal Venkat
+<rajagopal.venkat(a)linaro.org> wrote:
+> Incorrect timer and work perf events timestamp tracing is one
+> of the reason for reporting usage over 100%. This patch will
+> resolve the issue by
+> - rejecting the events for which entry timestamp is not recorded.
+> Currently these events exit timestamp itself is considered as
+> usage period resulting in over 100% usage.
+> - clearing event timestamps from global map at the end of each
+> measurement to avoid collision with earlier recorded timestamps.
 
-> doesn't correctly
-> handle the situation when /sys/kernel/debug is present but =
+Tried it few times on Panda Board.
 
-> /sys/kernel/debug/tracing is not.
->
-> So the PowerTOP will be unable to get information about trace events. =
+Tested-by: Viresh Kumar <viresh.kumar(a)linaro.org>
 
-> And instead of
-> arguing about that or skipping some tests, it will run and produce =
-
-> wrong reports.
->
-> Since there will be no trace events captured, the measurement_time =
-
-> variable
-> in src/process/do_process.c will remain zero. So the functions like =
-
-> total_wakeups(),
-> total_gpu_ops(), total_disk_hits(), etc. will happily divide total by =
-
-> zero.
->
-> Yes, I know that it is not very useful to run the PowerTOP with =
-
-> tracing disabled (although
-> the PowerTOP can still report information about devices), but I =
-
-> suppose that the PowerTOP
-> should check whether /sys/kernel/debug/tracing presents and say =
-
-> something if not.
->
-> And as I see the PowerTOP almost never check the result of file =
-
-> opening functions.
-> If it cannot open a file, the PowerTOP just silently skip it.
->
-> Thank you.
->
-Great, thanks, I will start look at this.
--Chris
-
-
---===============8757466950438909204==--
+--===============1673651462852662879==--
 
