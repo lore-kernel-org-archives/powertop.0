@@ -1,64 +1,140 @@
-Content-Type: multipart/mixed; boundary="===============1472374336652057754=="
+Content-Type: multipart/mixed; boundary="===============0649689410787203697=="
 MIME-Version: 1.0
-From: Joerg Mayer <jmpt at loplof.de>
-Subject: [Powertop] [CLI fixes 3/5] Fix spelling of command line argument
- --quite to --quiet. Add a manpage entry for --quiet, which was missing.
-Date: Thu, 23 Aug 2012 23:29:49 +0200
-Message-ID: <20120824150836.4E29EDFFDC@linda.rhrk.uni-kl.de>
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH] Fix timer and work perf events timestamp
+ tracing
+Date: Wed, 05 Sep 2012 15:44:58 +0300
+Message-ID: <20120905124458.GA16664@swordfish>
+In-Reply-To: 1346840555-18457-1-git-send-email-rajagopal.venkat@linaro.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1472374336652057754==
+--===============0649689410787203697==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Joerg Mayer <jmpt(a)loplof.de>
+Hi,
 
-diff --git a/doc/powertop.8 b/doc/powertop.8
-index 8020d4e..8a70076 100644
---- a/doc/powertop.8
-+++ b/doc/powertop.8
-@@ -46,6 +46,9 @@ sent to others to help diagnose power issues.
- \fB\-\-iteration[\fR=3D\fIiterations\fR]
- number of times to run each test.
- .TP
-+\fB\-\-quiet
-+ supress stderr output.
-+.TP
- \fB\-\-time[\fR=3D\fIseconds\fR]
- generate a report for a specified number of seconds.
- .TP
-diff --git a/src/main.cpp b/src/main.cpp
-index 8714daf..c310cb2 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -77,7 +77,7 @@ static const struct option long_options[] =3D
- 	{"time", optional_argument, NULL, 't'},
- 	{"iteration", optional_argument, NULL, 'i'},
- 	{"workload", optional_argument, NULL, 'w'},
--	{"quite", optional_argument, NULL, 'q'},
-+	{"quiet", optional_argument, NULL, 'q'},
- 	{NULL, 0, NULL, 0}
- };
- =
+On (09/05/12 15:52), Rajagopal Venkat wrote:
+> Incorrect timer and work perf events timestamp tracing is one
+> of the reason for reporting usage over 100%. This patch will
+> resolve the issue by
+> - rejecting the events for which entry timestamp is not recorded.
 
-@@ -112,7 +112,7 @@ static void print_usage()
- 	printf("--time%s \t %s\n",_("[=3Dseconds]"), _("generate a report for 'x'=
- seconds"));
- 	printf("--iteration%s\n", _("[=3Diterations] number of times to run each =
-test"));
- 	printf("--workload%s \t %s\n", _("[=3Dworkload]"), _("file to execute for=
- workload"));
--	printf("--quite \t %s\n", _("supress stderr output"));
-+	printf("--quiet \t\t %s\n", _("supress stderr output"));
- 	printf("--help \t\t\t %s\n",_("print this help menu"));
- 	printf("\n");
- 	printf("%s\n\n",_("For more help please refer to the README"));
--- =
-
-1.7.7
+how is that possible?
+do you mean erasing between measurements?
 
 
---===============1472374336652057754==--
+schematically:
+
+measure0:
+
+ev1.start
+ev2.start
+ev2.end
+
+processing
+clear
+
+
+measure1:
+ev3.start
+ev1.end  <<<<<
+ev3.end
+
+processing
+clear
+
+
+if so, then we're loosing events, which is no good. reporting less than 100%
+is ok, but reporting less than real is not.
+
+
+p.s.
+I'll try to check emails, but most probably will be off-line most of the da=
+y.
+
+	-ss
+
+
+> Currently these events exit timestamp itself is considered as
+> usage period resulting in over 100% usage.
+> - clearing event timestamps from global map at the end of each
+> measurement to avoid collision with earlier recorded timestamps.
+> =
+
+> Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
+> ---
+>  src/process/timer.cpp | 5 ++++-
+>  src/process/work.cpp  | 5 ++++-
+>  2 files changed, 8 insertions(+), 2 deletions(-)
+> =
+
+> diff --git a/src/process/timer.cpp b/src/process/timer.cpp
+> index 8917490..db074c4 100644
+> --- a/src/process/timer.cpp
+> +++ b/src/process/timer.cpp
+> @@ -79,7 +79,8 @@ uint64_t timer::done(uint64_t time, uint64_t timer_stru=
+ct)
+>  {
+>  	int64_t delta;
+>  =
+
+> -	if (running_since[timer_struct] > time)
+> +	if (running_since.find(timer_struct) =3D=3D running_since.end() ||
+> +			running_since[timer_struct] > time)
+>  		return 0;
+>  =
+
+>  	delta =3D time - running_since[timer_struct];
+> @@ -147,6 +148,8 @@ void clear_timers(void)
+>  		all_timers.erase(it);
+>  		it =3D all_timers.begin();
+>  	}
+> +
+> +	running_since.clear();
+>  }
+>  =
+
+>  bool timer::is_deferred(void)
+> diff --git a/src/process/work.cpp b/src/process/work.cpp
+> index 82f13a2..e436643 100644
+> --- a/src/process/work.cpp
+> +++ b/src/process/work.cpp
+> @@ -56,7 +56,8 @@ uint64_t work::done(uint64_t time, uint64_t work_struct)
+>  {
+>  	int64_t delta;
+>  =
+
+> -	if (running_since[work_struct] > time)
+> +	if (running_since.find(work_struct) =3D=3D running_since.end() ||
+> +			running_since[work_struct] > time)
+>  		return 0;
+>  =
+
+>  	delta =3D time - running_since[work_struct];
+> @@ -102,6 +103,8 @@ void clear_work(void)
+>  		all_work.erase(it);
+>  		it =3D all_work.begin();
+>  	}
+> +
+> +	running_since.clear();
+>  }
+>  =
+
+>  =
+
+> -- =
+
+> 1.7.11.3
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>=20
+
+--===============0649689410787203697==--
 
