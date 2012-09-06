@@ -1,51 +1,36 @@
-Content-Type: multipart/mixed; boundary="===============3701046635402123859=="
+Content-Type: multipart/mixed; boundary="===============1066409744848051068=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH 2/2] perf: Check return value of strdup
-Date: Mon, 17 Sep 2012 01:48:16 +0300
-Message-ID: <20120916224816.GA3092@swordfish>
-In-Reply-To: 1347805051-2889-2-git-send-email-namhyung@gmail.com
+Subject: Re: [Powertop] PowerTOP Community Meeting
+Date: Thu, 06 Sep 2012 16:05:52 +0300
+Message-ID: <20120906130433.GA3040@swordfish>
+In-Reply-To: 50476A14.2000701@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3701046635402123859==
+--===============1066409744848051068==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (09/16/12 23:17), Namhyung Kim wrote:
-> The strdup() can return NULL so that the result should be checked.
+On (09/05/12 08:04), Chris Ferron wrote:
+> >Hi,
+> >Currently NYC, NY. From next tuesday: Minsk, Belarus.
+> >Never tried g+, though, I guess I'd prefer g+ hangout.
+> >
+> Ok Got you down. What time in your day is good for you? I want to
+> make sure it is also convenient for you.
 > =
 
-> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
-> ---
 
-looks good to me, thank you.
+Hi,
+It depends how time critical this meeting is. If we need to meet
+this week then it'll catch me somewehere in the city. next week,
+starting from monday, I'll be available from 10am your time (which
+is I believe from 8pm BY time).
+
 
 	-ss
 
->  src/perf/perf.cpp |    5 +++++
->  1 file changed, 5 insertions(+)
-> =
-
-> diff --git a/src/perf/perf.cpp b/src/perf/perf.cpp
-> index c8ba7a8..35b4017 100644
-> --- a/src/perf/perf.cpp
-> +++ b/src/perf/perf.cpp
-> @@ -145,6 +145,11 @@ void perf_event::set_event_name(const char *event_na=
-me)
->  	if (name)
->  		free(name);
->  	name =3D strdup(event_name);
-> +	if (!name) {
-> +		fprintf(stderr, "failed to allocate event name\n");
-> +		return;
-> +	}
-> +
->  	char *c;
->  =
-
->  	c =3D strchr(name, ':');
-
---===============3701046635402123859==--
+--===============1066409744848051068==--
 
