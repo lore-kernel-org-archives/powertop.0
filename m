@@ -1,68 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============2657240910326790248=="
+Content-Type: multipart/mixed; boundary="===============7751846765658189947=="
 MIME-Version: 1.0
-From: Paul Menzel <paulepanter at users.sourceforge.net>
-Subject: Re: [Powertop] [PATCH 1/4] main: Fix typo in print_usage
-Date: Sun, 23 Sep 2012 00:05:58 +0200
-Message-ID: <1348351558.4265.11.camel@mattotaupa>
-In-Reply-To: 1348338789-16252-2-git-send-email-colin.king@canonical.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Fix timer and work perf events timestamp
+ tracing
+Date: Thu, 06 Sep 2012 06:51:36 -0700
+Message-ID: <5048AA68.6000509@linux.intel.com>
+In-Reply-To: CA+Z25wX6CkgLbKwKw6yei2i=R1AawdkEY0UWgjWDwuv9BLu=oQ@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2657240910326790248==
+--===============7751846765658189947==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Dear Colin,
-
-
-thanks a lot for these patches.
-
-
-Am Samstag, den 22.09.2012, 19:33 +0100 schrieb Colin King:
-> From: Colin Ian King <colin.king(a)canonical.com>
+On 9/6/2012 6:42 AM, Rajagopal Venkat wrote:
+> (305177)	      (4380506988525)		(4380506988525)
+> (4380507324219)       (4380507019042)		(0)    <<<<<<<
+> (4380507354736)       (4380596923827)		(4380596893310)
+> (4380507415771)       (4380606964111)		(4380606903076)
 > =
 
-> supress =3D=3D> suppress
+> cpu usage from total_cpu_time() - (425033.990889%)
+> -------------------------------------------------------------------------=
+-----
+> =
 
-You could make the commit summary more informative by adding that line
-to it and leave the body empty.
-
-main: Fix sup*p*ress in print_usage
-
-or (with UTF-8 [1] (sixth layer))
-
-main:print_usage: supress =E2=87=92 suppress
-
-or (different arrow)
-
-main:print_usage: supress =E2=86=92 suppress
-
-> Signed-off-by: Colin Ian King <colin.king(a)canonical.com>
-> ---
->  src/main.cpp |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Acked-by: Paul Menzel <paulepanter(a)users.sourceforge.net>
+> As mentioned in my earlier comments, next patch will be submitted
+> to handle these events(for which start time is not recorded) instead
+> of ignoring them.
+> =
 
 
-Thanks,
+now THIS explains a lot, and makes the fix (the one in the other mail you j=
+ust sent) make a lot more sense
+than the things from earlier ;-)
 
-Paul
+thanks for chasing this down!
 
 
-[1] http://www.neo-layout.org/
 
---===============2657240910326790248==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
-L0xpbnV4KQoKaUVZRUFCRUNBQVlGQWxCZU5rWUFDZ2tRUFgxYUsyd09IVmp4TFFDZlpNa1dRWGJP
-WU9ETVdtNzU0ZHBRVWdYWQpqck1Bbmk1RFNPcjJzMTFzWGJXbHVIdlN0ODJiMW5adwo9Rmt3dwot
-LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
-
---===============2657240910326790248==--
+--===============7751846765658189947==--
 
