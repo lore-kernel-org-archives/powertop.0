@@ -1,88 +1,128 @@
-Content-Type: multipart/mixed; boundary="===============3010554928942317471=="
+Content-Type: multipart/mixed; boundary="===============1198981377455757649=="
 MIME-Version: 1.0
-From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: Re: [Powertop] Support for printing report in text format in
- powertop2.x
-Date: Wed, 29 Aug 2012 10:59:08 +0400
-Message-ID: <503DBDBC.1020801@samsung.com>
-In-Reply-To: CAOh2x=nmJYnz1JT=m8KUU=Lj9iRn__Xt-uua9RReqfioXn+gOw@mail.gmail.com
+From: Rajagopal Venkat <rajagopal.venkat at linaro.org>
+Subject: [Powertop] [PATCH v1] Fix timer and work perf events timestamp tracing
+Date: Thu, 06 Sep 2012 19:09:24 +0530
+Message-ID: <1346938764-31141-1-git-send-email-rajagopal.venkat@linaro.org>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3010554928942317471==
+--===============1198981377455757649==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi everyone!
+Fix timer and work perf events timestamp tracing by
+- considering event exit timestamp relative to measurement first
+timestamp for events which entry timestamp is not recorded.
+Currently these events exit timestamp itself is considered as
+usage period resulting in false usage report.
+- clearing event timestamps from global map at the end of each
+measurement to avoid collision with earlier recorded timestamps.
 
-Viresh Kumar wrote:
+Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
+---
+ src/process/do_process.cpp | 12 ++++++++++++
+ src/process/timer.cpp      |  4 ++++
+ src/process/work.cpp       |  4 ++++
+ 3 files changed, 20 insertions(+)
 
-> I have following test case, i need to capture data using powertop
-> for some time and then analyse it.
->
-> There are two formats in which this is done as of today
-> - html
-> - csv
->
-> I believe we must also have a plain text version for it. Any cons
-> of that?
+diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
+index cb7c672..eaef7f1 100644
+--- a/src/process/do_process.cpp
++++ b/src/process/do_process.cpp
+@@ -490,6 +490,10 @@ void perf_process_bundle::handle_trace_point(void *tra=
+ce, int cpu, uint64_t time
+ 		}
+ 		pop_consumer(cpu);
+ 		t =3D timer->done(time, tmr);
++		if (t =3D=3D ~0ULL) {
++			timer->fire(first_stamp, tmr);
++			t =3D timer->done(time, tmr);
++		}
+ 		consumer_child_time(cpu, t);
+ 	}
+ 	else if (strcmp(event->name, "hrtimer_expire_entry") =3D=3D 0) {
+@@ -532,6 +536,10 @@ void perf_process_bundle::handle_trace_point(void *tra=
+ce, int cpu, uint64_t time
+ =
 
-I agree with that. Also I think that report system with many places like:
+ 		pop_consumer(cpu);
+ 		t =3D timer->done(time, tmr);
++		if (t =3D=3D ~0ULL) {
++			timer->fire(first_stamp, tmr);
++			t =3D timer->done(time, tmr);
++		}
+ 		consumer_child_time(cpu, t);
+ 	}
+ 	else if (strcmp(event->name, "workqueue_execute_start") =3D=3D 0) {
+@@ -575,6 +583,10 @@ void perf_process_bundle::handle_trace_point(void *tra=
+ce, int cpu, uint64_t time
+ 		}
+ 		pop_consumer(cpu);
+ 		t =3D work->done(time, wk);
++		if (t =3D=3D ~0ULL) {
++			work->fire(first_stamp, wk);
++			t =3D work->done(time, wk);
++		}
+ 		consumer_child_time(cpu, t);
+ 	}
+ 	else if (strcmp(event->name, "cpu_idle") =3D=3D 0) {
+diff --git a/src/process/timer.cpp b/src/process/timer.cpp
+index 8917490..1ca8c25 100644
+--- a/src/process/timer.cpp
++++ b/src/process/timer.cpp
+@@ -79,6 +79,9 @@ uint64_t timer::done(uint64_t time, uint64_t timer_struct)
+ {
+ 	int64_t delta;
+ =
 
-if (html)
-	printf(something);
-else
-	printf(nearly-the-same);
++	if (running_since.find(timer_struct) =3D=3D running_since.end())
++		return ~0ULL;
++
+ 	if (running_since[timer_struct] > time)
+ 		return 0;
+ =
 
-that needs to be redesigned. I use something like CSV-generator in my
-yet to be merged MALI GPU support patch because generated CVS's doesn't
-conform to any CSV standards: there are no quotes for empty values,
-also quote symbols are not escaped inside the values. Commas are not escape=
-d too. So it is impossible to parse generated CSV's with
-traditional parsers.
+@@ -147,6 +150,7 @@ void clear_timers(void)
+ 		all_timers.erase(it);
+ 		it =3D all_timers.begin();
+ 	}
++	running_since.clear();
+ }
+ =
 
-I think that we could design generalized reporting system that could
-output data in any desired format (HTML, CSV and probably TXT).
+ bool timer::is_deferred(void)
+diff --git a/src/process/work.cpp b/src/process/work.cpp
+index 82f13a2..e62e5d3 100644
+--- a/src/process/work.cpp
++++ b/src/process/work.cpp
+@@ -56,6 +56,9 @@ uint64_t work::done(uint64_t time, uint64_t work_struct)
+ {
+ 	int64_t delta;
+ =
 
-Since all results are contained inside the tables, that system could have i=
-nterface like
-create_report(type);
-report.add_table(...);
-report.add_column_name(const char *name, bool last_in_line =3D false);
-report.add_column_val(const char *value, bool last_in_line =3D false);
-report.get_result();
++	if (running_since.find(work_struct) =3D=3D running_since.end())
++		return ~0ULL;
++
+ 	if (running_since[work_struct] > time)
+ 		return 0;
+ =
 
-Now there are a lots of code like that:
+@@ -102,6 +105,7 @@ void clear_work(void)
+ 		all_work.erase(it);
+ 		it =3D all_work.begin();
+ 	}
++	running_since.clear();
+ }
+ =
 
-if (reporttype)
-	fprintf(reportout.http_report,
-		"<tr class=3D\"%s\"><td class=3D\"process_power\">%s</td><td class=3D\"pr=
-ocess_power\">%s</td><td class=3D\"process_power\">%s</td><td>%s</td><td>%s=
-</td></tr>\n",
-		process_class(lines), power, usage, events, name, pretty_print(all_power[=
-i]->description(), descr, 128));
-else
-	fprintf(reportout.csv_report,
-		"%s,%s,%s,%s,%s \n",
-		power, usage, events, name, pretty_print(all_power[i]->description(), des=
-cr, 128));
-
-I think that we could separate CSV/HTML generation code from processing log=
-ic. What you think?
+ =
 
 -- =
 
-Best regards,
-Igor Zhbanov,
-Expert Software Engineer,
-phone: +7 (495) 797 25 00 ext 3806
-e-mail: i.zhbanov(a)samsung.com
-
-ASWG, Moscow R&D center, Samsung Electronics
-12 Dvintsev street, building 1
-127018, Moscow, Russian Federation
+1.7.11.3
 
 
---===============3010554928942317471==--
+--===============1198981377455757649==--
 
