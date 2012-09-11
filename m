@@ -1,45 +1,161 @@
-Content-Type: multipart/mixed; boundary="===============6243130429444727266=="
+Content-Type: multipart/mixed; boundary="===============4384643941425817439=="
 MIME-Version: 1.0
 From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] cpu: Fix typo on freq_class
-Date: Fri, 21 Sep 2012 07:50:58 -0700
-Message-ID: <505C7ED2.80607@linux.intel.com>
-In-Reply-To: 1348155305-3313-1-git-send-email-namhyung@gmail.com
+Subject: [Powertop] PowerTOP UI navigation enhancement(v2).
+Date: Tue, 11 Sep 2012 10:07:26 -0700
+Message-ID: <504F6FCE.5000100@linux.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6243130429444727266==
+--===============4384643941425817439==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 09/20/2012 08:35 AM, Namhyung Kim wrote:
-> s/cpu_even_req/cpu_even_freq/
->
-> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
-> ---
->   src/cpu/cpu.cpp |    2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-> index cc37748..96e3888 100644
-> --- a/src/cpu/cpu.cpp
-> +++ b/src/cpu/cpu.cpp
-> @@ -385,7 +385,7 @@ static const char *freq_class(int line)
->   	if (line & 1) {
->   		return "cpu_odd_freq";
->   	}
-> -	return "cpu_even_req";
-> +	return "cpu_even_freq";
->   }
->   =
 
->   static int has_state_level(class abstract_cpu *acpu, int state, int lin=
-e)
-Your patch has been merged.
-Thank You
--C
+This patch add more ui navigation features allowing for the scrolling of =
+
+PowerTop content for each tab. This is done by controlling the location =
+
+of the winpad, and refreshing the terminal window when needed. To do =
+
+this, the navigation keys have been updated as follows.
+
+"Arrow Keys" now scroll the tab windows
+"Page up/down" scroll tab windows up and down
+"TAB" cycles the next window tab
+"SHIFT+TAB" cycles the previous window tab
+"ENTER" toggles tunables
+"SPACE BAR" toggles tunables
+"r KEY" refresh results and resets view of tab window.
+
+Known issues:
+There is no handler for terminal re-sizing. The workaround is to use "r =
+
+KEY" to refresh if terminal windows size is changed mid session.
+---
+  src/cpu/abstract_cpu.cpp |  6 ---
+  src/display.cpp          | 98 =
+
+++++++++++++++++++++++++++++++++++--------------
+  src/display.h            | 13 ++++++-
+  src/main.cpp             | 17 ++++++---
+  4 files changed, 93 insertions(+), 41 deletions(-)
 
 
---===============6243130429444727266==--
+
+--===============4384643941425817439==
+Content-Type: text/x-patch
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="0001-PowerTOP-UI-navigation-enhancement-v2.patch"
+
+ZGlmZiAtLWdpdCBhL3NyYy9jcHUvYWJzdHJhY3RfY3B1LmNwcCBiL3NyYy9jcHUvYWJzdHJhY3Rf
+Y3B1LmNwcAppbmRleCA4YjRjNjUwLi5lYmRjNTEwIDEwMDY0NAotLS0gYS9zcmMvY3B1L2Fic3Ry
+YWN0X2NwdS5jcHAKKysrIGIvc3JjL2NwdS9hYnN0cmFjdF9jcHUuY3BwCkBAIC00MjEsMTIgKzQy
+MSw2IEBAIHZvaWQgYWJzdHJhY3RfY3B1Ojp2YWxpZGF0ZSh2b2lkKQogCWZvciAoaSA9IDA7IGkg
+PCBjaGlsZHJlbi5zaXplKCk7IGkrKykgewogCiAJCWlmIChjaGlsZHJlbltpXSkgewotCQkJaWYg
+KG15X3RpbWUgIT0gY2hpbGRyZW5baV0tPnRvdGFsX3BzdGF0ZV90aW1lKCkpCi0JCQkJcHJpbnRm
+KCJNeSAoJWkpIHRpbWUgJWxsdSBpcyBub3QgdGhlIHNhbWUgYXMgY2hpbGQgKCVpKSB0aW1lICVs
+bHVcbiIsCi0JCQkJCWZpcnN0X2NwdSwKLQkJCQkJKHVuc2lnbmVkIGxvbmcgbG9uZylteV90aW1l
+LAotCQkJCQljaGlsZHJlbltpXS0+bnVtYmVyLAotCQkJCQkodW5zaWduZWQgbG9uZyBsb25nKWNo
+aWxkcmVuW2ldLT50b3RhbF9wc3RhdGVfdGltZSgpKTsKIAkJCWNoaWxkcmVuW2ldLT52YWxpZGF0
+ZSgpOwogCQl9CiAJfQpkaWZmIC0tZ2l0IGEvc3JjL2Rpc3BsYXkuY3BwIGIvc3JjL2Rpc3BsYXku
+Y3BwCmluZGV4IGY0OGI1M2YuLjZhMTE5YmMgMTAwNjQ0Ci0tLSBhL3NyYy9kaXNwbGF5LmNwcAor
+KysgYi9zcmMvZGlzcGxheS5jcHAKQEAgLTk1LDcgKzk1LDcgQEAgc3RhdGljIGludCBjdXJyZW50
+X3RhYjsKIAogdm9pZCBzaG93X3RhYih1bnNpZ25lZCBpbnQgdGFiKQogewotCVdJTkRPVyAqd2lu
+OworCWNsYXNzIHRhYl93aW5kb3cgKndpbjsKIAl1bnNpZ25lZCBpbnQgaTsKIAlpbnQgdGFiX3Bv
+cyA9IDE3OwogCWNvbnN0IGNoYXIgKmM7CkBAIC0xNDUsMTEgKzE0NSwxMSBAQCB2b2lkIHNob3df
+dGFiKHVuc2lnbmVkIGludCB0YWIpCiAJd3JlZnJlc2godGFiX2Jhcik7CiAJd3JlZnJlc2goYm90
+dG9tX2xpbmUpOwogCi0Jd2luID0gZ2V0X25jdXJzZXNfd2luKHRhYl9uYW1lc1t0YWJdKTsKKwl3
+aW4gPSB0YWJfd2luZG93c1t0YWJfbmFtZXNbdGFiXV07CiAJaWYgKCF3aW4pCiAJCXJldHVybjsK
+IAotCXByZWZyZXNoKHdpbiwgMCwgMCwgMSwgMCwgTElORVMgLSAzLCBDT0xTIC0gMSk7CisJcHJl
+ZnJlc2god2luLT53aW4sIHdpbi0+eXBhZF9wb3MsIHdpbi0+eHBhZF9wb3MsIDEsIDAsIExJTkVT
+IC0gMywgQ09MUyAtIDEpOwogfQogCiBXSU5ET1cgKmdldF9uY3Vyc2VzX3dpbihjb25zdCBjaGFy
+ICpuYW1lKQpAQCAtMTg1LDQyICsxODUsNDEgQEAgV0lORE9XICpnZXRfbmN1cnNlc193aW4oY29u
+c3Qgc3RyaW5nICZuYW1lKQogCXJldHVybiBnZXRfbmN1cnNlc193aW4obmFtZS5jX3N0cigpKTsK
+IH0KIAotCi12b2lkIHNob3dfbmV4dF90YWIodm9pZCkKK3ZvaWQgc2hvd19wcmV2X3RhYih2b2lk
+KQogewotCWNsYXNzIHRhYl93aW5kb3cgKnc7CisgICAgICAgY2xhc3MgdGFiX3dpbmRvdyAqdzsK
+IAotCWlmICghZGlzcGxheSkKLQkJcmV0dXJuOworICAgICAgIGlmICghZGlzcGxheSkKKyAgICAg
+ICAgICAgICAgIHJldHVybjsKKyAgICAgICB3ID0gdGFiX3dpbmRvd3NbdGFiX25hbWVzW2N1cnJl
+bnRfdGFiXV07CisgICAgICAgaWYgKHcpCisgICAgICAgICAgICAgICB3LT5oaWRlKCk7CiAKLQl3
+ID0gdGFiX3dpbmRvd3NbdGFiX25hbWVzW2N1cnJlbnRfdGFiXV07Ci0JaWYgKHcpCi0JCXctPmhp
+ZGUoKTsKKyAgICAgICBjdXJyZW50X3RhYiAtLTsKKyAgICAgICBpZiAoY3VycmVudF90YWIgPCAw
+KQorICAgICAgICAgICAgICAgY3VycmVudF90YWIgPSB0YWJfbmFtZXMuc2l6ZSgpIC0gMTsKIAot
+CWN1cnJlbnRfdGFiICsrOwotCWlmIChjdXJyZW50X3RhYiA+PSAoaW50KXRhYl9uYW1lcy5zaXpl
+KCkpCi0JCWN1cnJlbnRfdGFiID0gMDsKLQotCXcgPSB0YWJfd2luZG93c1t0YWJfbmFtZXNbY3Vy
+cmVudF90YWJdXTsKLQlpZiAodykKLQkJdy0+ZXhwb3NlKCk7CisgICAgICAgdyA9IHRhYl93aW5k
+b3dzW3RhYl9uYW1lc1tjdXJyZW50X3RhYl1dOworICAgICAgIGlmICh3KQorICAgICAgICAgICAg
+ICAgdy0+ZXhwb3NlKCk7CiAKLQlzaG93X3RhYihjdXJyZW50X3RhYik7CisgICAgICAgc2hvd190
+YWIoY3VycmVudF90YWIpOwogfQogCi12b2lkIHNob3dfcHJldl90YWIodm9pZCkKK3ZvaWQgc2hv
+d19uZXh0X3RhYih2b2lkKQogewogCWNsYXNzIHRhYl93aW5kb3cgKnc7CiAKIAlpZiAoIWRpc3Bs
+YXkpCiAJCXJldHVybjsKKwogCXcgPSB0YWJfd2luZG93c1t0YWJfbmFtZXNbY3VycmVudF90YWJd
+XTsKIAlpZiAodykKIAkJdy0+aGlkZSgpOwogCi0JY3VycmVudF90YWIgLS07Ci0JaWYgKGN1cnJl
+bnRfdGFiIDwgMCkKLQkJY3VycmVudF90YWIgPSB0YWJfbmFtZXMuc2l6ZSgpIC0gMTsKKwljdXJy
+ZW50X3RhYiArKzsKKwlpZiAoY3VycmVudF90YWIgPj0gKGludCl0YWJfbmFtZXMuc2l6ZSgpKQor
+CQljdXJyZW50X3RhYiA9IDA7CiAKIAl3ID0gdGFiX3dpbmRvd3NbdGFiX25hbWVzW2N1cnJlbnRf
+dGFiXV07CiAJaWYgKHcpCkBAIC0yNDEsOCArMjQwLDE2IEBAIHZvaWQgY3Vyc29yX2Rvd24odm9p
+ZCkKIAljbGFzcyB0YWJfd2luZG93ICp3OwogCiAJdyA9IHRhYl93aW5kb3dzW3RhYl9uYW1lc1tj
+dXJyZW50X3RhYl1dOwotCWlmICh3KQotCQl3LT5jdXJzb3JfZG93bigpOworCWlmICh3KSB7CisJ
+CWlmICh0YWJfbmFtZXNbY3VycmVudF90YWJdID09ICJUdW5hYmxlcyIpIHsKKwkgICAgICAgICAg
+ICAgICAgaWYgKCh3LT5jdXJzb3JfcG9zICsgNykgPj0gTElORVMpIHsgCisJCQkJcHJlZnJlc2go
+dy0+d2luLCArK3ctPnlwYWRfcG9zLCB3LT54cGFkX3BvcywgMSwgMCwgTElORVMgLSAzLCBDT0xT
+IC0gMSk7CisJCQl9CQkJCisJCQkJdy0+Y3Vyc29yX2Rvd24oKTsgCisJCX0gZWxzZSB7CisJCQlw
+cmVmcmVzaCh3LT53aW4sICsrdy0+eXBhZF9wb3MsIHctPnhwYWRfcG9zLCAxLCAwLCBMSU5FUyAt
+IDMsIENPTFMgLSAxKTsKKwkJfQorCX0KIAogCXNob3dfY3VyX3RhYigpOwogfQpAQCAtMjUzLDEy
+ICsyNjAsNDUgQEAgdm9pZCBjdXJzb3JfdXAodm9pZCkKIAogCXcgPSB0YWJfd2luZG93c1t0YWJf
+bmFtZXNbY3VycmVudF90YWJdXTsKIAotCWlmICh3KQotCQl3LT5jdXJzb3JfdXAoKTsKLQorCWlm
+ICh3KSB7CisJCXctPmN1cnNvcl91cCgpOyAKKwkJaWYody0+eXBhZF9wb3MgPiAwKSB7CisJICAg
+ICAgICAgICAgICAgIGlmICh0YWJfbmFtZXNbY3VycmVudF90YWJdID09ICJUdW5hYmxlcyIpIHsK
+KyAgICAgICAgCSAgICAgICAgICAgICAgIHByZWZyZXNoKHctPndpbiwgLS13LT55cGFkX3Bvcywg
+dy0+eHBhZF9wb3MsIDEsIDAsIExJTkVTIC0gMywgQ09MUyAtIDEpOworCSAgICAgICAgICAgICAg
+ICB9IGVsc2UgeworICAgICAgICAJICAgICAgICAgICAgICAgcHJlZnJlc2gody0+d2luLCAtLXct
+PnlwYWRfcG9zLCB3LT54cGFkX3BvcywgMSwgMCwgTElORVMgLSAzLCBDT0xTIC0gMSk7CisJICAg
+ICAgICAgICAgICAgIH0KKwkJfQorCX0KKwkKIAlzaG93X2N1cl90YWIoKTsKIH0KIAordm9pZCBj
+dXJzb3JfbGVmdCh2b2lkKQoreworICAgICAgICBjbGFzcyB0YWJfd2luZG93ICp3OworCisJdyA9
+IHRhYl93aW5kb3dzW3RhYl9uYW1lc1tjdXJyZW50X3RhYl1dOworCQorCWlmICh3KSB7CQkJCisJ
+CWlmICh3LT54cGFkX3BvcyA+IDApIHsKKwkJCXByZWZyZXNoKHctPndpbiwgdy0+eXBhZF9wb3Ms
+LS13LT54cGFkX3BvcywgMSwgMCwgTElORVMgLSAzLCBDT0xTIC0gMSk7CisJCX0KKwl9Cit9CisK
+K3ZvaWQgY3Vyc29yX3JpZ2h0KHZvaWQpIAoreworICAgICAgICBjbGFzcyB0YWJfd2luZG93ICp3
+OworCisJdyA9IHRhYl93aW5kb3dzW3RhYl9uYW1lc1tjdXJyZW50X3RhYl1dOworCisJaWYgKHcp
+IHsKKwkJcHJlZnJlc2gody0+d2luLCB3LT55cGFkX3BvcywgKyt3LT54cGFkX3BvcywgMSwgMCwg
+TElORVMgLSAzLCBDT0xTIC0gMSk7CisJfQorCQorfQorCiB2b2lkIGN1cnNvcl9lbnRlcih2b2lk
+KQogewogCWNsYXNzIHRhYl93aW5kb3cgKnc7CkBAIC0yNzksNiArMzE5LDggQEAgdm9pZCB3aW5k
+b3dfcmVmcmVzaCgpCiAJdyA9IHRhYl93aW5kb3dzW3RhYl9uYW1lc1tjdXJyZW50X3RhYl1dOwog
+CiAJaWYgKHcpIHsKKwkJdy0+eXBhZF9wb3MgPSAwOworCQl3LT54cGFkX3BvcyA9IDA7CiAJCXct
+PndpbmRvd19yZWZyZXNoKCk7CiAJCXctPnJlcGFpbnQoKTsKIAl9CmRpZmYgLS1naXQgYS9zcmMv
+ZGlzcGxheS5oIGIvc3JjL2Rpc3BsYXkuaAppbmRleCAzM2FhYWUxLi4wMDg4N2FhIDEwMDY0NAot
+LS0gYS9zcmMvZGlzcGxheS5oCisrKyBiL3NyYy9kaXNwbGF5LmgKQEAgLTQxLDYgKzQxLDggQEAg
+ZXh0ZXJuIHZvaWQgc2hvd19wcmV2X3RhYih2b2lkKTsKIGV4dGVybiB2b2lkIHNob3dfY3VyX3Rh
+Yih2b2lkKTsKIGV4dGVybiB2b2lkIGN1cnNvcl91cCh2b2lkKTsKIGV4dGVybiB2b2lkIGN1cnNv
+cl9kb3duKHZvaWQpOworZXh0ZXJuIHZvaWQgY3Vyc29yX3JpZ2h0KHZvaWQpOworZXh0ZXJuIHZv
+aWQgY3Vyc29yX2xlZnQodm9pZCk7CiBleHRlcm4gdm9pZCBjdXJzb3JfZW50ZXIodm9pZCk7CiBl
+eHRlcm4gdm9pZCB3aW5kb3dfcmVmcmVzaCh2b2lkKTsKIApAQCAtNDgsMTAgKzUwLDE3IEBAIGNs
+YXNzIHRhYl93aW5kb3cgewogcHVibGljOgogCWludCBjdXJzb3JfcG9zOwogCWludCBjdXJzb3Jf
+bWF4OworCWludCB4cGFkX3BvcywgeXBhZF9wb3M7IAogCVdJTkRPVyAqd2luOwogCi0JdmlydHVh
+bCB2b2lkIGN1cnNvcl9kb3duKHZvaWQpIHsgaWYgKGN1cnNvcl9wb3MgPCBjdXJzb3JfbWF4ICkg
+Y3Vyc29yX3BvcysrOyByZXBhaW50KCk7IH0gOwotCXZpcnR1YWwgdm9pZCBjdXJzb3JfdXAodm9p
+ZCkgeyBpZiAoY3Vyc29yX3BvcyA+IDApIGN1cnNvcl9wb3MtLTsgcmVwYWludCgpOyB9OworCXZp
+cnR1YWwgdm9pZCBjdXJzb3JfZG93bih2b2lkKSB7IAorCQlpZiAoY3Vyc29yX3BvcyA8IGN1cnNv
+cl9tYXggKSBjdXJzb3JfcG9zKys7IHJlcGFpbnQoKTsgCisJfSA7CisJdmlydHVhbCB2b2lkIGN1
+cnNvcl91cCh2b2lkKSB7IAorCQlpZiAoY3Vyc29yX3BvcyA+IDApIGN1cnNvcl9wb3MtLTsgcmVw
+YWludCgpOyAKKwl9OworCXZpcnR1YWwgdm9pZCBjdXJzb3JfbGVmdCh2b2lkKSB7IH07CisJdmly
+dHVhbCB2b2lkIGN1cnNvcl9yaWdodCh2b2lkKSB7IH07CiAKIAl2aXJ0dWFsIHZvaWQgY3Vyc29y
+X2VudGVyKHZvaWQpIHsgfTsKIAl2aXJ0dWFsIHZvaWQgd2luZG93X3JlZnJlc2goKSB7IH07CmRp
+ZmYgLS1naXQgYS9zcmMvbWFpbi5jcHAgYi9zcmMvbWFpbi5jcHAKaW5kZXggY2Y0N2I0ZS4uZWRj
+NDE0NyAxMDA2NDQKLS0tIGEvc3JjL21haW4uY3BwCisrKyBiL3NyYy9tYWluLmNwcApAQCAtMTM1
+LDIyICsxMzUsMjkgQEAgc3RhdGljIHZvaWQgZG9fc2xlZXAoaW50IHNlY29uZHMpCiAJCWhhbGZk
+ZWxheShkZWx0YSAqIDEwKTsKIAogCQljID0gZ2V0Y2goKTsKLQorCQlwcmludGYoImMgKCVpKSIs
+IGMpOyAKIAkJc3dpdGNoIChjKSB7Ci0JCWNhc2UgS0VZX05QQUdFOgorCQljYXNlIDM1MzogCisJ
+CQlzaG93X3ByZXZfdGFiKCk7CisJCQlicmVhazsKKwkJY2FzZSA5OgorCQkJc2hvd19uZXh0X3Rh
+YigpOyAKKwkJCWJyZWFrOwogCQljYXNlIEtFWV9SSUdIVDoKLQkJCXNob3dfbmV4dF90YWIoKTsK
+KwkJCWN1cnNvcl9yaWdodCgpOyAKIAkJCWJyZWFrOwotCQljYXNlIEtFWV9QUEFHRToKIAkJY2Fz
+ZSBLRVlfTEVGVDoKLQkJCXNob3dfcHJldl90YWIoKTsKKwkJCWN1cnNvcl9sZWZ0KCk7IAogCQkJ
+YnJlYWs7CisJCWNhc2UgS0VZX05QQUdFOgogCQljYXNlIEtFWV9ET1dOOgogCQkJY3Vyc29yX2Rv
+d24oKTsKIAkJCWJyZWFrOworCQljYXNlIEtFWV9QUEFHRToKIAkJY2FzZSBLRVlfVVA6CiAJCQlj
+dXJzb3JfdXAoKTsKIAkJCWJyZWFrOworCQljYXNlIDMyOgogCQljYXNlIDEwOgogCQkJY3Vyc29y
+X2VudGVyKCk7CiAJCQlicmVhazsKCg==
+
+--===============4384643941425817439==--
 
