@@ -1,69 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============6438424695997395863=="
+Content-Type: multipart/mixed; boundary="===============1518456329306078953=="
 MIME-Version: 1.0
-From: Joerg Mayer <jmpt at loplof.de>
-Subject: [Powertop] [PATCH 3/4] Fix spelling of command line argument --quite
- to --quiet. Add a manpage entry for --quiet, which was missing.
-Date: Thu, 23 Aug 2012 23:29:49 +0200
-Message-ID: <20120823215427.C0D7BDFFDC@linda.rhrk.uni-kl.de>
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] PowerTOP UI navigation enhancement(v3).
+Date: Wed, 12 Sep 2012 01:37:44 +0300
+Message-ID: <20120911223744.GE2955@swordfish.minsk.epam.com>
+In-Reply-To: CAMFVxVikj+FrNAMzphyu-6Y1_DEPo8_s=2a3JspQjL2FvYLxNA@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6438424695997395863==
+--===============1518456329306078953==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+On (09/11/12 14:59), Ferron, Chris E wrote:
+> >
+> > I can scroll down/right as much as I want (can), even to (signed int)-1.
+> > the biggest in LINES window seems to be `Overview'. is that window limi=
+ted to max pid?
+> >
+> The Window is created to size of terminal, but PowerTOP creates a
+> winpad at 1000x1000. So the real max is the actual max of the pad for
+> PowerTOP. Overview can be big in terms of lines drawn to the pad, but
+> so can tunables, but I tend to agree Overview will have the most lines
+> for the most part. Didn't really think of the implications of max_pid
+> or wrapping, but im thinking it may not be a big issue overall.
+>
 
-Signed-off-by: Joerg Mayer <jmpt(a)loplof.de>
----
- doc/powertop.8 |    3 +++
- src/main.cpp   |    4 ++--
- 2 files changed, 5 insertions(+), 2 deletions(-)
+agree.
 
-diff --git a/doc/powertop.8 b/doc/powertop.8
-index 8020d4e..8a70076 100644
---- a/doc/powertop.8
-+++ b/doc/powertop.8
-@@ -46,6 +46,9 @@ sent to others to help diagnose power issues.
- \fB\-\-iteration[\fR=3D\fIiterations\fR]
- number of times to run each test.
- .TP
-+\fB\-\-quiet
-+ supress stderr output.
-+.TP
- \fB\-\-time[\fR=3D\fIseconds\fR]
- generate a report for a specified number of seconds.
- .TP
-diff --git a/src/main.cpp b/src/main.cpp
-index 8714daf..c310cb2 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -77,7 +77,7 @@ static const struct option long_options[] =3D
- 	{"time", optional_argument, NULL, 't'},
- 	{"iteration", optional_argument, NULL, 'i'},
- 	{"workload", optional_argument, NULL, 'w'},
--	{"quite", optional_argument, NULL, 'q'},
-+	{"quiet", optional_argument, NULL, 'q'},
- 	{NULL, 0, NULL, 0}
- };
  =
 
-@@ -112,7 +112,7 @@ static void print_usage()
- 	printf("--time%s \t %s\n",_("[=3Dseconds]"), _("generate a report for 'x'=
- seconds"));
- 	printf("--iteration%s\n", _("[=3Diterations] number of times to run each =
-test"));
- 	printf("--workload%s \t %s\n", _("[=3Dworkload]"), _("file to execute for=
- workload"));
--	printf("--quite \t %s\n", _("supress stderr output"));
-+	printf("--quiet \t\t %s\n", _("supress stderr output"));
- 	printf("--help \t\t\t %s\n",_("print this help menu"));
- 	printf("\n");
- 	printf("%s\n\n",_("For more help please refer to the README"));
--- =
-
-1.7.7
+> >
+> ya, this should be tightened regardless
+> >         -ss
+> So tuning and comments aside, will this fix your intrest to truncate
+> for terminal sizing issues?
+> =
 
 
---===============6438424695997395863==--
+absolutely, I like the patch. great job!
+
+
+	-ss
+
+--===============1518456329306078953==--
 
