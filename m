@@ -1,40 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============7763392555294198560=="
+Content-Type: multipart/mixed; boundary="===============0524192749033632727=="
 MIME-Version: 1.0
-From: Saumil Merchant <msaumil at gmail.com>
-Subject: [Powertop] Software resource usage by cpu's
-Date: Fri, 21 Sep 2012 17:17:38 +0530
-Message-ID: <CAMo2APiwhVrd+efLY40_S2n7POav_i9zfRrZ0mGmPNLb5_iNnA@mail.gmail.com>
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] abstract_cpu: do not call total_pstate_time()
+ in validate()
+Date: Thu, 13 Sep 2012 08:19:00 -0700
+Message-ID: <5051F964.6090103@linux.intel.com>
+In-Reply-To: 20120913124129.GA4894@swordfish.minsk.epam.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7763392555294198560==
+--===============0524192749033632727==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
-I am new to PowerTop and think it is a wonderful tool and am exploring its
-possible use in my work.  I had a question.  Can PowerTop report software
-resource usage info for individual CPU's?  For example, have a CPU column
-in the software info report which specifies the cpu on which the process
-was scheduled.
+On 09/13/2012 05:41 AM, Sergey Senozhatsky wrote:
+>   abstract_cpu: do not call total_pstate_time() in validate()
+>
+> Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+>
+> ---
+>
+>   src/cpu/abstract_cpu.cpp | 7 +------
+>   1 file changed, 1 insertion(+), 6 deletions(-)
+>
+> diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
+> index ebdc510..386d981 100644
+> --- a/src/cpu/abstract_cpu.cpp
+> +++ b/src/cpu/abstract_cpu.cpp
+> @@ -414,15 +414,10 @@ uint64_t abstract_cpu::total_pstate_time(void)
+>   void abstract_cpu::validate(void)
+>   {
+>   	unsigned int i;
+> -	uint64_t my_time;
+> -
+> -	my_time =3D total_pstate_time();
+>   =
 
-Thanks,
-Saumil
+>   	for (i =3D 0; i < children.size(); i++) {
+> -
+> -		if (children[i]) {
+> +		if (children[i])
+>   			children[i]->validate();
+> -		}
+>   	}
+>   }
+>   =
 
---===============7763392555294198560==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+Your patch has been applied.
+Thank You
+-C
 
-SGksPGJyPkkgYW0gbmV3IHRvIFBvd2VyVG9wIGFuZCB0aGluayBpdCBpcyBhIHdvbmRlcmZ1bCB0
-b29sIGFuZCBhbSAKZXhwbG9yaW5nIGl0cyBwb3NzaWJsZSB1c2UgaW4gbXkgd29yay6gIEkgaGFk
-IGEgcXVlc3Rpb24uoCBDYW4gUG93ZXJUb3AgCnJlcG9ydCBzb2Z0d2FyZSByZXNvdXJjZSB1c2Fn
-ZSBpbmZvIGZvciBpbmRpdmlkdWFsIENQVSYjMzk7cz+gIEZvciBleGFtcGxlLCAKaGF2ZSBhIENQ
-VSBjb2x1bW4gaW4gdGhlIHNvZnR3YXJlIGluZm8gcmVwb3J0IHdoaWNoIHNwZWNpZmllcyB0aGUg
-Y3B1IG9uCiB3aGljaCB0aGUgcHJvY2VzcyB3YXMgc2NoZWR1bGVkLjxicj4KPGJyPlRoYW5rcyw8
-YnI+U2F1bWlsCg==
 
---===============7763392555294198560==--
+--===============0524192749033632727==--
 
