@@ -1,42 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============0701241482113666970=="
+Content-Type: multipart/mixed; boundary="===============0767249440049313065=="
 MIME-Version: 1.0
-From: Joerg Mayer <jmpt at loplof.de>
-Subject: [Powertop] [Warning fixes 3/6] Remove trailing whitespace
-Date: Fri, 24 Aug 2012 18:54:57 +0200
-Message-ID: <20120824173217.DED8CE00CC@linda.rhrk.uni-kl.de>
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: [Powertop] [PATCH] abstract_cpu: do not call total_pstate_time() in
+ validate()
+Date: Thu, 13 Sep 2012 15:41:29 +0300
+Message-ID: <20120913124129.GA4894@swordfish.minsk.epam.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0701241482113666970==
+--===============0767249440049313065==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Joerg Mayer <jmpt(a)loplof.de>
+ abstract_cpu: do not call total_pstate_time() in validate()
 
-diff --git a/src/Makefile.am b/src/Makefile.am
-index ec70bc4..48b0e3b 100644
---- a/src/Makefile.am
-+++ b/src/Makefile.am
-@@ -1,8 +1,8 @@
- AUTOMAKE_OPTIONS =3D subdir-objects
--ACLOCAL_AMFLAGS =3D -I ../m4 =
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
 
-+ACLOCAL_AMFLAGS =3D -I ../m4
+---
+
+ src/cpu/abstract_cpu.cpp | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
+index ebdc510..386d981 100644
+--- a/src/cpu/abstract_cpu.cpp
++++ b/src/cpu/abstract_cpu.cpp
+@@ -414,15 +414,10 @@ uint64_t abstract_cpu::total_pstate_time(void)
+ void abstract_cpu::validate(void)
+ {
+ 	unsigned int i;
+-	uint64_t my_time;
+-
+-	my_time =3D total_pstate_time();
  =
 
- noinst_PROGRAMS =3D csstoh
--csstoh_SOURCES =3D csstoh.c =
+ 	for (i =3D 0; i < children.size(); i++) {
+-
+-		if (children[i]) {
++		if (children[i])
+ 			children[i]->validate();
+-		}
+ 	}
+ }
+=20
 
-+csstoh_SOURCES =3D csstoh.c
- =
-
- sbin_PROGRAMS =3D powertop
- nodist_powertop_SOURCES =3D css.h
--- =
-
-1.7.7
-
-
---===============0701241482113666970==--
+--===============0767249440049313065==--
 
