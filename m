@@ -1,146 +1,104 @@
-Content-Type: multipart/mixed; boundary="===============6170436928414426842=="
+Content-Type: multipart/mixed; boundary="===============5100406606584286318=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [Bug] powertop 2.1 isn't measuring task power properly
- on my Thinkpad T530
-Date: Mon, 03 Sep 2012 08:43:37 +0300
-Message-ID: <20120903054337.GA3041@swordfish>
-In-Reply-To: 20120902153203.GG10826@merlins.org
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: Re: [Powertop] [PATCH] Remove unneded escaping backslashes from CSS
+Date: Fri, 14 Sep 2012 14:15:33 +0400
+Message-ID: <505303C5.8090902@samsung.com>
+In-Reply-To: 1347616964.6783.13.camel@mattotaupa
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6170436928414426842==
+--===============5100406606584286318==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (09/02/12 08:32), Marc MERLIN wrote:
-> [retrying with fixed subject line]
-> =
+Dear Paul,
 
-> Howdy,
-> =
+Paul Menzel wrote:
+> Am Freitag, den 14.09.2012, 13:46 +0400 schrieb Igor Zhbanov:
+>> Remove unneded escaping backslashes from CSS.
+> copying the summary into the body is not useful, because it adds no
+> further information.
+What to do when the commit summary describes all of the issue?
+Should I left body empty?
+> Please also add why the escaping was added beforehand and why it is
+> unneeded.
+I don't know why this particular escapes was added.
+In the file powertop.css there are lots of escaped quotes characters (")
+because later each line of this file will be wrapped inside of "LINE\n"
+to form a C array css[] in the file css.h.
 
-> I just downloaded and built 2.1, and a couple of things aren't right:
-> 1) header columns aren't aligned with the data
-> 2) power estimate shown in the kW range :)
->
+But I don't know the reason for putting backslashes before slash in a =
 
-Hi,
+closing
+</div> tag for jQuery append() method. I don't know any special handling
+of slashes in append() method.
 
-thanks for reporting. frankly, those are not critical ones. however, we're =
-about
-to rework UI rendering, so may be it will be corrected by the way.
+Should I repost the patch with another description?
+
+>> ---
+>>   src/powertop.css |   16 ++++++++--------
+>>   1 files changed, 8 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/src/powertop.css b/src/powertop.css
+>> index 087e384..5d303dc 100644
+>> --- a/src/powertop.css
+>> +++ b/src/powertop.css
+>> @@ -21,14 +21,14 @@ $(document).ready(function(){
+>>   	$('#tuning h2').addClass('hide');
+>>   	$('#tuning table').addClass('hide');
+>>   =
+
+>> -	$('#top').append('<div class=3D\"SystemButton\"   onclick=3D\"toggleSy=
+stem()\">System Info<\\/div>');
+>> -	$('#top').append('<div class=3D\"SummaryButton\"  onclick=3D\"toggleSu=
+mmary()\">Summary<\\/div>');
+>> -	$('#top').append('<div class=3D\"CpuidleButton\"  onclick=3D\"toggleCp=
+uidle()\">CPU Idle<\\/div>');
+>> -	$('#top').append('<div class=3D\"CpufreqButton\"  onclick=3D\"toggleCp=
+ufreq()\">CPU Frequency<\\/div>');
+>> -	$('#top').append('<div class=3D\"SoftwareButton\" onclick=3D\"toggleSo=
+ftware()\">Software info<\\/div>');
+>> -	$('#top').append('<div class=3D\"DeviceButton\"   onclick=3D\"toggleDe=
+vice()\">Device Info<\\/div>');
+>> -	$('#top').append('<div class=3D\"TuningButton\"   onclick=3D\"toggleTu=
+ning()\">Tuning<\\/div>');
+>> -	$('#top').append('<div class=3D\"AllButton\"      onclick=3D\"toggleAl=
+l()\">All<\\/div>');
+>> +	$('#top').append('<div class=3D\"SystemButton\"   onclick=3D\"toggleSy=
+stem()\">System Info</div>');
+>> +	$('#top').append('<div class=3D\"SummaryButton\"  onclick=3D\"toggleSu=
+mmary()\">Summary</div>');
+>> +	$('#top').append('<div class=3D\"CpuidleButton\"  onclick=3D\"toggleCp=
+uidle()\">CPU Idle</div>');
+>> +	$('#top').append('<div class=3D\"CpufreqButton\"  onclick=3D\"toggleCp=
+ufreq()\">CPU Frequency</div>');
+>> +	$('#top').append('<div class=3D\"SoftwareButton\" onclick=3D\"toggleSo=
+ftware()\">Software info</div>');
+>> +	$('#top').append('<div class=3D\"DeviceButton\"   onclick=3D\"toggleDe=
+vice()\">Device Info</div>');
+>> +	$('#top').append('<div class=3D\"TuningButton\"   onclick=3D\"toggleTu=
+ning()\">Tuning</div>');
+>> +	$('#top').append('<div class=3D\"AllButton\"      onclick=3D\"toggleAl=
+l()\">All</div>');
+>>   	$('#top .SummaryButton').toggleClass('pressed');
+>>   =
+
+>>       }
+
+-- =
+
+Best regards,
+Igor Zhbanov,
+Expert Software Engineer,
+phone: +7 (495) 797 25 00 ext 3806
+e-mail: i.zhbanov(a)samsung.com
+
+ASWG, Moscow R&D center, Samsung Electronics
+12 Dvintsev street, building 1
+127018, Moscow, Russian Federation
 
 
-	-ss
-
- =
-
-> I re-ran the new powertop later, and even when it's not way way off, I
-> still get weird data like this:
->   21.3 W     86.7%                      Device         Display backlight
-> I don't think my display uses 21W :) (it's about 6W when it's burning as
-> high as it can).
-> =
-
-> See screenshot of 2.1 vs 1.98:
-> =
-
-> Is there other info I can provide?
-> =
-
-> Thanks,
-> Marc
-> =
-
-> -------------------------------------------------------------------------=
----
-> PowerTOP 2.1      Overview   Idle stats   Frequency stats   Device stats =
-  Tunables                                     =
-
-> The battery reports a discharge rate of 14.0 W
-> The estimated remaining time is 5 hours, 16 minutes
-> =
-
-> Summary: 448.2 wakeups/second,  82.7 GPU ops/seconds, 0.0 VFS ops/sec and=
- 10.6% CPU use
-> =
-
-> Power est.              Usage       Events/s    Category       Description
->  10.0 kW     66.2 ms/s     257.2        Process        /usr/bin/enlighten=
-ment
->  3.72 kW    566.5 =C2=B5s/s      69.9        Process        nm-applet --s=
-m-disable
->   79.4 W      0.9 ms/s       9.7        Process        xfce4-terminal -T =
-window9 --role=3Dwindow9
->   6.26 W    123.2 =C2=B5s/s      0.00        Process        xfce4-termina=
-l -T window12 --role=3Dwindow12
->   5.89 W     26.7%                      Device         Display backlight
->   2.10 W    100.0%                      Device         Audio codec alsa:h=
-wC0D0: thinkpad (Realtek)
->   2.09 W     11.2 =C2=B5s/s      0.15        Process        xscreensaver
->   1.37 W     35.4 pkts/s                Device         Network interface:=
- wlan0 (iwlwifi)
->   180 mW      3.7 ms/s      54.9        Interrupt      [6] tasklet(softir=
-q)
->   105 mW      1.1 ms/s      32.1        Process        /usr/bin/python /u=
-sr/local/bin/offlineimap
->  77.8 mW      1.3 ms/s      23.7        Interrupt      [47] i915(a)pci:00=
-00:00:02.0
->  63.4 mW      0.8 ms/s      19.3        Timer          hrtimer_wakeup
->  47.0 mW      1.1 ms/s      14.3        Timer          tick_sched_timer
->  35.5 mW      1.5 ms/s      10.8        Interrupt      [7] sched(softirq)
-> =
-
-> -------------------------------------------------------------------------=
----
-> =
-
-> PowerTOP 1.98     Overview   Idle stats   Frequency stats   Device stats =
-  Tunab
-> =
-
-> The battery reports a discharge rate of 14.1 W
-> =
-
-> Summary: 627.6 wakeups/second,  0.0 GPU ops/second and 0.0 VFS ops/sec
-> =
-
-> Power est.      Usage       Events/s    Category       Description
->   21.4 W     26.7%                      Device         Display backlight
->     0 mW     88.5 ms/s     148.6        Process        /usr/bin/enlighten=
-ment
->     0 mW     45.9 ms/s       0.5        Process        powertop-2.1
->     0 mW     15.8 ms/s     147.2        Process        /usr/bin/X :0 vt7 =
--br -no
->     0 mW      6.2 ms/s       1.4        Process        /usr/sbin/NetworkM=
-anager
->     0 mW      4.7 ms/s       9.0        Interrupt      [46] iwlwifi
->     0 mW      2.8 ms/s      0.15        Process        [kswapd0]
->     0 mW      1.9 ms/s      85.0        Interrupt      [6] tasklet(softir=
-q)
->     0 mW      1.4 ms/s       5.9        Process        gvim /home/merlin/=
-powerto
->     0 mW      1.3 ms/s      39.3        Interrupt      [47] i915(a)pci:00=
-00:00:02.
->     0 mW      1.2 ms/s      49.7        Timer          tick_sched_timer
->     0 mW      1.1 ms/s      30.5        Interrupt      [7] sched(softirq)
-> =
-
-> -- =
-
-> "A mouse is a device used to point at the xterm you want to type in" - A.=
-S.R.
-> Microsoft is to operating systems ....
->                                       .... what McDonalds is to gourmet c=
-ooking
-> Home page: http://marc.merlins.org/
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============6170436928414426842==--
+--===============5100406606584286318==--
 
