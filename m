@@ -1,44 +1,96 @@
-Content-Type: multipart/mixed; boundary="===============4002389912713280149=="
+Content-Type: multipart/mixed; boundary="===============1117637964343004000=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH 1/2] devlist: Remove an unnecessary sprintf
-Date: Tue, 18 Sep 2012 08:42:42 -0700
-Message-ID: <50589672.7090006@linux.intel.com>
-In-Reply-To: 1347981198-10438-1-git-send-email-namhyung@gmail.com
+From: Paul Menzel <paulepanter at users.sourceforge.net>
+Subject: Re: [Powertop] [PATCH] Remove unneded escaping backslashes from CSS
+Date: Fri, 14 Sep 2012 12:02:44 +0200
+Message-ID: <1347616964.6783.13.camel@mattotaupa>
+In-Reply-To: 1347616012-26879-1-git-send-email-i.zhbanov@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4002389912713280149==
+--===============1117637964343004000==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 09/18/2012 08:13 AM, Namhyung Kim wrote:
-> The 'filename' is not used in the loop anymore.
->
-> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+Dear Igor,
+
+
+Am Freitag, den 14.09.2012, 13:46 +0400 schrieb Igor Zhbanov:
+> Remove unneded escaping backslashes from CSS.
+
+copying the summary into the body is not useful, because it adds no
+further information.
+
+Please also add why the escaping was added beforehand and why it is
+unneeded.
+
 > ---
->   src/devlist.cpp |    1 -
->   1 file changed, 1 deletion(-)
->
-> diff --git a/src/devlist.cpp b/src/devlist.cpp
-> index 5ec0a8b..828f47f 100644
-> --- a/src/devlist.cpp
-> +++ b/src/devlist.cpp
-> @@ -147,7 +147,6 @@ void collect_open_devices(void)
->   					continue;
->   				dev->pid =3D strtoull(entry->d_name, NULL, 10);
->   				strncpy(dev->device, link, 251);
-> -				sprintf(filename, "/proc/%s/comm", entry->d_name);
->   				strncpy(dev->comm, read_sysfs_string("/proc/%s/comm", entry->d_name=
-).c_str(), 31);
->   				target->push_back(dev);
->   =
+>  src/powertop.css |   16 ++++++++--------
+>  1 files changed, 8 insertions(+), 8 deletions(-)
+> =
 
-Your patch has been merged
-Thank You
--C
+> diff --git a/src/powertop.css b/src/powertop.css
+> index 087e384..5d303dc 100644
+> --- a/src/powertop.css
+> +++ b/src/powertop.css
+> @@ -21,14 +21,14 @@ $(document).ready(function(){
+>  	$('#tuning h2').addClass('hide');
+>  	$('#tuning table').addClass('hide');
+>  =
+
+> -	$('#top').append('<div class=3D\"SystemButton\"   onclick=3D\"toggleSys=
+tem()\">System Info<\\/div>');
+> -	$('#top').append('<div class=3D\"SummaryButton\"  onclick=3D\"toggleSum=
+mary()\">Summary<\\/div>');
+> -	$('#top').append('<div class=3D\"CpuidleButton\"  onclick=3D\"toggleCpu=
+idle()\">CPU Idle<\\/div>');
+> -	$('#top').append('<div class=3D\"CpufreqButton\"  onclick=3D\"toggleCpu=
+freq()\">CPU Frequency<\\/div>');
+> -	$('#top').append('<div class=3D\"SoftwareButton\" onclick=3D\"toggleSof=
+tware()\">Software info<\\/div>');
+> -	$('#top').append('<div class=3D\"DeviceButton\"   onclick=3D\"toggleDev=
+ice()\">Device Info<\\/div>');
+> -	$('#top').append('<div class=3D\"TuningButton\"   onclick=3D\"toggleTun=
+ing()\">Tuning<\\/div>');
+> -	$('#top').append('<div class=3D\"AllButton\"      onclick=3D\"toggleAll=
+()\">All<\\/div>');
+> +	$('#top').append('<div class=3D\"SystemButton\"   onclick=3D\"toggleSys=
+tem()\">System Info</div>');
+> +	$('#top').append('<div class=3D\"SummaryButton\"  onclick=3D\"toggleSum=
+mary()\">Summary</div>');
+> +	$('#top').append('<div class=3D\"CpuidleButton\"  onclick=3D\"toggleCpu=
+idle()\">CPU Idle</div>');
+> +	$('#top').append('<div class=3D\"CpufreqButton\"  onclick=3D\"toggleCpu=
+freq()\">CPU Frequency</div>');
+> +	$('#top').append('<div class=3D\"SoftwareButton\" onclick=3D\"toggleSof=
+tware()\">Software info</div>');
+> +	$('#top').append('<div class=3D\"DeviceButton\"   onclick=3D\"toggleDev=
+ice()\">Device Info</div>');
+> +	$('#top').append('<div class=3D\"TuningButton\"   onclick=3D\"toggleTun=
+ing()\">Tuning</div>');
+> +	$('#top').append('<div class=3D\"AllButton\"      onclick=3D\"toggleAll=
+()\">All</div>');
+>  	$('#top .SummaryButton').toggleClass('pressed');
+>  =
+
+>      }
 
 
---===============4002389912713280149==--
+Thanks,
+
+Paul
+
+--===============1117637964343004000==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="signature.asc"
+
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
+L0xpbnV4KQoKaUVZRUFCRUNBQVlGQWxCVEFNUUFDZ2tRUFgxYUsyd09IVmhWUkFDZU9SVkhoK0VQ
+aTMyN2RFV1VHTHZ3Wng0RgpHdjhBblJyZ29XVThpZmpDUzYwUVJSa3J6QTBZNmFUUAo9anYwegot
+LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
+
+--===============1117637964343004000==--
 
