@@ -1,68 +1,71 @@
-Content-Type: multipart/mixed; boundary="===============5600891618258740967=="
+Content-Type: multipart/mixed; boundary="===============3326473375172835211=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] do not implement get_user_input() in
- DISABLE_NCURSES builds
-Date: Mon, 20 Aug 2012 18:31:05 +0300
-Message-ID: <20120820153105.GD3137@swordfish>
-In-Reply-To: 50325563.6040605@linux.intel.com
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: [Powertop] [PATCH] Remove unneded escaping backslashes from CSS
+Date: Fri, 14 Sep 2012 13:46:52 +0400
+Message-ID: <1347616012-26879-1-git-send-email-i.zhbanov@samsung.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5600891618258740967==
+--===============3326473375172835211==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (08/20/12 08:18), Chris Ferron wrote:
-> >>right now, powertop uses ncurses.
-> >>
-> >>either we want to make it optional, but then this stuff needs to get a =
-lot more modular,
-> >>or we just declare that you need ncurses.
-> >>I'm very much leaning towards the later fwiw...
-> >>
-> >I agree, and actually I don't like this patch (ifdef stuff also affects =
-patches I'm currently
-> >working on). it's rather hard to tell how many people will be affected b=
-y #2 decision, but we
-> >can tell the number for #1 case.
-> >
-> >DISABLE_NCURSES is not that nasty in overall, since it just disables som=
-e application features,
-> >comparing to, for example, DISABLE_TRYCATCH, which disables standard lan=
-guage features for very
-> >much non-obvious reason for someone with no embedded background.
-> >
-> >that said, it'll be nice if we forbid DISABLE_NCURSES, but we'll still h=
-ave ifdefs in
-> >code because of decisions different people made (like no ncurses in some=
- distros or incomplete/buggy
-> >programming language support).
-> >
-> >
-> >	-ss
-> The only reason we allowed DISABLE_NCURSES in the first place, was to
-> support android. If we don't want to support android out of the box,
-> we can start removing the crude and android can patch PowerTOP within
-> their distro if they wanted.
-> =
+Remove unneded escaping backslashes from CSS.
+---
+ src/powertop.css |   16 ++++++++--------
+ 1 files changed, 8 insertions(+), 8 deletions(-)
 
-> All other ifdef's need to be scrutinized.
-> -C
-> =
+diff --git a/src/powertop.css b/src/powertop.css
+index 087e384..5d303dc 100644
+--- a/src/powertop.css
++++ b/src/powertop.css
+@@ -21,14 +21,14 @@ $(document).ready(function(){
+ 	$('#tuning h2').addClass('hide');
+ 	$('#tuning table').addClass('hide');
+ =
+
+-	$('#top').append('<div class=3D\"SystemButton\"   onclick=3D\"toggleSyste=
+m()\">System Info<\\/div>');
+-	$('#top').append('<div class=3D\"SummaryButton\"  onclick=3D\"toggleSumma=
+ry()\">Summary<\\/div>');
+-	$('#top').append('<div class=3D\"CpuidleButton\"  onclick=3D\"toggleCpuid=
+le()\">CPU Idle<\\/div>');
+-	$('#top').append('<div class=3D\"CpufreqButton\"  onclick=3D\"toggleCpufr=
+eq()\">CPU Frequency<\\/div>');
+-	$('#top').append('<div class=3D\"SoftwareButton\" onclick=3D\"toggleSoftw=
+are()\">Software info<\\/div>');
+-	$('#top').append('<div class=3D\"DeviceButton\"   onclick=3D\"toggleDevic=
+e()\">Device Info<\\/div>');
+-	$('#top').append('<div class=3D\"TuningButton\"   onclick=3D\"toggleTunin=
+g()\">Tuning<\\/div>');
+-	$('#top').append('<div class=3D\"AllButton\"      onclick=3D\"toggleAll()=
+\">All<\\/div>');
++	$('#top').append('<div class=3D\"SystemButton\"   onclick=3D\"toggleSyste=
+m()\">System Info</div>');
++	$('#top').append('<div class=3D\"SummaryButton\"  onclick=3D\"toggleSumma=
+ry()\">Summary</div>');
++	$('#top').append('<div class=3D\"CpuidleButton\"  onclick=3D\"toggleCpuid=
+le()\">CPU Idle</div>');
++	$('#top').append('<div class=3D\"CpufreqButton\"  onclick=3D\"toggleCpufr=
+eq()\">CPU Frequency</div>');
++	$('#top').append('<div class=3D\"SoftwareButton\" onclick=3D\"toggleSoftw=
+are()\">Software info</div>');
++	$('#top').append('<div class=3D\"DeviceButton\"   onclick=3D\"toggleDevic=
+e()\">Device Info</div>');
++	$('#top').append('<div class=3D\"TuningButton\"   onclick=3D\"toggleTunin=
+g()\">Tuning</div>');
++	$('#top').append('<div class=3D\"AllButton\"      onclick=3D\"toggleAll()=
+\">All</div>');
+ 	$('#top .SummaryButton').toggleClass('pressed');
+ =
+
+     }
+-- =
+
+1.7.5.4
 
 
-as far as I concerned, android build require several defines:
- -- DISABLE_NCURSES
- -- DISABLE_TRYCATCH
- -- DISABLE_I18N
- -- perhaps, some more
-
-/* patch series by John Mathew */
-
-
-	-ss
-
---===============5600891618258740967==--
+--===============3326473375172835211==--
 
