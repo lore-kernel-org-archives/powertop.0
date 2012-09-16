@@ -1,47 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============2546352813658932282=="
+Content-Type: multipart/mixed; boundary="===============0566355082889751475=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH 2/2] perf: Check return value of strdup
-Date: Mon, 17 Sep 2012 08:21:15 -0700
-Message-ID: <50573FEB.80906@linux.intel.com>
-In-Reply-To: 1347805051-2889-2-git-send-email-namhyung@gmail.com
+From: Namhyung Kim <namhyung at gmail.com>
+Subject: [Powertop] [PATCH 1/2] perf: Pass 0 as a third argument to ioctl on
+ perf_fd
+Date: Sun, 16 Sep 2012 23:17:30 +0900
+Message-ID: <1347805051-2889-1-git-send-email-namhyung@gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2546352813658932282==
+--===============0566355082889751475==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 09/16/2012 07:17 AM, Namhyung Kim wrote:
-> The strdup() can return NULL so that the result should be checked.
->
-> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
-> ---
->   src/perf/perf.cpp |    5 +++++
->   1 file changed, 5 insertions(+)
->
-> diff --git a/src/perf/perf.cpp b/src/perf/perf.cpp
-> index c8ba7a8..35b4017 100644
-> --- a/src/perf/perf.cpp
-> +++ b/src/perf/perf.cpp
-> @@ -145,6 +145,11 @@ void perf_event::set_event_name(const char *event_na=
-me)
->   	if (name)
->   		free(name);
->   	name =3D strdup(event_name);
-> +	if (!name) {
-> +		fprintf(stderr, "failed to allocate event name\n");
-> +		return;
-> +	}
-> +
->   	char *c;
->   =
+The third argument of PERF_EVENT_IOC_{ENABLE,DISABLE} ioctl is a flag
+to determine whether the command should be applied to group members.
+Since the powertop doesn't use the event grouping feature, it'd better
+passing 0 as a third argument explicitly.
 
->   	c =3D strchr(name, ':');
-Your patch as been merged.
-Thank You
--C
+Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+---
+ src/perf/perf.cpp |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
---===============2546352813658932282==--
+diff --git a/src/perf/perf.cpp b/src/perf/perf.cpp
+index 69f1da3..c8ba7a8 100644
+--- a/src/perf/perf.cpp
++++ b/src/perf/perf.cpp
+@@ -128,7 +128,7 @@ void perf_event::create_perf_event(char *eventname, int=
+ _cpu)
+ 		return;
+ 	}
+ =
+
+-	ret =3D ioctl(perf_fd, PERF_EVENT_IOC_ENABLE);
++	ret =3D ioctl(perf_fd, PERF_EVENT_IOC_ENABLE, 0);
+ =
+
+ 	if (ret < 0) {
+ 		fprintf(stderr, "failed to enable perf \n");
+@@ -210,7 +210,7 @@ void perf_event::start(void)
+ void perf_event::stop(void)
+ {
+ 	int ret;
+-	ret =3D ioctl(perf_fd, PERF_EVENT_IOC_DISABLE);
++	ret =3D ioctl(perf_fd, PERF_EVENT_IOC_DISABLE, 0);
+ 	if (ret)
+ 		cout << "stop failing\n";
+ }
+-- =
+
+1.7.9.2
+
+
+--===============0566355082889751475==--
 
