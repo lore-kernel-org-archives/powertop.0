@@ -1,75 +1,47 @@
-Content-Type: multipart/mixed; boundary="===============2843450603552206107=="
+Content-Type: multipart/mixed; boundary="===============2546352813658932282=="
 MIME-Version: 1.0
-From: Rajagopal Venkat <rajagopal.venkat at linaro.org>
-Subject: Re: [Powertop] [PATCH 1/2] Updates to support Android platform
-Date: Tue, 18 Sep 2012 09:54:37 +0530
-Message-ID: <CA+Z25wU4UMNYCR7hR2LWDhSprArsSk8U=rKrGRNCM-+hYHhTRA@mail.gmail.com>
-In-Reply-To: 50574FA0.1050102@linux.intel.com
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [PATCH 2/2] perf: Check return value of strdup
+Date: Mon, 17 Sep 2012 08:21:15 -0700
+Message-ID: <50573FEB.80906@linux.intel.com>
+In-Reply-To: 1347805051-2889-2-git-send-email-namhyung@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2843450603552206107==
+--===============2546352813658932282==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 17 September 2012 21:58, Chris Ferron <chris.e.ferron(a)linux.intel.com>=
- wrote:
-> On 09/17/2012 07:34 AM, Rajagopal Venkat wrote:
->>
->>     #include "devices/device.h"
->> diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
->> index eaef7f1..c9d6b0b 100644
->> --- a/src/process/do_process.cpp
->> +++ b/src/process/do_process.cpp
->> @@ -869,7 +869,7 @@ void process_update_display(void)
->>                 if (!show_power)
->>                         strcpy(power, "          ");
->>                 sprintf(name, "%s", all_power[i]->type());
->> -               while (mbstowcs(NULL,name,0) < 14) strcat(name, " ");
->> +               while (mbstowcs(NULL,name,20) < 14) strcat(name, " ");
->>
+On 09/16/2012 07:17 AM, Namhyung Kim wrote:
+> The strdup() can return NULL so that the result should be checked.
 >
-> mbstowcs(NULL,name,0) is a test. return will be count. while catches the
-> error.
-
-Agree. The Android bionic libc version of mbstowcs always returns zero if
-max(third parameter) is zero, resulting in infinite loop.
-
-I believe this change should not cause any adverse effect on current behavi=
-or.
-The mbstowcs would stop parsing source string when it encounters null-chara=
-cter
-or max len. Atleast I didn't observe any change in return value(count).
-
+> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+> ---
+>   src/perf/perf.cpp |    5 +++++
+>   1 file changed, 5 insertions(+)
 >
->
->>                 if (all_power[i]->events() =3D=3D 0 && all_power[i]->usa=
-ge()
->> =3D=3D 0 && all_power[i]->Witts() =3D=3D 0)
->> @@ -882,7 +882,7 @@ void process_update_display(void)
->>                         else
->>                                 sprintf(usage, "%5i%s",
->> (int)all_power[i]->usage(), all_power[i]->usage_units());
->>                 }
->> -               while (mbstowcs(NULL,usage,0) < 14) strcat(usage, " ");
->> +               while (mbstowcs(NULL,usage,20) < 14) strcat(usage, " ");
->>                 sprintf(events, "%5.1f", all_power[i]->events());
->>                 if (!all_power[i]->show_events())
->>                         events[0] =3D 0;
->
->
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
+> diff --git a/src/perf/perf.cpp b/src/perf/perf.cpp
+> index c8ba7a8..35b4017 100644
+> --- a/src/perf/perf.cpp
+> +++ b/src/perf/perf.cpp
+> @@ -145,6 +145,11 @@ void perf_event::set_event_name(const char *event_na=
+me)
+>   	if (name)
+>   		free(name);
+>   	name =3D strdup(event_name);
+> +	if (!name) {
+> +		fprintf(stderr, "failed to allocate event name\n");
+> +		return;
+> +	}
+> +
+>   	char *c;
+>   =
 
+>   	c =3D strchr(name, ':');
+Your patch as been merged.
+Thank You
+-C
 
-
--- =
-
-Regards,
-Rajagopal
-
---===============2843450603552206107==--
+--===============2546352813658932282==--
 
