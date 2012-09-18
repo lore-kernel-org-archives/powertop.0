@@ -1,70 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============3716073793254216266=="
+Content-Type: multipart/mixed; boundary="===============9016938335194202470=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH v2] Fix string null termination and SIGABRT
- from glibc
-Date: Wed, 26 Sep 2012 07:19:40 -0700
-Message-ID: <20120926141939.GB3014@swordfish>
-In-Reply-To: 1348668750-15870-1-git-send-email-mikko.rapeli@iki.fi
+From: Namhyung Kim <namhyung at gmail.com>
+Subject: [Powertop] [PATCH 1/2] perf_bundle: Check memory allocation failure
+Date: Tue, 18 Sep 2012 23:21:02 +0900
+Message-ID: <1347978063-10119-1-git-send-email-namhyung@gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3716073793254216266==
+--===============9016938335194202470==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (09/26/12 16:12), Mikko Rapeli wrote:
-> According to http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D682388
-> the string is not null terminated when too much data is read.
-> =
+Check return value of malloc/strdup not to make NULL dereferences.
 
-> This patch fixes the crashes on my system.
-> ---
->  src/process/process.cpp |    3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
+Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+---
+ src/perf/perf_bundle.cpp |   13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-LGTM, thanks!
-
-	-ss
+diff --git a/src/perf/perf_bundle.cpp b/src/perf/perf_bundle.cpp
+index 38e1e91..4e70f30 100644
+--- a/src/perf/perf_bundle.cpp
++++ b/src/perf/perf_bundle.cpp
+@@ -60,6 +60,9 @@ void perf_bundle_event::handle_event(struct perf_event_he=
+ader *header, void *coo
+ 	vector<void *> *vector;
  =
 
-> diff --git a/src/process/process.cpp b/src/process/process.cpp
-> index 71f81b6..34dc68d 100644
-> --- a/src/process/process.cpp
-> +++ b/src/process/process.cpp
-> @@ -86,7 +86,7 @@ static void cmdline_to_string(char *str)
->  =
+ 	buffer =3D (unsigned char *)malloc(header->size);
++	if (!buffer)
++		return;
++
+ 	memcpy(buffer, header, header->size);
+ =
 
->  process::process(const char *_comm, int _pid, int _tid) : power_consumer=
-()
->  {
-> -	char line[4096];
-> +	char line[4097];
->  	ifstream file;
->  =
+ #ifdef USE_DECLTYPE
+@@ -130,6 +133,9 @@ static void parse_event_format(const char *event_name)
+ {
+ 	char *tptr;
+ 	char *name =3D strdup(event_name);
++	if (!name)
++		return;
++
+ 	char *sys =3D strtok_r(name, ":", &tptr);
+ 	char *event =3D strtok_r(NULL, ":", &tptr);
+ 	char *file;
+@@ -137,6 +143,9 @@ static void parse_event_format(const char *event_name)
+ =
 
->  	strcpy(comm, _comm);
-> @@ -103,6 +103,7 @@ process::process(const char *_comm, int _pid, int _ti=
-d) : power_consumer()
->  		file.open(line);
->  		while (file) {
->  			file.getline(line, 4096);
-> +			line[4096] =3D '\0';
->  			if (strstr(line, "Tgid")) {
->  				char *c;
->  				c =3D strchr(line, ':');
-> -- =
+ 	file =3D (char *)malloc(strlen(sys) + strlen(event) +
+ 		      strlen("/sys/kernel/debug/tracing/events////format") + 2);
++	if (!file)
++		return;
++
+ 	sprintf(file, "/sys/kernel/debug/tracing/events/%s/%s/format", sys, event=
+);
+ =
 
-> 1.7.10.4
-> =
+ 	buf =3D read_file(file);
+@@ -169,6 +178,10 @@ bool perf_bundle::add_event(const char *event_name)
+ 		if ((int)ev->trace_type >=3D 0) {
+ 			if (event_names.find(ev->trace_type) =3D=3D event_names.end()) {
+ 				event_names[ev->trace_type] =3D strdup(event_name);
++				if (!event_names[ev->trace_type]) {
++					delete ev;
++					continue;
++				}
+ 				parse_event_format(event_name);
+ 			}
+ 			events.push_back(ev);
+-- =
 
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
+1.7.9.2
 
---===============3716073793254216266==--
+
+--===============9016938335194202470==--
 
