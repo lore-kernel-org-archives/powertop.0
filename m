@@ -1,71 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============0309865280164398744=="
+Content-Type: multipart/mixed; boundary="===============3112635495737634746=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] tuninig: resize scaling support (v1)
-Date: Thu, 23 Aug 2012 23:53:38 +0300
-Message-ID: <20120823205337.GB3065@swordfish.minsk.epam.com>
-In-Reply-To: 50366107.5080509@linux.intel.com
+From: Namhyung Kim <namhyung at gmail.com>
+Subject: Re: [Powertop] [PATCH 1/2] perf_bundle: Check memory allocation
+ failure
+Date: Tue, 18 Sep 2012 23:33:44 +0900
+Message-ID: <1347978824.1771.4.camel@leonhard>
+In-Reply-To: 50588442.7040404@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0309865280164398744==
+--===============3112635495737634746==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (08/23/12 09:57), Chris Ferron wrote:
-> >>
-> So this may be nice for the tuning tab, but we have an overall issue
-> with other tabs as well.
-> Maybe we should change the controls around, and just move the pad.
-> That way we could scroll all tabs and not have to truncate strings.
-> ?
-> -Chris
+2012-09-18 (=ED=99=94), 07:25 -0700, Arjan van de Ven:
+> On 9/18/2012 7:21 AM, Namhyung Kim wrote:
+> > Check return value of malloc/strdup not to make NULL dereferences.
 > =
 
+> I don't mind these patches; they are clean code
+> =
 
-That was the first one in a upcoming series of patches. =
+> however, one of the core userspace developers at work basically said "we =
+don't check for malloc NULL in userspace;
+> if that ever happens the system is so screwed up anyway that you just can=
+not continue".
 
-Because we have separate display logic on every tab, I was moving in a
-direction of teaching each tabs honour resize. =
+Thanks for the quick reply. :)
 
+Basically I agree with you.  But even in that case it'd be better
+letting a user know about current situation somehow rather than just
+segfault.  Maybe by replacing them to xmalloc or so?
 
-
-> Maybe we should change the controls around, and just move the pad.
-> That way we could scroll all tabs and not have to truncate strings.
-
-Sorry, I'm not sure I got this one, could you please elaborate?
-
-We can't avaoid string truncation (unless we introduce support for horizont=
-al
-scrolling as well) when X becomes smaller than the longest string in tab =
-
-(we actually can just ignore it and print beyond the sceen, but I think the
-common behaviour in that case is to let user notice that text has been trun=
-cated
-via ~ for example). I don't know what to do with C, P states tab when we on=
-ly
-have space for "Package" and "Core", or when half of currently required X s=
-pace for
-"Frequency stats" tab is available -- dynamic re-arrange looks a bit comple=
-x at
-the moment.
-
-As of Y scroll, well, we can come up with a common interface:
--- for tab w/ cursor =
-
-scrolling happens on every n*Y cursor position, because cursor step is 1.
-
--- for tab w/o cursor
-scroling happens every cursor step (which is Y in this case).
-
-Schematically, what we need is a common method which will tell the number
-of lines particular tab is going to print, flag that indecates cursor step
-and common method (similar to one that used in tuning tab) to print tab
-content from BEGIN position to END (BEGIN and END depends on current frame).
+Thanks,
+Namhyung
 
 
-	-ss
 
---===============0309865280164398744==--
+--===============3112635495737634746==--
 
