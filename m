@@ -1,34 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============2657727478152795341=="
+Content-Type: multipart/mixed; boundary="===============0421435834628807267=="
 MIME-Version: 1.0
-From: Kok, Auke-jan H <auke-jan.h.kok at intel.com>
-Subject: Re: [Powertop] [PATCH] Fixes to manpage and command line handling
-Date: Thu, 23 Aug 2012 11:53:50 -0700
-Message-ID: <CABsxX9JUTvr7R3zt7omX3_JYqVHAxCcYxJGV8bq8-yta+W-_Bg@mail.gmail.com>
-In-Reply-To: 20120823180516.GA30340@rhrk.uni-kl.de
+From: Namhyung Kim <namhyung at gmail.com>
+Subject: [Powertop] [PATCH 2/2] devlist: NULL terminate struct devuser fields
+Date: Wed, 19 Sep 2012 00:13:18 +0900
+Message-ID: <1347981198-10438-2-git-send-email-namhyung@gmail.com>
+In-Reply-To: 1347981198-10438-1-git-send-email-namhyung@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2657727478152795341==
+--===============0421435834628807267==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 23, 2012 at 11:05 AM, Joerg Mayer <jmpt(a)loplof.de> wrote:
-> Hello,
->
-> I just decided to play with powertop again. So git pull, find out the repo
-> has moved etcetc.
->
-> I found a few cosmetic things within the first 5 minutes of use which I
-> decided to provide a fix for.
->
-> Please apply if it is acceptable, otherwise let me know how to improve it.
+As strncpy doesn't guarantee the destination buffer is NULL-
+terminated, do it explicitly.
 
-could you split these up into functionally different patches? e.g. one
-for whitespace, one for man page changes, and one for the getopt()
-fixes?
+Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+---
+ src/devlist.cpp |    2 ++
+ 1 file changed, 2 insertions(+)
 
-Auke
+diff --git a/src/devlist.cpp b/src/devlist.cpp
+index 828f47f..71898af 100644
+--- a/src/devlist.cpp
++++ b/src/devlist.cpp
+@@ -147,7 +147,9 @@ void collect_open_devices(void)
+ 					continue;
+ 				dev->pid =3D strtoull(entry->d_name, NULL, 10);
+ 				strncpy(dev->device, link, 251);
++				dev->device[251] =3D '\0';
+ 				strncpy(dev->comm, read_sysfs_string("/proc/%s/comm", entry->d_name).c=
+_str(), 31);
++				dev->comm[31] =3D '\0';
+ 				target->push_back(dev);
+ =
 
---===============2657727478152795341==--
+ 			}
+-- =
+
+1.7.9.2
+
+
+--===============0421435834628807267==--
 
