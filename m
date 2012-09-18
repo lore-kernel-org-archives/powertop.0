@@ -1,57 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============3453332797735824590=="
+Content-Type: multipart/mixed; boundary="===============4002389912713280149=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Fix timer and work perf events timestamp
- tracing
-Date: Wed, 05 Sep 2012 11:06:36 -0700
-Message-ID: <504794AC.9040305@linux.intel.com>
-In-Reply-To: CA+Z25wXrKPzkNDR5CbNNPW4YFLUgqPCXBDNthL09dv-4EnSdOw@mail.gmail.com
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [PATCH 1/2] devlist: Remove an unnecessary sprintf
+Date: Tue, 18 Sep 2012 08:42:42 -0700
+Message-ID: <50589672.7090006@linux.intel.com>
+In-Reply-To: 1347981198-10438-1-git-send-email-namhyung@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3453332797735824590==
+--===============4002389912713280149==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 9/5/2012 10:45 AM, Rajagopal Venkat wrote:
-> On 5 September 2012 22:52, Arjan van de Ven <arjan(a)linux.intel.com> wro=
-te:
->> On 9/5/2012 10:19 AM, Rajagopal Venkat wrote:
->>> On 5 September 2012 22:39, Arjan van de Ven <arjan(a)linux.intel.com> w=
-rote:
->>>> On 9/5/2012 9:56 AM, Rajagopal Venkat wrote:
->>>>>> measure1:
->>>>>> ev3.start
->>>>>> ev1.end  <<<<<
->>>>>
->>>>> evX.end  <<<<<
->>>>> These events are causing numbers to go wrong.
->>>>
->>>> but out of a 20 second window.. this is a tiny tiny window...
->>>> if you see 100.1% I'd buy this reasoning.
->>>> but you're seeing much more than that.
->>>
->>> How about generating a report for 1sec duration?
->>
->> even for 1 second... still it's miniscule compared to this whole 1 second
->> the amount of setup/teardown time just is not that huge.
->>
-> Here are some perf timestamps,
-> (3979299431)
-> (3979303554)
-> (4079217947)
-> (4091306943)
-> (4091322535)
-> (4091336882)
-> When 1sec report is generated and if above timestamp gets
-> added to timer accumulated_runtime, no wonder why such
-> huge usage is reported.
+On 09/18/2012 08:13 AM, Namhyung Kim wrote:
+> The 'filename' is not used in the loop anymore.
+>
+> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+> ---
+>   src/devlist.cpp |    1 -
+>   1 file changed, 1 deletion(-)
+>
+> diff --git a/src/devlist.cpp b/src/devlist.cpp
+> index 5ec0a8b..828f47f 100644
+> --- a/src/devlist.cpp
+> +++ b/src/devlist.cpp
+> @@ -147,7 +147,6 @@ void collect_open_devices(void)
+>   					continue;
+>   				dev->pid =3D strtoull(entry->d_name, NULL, 10);
+>   				strncpy(dev->device, link, 251);
+> -				sprintf(filename, "/proc/%s/comm", entry->d_name);
+>   				strncpy(dev->comm, read_sysfs_string("/proc/%s/comm", entry->d_name=
+).c_str(), 31);
+>   				target->push_back(dev);
+>   =
 
-question is... how did these get here?
-is the kernel reporting garbage time ????
+Your patch has been merged
+Thank You
+-C
 
 
-
---===============3453332797735824590==--
+--===============4002389912713280149==--
 
