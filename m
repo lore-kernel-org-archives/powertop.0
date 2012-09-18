@@ -1,31 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============3593818050456097923=="
+Content-Type: multipart/mixed; boundary="===============7508622839529034645=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] do not implement get_user_input() in
- DISABLE_NCURSES builds
-Date: Sun, 19 Aug 2012 17:40:38 -0700
-Message-ID: <50318786.20701@linux.intel.com>
-In-Reply-To: 20120819215734.GA3137@swordfish
+From: Namhyung Kim <namhyung at gmail.com>
+Subject: [Powertop] [PATCH 1/2] devlist: Remove an unnecessary sprintf
+Date: Wed, 19 Sep 2012 00:13:17 +0900
+Message-ID: <1347981198-10438-1-git-send-email-namhyung@gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3593818050456097923==
+--===============7508622839529034645==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 8/19/2012 2:57 PM, Sergey Senozhatsky wrote:
-> do not implement get_user_input() in DISABLE_NCURSES builds
+The 'filename' is not used in the loop anymore.
 
-no offence.. but this ifdef madness needs to stop.
+Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+---
+ src/devlist.cpp |    1 -
+ 1 file changed, 1 deletion(-)
 
-right now, powertop uses ncurses.
+diff --git a/src/devlist.cpp b/src/devlist.cpp
+index 5ec0a8b..828f47f 100644
+--- a/src/devlist.cpp
++++ b/src/devlist.cpp
+@@ -147,7 +147,6 @@ void collect_open_devices(void)
+ 					continue;
+ 				dev->pid =3D strtoull(entry->d_name, NULL, 10);
+ 				strncpy(dev->device, link, 251);
+-				sprintf(filename, "/proc/%s/comm", entry->d_name);
+ 				strncpy(dev->comm, read_sysfs_string("/proc/%s/comm", entry->d_name).c=
+_str(), 31);
+ 				target->push_back(dev);
+ =
 
-either we want to make it optional, but then this stuff needs to get a lot =
-more modular,
-or we just declare that you need ncurses.
-I'm very much leaning towards the later fwiw...
+-- =
+
+1.7.9.2
 
 
---===============3593818050456097923==--
+--===============7508622839529034645==--
 
