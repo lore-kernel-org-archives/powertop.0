@@ -1,361 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============8879067603530677839=="
+Content-Type: multipart/mixed; boundary="===============7485917848777872790=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] PowerTOP UI navigation enhancement.
-Date: Tue, 11 Sep 2012 19:55:42 +0300
-Message-ID: <20120911165542.GB2955@swordfish.minsk.epam.com>
-In-Reply-To: 504F6928.10301@linux.intel.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [PATCH 1/2] Updates to support Android platform
+Date: Tue, 18 Sep 2012 06:26:37 -0700
+Message-ID: <5058768D.1090701@linux.intel.com>
+In-Reply-To: CA+Z25wVQO-a7Rqjh+XA0iAb04sNoRE8bd2H0UBXtjjrM-b5KuA@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8879067603530677839==
+--===============7485917848777872790==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (09/11/12 09:39), Chris Ferron wrote:
-> This patch add more ui navigation features allowing for the scrolling
-> of PowerTop content for each tab. This is done by controlling the
-> location of the winpad, and refreshing the terminal window when
-> needed. To do this, the navigation keys have been updated as follows.
+On 9/17/2012 10:53 PM, Rajagopal Venkat wrote:
+> On 18 September 2012 10:53, Magnus Fromreide <magfr(a)lysator.liu.se> wro=
+te:
+>> On Tue, 2012-09-18 at 09:54 +0530, Rajagopal Venkat wrote:
+>>> On 17 September 2012 21:58, Chris Ferron <chris.e.ferron(a)linux.intel.=
+com> wrote:
+>>>> On 09/17/2012 07:34 AM, Rajagopal Venkat wrote:
+>>>>>
+>>>>>     #include "devices/device.h"
+>>>>> diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
+>>>>> index eaef7f1..c9d6b0b 100644
+>>>>> --- a/src/process/do_process.cpp
+>>>>> +++ b/src/process/do_process.cpp
+>>>>> @@ -869,7 +869,7 @@ void process_update_display(void)
+>>>>>                 if (!show_power)
+>>>>>                         strcpy(power, "          ");
+>>>>>                 sprintf(name, "%s", all_power[i]->type());
+>>>>> -               while (mbstowcs(NULL,name,0) < 14) strcat(name, " ");
+>>>>> +               while (mbstowcs(NULL,name,20) < 14) strcat(name, " ");
+>>>>>
+>>>>
+>>>> mbstowcs(NULL,name,0) is a test. return will be count. while catches t=
+he
+>>>> error.
+>>>
+>>> Agree. The Android bionic libc version of mbstowcs always returns zero =
+if
+>>> max(third parameter) is zero, resulting in infinite loop.
+>>
+>> Have you reported the bug in the library to Google? If the first
+>> argument is NULL posix says the third argument should be ignored.
 > =
 
-> "Arrow Keys" now scroll the tab windows
-> "Page up/down" scroll tab windows up and down
-> "TAB" cycles the next window tab
-> "SHIFT+TAB" cycles the previous window tab
-> "ENTER" toggles tunables
-> "SPACE BAR" toggles tunables
-> "r KEY" refresh results and resets view of tab window.
-> =
+> I don't see bionic libc claiming to be posix compliant.
 
-> Known issues:
-> There is no handler for terminal re-sizing. The workaround is to use
-> "r KEY" to refresh if terminal windows size is changed mid session.
-> ---
->  src/cpu/abstract_cpu.cpp |  1 -
->  src/display.cpp          | 98
-> ++++++++++++++++++++++++++++++++++--------------
->  src/display.h            | 13 ++++++-
->  src/main.cpp             | 17 ++++++---
->  4 files changed, 93 insertions(+), 36 deletions(-)
-> =
-
-> =
-
-
-> diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
-> index 8b4c650..ca6901c 100644
-> --- a/src/cpu/abstract_cpu.cpp
-> +++ b/src/cpu/abstract_cpu.cpp
-> @@ -422,7 +422,6 @@ void abstract_cpu::validate(void)
->  =
-
->  		if (children[i]) {
->  			if (my_time !=3D children[i]->total_pstate_time())
-> -				printf("My (%i) time %llu is not the same as child (%i) time %llu\n",
->  					first_cpu,
->  					(unsigned long long)my_time,
->  					children[i]->number,
-
-
-not sure this will compile.
-
-
-	-ss
-
-> diff --git a/src/display.cpp b/src/display.cpp
-> index f48b53f..6a119bc 100644
-> --- a/src/display.cpp
-> +++ b/src/display.cpp
-> @@ -95,7 +95,7 @@ static int current_tab;
->  =
-
->  void show_tab(unsigned int tab)
->  {
-> -	WINDOW *win;
-> +	class tab_window *win;
->  	unsigned int i;
->  	int tab_pos =3D 17;
->  	const char *c;
-> @@ -145,11 +145,11 @@ void show_tab(unsigned int tab)
->  	wrefresh(tab_bar);
->  	wrefresh(bottom_line);
->  =
-
-> -	win =3D get_ncurses_win(tab_names[tab]);
-> +	win =3D tab_windows[tab_names[tab]];
->  	if (!win)
->  		return;
->  =
-
-> -	prefresh(win, 0, 0, 1, 0, LINES - 3, COLS - 1);
-> +	prefresh(win->win, win->ypad_pos, win->xpad_pos, 1, 0, LINES - 3, COLS =
-- 1);
->  }
->  =
-
->  WINDOW *get_ncurses_win(const char *name)
-> @@ -185,42 +185,41 @@ WINDOW *get_ncurses_win(const string &name)
->  	return get_ncurses_win(name.c_str());
->  }
->  =
-
-> -
-> -void show_next_tab(void)
-> +void show_prev_tab(void)
->  {
-> -	class tab_window *w;
-> +       class tab_window *w;
->  =
-
-> -	if (!display)
-> -		return;
-> +       if (!display)
-> +               return;
-> +       w =3D tab_windows[tab_names[current_tab]];
-> +       if (w)
-> +               w->hide();
->  =
-
-> -	w =3D tab_windows[tab_names[current_tab]];
-> -	if (w)
-> -		w->hide();
-> +       current_tab --;
-> +       if (current_tab < 0)
-> +               current_tab =3D tab_names.size() - 1;
->  =
-
-> -	current_tab ++;
-> -	if (current_tab >=3D (int)tab_names.size())
-> -		current_tab =3D 0;
-> -
-> -	w =3D tab_windows[tab_names[current_tab]];
-> -	if (w)
-> -		w->expose();
-> +       w =3D tab_windows[tab_names[current_tab]];
-> +       if (w)
-> +               w->expose();
->  =
-
-> -	show_tab(current_tab);
-> +       show_tab(current_tab);
->  }
->  =
-
-> -void show_prev_tab(void)
-> +void show_next_tab(void)
->  {
->  	class tab_window *w;
->  =
-
->  	if (!display)
->  		return;
-> +
->  	w =3D tab_windows[tab_names[current_tab]];
->  	if (w)
->  		w->hide();
->  =
-
-> -	current_tab --;
-> -	if (current_tab < 0)
-> -		current_tab =3D tab_names.size() - 1;
-> +	current_tab ++;
-> +	if (current_tab >=3D (int)tab_names.size())
-> +		current_tab =3D 0;
->  =
-
->  	w =3D tab_windows[tab_names[current_tab]];
->  	if (w)
-> @@ -241,8 +240,16 @@ void cursor_down(void)
->  	class tab_window *w;
->  =
-
->  	w =3D tab_windows[tab_names[current_tab]];
-> -	if (w)
-> -		w->cursor_down();
-> +	if (w) {
-> +		if (tab_names[current_tab] =3D=3D "Tunables") {
-> +	                if ((w->cursor_pos + 7) >=3D LINES) { =
-
-> +				prefresh(w->win, ++w->ypad_pos, w->xpad_pos, 1, 0, LINES - 3, COLS -=
- 1);
-> +			}			=
-
-> +				w->cursor_down(); =
-
-> +		} else {
-> +			prefresh(w->win, ++w->ypad_pos, w->xpad_pos, 1, 0, LINES - 3, COLS - =
-1);
-> +		}
-> +	}
->  =
-
->  	show_cur_tab();
->  }
-> @@ -253,12 +260,45 @@ void cursor_up(void)
->  =
-
->  	w =3D tab_windows[tab_names[current_tab]];
->  =
-
-> -	if (w)
-> -		w->cursor_up();
-> -
-> +	if (w) {
-> +		w->cursor_up(); =
-
-> +		if(w->ypad_pos > 0) {
-> +	                if (tab_names[current_tab] =3D=3D "Tunables") {
-> +        	               prefresh(w->win, --w->ypad_pos, w->xpad_pos, 1, =
-0, LINES - 3, COLS - 1);
-> +	                } else {
-> +        	               prefresh(w->win, --w->ypad_pos, w->xpad_pos, 1, =
-0, LINES - 3, COLS - 1);
-> +	                }
-> +		}
-> +	}
-> +	=
-
->  	show_cur_tab();
->  }
->  =
-
-> +void cursor_left(void)
-> +{
-> +        class tab_window *w;
-> +
-> +	w =3D tab_windows[tab_names[current_tab]];
-> +	=
-
-> +	if (w) {			=
-
-> +		if (w->xpad_pos > 0) {
-> +			prefresh(w->win, w->ypad_pos,--w->xpad_pos, 1, 0, LINES - 3, COLS - 1=
-);
-> +		}
-> +	}
-> +}
-> +
-> +void cursor_right(void) =
-
-> +{
-> +        class tab_window *w;
-> +
-> +	w =3D tab_windows[tab_names[current_tab]];
-> +
-> +	if (w) {
-> +		prefresh(w->win, w->ypad_pos, ++w->xpad_pos, 1, 0, LINES - 3, COLS - 1=
-);
-> +	}
-> +	=
-
-> +}
-> +
->  void cursor_enter(void)
->  {
->  	class tab_window *w;
-> @@ -279,6 +319,8 @@ void window_refresh()
->  	w =3D tab_windows[tab_names[current_tab]];
->  =
-
->  	if (w) {
-> +		w->ypad_pos =3D 0;
-> +		w->xpad_pos =3D 0;
->  		w->window_refresh();
->  		w->repaint();
->  	}
-> diff --git a/src/display.h b/src/display.h
-> index 33aaae1..00887aa 100644
-> --- a/src/display.h
-> +++ b/src/display.h
-> @@ -41,6 +41,8 @@ extern void show_prev_tab(void);
->  extern void show_cur_tab(void);
->  extern void cursor_up(void);
->  extern void cursor_down(void);
-> +extern void cursor_right(void);
-> +extern void cursor_left(void);
->  extern void cursor_enter(void);
->  extern void window_refresh(void);
->  =
-
-> @@ -48,10 +50,17 @@ class tab_window {
->  public:
->  	int cursor_pos;
->  	int cursor_max;
-> +	int xpad_pos, ypad_pos; =
-
->  	WINDOW *win;
->  =
-
-> -	virtual void cursor_down(void) { if (cursor_pos < cursor_max ) cursor_p=
-os++; repaint(); } ;
-> -	virtual void cursor_up(void) { if (cursor_pos > 0) cursor_pos--; repain=
-t(); };
-> +	virtual void cursor_down(void) { =
-
-> +		if (cursor_pos < cursor_max ) cursor_pos++; repaint(); =
-
-> +	} ;
-> +	virtual void cursor_up(void) { =
-
-> +		if (cursor_pos > 0) cursor_pos--; repaint(); =
-
-> +	};
-> +	virtual void cursor_left(void) { };
-> +	virtual void cursor_right(void) { };
->  =
-
->  	virtual void cursor_enter(void) { };
->  	virtual void window_refresh() { };
-> diff --git a/src/main.cpp b/src/main.cpp
-> index cf47b4e..edc4147 100644
-> --- a/src/main.cpp
-> +++ b/src/main.cpp
-> @@ -135,22 +135,29 @@ static void do_sleep(int seconds)
->  		halfdelay(delta * 10);
->  =
-
->  		c =3D getch();
-> -
-> +		printf("c (%i)", c); =
-
->  		switch (c) {
-> -		case KEY_NPAGE:
-> +		case 353: =
-
-> +			show_prev_tab();
-> +			break;
-> +		case 9:
-> +			show_next_tab(); =
-
-> +			break;
->  		case KEY_RIGHT:
-> -			show_next_tab();
-> +			cursor_right(); =
-
->  			break;
-> -		case KEY_PPAGE:
->  		case KEY_LEFT:
-> -			show_prev_tab();
-> +			cursor_left(); =
-
->  			break;
-> +		case KEY_NPAGE:
->  		case KEY_DOWN:
->  			cursor_down();
->  			break;
-> +		case KEY_PPAGE:
->  		case KEY_UP:
->  			cursor_up();
->  			break;
-> +		case 32:
->  		case 10:
->  			cursor_enter();
->  			break;
-> =
+can you make a small wrapper in your android compat header to cope with thi=
+s case?
+(in the idea of keeping all the junk to work around a buggy platform in one=
+ place)
 
 
 
---===============8879067603530677839==--
+
+--===============7485917848777872790==--
 
