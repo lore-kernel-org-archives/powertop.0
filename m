@@ -1,68 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============2879210564262264378=="
+Content-Type: multipart/mixed; boundary="===============0578495158406130438=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] [PATCH v2 1/2] Updates to support Android platform
-Date: Tue, 25 Sep 2012 07:45:24 +0200
-Message-ID: <506144F4.70007@linux.intel.com>
-In-Reply-To: CA+Z25wV9QXDp9zmaoQrxXUh6VGMBs0Rb3=tNd-xnT50HPz2Uqg@mail.gmail.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH 1/2] Updates to support Android platform
+Date: Tue, 18 Sep 2012 11:11:54 +0300
+Message-ID: <20120918081153.GA3134@swordfish.minsk.epam.com>
+In-Reply-To: CA+Z25wVXrMZaKyGsVjwyv3op4L3JaH7+ONi0oJUeFgi2cNN5jQ@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2879210564262264378==
+--===============0578495158406130438==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 9/25/2012 7:34 AM, Rajagopal Venkat wrote:
->> On 09/24/2012 06:28 AM, Rajagopal Venkat wrote:
->>>
->>> This patch adds following minor changes to prepare powertop
->>> to support Android platform.
->>>
->>> - Add missing HAVE_CONFIG_H conditional check.
->>> - remove un-used ethtool_cmd_speed_set and ethtool_cmd_speed
->>> functions.
->>> - Minimize dependency on exception handling in catch blocks.
->>>
->>> These changes will not affect powertop functionality.
->>>
->>> Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
-
-
->>
-> As discussed in first patch set, android doesn't support exception
-> handling. This
-
-where is this in your commit log?
-
-> is the reason powertop had DISABLE_TRYCATCH conditional macro which is
-> removed in recent commit.
-
-Android being braindead about the C++ language should be it's own patch, no=
-t snuck in as part of another change.
-
-
+On (09/18/12 11:28), Rajagopal Venkat wrote:
+> >> >
+> >> Android doesn't support C++ exception handling. Here is the Android of=
+ficial
+> >> answer [1]. This is the reason for having DISABLE_TRYCATCH macro in
+> >> powertop code which were removed in recent commit.
+> >>
+> >> [1] https://groups.google.com/forum/?fromgroups=3D#!topic/android-ndk/=
+idtn7R-_ZFA
+> >
+> > That reference is two years old and it ends with a note that they will
+> > try to enable exception handling for user space programs. Have anything
+> > happened on that part in these last two years?
 > =
 
-> The patch 2/2 adds stubs for exception handling
+> I don't think it is yet there. Here is another reference[2],
+> "Android does not yet support C++ exceptions".
 > =
 
-> #define try           if (true)
-> #define catch(x)      if (false)
+> [2] http://developer.android.com/guide/practices/jni.html
 > =
 
-> With this, fprintf(stderr, "%s\n", c.what()); in catch block throws
-> undefined reference
-> to c. So added message instead of c.what().
-> =
 
-> Any better ways of adding stubs are welcome.
-
-#define try(x)   if (true) { x;
-#define catch(x) } else
-
-?
+so... we endup in need to support non-POSIX C runtime and non-ISO C++.
 
 
---===============2879210564262264378==--
+	-ss
+
+--===============0578495158406130438==--
 
