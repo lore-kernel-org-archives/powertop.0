@@ -1,34 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============7840507326826135545=="
+Content-Type: multipart/mixed; boundary="===============3149620663391908592=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Query: Weird Output values: Percentage over 100%
-Date: Mon, 03 Sep 2012 20:57:50 +0300
-Message-ID: <20120903175750.GB3062@swordfish>
-In-Reply-To: 5044EADC.7040205@linux.intel.com
+From: Rajagopal Venkat <rajagopal.venkat at linaro.org>
+Subject: Re: [Powertop] [PATCH 1/2] Updates to support Android platform
+Date: Tue, 18 Sep 2012 11:28:14 +0530
+Message-ID: <CA+Z25wVXrMZaKyGsVjwyv3op4L3JaH7+ONi0oJUeFgi2cNN5jQ@mail.gmail.com>
+In-Reply-To: 1347946993.3210.21.camel@sara
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7840507326826135545==
+--===============3149620663391908592==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (09/03/12 10:37), Arjan van de Ven wrote:
-> >> Running on ARM: Panda Board.
-> =
+On 18 September 2012 11:13, Magnus Fromreide <magfr(a)lysator.liu.se> wrote:
+> On Tue, 2012-09-18 at 09:20 +0530, Rajagopal Venkat wrote:
+>> On 17 September 2012 21:29, Arjan van de Ven <arjan(a)linux.intel.com> w=
+rote:
+>> >
+>> >
+>> Android doesn't support C++ exception handling. Here is the Android offi=
+cial
+>> answer [1]. This is the reason for having DISABLE_TRYCATCH macro in
+>> powertop code which were removed in recent commit.
+>>
+>> [1] https://groups.google.com/forum/?fromgroups=3D#!topic/android-ndk/id=
+tn7R-_ZFA
+>
+> That reference is two years old and it ends with a note that they will
+> try to enable exception handling for user space programs. Have anything
+> happened on that part in these last two years?
 
-> I wonder if the perf data is somehow incorrect on your platform.
-> powertop depends on correct timestamps for example.
-> =
+I don't think it is yet there. Here is another reference[2],
+"Android does not yet support C++ exceptions".
 
-> =
+[2] http://developer.android.com/guide/practices/jni.html
+
+>
+> /MF
+>
 
 
-I was thinking about this. Could it be possible that we lose
-some perf samples? E.g. we have start, but no end timestamps.
 
+-- =
 
-	-ss
+Regards,
+Rajagopal
 
---===============7840507326826135545==--
+--===============3149620663391908592==--
 
