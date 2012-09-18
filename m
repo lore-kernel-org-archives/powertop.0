@@ -1,96 +1,75 @@
-Content-Type: multipart/mixed; boundary="===============1117637964343004000=="
+Content-Type: multipart/mixed; boundary="===============2843450603552206107=="
 MIME-Version: 1.0
-From: Paul Menzel <paulepanter at users.sourceforge.net>
-Subject: Re: [Powertop] [PATCH] Remove unneded escaping backslashes from CSS
-Date: Fri, 14 Sep 2012 12:02:44 +0200
-Message-ID: <1347616964.6783.13.camel@mattotaupa>
-In-Reply-To: 1347616012-26879-1-git-send-email-i.zhbanov@samsung.com
+From: Rajagopal Venkat <rajagopal.venkat at linaro.org>
+Subject: Re: [Powertop] [PATCH 1/2] Updates to support Android platform
+Date: Tue, 18 Sep 2012 09:54:37 +0530
+Message-ID: <CA+Z25wU4UMNYCR7hR2LWDhSprArsSk8U=rKrGRNCM-+hYHhTRA@mail.gmail.com>
+In-Reply-To: 50574FA0.1050102@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1117637964343004000==
+--===============2843450603552206107==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Dear Igor,
+On 17 September 2012 21:58, Chris Ferron <chris.e.ferron(a)linux.intel.com>=
+ wrote:
+> On 09/17/2012 07:34 AM, Rajagopal Venkat wrote:
+>>
+>>     #include "devices/device.h"
+>> diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
+>> index eaef7f1..c9d6b0b 100644
+>> --- a/src/process/do_process.cpp
+>> +++ b/src/process/do_process.cpp
+>> @@ -869,7 +869,7 @@ void process_update_display(void)
+>>                 if (!show_power)
+>>                         strcpy(power, "          ");
+>>                 sprintf(name, "%s", all_power[i]->type());
+>> -               while (mbstowcs(NULL,name,0) < 14) strcat(name, " ");
+>> +               while (mbstowcs(NULL,name,20) < 14) strcat(name, " ");
+>>
+>
+> mbstowcs(NULL,name,0) is a test. return will be count. while catches the
+> error.
+
+Agree. The Android bionic libc version of mbstowcs always returns zero if
+max(third parameter) is zero, resulting in infinite loop.
+
+I believe this change should not cause any adverse effect on current behavi=
+or.
+The mbstowcs would stop parsing source string when it encounters null-chara=
+cter
+or max len. Atleast I didn't observe any change in return value(count).
+
+>
+>
+>>                 if (all_power[i]->events() =3D=3D 0 && all_power[i]->usa=
+ge()
+>> =3D=3D 0 && all_power[i]->Witts() =3D=3D 0)
+>> @@ -882,7 +882,7 @@ void process_update_display(void)
+>>                         else
+>>                                 sprintf(usage, "%5i%s",
+>> (int)all_power[i]->usage(), all_power[i]->usage_units());
+>>                 }
+>> -               while (mbstowcs(NULL,usage,0) < 14) strcat(usage, " ");
+>> +               while (mbstowcs(NULL,usage,20) < 14) strcat(usage, " ");
+>>                 sprintf(events, "%5.1f", all_power[i]->events());
+>>                 if (!all_power[i]->show_events())
+>>                         events[0] =3D 0;
+>
+>
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
 
 
-Am Freitag, den 14.09.2012, 13:46 +0400 schrieb Igor Zhbanov:
-> Remove unneded escaping backslashes from CSS.
 
-copying the summary into the body is not useful, because it adds no
-further information.
+-- =
 
-Please also add why the escaping was added beforehand and why it is
-unneeded.
+Regards,
+Rajagopal
 
-> ---
->  src/powertop.css |   16 ++++++++--------
->  1 files changed, 8 insertions(+), 8 deletions(-)
-> =
-
-> diff --git a/src/powertop.css b/src/powertop.css
-> index 087e384..5d303dc 100644
-> --- a/src/powertop.css
-> +++ b/src/powertop.css
-> @@ -21,14 +21,14 @@ $(document).ready(function(){
->  	$('#tuning h2').addClass('hide');
->  	$('#tuning table').addClass('hide');
->  =
-
-> -	$('#top').append('<div class=3D\"SystemButton\"   onclick=3D\"toggleSys=
-tem()\">System Info<\\/div>');
-> -	$('#top').append('<div class=3D\"SummaryButton\"  onclick=3D\"toggleSum=
-mary()\">Summary<\\/div>');
-> -	$('#top').append('<div class=3D\"CpuidleButton\"  onclick=3D\"toggleCpu=
-idle()\">CPU Idle<\\/div>');
-> -	$('#top').append('<div class=3D\"CpufreqButton\"  onclick=3D\"toggleCpu=
-freq()\">CPU Frequency<\\/div>');
-> -	$('#top').append('<div class=3D\"SoftwareButton\" onclick=3D\"toggleSof=
-tware()\">Software info<\\/div>');
-> -	$('#top').append('<div class=3D\"DeviceButton\"   onclick=3D\"toggleDev=
-ice()\">Device Info<\\/div>');
-> -	$('#top').append('<div class=3D\"TuningButton\"   onclick=3D\"toggleTun=
-ing()\">Tuning<\\/div>');
-> -	$('#top').append('<div class=3D\"AllButton\"      onclick=3D\"toggleAll=
-()\">All<\\/div>');
-> +	$('#top').append('<div class=3D\"SystemButton\"   onclick=3D\"toggleSys=
-tem()\">System Info</div>');
-> +	$('#top').append('<div class=3D\"SummaryButton\"  onclick=3D\"toggleSum=
-mary()\">Summary</div>');
-> +	$('#top').append('<div class=3D\"CpuidleButton\"  onclick=3D\"toggleCpu=
-idle()\">CPU Idle</div>');
-> +	$('#top').append('<div class=3D\"CpufreqButton\"  onclick=3D\"toggleCpu=
-freq()\">CPU Frequency</div>');
-> +	$('#top').append('<div class=3D\"SoftwareButton\" onclick=3D\"toggleSof=
-tware()\">Software info</div>');
-> +	$('#top').append('<div class=3D\"DeviceButton\"   onclick=3D\"toggleDev=
-ice()\">Device Info</div>');
-> +	$('#top').append('<div class=3D\"TuningButton\"   onclick=3D\"toggleTun=
-ing()\">Tuning</div>');
-> +	$('#top').append('<div class=3D\"AllButton\"      onclick=3D\"toggleAll=
-()\">All</div>');
->  	$('#top .SummaryButton').toggleClass('pressed');
->  =
-
->      }
-
-
-Thanks,
-
-Paul
-
---===============1117637964343004000==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
-L0xpbnV4KQoKaUVZRUFCRUNBQVlGQWxCVEFNUUFDZ2tRUFgxYUsyd09IVmhWUkFDZU9SVkhoK0VQ
-aTMyN2RFV1VHTHZ3Wng0RgpHdjhBblJyZ29XVThpZmpDUzYwUVJSa3J6QTBZNmFUUAo9anYwegot
-LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
-
---===============1117637964343004000==--
+--===============2843450603552206107==--
 
