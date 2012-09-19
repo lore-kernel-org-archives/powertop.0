@@ -1,44 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============8092377173872492410=="
+Content-Type: multipart/mixed; boundary="===============4798020587258524841=="
 MIME-Version: 1.0
 From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: [Powertop] [PATCH] Fix backlight usage reporting when backlight
- control is not supported
-Date: Mon, 13 Aug 2012 20:49:09 +0400
-Message-ID: <1344876549-13923-1-git-send-email-i.zhbanov@samsung.com>
+Subject: Re: [Powertop] Powertop doesn't detects sleeping ARM cores
+Date: Wed, 19 Sep 2012 12:26:59 +0400
+Message-ID: <505981D3.7010403@samsung.com>
+In-Reply-To: 50571E4F.1010604@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8092377173872492410==
+--===============4798020587258524841==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On PC file /sys/class/backlight/.../max_brightness can contain 0
-when backlight control is not supported. Added check helps to avoid
-dividing by zero and printing NaN.
----
- src/devices/backlight.cpp |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+Hi,
 
-diff --git a/src/devices/backlight.cpp b/src/devices/backlight.cpp
-index b8c9147..82cb1e0 100644
---- a/src/devices/backlight.cpp
-+++ b/src/devices/backlight.cpp
-@@ -145,6 +145,9 @@ double backlight::utilization(void)
- {
- 	double p;
- =
+Here is some notes to my previous post.
 
-+	if (max_level =3D=3D 0)
-+		return 0.0;
-+
- 	p =3D 100.0 * (end_level + start_level) / 2 / max_level;
- 	return p;
- }
+I mean that only online cores are shown in /proc/cpuinfo.
+So the PowerTOP doesn't count currently offline ones.
+And you must run the PowerTOP on a heavy loaded system
+to let the PowerTOP see all CPU cores.
+
+Therefore it is impossible to run the PowerTOP before starting
+of heavy application to get information about all CPU cores.
+
+Probably the PowerTOP could cache CPU information in some file,
+so it will be possible to register trace events for all cores.
+
 -- =
 
-1.7.5.4
+Best regards,
+Igor Zhbanov,
+Expert Software Engineer,
+phone: +7 (495) 797 25 00 ext 3806
+e-mail: i.zhbanov(a)samsung.com
+
+ASWG, Moscow R&D center, Samsung Electronics
+12 Dvintsev street, building 1
+127018, Moscow, Russian Federation
 
 
---===============8092377173872492410==--
+--===============4798020587258524841==--
 
