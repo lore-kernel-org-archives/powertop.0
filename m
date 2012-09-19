@@ -1,40 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============4661865518370531309=="
+Content-Type: multipart/mixed; boundary="===============9139339401808654069=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] [PATCH 1/2] Updates to support Android platform
-Date: Mon, 17 Sep 2012 08:59:44 -0700
-Message-ID: <505748F0.6010708@linux.intel.com>
-In-Reply-To: 20120917145442.GA2969@swordfish.minsk.epam.com
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] Powertop doesn't detects sleeping ARM cores
+Date: Wed, 19 Sep 2012 08:15:59 -0700
+Message-ID: <5059E1AF.3010000@linux.intel.com>
+In-Reply-To: 505981D3.7010403@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4661865518370531309==
+--===============9139339401808654069==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-
+On 09/19/2012 01:26 AM, Igor Zhbanov wrote:
 > Hi,
-> I don't have exp with android development.
-> this is not the first time we have exception related patches in order to =
-support android.
-> I just wonder -- what's wrong with C++ in general (and exception handling=
- in particular) =
+>
+> Here is some notes to my previous post.
+>
+> I mean that only online cores are shown in /proc/cpuinfo.
+> So the PowerTOP doesn't count currently offline ones.
+> And you must run the PowerTOP on a heavy loaded system
+> to let the PowerTOP see all CPU cores.
+>
+> Therefore it is impossible to run the PowerTOP before starting
+> of heavy application to get information about all CPU cores.
+>
+> Probably the PowerTOP could cache CPU information in some file,
+> so it will be possible to register trace events for all cores.
+>
+Off hand I don't have a good solution to help your ARM story. Your notes =
 
-> in android?
+are interesting and I agree this is something that ARM is going to need. =
 
-yeah this looks extremely fragile
+Do you have a complete solution you would like to purpose? I assume you =
 
-+/* define stubs for C++ exception handling */
-+#define try     	if (true)
-+#define catch(x) 	if (false)
-+
+have done some hacking to get around this, but if you have taken that =
 
-I mean.. this really is wrong.
-Is C++ on Android really so broken that try/catch do not work ???
+and tuned it i suggest purposing the change. If you find a solution that =
 
-what else is terminal in the C++ implementation on android then?
+doesn't digress the Architectures, and corrects the ARM story then =
+
+please submit patches. I would be interested in seeing what you have =
+
+come up with.
+
+I will try and look for a general solution, are there any other ARM =
+
+advocates on this list who would like to chime in?
+
+-C
 
 
---===============4661865518370531309==--
+--===============9139339401808654069==--
 
