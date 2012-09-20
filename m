@@ -1,28 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============4628530338699206718=="
+Content-Type: multipart/mixed; boundary="===============2985193711271853046=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Fix screen DPMS support detection
-Date: Mon, 13 Aug 2012 10:35:15 -0700
-Message-ID: <50293AD3.6020900@linux.intel.com>
-In-Reply-To: 502930CC.5070204@samsung.com
+From: Namhyung Kim <namhyung at gmail.com>
+Subject: Re: [Powertop] [PATCH] report: Try /etc/lsb-release for OS information
+Date: Fri, 21 Sep 2012 00:07:27 +0900
+Message-ID: <1348153647.1510.9.camel@leonhard>
+In-Reply-To: 505B2FDF.3000804@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4628530338699206718==
+--===============2985193711271853046==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 8/13/2012 9:52 AM, Igor Zhbanov wr
-> The problem is that on some architectures max_brightness is 0. =
+2012-09-20 (=EB=AA=A9), 17:01 +0200, Arjan van de Ven:
+> On 9/20/2012 4:58 PM, Namhyung Kim wrote:
+> > Ubuntu doesn't provide /etc/{system,redhat,os}-release but
+> > /etc/lsb-release file.  Since it's present on any LSB (Linux Standard
+> > Base) compliant distributions, it'd better to try to read it.
+> =
+
+> it's obsolete though
+> everyone has moved (or is moving) to /etc/os-release, which is a freedesk=
+top standard
+> and has pretty decent semantics...
+
+Didn't know that.  But at least my desktop box doesn't have the
+os-release yet.  Do you mind if we try the lsb-release file as a
+fallback (as does in this patch)?
+
+Thanks,
+Namhyung
 
 
 
-oooof that's bad
-yes we shouldn't do divide by zero
 
-but what kind of platform has a max brightness of 0 ?????
-
-
---===============4628530338699206718==--
+--===============2985193711271853046==--
 
