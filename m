@@ -1,173 +1,64 @@
-Content-Type: multipart/mixed; boundary="===============7285385686263995553=="
+Content-Type: multipart/mixed; boundary="===============1608989733203405527=="
 MIME-Version: 1.0
-From: Joerg Mayer <jmpt at loplof.de>
-Subject: [Powertop] [PATCH 1/4] Remove trailing whitespace
-Date: Thu, 23 Aug 2012 23:20:13 +0200
-Message-ID: <20120823215418.50D6CDFFDC@linda.rhrk.uni-kl.de>
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: Re: [Powertop] Powertop doesn't detects sleeping ARM cores
+Date: Thu, 20 Sep 2012 13:29:40 +0400
+Message-ID: <505AE204.6090907@samsung.com>
+In-Reply-To: 20120920091433.GA3237@swordfish.minsk.epam.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7285385686263995553==
+--===============1608989733203405527==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Sergey Senozhatsky wrote:
 
-Signed-off-by: Joerg Mayer <jmpt(a)loplof.de>
----
- src/display.cpp |    2 +-
- src/display.h   |    2 +-
- src/lib.cpp     |    2 +-
- src/main.cpp    |   12 ++++++------
- src/report.cpp  |    6 +++---
- 5 files changed, 12 insertions(+), 12 deletions(-)
+> On (09/20/12 12:24), Igor Zhbanov wrote:
+>> Chris Ferron wrote:
+>>
+>> Now I'm looking for solution. But I see now only four ways:
+>>
+>> 1) Develop another kernel mechanism for providing information about all =
+available
+>>     CPUs and cores. Or ask the kernel authors not to remove offline core=
+s from
+>>     /proc/cpuinfo and their information files from /sys/.../cpu/.
+> procps (e.g. top utility) use sysconf _SC_NPROCESSORS_CONF/_SC_NPROCESSOR=
+S_ONLN for
+> that purpose.
+>
+> https://www.gnu.org/software/libc/manual/html_node/Processor-Resources.ht=
+ml
 
-diff --git a/src/display.cpp b/src/display.cpp
-index e17745d..f48b53f 100644
---- a/src/display.cpp
-+++ b/src/display.cpp
-@@ -275,7 +275,7 @@ void cursor_enter(void)
- void window_refresh()
- {
- 	class tab_window *w;
--	=
+Counting of the CPUs is the least problem. (By the way, how sysconf() figur=
+es
+out the number? I suppose that it reads /proc/cpuinfo of scans /sys/.
+Is there any other way?).
 
-+
- 	w =3D tab_windows[tab_names[current_tab]];
- =
+The problem is that the PowerTOP needs to read information about cores
+from the files in /sys/.../cpu/cpuX/ directory (about C- and P-states, sibl=
+ings
+etc). And needed files in these directories are present only for cores
+which are currently online.
 
- 	if (w) {
-diff --git a/src/display.h b/src/display.h
-index 72f771a..33aaae1 100644
---- a/src/display.h
-+++ b/src/display.h
-@@ -60,7 +60,7 @@ public:
- 	virtual void expose(void) { cursor_pos =3D 0; repaint();};
- 	virtual void hide(void) { };
- =
+So the Powertop is unable
+1) To count the number of available CPUs.
+2) To read information about all CPUs.
 
--	virtual ~tab_window() =
-
-+	virtual ~tab_window()
- 	{
- 		delwin(win);
- 		win =3D NULL;
-diff --git a/src/lib.cpp b/src/lib.cpp
-index 8753421..9838c0b 100644
---- a/src/lib.cpp
-+++ b/src/lib.cpp
-@@ -164,7 +164,7 @@ void write_sysfs(const string &filename, const string &=
-value)
- 	file.open(filename.c_str(), ios::out);
- 	if (!file)
- 		return;
--	try =
-
-+	try
- 	{
- 		file << value;
- 		file.close();
-diff --git a/src/main.cpp b/src/main.cpp
-index 139b514..8714daf 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -237,7 +237,7 @@ void report(int time, char *workload, int iterations, c=
-har *file)
- 	fprintf(stderr, _("Preparing to take measurements\n"));
- 	utf_ok =3D 0;
- 	one_measurement(1, NULL);
--	=
-
-+
- 	if (!workload[0])
- 	  fprintf(stderr, _("Taking %d measurement(s) for a duration of %d second=
-(s) each.\n"),iterations,time);
- 	else
-@@ -260,7 +260,7 @@ void report(int time, char *workload, int iterations, c=
-har *file)
- }
- =
-
- static void checkroot() {
--	int uid; =
-
-+	int uid;
- 	uid =3D getuid();
- =
-
- 	if (uid !=3D 0) {
-@@ -268,7 +268,7 @@ static void checkroot() {
- 		printf(_("exiting...\n"));
- 		exit(EXIT_FAILURE);
- 	}
--	=
-
-+
- }
- =
-
- static void powertop_init(void)
-@@ -280,7 +280,7 @@ static void powertop_init(void)
- 	if (initialized)
- 		return;
- =
-
--	checkroot(); =
-
-+	checkroot();
- 	ret =3D system("/sbin/modprobe cpufreq_stats > /dev/null 2>&1");
- 	ret =3D system("/sbin/modprobe msr > /dev/null 2>&1");
- 	statfs("/sys/kernel/debug", &st_fs);
-@@ -355,7 +355,7 @@ int main(int argc, char **argv)
- 				break;
- =
-
- 			case 'e': /* Extech power analyzer support */
--				checkroot(); =
-
-+				checkroot();
- 				extech_power_meter(optarg ? optarg : "/dev/ttyUSB0");
- 				break;
- 			case 'u':
-@@ -388,7 +388,7 @@ int main(int argc, char **argv)
- 			case 'q':
- 				freopen("/dev/null", "a", stderr);
- 				break;
--				=
-
-+
- 			case 'C': /* csv report*/
- 				wantreport =3D true;
- 				reporttype =3D 0;
-diff --git a/src/report.cpp b/src/report.cpp
-index af4b89b..fcb2e22 100644
---- a/src/report.cpp
-+++ b/src/report.cpp
-@@ -190,12 +190,12 @@ void init_report_output(char *filename_str, int itera=
-tions)
- 	memset(&stamp, 0, sizeof(time_t));
- 	stamp=3Dtime(NULL);
- 	strftime(datestr, sizeof(datestr), "%Y%m%d-%H%M%S", localtime(&stamp));
--	=
-
-+
- 	if (iterations !=3D 1)
--		sprintf(reportout.filename, "%s-%s.%s", =
-
-+		sprintf(reportout.filename, "%s-%s.%s",
- 			file_prefix, datestr,file_postfix);
- 	else
--		sprintf(reportout.filename, "%s.%s", =
-
-+		sprintf(reportout.filename, "%s.%s",
- 			file_prefix, file_postfix);
- =
-
- 	if (reporttype) {
 -- =
 
-1.7.7
+Best regards,
+Igor Zhbanov,
+Expert Software Engineer,
+phone: +7 (495) 797 25 00 ext 3806
+e-mail: i.zhbanov(a)samsung.com
+
+ASWG, Moscow R&D center, Samsung Electronics
+12 Dvintsev street, building 1
+127018, Moscow, Russian Federation
 
 
---===============7285385686263995553==--
+--===============1608989733203405527==--
 
