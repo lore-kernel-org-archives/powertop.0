@@ -1,46 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============3441857747546985584=="
+Content-Type: multipart/mixed; boundary="===============3918768177366497229=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Fix timer and work perf events timestamp
- tracing
-Date: Wed, 05 Sep 2012 10:09:00 -0700
-Message-ID: <5047872C.1090608@linux.intel.com>
-In-Reply-To: CA+Z25wUBxT1oCmRujQ6_nzbdSUvEmfVXoy=gxjo0Jgj-VsYxUQ@mail.gmail.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH] cpu: Fix abstract_cpu::calculate_freq
+Date: Thu, 20 Sep 2012 17:46:44 +0300
+Message-ID: <20120920144644.GC3237@swordfish.minsk.epam.com>
+In-Reply-To: 1348151599-2740-1-git-send-email-namhyung@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3441857747546985584==
+--===============3918768177366497229==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 9/5/2012 9:56 AM, Rajagopal Venkat wrote:
->> measure1:
->> ev3.start
->> ev1.end  <<<<<
+On (09/20/12 23:33), Namhyung Kim wrote:
+> The 'freq' should have the maximun frequency value of all children.
+> But the current code does not update the freq properly.  Fix it.
 > =
 
-> evX.end  <<<<<
-> These events are causing numbers to go wrong.
+> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
 
-but out of a 20 second window.. this is a tiny tiny window...
-if you see 100.1% I'd buy this reasoning.
-but you're seeing much more than that.
+looks good to me, thanks.
 
+	-ss
 
->>
->> if so, then we're loosing events, which is no good. reporting less than =
-100%
->> is ok, but reporting less than real is not.
+> ---
+>  src/cpu/abstract_cpu.cpp |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > =
 
-> I did thought of it. Yes, agree that, we are loosing events for which
-> start timestamp
+> diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
+> index 386d981..de55cf2 100644
+> --- a/src/cpu/abstract_cpu.cpp
+> +++ b/src/cpu/abstract_cpu.cpp
+> @@ -341,7 +341,7 @@ void abstract_cpu::calculate_freq(uint64_t time)
+>  				is_idle =3D false;
+>  			}
+>  			if (f > freq)
+> -				f =3D freq;
+> +				freq =3D f;
+>  		}
+>  =
 
-we can't lose those!
-those are the events that give us the initial CPU frequency in the window e=
-tc....
+>  	current_frequency =3D freq;
 
-
---===============3441857747546985584==--
+--===============3918768177366497229==--
 
