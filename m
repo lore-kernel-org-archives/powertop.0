@@ -1,128 +1,29 @@
-Content-Type: multipart/mixed; boundary="===============1198981377455757649=="
+Content-Type: multipart/mixed; boundary="===============2442270196787820287=="
 MIME-Version: 1.0
-From: Rajagopal Venkat <rajagopal.venkat at linaro.org>
-Subject: [Powertop] [PATCH v1] Fix timer and work perf events timestamp tracing
-Date: Thu, 06 Sep 2012 19:09:24 +0530
-Message-ID: <1346938764-31141-1-git-send-email-rajagopal.venkat@linaro.org>
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] report: Try /etc/lsb-release for OS information
+Date: Thu, 20 Sep 2012 17:01:51 +0200
+Message-ID: <505B2FDF.3000804@linux.intel.com>
+In-Reply-To: 1348153109-2991-1-git-send-email-namhyung@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1198981377455757649==
+--===============2442270196787820287==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Fix timer and work perf events timestamp tracing by
-- considering event exit timestamp relative to measurement first
-timestamp for events which entry timestamp is not recorded.
-Currently these events exit timestamp itself is considered as
-usage period resulting in false usage report.
-- clearing event timestamps from global map at the end of each
-measurement to avoid collision with earlier recorded timestamps.
+On 9/20/2012 4:58 PM, Namhyung Kim wrote:
+> Ubuntu doesn't provide /etc/{system,redhat,os}-release but
+> /etc/lsb-release file.  Since it's present on any LSB (Linux Standard
+> Base) compliant distributions, it'd better to try to read it.
 
-Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
----
- src/process/do_process.cpp | 12 ++++++++++++
- src/process/timer.cpp      |  4 ++++
- src/process/work.cpp       |  4 ++++
- 3 files changed, 20 insertions(+)
-
-diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
-index cb7c672..eaef7f1 100644
---- a/src/process/do_process.cpp
-+++ b/src/process/do_process.cpp
-@@ -490,6 +490,10 @@ void perf_process_bundle::handle_trace_point(void *tra=
-ce, int cpu, uint64_t time
- 		}
- 		pop_consumer(cpu);
- 		t =3D timer->done(time, tmr);
-+		if (t =3D=3D ~0ULL) {
-+			timer->fire(first_stamp, tmr);
-+			t =3D timer->done(time, tmr);
-+		}
- 		consumer_child_time(cpu, t);
- 	}
- 	else if (strcmp(event->name, "hrtimer_expire_entry") =3D=3D 0) {
-@@ -532,6 +536,10 @@ void perf_process_bundle::handle_trace_point(void *tra=
-ce, int cpu, uint64_t time
- =
-
- 		pop_consumer(cpu);
- 		t =3D timer->done(time, tmr);
-+		if (t =3D=3D ~0ULL) {
-+			timer->fire(first_stamp, tmr);
-+			t =3D timer->done(time, tmr);
-+		}
- 		consumer_child_time(cpu, t);
- 	}
- 	else if (strcmp(event->name, "workqueue_execute_start") =3D=3D 0) {
-@@ -575,6 +583,10 @@ void perf_process_bundle::handle_trace_point(void *tra=
-ce, int cpu, uint64_t time
- 		}
- 		pop_consumer(cpu);
- 		t =3D work->done(time, wk);
-+		if (t =3D=3D ~0ULL) {
-+			work->fire(first_stamp, wk);
-+			t =3D work->done(time, wk);
-+		}
- 		consumer_child_time(cpu, t);
- 	}
- 	else if (strcmp(event->name, "cpu_idle") =3D=3D 0) {
-diff --git a/src/process/timer.cpp b/src/process/timer.cpp
-index 8917490..1ca8c25 100644
---- a/src/process/timer.cpp
-+++ b/src/process/timer.cpp
-@@ -79,6 +79,9 @@ uint64_t timer::done(uint64_t time, uint64_t timer_struct)
- {
- 	int64_t delta;
- =
-
-+	if (running_since.find(timer_struct) =3D=3D running_since.end())
-+		return ~0ULL;
-+
- 	if (running_since[timer_struct] > time)
- 		return 0;
- =
-
-@@ -147,6 +150,7 @@ void clear_timers(void)
- 		all_timers.erase(it);
- 		it =3D all_timers.begin();
- 	}
-+	running_since.clear();
- }
- =
-
- bool timer::is_deferred(void)
-diff --git a/src/process/work.cpp b/src/process/work.cpp
-index 82f13a2..e62e5d3 100644
---- a/src/process/work.cpp
-+++ b/src/process/work.cpp
-@@ -56,6 +56,9 @@ uint64_t work::done(uint64_t time, uint64_t work_struct)
- {
- 	int64_t delta;
- =
-
-+	if (running_since.find(work_struct) =3D=3D running_since.end())
-+		return ~0ULL;
-+
- 	if (running_since[work_struct] > time)
- 		return 0;
- =
-
-@@ -102,6 +105,7 @@ void clear_work(void)
- 		all_work.erase(it);
- 		it =3D all_work.begin();
- 	}
-+	running_since.clear();
- }
- =
-
- =
-
--- =
-
-1.7.11.3
+it's obsolete though
+everyone has moved (or is moving) to /etc/os-release, which is a freedeskto=
+p standard
+and has pretty decent semantics...
 
 
---===============1198981377455757649==--
+
+--===============2442270196787820287==--
 
