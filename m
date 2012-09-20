@@ -1,173 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============2307602749851872430=="
+Content-Type: multipart/mixed; boundary="===============9136886282636402373=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH v2 1/2] Updates to support Android platform
-Date: Tue, 25 Sep 2012 08:25:23 -0700
-Message-ID: <5061CCE3.5010804@linux.intel.com>
-In-Reply-To: CA+Z25wV9QXDp9zmaoQrxXUh6VGMBs0Rb3=tNd-xnT50HPz2Uqg@mail.gmail.com
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: Re: [Powertop] Powertop doesn't detects sleeping ARM cores
+Date: Thu, 20 Sep 2012 12:24:48 +0400
+Message-ID: <505AD2D0.10505@samsung.com>
+In-Reply-To: 5059E1AF.3010000@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2307602749851872430==
+--===============9136886282636402373==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 09/24/2012 10:34 PM, Rajagopal Venkat wrote:
-> On 24 September 2012 21:27, Chris Ferron <chris.e.ferron(a)linux.intel.co=
-m> wrote:
->> On 09/24/2012 06:28 AM, Rajagopal Venkat wrote:
->>> This patch adds following minor changes to prepare powertop
->>> to support Android platform.
->>>
->>> - Add missing HAVE_CONFIG_H conditional check.
->>> - remove un-used ethtool_cmd_speed_set and ethtool_cmd_speed
->>> functions.
->>> - Minimize dependency on exception handling in catch blocks.
->>>
->>> These changes will not affect powertop functionality.
->>>
->>> Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
->>> ---
->>>    src/devices/ahci.cpp    |  4 ++--
->>>    src/devices/alsa.cpp    |  4 ++--
->>>    src/devices/network.cpp | 16 ----------------
->>>    src/main.cpp            |  2 ++
->>>    4 files changed, 6 insertions(+), 20 deletions(-)
->>>
->>> diff --git a/src/devices/ahci.cpp b/src/devices/ahci.cpp
->>> index 1fe39c7..67ce06e 100644
->>> --- a/src/devices/ahci.cpp
->>> +++ b/src/devices/ahci.cpp
->>> @@ -170,7 +170,7 @@ void ahci::start_measurement(void)
->>>                  file.close();
->>>          }
->>>          catch (std::ios_base::failure &c) {
->>> -               fprintf(stderr, "%s\n", c.what());
->>> +               fprintf(stderr, "Failed to start measurement for ahci
->>> device\n");
->> adding addition message here is acceptable, but eliminating the informat=
-ion
->> from the catches error is not.
->>
-> As discussed in first patch set, android doesn't support exception
-> handling. This
-> is the reason powertop had DISABLE_TRYCATCH conditional macro which is
-> removed in recent commit.
->
-> The patch 2/2 adds stubs for exception handling
->
-> #define try           if (true)
-> #define catch(x)      if (false)
->
-> With this, fprintf(stderr, "%s\n", c.what()); in catch block throws
-> undefined reference
-> to c. So added message instead of c.what().
->
-> Any better ways of adding stubs are welcome.
-So it is my opinion that this is a bug for deficiency's in Android, and =
+Chris Ferron wrote:
 
-one that is not appropriate to work around in this core tool.  Any =
+> On 09/19/2012 01:26 AM, Igor Zhbanov wrote:
+>> I mean that only online cores are shown in /proc/cpuinfo.
+>> So the PowerTOP doesn't count currently offline ones.
+>> And you must run the PowerTOP on a heavy loaded system
+>> to let the PowerTOP see all CPU cores.
+>> Therefore it is impossible to run the PowerTOP before starting
+>> of heavy application to get information about all CPU cores.
+>> Probably the PowerTOP could cache CPU information in some file,
+>> so it will be possible to register trace events for all cores.
+> Off hand I don't have a good solution to help your ARM story. Your notes
+> are interesting and I agree this is something that ARM is going to need.
+> Do you have a complete solution you would like to purpose? I assume you
+> have done some hacking to get around this, but if you have taken that
+> and tuned it i suggest purposing the change. If you find a solution that
+> doesn't digress the Architectures, and corrects the ARM story then
+> please submit patches. I would be interested in seeing what you have
+> come up with.
+> I will try and look for a general solution, are there any other ARM
+> advocates on this list who would like to chime in?
 
-patch/fix/workaround should be submitted to the people maintaining =
+Now I'm looking for solution. But I see now only four ways:
 
-Android. The reason the DISABLE_TRYCATCH was removed was to eliminate =
+1) Develop another kernel mechanism for providing information about all ava=
+ilable
+    CPUs and cores. Or ask the kernel authors not to remove offline cores f=
+rom
+    /proc/cpuinfo and their information files from /sys/.../cpu/.
+2) Scan /sys/.../cpu for all CPUs and temporarily wake it up to gather info=
+rmation.
+3) Ask the user to run PowerTOP on a heavy loaded system for the first time
+    (or wake up all CPUs by the PowerTOP) and store collected CPU informati=
+on somewhere
+    in /var/cache/powertop and reuse it on later runs.
+4) Don't just sleep in a main cycle, but scan /sys/.../cpu for new CPUs to =
+appear.
+    (Perhaps there could be something like D-Bus or netlink notification wh=
+en a core
+     brought online -- I don't know about it).
 
-any non generic need for defines within the tool. We are actively trying =
+At your personal view, what way fits better in the PowerTOP project?
 
-to eliminate and discouraging distribution specific code within the core =
+P.S. This may be the case for x86 CPUs too. I have disable CPU2 by writing
+to /sys/devices/system/cpu2/online, and the PowerTOP sees only CPU0, CPU1, =
+and CPU3.
+Although default PC's CPU governor as I know doesn't turn off CPUs frequent=
+ly.
 
-PowerTOP source. There is some flex ability for example your stub header =
+-- =
 
-for android.
+Best regards,
+Igor Zhbanov,
+Expert Software Engineer,
+phone: +7 (495) 797 25 00 ext 3806
+e-mail: i.zhbanov(a)samsung.com
 
-My current suggestion is to re-submit your patches minus the Android =
-
-workarounds for C++ try-catches, and then work this issues with the fine =
-
-people at google.
-
-PowerTOP focus should be on platforms, architectures, and the Linux =
-
-kernel, not distributions.
-
--C
-
->>>          }
->>>      }
->>> @@ -203,7 +203,7 @@ void ahci::end_measurement(void)
->>>                  file.close();
->>>          }
->>>          catch (std::ios_base::failure &c) {
->>> -               fprintf(stderr, "%s\n", c.what());
->>> +               fprintf(stderr, "Failed to end measurement for ahci
->>> device\n");
->>>          }
->>>          if (end_active < start_active)
->>>                  end_active =3D start_active;
->>> diff --git a/src/devices/alsa.cpp b/src/devices/alsa.cpp
->>> index 4f5d3f9..a67780c 100644
->>> --- a/src/devices/alsa.cpp
->>> +++ b/src/devices/alsa.cpp
->>> @@ -104,7 +104,7 @@ void alsa::start_measurement(void)
->>>                  file.close();
->>>          }
->>>          catch (std::ios_base::failure &c) {
->>> -               fprintf(stderr, "%s\n", c.what());
->>> +               fprintf(stderr, "Failed to start measurement for alsa
->>> device\n");
->>>          }
->>>    }
->>>    @@ -130,7 +130,7 @@ void alsa::end_measurement(void)
->>>                  file.close();
->>>          }
->>>          catch (std::ios_base::failure &c) {
->>> -               fprintf(stderr, "%s\n", c.what());
->>> +               fprintf(stderr, "Failed to end measurement for alsa
->>> device\n");
->>>          }
->>>          p =3D (end_active - start_active) / (0.001 + end_active +
->>> end_inactive - start_active - start_inactive) * 100.0;
->>> diff --git a/src/devices/network.cpp b/src/devices/network.cpp
->>> index b8a5c9c..ed9d7aa 100644
->>> --- a/src/devices/network.cpp
->>> +++ b/src/devices/network.cpp
->>> @@ -55,22 +55,6 @@ extern "C" {
->>>      static map<string, class network *> nics;
->>>    -#ifdef DISABLE_TRYCATCH
->>> -
->>> -static inline void ethtool_cmd_speed_set(struct ethtool_cmd *ep,
->>> -                                               __u32 speed)
->>> -{
->>> -
->>> -       ep->speed =3D (__u16)speed;
->>> -       ep->speed_hi =3D (__u16)(speed >> 16);
->>> -}
->>> -
->>> -static inline __u32 ethtool_cmd_speed(struct ethtool_cmd *ep)
->>> -{
->>> -       return (ep->speed_hi << 16) | ep->speed;
->>> -}
->>> -
->>> -#endif
->>>      static void do_proc_net_dev(void)
->>>    {
->>> diff --git a/src/main.cpp b/src/main.cpp
->>> index 1815075..dc49dba 100644
->>> --- a/src/main.cpp
->>> +++ b/src/main.cpp
->>> @@ -42,7 +42,9 @@
->>>    #include "perf/perf.h"
->>>    #include "perf/perf_bundle.h"
->>>    #include "lib.h"
->>> +#ifdef HAVE_CONFIG_H
->>>    #include "../config.h"
->>> +#endif
->>>        #include "devices/device.h"
->>
->
->
+ASWG, Moscow R&D center, Samsung Electronics
+12 Dvintsev street, building 1
+127018, Moscow, Russian Federation
 
 
---===============2307602749851872430==--
+--===============9136886282636402373==--
 
