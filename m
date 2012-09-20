@@ -1,57 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============0566355082889751475=="
+Content-Type: multipart/mixed; boundary="===============0890836116898663704=="
 MIME-Version: 1.0
-From: Namhyung Kim <namhyung at gmail.com>
-Subject: [Powertop] [PATCH 1/2] perf: Pass 0 as a third argument to ioctl on
- perf_fd
-Date: Sun, 16 Sep 2012 23:17:30 +0900
-Message-ID: <1347805051-2889-1-git-send-email-namhyung@gmail.com>
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] Powertop doesn't detects sleeping ARM cores
+Date: Thu, 20 Sep 2012 12:42:34 +0200
+Message-ID: <505AF31A.4000400@linux.intel.com>
+In-Reply-To: 505AF291.4000308@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0566355082889751475==
+--===============0890836116898663704==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The third argument of PERF_EVENT_IOC_{ENABLE,DISABLE} ioctl is a flag
-to determine whether the command should be applied to group members.
-Since the powertop doesn't use the event grouping feature, it'd better
-passing 0 as a third argument explicitly.
+On 9/20/2012 12:40 PM, Igor Zhbanov wrote:
+> But is it correct to consider ARM core to be offline when it is just in W=
+FI state?
 
-Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
----
- src/perf/perf.cpp |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+nope
 
-diff --git a/src/perf/perf.cpp b/src/perf/perf.cpp
-index 69f1da3..c8ba7a8 100644
---- a/src/perf/perf.cpp
-+++ b/src/perf/perf.cpp
-@@ -128,7 +128,7 @@ void perf_event::create_perf_event(char *eventname, int=
- _cpu)
- 		return;
- 	}
- =
+for all intents and purposes, the cpu is still there.
 
--	ret =3D ioctl(perf_fd, PERF_EVENT_IOC_ENABLE);
-+	ret =3D ioctl(perf_fd, PERF_EVENT_IOC_ENABLE, 0);
- =
+in an idle state, the cpu logically is there, and ready to resume execution=
+ if needed...
+that's the definition of idle ;-)
 
- 	if (ret < 0) {
- 		fprintf(stderr, "failed to enable perf \n");
-@@ -210,7 +210,7 @@ void perf_event::start(void)
- void perf_event::stop(void)
- {
- 	int ret;
--	ret =3D ioctl(perf_fd, PERF_EVENT_IOC_DISABLE);
-+	ret =3D ioctl(perf_fd, PERF_EVENT_IOC_DISABLE, 0);
- 	if (ret)
- 		cout << "stop failing\n";
- }
--- =
+offline is where the administrator takes a cpu out of circulation.
 
-1.7.9.2
+neither specifies any physical hardware state... in fact offline is usually=
+ implemented as an idle state, at
+least on x86. the semantics for how to get back are different (system auton=
+omous versus administrator)
+
+now, quite possible some ARM platforms abuse this and don't implement somet=
+hing as "idle" but as "offline" instead.
+that sounds not very smart to me.
 
 
---===============0566355082889751475==--
+
+--===============0890836116898663704==--
 
