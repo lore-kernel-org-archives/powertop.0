@@ -1,68 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============2087500190073315631=="
+Content-Type: multipart/mixed; boundary="===============0550310857349582468=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] do not implement get_user_input() in
- DISABLE_NCURSES builds
-Date: Mon, 20 Aug 2012 08:18:59 -0700
-Message-ID: <50325563.6040605@linux.intel.com>
-In-Reply-To: 20120820094917.GB3137@swordfish
+From: Colin King <colin.king at canonical.com>
+Subject: [Powertop] [PATCH 2/4] cpu: abstract_cpu: Fix typo in comment
+Date: Sat, 22 Sep 2012 19:33:07 +0100
+Message-ID: <1348338789-16252-3-git-send-email-colin.king@canonical.com>
+In-Reply-To: 1348338789-16252-1-git-send-email-colin.king@canonical.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2087500190073315631==
+--===============0550310857349582468==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 08/20/2012 02:49 AM, Sergey Senozhatsky wrote:
-> On (08/19/12 17:40), Arjan van de Ven wrote:
->> On 8/19/2012 2:57 PM, Sergey Senozhatsky wrote:
->>> do not implement get_user_input() in DISABLE_NCURSES builds
->> no offence.. but this ifdef madness needs to stop.
->>
->> right now, powertop uses ncurses.
->>
->> either we want to make it optional, but then this stuff needs to get a l=
-ot more modular,
->> or we just declare that you need ncurses.
->> I'm very much leaning towards the later fwiw...
->>
-> I agree, and actually I don't like this patch (ifdef stuff also affects p=
-atches I'm currently
-> working on). it's rather hard to tell how many people will be affected by=
- #2 decision, but we
-> can tell the number for #1 case.
->
-> DISABLE_NCURSES is not that nasty in overall, since it just disables some=
- application features,
-> comparing to, for example, DISABLE_TRYCATCH, which disables standard lang=
-uage features for very
-> much non-obvious reason for someone with no embedded background.
->
-> that said, it'll be nice if we forbid DISABLE_NCURSES, but we'll still ha=
-ve ifdefs in
-> code because of decisions different people made (like no ncurses in some =
-distros or incomplete/buggy
-> programming language support).
->
->
-> 	-ss
-The only reason we allowed DISABLE_NCURSES in the first place, was to =
+From: Colin Ian King <colin.king(a)canonical.com>
 
-support android. If we don't want to support android out of the box, we =
+thier =3D=3D> their
 
-can start removing the crude and android can patch PowerTOP within their =
+Signed-off-by: Colin Ian King <colin.king(a)canonical.com>
+---
+ src/cpu/abstract_cpu.cpp |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-distro if they wanted.
+diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
+index 386d981..e159877 100644
+--- a/src/cpu/abstract_cpu.cpp
++++ b/src/cpu/abstract_cpu.cpp
+@@ -162,7 +162,7 @@ void abstract_cpu::insert_cstate(const char *linux_name=
+, const char *human_name,
+ 		c++;
+ 	}
+ =
 
-All other ifdef's need to be scrutinized.
--C
+-	/* some architectures (ARM) don't have good numbers in thier human name..=
+ fall back to the linux name for those */
++	/* some architectures (ARM) don't have good numbers in their human name..=
+ fall back to the linux name for those */
+ 	c =3D linux_name;
+ 	while (*c && state->line_level < 0) {
+ 		if (*c >=3D '0' && *c <=3D'9') {
+-- =
 
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
+1.7.10.4
 
 
---===============2087500190073315631==--
+--===============0550310857349582468==--
 
