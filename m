@@ -1,211 +1,47 @@
-Content-Type: multipart/mixed; boundary="===============0068304524744691411=="
+Content-Type: multipart/mixed; boundary="===============1064507998144148760=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] tuninig: resize scaling support (v1)
-Date: Thu, 23 Aug 2012 11:04:50 +0300
-Message-ID: <20120823080450.GB20639@swordfish.minsk.epam.com>
-In-Reply-To: 1345695730.2849.3.camel@sara
+From: Colin King <colin.king at canonical.com>
+Subject: [Powertop] [PATCH 1/4] main: Fix typo in print_usage
+Date: Sat, 22 Sep 2012 19:33:06 +0100
+Message-ID: <1348338789-16252-2-git-send-email-colin.king@canonical.com>
+In-Reply-To: 1348338789-16252-1-git-send-email-colin.king@canonical.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0068304524744691411==
+--===============1064507998144148760==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (08/23/12 06:22), Magnus Fromreide wrote:
-> On Thu, 2012-08-23 at 01:47 +0300, Sergey Senozhatsky wrote:
-> > tuninig: resize scaling support v1
-> > =
+From: Colin Ian King <colin.king(a)canonical.com>
 
-> > Initial version of terminal window resize support for tuning tab.
-> > Supports both X and Y scalings:
-> > -- X scaling: truncation (*)
-> > * tunable result and description strings are now stored in dynamic
-> > array, limited in size to current window X (mod MAX_LEN).
-> > =
+supress =3D=3D> suppress
 
-> > -- Y scaling: paging and scrolling
-> =
+Signed-off-by: Colin Ian King <colin.king(a)canonical.com>
+---
+ src/main.cpp |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Have you tested this patch in a locale that are using multibyte
-> characters?
-> =
+diff --git a/src/main.cpp b/src/main.cpp
+index 1815075..02e9f63 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -112,7 +112,7 @@ static void print_usage()
+ 	printf("--time%s \t %s\n",_("[=3Dseconds]"), _("generate a report for 'x'=
+ seconds"));
+ 	printf("--iteration%s\n", _("[=3Diterations] number of times to run each =
+test"));
+ 	printf("--workload%s \t %s\n", _("[=3Dworkload]"), _("file to execute for=
+ workload"));
+-	printf("--quiet \t\t %s\n", _("supress stderr output"));
++	printf("--quiet \t\t %s\n", _("suppress stderr output"));
+ 	printf("--help \t\t\t %s\n",_("print this help menu"));
+ 	printf("\n");
+ 	printf("%s\n\n",_("For more help please refer to the README"));
+-- =
 
-> The len argument to snprintf is the number of bytes in the result string
-> and strlen also returns the number of bytes in the string.
->
+1.7.10.4
 
-well, line is just a stream of bytes limited in size. it was never
-intended to be a stream of characters. at this point we just work
-with bytes, it's waddnstr() who should care. the same way as
-"strcpy()/strlen()/strcat()-->wprintw()" worked before.
 
-probably, we should truncate carefully, I need to think how. any
-input is welcome.
-
-	-ss
- =
-
-> /MF
-> =
-
-> > =
-
-> > Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
-> > =
-
-> > ---
-> > =
-
-> >  src/tuning/tuning.cpp | 87 +++++++++++++++++++++++++++++++++++--------=
---------
-> >  1 file changed, 60 insertions(+), 27 deletions(-)
-> > =
-
-> > diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
-> > index 4893597..541e9e0 100644
-> > --- a/src/tuning/tuning.cpp
-> > +++ b/src/tuning/tuning.cpp
-> > @@ -28,7 +28,7 @@
-> >  #include <stdio.h>
-> >  #include <string.h>
-> >  #include <ncurses.h>
-> > -
-> > +#include <math.h>
-> >  =
-
-> >  #include "tuning.h"
-> >  #include "tuningsysfs.h"
-> > @@ -79,48 +79,81 @@ void initialize_tuning(void)
-> >  	create_tab("Tunables", _("Tunables"), w, _(" <ESC> Exit | <Enter> Tog=
-gle tunable | <r> Window refresh"));
-> >  =
-
-> >  	init_tuning();
-> > -
-> >  	w->cursor_max =3D all_tunables.size() - 1;
-> >  }
-> >  =
-
-> > +#define XINDENT	3
-> > +#define YINDENT	4
-> > +#define MAX_LEN	4096
-> >  =
-
-> > +static void redraw_window(WINDOW *win, int begin, int end, int cursor_=
-pos)
-> > +{
-> > +	int x, y, i;
-> > +	getmaxyx(stdscr, y, x);
-> > +	=
-
-> > +	wclrtoeol(win);
-> > +	wmove(win, 1, 0);
-> > +	x %=3D MAX_LEN;
-> > +
-> > +	for (y =3D 0, i =3D begin; i < end; i++, y++) {
-> > +		char truncate =3D 0;
-> > +		size_t sz =3D 0;
-> > +		char line[x + 1];
-> > +		if ((int)(y) !=3D cursor_pos) {
-> > +			wattrset(win, A_NORMAL);
-> > +			sz =3D snprintf(line, x, "   ");
-> > +		} else {
-> > +			wattrset(win, A_REVERSE);
-> > +			sz =3D snprintf(line, x, ">> ");
-> > +		}
-> > +		sz +=3D snprintf(line + sz, x, "%s", all_tunables[i]->result_string(=
-));
-> > +		while (sz < 12)
-> > +			sz +=3D snprintf(line + sz, x, " ");
-> > +		sz +=3D snprintf(line + sz, x, "%s", all_tunables[i]->description());
-> > +		if ((int)sz > x - XINDENT)
-> > +			truncate =3D 1;
-> > +		while ((int)sz < x - XINDENT)
-> > +			sz +=3D snprintf(line + sz, x, " ");
-> > +		if (truncate)
-> > +			sz +=3D snprintf(line + x - XINDENT - 1, x, "~\n");
-> > +		else
-> > +			sz +=3D snprintf(line + sz, x, "\n");
-> > +
-> > +		waddnstr(win, line, sz);
-> > +	}
-> > +}
-> >  =
-
-> >  static void __tuning_update_display(int cursor_pos)
-> >  {
-> > +	static int last_frame_nr =3D 0;
-> > +	int x, y, begin, end, frame_nr;
-> >  	WINDOW *win;
-> > -	unsigned int i;
-> > -
-> > +        =
-
-> >  	win =3D get_ncurses_win("Tunables");
-> > -
-> >  	if (!win)
-> >  		return;
-> > +	getmaxyx(stdscr, y, x);
-> > +
-> > +	y -=3D YINDENT;
-> > +	frame_nr =3D ceil(cursor_pos / y);
-> > +	end =3D (frame_nr + 1) * y;
-> > +	if (end > (int)all_tunables.size())
-> > +		end =3D all_tunables.size();
-> > +
-> > +	begin =3D frame_nr * y;
-> > +	/* actual cursor position is frame-dependent */
-> > +	cursor_pos -=3D frame_nr * y;
-> > +	if (frame_nr !=3D last_frame_nr)
-> > +		should_clear =3D TRUE;
-> > +	last_frame_nr =3D frame_nr;
-> >  =
-
-> >  	if (should_clear) {
-> > -		should_clear =3D false;
-> > +		should_clear =3D FALSE;
-> >  		wclear(win);
-> >  	}
-> >  =
-
-> > -	wmove(win, 2,0);
-> > -
-> > -	for (i =3D 0; i < all_tunables.size(); i++) {
-> > -		char res[128];
-> > -		char desc[4096];
-> > -		strcpy(res, all_tunables[i]->result_string());
-> > -		strcpy(desc, all_tunables[i]->description());
-> > -		while (strlen(res) < 12)
-> > -			strcat(res, " ");
-> > -
-> > -		while (strlen(desc) < 103)
-> > -			strcat(desc, " ");
-> > -		if ((int)i !=3D cursor_pos) {
-> > -			wattrset(win, A_NORMAL);
-> > -			wprintw(win, "   ");
-> > -		} else {
-> > -			wattrset(win, A_REVERSE);
-> > -			wprintw(win, ">> ");
-> > -		}
-> > -		wprintw(win, "%s  %s\n", _(res), _(desc));
-> > -	}
-> > +	redraw_window(win, begin, end, cursor_pos);
-> > +	wnoutrefresh(win);
-> >  }
-> >  =
-
-> >  void tuning_update_display(void)
-> > =
-
-> > _______________________________________________
-> > PowerTop mailing list
-> > PowerTop(a)lists.01.org
-> > https://lists.01.org/mailman/listinfo/powertop
-> =
-
->=20
-
---===============0068304524744691411==--
+--===============1064507998144148760==--
 
