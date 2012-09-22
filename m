@@ -1,45 +1,37 @@
-Content-Type: multipart/mixed; boundary="===============4798020587258524841=="
+Content-Type: multipart/mixed; boundary="===============4594618203548853797=="
 MIME-Version: 1.0
-From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: Re: [Powertop] Powertop doesn't detects sleeping ARM cores
-Date: Wed, 19 Sep 2012 12:26:59 +0400
-Message-ID: <505981D3.7010403@samsung.com>
-In-Reply-To: 50571E4F.1010604@samsung.com
+From: Colin King <colin.king at canonical.com>
+Subject: [Powertop] [PATCH 0/4] Fix a few minor typos.
+Date: Sat, 22 Sep 2012 19:33:05 +0100
+Message-ID: <1348338789-16252-1-git-send-email-colin.king@canonical.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4798020587258524841==
+--===============4594618203548853797==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+From: Colin Ian King <colin.king(a)canonical.com>
 
-Here is some notes to my previous post.
+Just a few minor spelling mistakes/typos that need fixing.
 
-I mean that only online cores are shown in /proc/cpuinfo.
-So the PowerTOP doesn't count currently offline ones.
-And you must run the PowerTOP on a heavy loaded system
-to let the PowerTOP see all CPU cores.
+Colin Ian King (4):
+  main: Fix type in print_usage
+  cpu: abstract_cpu: Fix typo in comment
+  process: do_process: Fix typo in handle_trace_point
+  tuning/nl80211.h: Fix a few minor typos in comments.
 
-Therefore it is impossible to run the PowerTOP before starting
-of heavy application to get information about all CPU cores.
-
-Probably the PowerTOP could cache CPU information in some file,
-so it will be possible to register trace events for all cores.
+ src/cpu/abstract_cpu.cpp   |    2 +-
+ src/main.cpp               |    2 +-
+ src/process/do_process.cpp |    2 +-
+ src/tuning/nl80211.h       |    6 +++---
+ 4 files changed, 6 insertions(+), 6 deletions(-)
 
 -- =
 
-Best regards,
-Igor Zhbanov,
-Expert Software Engineer,
-phone: +7 (495) 797 25 00 ext 3806
-e-mail: i.zhbanov(a)samsung.com
-
-ASWG, Moscow R&D center, Samsung Electronics
-12 Dvintsev street, building 1
-127018, Moscow, Russian Federation
+1.7.10.4
 
 
---===============4798020587258524841==--
+--===============4594618203548853797==--
 
