@@ -1,43 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============0802181965310065963=="
+Content-Type: multipart/mixed; boundary="===============2657240910326790248=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [Warning fixes 1/6] if 0/endif out unused function
- dbg_printf_pevent_info
-Date: Thu, 13 Sep 2012 15:46:25 +0300
-Message-ID: <20120913124625.GB4894@swordfish.minsk.epam.com>
-In-Reply-To: 20120824173217.DE322DFFDB@linda.rhrk.uni-kl.de
+From: Paul Menzel <paulepanter at users.sourceforge.net>
+Subject: Re: [Powertop] [PATCH 1/4] main: Fix typo in print_usage
+Date: Sun, 23 Sep 2012 00:05:58 +0200
+Message-ID: <1348351558.4265.11.camel@mattotaupa>
+In-Reply-To: 1348338789-16252-2-git-send-email-colin.king@canonical.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0802181965310065963==
+--===============2657240910326790248==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (08/24/12 18:48), Joerg Mayer wrote:
-> +#if 0
->  static void dbg_printf_pevent_info(struct event_format *event, struct pe=
-vent_record *rec)
->  {
->  	static struct trace_seq s;
-> @@ -198,6 +199,7 @@ static void dbg_printf_pevent_info(struct event_forma=
-t *event, struct pevent_rec
->  	fprintf(stderr, "%.*s", s.len, s.buffer);
->  	trace_seq_destroy(&s);
->  }
-> +#endif
->  =
+Dear Colin,
 
->  static char * get_pevent_field_str(void *trace, struct event_format *eve=
-nt, struct format_field *field)
->  {
 
-Hello,
+thanks a lot for these patches.
 
-sorry, did you re-send your patches? for some reason I can't find them in m=
-y box.
 
-	-ss
+Am Samstag, den 22.09.2012, 19:33 +0100 schrieb Colin King:
+> From: Colin Ian King <colin.king(a)canonical.com>
+> =
 
---===============0802181965310065963==--
+> supress =3D=3D> suppress
+
+You could make the commit summary more informative by adding that line
+to it and leave the body empty.
+
+main: Fix sup*p*ress in print_usage
+
+or (with UTF-8 [1] (sixth layer))
+
+main:print_usage: supress =E2=87=92 suppress
+
+or (different arrow)
+
+main:print_usage: supress =E2=86=92 suppress
+
+> Signed-off-by: Colin Ian King <colin.king(a)canonical.com>
+> ---
+>  src/main.cpp |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Acked-by: Paul Menzel <paulepanter(a)users.sourceforge.net>
+
+
+Thanks,
+
+Paul
+
+
+[1] http://www.neo-layout.org/
+
+--===============2657240910326790248==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="signature.asc"
+
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
+L0xpbnV4KQoKaUVZRUFCRUNBQVlGQWxCZU5rWUFDZ2tRUFgxYUsyd09IVmp4TFFDZlpNa1dRWGJP
+WU9ETVdtNzU0ZHBRVWdYWQpqck1Bbmk1RFNPcjJzMTFzWGJXbHVIdlN0ODJiMW5adwo9Rmt3dwot
+LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
+
+--===============2657240910326790248==--
 
