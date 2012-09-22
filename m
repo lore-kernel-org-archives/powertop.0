@@ -1,58 +1,67 @@
-Content-Type: multipart/mixed; boundary="===============4770953836609296824=="
+Content-Type: multipart/mixed; boundary="===============1071388973231748583=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] do not implement get_user_input() in
- DISABLE_NCURSES builds
-Date: Mon, 20 Aug 2012 12:49:17 +0300
-Message-ID: <20120820094917.GB3137@swordfish>
-In-Reply-To: 50318786.20701@linux.intel.com
+From: Colin King <colin.king at canonical.com>
+Subject: [Powertop] [PATCH 4/4] tuning/nl80211.h: Fix a few minor typos in
+ comments.
+Date: Sat, 22 Sep 2012 19:33:09 +0100
+Message-ID: <1348338789-16252-5-git-send-email-colin.king@canonical.com>
+In-Reply-To: 1348338789-16252-1-git-send-email-colin.king@canonical.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4770953836609296824==
+--===============1071388973231748583==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (08/19/12 17:40), Arjan van de Ven wrote:
-> On 8/19/2012 2:57 PM, Sergey Senozhatsky wrote:
-> > do not implement get_user_input() in DISABLE_NCURSES builds
-> =
+From: Colin Ian King <colin.king(a)canonical.com>
 
-> no offence.. but this ifdef madness needs to stop.
-> =
+descripton =3D=3D> description
+pased =3D=3D> passed
+inital =3D=3D> initial
 
-> right now, powertop uses ncurses.
-> =
+Signed-off-by: Colin Ian King <colin.king(a)canonical.com>
+---
+ src/tuning/nl80211.h |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-> either we want to make it optional, but then this stuff needs to get a lo=
-t more modular,
-> or we just declare that you need ncurses.
-> I'm very much leaning towards the later fwiw...
-> =
+diff --git a/src/tuning/nl80211.h b/src/tuning/nl80211.h
+index b37148a..e4a8839 100644
+--- a/src/tuning/nl80211.h
++++ b/src/tuning/nl80211.h
+@@ -839,7 +839,7 @@ enum nl80211_commands {
+  *	This can be used to mask out antennas which are not attached or should
+  *	not be used for receiving. If an antenna is not selected in this bitmap
+  *	the hardware should not be configured to receive on this antenna.
+- *	For a more detailed descripton see @NL80211_ATTR_WIPHY_ANTENNA_TX.
++ *	For a more detailed description see @NL80211_ATTR_WIPHY_ANTENNA_TX.
+  *
+  * @NL80211_ATTR_MCAST_RATE: Multicast tx rate (in 100 kbps) for IBSS
+  *
+@@ -1367,7 +1367,7 @@ enum nl80211_bitrate_attr {
+  *	802.11 country information element with regulatory information it
+  *	thinks we should consider. cfg80211 only processes the country
+  *	code from the IE, and relies on the regulatory domain information
+- *	structure pased by userspace (CRDA) from our wireless-regdb.
++ *	structure passed by userspace (CRDA) from our wireless-regdb.
+  *	If a channel is enabled but the country code indicates it should
+  *	be disabled we disable the channel and re-enable it upon disassociation.
+  */
+@@ -1545,7 +1545,7 @@ enum nl80211_mntr_flags {
+  * @NL80211_MESHCONF_RETRY_TIMEOUT: specifies the initial retry timeout in
+  * millisecond units, used by the Peer Link Open message
+  *
+- * @NL80211_MESHCONF_CONFIRM_TIMEOUT: specifies the inital confirm timeout=
+, in
++ * @NL80211_MESHCONF_CONFIRM_TIMEOUT: specifies the initial confirm timeou=
+t, in
+  * millisecond units, used by the peer link management to close a peer link
+  *
+  * @NL80211_MESHCONF_HOLDING_TIMEOUT: specifies the holding timeout, in
+-- =
+
+1.7.10.4
 
 
-I agree, and actually I don't like this patch (ifdef stuff also affects pat=
-ches I'm currently
-working on). it's rather hard to tell how many people will be affected by #=
-2 decision, but we
-can tell the number for #1 case. =
-
-
-DISABLE_NCURSES is not that nasty in overall, since it just disables some a=
-pplication features,
-comparing to, for example, DISABLE_TRYCATCH, which disables standard langua=
-ge features for very
-much non-obvious reason for someone with no embedded background.
-
-that said, it'll be nice if we forbid DISABLE_NCURSES, but we'll still have=
- ifdefs in
-code because of decisions different people made (like no ncurses in some di=
-stros or incomplete/buggy
-programming language support).
-
-
-	-ss
-
---===============4770953836609296824==--
+--===============1071388973231748583==--
 
