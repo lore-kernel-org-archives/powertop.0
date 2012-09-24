@@ -1,53 +1,136 @@
-Content-Type: multipart/mixed; boundary="===============7648872640626663073=="
+Content-Type: multipart/mixed; boundary="===============3714663147440604069=="
 MIME-Version: 1.0
 From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH 1/2] Updates to support Android platform
-Date: Mon, 17 Sep 2012 09:28:16 -0700
-Message-ID: <50574FA0.1050102@linux.intel.com>
-In-Reply-To: 1347892449-10484-1-git-send-email-rajagopal.venkat@linaro.org
+Subject: Re: [Powertop] [PATCH v2 1/2] Updates to support Android platform
+Date: Mon, 24 Sep 2012 08:57:34 -0700
+Message-ID: <506082EE.5080602@linux.intel.com>
+In-Reply-To: 1348493284-9375-1-git-send-email-rajagopal.venkat@linaro.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7648872640626663073==
+--===============3714663147440604069==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 09/17/2012 07:34 AM, Rajagopal Venkat wrote:
+On 09/24/2012 06:28 AM, Rajagopal Venkat wrote:
+> This patch adds following minor changes to prepare powertop
+> to support Android platform.
+>
+> - Add missing HAVE_CONFIG_H conditional check.
+> - remove un-used ethtool_cmd_speed_set and ethtool_cmd_speed
+> functions.
+> - Minimize dependency on exception handling in catch blocks.
+>
+> These changes will not affect powertop functionality.
+>
+> Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
+> ---
+>   src/devices/ahci.cpp    |  4 ++--
+>   src/devices/alsa.cpp    |  4 ++--
+>   src/devices/network.cpp | 16 ----------------
+>   src/main.cpp            |  2 ++
+>   4 files changed, 6 insertions(+), 20 deletions(-)
+>
+> diff --git a/src/devices/ahci.cpp b/src/devices/ahci.cpp
+> index 1fe39c7..67ce06e 100644
+> --- a/src/devices/ahci.cpp
+> +++ b/src/devices/ahci.cpp
+> @@ -170,7 +170,7 @@ void ahci::start_measurement(void)
+>   		file.close();
+>   	}
+>   	catch (std::ios_base::failure &c) {
+> -		fprintf(stderr, "%s\n", c.what());
+> +		fprintf(stderr, "Failed to start measurement for ahci device\n");
+adding addition message here is acceptable, but eliminating the =
+
+information from the catches error is not.
+
+>   	}
+>   =
+
+>   }
+> @@ -203,7 +203,7 @@ void ahci::end_measurement(void)
+>   		file.close();
+>   	}
+>   	catch (std::ios_base::failure &c) {
+> -		fprintf(stderr, "%s\n", c.what());
+> +		fprintf(stderr, "Failed to end measurement for ahci device\n");
+>   	}
+>   	if (end_active < start_active)
+>   		end_active =3D start_active;
+> diff --git a/src/devices/alsa.cpp b/src/devices/alsa.cpp
+> index 4f5d3f9..a67780c 100644
+> --- a/src/devices/alsa.cpp
+> +++ b/src/devices/alsa.cpp
+> @@ -104,7 +104,7 @@ void alsa::start_measurement(void)
+>   		file.close();
+>   	}
+>   	catch (std::ios_base::failure &c) {
+> -		fprintf(stderr, "%s\n", c.what());
+> +		fprintf(stderr, "Failed to start measurement for alsa device\n");
+>   	}
+>   }
+>   =
+
+> @@ -130,7 +130,7 @@ void alsa::end_measurement(void)
+>   		file.close();
+>   	}
+>   	catch (std::ios_base::failure &c) {
+> -		fprintf(stderr, "%s\n", c.what());
+> +		fprintf(stderr, "Failed to end measurement for alsa device\n");
+>   	}
+>   =
+
+>   	p =3D (end_active - start_active) / (0.001 + end_active + end_inactive=
+ - start_active - start_inactive) * 100.0;
+> diff --git a/src/devices/network.cpp b/src/devices/network.cpp
+> index b8a5c9c..ed9d7aa 100644
+> --- a/src/devices/network.cpp
+> +++ b/src/devices/network.cpp
+> @@ -55,22 +55,6 @@ extern "C" {
+>   =
+
+>   static map<string, class network *> nics;
+>   =
+
+> -#ifdef DISABLE_TRYCATCH
+> -
+> -static inline void ethtool_cmd_speed_set(struct ethtool_cmd *ep,
+> -						__u32 speed)
+> -{
+> -
+> -	ep->speed =3D (__u16)speed;
+> -	ep->speed_hi =3D (__u16)(speed >> 16);
+> -}
+> -
+> -static inline __u32 ethtool_cmd_speed(struct ethtool_cmd *ep)
+> -{
+> -	return (ep->speed_hi << 16) | ep->speed;
+> -}
+> -
+> -#endif
+>   =
+
+>   static void do_proc_net_dev(void)
+>   {
+> diff --git a/src/main.cpp b/src/main.cpp
+> index 1815075..dc49dba 100644
+> --- a/src/main.cpp
+> +++ b/src/main.cpp
+> @@ -42,7 +42,9 @@
+>   #include "perf/perf.h"
+>   #include "perf/perf_bundle.h"
+>   #include "lib.h"
+> +#ifdef HAVE_CONFIG_H
+>   #include "../config.h"
+> +#endif
+>   =
+
 >   =
 
 >   #include "devices/device.h"
-> diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
-> index eaef7f1..c9d6b0b 100644
-> --- a/src/process/do_process.cpp
-> +++ b/src/process/do_process.cpp
-> @@ -869,7 +869,7 @@ void process_update_display(void)
->   		if (!show_power)
->   			strcpy(power, "          ");
->   		sprintf(name, "%s", all_power[i]->type());
-> -		while (mbstowcs(NULL,name,0) < 14) strcat(name, " ");
-> +		while (mbstowcs(NULL,name,20) < 14) strcat(name, " ");
->   =
-
-mbstowcs(NULL,name,0) is a test. return will be count. while catches the =
-
-error.
-
->   =
-
->   		if (all_power[i]->events() =3D=3D 0 && all_power[i]->usage() =3D=3D 0=
- && all_power[i]->Witts() =3D=3D 0)
-> @@ -882,7 +882,7 @@ void process_update_display(void)
->   			else
->   				sprintf(usage, "%5i%s", (int)all_power[i]->usage(), all_power[i]->u=
-sage_units());
->   		}
-> -		while (mbstowcs(NULL,usage,0) < 14) strcat(usage, " ");
-> +		while (mbstowcs(NULL,usage,20) < 14) strcat(usage, " ");
->   		sprintf(events, "%5.1f", all_power[i]->events());
->   		if (!all_power[i]->show_events())
->   			events[0] =3D 0;
 
 
---===============7648872640626663073==--
+--===============3714663147440604069==--
 
