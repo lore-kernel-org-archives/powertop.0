@@ -1,93 +1,211 @@
-Content-Type: multipart/mixed; boundary="===============2729113143585514131=="
+Content-Type: multipart/mixed; boundary="===============0402178209575813152=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] [PATCH 1/2] perf_bundle: Check memory allocation
- failure
-Date: Tue, 18 Sep 2012 07:25:06 -0700
-Message-ID: <50588442.7040404@linux.intel.com>
-In-Reply-To: 1347978063-10119-1-git-send-email-namhyung@gmail.com
+From: Rajagopal Venkat <rajagopal.venkat at linaro.org>
+Subject: [Powertop] [PATCH v2 2/2] Add stubs to support Android platform
+Date: Mon, 24 Sep 2012 18:58:04 +0530
+Message-ID: <1348493284-9375-2-git-send-email-rajagopal.venkat@linaro.org>
+In-Reply-To: 1348493284-9375-1-git-send-email-rajagopal.venkat@linaro.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2729113143585514131==
+--===============0402178209575813152==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 9/18/2012 7:21 AM, Namhyung Kim wrote:
-> Check return value of malloc/strdup not to make NULL dereferences.
+This patch adds stubs for features that are not supported
+by Andriod. An header file which defines all stubs is
+included only for Android builds.
 
-I don't mind these patches; they are clean code
+Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
+---
+ Android.mk          | 33 ++++++++++++++++++++++-----
+ src/android_stubs.h | 65 +++++++++++++++++++++++++++++++++++++++++++++++++=
+++++
+ src/lib.h           |  4 ++++
+ 3 files changed, 96 insertions(+), 6 deletions(-)
+ create mode 100644 src/android_stubs.h
 
-however, one of the core userspace developers at work basically said "we do=
-n't check for malloc NULL in userspace;
-if that ever happens the system is so screwed up anyway that you just canno=
-t continue".
+diff --git a/Android.mk b/Android.mk
+index a52ecfd..081f470 100644
+--- a/Android.mk
++++ b/Android.mk
+@@ -1,17 +1,36 @@
+ LOCAL_PATH :=3D $(call my-dir)
+ include $(CLEAR_VARS)
+ =
+
++LOCAL_MODULE :=3D powertop
++
+ LOCAL_MODULE_TAGS :=3D debug
+ LOCAL_SHARED_LIBRARIES :=3D libstlport \
+ 			  libnl \
+ 			  libpci \
+-			  libtraceevnet \
+-LOCAL_MODULE :=3D powertop  =
+
++
++LOCAL_STATIC_LIBRARIES :=3D libncurses
++
++CSSTOH_SOURCE :=3D $(LOCAL_PATH)/src/csstoh.c
++POWERTOP_CSS_SOURCE :=3D $(LOCAL_PATH)/src/powertop.css
++GEN_CSSTOH :=3D $(LOCAL_PATH)/src/csstoh
++GEN_CSS_H :=3D $(LOCAL_PATH)/src/css.h
++$(GEN_CSS_H):
++	$(CC) -o $(GEN_CSSTOH) $(CSSTOH_SOURCE)
++	./$(GEN_CSSTOH) $(POWERTOP_CSS_SOURCE) $@
++
++LOCAL_GENERATED_SOURCES +=3D $(GEN_CSS_H)
+ =
+
+ #LOCAL_CFLAGS +=3D -Wall -O2 -g -fno-omit-frame-pointer -fstack-protector =
+-Wshadow -Wformat -D_FORTIFY_SOURCE=3D2
+ #LOCAL_CPPFLAGS +=3D -Wall -O2 -g -fno-omit-frame-pointer
+ =
+
+-LOCAL_C_INCLUDES +=3D external/stlport/stlport/ external/stlport/stlport/s=
+tl external/stlport/stlport/using/h/  bionic external/libnl/include/
++LOCAL_C_INCLUDES +=3D external/stlport/stlport/ \
++	external/stlport/stlport/stl \
++	external/stlport/stlport/using/h/ \
++	bionic \
++	external/libnl/include/ \
++	external/ncurses/include \
++	external/elfutils/bionic-fixup \
++	$(LOCAL_PATH)/src
+ =
+
+ LOCAL_SRC_FILES +=3D \
+ 	src/parameters/parameters.cpp \
+@@ -21,10 +40,11 @@ LOCAL_SRC_FILES +=3D \
+ 	src/process/work.cpp \
+ 	src/process/process.cpp \
+ 	src/process/timer.cpp \
+-	src/process/device.cpp \
++	src/process/processdevice.cpp \
+ 	src/process/interrupt.cpp \
+ 	src/process/do_process.cpp \
+ 	src/cpu/intel_cpus.cpp \
++	src/cpu/intel_gpu.cpp \
+ 	src/cpu/cpu.cpp \
+ 	src/cpu/cpu_linux.cpp \
+ 	src/cpu/cpudevice.cpp \
+@@ -33,20 +53,21 @@ LOCAL_SRC_FILES +=3D \
+ 	src/cpu/abstract_cpu.cpp \
+ 	src/measurement/measurement.cpp \
+ 	src/measurement/acpi.cpp \
++	src/measurement/sysfs.cpp \
+ 	src/measurement/extech.cpp \
+ 	src/measurement/power_supply.cpp \
+ 	src/display.cpp \
+ 	src/report.cpp \
+ 	src/main.cpp \
+ 	src/tuning/tuning.cpp \
+-	src/tuning/usb.cpp \
++	src/tuning/tuningusb.cpp \
+ 	src/tuning/bluetooth.cpp \
+ 	src/tuning/ethernet.cpp \
+ 	src/tuning/runtime.cpp \
+ 	src/tuning/iw.c \
+ 	src/tuning/iw.h \
+ 	src/tuning/tunable.cpp \
+-	src/tuning/sysfs.cpp \
++	src/tuning/tuningsysfs.cpp \
+ 	src/tuning/cpufreq.cpp \
+ 	src/tuning/wifi.cpp \
+ 	src/perf/perf_bundle.cpp \
+diff --git a/src/android_stubs.h b/src/android_stubs.h
+new file mode 100644
+index 0000000..ed37c0e
+--- /dev/null
++++ b/src/android_stubs.h
+@@ -0,0 +1,65 @@
++#include <linux/ethtool.h>
++#include <sys/socket.h>
++#include <string.h>
++#include <wchar.h>
++
++
++/* Android doesn't provide locale support in its C and C++
++ * runtime. Handled at higher level in application stack.
++ * So define stubs for gettext funtions used.
++ */
++#define PACKAGE			0
++#define LOCALEDIR		0
++#define bindtextdomain(x, y)
++#define textdomain(x)
++#define gettext(x)		(x)
++
++/* Android C++ new operator does not throw exception on failure */
++#define set_new_handler(x)
++
++/* define stubs for C++ exception handling */
++#define try     	if (true)
++#define catch(x) 	if (false)
++
++/* Define __NR_perf_event_open if not already defined */
++#if __arm__
++#ifndef __NR_perf_event_open
++#define __NR_perf_event_open    364
++#endif
++#endif
++
++/*
++ * bionic libc mbstowcs version returns zero when max parameter
++ * is zero, resulting infinite loops in powertop source. Add
++ * mbstowcs wrapper to fix it.
++ */
++namespace pandroid {
++	extern "C" inline size_t mbstowcs(wchar_t *dst,
++			const char *src, size_t len)
++	{
++		return ::mbstowcs(dst, src, ::strlen(src));
++	}
++}
++
++#define mbstowcs(dst, src, len)		pandroid::mbstowcs(dst, src, len)
++
++/* Implement missing functions */
++static inline void ethtool_cmd_speed_set(struct ethtool_cmd *ep,
++						__u32 speed)
++{
++
++	ep->speed =3D (__u16)speed;
++	ep->speed_hi =3D (__u16)(speed >> 16);
++}
++
++static inline __u32 ethtool_cmd_speed(struct ethtool_cmd *ep)
++{
++	return (ep->speed_hi << 16) | ep->speed;
++}
++
++static inline char *strchrnul(const char *s, int c)
++{
++	while (*s && (*s !=3D c))
++		s++;
++	return (char *)s;
++}
+diff --git a/src/lib.h b/src/lib.h
+index 8cf4632..6772904 100644
+--- a/src/lib.h
++++ b/src/lib.h
+@@ -33,6 +33,10 @@
+ #include "config.h"
+ #endif
+ =
+
++#ifdef __ANDROID__
++#include "android_stubs.h"
++#endif
++
+ #define _(STRING)    gettext(STRING)
+ =
+
+ #define POWERTOP_VERSION "v2.1"
+-- =
+
+1.7.11.3
 
 
-
-> =
-
-> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
-> ---
->  src/perf/perf_bundle.cpp |   13 +++++++++++++
->  1 file changed, 13 insertions(+)
-> =
-
-> diff --git a/src/perf/perf_bundle.cpp b/src/perf/perf_bundle.cpp
-> index 38e1e91..4e70f30 100644
-> --- a/src/perf/perf_bundle.cpp
-> +++ b/src/perf/perf_bundle.cpp
-> @@ -60,6 +60,9 @@ void perf_bundle_event::handle_event(struct perf_event_=
-header *header, void *coo
->  	vector<void *> *vector;
->  =
-
->  	buffer =3D (unsigned char *)malloc(header->size);
-> +	if (!buffer)
-> +		return;
-> +
->  	memcpy(buffer, header, header->size);
->  =
-
->  #ifdef USE_DECLTYPE
-> @@ -130,6 +133,9 @@ static void parse_event_format(const char *event_name)
->  {
->  	char *tptr;
->  	char *name =3D strdup(event_name);
-> +	if (!name)
-> +		return;
-> +
->  	char *sys =3D strtok_r(name, ":", &tptr);
->  	char *event =3D strtok_r(NULL, ":", &tptr);
->  	char *file;
-> @@ -137,6 +143,9 @@ static void parse_event_format(const char *event_name)
->  =
-
->  	file =3D (char *)malloc(strlen(sys) + strlen(event) +
->  		      strlen("/sys/kernel/debug/tracing/events////format") + 2);
-> +	if (!file)
-> +		return;
-> +
->  	sprintf(file, "/sys/kernel/debug/tracing/events/%s/%s/format", sys, eve=
-nt);
->  =
-
->  	buf =3D read_file(file);
-> @@ -169,6 +178,10 @@ bool perf_bundle::add_event(const char *event_name)
->  		if ((int)ev->trace_type >=3D 0) {
->  			if (event_names.find(ev->trace_type) =3D=3D event_names.end()) {
->  				event_names[ev->trace_type] =3D strdup(event_name);
-> +				if (!event_names[ev->trace_type]) {
-> +					delete ev;
-> +					continue;
-> +				}
->  				parse_event_format(event_name);
->  			}
->  			events.push_back(ev);
-> =
-
-
-
---===============2729113143585514131==--
+--===============0402178209575813152==--
 
