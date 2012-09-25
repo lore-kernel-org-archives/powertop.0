@@ -1,32 +1,173 @@
-Content-Type: multipart/mixed; boundary="===============3849802436005001529=="
+Content-Type: multipart/mixed; boundary="===============2307602749851872430=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] Software resource usage by cpu's
-Date: Fri, 21 Sep 2012 17:07:51 +0200
-Message-ID: <505C82C7.4010000@linux.intel.com>
-In-Reply-To: CAMo2APiwhVrd+efLY40_S2n7POav_i9zfRrZ0mGmPNLb5_iNnA@mail.gmail.com
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [PATCH v2 1/2] Updates to support Android platform
+Date: Tue, 25 Sep 2012 08:25:23 -0700
+Message-ID: <5061CCE3.5010804@linux.intel.com>
+In-Reply-To: CA+Z25wV9QXDp9zmaoQrxXUh6VGMBs0Rb3=tNd-xnT50HPz2Uqg@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3849802436005001529==
+--===============2307602749851872430==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 9/21/2012 1:47 PM, Saumil Merchant wrote:
-> Hi,
-> I am new to PowerTop and think it is a wonderful tool and am exploring it=
-s possible use in my work.  I had a question.  Can PowerTop report software=
- resource usage info for
-> individual CPU's?  For example, have a CPU column in the software info re=
-port which specifies the cpu on which the process was scheduled.
-> =
+On 09/24/2012 10:34 PM, Rajagopal Venkat wrote:
+> On 24 September 2012 21:27, Chris Ferron <chris.e.ferron(a)linux.intel.co=
+m> wrote:
+>> On 09/24/2012 06:28 AM, Rajagopal Venkat wrote:
+>>> This patch adds following minor changes to prepare powertop
+>>> to support Android platform.
+>>>
+>>> - Add missing HAVE_CONFIG_H conditional check.
+>>> - remove un-used ethtool_cmd_speed_set and ethtool_cmd_speed
+>>> functions.
+>>> - Minimize dependency on exception handling in catch blocks.
+>>>
+>>> These changes will not affect powertop functionality.
+>>>
+>>> Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
+>>> ---
+>>>    src/devices/ahci.cpp    |  4 ++--
+>>>    src/devices/alsa.cpp    |  4 ++--
+>>>    src/devices/network.cpp | 16 ----------------
+>>>    src/main.cpp            |  2 ++
+>>>    4 files changed, 6 insertions(+), 20 deletions(-)
+>>>
+>>> diff --git a/src/devices/ahci.cpp b/src/devices/ahci.cpp
+>>> index 1fe39c7..67ce06e 100644
+>>> --- a/src/devices/ahci.cpp
+>>> +++ b/src/devices/ahci.cpp
+>>> @@ -170,7 +170,7 @@ void ahci::start_measurement(void)
+>>>                  file.close();
+>>>          }
+>>>          catch (std::ios_base::failure &c) {
+>>> -               fprintf(stderr, "%s\n", c.what());
+>>> +               fprintf(stderr, "Failed to start measurement for ahci
+>>> device\n");
+>> adding addition message here is acceptable, but eliminating the informat=
+ion
+>> from the catches error is not.
+>>
+> As discussed in first patch set, android doesn't support exception
+> handling. This
+> is the reason powertop had DISABLE_TRYCATCH conditional macro which is
+> removed in recent commit.
+>
+> The patch 2/2 adds stubs for exception handling
+>
+> #define try           if (true)
+> #define catch(x)      if (false)
+>
+> With this, fprintf(stderr, "%s\n", c.what()); in catch block throws
+> undefined reference
+> to c. So added message instead of c.what().
+>
+> Any better ways of adding stubs are welcome.
+So it is my opinion that this is a bug for deficiency's in Android, and =
 
-internally it has this information in raw form, but.. presenting this to th=
-e user in a useful way would concern me.
-(also note that the answer isn't a single cpu, but a list of cpus)
+one that is not appropriate to work around in this core tool.  Any =
+
+patch/fix/workaround should be submitted to the people maintaining =
+
+Android. The reason the DISABLE_TRYCATCH was removed was to eliminate =
+
+any non generic need for defines within the tool. We are actively trying =
+
+to eliminate and discouraging distribution specific code within the core =
+
+PowerTOP source. There is some flex ability for example your stub header =
+
+for android.
+
+My current suggestion is to re-submit your patches minus the Android =
+
+workarounds for C++ try-catches, and then work this issues with the fine =
+
+people at google.
+
+PowerTOP focus should be on platforms, architectures, and the Linux =
+
+kernel, not distributions.
+
+-C
+
+>>>          }
+>>>      }
+>>> @@ -203,7 +203,7 @@ void ahci::end_measurement(void)
+>>>                  file.close();
+>>>          }
+>>>          catch (std::ios_base::failure &c) {
+>>> -               fprintf(stderr, "%s\n", c.what());
+>>> +               fprintf(stderr, "Failed to end measurement for ahci
+>>> device\n");
+>>>          }
+>>>          if (end_active < start_active)
+>>>                  end_active =3D start_active;
+>>> diff --git a/src/devices/alsa.cpp b/src/devices/alsa.cpp
+>>> index 4f5d3f9..a67780c 100644
+>>> --- a/src/devices/alsa.cpp
+>>> +++ b/src/devices/alsa.cpp
+>>> @@ -104,7 +104,7 @@ void alsa::start_measurement(void)
+>>>                  file.close();
+>>>          }
+>>>          catch (std::ios_base::failure &c) {
+>>> -               fprintf(stderr, "%s\n", c.what());
+>>> +               fprintf(stderr, "Failed to start measurement for alsa
+>>> device\n");
+>>>          }
+>>>    }
+>>>    @@ -130,7 +130,7 @@ void alsa::end_measurement(void)
+>>>                  file.close();
+>>>          }
+>>>          catch (std::ios_base::failure &c) {
+>>> -               fprintf(stderr, "%s\n", c.what());
+>>> +               fprintf(stderr, "Failed to end measurement for alsa
+>>> device\n");
+>>>          }
+>>>          p =3D (end_active - start_active) / (0.001 + end_active +
+>>> end_inactive - start_active - start_inactive) * 100.0;
+>>> diff --git a/src/devices/network.cpp b/src/devices/network.cpp
+>>> index b8a5c9c..ed9d7aa 100644
+>>> --- a/src/devices/network.cpp
+>>> +++ b/src/devices/network.cpp
+>>> @@ -55,22 +55,6 @@ extern "C" {
+>>>      static map<string, class network *> nics;
+>>>    -#ifdef DISABLE_TRYCATCH
+>>> -
+>>> -static inline void ethtool_cmd_speed_set(struct ethtool_cmd *ep,
+>>> -                                               __u32 speed)
+>>> -{
+>>> -
+>>> -       ep->speed =3D (__u16)speed;
+>>> -       ep->speed_hi =3D (__u16)(speed >> 16);
+>>> -}
+>>> -
+>>> -static inline __u32 ethtool_cmd_speed(struct ethtool_cmd *ep)
+>>> -{
+>>> -       return (ep->speed_hi << 16) | ep->speed;
+>>> -}
+>>> -
+>>> -#endif
+>>>      static void do_proc_net_dev(void)
+>>>    {
+>>> diff --git a/src/main.cpp b/src/main.cpp
+>>> index 1815075..dc49dba 100644
+>>> --- a/src/main.cpp
+>>> +++ b/src/main.cpp
+>>> @@ -42,7 +42,9 @@
+>>>    #include "perf/perf.h"
+>>>    #include "perf/perf_bundle.h"
+>>>    #include "lib.h"
+>>> +#ifdef HAVE_CONFIG_H
+>>>    #include "../config.h"
+>>> +#endif
+>>>        #include "devices/device.h"
+>>
+>
+>
 
 
-
---===============3849802436005001529==--
+--===============2307602749851872430==--
 
