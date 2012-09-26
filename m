@@ -1,46 +1,77 @@
-Content-Type: multipart/mixed; boundary="===============0051333312785026389=="
+Content-Type: multipart/mixed; boundary="===============2523389195166092291=="
 MIME-Version: 1.0
-From: Namhyung Kim <namhyung at gmail.com>
-Subject: [Powertop] [PATCH 2/2] perf: Check return value of strdup
-Date: Sun, 16 Sep 2012 23:17:31 +0900
-Message-ID: <1347805051-2889-2-git-send-email-namhyung@gmail.com>
-In-Reply-To: 1347805051-2889-1-git-send-email-namhyung@gmail.com
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [PATCH v2] Fix string null termination and SIGABRT
+ from glibc
+Date: Wed, 26 Sep 2012 10:13:45 -0700
+Message-ID: <506337C9.1090807@linux.intel.com>
+In-Reply-To: 20120926141939.GB3014@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0051333312785026389==
+--===============2523389195166092291==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The strdup() can return NULL so that the result should be checked.
+On 09/26/2012 07:19 AM, Sergey Senozhatsky wrote:
+> On (09/26/12 16:12), Mikko Rapeli wrote:
+>> According to http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D682388
+>> the string is not null terminated when too much data is read.
+>>
+>> This patch fixes the crashes on my system.
+>> ---
+>>   src/process/process.cpp |    3 ++-
+>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+> LGTM, thanks!
+>
+> 	-ss
+>   =
 
-Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
----
- src/perf/perf.cpp |    5 +++++
- 1 file changed, 5 insertions(+)
+Your patch has been merged.
+Thank You
+-C
 
-diff --git a/src/perf/perf.cpp b/src/perf/perf.cpp
-index c8ba7a8..35b4017 100644
---- a/src/perf/perf.cpp
-+++ b/src/perf/perf.cpp
-@@ -145,6 +145,11 @@ void perf_event::set_event_name(const char *event_name)
- 	if (name)
- 		free(name);
- 	name =3D strdup(event_name);
-+	if (!name) {
-+		fprintf(stderr, "failed to allocate event name\n");
-+		return;
-+	}
-+
- 	char *c;
- =
+>> diff --git a/src/process/process.cpp b/src/process/process.cpp
+>> index 71f81b6..34dc68d 100644
+>> --- a/src/process/process.cpp
+>> +++ b/src/process/process.cpp
+>> @@ -86,7 +86,7 @@ static void cmdline_to_string(char *str)
+>>   =
 
- 	c =3D strchr(name, ':');
--- =
+>>   process::process(const char *_comm, int _pid, int _tid) : power_consum=
+er()
+>>   {
+>> -	char line[4096];
+>> +	char line[4097];
+>>   	ifstream file;
+>>   =
 
-1.7.9.2
+>>   	strcpy(comm, _comm);
+>> @@ -103,6 +103,7 @@ process::process(const char *_comm, int _pid, int _t=
+id) : power_consumer()
+>>   		file.open(line);
+>>   		while (file) {
+>>   			file.getline(line, 4096);
+>> +			line[4096] =3D '\0';
+>>   			if (strstr(line, "Tgid")) {
+>>   				char *c;
+>>   				c =3D strchr(line, ':');
+>> -- =
+
+>> 1.7.10.4
+>>
+>> _______________________________________________
+>> PowerTop mailing list
+>> PowerTop(a)lists.01.org
+>> https://lists.01.org/mailman/listinfo/powertop
+>>
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
 
 
---===============0051333312785026389==--
+--===============2523389195166092291==--
 
