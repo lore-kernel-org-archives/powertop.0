@@ -1,66 +1,72 @@
-Content-Type: multipart/mixed; boundary="===============3207561504549830431=="
+Content-Type: multipart/mixed; boundary="===============4441430807334816212=="
 MIME-Version: 1.0
-From: viresh kumar <viresh.kumar at linaro.org>
-Subject: Re: [Powertop] Query: Weird Output values: Percentage over 100%
-Date: Mon, 03 Sep 2012 12:24:25 +0530
-Message-ID: <CAOh2x=m_tWKcnGzOFpxSpr-+6qOozuJyVZkxpHDDQ3a6oc34hA@mail.gmail.com>
-In-Reply-To: CAOh2x==gOcSqWZhEn0iX5Es=cjByYHVe0_gM3WhaKtsjhvXfFg@mail.gmail.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH v2 2/2] Add stubs to support Android platform
+Date: Fri, 28 Sep 2012 10:10:34 -0700
+Message-ID: <20120928171033.GA3110@swordfish.datadirect.datadirectnet.com>
+In-Reply-To: 5065D646.7000903@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3207561504549830431==
+--===============4441430807334816212==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Ping!!
+On (09/28/12 09:54), Chris Ferron wrote:
+[..]
+> Well to be fair, not that I agree any-more, but years ago it was
+> common practice to disable exceptions (via the compiler) for C++ in
+> very specialized "REAL" "Embedded Systems". This practice was
+> problematic in that you needed to have a will defined Error handling
+> design, but saved space. Honestly, its been a long time since I
+> worked on anything that has a "REAL" size requirement, so I don't see
+> the point. On the other hand in some Embedded system  The whole
+> reason to using your own error handling design was that in a real
+> embedded system, design considerations like, uptime, failure control
+> and ability to eliminate undefined behaviour were KEY. So taking the
+> time to design was already a given, and size was not a single point
+> factor. (not arguing the C vs C++ point here BTW)  So for what ever
+> reason the decision to use C++ happens for an embedded project.
+> Problem was C++ exception were good for insure the program didn't
+> fail, but detailed failure handling became problematic. Sure you
+> could avoid general failures but often especially in an embedded
+> system you found yourself with undefined behaviour that was nearly
+> imposable to handle. OK in general history over :)
+> =
 
-On Wed, Aug 29, 2012 at 1:39 PM, viresh kumar <viresh.kumar(a)linaro.org> w=
-rote:
-> Hi,
->
-> I am noticing something strange in powertop reports.
-> When i run powertop with following parameters:
->
-> powertop -t 120 --html
->
-> I see following in summary section
->
-> Power Consumption Summary
->
-> 0.1 wakeups/second, 0.0 GPU ops/second, 0.0 VFS ops/sec, 0.0 GFX
-> wakes/sec and 5375.4% CPU use
->
-> Usage   Events/s        Category        Description
-> 2693%    0.07   Timer   tick_sched_timer
-> 2680%    0.00   Timer   ehci_watchdog
-> 0.6%     0.00   Interrupt       [7] sched(softirq)
-> 0.2%     0.00   Interrupt       [1] timer(softirq)
-> 0.2%     0.00   Interrupt       [29] twd
-> 0.1%     0.00   kWork   pm_runtime_work
-> 0.1%     0.00   Timer   led_heartbeat_function
-> 0.1%     0.00   Interrupt       [9] RCU(softirq)
-> 0.1%     0.00   Interrupt       [57] OMAP DISPC
-> 0.1%     0.00   Process rsyslogd -c5
->
->
-> How is percentage over 100 %...
->
-> System Info:
->
-> PowerTOP Version        v2.0
-> Kernel Version  Linux version 3.4.0-01820-gcc96f22
-> (viresh(a)blr-linut-001) (gcc version 4.7.1 20120514 (prerelease)
-> (crosstool-NG linaro-1.13.1-2012.05-20120523 - Linaro GCC 2012.05) )
-> #5 SMP PREEMPT Tue Aug 28 12:44:52 IST 2012
-> System Name
-> CPU Information 2x
-> OS Information
->
-> Running on ARM: Panda Board.
->
-> --
-> viresh
+> Unfortunately this practice has been inherited still today in
+> segments of other then embedded. Most commonly you may see this
+> practice in specialized segments like gaming consoles. Such practices
+> are still in valid use in such device as switches,
+> telecommunications, avionic systems, weapon systems, medical devices,
+> ect.
+> =
 
---===============3207561504549830431==--
+> So I have an understanding of the issues, "some" of its history, and
+> valid uses. But in my opinion this is still a bad implementation for
+> anyone distributing a general operating system.
+> =
+
+> =
+
+
+Sure, I totally agree. Nowadays, with 4 CPU cores in a pocket, I simply don=
+'t buy =
+
+"exceptions are slow" argument. If in some particular project exceptions ar=
+e so =
+
+common that they're able to sensibly slow down application, then the projec=
+t most
+probably is doing something terribly wrong and mis-concept exceptions.
+
+The tragedy is that at this point in time I believe Google will never consi=
+der using
+exceptions due to legacy reasons.
+
+
+	-ss
+
+--===============4441430807334816212==--
 
