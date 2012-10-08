@@ -1,76 +1,93 @@
-Content-Type: multipart/mixed; boundary="===============7988560981175769494=="
+Content-Type: multipart/mixed; boundary="===============1592232832110505325=="
 MIME-Version: 1.0
-From: Mingye Wang (Artoria2e5) <arthur2e5 at aosc.io>
-Subject: [Powertop] [PATCH 1/2] Stop using strlen() on C++ strings
-Date: Sat, 03 Mar 2018 14:53:20 -0500
-Message-ID: <08177305-54b3-a686-7dfd-4a1c9ef4cdba@aosc.io>
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [RFC][PATCH 2/2] Convert powertop to use new report
+ generator facility
+Date: Mon, 08 Oct 2012 11:22:23 -0700
+Message-ID: <507319DF.5000607@linux.intel.com>
+In-Reply-To: 1349283961-26760-1-git-send-email-i.zhbanov@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7988560981175769494==
+--===============1592232832110505325==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-C++'s strings have a quicker length operation. There's no need to
-convert those strings to null-terminated C strings and run strlen()
-on it.
----
-  src/devices/ahci.cpp | 2 +-
-  src/display.cpp      | 7 +++----
-  src/lib.cpp          | 2 +-
-  3 files changed, 5 insertions(+), 6 deletions(-)
+On 10/03/2012 10:06 AM, Igor Zhbanov wrote:
+> Convert report system to use new report generator facility
+> for producing parsable CSV- and HTML-reports, enhancing code readability
+> and maintainability, merging CSV and HTML codepaths, separating document
+> structure from text formatting.
+> ---
+>   src/cpu/cpu.cpp            |  410 ++++++++++---------------------------=
+-------
+>   src/cpu/cpu.h              |    5 +
+>   src/cpu/cpu_core.cpp       |   11 --
+>   src/cpu/cpu_linux.cpp      |   55 +++++--
+>   src/cpu/cpu_package.cpp    |   12 --
+>   src/cpu/intel_cpus.cpp     |   19 --
+>   src/devices/device.cpp     |  112 ++++--------
+>   src/devlist.cpp            |   44 ++----
+>   src/main.cpp               |   13 +-
+>   src/powertop.css           |   10 +
+>   src/process/do_process.cpp |  199 ++++++++++------------
+>   src/report.cpp             |  145 +++++-----------
+>   src/report.h               |   12 +-
+>   src/tuning/tuning.cpp      |  145 +++++-----------
+>   14 files changed, 393 insertions(+), 799 deletions(-)
+>
+>
+Hello,
+So first id like to say nice work. I see lots of improvements, and some =
 
-diff --git a/src/devices/ahci.cpp b/src/devices/ahci.cpp
-index 2fa2f52..31a42d3 100644
---- a/src/devices/ahci.cpp
-+++ b/src/devices/ahci.cpp
-@@ -150,7 +150,7 @@ ahci::ahci(char *_name, char *path): device()
-   	diskname =3D model_name(path, _name);
-  -	if (strlen(diskname.c_str()) =3D=3D 0)
-+	if (diskname.length() =3D=3D 0)
-  		snprintf(humanname, sizeof(humanname), _("SATA link: %s"), _name);
-  	else
-  		snprintf(humanname, sizeof(humanname), _("SATA disk: %s"), =
+fixes that were missed in the past.
+Couple of things,
 
-diskname.c_str());
-diff --git a/src/display.cpp b/src/display.cpp
-index 10ee48a..8484683 100644
---- a/src/display.cpp
-+++ b/src/display.cpp
-@@ -98,7 +98,7 @@ void show_tab(unsigned int tab)
-  	class tab_window *win;
-  	unsigned int i;
-  	int tab_pos =3D 17;
--	const char *c;
-+	string& s =3D bottom_lines[tab_names[tab]];
-   	if (!display)
-  		return;
-@@ -123,9 +123,8 @@ void show_tab(unsigned int tab)
-  	wattrset(bottom_line, A_REVERSE);
-  	mvwprintw(bottom_line, 0,0, "%120s", "");
-  -	c =3D bottom_lines[tab_names[tab]].c_str();
--	if (c && strlen(c) > 0)
--		mvwprintw(bottom_line, 0,0, c);
-+	if (s.length() > 0)
-+		mvwprintw(bottom_line, 0,0, s.c_str());
-  	else
-  		mvwprintw(bottom_line, 0, 0,
-  			"<ESC> %s | <TAB> / <Shift + TAB> %s | ", _("Exit"),
-diff --git a/src/lib.cpp b/src/lib.cpp
-index 5e48f37..b80ad36 100644
---- a/src/lib.cpp
-+++ b/src/lib.cpp
-@@ -424,7 +424,7 @@ char *pretty_print(const char *str, char *buf, int len)
-   	p =3D pretty_prints[str].c_str();
-  -	if (strlen(p) =3D=3D 0)
-+	if (pretty_prints[str].length() =3D=3D 0)
-  		p =3D str;
-   	snprintf(buf, len,  "%s", p);
--- =
+#1 I noticed that the scripts section of Software Settings in need of =
 
-2.16.1.windows.4
+Tuning is missing. I see the nice header, but not data.
+#2 C0 active table cells are not aligned , and the CPU's are also not =
+
+aligned correctly in the Processor Idle state report section.
+#3 I get some warning compiling, I know PowerTOP is not warning less, =
+
+but would like to attempt to prevent adding more. (and fixing exiting =
+
+ones of course)
+report/report-maker.cpp: In destructor =E2=80=98report_maker::~report_maker=
+()=E2=80=99:
+report/report-maker.cpp:51:10: warning: deleting object of abstract =
+
+class type =E2=80=98report_formatter=E2=80=99 which has non-virtual destruc=
+tor will =
+
+cause undefined behaviour [-Wdelete-non-virtual-dtor]
+report/report-maker.cpp: In member function =E2=80=98void =
+
+report_maker::setup_report_formatter()=E2=80=99:
+report/report-maker.cpp:110:10: warning: deleting object of abstract =
+
+class type =E2=80=98report_formatter=E2=80=99 which has non-virtual destruc=
+tor will =
+
+cause undefined behaviour [-Wdelete-non-virtual-dtor]
+
+#4 report[c,h] should probable just go in your new sub/dir (report).
+#5 csv report has alignment issues for both the cpu Idle and Freq. Even =
+
+if they are machine readable, they need to be easily parsed using open =
+
+office or MS excel and look aligned with the http report.
+
+other issues are small and can be attended to in the future, or have =
+
+been already expressed.
+
+Thanks
+-C
 
 
---===============7988560981175769494==--
+
+--===============1592232832110505325==--
 
