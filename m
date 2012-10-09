@@ -1,93 +1,141 @@
-Content-Type: multipart/mixed; boundary="===============2594453958467956067=="
+Content-Type: multipart/mixed; boundary="===============3715907034994582223=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: Re: [Powertop] cpu wiggle changes userspace governor settings
-Date: Tue, 26 Jul 2016 11:20:53 -0700
-Message-ID: <20160726112053.4982a0da@jbkonno-lemu6.jf.intel.com>
-In-Reply-To: c9a9b03b-a3b1-d362-7bbc-60e84af79acb@tu-dresden.de
+From: Ferron, Chris E <chris.e.ferron at intel.com>
+Subject: Re: [Powertop] [RFC][PATCH 2/2] Convert powertop to use new report
+ generator facility
+Date: Tue, 09 Oct 2012 13:25:30 -0700
+Message-ID: <CAMFVxVhepL+G4mYjjAiuRwKg0c5SE9gwEbUJES=e-EUQm_uRpQ@mail.gmail.com>
+In-Reply-To: 50745C1E.6060503@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2594453958467956067==
+--===============3715907034994582223==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 21 Jul 2016 12:13:17 +0200
-Thomas Ilsche <thomas.ilsche(a)tu-dresden.de> wrote:
+On Tue, Oct 9, 2012 at 10:17 AM, Igor Zhbanov <i.zhbanov(a)samsung.com> wro=
+te:
+> Hi Chris,
+>
+> Please check the new version of the patch set (when it will be approved
+> by mailing list moderator because of its size).
+Sorry about that, I have approved.
+>
+>
+> Chris Ferron wrote:
+>>
+>> Couple of things,
+>>
+>> #1 I noticed that the scripts section of Software Settings in need of
+>> Tuning is missing. I see the nice header, but not data.
+>
+> Done.
+>
+>> #2 C0 active table cells are not aligned , and the CPU's are also not
+>> aligned correctly in the Processor Idle state report section.
+>
+> Done. I hope. :-) I have aligned table headers as in original Powertop
+> If you mean something else please tell.
+>
+>> #3 I get some warning compiling, I know PowerTOP is not warning less, but
+>> would like to attempt to prevent adding more. (and fixing exiting ones of
+>> course)
+>> report/report-maker.cpp: In destructor =E2=80=98report_maker::~report_ma=
+ker()=E2=80=99:
+>> report/report-maker.cpp:51:10: warning: deleting object of abstract class
+>> type =E2=80=98report_formatter=E2=80=99 which has non-virtual destructor=
+ will cause
+>> undefined behaviour [-Wdelete-non-virtual-dtor]
+>> report/report-maker.cpp: In member function =E2=80=98void
+>> report_maker::setup_report_formatter()=E2=80=99:
+>> report/report-maker.cpp:110:10: warning: deleting object of abstract cla=
+ss
+>> type =E2=80=98report_formatter=E2=80=99 which has non-virtual destructor=
+ will cause
+>> undefined behaviour [-Wdelete-non-virtual-dtor]
+>
+> Done.
+>
+>> #4 report[c,h] should probable just go in your new sub/dir (report).
+>
+> I will send this patch later because it will make my patch bigger and that
+> could
+> make the understanding more difficult. It could be a separated patch to
+> easily
+> see changes.
+>
+>> #5 csv report has alignment issues for both the cpu Idle and Freq. Even =
+if
+>> they are machine readable, they need to be easily parsed using open offi=
+ce
+>> or MS excel and look aligned with the http report.
+>
+> CSV has a lots of questions. First of all, what CSV standard to follow?
+> Should it be readable by parsers or by Offices?
+>
+> I have tried to make report maker to be CSV RFC compliant, but as I see
+> Offices doesn't like that CSV. They both prefer to use semicolon as
+> separator,
+> and not to quote strings because of spaces inside of them, and not to quo=
+te
+> empty strings. The only reason to quote is when the string contains
+> semicolon
+> inside of it.
+>
+> So I have tuned CSV report maker to produce CSVs to be read by Offices.
+> Both (MS and Open) can read it with default settings.
+>
+> The other question is formatting inside the CSV. In my opinion there shou=
+ld
+> not
+> be any space padding for values inside the CSV. First of all, is is a
+> machine-readable
+> format. Second, MS Office ignores it totally.
+>
+> By the way, as I see, both offices uses following text alignment rules: if
+> the cell
+> consists of text (letters) then it will be shown aligned to the left, and=
+ if
+> the cell
+> is a number, then it will be shown aligned to the right. This formatting
+> rules
+> are reasonable, so we could totally remove any padding by space in CSV (a=
+nd
+> still
+> have pretty table in Offices).
+>
+> What you think?
+Sounds reasonable to me.
+>
+> And if we need report in human readable text format, we could create TXT
+> report
+> formatter.
+As long as CSV can be parsed nicely (FOR THE MOST PART) in (MS/Open
+office) that will be fine.
 
-> Dear Powertop Team,
-> =
+I will test your latest patches and if Sergey also satisfied I will
+start to merge.
+-C
+THANKS AGAIN, this is looking great.
 
-> I have noticed that powertop changes the frequency set by the
-> userspace governor to the minimum available frequency.
-> =
+>
+> --
+> Best regards,
+> Igor Zhbanov,
+> Expert Software Engineer,
+> phone: +7 (495) 797 25 00 ext 3806
+> e-mail: i.zhbanov(a)samsung.com
+>
+> ASWG, Moscow R&D center, Samsung Electronics
+> 12 Dvintsev street, building 1
+> 127018, Moscow, Russian Federation
+>
+>
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
 
-> This is caused by abstract_cpu::wiggle that touches the
-> {min,max}_freq. By doing so, it also narrows down the
-> scaling_setspeed setting within the min-max-range, but it is not
-> reset upon restoring max_freq. To illustrate what is happening behind
-> the scenes:
-> =
-
-> $ cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_{min,max,cur}_freq
-> 1200000
-> 2901000
-> 2000000
-> $ cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_{governor,setspeed}
-> userspace
-> 2000000
-> $ echo 1200000 | sudo
-> tee /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1200000
-> $ cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_setspeed
-> 1200000
-> =
-
-> (Tested with Linux 4.4.0-21 Ubuntu)
-> =
-
-> Attached is a patch that resets the setspeed value if it was set to a
-> numeric value before the wiggle.
-> =
-
-> Please note that I don't really understand what you are trying to
-> achieve with the wiggle in the first place. It seems for instance
-> that this doesn't do anything if max_freq =3D=3D min_freq.
-
-We need to force a perf event at the beginning of the sampling
-period. That's the only way the code can determine the starting
-frequency. There may be other/better ways to do this. Patches, input
-always welcome.
-
-> =
-
-> Best Regards,
-> Thomas Ilsche
-> =
-
-
-
---===============2594453958467956067==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.sig"
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjIKCmlRSWNCQUVC
-Q0FBR0JRSlhsNm9GQUFvSkVJMklSOVV2U3FwbWxBd1FBTGZOOUtUdnk3a3hPM0hXa1lBSTNJcHoK
-eGt6Y2M0aEhtTTgwNm5MUlF0T0JvamcyblJVM0VmVTZhZWJEUDRlMGIzRllyZTJSbjJ1Q0dTdi9H
-cTgwRS9lOApQaDlzSlVKVlpBRGExVFMwdHpEV2wycFdQM2QvZlFVVXdpR0JsbUJ2YjJEMmVrblp3
-cnd4OU1rS1RHd1ZESFA1CnY1bEVkS3ZKWWpUdjl5bDNCWjVZQVJuZ3BqWWJITUFWTnR0bjdHWWxo
-WUh4SFlqQjlFc2MzQ2ppUldkNnRKMG8KUTF5UTRkakduVXprZW5MV29XaWNMR2FoY2tZWUs4OEt4
-eWZzclFCQmVXRzltbFJOc3VTTUwwbzIxVGRCNjRzTQpMZGIya2hPYnQxUUxtNjFPRVR0S2VCeHlk
-RThONVRpd0EvMWtCZmVGWkM0dHN6VmlNK0dKSFNjNUxUUjdUWWM0CjNLc2lCWmlnNVFJTmFXTVpz
-ZERQWm5tdkF5TVdLZkF6c1pkajlFREpOcUwvZ2NSRWptOTBzS2lXSVMxRU52a1gKNFY0ZksxcVgw
-NlBLV0NYMmxuVHZPc2NPZ0ExR1NET2hNSUFRa3RqMVBIVG9ZYjNHZFkrMGUvbno5akcxR1VESgpt
-R250aUpwUU94Sld1OTFPaG9LeCtaN1BEejBiTlBWS3g4TEdCY2ZQV3ovRTZIWnE0MFZvS1hvVFFX
-dzhHNktqCjFoR3hMajNkd1dCNGxNeEs0Q2UrYjdFeHcwRzlmcm9uN0ZadDRwSDRtZkJzUVRLcjkw
-dGVlQWRDb3FSbUFINUgKSVVNb1cxOU45bXBsQTJMcDI4c1dKZGU5S0lFeVdiUjNtV3pUVFBobGY0
-dkJhN2FLRzkzMTZHSWU5dHJWSmxzWgpodDVia0ZmenBMcEVqSDhzbmdnRgo9emRHNQotLS0tLUVO
-RCBQR1AgU0lHTkFUVVJFLS0tLS0K
-
---===============2594453958467956067==--
+--===============3715907034994582223==--
 
