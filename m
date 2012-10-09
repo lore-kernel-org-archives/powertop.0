@@ -1,103 +1,130 @@
-Content-Type: multipart/mixed; boundary="===============8641624890108448824=="
+Content-Type: multipart/mixed; boundary="===============4260374744155173680=="
 MIME-Version: 1.0
-From: cshanahan at comcast.net
-Subject: Re: [Powertop] Strange Behavior - PowerTOP 2.0 Seg Fault
-Date: Mon, 12 Nov 2012 02:01:02 +0000
-Message-ID: <179380942.45470.1352685662441.JavaMail.root@sz0055a.westchester.pa.mail.comcast.net>
-In-Reply-To: 20121111194528.GA3851@swordfish
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: Re: [Powertop] [RFC][PATCH 2/2] Convert powertop to use new report
+ generator facility
+Date: Tue, 09 Oct 2012 21:17:18 +0400
+Message-ID: <50745C1E.6060503@samsung.com>
+In-Reply-To: 507319DF.5000607@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8641624890108448824==
+--===============4260374744155173680==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
------ Original Message -----
-Sent: Sunday, November 11, 2012 2:45:28 PM
-Subject: Re: [Powertop] Strange Behavior - PowerTOP 2.0 Seg Fault
+Hi Chris,
 
->> =
+Please check the new version of the patch set (when it will be approved
+by mailing list moderator because of its size).
 
->> (gdb) run --calibrate
->> Starting program: /usr/sbin/powertop --calibrate
->> [Thread debugging using libthread_db enabled]
->> Using host libthread_db library "/lib64/libthread_db.so.1".
->> Starting PowerTOP power estimate calibration =
-
->> Calibrating idle
->> Detaching after fork from child process 3784.
->> =
-
->> Program received signal SIGSEGV, Segmentation fault.
->> perf_bundle::start (this=3D0x0) at perf/perf_bundle.cpp:180
->> 180     perf/perf_bundle.cpp: No such file or directory.
->> Missing separate debuginfos, use: zypper install glibc-debuginfo-2.15-22=
-.6.4.x86_64
->> libgcc47-debuginfo-4.7.1_20120723-1.1.1.x86_64 libncurses5-debuginfo-5.9=
--12.5.1.x86_64
->> libnl3-200-debuginfo-3.2.9-2.1.2.x86_64 libpci3-debuginfo-3.1.9-3.1.2.x8=
-6_64
->> libstdc++47-debuginfo-4.7.1_20120723-1.1.1.x86_64 zlib-debuginfo-1.2.7-2=
-.1.2.x86_64
->> (gdb) bt
->> #0  perf_bundle::start (this=3D0x0) at perf/perf_bundle.cpp:180
->> #1  0x000000000040ff30 in start_cpu_measurement () at cpu/cpu.cpp:297
->> #2  0x0000000000442f15 in one_measurement (seconds=3D15) at main.cpp:182
->> #3  0x000000000043fd7a in idle_calibration () at calibrate/calibrate.cpp=
-:423
->> #4  calibrate () at calibrate/calibrate.cpp:466
->> #5  0x0000000000406f98 in main (argc=3D2, argv=3D0x7fffffffe388) at main=
-.cpp:325
->> (gdb)
->> =
-
-> =
-
+Chris Ferron wrote:
+> Couple of things,
 >
-> hm, that's something. seems like enumerate_cpus(); failed
-> because perf_bundle was NULL in cpu by the time of =
+> #1 I noticed that the scripts section of Software Settings in need of =
 
->	perf_events->start();
->
-> call, but it did not crashed on any of enumerate_cpus()
->
-> 332         perf_events =3D new perf_power_bundle();
-> 333 =
+> Tuning is missing. I see the nice header, but not data.
+Done.
+> #2 C0 active table cells are not aligned , and the CPU's are also not =
 
-> 334         if (!perf_events->add_event("power:cpu_idle")){
-> 335                 perf_events->add_event("power:power_start");
-> 336                 perf_events->add_event("power:power_end");
-> 337         }
-> 338         if (!perf_events->add_event("power:cpu_frequency"))
-> 339                 perf_events->add_event("power:power_frequency");
->
->
-> so it leaves only one suspect: enumerate_cpus()
->
-> 269         file.open("/proc/cpuinfo",  ios::in);
-> 270 =
+> aligned correctly in the Processor Idle state report section.
+Done. I hope. :-) I have aligned table headers as in original Powertop
+If you mean something else please tell.
+> #3 I get some warning compiling, I know PowerTOP is not warning less, =
 
-> 271         if (!file)
-> 272                 return;
->
->
-> is that happeninig all the time?
+> but would like to attempt to prevent adding more. (and fixing exiting =
 
-Yes. Happens all the time.
+> ones of course)
+> report/report-maker.cpp: In destructor =E2=80=98report_maker::~report_mak=
+er()=E2=80=99:
+> report/report-maker.cpp:51:10: warning: deleting object of abstract =
+
+> class type =E2=80=98report_formatter=E2=80=99 which has non-virtual destr=
+uctor will =
+
+> cause undefined behaviour [-Wdelete-non-virtual-dtor]
+> report/report-maker.cpp: In member function =E2=80=98void =
+
+> report_maker::setup_report_formatter()=E2=80=99:
+> report/report-maker.cpp:110:10: warning: deleting object of abstract =
+
+> class type =E2=80=98report_formatter=E2=80=99 which has non-virtual destr=
+uctor will =
+
+> cause undefined behaviour [-Wdelete-non-virtual-dtor]
+Done.
+> #4 report[c,h] should probable just go in your new sub/dir (report).
+I will send this patch later because it will make my patch bigger and =
+
+that could
+make the understanding more difficult. It could be a separated patch to =
+
+easily
+see changes.
+> #5 csv report has alignment issues for both the cpu Idle and Freq. =
+
+> Even if they are machine readable, they need to be easily parsed using =
+
+> open office or MS excel and look aligned with the http report. =
+
+CSV has a lots of questions. First of all, what CSV standard to follow?
+Should it be readable by parsers or by Offices?
+
+I have tried to make report maker to be CSV RFC compliant, but as I see
+Offices doesn't like that CSV. They both prefer to use semicolon as =
+
+separator,
+and not to quote strings because of spaces inside of them, and not to quote
+empty strings. The only reason to quote is when the string contains =
+
+semicolon
+inside of it.
+
+So I have tuned CSV report maker to produce CSVs to be read by Offices.
+Both (MS and Open) can read it with default settings.
+
+The other question is formatting inside the CSV. In my opinion there =
+
+should not
+be any space padding for values inside the CSV. First of all, is is a =
+
+machine-readable
+format. Second, MS Office ignores it totally.
+
+By the way, as I see, both offices uses following text alignment rules: =
+
+if the cell
+consists of text (letters) then it will be shown aligned to the left, =
+
+and if the cell
+is a number, then it will be shown aligned to the right. This formatting =
+
+rules
+are reasonable, so we could totally remove any padding by space in CSV =
+
+(and still
+have pretty table in Offices).
+
+What you think?
+
+And if we need report in human readable text format, we could create TXT =
+
+report
+formatter.
+
+-- =
+
+Best regards,
+Igor Zhbanov,
+Expert Software Engineer,
+phone: +7 (495) 797 25 00 ext 3806
+e-mail: i.zhbanov(a)samsung.com
+
+ASWG, Moscow R&D center, Samsung Electronics
+12 Dvintsev street, building 1
+127018, Moscow, Russian Federation
 
 
-> a *very* stupid question - do you have /proc/cpuinfo file?
-
-Yes, I do.
-
-Any idea about my problem?
-
-Thank you for youe help.
-
-
---
-Chris
-
---===============8641624890108448824==--
+--===============4260374744155173680==--
 
