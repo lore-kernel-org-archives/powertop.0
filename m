@@ -1,54 +1,160 @@
-Content-Type: multipart/mixed; boundary="===============4681243410777070171=="
+Content-Type: multipart/mixed; boundary="===============6775550665323735224=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: [Powertop] [PATCH] tab_window: null members on construction
-Date: Wed, 19 Dec 2012 19:06:52 +0300
-Message-ID: <20121219160652.GC3200@swordfish.minsk.epam.com>
+Subject: Re: [Powertop] [RFC][PATCH 1/2] Adding report generator facility
+Date: Tue, 09 Oct 2012 12:03:26 -0700
+Message-ID: <20121009190326.GB3633@swordfish>
+In-Reply-To: 20121009185555.GA3633@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4681243410777070171==
+--===============6775550665323735224==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-introduce tab_window ctor and null memebers during construction. show_tab()=
- may be
-called before window_refresh() [which sets ypad_pos and xpad_pos to 0], cau=
-sing prefresh()
-call with uninit win->ypad_pos, win->xpad_pos args.
+On (10/09/12 11:55), Sergey Senozhatsky wrote:
+> =
 
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+> so we still can call formatter =3D new report_formatter() and use it as w=
+e did before.
+> the obvious problem is that we waste memory and CPU cycles on add* calls =
+for basic
+> class. in other words, if we take a look on the problem from a different =
+angle,
+> among all functions we have 3 types of functions (counting from 1):
+> #1 those that must be NULL in base class - derived class implementation s=
+pecific
+> #2 those that must be same for all derived classes, but NULL in base class
+> #3 those that must be derived with basic implementation
+> =
 
----
+> =
 
- src/display.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+> =
 
-diff --git a/src/display.h b/src/display.h
-index b450f8b..9af3ec0 100644
---- a/src/display.h
-+++ b/src/display.h
-@@ -53,6 +53,14 @@ public:
- 	short int xpad_pos, ypad_pos; =
+> that leads to a quick solution (meaning that it may not be perfect nor be=
+autiful). we define and
+> implement base class with all function being both virtual and empty, let'=
+s call it base (report_formatter).
+> then we define base_impl class, and implement only type #1 functions, for=
+ example, in our case a family of
+> add*() functions plus get/clear result() and so on.
+> =
 
- 	WINDOW *win;
+> then we define and implement formatter clases, that should inherit from b=
+ase_impl, and override
+> class #2 functions (for example, escaping).
+>
+
+Oh, I messed up there. should be "and implement only type #2 functions" and=
+ "override class #1 functions".
+
+	=
+
+	-ss
  =
 
-+	tab_window() {
-+		cursor_pos =3D 0;
-+		cursor_max =3D 0;
-+		xpad_pos =3D0;
-+		ypad_pos =3D 0;
-+		win =3D NULL;
-+	}
-+
- 	virtual void cursor_down(void) { =
+> =
 
- 		if (cursor_pos < cursor_max ) cursor_pos++; repaint(); =
+> from the top of my head, schematically is something like this:
+> =
 
- 	} ;
+> class base {
+>         public:
+>                 base() {}
+>                 virtual ~base() {}
+>                 virtual void foo(const char *p)
+>                 {
+>                         printf("base foo call\n");
+>                 }
+>                 virtual void bar()
+>                 {
+>                         printf("base bar call\n");
+>                 }
+>                 virtual void xyz()
+>                 {
+>                         printf("base xyz call\n");
+>                 }
+>                 virtual void begin_table()
+>                 {
+>                         printf("base begin table call\n");
+>                 }
+> };
+> =
 
+> class base_impl : public base {
+>         public:
+>                 std::string data;
+>                 virtual void foo(const char *p)
+>                 {
+>                         printf("impl foo call\n");
+>                         data.append(p);
+>                 }
+> =
 
---===============4681243410777070171==--
+>                 virtual void bar()
+>                 {
+>                         printf("impl bar call: %s\n", data.c_str());
+>                 }
+> };
+> =
+
+> class derived : public base_impl {
+>         public:
+>                 virtual void begin_table()
+>                 {
+>                         printf("derived begin table call\n");
+>                 }
+> };
+> =
+
+> =
+
+> int main()
+> {
+>         class derived *d =3D new derived();
+>         d->foo("test");
+>         d->bar();
+>         d->xyz();
+>         d->begin_table();
+> =
+
+>         class base *b =3D new base();
+>         b->foo("test");
+>         b->bar();
+>         b->xyz();
+>         b->begin_table();
+> =
+
+>         delete d;
+>         delete b;
+>         return 0;
+> }
+> =
+
+> $g++ -O2 test.cpp -o a.out
+> =
+
+> $./a.out =
+
+> impl foo call
+> impl bar call: test
+> base xyz call
+> derived begin table call
+> =
+
+> base foo call
+> base bar call
+> base xyz call
+> base begin table call
+> =
+
+> =
+
+> =
+
+> 	-ss
+
+--===============6775550665323735224==--
 
