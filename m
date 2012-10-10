@@ -1,141 +1,872 @@
-Content-Type: multipart/mixed; boundary="===============8318550429642474267=="
+Content-Type: multipart/mixed; boundary="===============2545806327714303535=="
 MIME-Version: 1.0
-From: Austin Zhang <zhang.austin at gmail.com>
-Subject: Re: [Powertop] [Powertop ]compiling issue and running issue
-Date: Thu, 01 Nov 2012 00:18:51 +0800
-Message-ID: <CAGLu0vO-zTDaX_=mEeDMw65oRn36r1AH_W+-qhMKF_AJiLCGZA@mail.gmail.com>
-In-Reply-To: 50914293.80704@linux.intel.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [RFC][PATCH] Small rework on report formatter side
+Date: Wed, 10 Oct 2012 16:03:22 -0700
+Message-ID: <20121010230322.GD4628@swordfish.datadirect.datadirectnet.com>
+In-Reply-To: 20121010181352.GA4628@swordfish.datadirect.datadirectnet.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8318550429642474267==
+--===============2545806327714303535==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-thanks for your reply. In case I confused people, I list it as:
+On (10/10/12 11:13), Sergey Senozhatsky wrote:
+> =
 
-austin(a)austin-Studio:~$ uname -a
+> Hello,
+> =
 
-Linux austin-Studio 3.0.0-15-generic #26-Ubuntu SMP Fri Jan 20 17:23:00 UTC
-2012 x86_64 x86_64 x86_64 GNU/Linux
-austin(a)austin-Studio:~$ dpkg -L libnl2
+> below is initial version of rework I was talking about. Igor did most par=
+t of it (introduced =
 
-/.
-/usr
-/usr/share
-/usr/share/doc
-/usr/share/doc/libnl2
-/usr/share/doc/libnl2/copyright
-/usr/share/doc/libnl2/changelog.Debian.gz
-/usr/lib
-/usr/lib/libnl-cli.so.2.0.0
-/usr/lib/libnl-route.so.2.0.0
-/usr/lib/libnl-genl.so.2.0.0
-/usr/lib/libnl-nf.so.2.0.0
-/usr/lib/libnl.so.2.0.0
-/usr/lib/libnl-route.so.2
-/usr/lib/libnl-cli.so.2
-/usr/lib/libnl-genl.so.2
-/usr/lib/libnl.so.2
-/usr/lib/libnl-nf.so.2
-austin(a)austin-Studio:~$ dpkg -L libnl3
+> report_formatter_base class), so mine are just minor tweaks. I'm glad sti=
+ll no one mentioned
+> templates, just kidding.
+> =
 
-/.
-/usr
-/usr/share
-/usr/share/doc
-/usr/share/doc/libnl3
-/usr/share/doc/libnl3/README.Debian
-/usr/share/doc/libnl3/copyright
-/usr/share/doc/libnl3/changelog.Debian.gz
-/usr/lib
-/usr/lib/libnl-cli.so.3.0.0
-/usr/lib/libnl-genl.so.3.0.0
-/usr/lib/libnl-nf.so.3.0.0
-/usr/lib/libnl-route.so.3.0.0
-/usr/lib/libnl.so.3.0.0
-/usr/lib/libnl-cli.so.3
-/usr/lib/libnl-genl.so.3
-/usr/lib/libnl-nf.so.3
-/usr/lib/libnl-route.so.3
-/usr/lib/libnl.so.3
-austin(a)austin-Studio:~$
+> one thing I don't really like so far is
+> =
+
+>         else if (type =3D=3D REPORT_OFF)
+>                formatter =3D new report_formatter();
+> =
+
+> which is just cryptic and thus look wrong.
+> perhaps we need something like `new report_formatter_basic()' here (which=
+ will require header
+> file rename).
+> =
+
+> please review and comment.
+> =
+
+> ------------------------------------------------------------------------
+> =
+
+>     Small rework on report formatter side:
+>     =
+
+>     - make report_formatter a basic class (previously was interface). hen=
+ce we can
+>     remove empty report_formatter interface implementation.
+>     =
+
+>     - drop report-formatter-null class
+>     =
+
+>     - in report maker now we create report_formatter instance for REPORT_=
+OFF mode
+>     =
+
+>     - rename report_formatter_base to report_formatter_string_base, so cl=
+ass name tells
+>     a bit more, later we can create report_formatter_xml_base/report_form=
+atter_json_base/etc.
+> =
+
+> =
+
+> Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+> =
 
 
-2012/10/31 Arjan van de Ven <arjan(a)linux.intel.com>
 
-> On 10/31/2012 7:11 AM, Austin Zhang wrote:
-> > Hi,
-> >
-> > I am trying to compile powertop on my box: ubuntu 12.04, X86-64.
-> >
-> > (1)compiling issue
-> >
-> > Here, my system didn=E2=80=99t install libnl-1, but I installed libnl2 =
-(under
-> /usr/lib) and libnl-3 (under /lib).
->
->
-> on a 64 bit system, that should have been /usr/lib64 and  /lib64
-> otherwise you got 32 bit libraries ;-)
->
->
+plus:
 
---===============8318550429642474267==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+-- renamed report_formatter to basic_report_formatter, so now
 
-dGhhbmtzIGZvciB5b3VyIHJlcGx5LiBJbiBjYXNlIEkgY29uZnVzZWQgcGVvcGxlLCBJIGxpc3Qg
-aXQgYXM6PGRpdj48YnI+PC9kaXY+PGRpdj48ZGl2PmF1c3RpbkBhdXN0aW4tU3R1ZGlvOn4kIHVu
-YW1lIC1hIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
-oCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKCgPC9k
-aXY+CjxkaXY+TGludXggYXVzdGluLVN0dWRpbyAzLjAuMC0xNS1nZW5lcmljICMyNi1VYnVudHUg
-U01QIEZyaSBKYW4gMjAgMTc6MjM6MDAgVVRDIDIwMTIgeDg2XzY0IHg4Nl82NCB4ODZfNjQgR05V
-L0xpbnV4PC9kaXY+PGRpdj5hdXN0aW5AYXVzdGluLVN0dWRpbzp+JCBkcGtnIC1MIGxpYm5sMiCg
-IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
-oCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgoDwvZGl2Pgo8ZGl2Pi8uPC9k
-aXY+PGRpdj4vdXNyPC9kaXY+PGRpdj4vdXNyL3NoYXJlPC9kaXY+PGRpdj4vdXNyL3NoYXJlL2Rv
-YzwvZGl2PjxkaXY+L3Vzci9zaGFyZS9kb2MvbGlibmwyPC9kaXY+PGRpdj4vdXNyL3NoYXJlL2Rv
-Yy9saWJubDIvY29weXJpZ2h0PC9kaXY+PGRpdj4vdXNyL3NoYXJlL2RvYy9saWJubDIvY2hhbmdl
-bG9nLkRlYmlhbi5nejwvZGl2PjxkaXY+L3Vzci9saWI8L2Rpdj48ZGl2PgovdXNyL2xpYi9saWJu
-bC1jbGkuc28uMi4wLjA8L2Rpdj48ZGl2Pi91c3IvbGliL2xpYm5sLXJvdXRlLnNvLjIuMC4wPC9k
-aXY+PGRpdj4vdXNyL2xpYi9saWJubC1nZW5sLnNvLjIuMC4wPC9kaXY+PGRpdj4vdXNyL2xpYi9s
-aWJubC1uZi5zby4yLjAuMDwvZGl2PjxkaXY+L3Vzci9saWIvbGlibmwuc28uMi4wLjA8L2Rpdj48
-ZGl2Pi91c3IvbGliL2xpYm5sLXJvdXRlLnNvLjI8L2Rpdj48ZGl2PgovdXNyL2xpYi9saWJubC1j
-bGkuc28uMjwvZGl2PjxkaXY+L3Vzci9saWIvbGlibmwtZ2VubC5zby4yPC9kaXY+PGRpdj4vdXNy
-L2xpYi9saWJubC5zby4yPC9kaXY+PGRpdj4vdXNyL2xpYi9saWJubC1uZi5zby4yPC9kaXY+PGRp
-dj5hdXN0aW5AYXVzdGluLVN0dWRpbzp+JCBkcGtnIC1MIGxpYm5sMyCgIKAgoCCgIKAgoCCgIKAg
-oCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
-IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgPC9kaXY+CjxkaXY+Ly48L2Rpdj48ZGl2Pi91
-c3I8L2Rpdj48ZGl2Pi91c3Ivc2hhcmU8L2Rpdj48ZGl2Pi91c3Ivc2hhcmUvZG9jPC9kaXY+PGRp
-dj4vdXNyL3NoYXJlL2RvYy9saWJubDM8L2Rpdj48ZGl2Pi91c3Ivc2hhcmUvZG9jL2xpYm5sMy9S
-RUFETUUuRGViaWFuPC9kaXY+PGRpdj4vdXNyL3NoYXJlL2RvYy9saWJubDMvY29weXJpZ2h0PC9k
-aXY+PGRpdj4vdXNyL3NoYXJlL2RvYy9saWJubDMvY2hhbmdlbG9nLkRlYmlhbi5nejwvZGl2Pgo8
-ZGl2Pi91c3IvbGliPC9kaXY+PGRpdj4vdXNyL2xpYi9saWJubC1jbGkuc28uMy4wLjA8L2Rpdj48
-ZGl2Pi91c3IvbGliL2xpYm5sLWdlbmwuc28uMy4wLjA8L2Rpdj48ZGl2Pi91c3IvbGliL2xpYm5s
-LW5mLnNvLjMuMC4wPC9kaXY+PGRpdj4vdXNyL2xpYi9saWJubC1yb3V0ZS5zby4zLjAuMDwvZGl2
-PjxkaXY+L3Vzci9saWIvbGlibmwuc28uMy4wLjA8L2Rpdj48ZGl2Pi91c3IvbGliL2xpYm5sLWNs
-aS5zby4zPC9kaXY+CjxkaXY+L3Vzci9saWIvbGlibmwtZ2VubC5zby4zPC9kaXY+PGRpdj4vdXNy
-L2xpYi9saWJubC1uZi5zby4zPC9kaXY+PGRpdj4vdXNyL2xpYi9saWJubC1yb3V0ZS5zby4zPC9k
-aXY+PGRpdj4vdXNyL2xpYi9saWJubC5zby4zPC9kaXY+PGRpdj5hdXN0aW5AYXVzdGluLVN0dWRp
-bzp+JKA8L2Rpdj48L2Rpdj48ZGl2IGNsYXNzPSJnbWFpbF9leHRyYSI+PGJyPjxicj48ZGl2IGNs
-YXNzPSJnbWFpbF9xdW90ZSI+CjIwMTIvMTAvMzEgQXJqYW4gdmFuIGRlIFZlbiA8c3BhbiBkaXI9
-Imx0ciI+Jmx0OzxhIGhyZWY9Im1haWx0bzphcmphbkBsaW51eC5pbnRlbC5jb20iIHRhcmdldD0i
-X2JsYW5rIj5hcmphbkBsaW51eC5pbnRlbC5jb208L2E+Jmd0Ozwvc3Bhbj48YnI+PGJsb2NrcXVv
-dGUgY2xhc3M9ImdtYWlsX3F1b3RlIiBzdHlsZT0ibWFyZ2luOjAgMCAwIC44ZXg7Ym9yZGVyLWxl
-ZnQ6MXB4ICNjY2Mgc29saWQ7cGFkZGluZy1sZWZ0OjFleCI+CjxkaXYgY2xhc3M9ImltIj5PbiAx
-MC8zMS8yMDEyIDc6MTEgQU0sIEF1c3RpbiBaaGFuZyB3cm90ZTo8YnI+CiZndDsgSGksPGJyPgom
-Z3Q7PGJyPgomZ3Q7IEkgYW0gdHJ5aW5nIHRvIGNvbXBpbGUgcG93ZXJ0b3Agb24gbXkgYm94OiB1
-YnVudHUgMTIuMDQsIFg4Ni02NC48YnI+CiZndDs8YnI+CiZndDsgKDEpY29tcGlsaW5nIGlzc3Vl
-PGJyPgomZ3Q7PGJyPgomZ3Q7IEhlcmUsIG15IHN5c3RlbSBkaWRuknQgaW5zdGFsbCBsaWJubC0x
-LCBidXQgSSBpbnN0YWxsZWQgbGlibmwyICh1bmRlciAvdXNyL2xpYikgYW5kIGxpYm5sLTMgKHVu
-ZGVyIC9saWIpLjxicj4KPGJyPgo8YnI+CjwvZGl2Pm9uIGEgNjQgYml0IHN5c3RlbSwgdGhhdCBz
-aG91bGQgaGF2ZSBiZWVuIC91c3IvbGliNjQgYW5kIKAvbGliNjQ8YnI+Cm90aGVyd2lzZSB5b3Ug
-Z290IDMyIGJpdCBsaWJyYXJpZXMgOy0pPGJyPgo8YnI+CjwvYmxvY2txdW90ZT48L2Rpdj48YnI+
-PC9kaXY+Cg==
+         else if (type =3D=3D REPORT_OFF)
+                formatter =3D new basic_report_formatter();
 
---===============8318550429642474267==--
+look a bit better (yeah, we have basic_report_formatter and report_formatte=
+r_string_base. ugly!!!)
+
+
+-- removed some empty function from CSV/HTML classes. like
+
+	void report_formatter_csv::add_empty_cell()
+	{
+		/* Do nothing special */
+	}
+
+we don't really need such functions in derived classes, they're already doi=
+ng nothing in base class.
+
+
+---
+ src/Makefile.am                      |   1 -
+ src/report/basic-report-formatter.h  |  65 +++++++++++++
+ src/report/report-formatter-base.cpp |  14 +--
+ src/report/report-formatter-base.h   |   4 +-
+ src/report/report-formatter-csv.cpp  |  42 --------
+ src/report/report-formatter-csv.h    |  10 +-
+ src/report/report-formatter-html.h   |   2 +-
+ src/report/report-formatter-null.cpp | 179 -------------------------------=
+----
+ src/report/report-formatter-null.h   |  66 -------------
+ src/report/report-formatter.h        |  65 -------------
+ src/report/report-maker.cpp          |   3 +-
+ src/report/report-maker.h            |   4 +-
+ 12 files changed, 79 insertions(+), 376 deletions(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index ccf3f0c..1a64622 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -34,7 +34,6 @@ powertop_SOURCES =3D parameters/persistent.cpp parameters=
+/learn.cpp parameters/par
+ 		report/report-formatter-base.cpp report/report-formatter-base.h \
+ 		report/report-formatter-csv.cpp report/report-formatter-csv.h \
+ 		report/report-formatter-html.cpp report/report-formatter-html.h \
+-		report/report-formatter-null.cpp report/report-formatter-null.h \
+ 		main.cpp css.h powertop.css cpu/intel_gpu.cpp
+ =
+
+ =
+
+diff --git a/src/report/basic-report-formatter.h b/src/report/basic-report-=
+formatter.h
+new file mode 100644
+index 0000000..5134bf5
+--- /dev/null
++++ b/src/report/basic-report-formatter.h
+@@ -0,0 +1,65 @@
++/* Copyright (c) 2012 Samsung Electronics Co., Ltd.
++ *	http://www.samsung.com/
++ *
++ * This file is part of PowerTOP
++ *
++ * This program file is free software; you can redistribute it and/or modi=
+fy it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; version 2 of the License.
++ *
++ * This program is distributed in the hope that it will be useful, but WIT=
+HOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
++ * for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program in a file named COPYING; if not, write to the
++ * Free Software Foundation, Inc,
++ * 51 Franklin Street, Fifth Floor,
++ * Boston, MA 02110-1301 USA
++ * or just google for it.
++ *
++ * report_formatter interface.
++ * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
++ * 2012.10 */
++
++#ifndef _REPORT_FORMATTER_H_
++#define _REPORT_FORMATTER_H_
++
++#include "report-maker.h"
++
++class basic_report_formatter
++{
++public:
++	virtual ~basic_report_formatter() {}
++
++	virtual void finish_report() {};
++	virtual const char *get_result() {return "Basic report_formatter::get_res=
+ul call\n";};
++	virtual void clear_result() {};
++
++	virtual void add(const char *str) {};
++	virtual void addv(const char *fmt, va_list ap) {};
++
++	virtual void add_header(const char *header, int level) {};
++
++	virtual void begin_section(section_type stype) {};
++	virtual void end_section() {};
++
++	virtual void begin_table(table_type ttype) {};
++	virtual void end_table() {};
++
++	virtual void begin_row(row_type rtype) {};
++	virtual void end_row() {};
++
++	virtual void begin_cell(cell_type ctype) {};
++	virtual void end_cell() {};
++	virtual void add_empty_cell() {};
++
++	virtual void begin_paragraph() {};
++	virtual void end_paragraph() {};
++
++	/* For quad-colouring CPU tables in HTML */
++	virtual void set_cpu_number(int nr) {};
++};
++
++#endif /* _REPORT_FORMATTER_H_ */
+diff --git a/src/report/report-formatter-base.cpp b/src/report/report-forma=
+tter-base.cpp
+index 4b448be..c6d5d9d 100644
+--- a/src/report/report-formatter-base.cpp
++++ b/src/report/report-formatter-base.cpp
+@@ -36,7 +36,7 @@
+ /* ***********************************************************************=
+* */
+ =
+
+ const char *
+-report_formatter_base::get_result()
++report_formatter_string_base::get_result()
+ {
+ 	return result.c_str();
+ }
+@@ -44,7 +44,7 @@ report_formatter_base::get_result()
+ /* ***********************************************************************=
+* */
+ =
+
+ void
+-report_formatter_base::clear_result()
++report_formatter_string_base::clear_result()
+ {
+ 	result.clear();
+ }
+@@ -52,7 +52,7 @@ report_formatter_base::clear_result()
+ /* ***********************************************************************=
+* */
+ =
+
+ void
+-report_formatter_base::add(const char *str)
++report_formatter_string_base::add(const char *str)
+ {
+ 	assert(str);
+ =
+
+@@ -62,7 +62,7 @@ report_formatter_base::add(const char *str)
+ /* ***********************************************************************=
+* */
+ =
+
+ void
+-report_formatter_base::add_exact(const char *str)
++report_formatter_string_base::add_exact(const char *str)
+ {
+ 	assert(str);
+ =
+
+@@ -74,7 +74,7 @@ report_formatter_base::add_exact(const char *str)
+ #define LINE_SIZE 8192
+ =
+
+ void
+-report_formatter_base::addv(const char *fmt, va_list ap)
++report_formatter_string_base::addv(const char *fmt, va_list ap)
+ {
+ 	char str[LINE_SIZE];
+ =
+
+@@ -87,7 +87,7 @@ report_formatter_base::addv(const char *fmt, va_list ap)
+ /* ***********************************************************************=
+* */
+ =
+
+ void
+-report_formatter_base::addf(const char *fmt, ...)
++report_formatter_string_base::addf(const char *fmt, ...)
+ {
+ 	va_list ap;
+ =
+
+@@ -101,7 +101,7 @@ report_formatter_base::addf(const char *fmt, ...)
+ /* ***********************************************************************=
+* */
+ =
+
+ void
+-report_formatter_base::addf_exact(const char *fmt, ...)
++report_formatter_string_base::addf_exact(const char *fmt, ...)
+ {
+ 	char str[LINE_SIZE];
+ 	va_list ap;
+diff --git a/src/report/report-formatter-base.h b/src/report/report-formatt=
+er-base.h
+index 7063174..61cf1ba 100644
+--- a/src/report/report-formatter-base.h
++++ b/src/report/report-formatter-base.h
+@@ -26,9 +26,9 @@
+ #ifndef _REPORT_FORMATTER_BASE_H_
+ #define _REPORT_FORMATTER_BASE_H_
+ =
+
+-#include "report-formatter.h"
++#include "basic-report-formatter.h"
+ =
+
+-class report_formatter_base: public report_formatter
++class report_formatter_string_base: public basic_report_formatter
+ {
+ public:
+ 	virtual const char *get_result();
+diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-format=
+ter-csv.cpp
+index 9b154b5..893c92a 100644
+--- a/src/report/report-formatter-csv.cpp
++++ b/src/report/report-formatter-csv.cpp
+@@ -45,14 +45,6 @@ report_formatter_csv::report_formatter_csv()
+ /* ***********************************************************************=
+* */
+ =
+
+ void
+-report_formatter_csv::finish_report()
+-{
+-	/* Do nothing special */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+ report_formatter_csv::add_doc_header()
+ {
+ 	add_header(report_csv_header, 1);
+@@ -72,24 +64,6 @@ report_formatter_csv::add_header(const char *header, int=
+ level)
+ 	add_exact("\n");
+ }
+ =
+
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_csv::begin_section(section_type stype)
+-{
+-	/* Do nothing special */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_csv::end_section()
+-{
+-	/* Do nothing special */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+ void
+ report_formatter_csv::begin_table(table_type ttype)
+ {
+@@ -163,14 +137,6 @@ report_formatter_csv::end_cell()
+ /* ***********************************************************************=
+* */
+ =
+
+ void
+-report_formatter_csv::add_empty_cell()
+-{
+-	/* Do nothing special */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+ report_formatter_csv::begin_paragraph()
+ {
+ 	text_start =3D result.length();
+@@ -213,11 +179,3 @@ report_formatter_csv::escape_string(const char *str)
+ =
+
+ 	return res;
+ }
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_csv::set_cpu_number(int nr UNUSED)
+-{
+-	/* Do nothing */
+-}
+diff --git a/src/report/report-formatter-csv.h b/src/report/report-formatte=
+r-csv.h
+index fbec0c9..8db9839 100644
+--- a/src/report/report-formatter-csv.h
++++ b/src/report/report-formatter-csv.h
+@@ -44,18 +44,13 @@
+ =
+
+ /* ***********************************************************************=
+* */
+ =
+
+-class report_formatter_csv: public report_formatter_base
++class report_formatter_csv: public report_formatter_string_base
+ {
+ public:
+ 	report_formatter_csv();
+ =
+
+-	void finish_report();
+-
+ 	void add_header(const char *header, int level);
+ =
+
+-	void begin_section(section_type stype);
+-	void end_section();
+-
+ 	void begin_table(table_type ttype);
+ 	void end_table();
+ =
+
+@@ -64,13 +59,10 @@ public:
+ =
+
+ 	void begin_cell(cell_type ctype);
+ 	void end_cell();
+-	void add_empty_cell();
+ =
+
+ 	void begin_paragraph();
+ 	void end_paragraph();
+ =
+
+-	void set_cpu_number(int nr);
+-
+ private:
+ 	void add_doc_header();
+ =
+
+diff --git a/src/report/report-formatter-html.h b/src/report/report-formatt=
+er-html.h
+index 1c3eb4a..4d00efe 100644
+--- a/src/report/report-formatter-html.h
++++ b/src/report/report-formatter-html.h
+@@ -55,7 +55,7 @@ struct html_cell {
+ =
+
+ /* ***********************************************************************=
+* */
+ =
+
+-class report_formatter_html: public report_formatter_base
++class report_formatter_html: public report_formatter_string_base
+ {
+ public:
+ 	report_formatter_html();
+diff --git a/src/report/report-formatter-null.cpp b/src/report/report-forma=
+tter-null.cpp
+deleted file mode 100644
+index 22da7a0..0000000
+--- a/src/report/report-formatter-null.cpp
++++ /dev/null
+@@ -1,179 +0,0 @@
+-/* Copyright (c) 2012 Samsung Electronics Co., Ltd.
+- *	http://www.samsung.com/
+- *
+- * This file is part of PowerTOP
+- *
+- * This program file is free software; you can redistribute it and/or modi=
+fy it
+- * under the terms of the GNU General Public License as published by the
+- * Free Software Foundation; version 2 of the License.
+- *
+- * This program is distributed in the hope that it will be useful, but WIT=
+HOUT
+- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+- * for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program in a file named COPYING; if not, write to the
+- * Free Software Foundation, Inc,
+- * 51 Franklin Street, Fifth Floor,
+- * Boston, MA 02110-1301 USA
+- * or just google for it.
+- *
+- * Null report generator.
+- * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
+- * 2012.10 */
+-
+-#include <stdarg.h>
+-
+-#include "report-formatter-null.h"
+-
+-/* ***********************************************************************=
+* */
+-
+-report_formatter_null::report_formatter_null()
+-{
+-	/* Do nothing */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_null::finish_report()
+-{
+-	/* Do nothing */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-const char *
+-report_formatter_null::get_result()
+-{
+-	return "";
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_null::clear_result()
+-{
+-	/* Do nothing */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_null::add(const char *str UNUSED)
+-{
+-	/* Do nothing */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_null::addv(const char *fmt UNUSED, va_list ap UNUSED)
+-{
+-	/* Do nothing */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_null::add_header(const char *header UNUSED, int level UNU=
+SED)
+-{
+-	/* Do nothing */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_null::begin_section(section_type stype UNUSED)
+-{
+-	/* Do nothing */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_null::end_section()
+-{
+-	/* Do nothing */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_null::begin_table(table_type ttype UNUSED)
+-{
+-	/* Do nothing */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_null::end_table()
+-{
+-	/* Do nothing */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_null::begin_row(row_type rtype UNUSED)
+-{
+-	/* Do nothing */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_null::end_row()
+-{
+-	/* Do nothing */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_null::begin_cell(cell_type ctype UNUSED)
+-{
+-	/* Do nothing */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_null::end_cell()
+-{
+-	/* Do nothing */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_null::add_empty_cell()
+-{
+-	/* Do nothing */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_null::begin_paragraph()
+-{
+-	/* Do nothing */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_null::end_paragraph()
+-{
+-	/* Do nothing */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_null::set_cpu_number(int nr UNUSED)
+-{
+-	/* Do nothing */
+-}
+diff --git a/src/report/report-formatter-null.h b/src/report/report-formatt=
+er-null.h
+deleted file mode 100644
+index 51493ee..0000000
+--- a/src/report/report-formatter-null.h
++++ /dev/null
+@@ -1,66 +0,0 @@
+-/* Copyright (c) 2012 Samsung Electronics Co., Ltd.
+- *	http://www.samsung.com/
+- *
+- * This file is part of PowerTOP
+- *
+- * This program file is free software; you can redistribute it and/or modi=
+fy it
+- * under the terms of the GNU General Public License as published by the
+- * Free Software Foundation; version 2 of the License.
+- *
+- * This program is distributed in the hope that it will be useful, but WIT=
+HOUT
+- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+- * for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program in a file named COPYING; if not, write to the
+- * Free Software Foundation, Inc,
+- * 51 Franklin Street, Fifth Floor,
+- * Boston, MA 02110-1301 USA
+- * or just google for it.
+- *
+- * Null report generator.
+- * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
+- * 2012.10 */
+-
+-#ifndef _REPORT_FORMATTER_NULL_H_
+-#define _REPORT_FORMATTER_NULL_H_
+-
+-#include "report-formatter.h"
+-
+-/* ***********************************************************************=
+* */
+-
+-class report_formatter_null: public report_formatter
+-{
+-public:
+-	report_formatter_null();
+-
+-	void finish_report();
+-	const char *get_result();
+-	void clear_result();
+-
+-	void add(const char *str);
+-	void addv(const char *fmt, va_list ap);
+-
+-	void add_header(const char *header, int level);
+-
+-	void begin_section(section_type stype);
+-	void end_section();
+-
+-	void begin_table(table_type ttype);
+-	void end_table();
+-
+-	void begin_row(row_type rtype);
+-	void end_row();
+-
+-	void begin_cell(cell_type ctype);
+-	void end_cell();
+-	void add_empty_cell();
+-
+-	void begin_paragraph();
+-	void end_paragraph();
+-
+-	void set_cpu_number(int nr);
+-};
+-
+-#endif /* _REPORT_FORMATTER_NULL_H_ */
+diff --git a/src/report/report-formatter.h b/src/report/report-formatter.h
+deleted file mode 100644
+index cec0796..0000000
+--- a/src/report/report-formatter.h
++++ /dev/null
+@@ -1,65 +0,0 @@
+-/* Copyright (c) 2012 Samsung Electronics Co., Ltd.
+- *	http://www.samsung.com/
+- *
+- * This file is part of PowerTOP
+- *
+- * This program file is free software; you can redistribute it and/or modi=
+fy it
+- * under the terms of the GNU General Public License as published by the
+- * Free Software Foundation; version 2 of the License.
+- *
+- * This program is distributed in the hope that it will be useful, but WIT=
+HOUT
+- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+- * for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program in a file named COPYING; if not, write to the
+- * Free Software Foundation, Inc,
+- * 51 Franklin Street, Fifth Floor,
+- * Boston, MA 02110-1301 USA
+- * or just google for it.
+- *
+- * report_formatter interface.
+- * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
+- * 2012.10 */
+-
+-#ifndef _REPORT_FORMATTER_H_
+-#define _REPORT_FORMATTER_H_
+-
+-#include "report-maker.h"
+-
+-class report_formatter /* Interface */
+-{
+-public:
+-	virtual ~report_formatter() {}
+-
+-	virtual void finish_report() =3D 0;
+-	virtual const char *get_result() =3D 0;
+-	virtual void clear_result() =3D 0;
+-
+-	virtual void add(const char *str) =3D 0;
+-	virtual void addv(const char *fmt, va_list ap) =3D 0;
+-
+-	virtual void add_header(const char *header, int level) =3D 0;
+-
+-	virtual void begin_section(section_type stype) =3D 0;
+-	virtual void end_section() =3D 0;
+-
+-	virtual void begin_table(table_type ttype) =3D 0;
+-	virtual void end_table() =3D 0;
+-
+-	virtual void begin_row(row_type rtype) =3D 0;
+-	virtual void end_row() =3D 0;
+-
+-	virtual void begin_cell(cell_type ctype) =3D 0;
+-	virtual void end_cell() =3D 0;
+-	virtual void add_empty_cell() =3D 0;
+-
+-	virtual void begin_paragraph() =3D 0;
+-	virtual void end_paragraph() =3D 0;
+-
+-	/* For quad-colouring CPU tables in HTML */
+-	virtual void set_cpu_number(int nr) =3D 0;
+-};
+-
+-#endif /* _REPORT_FORMATTER_H_ */
+diff --git a/src/report/report-maker.cpp b/src/report/report-maker.cpp
+index 4a68a8c..6d0989a 100644
+--- a/src/report/report-maker.cpp
++++ b/src/report/report-maker.cpp
+@@ -31,7 +31,6 @@
+ #include "report-maker.h"
+ #include "report-formatter-csv.h"
+ #include "report-formatter-html.h"
+-#include "report-formatter-null.h"
+ =
+
+ /* ***********************************************************************=
+* */
+ =
+
+@@ -114,7 +113,7 @@ report_maker::setup_report_formatter()
+ 	else if (type =3D=3D REPORT_CSV)
+ 		formatter =3D new report_formatter_csv();
+ 	else if (type =3D=3D REPORT_OFF)
+-		formatter =3D new report_formatter_null();
++		formatter =3D new basic_report_formatter();
+ 	else
+ 		assert(false);
+ }
+diff --git a/src/report/report-maker.h b/src/report/report-maker.h
+index 75e0d06..df8d20c 100644
+--- a/src/report/report-maker.h
++++ b/src/report/report-maker.h
+@@ -162,7 +162,7 @@ enum cell_type {
+ =
+
+ /* ***********************************************************************=
+* */
+ =
+
+-class report_formatter;
++class basic_report_formatter;
+ =
+
+ class report_maker
+ {
+@@ -202,7 +202,7 @@ private:
+ 	void end_paragraph();
+ =
+
+ 	report_type type;
+-	report_formatter *formatter;
++	basic_report_formatter *formatter;
+ 	bool cell_opened, row_opened, table_opened, section_opened,
+ 	     paragraph_opened;
+ };
+
+
+
+--===============2545806327714303535==--
 
