@@ -1,149 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============0697731677019656260=="
+Content-Type: multipart/mixed; boundary="===============4993853392933911077=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] Fix C states and P states presentation issue.
-Date: Tue, 15 Jan 2013 14:28:17 +0300
-Message-ID: <20130115112817.GB2344@swordfish.minsk.epam.com>
-In-Reply-To: 20130115112353.GA2344@swordfish.minsk.epam.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Move report.cpp and report.h to report/
+ directory.
+Date: Thu, 11 Oct 2012 06:21:45 -0700
+Message-ID: <5076C7E9.1030205@linux.intel.com>
+In-Reply-To: 5076A76E.4020001@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0697731677019656260==
+--===============4993853392933911077==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (01/15/13 14:23), Sergey Senozhatsky wrote:
-> On (01/15/13 19:05), Austin Zhang wrote:
-> > If using '10' in this 'for' loop, for P states, once the processor
-> > provides more than 10 P states, those additional ones cannot been
-> > presented; and for C states, once the processor provides maximize
-> > C states level more than 9, for example, it only has POLL, C1, C3,
-> > C6, C10, the additional one like C10 also cannot be presented.
-> >
+On 10/11/2012 4:03 AM, Igor Zhbanov wrote:
+> Igor Zhbanov wrote:
+>> Move report.cpp and report.h to report/ directory to other report-related
+>> files.
+>> ---
+>>   src/Makefile.am            |    4 +-
+>>   src/cpu/cpu.cpp            |    2 +-
+>>   src/devices/device.cpp     |    2 +-
+>>   src/devlist.cpp            |    2 +-
+>>   src/main.cpp               |    2 +-
+>>   src/process/do_process.cpp |    2 +-
+>>   src/report.cpp             |  195 ------------------------------------=
+--------
+>>   src/report.h               |   46 ----------
+>>   src/tuning/tuning.cpp      |    2 +-
+>>   9 files changed, 8 insertions(+), 249 deletions(-)
+>>   delete mode 100644 src/report.cpp
+>>   delete mode 100644 src/report.h
+> Oops... Forget to tell the git about new file. Please wait for the new ve=
+rsion of the patch.
 > =
 
-> Hm, I'm sure I've seen this before. Was it the same patch from
-> you?
-> =
 
-> I recall Igor patched html report for pstate, but I also remember we had
-> something about c states as well.
-> =
+can you tell git also to make a patch that detects renames (m option)
+that way it's more obvious nothing changed ;-)
 
-> 	-ss
->
 
-Ok, I found it: "Display all P-states in HTML-report"
-(http://lists.01.org/pipermail/powertop/2012-July/000161.html).
-There was a note from Igor
-" The same issue may affect the function report_display_cpu_cstates()
-but I'm not sure that CPUs with more than 10 C-states exists. "
-
-I'll take a look at your patch, thanks.
-
-	-ss
-  =
-
-> > Now we get the loop numbers from the system information we had got
-> > before.
-> > =
-
-> > Signed-off-by: Austin Zhang <zhang.austin(a)gmail.com>
-> > ---
-> >  src/cpu/cpu.cpp |   35 +++++++++++++++++++++++++++++------
-> >  1 files changed, 29 insertions(+), 6 deletions(-)
-> > =
-
-> > diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-> > index 7f3af69..28f77b7 100644
-> > --- a/src/cpu/cpu.cpp
-> > +++ b/src/cpu/cpu.cpp
-> > @@ -404,6 +404,15 @@ void report_display_cpu_cstates(void)
-> >  	unsigned int package, core, cpu;
-> >  	int line;
-> >  	class abstract_cpu *_package, * _core, * _cpu;
-> > +	unsigned int i, j, cstates_num;
-> > +
-> > +	for (i =3D 0, cstates_num =3D 0; i < all_cpus.size(); i++) {
-> > +		if (all_cpus[i])
-> > +			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
-> > +				if ((all_cpus[i]->cstates[j])->line_level >=3D 0 &&
-> > +				    (all_cpus[i]->cstates[j])->line_level > cstates_num)
-> > +					cstates_num =3D (all_cpus[i]->cstates[j])->line_level;
-> > +	}
-> >  =
-
-> >  	report.begin_section(SECTION_CPUIDLE);
-> >  	report.add_header("Processor Idle state report");
-> > @@ -421,7 +430,7 @@ void report_display_cpu_cstates(void)
-> >  			if (!_core)
-> >  				continue;
-> >  =
-
-> > -			for (line =3D LEVEL_HEADER; line < 10; line++) {
-> > +			for (line =3D LEVEL_HEADER; line <=3D (int)cstates_num; line++) {
-> >  				bool first_cpu =3D true;
-> >  =
-
-> >  				if (!_package->has_cstate_level(line))
-> > @@ -628,14 +637,29 @@ void impl_w_display_cpu_states(int state)
-> >  	char buffer[128];
-> >  	char linebuf[1024];
-> >  	unsigned int package, core, cpu;
-> > -	int line;
-> > +	int line, loop;
-> >  	class abstract_cpu *_package, * _core, * _cpu;
-> >  	int ctr =3D 0;
-> > +	unsigned int i, j, cstates_num, pstates_num;
-> > +
-> > +	for (i =3D 0, cstates_num =3D 0, pstates_num =3D 0; i < all_cpus.size=
-(); i++) {
-> > +		if (all_cpus[i] && all_cpus[i]->pstates.size() > pstates_num)
-> > +			pstates_num =3D all_cpus[i]->pstates.size();
-> >  =
-
-> > -	if (state =3D=3D PSTATE)
-> > +		if (all_cpus[i])
-> > +			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
-> > +				if ((all_cpus[i]->cstates[j])->line_level >=3D 0 &&
-> > +				    (all_cpus[i]->cstates[j])->line_level > cstates_num)
-> > +					cstates_num =3D (all_cpus[i]->cstates[j])->line_level;
-> > +	}
-> > +
-> > +	if (state =3D=3D PSTATE) {
-> >  		win =3D get_ncurses_win("Frequency stats");
-> > -	else
-> > +		loop =3D (int)pstates_num;
-> > +	} else {
-> >  		win =3D get_ncurses_win("Idle stats");
-> > +		loop =3D (int)cstates_num;
-> > +	}
-> >  =
-
-> >  	if (!win)
-> >  		return;
-> > @@ -656,8 +680,7 @@ void impl_w_display_cpu_states(int state)
-> >  			if (!_core->has_pstates() && state =3D=3D PSTATE)
-> >  				continue;
-> >  =
-
-> > -
-> > -			for (line =3D LEVEL_HEADER; line < 10; line++) {
-> > +			for (line =3D LEVEL_HEADER; line <=3D loop; line++) {
-> >  				int first =3D 1;
-> >  				ctr =3D 0;
-> >  				linebuf[0] =3D 0;
-> > -- =
-
-> > 1.7.5.4
-> > =
-
-> > _______________________________________________
-> > PowerTop mailing list
-> > PowerTop(a)lists.01.org
-> > https://lists.01.org/mailman/listinfo/powertop
-> >=20
-
---===============0697731677019656260==--
+--===============4993853392933911077==--
 
