@@ -1,60 +1,159 @@
-Content-Type: multipart/mixed; boundary="===============7997326644212742038=="
+Content-Type: multipart/mixed; boundary="===============1812756579481939185=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] Change library/pkg search condition for
- libnl2/3
-Date: Fri, 09 Nov 2012 14:30:26 +0300
-Message-ID: <20121109113026.GB3239@swordfish.minsk.epam.com>
-In-Reply-To: CAGLu0vOCzSjQ1nDg1PGTv3LEChGLcKqXOMx5eU-E_vaP8FvD_A@mail.gmail.com
+Subject: [Powertop] [PATCH] clean up csv report formatter
+Date: Thu, 11 Oct 2012 15:33:08 -0700
+Message-ID: <20121011223308.GA3045@swordfish.datadirect.datadirectnet.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7997326644212742038==
+--===============1812756579481939185==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (11/09/12 19:17), Austin Zhang wrote:
->    libnl3:
->    libnl-3.0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0libnl - Convenience library for netlink
->    sockets
->    libnl2:
->    libnl-2.0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0libnl - Convenience library for netlink
->    sockets
-> =
+[PATCH] clean up csv report formatter
+
+Do not re-define/re-implement unused basic formatter functions in csv repor=
+ter
+(e.g. report_formatter_csv::finish_report()).
 
 
-so, libnl-3.0.pc and libnl-2.0.pc are there, but there are no evidence of, =
-for example,
-libnl-genl
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
 
-pkg-config output on Arch
+---
 
-libnl-3.0                   libnl - Convenience library for netlink sockets
-libnl-cli-3.0               libnl-cli - Command Line Interface library for =
-netlink sockets
-libnl-nf-3.0                libnl-nf - Netfilter Netlink Library
-libnl-route-3.0             libnl-route - Netlink Routing Family Library
-libnl-genl-3.0              libnl-genl - Generic Netlink Library
+ src/report/report-formatter-csv.cpp | 40 ---------------------------------=
+----
+ src/report/report-formatter-csv.h   |  8 --------
+ 2 files changed, 48 deletions(-)
+
+diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-format=
+ter-csv.cpp
+index 9b154b5..37ac86b 100644
+--- a/src/report/report-formatter-csv.cpp
++++ b/src/report/report-formatter-csv.cpp
+@@ -45,14 +45,6 @@ report_formatter_csv::report_formatter_csv()
+ /* ***********************************************************************=
+* */
+ =
+
+ void
+-report_formatter_csv::finish_report()
+-{
+-	/* Do nothing special */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+ report_formatter_csv::add_doc_header()
+ {
+ 	add_header(report_csv_header, 1);
+@@ -75,22 +67,6 @@ report_formatter_csv::add_header(const char *header, int=
+ level)
+ /* ***********************************************************************=
+* */
+ =
+
+ void
+-report_formatter_csv::begin_section(section_type stype)
+-{
+-	/* Do nothing special */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_csv::end_section()
+-{
+-	/* Do nothing special */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+ report_formatter_csv::begin_table(table_type ttype)
+ {
+ 	add_exact("\n");
+@@ -163,14 +139,6 @@ report_formatter_csv::end_cell()
+ /* ***********************************************************************=
+* */
+ =
+
+ void
+-report_formatter_csv::add_empty_cell()
+-{
+-	/* Do nothing special */
+-}
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+ report_formatter_csv::begin_paragraph()
+ {
+ 	text_start =3D result.length();
+@@ -213,11 +181,3 @@ report_formatter_csv::escape_string(const char *str)
+ =
+
+ 	return res;
+ }
+-
+-/* ***********************************************************************=
+* */
+-
+-void
+-report_formatter_csv::set_cpu_number(int nr UNUSED)
+-{
+-	/* Do nothing */
+-}
+diff --git a/src/report/report-formatter-csv.h b/src/report/report-formatte=
+r-csv.h
+index 8dd2976..8db9839 100644
+--- a/src/report/report-formatter-csv.h
++++ b/src/report/report-formatter-csv.h
+@@ -49,13 +49,8 @@ class report_formatter_csv: public report_formatter_stri=
+ng_base
+ public:
+ 	report_formatter_csv();
+ =
+
+-	void finish_report();
+-
+ 	void add_header(const char *header, int level);
+ =
+
+-	void begin_section(section_type stype);
+-	void end_section();
+-
+ 	void begin_table(table_type ttype);
+ 	void end_table();
+ =
+
+@@ -64,13 +59,10 @@ public:
+ =
+
+ 	void begin_cell(cell_type ctype);
+ 	void end_cell();
+-	void add_empty_cell();
+ =
+
+ 	void begin_paragraph();
+ 	void end_paragraph();
+ =
+
+-	void set_cpu_number(int nr);
+-
+ private:
+ 	void add_doc_header();
+ =
 
 
-in case if we remove libnl-genl from PKG_CHECK_MODULES, we'll break the bui=
-ld, because LIBNL_LIBS
-should be '-lnl-genl-3 -lnl-3', not just '-lnl-3'.
-
-[..]
-src/tuning/iw.c:89: undefined reference to `genl_connect'
-src/tuning/iw.c:95: undefined reference to `genl_ctrl_alloc_cache'
-src/tuning/iw.c:101: undefined reference to `genl_ctrl_search_by_name'
-and so on...
 
 
-looks like we need to workaround ubuntu.
-
-
-	-ss
-
---===============7997326644212742038==--
+--===============1812756579481939185==--
 
