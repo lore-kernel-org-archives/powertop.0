@@ -1,50 +1,194 @@
-Content-Type: multipart/mixed; boundary="===============6004076925562681484=="
+Content-Type: multipart/mixed; boundary="===============4193083211804559694=="
 MIME-Version: 1.0
-From: Paul Menzel <paulepanter at users.sourceforge.net>
-Subject: [Powertop] [Git HEAD] Idle stats shows nothing on T60
-Date: Sun, 04 Nov 2012 12:24:15 +0100
-Message-ID: <1352028255.4710.4.camel@mattotaupa>
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Move report.cpp and report.h to report/
+ directory (v4)
+Date: Thu, 11 Oct 2012 14:55:42 -0700
+Message-ID: <5077405E.80109@linux.intel.com>
+In-Reply-To: 1349959789-25077-1-git-send-email-i.zhbanov@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6004076925562681484==
+--===============4193083211804559694==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Dear PowerTOP,
+On 10/11/2012 05:49 AM, Igor Zhbanov wrote:
+> Move report.cpp and report.h to report/ directory to other report-related
+> files.
+> ---
+> I hope this is the final version of the patch.
+> Never used "git mv" before.
+>
+>   src/Makefile.am             |    4 ++--
+>   src/cpu/cpu.cpp             |    2 +-
+>   src/devices/device.cpp      |    2 +-
+>   src/devlist.cpp             |    2 +-
+>   src/main.cpp                |    2 +-
+>   src/process/do_process.cpp  |    2 +-
+>   src/{ =3D> report}/report.cpp |    2 +-
+>   src/{ =3D> report}/report.h   |    2 +-
+>   src/tuning/tuning.cpp       |    2 +-
+>   9 files changed, 10 insertions(+), 10 deletions(-)
+>   rename src/{ =3D> report}/report.cpp (99%)
+>   rename src/{ =3D> report}/report.h (97%)
+>
+> diff --git a/src/Makefile.am b/src/Makefile.am
+> index ccf3f0c..4c4a7c0 100644
+> --- a/src/Makefile.am
+> +++ b/src/Makefile.am
+> @@ -11,10 +11,10 @@ powertop_SOURCES =3D parameters/persistent.cpp parame=
+ters/learn.cpp parameters/par
+>   		parameters/parameters.h display.cpp cpu/cpu_core.cpp cpu/cpudevice.cp=
+p  \
+>   		cpu/cpu.cpp cpu/cpu.h cpu/cpu_linux.cpp cpu/abstract_cpu.cpp cpu/inte=
+l_cpus.h \
+>   		cpu/cpu_package.cpp cpu/cpudevice.h cpu/intel_cpus.cpp devlist.h devl=
+ist.cpp \
+> -		lib.cpp report.cpp process/process.cpp process/interrupt.h process/tim=
+er.h  \
+> +		lib.cpp report/report.cpp process/process.cpp process/interrupt.h proc=
+ess/timer.h  \
+>   		process/processdevice.cpp process/powerconsumer.cpp process/work.h \
+>   		process/timer.cpp process/process.h process/work.cpp process/do_proce=
+ss.cpp \
+> -		process/processdevice.h process/interrupt.cpp process/powerconsumer.h =
+report.h \
+> +		process/processdevice.h process/interrupt.cpp process/powerconsumer.h =
+report/report.h \
+>   		perf/perf.cpp perf/perf_event.h perf/perf.h perf/perf_bundle.h perf/p=
+erf_bundle.cpp \
+>   		display.h devices/rfkill.h devices/i915-gpu.cpp devices/device.cpp de=
+vices/alsa.cpp \
+>   		devices/runtime_pm.cpp devices/thinkpad-fan.cpp devices/usb.cpp devic=
+es/ahci.cpp \
+> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+> index 3d260d9..e65d828 100644
+> --- a/src/cpu/cpu.cpp
+> +++ b/src/cpu/cpu.cpp
+> @@ -36,7 +36,7 @@
+>   #include "../perf/perf_bundle.h"
+>   #include "../lib.h"
+>   #include "../display.h"
+> -#include "../report.h"
+> +#include "../report/report.h"
+>   #include "../report/report-maker.h"
+>   =
+
+>   static class abstract_cpu system_level;
+> diff --git a/src/devices/device.cpp b/src/devices/device.cpp
+> index 01e37b4..00ec5e6 100644
+> --- a/src/devices/device.cpp
+> +++ b/src/devices/device.cpp
+> @@ -47,7 +47,7 @@ using namespace std;
+>   #include "../parameters/parameters.h"
+>   #include "../display.h"
+>   #include "../lib.h"
+> -#include "../report.h"
+> +#include "../report/report.h"
+>   #include "../report/report-maker.h"
+>   #include "../measurement/measurement.h"
+>   #include "../devlist.h"
+> diff --git a/src/devlist.cpp b/src/devlist.cpp
+> index c5d65e6..de5abff 100644
+> --- a/src/devlist.cpp
+> +++ b/src/devlist.cpp
+> @@ -42,7 +42,7 @@ using namespace std;
+>   =
+
+>   #include "devlist.h"
+>   #include "lib.h"
+> -#include "report.h"
+> +#include "report/report.h"
+>   #include "report/report-maker.h"
+>   =
+
+>   #include "process/process.h"
+> diff --git a/src/main.cpp b/src/main.cpp
+> index 7971f2b..e1dcb1c 100644
+> --- a/src/main.cpp
+> +++ b/src/main.cpp
+> @@ -56,7 +56,7 @@
+>   =
+
+>   #include "display.h"
+>   #include "devlist.h"
+> -#include "report.h"
+> +#include "report/report.h"
+>   =
+
+>   #define DEBUGFS_MAGIC          0x64626720
+>   =
+
+> diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
+> index 7c61947..8f73083 100644
+> --- a/src/process/do_process.cpp
+> +++ b/src/process/do_process.cpp
+> @@ -28,7 +28,7 @@
+>   #include "work.h"
+>   #include "processdevice.h"
+>   #include "../lib.h"
+> -#include "../report.h"
+> +#include "../report/report.h"
+>   #include "../report/report-maker.h"
+>   #include "../devlist.h"
+>   =
+
+> diff --git a/src/report.cpp b/src/report/report.cpp
+> similarity index 99%
+> rename from src/report.cpp
+> rename to src/report/report.cpp
+> index a2000c9..51bc6a7 100644
+> --- a/src/report.cpp
+> +++ b/src/report/report.cpp
+> @@ -26,7 +26,7 @@
+>   =
+
+>   #include "lib.h"
+>   #include "report.h"
+> -#include "report/report-maker.h"
+> +#include "report-maker.h"
+>   #include <errno.h>
+>   #include <string.h>
+>   #include <utility>
+> diff --git a/src/report.h b/src/report/report.h
+> similarity index 97%
+> rename from src/report.h
+> rename to src/report/report.h
+> index bf8f6de..77bf2d7 100644
+> --- a/src/report.h
+> +++ b/src/report/report.h
+> @@ -28,7 +28,7 @@
+>   #include <string>
+>   #include <stdio.h>
+>   =
+
+> -#include "report/report-maker.h"
+> +#include "report-maker.h"
+>   =
+
+>   using namespace std;
+>   =
+
+> diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
+> index 69f0783..ebb4ac8 100644
+> --- a/src/tuning/tuning.cpp
+> +++ b/src/tuning/tuning.cpp
+> @@ -39,7 +39,7 @@
+>   #include "ethernet.h"
+>   #include "wifi.h"
+>   #include "../display.h"
+> -#include "../report.h"
+> +#include "../report/report.h"
+>   #include "../report/report-maker.h"
+>   #include "../lib.h"
+>   =
+
+Your patch has been merged.
+Thank You,
+-C
 
 
-trying latest Git commit
-
-        commit 3c71131f96ad08d15f6508af2ee54b4003a59981
-        Author: Chris E Ferron <chris.e.ferron(a)linux.intel.com>
-        Date:   Wed Oct 31 14:46:13 2012 -0700
-        =
-
-            updated active % of GPU to Powered On
-
-on a Lenovo T60 with Debian Wheezy/testing having Linux 3.2.32 [1],
-going to tab Idle stats, besides one | nothing is shown.
-
-
-Thanks,
-
-Paul
-
-
-[1] http://packages.debian.org/wheezy/linux-image-3.2.0-4-686-pae
-
---===============6004076925562681484==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
-L0xpbnV4KQoKaUVZRUFCRUNBQVlGQWxDV1VHQUFDZ2tRUFgxYUsyd09IVmhmb3dDZmVUb1p2NVhE
-QS9RNTQ4WDdJUWZyaVptcwpndE1Bb0lTNEJmS1dpZHhEVHhvQmgveStDL2J6bFNnTgo9c2hkVgot
-LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
-
---===============6004076925562681484==--
+--===============4193083211804559694==--
 
