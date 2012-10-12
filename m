@@ -1,88 +1,95 @@
-Content-Type: multipart/mixed; boundary="===============3239001635381086958=="
+Content-Type: multipart/mixed; boundary="===============5063305758221722712=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [RFC] [PATCHv2 00/10] Code deduplication in cpu/*
-Date: Mon, 24 Dec 2012 23:41:35 +0300
-Message-ID: <20121224204135.GD3307@swordfish>
-In-Reply-To: E351AD52FA1E154C8FFF4F9FCD2CA8431B3CD913@ORSMSX108.amr.corp.intel.com
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: Re: [Powertop] [RFC][PATCH] Small rework on report formatter side
+Date: Fri, 12 Oct 2012 17:46:10 +0400
+Message-ID: <50781F22.3050805@samsung.com>
+In-Reply-To: 20121010230322.GD4628@swordfish.datadirect.datadirectnet.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3239001635381086958==
+--===============5063305758221722712==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (12/24/12 20:17), Ferron, Chris E wrote:
-> Thanks, I will attend to outstanding patches on Wednesday (GMT+8) when I =
-return to the office. =
+He Sergey,
 
-> -Chris
->
+Sergey Senozhatsky wrote:
 
-Thanks, Merry Christmas!
+...
 
-	-ss
+> ---
+>   src/Makefile.am                      |   1 -
+>   src/report/basic-report-formatter.h  |  65 +++++++++++++
+>   src/report/report-formatter-base.cpp |  14 +--
+>   src/report/report-formatter-base.h   |   4 +-
+>   src/report/report-formatter-csv.cpp  |  42 --------
+>   src/report/report-formatter-csv.h    |  10 +-
+>   src/report/report-formatter-html.h   |   2 +-
+>   src/report/report-formatter-null.cpp | 179 ----------------------------=
+-------
+>   src/report/report-formatter-null.h   |  66 -------------
+>   src/report/report-formatter.h        |  65 -------------
+>   src/report/report-maker.cpp          |   3 +-
+>   src/report/report-maker.h            |   4 +-
+>   12 files changed, 79 insertions(+), 376 deletions(-)
+...
+> +class basic_report_formatter
+> +{
+> +public:
+> +	virtual ~basic_report_formatter() {}
+> +
+> +	virtual void finish_report() {};
+> +	virtual const char *get_result() {return "Basic report_formatter::get_r=
+esul call\n";};
 
- =
+1)
+- "Basic report_formatter::get_resul call\n"
++ "basic_report_formatter::get_result call\n"
 
-> -----Original Message-----
-> From: powertop-bounces(a)lists.01.org [mailto:powertop-bounces(a)lists.01=
-.org] On Behalf Of Sergey Senozhatsky
-> Sent: Monday, December 24, 2012 8:25 AM
-> To: Chris Ferron
-> Cc: powertop(a)lists.01.org
-> Subject: Re: [Powertop] [RFC] [PATCHv2 00/10] Code deduplication in cpu/*
-> =
+> +	virtual void clear_result() {};
+> +
+> +	virtual void add(const char *str) {};
+> +	virtual void addv(const char *fmt, va_list ap) {};
+> +
+> +	virtual void add_header(const char *header, int level) {};
+> +
+> +	virtual void begin_section(section_type stype) {};
+> +	virtual void end_section() {};
+> +
+> +	virtual void begin_table(table_type ttype) {};
+> +	virtual void end_table() {};
+> +
+> +	virtual void begin_row(row_type rtype) {};
+> +	virtual void end_row() {};
+> +
+> +	virtual void begin_cell(cell_type ctype) {};
+> +	virtual void end_cell() {};
+> +	virtual void add_empty_cell() {};
+> +
+> +	virtual void begin_paragraph() {};
+> +	virtual void end_paragraph() {};
+> +
+> +	/* For quad-colouring CPU tables in HTML */
+> +	virtual void set_cpu_number(int nr) {};
+> +};
 
-> On (12/24/12 03:08), Ivan Shapovalov wrote:
-> > This is a resend (unchanged but rebased) of the patch series about =
+2) You don't need semicolon after closing bracket in class member inline de=
+finition in C++.
 
-> > refactoring code in cpu/* by deduplication. From this series, only the =
+-- =
 
-> > last bugfix patch has been applied so far due to a code freeze.
-> > =
+Best regards,
+Igor Zhbanov,
+Expert Software Engineer,
+phone: +7 (495) 797 25 00 ext 3806
+e-mail: i.zhbanov(a)samsung.com
 
-> > Ivan Shapovalov (10):
-> >       Fix includes: do not include intel_cpus.h inside cpu.h
-> >       Deduplication: move is_turbo() function to lib
-> >       Deduplication: move all instances of account_freq() to abstract_c=
-pu::account_freq()
-> >       Deduplication: remove nhm_cpu::account_freq() almost identical to=
- abstract_cpu::account_freq()
-> >       Deduplication: remove nhm_{cpu,core,package}::change_effective_fr=
-equency() identical to cpu_{linux,core,package}::change_effective_frequency=
-()
-> >       Deduplication: merge cpu_{core,linux,package}::change_effective_f=
-requency() into abstract_cpu::change_effective_frequency()
-> >       Deduplication: remove {cpu,nhm}_core::calculate_freq() identical =
-to abstract_cpu::calculate_freq()
-> >       Deduplication: remove nhm_package::calculate_freq() identical to =
-cpu_package::calculate_freq()
-> >       Deduplication: properly merge cpu_package::calculate_freq() into =
-abstract_cpu::calculate_freq()
-> >       Deduplication: merge go_idle()/go_unidle()/change_freq() =
+ASWG, Moscow R&D center, Samsung Electronics
+12 Dvintsev street, building 1
+127018, Moscow, Russian Federation
 
-> > overrides into abstract_cpu() class
-> > =
 
-> =
-
-> Hello Chris,
-> patch series looks good to me. thanks to Ivan.
-> =
-
-> please note V3 of 02 and 03 patches.
-> =
-
-> =
-
-> 	-ss
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============3239001635381086958==--
+--===============5063305758221722712==--
 
