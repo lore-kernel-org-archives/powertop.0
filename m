@@ -1,163 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============5915820295757461729=="
+Content-Type: multipart/mixed; boundary="===============4440154911475003111=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] Fix C states and P states presentation issue.
-Date: Tue, 22 Jan 2013 11:19:20 +0300
-Message-ID: <20130122081920.GA2489@swordfish.minsk.epam.com>
-In-Reply-To: 1358247918-31031-1-git-send-email-zhang.austin@gmail.com
+Subject: Re: [Powertop] Repeating lines in Git commit messages (was: [PATCH]
+ fix typo and correct coding styles in report_formatter)
+Date: Mon, 15 Oct 2012 08:00:04 -0700
+Message-ID: <20121015150004.GD3140@swordfish.minsk.epam.com>
+In-Reply-To: 1350312164.4867.28.camel@mattotaupa
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5915820295757461729==
+--===============4440154911475003111==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (01/15/13 19:05), Austin Zhang wrote:
-> Date: Tue, 15 Jan 2013 19:05:18 +0800
-> From: Austin Zhang <zhang.austin(a)gmail.com>
-> To: powertop(a)lists.01.org
-> Subject: [Powertop] [PATCH] Fix C states and P states presentation issue.
-> X-Mailer: git-send-email 1.7.5.4
+On (10/15/12 16:42), Paul Menzel wrote:
+> Am Montag, den 15.10.2012, 07:19 -0700 schrieb Arjan van de Ven:
+> > On 10/15/2012 7:02 AM, Paul Menzel wrote:
 > =
 
-> If using '10' in this 'for' loop, for P states, once the processor
-> provides more than 10 P states, those additional ones cannot been
-> presented; and for C states, once the processor provides maximize
-> C states level more than 9, for example, it only has POLL, C1, C3,
-> C6, C10, the additional one like C10 also cannot be presented.
+> > > thank you for your patch.
+> > > =
+
+> > > Am Montag, den 15.10.2012, 02:25 -0700 schrieb Sergey Senozhatsky:
+> > >> [PATCH] fix typo and correct coding styles in report_formatter
+> > > =
+
+> > > Please do not repeat the summary in the commit message body.
+> > =
+
+> > there's nothing wrong with that though.
 > =
 
-> Now we get the loop numbers from the system information we had got
-> before.
+> Well I would agree if it is kind of rephrased. But if it is the exact
+> same line I will say it is bad practice. ;-)
 > =
 
-> Signed-off-by: Austin Zhang <zhang.austin(a)gmail.com>
-> ---
->  src/cpu/cpu.cpp |   35 +++++++++++++++++++++++++++++------
->  1 files changed, 29 insertions(+), 6 deletions(-)
 > =
 
-> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-> index 7f3af69..28f77b7 100644
-> --- a/src/cpu/cpu.cpp
-> +++ b/src/cpu/cpu.cpp
-> @@ -404,6 +404,15 @@ void report_display_cpu_cstates(void)
->  	unsigned int package, core, cpu;
->  	int line;
->  	class abstract_cpu *_package, * _core, * _cpu;
-> +	unsigned int i, j, cstates_num;
-> +
-> +	for (i =3D 0, cstates_num =3D 0; i < all_cpus.size(); i++) {
-> +		if (all_cpus[i])
-> +			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
-> +				if ((all_cpus[i]->cstates[j])->line_level >=3D 0 &&
-> +				    (all_cpus[i]->cstates[j])->line_level > cstates_num)
-> +					cstates_num =3D (all_cpus[i]->cstates[j])->line_level;
-> +	}
->  =
 
-
-how about removing this `if' condition?
-	for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
-		cstates_num =3D std::max(cstates_num, (all_cpus[i]->cstates[j])->line_lev=
-el);
-
-
-
-
->  	report.begin_section(SECTION_CPUIDLE);
->  	report.add_header("Processor Idle state report");
-> @@ -421,7 +430,7 @@ void report_display_cpu_cstates(void)
->  			if (!_core)
->  				continue;
->  =
-
-> -			for (line =3D LEVEL_HEADER; line < 10; line++) {
-> +			for (line =3D LEVEL_HEADER; line <=3D (int)cstates_num; line++) {
->  				bool first_cpu =3D true;
->  =
-
->  				if (!_package->has_cstate_level(line))
-> @@ -628,14 +637,29 @@ void impl_w_display_cpu_states(int state)
->  	char buffer[128];
->  	char linebuf[1024];
->  	unsigned int package, core, cpu;
-> -	int line;
-> +	int line, loop;
->  	class abstract_cpu *_package, * _core, * _cpu;
->  	int ctr =3D 0;
-> +	unsigned int i, j, cstates_num, pstates_num;
-> +
-> +	for (i =3D 0, cstates_num =3D 0, pstates_num =3D 0; i < all_cpus.size()=
-; i++) {
-
-
-we have two all_cpus[i] checks in one for loop, let's change to single `if =
-(!all_cpus[i]) continue;'
-
-
-
-
-> +		if (all_cpus[i] && all_cpus[i]->pstates.size() > pstates_num)
-> +			pstates_num =3D all_cpus[i]->pstates.size();
->  =
-
-
-	pstates_num =3D std::max(pstates_num, all_cpus[i]->pstates.size())
-
-
-> -	if (state =3D=3D PSTATE)
-> +		if (all_cpus[i])
-> +			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
-> +				if ((all_cpus[i]->cstates[j])->line_level >=3D 0 &&
-> +				    (all_cpus[i]->cstates[j])->line_level > cstates_num)
-> +					cstates_num =3D (all_cpus[i]->cstates[j])->line_level;
-
-
-	for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
-		cstates_num =3D std::max(cstates_num, (all_cpus[i]->cstates[j])->line_lev=
-el)
+oh, please not again :)
 
 
 	-ss
 
-
-> +	}
-> +
-> +	if (state =3D=3D PSTATE) {
->  		win =3D get_ncurses_win("Frequency stats");
-> -	else
-> +		loop =3D (int)pstates_num;
-> +	} else {
->  		win =3D get_ncurses_win("Idle stats");
-> +		loop =3D (int)cstates_num;
-> +	}
->  =
-
->  	if (!win)
->  		return;
-> @@ -656,8 +680,7 @@ void impl_w_display_cpu_states(int state)
->  			if (!_core->has_pstates() && state =3D=3D PSTATE)
->  				continue;
->  =
-
-> -
-> -			for (line =3D LEVEL_HEADER; line < 10; line++) {
-> +			for (line =3D LEVEL_HEADER; line <=3D loop; line++) {
->  				int first =3D 1;
->  				ctr =3D 0;
->  				linebuf[0] =3D 0;
-> -- =
-
-> 1.7.5.4
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============5915820295757461729==--
+--===============4440154911475003111==--
 
