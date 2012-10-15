@@ -1,79 +1,110 @@
-Content-Type: multipart/mixed; boundary="===============1571082403456885011=="
+Content-Type: multipart/mixed; boundary="===============4133931547866385363=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] cpufreq: only try to open files under cpuX
-Date: Wed, 12 Dec 2012 20:56:57 +0300
-Message-ID: <20121212175657.GA5332@swordfish>
-In-Reply-To: 1355328973-22767-1-git-send-email-jskarvad@redhat.com
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] fix typo and correct coding styles in
+ report_formatter
+Date: Mon, 15 Oct 2012 09:23:37 -0700
+Message-ID: <507C3889.6030108@linux.intel.com>
+In-Reply-To: 20121015092546.GA3140@swordfish.minsk.epam.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1571082403456885011==
+--===============4133931547866385363==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (12/12/12 17:16), Jaroslav =C5=A0karvada wrote:
-> There are called many useless 'open' syscalls that always fail, like:
->   open("/sys/devices/system/cpu/uevent/cpufreq/scaling_governor", O_RDONL=
-Y) =3D -1 ENOTDIR (Not a directory)
-> This patch filters this to /sys/devices/system/cpu/cpuX, where X is string
-> starting with digit (from kernel sources it seems that X can only be inte=
-ger).
-> For match cases it will add only small overhead.
-> =
-
-> Originally reported as:
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D886185
-> =
-
-> Signed-off-by: Jaroslav =C5=A0karvada <jskarvad(a)redhat.com>
+On 10/15/2012 02:25 AM, Sergey Senozhatsky wrote:
+> [PATCH] fix typo and correct coding styles in report_formatter
+>
+> Igor noted a typo and coding styles errors in previous patch, correct the=
+m.
+>
+> Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+>
 > ---
->  src/tuning/cpufreq.cpp | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> =
+>
+>   src/report/report-formatter.h | 36 ++++++++++++++++++------------------
+>   1 file changed, 18 insertions(+), 18 deletions(-)
+>
+> diff --git a/src/report/report-formatter.h b/src/report/report-formatter.h
+> index 7f9f544..d532f30 100644
+> --- a/src/report/report-formatter.h
+> +++ b/src/report/report-formatter.h
+> @@ -33,33 +33,33 @@ class report_formatter
+>   public:
+>   	virtual ~report_formatter() {}
+>   =
 
-> diff --git a/src/tuning/cpufreq.cpp b/src/tuning/cpufreq.cpp
-> index df245ad..c448f4c 100644
-> --- a/src/tuning/cpufreq.cpp
-> +++ b/src/tuning/cpufreq.cpp
-> @@ -36,6 +36,7 @@
->  #include <dirent.h>
->  #include <errno.h>
->  #include <sys/stat.h>
-> +#include <ctype.h>
->  =
+> -	virtual void finish_report() {};
+> -	virtual const char *get_result() {return "Basic report_formatter::get_r=
+esul call\n";};
+> -	virtual void clear_result() {};
+> +	virtual void finish_report() {}
+> +	virtual const char *get_result() {return "Basic report_formatter::get_r=
+esult() call\n";}
+> +	virtual void clear_result() {}
+>   =
 
->  #include "../lib.h"
->  #include "cpufreq.h"
-> @@ -72,7 +73,7 @@ int cpufreq_tunable::good_bad(void)
->  		return ret;
->  =
+> -	virtual void add(const char *str) {};
+> -	virtual void addv(const char *fmt, va_list ap) {};
+> +	virtual void add(const char *str) {}
+> +	virtual void addv(const char *fmt, va_list ap) {}
+>   =
 
->  	while ((dirent =3D readdir(dir))) {
-> -		if (dirent->d_name[0]=3D=3D'.')
-> +		if (strlen(dirent->d_name) < 4 || strncmp(dirent->d_name, "cpu", 3) !=
-=3D 0 || !isdigit(dirent->d_name[3]))
->  			continue;
->  		sprintf(filename, "/sys/devices/system/cpu/%s/cpufreq/scaling_governor=
-", dirent->d_name);
->  		file =3D fopen(filename, "r");
-> -- =
+> -	virtual void add_header(const char *header, int level) {};
+> +	virtual void add_header(const char *header, int level) {}
+>   =
 
-> 1.7.11.7
-> =
+> -	virtual void begin_section(section_type stype) {};
+> -	virtual void end_section() {};
+> +	virtual void begin_section(section_type stype) {}
+> +	virtual void end_section() {}
+>   =
 
+> -	virtual void begin_table(table_type ttype) {};
+> -	virtual void end_table() {};
+> +	virtual void begin_table(table_type ttype) {}
+> +	virtual void end_table() {}
+>   =
 
-Hello,
-thanks for your patch. however, I'm afraid it does not fix all the cases. l=
-ooking at src/tuning/cpufreq.cpp we
-have several more places with exactly the same cpuX detection -- ::toggle*(=
-).
+> -	virtual void begin_row(row_type rtype) {};
+> -	virtual void end_row() {};
+> +	virtual void begin_row(row_type rtype) {}
+> +	virtual void end_row() {}
+>   =
 
-could you also please remove 'strlen(dirent->d_name) < 4', looks loke a sma=
-ll overhead there.
+> -	virtual void begin_cell(cell_type ctype) {};
+> -	virtual void end_cell() {};
+> -	virtual void add_empty_cell() {};
+> +	virtual void begin_cell(cell_type ctype) {}
+> +	virtual void end_cell() {}
+> +	virtual void add_empty_cell() {}
+>   =
 
-	-ss
+> -	virtual void begin_paragraph() {};
+> -	virtual void end_paragraph() {};
+> +	virtual void begin_paragraph() {}
+> +	virtual void end_paragraph() {}
+>   =
 
---===============1571082403456885011==--
+>   	/* For quad-colouring CPU tables in HTML */
+> -	virtual void set_cpu_number(int nr) {};
+> +	virtual void set_cpu_number(int nr) {}
+>   };
+>   =
+
+>   #endif /* _REPORT_FORMATTER_H_ */
+>
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>
+>
+Your patch has been merged.
+Sorry for merging early and missing types, but thank you for the quick fix.
+-C
+
+--===============4133931547866385363==--
 
