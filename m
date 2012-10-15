@@ -1,117 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============3049997809156456300=="
+Content-Type: multipart/mixed; boundary="===============2486819034556265418=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] Enable asserts and make correct comment
-Date: Wed, 17 Oct 2012 08:17:45 -0700
-Message-ID: <20121017151745.GA3012@swordfish.minsk.epam.com>
-In-Reply-To: 507ECA69.4000408@samsung.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] fix typo and correct coding styles in
+ report_formatter
+Date: Mon, 15 Oct 2012 07:19:18 -0700
+Message-ID: <507C1B66.80100@linux.intel.com>
+In-Reply-To: 1350309755.4867.15.camel@mattotaupa
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3049997809156456300==
+--===============2486819034556265418==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/17/12 19:10), Igor Zhbanov wrote:
-> Hi all.
+On 10/15/2012 7:02 AM, Paul Menzel wrote:
+> Dear Sergey,
 > =
 
-> Any comments? ;-)
-> This patch fixes the comments and enables the asserts.
->
-
-Hello,
-sorry, I thought it was merged. I don't have any objections for testing per=
-iod.
-
-can we make global flag somewhere and inverse the flag logic: `define DEBUG=
-' instead of `define NO_DEBUG'?
-
-	-ss
-
- =
-
-> Igor Zhbanov wrote:
-> >Enable asserts for test period and correct the comments.
-> >It is better to know why a crash happen when it could happen
-> >than just silently die.
-> >---
-> >  src/report/report-formatter-base.cpp |    3 ++-
-> >  src/report/report-formatter-csv.cpp  |    3 ++-
-> >  src/report/report-formatter-html.cpp |    3 ++-
-> >  src/report/report-maker.cpp          |    3 ++-
-> >  4 files changed, 8 insertions(+), 4 deletions(-)
-> >
-> >diff --git a/src/report/report-formatter-base.cpp b/src/report/report-fo=
-rmatter-base.cpp
-> >index 4b448be..e0dc49c 100644
-> >--- a/src/report/report-formatter-base.cpp
-> >+++ b/src/report/report-formatter-base.cpp
-> >@@ -25,7 +25,8 @@
-> >  #define _BSD_SOURCE
-> >-#define NDEBUG /* Enable asserts */
-> >+/* Uncomment to disable asserts */
-> >+/*#define NDEBUG*/
-> >  #include <stdio.h>
-> >  #include <assert.h>
-> >diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-for=
-matter-csv.cpp
-> >index 9b154b5..cd70d91 100644
-> >--- a/src/report/report-formatter-csv.cpp
-> >+++ b/src/report/report-formatter-csv.cpp
-> >@@ -25,7 +25,8 @@
-> >  #define _BSD_SOURCE
-> >-#define NDEBUG /* Enable asserts */
-> >+/* Uncomment to disable asserts */
-> >+/*#define NDEBUG*/
-> >  #include <stdio.h>
-> >  #include <assert.h>
-> >diff --git a/src/report/report-formatter-html.cpp b/src/report/report-fo=
-rmatter-html.cpp
-> >index 56f9648..5851575 100644
-> >--- a/src/report/report-formatter-html.cpp
-> >+++ b/src/report/report-formatter-html.cpp
-> >@@ -25,7 +25,8 @@
-> >  #define _BSD_SOURCE
-> >-#define NDEBUG /* Enable asserts */
-> >+/* Uncomment to disable asserts */
-> >+/*#define NDEBUG*/
-> >  #include <stdio.h>
-> >  #include <assert.h>
-> >diff --git a/src/report/report-maker.cpp b/src/report/report-maker.cpp
-> >index 4a68a8c..c00c955 100644
-> >--- a/src/report/report-maker.cpp
-> >+++ b/src/report/report-maker.cpp
-> >@@ -23,7 +23,8 @@
-> >   * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
-> >   * 2012.10 */
-> >-#define NDEBUG /* Enable asserts */
-> >+/* Uncomment to disable asserts */
-> >+/*#define NDEBUG*/
-> >  #include <assert.h>
-> >  #include <stdarg.h>
 > =
 
-> -- =
-
-> Best regards,
-> Igor Zhbanov,
-> Technical Leader,
-> phone: +7 (495) 797 25 00 ext 3806
-> e-mail: i.zhbanov(a)samsung.com
+> thank you for your patch.
 > =
 
-> ASWG, Moscow R&D center, Samsung Electronics
-> 12 Dvintsev street, building 1
-> 127018, Moscow, Russian Federation
+> Am Montag, den 15.10.2012, 02:25 -0700 schrieb Sergey Senozhatsky:
+>> [PATCH] fix typo and correct coding styles in report_formatter
 > =
 
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
+> Please do not repeat the summary in the commit message body.
 
---===============3049997809156456300==--
+there's nothing wrong with that though.
+
+I rather have one sentence too much, than a too short commit message.
+
+
+--===============2486819034556265418==--
 
