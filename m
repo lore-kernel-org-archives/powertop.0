@@ -1,57 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============7678511131729681403=="
+Content-Type: multipart/mixed; boundary="===============6756844395268665496=="
 MIME-Version: 1.0
-From: =?utf-8?q?Jaroslav_=C5=A0karvada_=3Cjskarvad_at_redhat=2Ecom=3E?=
-Subject: [Powertop] [PATCH] report: fixed crash when writing report to RO
- filesystem
-Date: Wed, 28 Nov 2012 16:42:41 +0100
-Message-ID: <1354117361-29155-1-git-send-email-jskarvad@redhat.com>
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] devices: Fix processing /proc/net/dev file
+Date: Mon, 15 Oct 2012 09:22:45 -0700
+Message-ID: <507C3855.5090401@linux.intel.com>
+In-Reply-To: 1350311616-9770-1-git-send-email-namhyung@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7678511131729681403==
+--===============6756844395268665496==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Jaroslav =C5=A0karvada <jskarvad(a)redhat.com>
----
- src/report/report.cpp | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+On 10/15/2012 07:33 AM, Namhyung Kim wrote:
+> The do_proc_net_dev() reads the /proc/net/dev file and counts tx/rx
+> packets for each interface.  However index for rx packet (1) is not
+> match to the file:
+>
+> $ cat /proc/net/dev
+> Inter-|   Receive                                                |  Trans=
+mit
+>   face |bytes    packets errs drop fifo frame compressed multicast|bytes =
+   packets errs drop fifo colls carrier compressed
+>         (1)      (2)     (3)  (4)  (5)  (6)   (7)        (8)       (9)   =
+   (10)    (11) (12) (13) (14)  (15)    (16)
+>
+> Change the index to 2 to match to the number of receive packets.
+>
+> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+> ---
+>   src/devices/network.cpp |    2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/src/devices/network.cpp b/src/devices/network.cpp
+> index b8a5c9c..3b67610 100644
+> --- a/src/devices/network.cpp
+> +++ b/src/devices/network.cpp
+> @@ -114,7 +114,7 @@ static void do_proc_net_dev(void)
+>   			c2 =3D c;
+>   			val =3D strtoull(c, &c, 10);
+>   			i++;
+> -			if (i =3D=3D 1 || i =3D=3D 10)
+> +			if (i =3D=3D 2 || i =3D=3D 10)
+>   				pkt +=3D val;
+>   =
 
-diff --git a/src/report/report.cpp b/src/report/report.cpp
-index 51bc6a7..c018bb1 100644
---- a/src/report/report.cpp
-+++ b/src/report/report.cpp
-@@ -183,13 +183,16 @@ void init_report_output(char *filename_str, int itera=
-tions)
- =
-
- void finish_report_output(void)
- {
--	fprintf(stderr, _("PowerTOP outputing using base filename %s\n"), reporto=
-ut.filename);
- 	if (reporttype =3D=3D REPORT_OFF)
- 		return;
- =
-
- 	report.finish_report();
--	fputs(report.get_result(), reportout.report_file);
--	fdatasync(fileno(reportout.report_file));
--	fclose(reportout.report_file);
-+	if (reportout.report_file)
-+	{
-+		fprintf(stderr, _("PowerTOP outputing using base filename %s\n"), report=
-out.filename);
-+		fputs(report.get_result(), reportout.report_file);
-+		fdatasync(fileno(reportout.report_file));
-+		fclose(reportout.report_file);
-+	}
- 	report.clear_result();
- }
--- =
-
-1.7.11.7
+>   		}
+Your patch has been merged
+Thank You
+-C
 
 
---===============7678511131729681403==--
+--===============6756844395268665496==--
 
