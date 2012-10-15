@@ -1,142 +1,63 @@
-Content-Type: multipart/mixed; boundary="===============6766077549412211319=="
+Content-Type: multipart/mixed; boundary="===============0260043197707808513=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [RFC][PATCH 1/2] Adding report generator facility
-Date: Tue, 09 Oct 2012 12:31:00 -0700
-Message-ID: <20121009193100.GE3633@swordfish>
-In-Reply-To: 20121009185555.GA3633@swordfish
+Subject: Re: [Powertop] [PATCH] fix typo and correct coding styles in
+ report_formatter
+Date: Mon, 15 Oct 2012 08:06:40 -0700
+Message-ID: <20121015150640.GE3140@swordfish.minsk.epam.com>
+In-Reply-To: 1350309755.4867.15.camel@mattotaupa
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6766077549412211319==
+--===============0260043197707808513==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/09/12 11:55), Sergey Senozhatsky wrote:
+On (10/15/12 16:02), Paul Menzel wrote:
+> thank you for your patch.
 > =
 
-> that leads to a quick solution (meaning that it may not be perfect nor be=
-autiful). we define and
-> implement base class with all function being both virtual and empty, let'=
-s call it base (report_formatter).
-> then we define base_impl class, and implement only type #1 functions, for=
- example, in our case a family of
-> add*() functions plus get/clear result() and so on.
+> Am Montag, den 15.10.2012, 02:25 -0700 schrieb Sergey Senozhatsky:
+> > [PATCH] fix typo and correct coding styles in report_formatter
 > =
 
-> then we define and implement formatter clases, that should inherit from b=
-ase_impl, and override
-> class #2 functions (for example, escaping).
-> =
-
-> =
-
-> from the top of my head, schematically is something like this:
+> Please do not repeat the summary in the commit message body.
 >
 
-I would like to state that I'm not forcing this solution or whatsoever, jus=
-t an idea.
+I do like this line in git shortlog, the only thing with that line
+is that *probably* [PATCH] should not be there, but I can't see any
+problems with it anyway.
+
+
+> > Igor noted a typo and coding styles errors in previous patch, correct t=
+hem.
+> =
+
+> Two patches are better. If not only that you can make the commit summary
+> smaller. ;-)
+>
+
+why? two patches are good for bisecting, no one ever will bisect those
+2 small changes.
 
 	-ss
-
  =
 
-> class base {
->         public:
->                 base() {}
->                 virtual ~base() {}
->                 virtual void foo(const char *p)
->                 {
->                         printf("base foo call\n");
->                 }
->                 virtual void bar()
->                 {
->                         printf("base bar call\n");
->                 }
->                 virtual void xyz()
->                 {
->                         printf("base xyz call\n");
->                 }
->                 virtual void begin_table()
->                 {
->                         printf("base begin table call\n");
->                 }
-> };
+> report-formatter.h: Fix typo iget_resul =E2=86=92 get_result()
+> report-formatter.h: Remove ; to adhere to coding style
 > =
 
-> class base_impl : public base {
->         public:
->                 std::string data;
->                 virtual void foo(const char *p)
->                 {
->                         printf("impl foo call\n");
->                         data.append(p);
->                 }
+> > Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
 > =
 
->                 virtual void bar()
->                 {
->                         printf("impl bar call: %s\n", data.c_str());
->                 }
-> };
-> =
-
-> class derived : public base_impl {
->         public:
->                 virtual void begin_table()
->                 {
->                         printf("derived begin table call\n");
->                 }
-> };
+> [=E2=80=A6]
 > =
 
 > =
 
-> int main()
-> {
->         class derived *d =3D new derived();
->         d->foo("test");
->         d->bar();
->         d->xyz();
->         d->begin_table();
-> =
+> It would be great if you could resend.
+>=20
 
->         class base *b =3D new base();
->         b->foo("test");
->         b->bar();
->         b->xyz();
->         b->begin_table();
-> =
-
->         delete d;
->         delete b;
->         return 0;
-> }
-> =
-
-> $g++ -O2 test.cpp -o a.out
-> =
-
-> $./a.out =
-
-> impl foo call
-> impl bar call: test
-> base xyz call
-> derived begin table call
-> =
-
-> base foo call
-> base bar call
-> base xyz call
-> base begin table call
-> =
-
-> =
-
-> =
-
-> 	-ss
-
---===============6766077549412211319==--
+--===============0260043197707808513==--
 
