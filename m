@@ -1,87 +1,117 @@
-Content-Type: multipart/mixed; boundary="===============5458873747423986635=="
+Content-Type: multipart/mixed; boundary="===============5325999834951244218=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [RFC] [PATCH 11/11] Ignore non-P-state-enabled CPUs
- when calculating frequency.
-Date: Wed, 14 Nov 2012 08:32:11 -0800
-Message-ID: <50A3C78B.2010602@linux.intel.com>
-In-Reply-To: 1427547.3NqOqQh5qg@intelfx-laptop
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: Re: [Powertop] [PATCH] Enable asserts and make correct comment
+Date: Wed, 17 Oct 2012 19:10:33 +0400
+Message-ID: <507ECA69.4000408@samsung.com>
+In-Reply-To: 1349953133-17076-1-git-send-email-i.zhbanov@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5458873747423986635==
+--===============5325999834951244218==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 11/14/2012 06:30 AM, Ivan Shapovalov wrote:
-> On 13 November 2012 11:14:52 Chris Ferron wrote:
->> On 11/05/2012 03:12 AM, Ivan Shapovalov wrote:
->>> This fixes bogus reported CPU frequencies (actually, uninitialized
->>> values from i965_core) when i965 monitoring is used.
->>>
->>> Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
->>> ---
->>>
->>>    src/cpu/abstract_cpu.cpp | 2 +-
->>>    1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
->>> index d64cb24..fea377b 100644
->>> --- a/src/cpu/abstract_cpu.cpp
->>> +++ b/src/cpu/abstract_cpu.cpp
->>> @@ -380,7 +380,7 @@ void abstract_cpu::calculate_freq(uint64_t time)
->>>
->>>    	/* calculate the maximum frequency of all children */
->>>    	for (i =3D 0; i < children.size(); i++)
->>>
->>> -		if (children[i]) {
->>> +		if (children[i] && children[i]->has_pstates()) {
->>>
->>>    			uint64_t f =3D 0;
->>>    			if (!children[i]->idle) {
->>>    			=
+Hi all.
 
->>>    				f =3D children[i]->current_frequency;
->> This patch for the bug fix has been merged.
-> Ugh, I forgot to notify - to make it work without previous patches,
-> one shall rather modify {cpu,nhm}_package::calculate_freq(),
-> so merging this patch alone and as-is doesn't do anything...
->
-> Please, consider this one for the release:
->
+Any comments? ;-)
+This patch fixes the comments and enables the asserts.
+
+Igor Zhbanov wrote:
+> Enable asserts for test period and correct the comments.
+> It is better to know why a crash happen when it could happen
+> than just silently die.
 > ---
-> diff --git a/src/cpu/cpu_package.cpp b/src/cpu/cpu_package.cpp
-> index 2e2e8a3..4675167 100644
-> --- a/src/cpu/cpu_package.cpp
-> +++ b/src/cpu/cpu_package.cpp
-> @@ -149,7 +149,7 @@ void cpu_package::calculate_freq(uint64_t time)
+>   src/report/report-formatter-base.cpp |    3 ++-
+>   src/report/report-formatter-csv.cpp  |    3 ++-
+>   src/report/report-formatter-html.cpp |    3 ++-
+>   src/report/report-maker.cpp          |    3 ++-
+>   4 files changed, 8 insertions(+), 4 deletions(-)
+>
+> diff --git a/src/report/report-formatter-base.cpp b/src/report/report-for=
+matter-base.cpp
+> index 4b448be..e0dc49c 100644
+> --- a/src/report/report-formatter-base.cpp
+> +++ b/src/report/report-formatter-base.cpp
+> @@ -25,7 +25,8 @@
 >   =
 
->   	/* calculate the maximum frequency of all children */
->   	for (i =3D 0; i < children.size(); i++)
-> -		if (children[i]) {
-> +		if (children[i] && children[i]->has_pstates()) {
->   			uint64_t f =3D 0;
->   			if (!children[i]->idle) {
->   				f =3D children[i]->current_frequency;
-> diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
-> index 24465a0..a4ed86d 100644
-> --- a/src/cpu/intel_cpus.cpp
-> +++ b/src/cpu/intel_cpus.cpp
-> @@ -460,7 +460,7 @@ void nhm_package::calculate_freq(uint64_t time)
+>   #define _BSD_SOURCE
 >   =
 
->   	/* calculate the maximum frequency of all children */
->   	for (i =3D 0; i < children.size(); i++)
-> -		if (children[i]) {
-> +		if (children[i] && children[i]->has_pstates()) {
->   			uint64_t f =3D 0;
->   			if (!children[i]->idle) {
->   				f =3D children[i]->current_frequency;
-> ---
-Yep, I already caught that. Thanks for the follow up.
+> -#define NDEBUG /* Enable asserts */
+> +/* Uncomment to disable asserts */
+> +/*#define NDEBUG*/
+>   =
+
+>   #include <stdio.h>
+>   #include <assert.h>
+> diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-form=
+atter-csv.cpp
+> index 9b154b5..cd70d91 100644
+> --- a/src/report/report-formatter-csv.cpp
+> +++ b/src/report/report-formatter-csv.cpp
+> @@ -25,7 +25,8 @@
+>   =
+
+>   #define _BSD_SOURCE
+>   =
+
+> -#define NDEBUG /* Enable asserts */
+> +/* Uncomment to disable asserts */
+> +/*#define NDEBUG*/
+>   =
+
+>   #include <stdio.h>
+>   #include <assert.h>
+> diff --git a/src/report/report-formatter-html.cpp b/src/report/report-for=
+matter-html.cpp
+> index 56f9648..5851575 100644
+> --- a/src/report/report-formatter-html.cpp
+> +++ b/src/report/report-formatter-html.cpp
+> @@ -25,7 +25,8 @@
+>   =
+
+>   #define _BSD_SOURCE
+>   =
+
+> -#define NDEBUG /* Enable asserts */
+> +/* Uncomment to disable asserts */
+> +/*#define NDEBUG*/
+>   =
+
+>   #include <stdio.h>
+>   #include <assert.h>
+> diff --git a/src/report/report-maker.cpp b/src/report/report-maker.cpp
+> index 4a68a8c..c00c955 100644
+> --- a/src/report/report-maker.cpp
+> +++ b/src/report/report-maker.cpp
+> @@ -23,7 +23,8 @@
+>    * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
+>    * 2012.10 */
+>   =
+
+> -#define NDEBUG /* Enable asserts */
+> +/* Uncomment to disable asserts */
+> +/*#define NDEBUG*/
+>   =
+
+>   #include <assert.h>
+>   #include <stdarg.h>
+
+-- =
+
+Best regards,
+Igor Zhbanov,
+Technical Leader,
+phone: +7 (495) 797 25 00 ext 3806
+e-mail: i.zhbanov(a)samsung.com
+
+ASWG, Moscow R&D center, Samsung Electronics
+12 Dvintsev street, building 1
+127018, Moscow, Russian Federation
 
 
---===============5458873747423986635==--
+--===============5325999834951244218==--
 
