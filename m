@@ -1,80 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============3472646408977762054=="
+Content-Type: multipart/mixed; boundary="===============2506338167325703143=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] Change library/pkg search condition for
- libnl2/3
-Date: Fri, 09 Nov 2012 15:07:51 +0300
-Message-ID: <20121109120750.GD3239@swordfish.minsk.epam.com>
-In-Reply-To: CAGLu0vNzi+Gbum7R+MWZvmXVFd3Pu8tN5Vr33U8WGYKiTBTDZg@mail.gmail.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [RFC/PATCH] devices: Use new(std::nothrow) for
+ creating devices
+Date: Thu, 18 Oct 2012 08:36:05 -0700
+Message-ID: <508021E5.8070209@linux.intel.com>
+In-Reply-To: 1350574368-4657-1-git-send-email-namhyung@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3472646408977762054==
+--===============2506338167325703143==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+On 10/18/2012 8:32 AM, Namhyung Kim wrote:
+> When allocation fails, just skip the device and proceed if possible.
+> This is also for consistency with others.
 
-Rework libnl detection.
+hmm...
+if we're that low on memory something is so seriously wrong, exiting is the=
+ right answer really.
 
-PKG_CHECK_MODULES macro appends FOO_CFLAGS and FOO_LIBS flags
-
-Example:
-LIBNL_CFLAGS =3D -I/usr/include/libnl3
-LIBNL_LIBS =3D -lnl-genl-3 -lnl-3
-
-while AC_SEARCH_LIBS only prepends -llibrary to LIBS, so AC_SEARCH_LIBS
-is not helpful here.
-
-
-Use pkg-config PC file names to search for minimum package versions:
-libnl 3.+ -- libnl-3.0.pc
-libnl 2.+ -- libnl-2.0.pc
-libnl 1.+ -- libnl-1.0.pc
-
-patch also changes $has_libnl_ver =3D=3D 0 error message and suppresses
-failed PKG_CHECK_MODULES output.
+I'm getting strong advice from other userspace coders that checking allocat=
+ions like this is actually
+pointless...
+based on that, I'd say we need to go for better code readability, not more =
+complexity for no actual gain.
 
 
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
 
----
-
- configure.ac | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
-
-diff --git a/configure.ac b/configure.ac
-index b8c183f..070b126 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -54,15 +54,12 @@ PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=3D1]=
-,[
-  =
-
- =
-
- has_libnl_ver=3D0
--PKG_CHECK_MODULES([LIBNL], [libnl-3.0 libnl-genl-3.0], [
--	has_libnl_ver=3D3], [
--	AC_SEARCH_LIBS([nl_socket_alloc], [nl-3 nl-genl-3], [
--		has_libnl_ver=3D3], [
--		AC_SEARCH_LIBS([nl_socket_alloc], [nl], [
--			has_libnl_ver=3D2], [
--			PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [])])])])
-+
-+PKG_CHECK_MODULES([LIBNL], [libnl-3.0 >=3D 3.0 libnl-genl-3.0 >=3D 3.0], [=
-has_libnl_ver=3D3], [
-+	PKG_CHECK_MODULES([LIBNL], [libnl-2.0 >=3D 2.0 libnl-genl-2.0 >=3D 2.0], =
-[has_libnl_ver=3D2], [
-+		PKG_CHECK_MODULES([LIBNL], [libnl-1.0], [has_libnl_ver=3D1], [has_libnl_=
-ver=3D0])])])
- if (test "$has_libnl_ver" -eq 0); then
--	AC_MSG_ERROR(libnl is required but not found)
-+	AC_MSG_ERROR(libnl and libnl-genl are required but were not found)
- fi
- if (test "$has_libnl_ver" -gt 1); then
- 	AC_DEFINE([HAVE_LIBNL20], [1], [Define if you have libnl-2.0 or higher])
-
-
---===============3472646408977762054==--
+--===============2506338167325703143==--
 
