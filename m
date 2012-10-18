@@ -1,52 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============7129617746658834358=="
+Content-Type: multipart/mixed; boundary="===============1626149599510246287=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Use PACKAGE_VERSION for POWERTOP_VERSION
-Date: Thu, 29 Nov 2012 07:58:57 -0800
-Message-ID: <50B78641.8060503@linux.intel.com>
-In-Reply-To: 1353166967-24095-1-git-send-email-namhyung@gmail.com
+From: Namhyung Kim <namhyung at gmail.com>
+Subject: Re: [Powertop] [RFC/PATCH] devices: Use new(std::nothrow) for
+ creating devices
+Date: Fri, 19 Oct 2012 00:44:57 +0900
+Message-ID: <1350575097.1610.12.camel@leonhard>
+In-Reply-To: 508021E5.8070209@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7129617746658834358==
+--===============1626149599510246287==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 11/17/2012 07:42 AM, Namhyung Kim wrote:
-> It was missed to update POWERTOP_VERSION macro so that the
-> new v2.2 release still shows v2.1 string on the header of
-> ncurses window.  Convert to use PACKAGE_VERSION macro which
-> set by autotools to the AC_INIT version so that it cannot
-> be missed anymore.
->
-> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
-> ---
->   src/lib.h |    4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/src/lib.h b/src/lib.h
-> index 8cf4632..209421a 100644
-> --- a/src/lib.h
-> +++ b/src/lib.h
-> @@ -35,8 +35,8 @@
->   =
+2012-10-18 (=EB=AA=A9), 08:36 -0700, Arjan van de Ven:
+> On 10/18/2012 8:32 AM, Namhyung Kim wrote:
+> > When allocation fails, just skip the device and proceed if possible.
+> > This is also for consistency with others.
+> =
 
->   #define _(STRING)    gettext(STRING)
->   =
+> hmm...
+> if we're that low on memory something is so seriously wrong, exiting is t=
+he right answer really.
+> =
 
-> -#define POWERTOP_VERSION "v2.1"
-> -#define POWERTOP_SHORT_VERSION "2.1"
-> +#define POWERTOP_VERSION "v"PACKAGE_VERSION
-> +#define POWERTOP_SHORT_VERSION PACKAGE_VERSION
->   =
-
->   =
-
->   extern int get_max_cpu(void);
-Your patch has been applied
--Chris
+> I'm getting strong advice from other userspace coders that checking alloc=
+ations like this is actually
+> pointless...
+> based on that, I'd say we need to go for better code readability, not mor=
+e complexity for no actual gain.
+> =
 
 
---===============7129617746658834358==--
+Understood.  Thanks for the quick reply!
+
+Namhyung
+
+
+
+--===============1626149599510246287==--
 
