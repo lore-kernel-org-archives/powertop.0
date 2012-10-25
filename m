@@ -1,155 +1,75 @@
-Content-Type: multipart/mixed; boundary="===============7650672188864184307=="
+Content-Type: multipart/mixed; boundary="===============5176707171933933435=="
 MIME-Version: 1.0
-From: Rajagopal Venkat <rajagopal.venkat at linaro.org>
-Subject: [Powertop] [PATCH v1] Allow frequency stats when cpuidle is not
- enabled
-Date: Tue, 04 Dec 2012 11:37:31 +0530
-Message-ID: <1354601251-5722-1-git-send-email-rajagopal.venkat@linaro.org>
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: [Powertop] Internationalization problem with abstract field "type"
+Date: Thu, 25 Oct 2012 12:55:50 +0400
+Message-ID: <5088FE96.20602@samsung.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7650672188864184307==
+--===============5176707171933933435==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Powertop fails to display frequency stats when cpuidle subsystem
-is not enabled. Fix it.
+Hi Chris,
 
-Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
----
- src/cpu/cpu.h         |  7 ++++++-
- src/cpu/cpu_linux.cpp | 36 +++++++++++++++++++++++++++---------
- 2 files changed, 33 insertions(+), 10 deletions(-)
+It seems that there is a problem with internationalization with the last co=
+mmit.
+Please look here:
+- report.addf(__("Package %i"), _package->get_number());
++ report.addf(__("%s %i"), _package->get_type(), _package->get_number());
 
-diff --git a/src/cpu/cpu.h b/src/cpu/cpu.h
-index 4480b11..781e33c 100644
---- a/src/cpu/cpu.h
-+++ b/src/cpu/cpu.h
-@@ -159,7 +159,12 @@ extern vector<class abstract_cpu *> all_cpus;
- class cpu_linux: public abstract_cpu
- {
- =
+I have introduced the macro __() /* Double underscore */ to be a conditiona=
+l =
 
--	void		account_freq(uint64_t frequency, uint64_t duration);
-+	void	account_freq(uint64_t frequency, uint64_t duration);
-+	void 	parse_pstates_start(void);
-+	void 	parse_cstates_start(void);
-+	void 	parse_pstates_end(void);
-+	void 	parse_cstates_end(void);
-+
- public:
- 	virtual void	measurement_start(void);
- 	virtual void	measurement_end(void);
-diff --git a/src/cpu/cpu_linux.cpp b/src/cpu/cpu_linux.cpp
-index d6caf45..e7a3d37 100644
---- a/src/cpu/cpu_linux.cpp
-+++ b/src/cpu/cpu_linux.cpp
-@@ -47,17 +47,13 @@ static int is_turbo(uint64_t freq, uint64_t max, uint64=
-_t maxmo)
- 	return 1;
- }
- =
+variant
+of classical _() /* Single underscore */ in the report refactoring commit.
 
--void cpu_linux::measurement_start(void)
-+void cpu_linux::parse_cstates_start(void)
- {
- 	ifstream file;
--
- 	DIR *dir;
- 	struct dirent *entry;
- 	char filename[256];
- 	int len;
--	unsigned int i;
--
--	abstract_cpu::measurement_start();
- =
+Usual underscore macro calls the gettext() function. And we need some sort =
 
- 	len =3D sprintf(filename, "/sys/devices/system/cpu/cpu%i/cpuidle", number=
-);
- =
+of conditional
+gettext() -- we want to print untranslated strings to CSV-report. (Of =
 
-@@ -111,9 +107,16 @@ void cpu_linux::measurement_start(void)
- =
+course, we could simply
+set English locale for CSV-reports. But this will look strange.)
 
- 	}
- 	closedir(dir);
-+}
- =
+So I have introduced the double underscore macro which calls gettext() for =
 
--	last_stamp =3D 0;
- =
+HTML-reports and
+return original strings for CSV.
 
-+void cpu_linux::parse_pstates_start(void)
-+{
-+	ifstream file;
-+	char filename[256];
-+	unsigned int i;
-+
-+	last_stamp =3D 0;
- 	for (i =3D 0; i < children.size(); i++)
- 		if (children[i])
- 			children[i]->wiggle();
-@@ -136,8 +139,14 @@ void cpu_linux::measurement_start(void)
- 	account_freq(0, 0);
- }
- =
+After your patch the gettext will try to translate the string "%s %i" and =
 
-+void cpu_linux::measurement_start(void)
-+{
-+	abstract_cpu::measurement_start();
-+	parse_cstates_start();
-+	parse_pstates_start();
-+}
- =
+not the "Package %i",
+so we have lost the internationalization here.
 
--void cpu_linux::measurement_end(void)
-+void cpu_linux::parse_cstates_end(void)
- {
- 	DIR *dir;
- 	struct dirent *entry;
-@@ -187,6 +196,12 @@ void cpu_linux::measurement_end(void)
- =
+We could fix it by internationalizing the "type" field in the class:
+   ret->set_type(__("Package"));
 
- 	}
- 	closedir(dir);
-+}
-+
-+void cpu_linux::parse_pstates_end(void)
-+{
-+	char filename[256];
-+	ifstream file;
- =
+But I'm not sure that it is good to have the type depending on current =
 
- 	sprintf(filename, "/sys/devices/system/cpu/cpu%i/cpufreq/stats/time_in_st=
-ate", number);
- =
+locale (especially
+if in some future there will be need to compare the value of this field by =
 
-@@ -216,12 +231,15 @@ void cpu_linux::measurement_end(void)
- 		}
- 		file.close();
- 	}
-+}
- =
+strcmp()).
 
--
-+void cpu_linux::measurement_end(void)
-+{
-+	parse_cstates_end();
-+	parse_pstates_end();
- 	abstract_cpu::measurement_end();
- }
- =
+What you think?
 
--
- char * cpu_linux::fill_cstate_line(int line_nr, char *buffer, const char *=
-separator)
- {
- 	unsigned int i;
+P.S. Why you not sending patches to mailing list for discussion? ;-)
+
 -- =
 
-1.7.11.3
+Best regards,
+Igor Zhbanov,
+Technical Leader,
+phone: +7 (495) 797 25 00 ext 3806
+e-mail: i.zhbanov(a)samsung.com
+
+Mobile group, Moscow R&D center, Samsung Electronics
+12 Dvintsev street, building 1
+127018, Moscow, Russian Federation
 
 
---===============7650672188864184307==--
+--===============5176707171933933435==--
 
