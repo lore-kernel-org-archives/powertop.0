@@ -1,222 +1,570 @@
-Content-Type: multipart/mixed; boundary="===============1310020083451128429=="
+Content-Type: multipart/mixed; boundary="===============8094114305002252667=="
 MIME-Version: 1.0
-From: Austin Zhang <zhang.austin at gmail.com>
-Subject: Re: [Powertop] [Powertop ]compiling issue and running issue
-Date: Thu, 01 Nov 2012 00:25:18 +0800
-Message-ID: <CAGLu0vNHMPJaZj+e-P9Hw8JjhGXvfR=zh7ybgWO3R-c4o1VLRA@mail.gmail.com>
-In-Reply-To: CAGLu0vO-zTDaX_=mEeDMw65oRn36r1AH_W+-qhMKF_AJiLCGZA@mail.gmail.com
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: [Powertop] [FYI][RFC][PATCH 1/2] Introducing process scanner facility
+Date: Thu, 01 Nov 2012 16:00:38 +0400
+Message-ID: <1351771239-18925-2-git-send-email-i.zhbanov@samsung.com>
+In-Reply-To: 1351771239-18925-1-git-send-email-i.zhbanov@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1310020083451128429==
+--===============8094114305002252667==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-In another box with i686 installed, it also encounted into similar issue
-(cannot link against libnl2)
+This patch adds the ablity to scan process list instead of sleeping
+to collect information about new processes.
 
-root(a)h-desktop:~# dpkg -L libnl2
+This could allow to powertop to display more verbose information
+about processes.
+
+The reason for this patch is that not all captured trace events contain
+process name and command line. Some of them contain only PID and others
+contain only 16-byte shortened executable name. And when some process
+was started after the Powertop begin to sleep and was terminated before
+Powertop wakes up, then it would be impossible to get information about
+this process from /proc/PID/. So we scan the process list for new processes
+with one-second interval.
+
+Reviewed-by: Kyungmin Park <kyungmin.park(a)samsung.com>
+---
+ src/Makefile.am                        |    1 +
+ src/main.cpp                           |    9 +-
+ src/mali-internal-events/proc-scan.cpp |  316 ++++++++++++++++++++++++++++=
+++++
+ src/mali-internal-events/proc-scan.h   |   59 ++++++
+ src/process/process.cpp                |   43 +++++
+ 5 files changed, 426 insertions(+), 2 deletions(-)
+ create mode 100644 src/mali-internal-events/proc-scan.cpp
+ create mode 100644 src/mali-internal-events/proc-scan.h
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index f60426a..e3eb6c2 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -28,6 +28,7 @@ powertop_SOURCES =3D parameters/persistent.cpp parameters=
+/learn.cpp parameters/par
+ 		tuning/tuningsysfs.cpp tuning/wifi.h tuning/runtime.cpp tuning/tunable.h=
+ \
+ 		tuning/runtime.h tuning/tuningusb.h tuning/iw.h calibrate/calibrate.cpp \
+ 		calibrate/calibrate.h measurement/measurement.cpp measurement/power_supp=
+ly.cpp \
++		mali-internal-events/proc-scan.cpp mali-internal-events/proc-scan.h \
+ 		measurement/measurement.h measurement/acpi.cpp measurement/sysfs.h measu=
+rement/sysfs.cpp \
+ 		measurement/acpi.h measurement/extech.cpp measurement/power_supply.h mea=
+surement/extech.h \
+ 		report/report-maker.cpp report/report-maker.h report/report-formatter.h \
+diff --git a/src/main.cpp b/src/main.cpp
+index e6036ae..83adfad 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -60,6 +60,8 @@
+ =
+
+ #define DEBUGFS_MAGIC          0x64626720
+ =
+
++#include "mali-internal-events/proc-scan.h"
++
+ int debug_learning =3D 0;
+ unsigned time_out =3D 20;
+ int leave_powertop =3D 0;
+@@ -124,7 +126,7 @@ static void do_sleep(int seconds)
+ 	int delta;
+ =
+
+ 	if (!ncurses_initialized()) {
+-		sleep(seconds);
++		scanproc(seconds, 1);
+ 		return;
+ 	}
+ 	target =3D time(NULL) + seconds;
+@@ -132,7 +134,7 @@ static void do_sleep(int seconds)
+ 	do {
+ 		int c;
+ 		usleep(6000);
+-		halfdelay(delta * 10);
++		scanproc(delta, 1);
+ =
+
+ 		c =3D getch();
+ 		switch (c) {
+@@ -191,8 +193,11 @@ void one_measurement(int seconds, char *workload)
+ 	start_cpu_measurement();
+ =
+
+ 	if (workload && workload[0]) {
++		scanproc(0, 0);
+ 		if (!system(workload))
+ 			fprintf(stderr, _("Unknown issue running workload!\n"));
++
++		scanproc(0, 0);
+ 	} else {
+ 		do_sleep(seconds);
+ 	}
+diff --git a/src/mali-internal-events/proc-scan.cpp b/src/mali-internal-eve=
+nts/proc-scan.cpp
+new file mode 100644
+index 0000000..58ecaf2
+--- /dev/null
++++ b/src/mali-internal-events/proc-scan.cpp
+@@ -0,0 +1,316 @@
++/* Copyright (c) 2012 Samsung Electronics Co., Ltd.
++ *	http://www.samsung.com/
++ *
++ * This file is part of PowerTOP
++ *
++ * This program file is free software; you can redistribute it and/or modi=
+fy it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; version 2 of the License.
++ *
++ * This program is distributed in the hope that it will be useful, but WIT=
+HOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
++ * for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program in a file named COPYING; if not, write to the
++ * Free Software Foundation, Inc,
++ * 51 Franklin Street, Fifth Floor,
++ * Boston, MA 02110-1301 USA
++ * or just google for it.
++ *
++ * Process list scanner.
++ * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>,
++ * Alina Litvinova <alina.litvinova(a)gmail.com>
++ * 2012.07 */
++
++#include <ctype.h>
++#include <stdio.h>
++#include <dirent.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <sys/types.h>
++
++#include <map>
++#include <vector>
++#include <algorithm>
++
++#include "../lib.h"
++#include "../display.h" /* For ncurses_initialized() */
++#include "proc-scan.h"
++
++#ifndef DISABLE_NCURSES
++#include <ncurses.h>
++#endif /* !DISABLE_NCURSES */
++
++#ifdef __arm__
++
++using namespace std;
++
++static process_map procs;
++
++/* ***********************************************************************=
+* */
++
++static int
++is_digit_name(const char *name)
++{
++	int i =3D 0;
++
++	while (name[i])
++		if (!isdigit(name[i++]))
++			return 0;
++
++	return 1;
++}
++
++/* ***********************************************************************=
+* */
++
++static int
++read_proc_file(pid_t pid, const char *fname, char *buf, size_t bufsize)
++{
++	FILE *f;
++	char name[4096];
++	size_t len;
++
++	snprintf(name, sizeof(name), "/proc/%d/%s", pid, fname);
++
++	f =3D fopen(name, "r");
++	if (!f) {
++/* 		fprintf(stderr, "Can't open '%s'.\n", name);*/
++		return -1; /* Process already died */
++	}
++
++	len =3D fread(buf, 1, bufsize, f);
++	fclose(f);
++
++	return len;
++}
++
++/* ***********************************************************************=
+* */
++
++static int
++fill_process_info(process_info *proc)
++{
++	size_t len, i;
++	char comm[32];
++
++	len =3D read_proc_file(proc->pid, "comm", comm, sizeof(comm));
++	if (len < 1) {
++/*		fprintf(stderr, "Can't read '/proc/%d/comm'.\n", proc->pid);*/
++		return -1; /* Process already died */
++	}
++
++	comm[len - 1] =3D '\0'; /* Cut end-of-line */
++	len =3D read_proc_file(proc->pid, "cmdline", proc->cmdline,
++			     sizeof(proc->cmdline));
++	if (len > 0) {
++		strcpy(proc->comm, comm);
++		proc->cmdline[sizeof(proc->cmdline) - 1] =3D '\0';
++		proc->cmdline[len] =3D '\0';
++		while (len)
++			if (proc->cmdline[len - 1] =3D=3D '\0' ||
++			    proc->cmdline[len - 1] =3D=3D ' ')
++				len--;
++			else
++				break;
++
++		for (i =3D 0; i < len - 1; i++)
++			if (proc->cmdline[i] =3D=3D '\0')
++				proc->cmdline[i] =3D ' ';
++	} else {
++		snprintf(proc->cmdline, sizeof(proc->cmdline),
++			 "[%s] (Kernel thread)", comm);
++		comm[sizeof(comm) - 2] =3D '\0'; /* Space for bracket */
++		snprintf(proc->comm, sizeof(proc->comm), "[%s]", comm);
++	}
++
++/*	fprintf(stderr, "New process %d: '%s' '%s'\n", proc->pid, proc->comm,
++		proc->cmdline);*/
++
++	return 0;
++}
++
++/* ***********************************************************************=
+* */
++
++static int
++update_proc(const char *str)
++{
++	pid_t pid;
++	process_map::iterator it;
++
++	pid =3D atoi(str);
++
++	it =3D procs.find(pid); /* Already known */
++	/* Here we can update the command line. It is possible that we could
++	 * catch a process in between of fork()/execve() calls, so we will
++	 * store only parent's name. We could monitor /proc/pid/stat for flag
++	 * describing whether this process did execve() call. But it will
++	 * cost extra open()/read()/close() calls.*/
++	if (it !=3D procs.end())
++		return 0;
++
++	process_info &newproc =3D procs[pid];
++
++	/* New process */
++	newproc.pid =3D pid;
++	newproc.power =3D 0;
++	newproc.unknown_name =3D false;
++	if (fill_process_info(&newproc) =3D=3D -1) { /* Process already died */
++		procs.erase(pid);
++		return -1;
++	}
++
++	return 0;
++}
++
++/* ***********************************************************************=
+* */
++
++void
++add_unknown_proc(pid_t pid, double power)
++{
++	process_map::iterator it;
++
++	it =3D procs.find(pid);
++	if (it !=3D procs.end()) /* Already known process */
++		return;
++
++	process_info &newproc =3D procs[pid];
++
++	/* New process */
++	newproc.pid =3D pid;
++	newproc.power =3D power;
++	newproc.unknown_name =3D true;
++	strncpy(newproc.comm, "(Unknown name)", sizeof(newproc.comm));
++	strncpy(newproc.cmdline, "(Unknown name)", sizeof(newproc.cmdline));
++	return;
++}
++
++/* ***********************************************************************=
+* */
++
++int
++scanproc(int sleeptime, int delay)
++{
++	DIR *dir;
++	int time =3D 0;
++
++	dir =3D opendir("/proc");
++	if (!dir) {
++		fprintf(stderr, "Can't open /proc.\n");
++		/* Fallback to sleep() */
++#ifdef DISABLE_NCURSES
++		sleep(sleeptime);
++#else /* !DISABLE_NCURSES */
++		if (!ncurses_initialized())
++			sleep(sleeptime);
++		else
++			halfdelay(10 * sleeptime);
++#endif /* !DISABLE_NCURSES */
++		return 1;
++	}
++
++	while (1) {
++		struct dirent *entry;
++
++		rewinddir(dir);
++		while ((entry =3D readdir(dir)) !=3D NULL) {
++			if (entry->d_type !=3D DT_DIR)
++				continue;
++
++			if (!is_digit_name(entry->d_name))
++				continue;
++
++			update_proc(entry->d_name);
++		}
++
++		if (time >=3D sleeptime)
++			break;
++
++#ifdef DISABLE_NCURSES
++		sleep(delay);
++#else /* !DISABLE_NCURSES */
++		if (!ncurses_initialized())
++			sleep(delay);
++		else
++			halfdelay(10 * delay);
++#endif /* !DISABLE_NCURSES */
++		time +=3D delay;
++	}
++
++	closedir(dir);
++	return 0;
++}
++
++/* ***********************************************************************=
+* */
++
++void
++clear_procs_info()
++{
++	procs.clear();
++}
++
++/* ***********************************************************************=
+* */
++
++process_info *
++get_proc_info(pid_t pid)
++{
++	process_map::iterator it;
++
++	it =3D procs.find(pid);
++	if (it =3D=3D procs.end())
++		return NULL;
++
++	return &it->second;
++}
++
++/* ***********************************************************************=
+* */
++
++static bool
++procs_comp(const process_info *left, const process_info *right)
++{
++	if (left->power =3D=3D right->power)
++		return (strcoll(left->comm, right->comm) < 0);
++
++	return left->power > right->power; /* Reverse order */
++}
++
++/* ***********************************************************************=
+* */
++
++void
++print_sorted_procs(procs_callback func, void *data)
++{
++	vector <process_info *> procs_sorted;
++	vector <process_info *>::iterator sit;
++	process_map::iterator it;
++
++	for (it =3D procs.begin(); it !=3D procs.end(); it++)
++ 		procs_sorted.push_back(&it->second);
++
++	if (procs_sorted.size() > 1)
++		sort(procs_sorted.begin(), procs_sorted.end(), procs_comp);
++
++	for (sit =3D procs_sorted.begin(); sit !=3D procs_sorted.end(); sit++)
++ 		func(*sit, data);
++}
++
++/* ***********************************************************************=
+* */
++
++#else /* !ARM */
++
++/* ***********************************************************************=
+* */
++
++int
++scanproc(int sleeptime UNUSED, int delay UNUSED)
++{
++#ifdef DISABLE_NCURSES
++	sleep(sleeptime);
++#else /* !DISABLE_NCURSES */
++	if (!ncurses_initialized())
++		sleep(sleeptime);
++	else
++		halfdelay(10 * sleeptime);
++#endif /* !DISABLE_NCURSES */
++	return 0;
++}
++
++#endif /* !ARM */
+diff --git a/src/mali-internal-events/proc-scan.h b/src/mali-internal-event=
+s/proc-scan.h
+new file mode 100644
+index 0000000..ce4a851
+--- /dev/null
++++ b/src/mali-internal-events/proc-scan.h
+@@ -0,0 +1,59 @@
++/* Copyright (c) 2012 Samsung Electronics Co., Ltd.
++ *	http://www.samsung.com/
++ *
++ * This file is part of PowerTOP
++ *
++ * This program file is free software; you can redistribute it and/or modi=
+fy it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; version 2 of the License.
++ *
++ * This program is distributed in the hope that it will be useful, but WIT=
+HOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
++ * for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program in a file named COPYING; if not, write to the
++ * Free Software Foundation, Inc,
++ * 51 Franklin Street, Fifth Floor,
++ * Boston, MA 02110-1301 USA
++ * or just google for it.
++ *
++ * Process list scanner header.
++ * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>,
++ * Alina Litvinova <alina.litvinova(a)gmail.com>
++ * 2012.10 */
++
++#ifndef _PROC_SCAN_H_
++#define _PROC_SCAN_H_
++
++#include <stdio.h>
++#include <unistd.h>
++#include <sys/types.h>
++
++#include <map>
++
++using namespace std;
++
++struct process_info {
++	pid_t pid;
++	char comm[16];
++	char cmdline[256];
++	double power;
++	bool unknown_name;
++};
++
++typedef map <pid_t, process_info> process_map;
++typedef bool (*procs_callback)(const process_info *pinfo, void *data);
++
++int scanproc(int sleeptime, int delay);
++void add_unknown_proc(pid_t pid, double power);
++process_info *get_proc_info(pid_t pid);
++void clear_procs_info();
++void print_sorted_procs(procs_callback func, void *data);
++
++#ifndef UNUSED
++#define UNUSED __attribute__((unused))
++#endif /* UNUSED */
++
++#endif /* _PROC_SCAN_H_ */
+diff --git a/src/process/process.cpp b/src/process/process.cpp
+index 34dc68d..0032598 100644
+--- a/src/process/process.cpp
++++ b/src/process/process.cpp
+@@ -241,3 +241,46 @@ void clear_processes(void)
+ 		it =3D all_processes.erase(it);
+ 	}
+ }
++
++/* pid     -- PID of the process to lookup.
++ * name    -- Name of the process. Will not be asssigned if NULL.
++ * cmdline -- Command line of the process. Will not be assigned if NULL.
++ * This function return true on success and false if process was not found=
+. */
++bool
++get_pt_proc_info(int pid, const char **name, const char **cmdline)
++{
++	unsigned int i;
++
++	for (i =3D 0; i < all_power.size(); i++) {
++		process *p;
++
++		if (strncmp(all_power[i]->type(), "Process",
++			    sizeof("Process")))
++			continue;
++
++		p =3D (process *)all_power[i];
++		if (p->pid =3D=3D pid) {
++			if (cmdline)
++				*cmdline =3D p->desc;
++
++			if (name)
++				*name =3D p->comm;
++
++			return true;
++		}
++	}
++
++	for (i =3D 0; i < all_processes.size(); i++) {
++		if (all_processes[i]->pid =3D=3D pid) {
++			if (cmdline)
++				*cmdline =3D all_processes[i]->desc;
++
++			if (name)
++				*name =3D all_processes[i]->comm;
++
++			return true;
++		}
++	}
++
++	return false;
++}
+-- =
+
+1.7.5.4
 
 
-/.
-/usr
-/usr/share
-/usr/share/doc
-/usr/share/doc/libnl2
-/usr/share/doc/libnl2/copyright
-/usr/share/doc/libnl2/changelog.Debian.gz
-/usr/lib
-/usr/lib/libnl-cli.so.2.0.0
-/usr/lib/libnl-genl.so.2.0.0
-/usr/lib/libnl-nf.so.2.0.0
-/usr/lib/libnl-route.so.2.0.0
-/usr/lib/libnl.so.2.0.0
-/usr/lib/libnl-cli.so.2
-/usr/lib/libnl-genl.so.2
-/usr/lib/libnl-nf.so.2
-/usr/lib/libnl-route.so.2
-/usr/lib/libnl.so.2
-root(a)h-desktop:~# dpkg -L libnl-3-200
-/.
-/usr
-/usr/share
-/usr/share/doc
-/usr/share/doc/libnl-3-200
-/usr/share/doc/libnl-3-200/copyright
-/usr/share/doc/libnl-3-200/README.Debian
-/usr/share/doc/libnl-3-200/changelog.Debian.gz
-/lib
-/lib/libnl-3.so.200.3.0
-/etc
-/etc/libnl-3
-/etc/libnl-3/classid
-/etc/libnl-3/pktloc
-/lib/libnl-3.so.200
-root(a)h-desktop:~# uname -a
-Linux h-desktop 3.0.0-12-generic-pae #20-Ubuntu SMP Fri Oct 7 16:37:17 UTC
-2011 i686 i686 i386 GNU/Linux
-
-
-2012/11/1 Austin Zhang <zhang.austin(a)gmail.com>
-
-> thanks for your reply. In case I confused people, I list it as:
->
-> austin(a)austin-Studio:~$ uname -a
->
-> Linux austin-Studio 3.0.0-15-generic #26-Ubuntu SMP Fri Jan 20 17:23:00
-> UTC 2012 x86_64 x86_64 x86_64 GNU/Linux
-> austin(a)austin-Studio:~$ dpkg -L libnl2
->
-> /.
-> /usr
-> /usr/share
-> /usr/share/doc
-> /usr/share/doc/libnl2
-> /usr/share/doc/libnl2/copyright
-> /usr/share/doc/libnl2/changelog.Debian.gz
-> /usr/lib
-> /usr/lib/libnl-cli.so.2.0.0
-> /usr/lib/libnl-route.so.2.0.0
-> /usr/lib/libnl-genl.so.2.0.0
-> /usr/lib/libnl-nf.so.2.0.0
-> /usr/lib/libnl.so.2.0.0
-> /usr/lib/libnl-route.so.2
-> /usr/lib/libnl-cli.so.2
-> /usr/lib/libnl-genl.so.2
-> /usr/lib/libnl.so.2
-> /usr/lib/libnl-nf.so.2
-> austin(a)austin-Studio:~$ dpkg -L libnl3
->
-> /.
-> /usr
-> /usr/share
-> /usr/share/doc
-> /usr/share/doc/libnl3
-> /usr/share/doc/libnl3/README.Debian
-> /usr/share/doc/libnl3/copyright
-> /usr/share/doc/libnl3/changelog.Debian.gz
-> /usr/lib
-> /usr/lib/libnl-cli.so.3.0.0
-> /usr/lib/libnl-genl.so.3.0.0
-> /usr/lib/libnl-nf.so.3.0.0
-> /usr/lib/libnl-route.so.3.0.0
-> /usr/lib/libnl.so.3.0.0
-> /usr/lib/libnl-cli.so.3
-> /usr/lib/libnl-genl.so.3
-> /usr/lib/libnl-nf.so.3
-> /usr/lib/libnl-route.so.3
-> /usr/lib/libnl.so.3
-> austin(a)austin-Studio:~$
->
->
-> 2012/10/31 Arjan van de Ven <arjan(a)linux.intel.com>
->
->> On 10/31/2012 7:11 AM, Austin Zhang wrote:
->> > Hi,
->> >
->> > I am trying to compile powertop on my box: ubuntu 12.04, X86-64.
->> >
->> > (1)compiling issue
->> >
->> > Here, my system didn=E2=80=99t install libnl-1, but I installed libnl2=
- (under
->> /usr/lib) and libnl-3 (under /lib).
->>
->>
->> on a 64 bit system, that should have been /usr/lib64 and  /lib64
->> otherwise you got 32 bit libraries ;-)
->>
->>
->
-
---===============1310020083451128429==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
-
-SW4gYW5vdGhlciBib3ggd2l0aCBpNjg2IGluc3RhbGxlZCwgaXQgYWxzbyBlbmNvdW50ZWQgaW50
-byBzaW1pbGFyIGlzc3VlIChjYW5ub3QgbGluayBhZ2FpbnN0IGxpYm5sMik8ZGl2Pjxicj48L2Rp
-dj48ZGl2PjxkaXY+cm9vdEBoLWRlc2t0b3A6fiMgZHBrZyAtTCBsaWJubDIgoCCgIKAgoCCgIKAg
-oCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
-IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKCgPC9kaXY+
-CjxkaXY+Ly48L2Rpdj48ZGl2Pi91c3I8L2Rpdj48ZGl2Pi91c3Ivc2hhcmU8L2Rpdj48ZGl2Pi91
-c3Ivc2hhcmUvZG9jPC9kaXY+PGRpdj4vdXNyL3NoYXJlL2RvYy9saWJubDI8L2Rpdj48ZGl2Pi91
-c3Ivc2hhcmUvZG9jL2xpYm5sMi9jb3B5cmlnaHQ8L2Rpdj48ZGl2Pi91c3Ivc2hhcmUvZG9jL2xp
-Ym5sMi9jaGFuZ2Vsb2cuRGViaWFuLmd6PC9kaXY+PGRpdj4vdXNyL2xpYjwvZGl2PjxkaXY+Ci91
-c3IvbGliL2xpYm5sLWNsaS5zby4yLjAuMDwvZGl2PjxkaXY+L3Vzci9saWIvbGlibmwtZ2VubC5z
-by4yLjAuMDwvZGl2PjxkaXY+L3Vzci9saWIvbGlibmwtbmYuc28uMi4wLjA8L2Rpdj48ZGl2Pi91
-c3IvbGliL2xpYm5sLXJvdXRlLnNvLjIuMC4wPC9kaXY+PGRpdj4vdXNyL2xpYi9saWJubC5zby4y
-LjAuMDwvZGl2PjxkaXY+L3Vzci9saWIvbGlibmwtY2xpLnNvLjI8L2Rpdj48ZGl2PgovdXNyL2xp
-Yi9saWJubC1nZW5sLnNvLjI8L2Rpdj48ZGl2Pi91c3IvbGliL2xpYm5sLW5mLnNvLjI8L2Rpdj48
-ZGl2Pi91c3IvbGliL2xpYm5sLXJvdXRlLnNvLjI8L2Rpdj48ZGl2Pi91c3IvbGliL2xpYm5sLnNv
-LjI8L2Rpdj48ZGl2PnJvb3RAaC1kZXNrdG9wOn4jIGRwa2cgLUwgbGlibmwtMy0yMDA8YnI+PC9k
-aXY+PGRpdj4vLjwvZGl2PjxkaXY+L3VzcjwvZGl2PjxkaXY+L3Vzci9zaGFyZTwvZGl2Pgo8ZGl2
-Pi91c3Ivc2hhcmUvZG9jPC9kaXY+PGRpdj4vdXNyL3NoYXJlL2RvYy9saWJubC0zLTIwMDwvZGl2
-PjxkaXY+L3Vzci9zaGFyZS9kb2MvbGlibmwtMy0yMDAvY29weXJpZ2h0PC9kaXY+PGRpdj4vdXNy
-L3NoYXJlL2RvYy9saWJubC0zLTIwMC9SRUFETUUuRGViaWFuPC9kaXY+PGRpdj4vdXNyL3NoYXJl
-L2RvYy9saWJubC0zLTIwMC9jaGFuZ2Vsb2cuRGViaWFuLmd6PC9kaXY+PGRpdj4KL2xpYjwvZGl2
-PjxkaXY+L2xpYi9saWJubC0zLnNvLjIwMC4zLjA8L2Rpdj48ZGl2Pi9ldGM8L2Rpdj48ZGl2Pi9l
-dGMvbGlibmwtMzwvZGl2PjxkaXY+L2V0Yy9saWJubC0zL2NsYXNzaWQ8L2Rpdj48ZGl2Pi9ldGMv
-bGlibmwtMy9wa3Rsb2M8L2Rpdj48ZGl2Pi9saWIvbGlibmwtMy5zby4yMDA8L2Rpdj48ZGl2PnJv
-b3RAaC1kZXNrdG9wOn4jIHVuYW1lIC1hPC9kaXY+PGRpdj5MaW51eCBoLWRlc2t0b3AgMy4wLjAt
-MTItZ2VuZXJpYy1wYWUgIzIwLVVidW50dSBTTVAgRnJpIE9jdCA3IDE2OjM3OjE3IFVUQyAyMDEx
-IGk2ODYgaTY4NiBpMzg2IEdOVS9MaW51eDwvZGl2Pgo8L2Rpdj48ZGl2IGNsYXNzPSJnbWFpbF9l
-eHRyYSI+PGJyPjxicj48ZGl2IGNsYXNzPSJnbWFpbF9xdW90ZSI+MjAxMi8xMS8xIEF1c3RpbiBa
-aGFuZyA8c3BhbiBkaXI9Imx0ciI+Jmx0OzxhIGhyZWY9Im1haWx0bzp6aGFuZy5hdXN0aW5AZ21h
-aWwuY29tIiB0YXJnZXQ9Il9ibGFuayI+emhhbmcuYXVzdGluQGdtYWlsLmNvbTwvYT4mZ3Q7PC9z
-cGFuPjxicj48YmxvY2txdW90ZSBjbGFzcz0iZ21haWxfcXVvdGUiIHN0eWxlPSJtYXJnaW46MCAw
-IDAgLjhleDtib3JkZXItbGVmdDoxcHggI2NjYyBzb2xpZDtwYWRkaW5nLWxlZnQ6MWV4Ij4KdGhh
-bmtzIGZvciB5b3VyIHJlcGx5LiBJbiBjYXNlIEkgY29uZnVzZWQgcGVvcGxlLCBJIGxpc3QgaXQg
-YXM6PGRpdj48YnI+PC9kaXY+PGRpdj48ZGl2PmF1c3RpbkBhdXN0aW4tU3R1ZGlvOn4kIHVuYW1l
-IC1hIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
-IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKCgPC9kaXY+
-Cgo8ZGl2PkxpbnV4IGF1c3Rpbi1TdHVkaW8gMy4wLjAtMTUtZ2VuZXJpYyAjMjYtVWJ1bnR1IFNN
-UCBGcmkgSmFuIDIwIDE3OjIzOjAwIFVUQyAyMDEyIHg4Nl82NCB4ODZfNjQgeDg2XzY0IEdOVS9M
-aW51eDwvZGl2PjxkaXY+YXVzdGluQGF1c3Rpbi1TdHVkaW86fiQgZHBrZyAtTCBsaWJubDIgoCCg
-IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
-oCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoKA8L2Rpdj4KCjxkaXY+Ly48L2Rp
-dj48ZGl2Pi91c3I8L2Rpdj48ZGl2Pi91c3Ivc2hhcmU8L2Rpdj48ZGl2Pi91c3Ivc2hhcmUvZG9j
-PC9kaXY+PGRpdj4vdXNyL3NoYXJlL2RvYy9saWJubDI8L2Rpdj48ZGl2Pi91c3Ivc2hhcmUvZG9j
-L2xpYm5sMi9jb3B5cmlnaHQ8L2Rpdj48ZGl2Pi91c3Ivc2hhcmUvZG9jL2xpYm5sMi9jaGFuZ2Vs
-b2cuRGViaWFuLmd6PC9kaXY+PGRpdj4vdXNyL2xpYjwvZGl2PjxkaXY+CgovdXNyL2xpYi9saWJu
-bC1jbGkuc28uMi4wLjA8L2Rpdj48ZGl2Pi91c3IvbGliL2xpYm5sLXJvdXRlLnNvLjIuMC4wPC9k
-aXY+PGRpdj4vdXNyL2xpYi9saWJubC1nZW5sLnNvLjIuMC4wPC9kaXY+PGRpdj4vdXNyL2xpYi9s
-aWJubC1uZi5zby4yLjAuMDwvZGl2PjxkaXY+L3Vzci9saWIvbGlibmwuc28uMi4wLjA8L2Rpdj48
-ZGl2Pi91c3IvbGliL2xpYm5sLXJvdXRlLnNvLjI8L2Rpdj48ZGl2PgoKL3Vzci9saWIvbGlibmwt
-Y2xpLnNvLjI8L2Rpdj48ZGl2Pi91c3IvbGliL2xpYm5sLWdlbmwuc28uMjwvZGl2PjxkaXY+L3Vz
-ci9saWIvbGlibmwuc28uMjwvZGl2PjxkaXY+L3Vzci9saWIvbGlibmwtbmYuc28uMjwvZGl2Pjxk
-aXY+YXVzdGluQGF1c3Rpbi1TdHVkaW86fiQgZHBrZyAtTCBsaWJubDMgoCCgIKAgoCCgIKAgoCCg
-IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
-oCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoDwvZGl2PgoKPGRpdj4vLjwvZGl2PjxkaXY+
-L3VzcjwvZGl2PjxkaXY+L3Vzci9zaGFyZTwvZGl2PjxkaXY+L3Vzci9zaGFyZS9kb2M8L2Rpdj48
-ZGl2Pi91c3Ivc2hhcmUvZG9jL2xpYm5sMzwvZGl2PjxkaXY+L3Vzci9zaGFyZS9kb2MvbGlibmwz
-L1JFQURNRS5EZWJpYW48L2Rpdj48ZGl2Pi91c3Ivc2hhcmUvZG9jL2xpYm5sMy9jb3B5cmlnaHQ8
-L2Rpdj48ZGl2Pi91c3Ivc2hhcmUvZG9jL2xpYm5sMy9jaGFuZ2Vsb2cuRGViaWFuLmd6PC9kaXY+
-Cgo8ZGl2Pi91c3IvbGliPC9kaXY+PGRpdj4vdXNyL2xpYi9saWJubC1jbGkuc28uMy4wLjA8L2Rp
-dj48ZGl2Pi91c3IvbGliL2xpYm5sLWdlbmwuc28uMy4wLjA8L2Rpdj48ZGl2Pi91c3IvbGliL2xp
-Ym5sLW5mLnNvLjMuMC4wPC9kaXY+PGRpdj4vdXNyL2xpYi9saWJubC1yb3V0ZS5zby4zLjAuMDwv
-ZGl2PjxkaXY+L3Vzci9saWIvbGlibmwuc28uMy4wLjA8L2Rpdj48ZGl2Pi91c3IvbGliL2xpYm5s
-LWNsaS5zby4zPC9kaXY+Cgo8ZGl2Pi91c3IvbGliL2xpYm5sLWdlbmwuc28uMzwvZGl2PjxkaXY+
-L3Vzci9saWIvbGlibmwtbmYuc28uMzwvZGl2PjxkaXY+L3Vzci9saWIvbGlibmwtcm91dGUuc28u
-MzwvZGl2PjxkaXY+L3Vzci9saWIvbGlibmwuc28uMzwvZGl2PjxkaXY+YXVzdGluQGF1c3Rpbi1T
-dHVkaW86fiSgPC9kaXY+PC9kaXY+PGRpdiBjbGFzcz0iSE9FblpiIj48ZGl2IGNsYXNzPSJoNSI+
-PGRpdiBjbGFzcz0iZ21haWxfZXh0cmEiPgo8YnI+PGJyPjxkaXYgY2xhc3M9ImdtYWlsX3F1b3Rl
-Ij4KMjAxMi8xMC8zMSBBcmphbiB2YW4gZGUgVmVuIDxzcGFuIGRpcj0ibHRyIj4mbHQ7PGEgaHJl
-Zj0ibWFpbHRvOmFyamFuQGxpbnV4LmludGVsLmNvbSIgdGFyZ2V0PSJfYmxhbmsiPmFyamFuQGxp
-bnV4LmludGVsLmNvbTwvYT4mZ3Q7PC9zcGFuPjxicj48YmxvY2txdW90ZSBjbGFzcz0iZ21haWxf
-cXVvdGUiIHN0eWxlPSJtYXJnaW46MCAwIDAgLjhleDtib3JkZXItbGVmdDoxcHggI2NjYyBzb2xp
-ZDtwYWRkaW5nLWxlZnQ6MWV4Ij4KCjxkaXY+T24gMTAvMzEvMjAxMiA3OjExIEFNLCBBdXN0aW4g
-Wmhhbmcgd3JvdGU6PGJyPgomZ3Q7IEhpLDxicj4KJmd0Ozxicj4KJmd0OyBJIGFtIHRyeWluZyB0
-byBjb21waWxlIHBvd2VydG9wIG9uIG15IGJveDogdWJ1bnR1IDEyLjA0LCBYODYtNjQuPGJyPgom
-Z3Q7PGJyPgomZ3Q7ICgxKWNvbXBpbGluZyBpc3N1ZTxicj4KJmd0Ozxicj4KJmd0OyBIZXJlLCBt
-eSBzeXN0ZW0gZGlkbpJ0IGluc3RhbGwgbGlibmwtMSwgYnV0IEkgaW5zdGFsbGVkIGxpYm5sMiAo
-dW5kZXIgL3Vzci9saWIpIGFuZCBsaWJubC0zICh1bmRlciAvbGliKS48YnI+Cjxicj4KPGJyPgo8
-L2Rpdj5vbiBhIDY0IGJpdCBzeXN0ZW0sIHRoYXQgc2hvdWxkIGhhdmUgYmVlbiAvdXNyL2xpYjY0
-IGFuZCCgL2xpYjY0PGJyPgpvdGhlcndpc2UgeW91IGdvdCAzMiBiaXQgbGlicmFyaWVzIDstKTxi
-cj4KPGJyPgo8L2Jsb2NrcXVvdGU+PC9kaXY+PGJyPjwvZGl2Pgo8L2Rpdj48L2Rpdj48L2Jsb2Nr
-cXVvdGU+PC9kaXY+PGJyPjwvZGl2Pgo=
-
---===============1310020083451128429==--
+--===============8094114305002252667==--
 
