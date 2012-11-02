@@ -1,129 +1,98 @@
-Content-Type: multipart/mixed; boundary="===============1830842817239326866=="
+Content-Type: multipart/mixed; boundary="===============2631804151261308613=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [RFC] [PATCH 01/11] Fix includes: do not include
- intel_cpus.h inside cpu.h
-Date: Mon, 05 Nov 2012 14:16:25 +0300
-Message-ID: <20121105111625.GD3123@swordfish>
-In-Reply-To: 1352113953-24687-2-git-send-email-intelfx100@gmail.com
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: Re: [Powertop] [FYI][RFC][PATCH 0/2] MALI GPU profiling support
+Date: Fri, 02 Nov 2012 19:05:36 +0400
+Message-ID: <5093E140.20604@samsung.com>
+In-Reply-To: CAMFVxViK-WCd7e4rA2S449S4p+YsPjp9Tp2iZe5Srd=b2SijuQ@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1830842817239326866==
+--===============2631804151261308613==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (11/05/12 15:12), Ivan Shapovalov wrote:
->
-> The file "cpu.h" is generic (unlike "intel_cpus.h"), so the existing orde=
-r seems
-> illogical. =
+Ferron, Chris E wrote:
+
+> On Thu, Nov 1, 2012 at 5:00 AM, Igor Zhbanov <i.zhbanov(a)samsung.com> wr=
+ote:
+>>                          * Initial voltage and frequency values *
+>>
+>> When PowerTOP starts on system with display turned on and some graphical
+>> applications already running, there is a possibility for situation where=
+ some
+>> rendering job will be started before PowerTOP grabs the first voltage or
+>> frequency setting event. So PowerTOP will be unaware of current frequency
+>> and/or voltage value. Because of this it is impossible to correctly calc=
+ulate
+>> power consumption for that task because it is impossible to ask the driv=
+er
+>> about current frequency and voltage. And in the current version PowerTOP=
+ drops
+>> jobs before first voltage or frequency change event (such events are fre=
+quent
+>> enough, so it's not a problem). It is possible to use some default value=
+ but
+> Gaining defaults and baselines is a pretty generic issues. To increase
+> samples and such, have you
+> considered using the calibration to help here?
+>> it will be GPU-dependent and we don't know what value to use.
+
+The Powertop doesn't have the ability to calibrate GPU now. It is possible =
+to refine
+the C constant by the means of calibration. But we still would not know at =
+what voltage
+and frequency the rendering job (that was started before the Powertop) runn=
+ing.
+Fortunately, these rendering jobs takes less than a second usually. So prob=
+ably
+we could ignore them.
+
+The better solution could be if we had some support from GPU driver to ask =
+for current
+frequency and voltage.
+
+Some off-topic.
+
+By the way, I now study the possibility to adopt another approach. Consider=
+ what would be
+if we had CPU and GPU power consumption statistics right inside the kernel.=
+ I don't like
+the current way when the Powertop must handle several thousands events per =
+second (because
+of catching every sched_switch and sched_wakeup events that could happen CO=
+NFIG_HZ * cpu_nr
+times every second) just to calculate single number (usage) for each proces=
+s.
+
+The kernel knows what is the current voltage and frequency for each process.
+Also it knows the duration of each time slice. So the kernel could easily c=
+ompute on each
+task switch how much power was consumed by particular task and update its c=
+ounter.
+
+Then the Powertop could just grab these counters periodically.
+
+This feature could have on/off switch via sysctl to be turned only for some=
+ time.
+
+I think that this way is better. Also it significantly reduces the amount o=
+f work performed
+by the Powertop. What you think?
+
+-- =
+
+Best regards,
+Igor Zhbanov,
+Technical Leader,
+phone: +7 (495) 797 25 00 ext 3806
+e-mail: i.zhbanov(a)samsung.com
+
+Mobile group, Moscow R&D center, Samsung Electronics
+12 Dvintsev street, building 1
+127018, Moscow, Russian Federation
 
 
->
->Also it broke KDevelop's code completion.
->
-
-just a side note. no offense, but are you gonna fix every product kdevelop =
-fails to
-parse instead of fixing just kdevelop?
-
-
-	-ss
-
- =
-
-> Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
-> ---
->  src/cpu/cpu.cpp        | 1 +
->  src/cpu/cpu.h          | 2 --
->  src/cpu/intel_cpus.cpp | 2 +-
->  src/cpu/intel_cpus.h   | 2 ++
->  src/cpu/intel_gpu.cpp  | 2 +-
->  5 files changed, 5 insertions(+), 4 deletions(-)
-> =
-
-> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-> index 7f3af69..3314e82 100644
-> --- a/src/cpu/cpu.cpp
-> +++ b/src/cpu/cpu.cpp
-> @@ -31,6 +31,7 @@
->  #include <unistd.h>
->  #include "cpu.h"
->  #include "cpudevice.h"
-> +#include "intel_cpus.h"
->  #include "../parameters/parameters.h"
->  =
-
->  #include "../perf/perf_bundle.h"
-> diff --git a/src/cpu/cpu.h b/src/cpu/cpu.h
-> index 4480b11..a9f258a 100644
-> --- a/src/cpu/cpu.h
-> +++ b/src/cpu/cpu.h
-> @@ -210,8 +210,6 @@ public:
->  =
-
->  };
->  =
-
-> -#include "intel_cpus.h"
-> -
->  extern void enumerate_cpus(void);
->  =
-
->  extern void report_display_cpu_pstates(void);
-> diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
-> index 24465a0..a5684aa 100644
-> --- a/src/cpu/intel_cpus.cpp
-> +++ b/src/cpu/intel_cpus.cpp
-> @@ -22,7 +22,7 @@
->   * Authors:
->   *	Arjan van de Ven <arjan(a)linux.intel.com>
->   */
-> -#include "cpu.h"
-> +#include "intel_cpus.h"
->  #include <iostream>
->  #include <fstream>
->  #include <stdlib.h>
-> diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
-> index 1949af1..a8bb892 100644
-> --- a/src/cpu/intel_cpus.h
-> +++ b/src/cpu/intel_cpus.h
-> @@ -25,6 +25,8 @@
->  #include <stdint.h>
->  #include <sys/time.h>
->  =
-
-> +#include "cpu.h"
-> +
->  =
-
->  #define MSR_TSC				0x10
->  #define MSR_NEHALEM_PLATFORM_INFO	0xCE
-> diff --git a/src/cpu/intel_gpu.cpp b/src/cpu/intel_gpu.cpp
-> index 57474f1..e0f4ac2 100644
-> --- a/src/cpu/intel_gpu.cpp
-> +++ b/src/cpu/intel_gpu.cpp
-> @@ -22,7 +22,7 @@
->   * Authors:
->   *	Arjan van de Ven <arjan(a)linux.intel.com>
->   */
-> -#include "cpu.h"
-> +#include "intel_cpus.h"
->  #include <iostream>
->  #include <fstream>
->  #include <stdlib.h>
-> -- =
-
-> 1.8.0
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============1830842817239326866==--
+--===============2631804151261308613==--
 
