@@ -1,161 +1,66 @@
-Content-Type: multipart/mixed; boundary="===============5565995157856452240=="
+Content-Type: multipart/mixed; boundary="===============6320288916617689969=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH v1] Allow frequency stats when cpuidle is not
- enabled
-Date: Tue, 04 Dec 2012 17:10:55 +0300
-Message-ID: <20121204141055.GA2833@swordfish.minsk.epam.com>
-In-Reply-To: 1354601251-5722-1-git-send-email-rajagopal.venkat@linaro.org
+From: zhang.austin at gmail.com
+Subject: [Powertop] [PATCH] Change library/pkg search condition for libnl2/3
+Date: Fri, 02 Nov 2012 20:30:46 +0800
+Message-ID: <1351859446-9074-1-git-send-email-zhang.austin@gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5565995157856452240==
+--===============6320288916617689969==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (12/04/12 11:37), Rajagopal Venkat wrote:
-> Powertop fails to display frequency stats when cpuidle subsystem
-> is not enabled. Fix it.
-> =
+From: Austin Zhang <zhang.austin(a)gmail.com>
 
-> Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
-> ---
+So that we can configure in system with libnl2 or/and libnl3.
 
-looks good to me, thanks.
+Without/With this patch, the './configure' result as:
+---------------------------------------------------------------------------=
+-----
+                   |        ubuntu 11-10         ||          ubuntu 12.04
+---------------------------------------------------------------------------=
+-----
+                   | libnl-1 | libnl-2 | libnl-3 || libnl-1 | libnl-2 | lib=
+nl-3
+---------------------------------------------------------------------------=
+-----
+without this patch | Pass    | Fail    | Fail    || Pass    | Fail    | Pass
+with    this patch | Pass    | Pass    | Pass    || Pass    | Pass    | Pass
+---------------------------------------------------------------------------=
+-----
 
-	-ss
+Signed-off-by: Austin Zhang <zhang.austin(a)gmail.com>
+---
+ configure.ac |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b8c183f..ccc0ec5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -54,11 +54,11 @@ PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=3D1]=
+,[
+  =
+
+ =
+
+ has_libnl_ver=3D0
+-PKG_CHECK_MODULES([LIBNL], [libnl-3.0 libnl-genl-3.0], [
++PKG_CHECK_MODULES([LIBNL], [libnl-3.0], [
+ 	has_libnl_ver=3D3], [
+ 	AC_SEARCH_LIBS([nl_socket_alloc], [nl-3 nl-genl-3], [
+ 		has_libnl_ver=3D3], [
+-		AC_SEARCH_LIBS([nl_socket_alloc], [nl], [
++		PKG_CHECK_MODULES([LIBNL], [libnl-2.0], [
+ 			has_libnl_ver=3D2], [
+ 			PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [])])])])
+ if (test "$has_libnl_ver" -eq 0); then
+-- =
+
+1.7.5.4
 
 
->  src/cpu/cpu.h         |  7 ++++++-
->  src/cpu/cpu_linux.cpp | 36 +++++++++++++++++++++++++++---------
->  2 files changed, 33 insertions(+), 10 deletions(-)
-> =
-
-> diff --git a/src/cpu/cpu.h b/src/cpu/cpu.h
-> index 4480b11..781e33c 100644
-> --- a/src/cpu/cpu.h
-> +++ b/src/cpu/cpu.h
-> @@ -159,7 +159,12 @@ extern vector<class abstract_cpu *> all_cpus;
->  class cpu_linux: public abstract_cpu
->  {
->  =
-
-> -	void		account_freq(uint64_t frequency, uint64_t duration);
-> +	void	account_freq(uint64_t frequency, uint64_t duration);
-> +	void 	parse_pstates_start(void);
-> +	void 	parse_cstates_start(void);
-> +	void 	parse_pstates_end(void);
-> +	void 	parse_cstates_end(void);
-> +
->  public:
->  	virtual void	measurement_start(void);
->  	virtual void	measurement_end(void);
-> diff --git a/src/cpu/cpu_linux.cpp b/src/cpu/cpu_linux.cpp
-> index d6caf45..e7a3d37 100644
-> --- a/src/cpu/cpu_linux.cpp
-> +++ b/src/cpu/cpu_linux.cpp
-> @@ -47,17 +47,13 @@ static int is_turbo(uint64_t freq, uint64_t max, uint=
-64_t maxmo)
->  	return 1;
->  }
->  =
-
-> -void cpu_linux::measurement_start(void)
-> +void cpu_linux::parse_cstates_start(void)
->  {
->  	ifstream file;
-> -
->  	DIR *dir;
->  	struct dirent *entry;
->  	char filename[256];
->  	int len;
-> -	unsigned int i;
-> -
-> -	abstract_cpu::measurement_start();
->  =
-
->  	len =3D sprintf(filename, "/sys/devices/system/cpu/cpu%i/cpuidle", numb=
-er);
->  =
-
-> @@ -111,9 +107,16 @@ void cpu_linux::measurement_start(void)
->  =
-
->  	}
->  	closedir(dir);
-> +}
->  =
-
-> -	last_stamp =3D 0;
->  =
-
-> +void cpu_linux::parse_pstates_start(void)
-> +{
-> +	ifstream file;
-> +	char filename[256];
-> +	unsigned int i;
-> +
-> +	last_stamp =3D 0;
->  	for (i =3D 0; i < children.size(); i++)
->  		if (children[i])
->  			children[i]->wiggle();
-> @@ -136,8 +139,14 @@ void cpu_linux::measurement_start(void)
->  	account_freq(0, 0);
->  }
->  =
-
-> +void cpu_linux::measurement_start(void)
-> +{
-> +	abstract_cpu::measurement_start();
-> +	parse_cstates_start();
-> +	parse_pstates_start();
-> +}
->  =
-
-> -void cpu_linux::measurement_end(void)
-> +void cpu_linux::parse_cstates_end(void)
->  {
->  	DIR *dir;
->  	struct dirent *entry;
-> @@ -187,6 +196,12 @@ void cpu_linux::measurement_end(void)
->  =
-
->  	}
->  	closedir(dir);
-> +}
-> +
-> +void cpu_linux::parse_pstates_end(void)
-> +{
-> +	char filename[256];
-> +	ifstream file;
->  =
-
->  	sprintf(filename, "/sys/devices/system/cpu/cpu%i/cpufreq/stats/time_in_=
-state", number);
->  =
-
-> @@ -216,12 +231,15 @@ void cpu_linux::measurement_end(void)
->  		}
->  		file.close();
->  	}
-> +}
->  =
-
-> -
-> +void cpu_linux::measurement_end(void)
-> +{
-> +	parse_cstates_end();
-> +	parse_pstates_end();
->  	abstract_cpu::measurement_end();
->  }
->  =
-
-> -
->  char * cpu_linux::fill_cstate_line(int line_nr, char *buffer, const char=
- *separator)
->  {
->  	unsigned int i;
-
---===============5565995157856452240==--
+--===============6320288916617689969==--
 
