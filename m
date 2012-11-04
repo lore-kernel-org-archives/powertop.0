@@ -1,52 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============5380129004636188999=="
+Content-Type: multipart/mixed; boundary="===============5772980196332433946=="
 MIME-Version: 1.0
 From: Paul Menzel <paulepanter at users.sourceforge.net>
-Subject: [Powertop] Repeating lines in Git commit messages (was: [PATCH] fix
- typo and correct coding styles in report_formatter)
-Date: Mon, 15 Oct 2012 16:42:44 +0200
-Message-ID: <1350312164.4867.28.camel@mattotaupa>
-In-Reply-To: 507C1B66.80100@linux.intel.com
+Subject: [Powertop] Consistent spelling of PowerTOP
+Date: Sun, 04 Nov 2012 12:31:02 +0100
+Message-ID: <1352028662.4710.10.camel@mattotaupa>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5380129004636188999==
+--===============5772980196332433946==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Am Montag, den 15.10.2012, 07:19 -0700 schrieb Arjan van de Ven:
-> On 10/15/2012 7:02 AM, Paul Menzel wrote:
+Dear PowerTOP folks,
 
-> > thank you for your patch.
-> > =
 
-> > Am Montag, den 15.10.2012, 02:25 -0700 schrieb Sergey Senozhatsky:
-> >> [PATCH] fix typo and correct coding styles in report_formatter
-> > =
-
-> > Please do not repeat the summary in the commit message body.
-> =
-
-> there's nothing wrong with that though.
-
-Well I would agree if it is kind of rephrased. But if it is the exact
-same line I will say it is bad practice. ;-)
+the spelling in the README is PowerTOP. If this is the preferred
+spelling =E2=80=93 I=E2=80=99d like Powertop better =E2=80=93 could this al=
+so be used in the
+mailing list tag(?), which is currently [Powertop].
 
 
 Thanks,
 
 Paul
 
---===============5380129004636188999==
+--===============5772980196332433946==
 Content-Type: application/pgp-signature
 MIME-Version: 1.0
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="signature.asc"
 
 LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
-L0xpbnV4KQoKaUVZRUFCRUNBQVlGQWxCOElPUUFDZ2tRUFgxYUsyd09IVmhZTkFDZmMzTHlqMDk0
-T0EydG1RZ09UNk8xQjFtbAowTm9BbjIyQitrWlhrdkNXemx0akNIOWtGWEloWHJrbwo9cmVDZgot
+L0xpbnV4KQoKaUVZRUFCRUNBQVlGQWxDV1VmWUFDZ2tRUFgxYUsyd09IVmdLeXdDZEcrTTk3emxC
+RFhpNGpTaURQUGxVbmRqaApuZHNBbjBsZzd6eXBhNjFpSEN3UkVxYTFqb3FIRTNIWgo9ZUdiUgot
 LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
 
---===============5380129004636188999==--
+--===============5772980196332433946==--
 
