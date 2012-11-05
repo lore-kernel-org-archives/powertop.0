@@ -1,61 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============6975515343365353093=="
+Content-Type: multipart/mixed; boundary="===============1079293759138548712=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] report: fixed crash when writing report to RO
- filesystem
-Date: Wed, 28 Nov 2012 19:02:06 +0300
-Message-ID: <20121128160206.GA2683@swordfish.minsk.epam.com>
-In-Reply-To: 1354117361-29155-1-git-send-email-jskarvad@redhat.com
+From: Ivan Shapovalov <intelfx100 at gmail.com>
+Subject: [Powertop] [RFC] [PATCH 11/11] Ignore non-P-state-enabled CPUs when
+ calculating frequency.
+Date: Mon, 05 Nov 2012 15:12:33 +0400
+Message-ID: <1352113953-24687-12-git-send-email-intelfx100@gmail.com>
+In-Reply-To: 1352113953-24687-1-git-send-email-intelfx100@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6975515343365353093==
+--===============1079293759138548712==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (11/28/12 16:42), Jaroslav =C5=A0karvada wrote:
-> Signed-off-by: Jaroslav =C5=A0karvada <jskarvad(a)redhat.com>
-> ---
+This fixes bogus reported CPU frequencies (actually, uninitialized
+values from i965_core) when i965 monitoring is used.
 
-looks good to me.
+Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
+---
+ src/cpu/abstract_cpu.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-	-ss
+diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
+index d64cb24..fea377b 100644
+--- a/src/cpu/abstract_cpu.cpp
++++ b/src/cpu/abstract_cpu.cpp
+@@ -380,7 +380,7 @@ void abstract_cpu::calculate_freq(uint64_t time)
+ =
 
->  src/report/report.cpp | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
-> =
+ 	/* calculate the maximum frequency of all children */
+ 	for (i =3D 0; i < children.size(); i++)
+-		if (children[i]) {
++		if (children[i] && children[i]->has_pstates()) {
+ 			uint64_t f =3D 0;
+ 			if (!children[i]->idle) {
+ 				f =3D children[i]->current_frequency;
+-- =
 
-> diff --git a/src/report/report.cpp b/src/report/report.cpp
-> index 51bc6a7..c018bb1 100644
-> --- a/src/report/report.cpp
-> +++ b/src/report/report.cpp
-> @@ -183,13 +183,16 @@ void init_report_output(char *filename_str, int ite=
-rations)
->  =
+1.8.0
 
->  void finish_report_output(void)
->  {
-> -	fprintf(stderr, _("PowerTOP outputing using base filename %s\n"), repor=
-tout.filename);
->  	if (reporttype =3D=3D REPORT_OFF)
->  		return;
->  =
 
->  	report.finish_report();
-> -	fputs(report.get_result(), reportout.report_file);
-> -	fdatasync(fileno(reportout.report_file));
-> -	fclose(reportout.report_file);
-> +	if (reportout.report_file)
-> +	{
-> +		fprintf(stderr, _("PowerTOP outputing using base filename %s\n"), repo=
-rtout.filename);
-> +		fputs(report.get_result(), reportout.report_file);
-> +		fdatasync(fileno(reportout.report_file));
-> +		fclose(reportout.report_file);
-> +	}
->  	report.clear_result();
->  }
-
---===============6975515343365353093==--
+--===============1079293759138548712==--
 
