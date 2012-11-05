@@ -1,49 +1,93 @@
-Content-Type: multipart/mixed; boundary="===============7535241547115115998=="
+Content-Type: multipart/mixed; boundary="===============2965971098742432457=="
 MIME-Version: 1.0
-From: Namhyung Kim <namhyung at gmail.com>
-Subject: [Powertop] [PATCH] devices: Trivial coding style fix
-Date: Thu, 18 Oct 2012 23:20:16 +0900
-Message-ID: <1350570016-3759-1-git-send-email-namhyung@gmail.com>
+From: Ivan Shapovalov <intelfx100 at gmail.com>
+Subject: [Powertop] [RFC] [PATCH 04/11] Deduplication: remove
+ nhm_cpu::account_freq() almost identical to abstract_cpu::account_freq()
+Date: Mon, 05 Nov 2012 15:12:26 +0400
+Message-ID: <1352113953-24687-5-git-send-email-intelfx100@gmail.com>
+In-Reply-To: 1352113953-24687-1-git-send-email-intelfx100@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7535241547115115998==
+--===============2965971098742432457==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-* block statement doesn't need a semicolon.
-* put closing curly bracket of function on a new line.
+See previous commit for explanation.
 
-Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
 ---
- src/devices/rfkill.cpp |    5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ src/cpu/intel_cpus.cpp | 36 ------------------------------------
+ src/cpu/intel_cpus.h   |  2 --
+ 2 files changed, 38 deletions(-)
 
-diff --git a/src/devices/rfkill.cpp b/src/devices/rfkill.cpp
-index 750175c..2404432 100644
---- a/src/devices/rfkill.cpp
-+++ b/src/devices/rfkill.cpp
-@@ -63,11 +63,12 @@ rfkill::rfkill(char *_name, char *path): device()
- 	sprintf(filename, "%s/device/driver", path);
- 	if (readlink(filename, line, 4096) > 0) {
- 		sprintf(humanname, _("Radio device: %s"), basename(line));
--	};
-+	}
- 	sprintf(filename, "%s/device/device/driver", path);
- 	if (readlink(filename, line, 4096) > 0) {
- 		sprintf(humanname, _("Radio device: %s"), basename(line));
--	}}
-+	}
-+}
+diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
+index 2a0a874..eeeb8c9 100644
+--- a/src/cpu/intel_cpus.cpp
++++ b/src/cpu/intel_cpus.cpp
+@@ -528,42 +528,6 @@ int nhm_cpu::has_pstate_level(int level)
+ 	return cpu_linux::has_pstate_level(level);
+ }
  =
 
- void rfkill::start_measurement(void)
+-void nhm_cpu::account_freq(uint64_t freq, uint64_t duration)
+-{
+-	struct frequency *state =3D NULL;
+-	unsigned int i;
+-
+-
+-	for (i =3D 0; i < pstates.size(); i++) {
+-		if (freq =3D=3D pstates[i]->freq) {
+-			state =3D pstates[i];
+-			break;
+-		}
+-	}
+-
+-	if (!state) {
+-		state =3D new(std::nothrow) struct frequency;
+-
+-		if (!state)
+-			return;
+-
+-		memset(state, 0, sizeof(*state));
+-
+-		pstates.push_back(state);
+-
+-		state->freq =3D freq;
+-		hz_to_human(freq, state->human_name);
+-		if (freq =3D=3D 0)
+-			strcpy(state->human_name, _("Idle"));
+-		state->after_count =3D 1;
+-	}
+-
+-
+-	state->time_after +=3D duration;
+-
+-
+-}
+-
+ void nhm_cpu::change_freq(uint64_t time, int frequency)
  {
+ 	current_frequency =3D frequency;
+diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
+index 181ffc4..cfa46ec 100644
+--- a/src/cpu/intel_cpus.h
++++ b/src/cpu/intel_cpus.h
+@@ -98,8 +98,6 @@ private:
+ =
+
+ 	uint64_t	last_stamp;
+ 	uint64_t	total_stamp;
+-
+-	void		account_freq(uint64_t frequency, uint64_t duration);
+ public:
+ 	virtual void	measurement_start(void);
+ 	virtual void	measurement_end(void);
 -- =
 
-1.7.9.2
+1.8.0
 
 
---===============7535241547115115998==--
+--===============2965971098742432457==--
 
