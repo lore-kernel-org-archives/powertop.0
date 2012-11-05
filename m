@@ -1,73 +1,78 @@
-Content-Type: multipart/mixed; boundary="===============8202132161667100233=="
+Content-Type: multipart/mixed; boundary="===============0131401098231318602=="
 MIME-Version: 1.0
-From: Justin Brown <justin.brown at fandingo.org>
-Subject: [Powertop] Multiple Batteries
-Date: Fri, 23 Nov 2012 22:55:48 -0600
-Message-ID: <CAKZK7uy6QP7xHvUpbhzz-Yh+SK2rBdzVNDcsBTgHG+=eiqGp4w@mail.gmail.com>
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] Strange Behavior - PowerTOP 2.0 Seg Fault
+Date: Mon, 05 Nov 2012 13:32:20 +0300
+Message-ID: <20121105103220.GB3123@swordfish>
+In-Reply-To: CABsxX9LUDU72h13LEDJ5jezRmgqb-c3cFeJcoLPKxD7EZOHoxw@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8202132161667100233==
+--===============0131401098231318602==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On (11/04/12 22:47), Kok, Auke-jan H wrote:
+> On Sun, Nov 4, 2012 at 7:51 AM,  <cshanahan(a)comcast.net> wrote:
+> > Hello,
+> >
+> > I was reading PowerTOP documentation and was curious whether it could h=
+elp me better manage power on my HP EliteBook 6930p laptop. I am running Po=
+werTOP v.2.0 on openSUSE 12.2 64-bit. After looking at some of my options f=
+rom the Overview and Stats tabs, I elected to run 'powertop --calibrate' as=
+ the docs suggest. PowerTOP did not complete the calibration process; it ex=
+ited with a seg fault. Now the hardware button for WiFi (small button along=
+ the top of the laptop near the screen) flashes constantly. I'm concerned t=
+hat PowerTOP caused some sort of hardware problem and damaged my laptop.
+> >
+> > Is there a way for me to check what PowerTOP did to my machine?
+> =
 
-I'm using Powertop 2.1, and I've noticed a somewhat minor bug. (I couldn't
-find a public bug tracker, but would be more than happy to move this
-discussion to one if someone could send me a URL.)
+> the calibration file will be instrumental, check if there are any
+> files under /var/cache/powertop?
+> =
 
-I have two batteries in my laptop, but Powertop does not recognize both
-when calculating battery life remaining. For example Gnome-Shell reports
-that my batteries are at 66% and 100% (85% combined) giving me 10 hours and
-11 minutes of estimated time remaining. On the other hand, Powertop reports
-just 3 hours 17  minutes of time. Both programs are reporting the proper
-discharge rate. It just seems like Powertop is only using my smaller
-battery (the currently active one).
+> > Is there a way for me to completely revert any changes made by PowerTOP?
+> =
 
-I'm not sure if this issue has been reported, or if the developers even
-have equipment with which to test. I'm more than willing to provide any
-sort of debugging output or testing as needed. I could also probably create
-a patch, but that's likely to take a lot longer for me to get setup with
-development on this project.
-It may be as simple as iterating over a directory in /sys/ or /proc to
-gather stats on multiple batteries. An experienced dev might be able to fix
-it quickly.
+> reboot.
+> =
 
-Cheers,
-Justin
+> Does the wifi LED still flash after a reboot? If so, I'm wondering if
+> it was RFKILL'ed. the 'rfkill' tool may be usable to un-rfkill it
+> again.
+> =
 
---===============8202132161667100233==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+> None of the changes powertop makes are permanent, and your systemd
+> should be operational if you reboot.
+> =
 
-SGVsbG8sPGRpdj48YnI+PC9kaXY+PGRpdj5JJiMzOTttIHVzaW5nIFBvd2VydG9wIDIuMSwgYW5k
-IEkmIzM5O3ZlIG5vdGljZWQgYSBzb21ld2hhdCBtaW5vciBidWcuIChJIGNvdWxkbiYjMzk7dCBm
-aW5kIGEgcHVibGljIGJ1ZyB0cmFja2VyLCBidXQgd291bGQgYmUgbW9yZSB0aGFuIGhhcHB5IHRv
-IG1vdmUgdGhpcyBkaXNjdXNzaW9uIHRvIG9uZSBpZiBzb21lb25lIGNvdWxkIHNlbmQgbWUgYSBV
-UkwuKTwvZGl2Pgo8ZGl2Pjxicj48L2Rpdj48ZGl2PkkgaGF2ZSB0d28gYmF0dGVyaWVzIGluIG15
-IGxhcHRvcCwgYnV0IFBvd2VydG9wIGRvZXMgbm90IHJlY29nbml6ZSBib3RoIHdoZW4gY2FsY3Vs
-YXRpbmcgYmF0dGVyeSBsaWZlIHJlbWFpbmluZy4gRm9yIGV4YW1wbGUgR25vbWUtU2hlbGwgcmVw
-b3J0cyB0aGF0IG15IGJhdHRlcmllcyBhcmUgYXQgNjYlIGFuZCAxMDAlICg4NSUgY29tYmluZWQp
-IGdpdmluZyBtZSAxMCBob3VycyBhbmQgMTEgbWludXRlcyBvZiBlc3RpbWF0ZWQgdGltZSByZW1h
-aW5pbmcuIE9uIHRoZSBvdGhlciBoYW5kLCBQb3dlcnRvcCByZXBvcnRzIGp1c3QgMyBob3VycyAx
-NyCgbWludXRlcyBvZiB0aW1lLiBCb3RoIHByb2dyYW1zIGFyZSByZXBvcnRpbmcgdGhlIHByb3Bl
-ciBkaXNjaGFyZ2UgcmF0ZS4gSXQganVzdCBzZWVtcyBsaWtlIFBvd2VydG9wIGlzIG9ubHkgdXNp
-bmcgbXkgc21hbGxlciBiYXR0ZXJ5ICh0aGUgY3VycmVudGx5IGFjdGl2ZSBvbmUpLjwvZGl2Pgo8
-ZGl2Pjxicj48L2Rpdj48ZGl2PkkmIzM5O20gbm90IHN1cmUgaWYgdGhpcyBpc3N1ZSBoYXMgYmVl
-biByZXBvcnRlZCwgb3IgaWYgdGhlIGRldmVsb3BlcnMgZXZlbiBoYXZlIGVxdWlwbWVudCB3aXRo
-IHdoaWNoIHRvIHRlc3QuIEkmIzM5O20gbW9yZSB0aGFuIHdpbGxpbmcgdG8gcHJvdmlkZSBhbnkg
-c29ydCBvZiBkZWJ1Z2dpbmcgb3V0cHV0IG9yIHRlc3RpbmcgYXMgbmVlZGVkLiBJIGNvdWxkIGFs
-c28gcHJvYmFibHkgY3JlYXRlIGEgcGF0Y2gsIGJ1dCB0aGF0JiMzOTtzIGxpa2VseSB0byB0YWtl
-IGEgbG90IGxvbmdlciBmb3IgbWUgdG8gZ2V0IHNldHVwIHdpdGggZGV2ZWxvcG1lbnQgb24gdGhp
-cyBwcm9qZWN0LqA8L2Rpdj4KPGRpdj5JdCBtYXkgYmUgYXMgc2ltcGxlIGFzIGl0ZXJhdGluZyBv
-dmVyIGEgZGlyZWN0b3J5IGluIC9zeXMvIG9yIC9wcm9jIHRvIGdhdGhlciBzdGF0cyBvbiBtdWx0
-aXBsZSBiYXR0ZXJpZXMuIEFuIGV4cGVyaWVuY2VkIGRldiBtaWdodCBiZSBhYmxlIHRvIGZpeCBp
-dCBxdWlja2x5LjwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+Q2hlZXJzLDwvZGl2PjxkaXY+SnVz
-dGluPC9kaXY+Cg==
+> > uname -a
+> > Linux 6930p.site 3.4.11-2.16-desktop #1 SMP PREEMPT Wed Sep 26 17:05:00=
+ UTC 2012 (259fc87) x86_64 x86_64 x86_64 GNU/Linux
+> >
+> > 6930p:~ # powertop --calibrate
+> > Starting PowerTOP power estimate calibration
+> > Calibrating idle
+> > Segmentation fault
+> =
 
---===============8202132161667100233==--
+> If you can, compile powertop from git, enable debug symbols (-g) and
+> run it under gdb and capture a backtrace, that will help us a lot
+> already to figure out where the problem may be.
+> =
+
+
+can you please do the following one (may be it'll work out w/o powertop
+re-compile)
+
+gdb PATH_TO_POWERTOP_BINARY
+$ run --calibrate
+$ bt
+
+
+	-ss
+
+--===============0131401098231318602==--
 
