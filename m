@@ -1,160 +1,154 @@
-Content-Type: multipart/mixed; boundary="===============5409622385383419668=="
+Content-Type: multipart/mixed; boundary="===============0011579936321607577=="
 MIME-Version: 1.0
-From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: [Powertop] [PATCH] Move report.cpp and report.h to report/ directory
- (v3)
-Date: Thu, 11 Oct 2012 15:32:43 +0400
-Message-ID: <1349955163-17514-1-git-send-email-i.zhbanov@samsung.com>
+From: Ivan Shapovalov <intelfx100 at gmail.com>
+Subject: Re: [Powertop] [RFC] [PATCH 01/11] Fix includes: do not include
+ intel_cpus.h inside cpu.h
+Date: Mon, 05 Nov 2012 15:26:50 +0400
+Message-ID: <1748183.YgtRxh8Mka@intelfx-laptop>
+In-Reply-To: 20121105111625.GD3123@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5409622385383419668==
+--===============0011579936321607577==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Move report.cpp and report.h to report/ directory to other report-related
-files.
----
- src/Makefile.am             |    4 ++--
- src/cpu/cpu.cpp             |    2 +-
- src/devices/device.cpp      |    2 +-
- src/devlist.cpp             |    2 +-
- src/main.cpp                |    2 +-
- src/process/do_process.cpp  |    2 +-
- src/{ =3D> report}/report.cpp |    0
- src/{ =3D> report}/report.h   |    0
- src/tuning/tuning.cpp       |    2 +-
- 9 files changed, 8 insertions(+), 8 deletions(-)
- rename src/{ =3D> report}/report.cpp (100%)
- rename src/{ =3D> report}/report.h (100%)
+On 05 Nov 2012 14:16:25 Sergey Senozhatsky wrote:
+> On (11/05/12 15:12), Ivan Shapovalov wrote:
+> > The file "cpu.h" is generic (unlike "intel_cpus.h"), so the existing or=
+der
+> > seems illogical.
+> >
+> >Also it broke KDevelop's code completion.
+> =
 
-diff --git a/src/Makefile.am b/src/Makefile.am
-index ccf3f0c..4c4a7c0 100644
---- a/src/Makefile.am
-+++ b/src/Makefile.am
-@@ -11,10 +11,10 @@ powertop_SOURCES =3D parameters/persistent.cpp paramete=
-rs/learn.cpp parameters/par
- 		parameters/parameters.h display.cpp cpu/cpu_core.cpp cpu/cpudevice.cpp  \
- 		cpu/cpu.cpp cpu/cpu.h cpu/cpu_linux.cpp cpu/abstract_cpu.cpp cpu/intel_c=
-pus.h \
- 		cpu/cpu_package.cpp cpu/cpudevice.h cpu/intel_cpus.cpp devlist.h devlist=
-.cpp \
--		lib.cpp report.cpp process/process.cpp process/interrupt.h process/timer=
-.h  \
-+		lib.cpp report/report.cpp process/process.cpp process/interrupt.h proces=
-s/timer.h  \
- 		process/processdevice.cpp process/powerconsumer.cpp process/work.h \
- 		process/timer.cpp process/process.h process/work.cpp process/do_process.=
-cpp \
--		process/processdevice.h process/interrupt.cpp process/powerconsumer.h re=
-port.h \
-+		process/processdevice.h process/interrupt.cpp process/powerconsumer.h re=
-port/report.h \
- 		perf/perf.cpp perf/perf_event.h perf/perf.h perf/perf_bundle.h perf/perf=
-_bundle.cpp \
- 		display.h devices/rfkill.h devices/i915-gpu.cpp devices/device.cpp devic=
-es/alsa.cpp \
- 		devices/runtime_pm.cpp devices/thinkpad-fan.cpp devices/usb.cpp devices/=
-ahci.cpp \
-diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-index 3d260d9..e65d828 100644
---- a/src/cpu/cpu.cpp
-+++ b/src/cpu/cpu.cpp
-@@ -36,7 +36,7 @@
- #include "../perf/perf_bundle.h"
- #include "../lib.h"
- #include "../display.h"
--#include "../report.h"
-+#include "../report/report.h"
- #include "../report/report-maker.h"
- =
+> just a side note. no offense, but are you gonna fix every product kdevelop
+> fails to parse instead of fixing just kdevelop?
 
- static class abstract_cpu system_level;
-diff --git a/src/devices/device.cpp b/src/devices/device.cpp
-index 01e37b4..00ec5e6 100644
---- a/src/devices/device.cpp
-+++ b/src/devices/device.cpp
-@@ -47,7 +47,7 @@ using namespace std;
- #include "../parameters/parameters.h"
- #include "../display.h"
- #include "../lib.h"
--#include "../report.h"
-+#include "../report/report.h"
- #include "../report/report-maker.h"
- #include "../measurement/measurement.h"
- #include "../devlist.h"
-diff --git a/src/devlist.cpp b/src/devlist.cpp
-index c5d65e6..de5abff 100644
---- a/src/devlist.cpp
-+++ b/src/devlist.cpp
-@@ -42,7 +42,7 @@ using namespace std;
- =
+It's a big architectural WIP there (on kdevelop).
 
- #include "devlist.h"
- #include "lib.h"
--#include "report.h"
-+#include "report/report.h"
- #include "report/report-maker.h"
- =
+- Ivan
 
- #include "process/process.h"
-diff --git a/src/main.cpp b/src/main.cpp
-index 7971f2b..e1dcb1c 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -56,7 +56,7 @@
- =
+> =
 
- #include "display.h"
- #include "devlist.h"
--#include "report.h"
-+#include "report/report.h"
- =
+> =
 
- #define DEBUGFS_MAGIC          0x64626720
- =
+> 	-ss
+> =
 
-diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
-index 7c61947..8f73083 100644
---- a/src/process/do_process.cpp
-+++ b/src/process/do_process.cpp
-@@ -28,7 +28,7 @@
- #include "work.h"
- #include "processdevice.h"
- #include "../lib.h"
--#include "../report.h"
-+#include "../report/report.h"
- #include "../report/report-maker.h"
- #include "../devlist.h"
- =
+> > Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
+> > ---
+> > =
 
-diff --git a/src/report.cpp b/src/report/report.cpp
-similarity index 100%
-rename from src/report.cpp
-rename to src/report/report.cpp
-diff --git a/src/report.h b/src/report/report.h
-similarity index 100%
-rename from src/report.h
-rename to src/report/report.h
-diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
-index 69f0783..ebb4ac8 100644
---- a/src/tuning/tuning.cpp
-+++ b/src/tuning/tuning.cpp
-@@ -39,7 +39,7 @@
- #include "ethernet.h"
- #include "wifi.h"
- #include "../display.h"
--#include "../report.h"
-+#include "../report/report.h"
- #include "../report/report-maker.h"
- #include "../lib.h"
- =
+> >  src/cpu/cpu.cpp        | 1 +
+> >  src/cpu/cpu.h          | 2 --
+> >  src/cpu/intel_cpus.cpp | 2 +-
+> >  src/cpu/intel_cpus.h   | 2 ++
+> >  src/cpu/intel_gpu.cpp  | 2 +-
+> >  5 files changed, 5 insertions(+), 4 deletions(-)
+> > =
 
--- =
+> > diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+> > index 7f3af69..3314e82 100644
+> > --- a/src/cpu/cpu.cpp
+> > +++ b/src/cpu/cpu.cpp
+> > @@ -31,6 +31,7 @@
+> > =
 
-1.7.5.4
+> >  #include <unistd.h>
+> >  #include "cpu.h"
+> >  #include "cpudevice.h"
+> > =
 
+> > +#include "intel_cpus.h"
+> > =
 
---===============5409622385383419668==--
+> >  #include "../parameters/parameters.h"
+> >  =
+
+> >  #include "../perf/perf_bundle.h"
+> > =
+
+> > diff --git a/src/cpu/cpu.h b/src/cpu/cpu.h
+> > index 4480b11..a9f258a 100644
+> > --- a/src/cpu/cpu.h
+> > +++ b/src/cpu/cpu.h
+> > =
+
+> > @@ -210,8 +210,6 @@ public:
+> >  };
+> > =
+
+> > -#include "intel_cpus.h"
+> > -
+> > =
+
+> >  extern void enumerate_cpus(void);
+> >  =
+
+> >  extern void report_display_cpu_pstates(void);
+> > =
+
+> > diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
+> > index 24465a0..a5684aa 100644
+> > --- a/src/cpu/intel_cpus.cpp
+> > +++ b/src/cpu/intel_cpus.cpp
+> > @@ -22,7 +22,7 @@
+> > =
+
+> >   * Authors:
+> >   *	Arjan van de Ven <arjan(a)linux.intel.com>
+> >   */
+> > =
+
+> > -#include "cpu.h"
+> > +#include "intel_cpus.h"
+> > =
+
+> >  #include <iostream>
+> >  #include <fstream>
+> >  #include <stdlib.h>
+> > =
+
+> > diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
+> > index 1949af1..a8bb892 100644
+> > --- a/src/cpu/intel_cpus.h
+> > +++ b/src/cpu/intel_cpus.h
+> > @@ -25,6 +25,8 @@
+> > =
+
+> >  #include <stdint.h>
+> >  #include <sys/time.h>
+> > =
+
+> > +#include "cpu.h"
+> > +
+> > =
+
+> >  #define MSR_TSC				0x10
+> >  #define MSR_NEHALEM_PLATFORM_INFO	0xCE
+> > =
+
+> > diff --git a/src/cpu/intel_gpu.cpp b/src/cpu/intel_gpu.cpp
+> > index 57474f1..e0f4ac2 100644
+> > --- a/src/cpu/intel_gpu.cpp
+> > +++ b/src/cpu/intel_gpu.cpp
+> > @@ -22,7 +22,7 @@
+> > =
+
+> >   * Authors:
+> >   *	Arjan van de Ven <arjan(a)linux.intel.com>
+> >   */
+> > =
+
+> > -#include "cpu.h"
+> > +#include "intel_cpus.h"
+> > =
+
+> >  #include <iostream>
+> >  #include <fstream>
+> >  #include <stdlib.h>
+
+--===============0011579936321607577==--
 
