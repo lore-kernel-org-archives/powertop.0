@@ -1,101 +1,74 @@
-Content-Type: multipart/mixed; boundary="===============3060534164881251880=="
+Content-Type: multipart/mixed; boundary="===============6375606808717152810=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] Change library/pkg search condition for
- libnl2/3
-Date: Fri, 09 Nov 2012 14:47:44 +0300
-Message-ID: <20121109114744.GC3239@swordfish.minsk.epam.com>
-In-Reply-To: CAGLu0vNzi+Gbum7R+MWZvmXVFd3Pu8tN5Vr33U8WGYKiTBTDZg@mail.gmail.com
+From: Ivan Shapovalov <intelfx100 at gmail.com>
+Subject: [Powertop] [RFC] [PATCH 00/11] Code deduplication and a single i965
+ P-states accounting bugfix in cpu/*
+Date: Mon, 05 Nov 2012 15:12:22 +0400
+Message-ID: <1352113953-24687-1-git-send-email-intelfx100@gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3060534164881251880==
+--===============6375606808717152810==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (11/09/12 19:43), Austin Zhang wrote:
->    >=EF=BF=BDbut there are no evidence of,
->    nl-gen will only impact compile rather than configure, right?
->    Those above build time error will happen in upstream version if you on=
-ly
->    install libnl3 but libnl-genl-3 for libnl3 case.
->    But anyway, it shouldn't impact 'configure' action.=EF=BF=BD
->
+This is a series of refactor (well, mainly deduplication) of cpu/* code fol=
+lowed with a
+single bugfix patch.
 
-disagree, successful configure itself is useless, build is the one that mat=
-ters.
-if one does not have all requirements for build, failed configure is ok.
+The bugfix itself may be applied even without applying refactoring, but then
+the same change shall be applied to all copies of calculate_freq().
 
-	-ss
+So the whole purpose of the series is to
+ 1) mercilessly purge those method overrides which are identical to the met=
+hods in base
+    classes, and
+ 2) prefer defining a helper function and overriding it rather than copy-pa=
+sting
+    the whole big function whose behavior needs to be altered and changing =
+one-two lines in it.
 
- =
+Ivan Shapovalov (11):
+  Fix includes: do not include intel_cpus.h inside cpu.h
+  Deduplication: move is_turbo() function to lib
+  Deduplication: move all instances of account_freq() to
+    abstract_cpu::account_freq()
+  Deduplication: remove nhm_cpu::account_freq() almost identical to
+    abstract_cpu::account_freq()
+  Deduplication: remove
+    nhm_{cpu,core,package}::change_effective_frequency() identical to
+    cpu_{linux,core,package}::change_effective_frequency()
+  Deduplication: merge
+    cpu_{core,linux,package}::change_effective_frequency() into
+    abstract_cpu::change_effective_frequency()
+  Deduplication: remove {cpu,nhm}_core::calculate_freq() identical to
+    abstract_cpu::calculate_freq()
+  Deduplication: remove nhm_package::calculate_freq() identical to
+    cpu_package::calculate_freq()
+  Deduplication: properly merge cpu_package::calculate_freq() into
+    abstract_cpu::calculate_freq()
+  Deduplication: merge go_idle()/go_unidle()/change_freq() overrides
+    into abstract_cpu() class
+  Ignore non-P-state-enabled CPUs when calculating frequency.
 
->    2012/11/9 Sergey Senozhatsky <[1]sergey.senozhatsky(a)gmail.com>
-> =
+ src/cpu/abstract_cpu.cpp |  69 ++++++++++--
+ src/cpu/cpu.cpp          |   1 +
+ src/cpu/cpu.h            |  29 ++----
+ src/cpu/cpu_core.cpp     |  97 -----------------
+ src/cpu/cpu_linux.cpp    |  98 ------------------
+ src/cpu/cpu_package.cpp  | 102 ++----------------
+ src/cpu/intel_cpus.cpp   | 265 +------------------------------------------=
+----
+ src/cpu/intel_cpus.h     |  23 +---
+ src/cpu/intel_gpu.cpp    |   2 +-
+ src/lib.cpp              |   9 ++
+ src/lib.h                |   1 +
+ 11 files changed, 94 insertions(+), 602 deletions(-)
 
->      On (11/09/12 19:17), Austin Zhang wrote:
->      > =EF=BF=BD =EF=BF=BDlibnl3:
->      > =EF=BF=BD =EF=BF=BDlibnl-3.0 =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
-=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BDli=
-bnl - Convenience library for
->      netlink
->      > =EF=BF=BD =EF=BF=BDsockets
->      > =EF=BF=BD =EF=BF=BDlibnl2:
->      > =EF=BF=BD =EF=BF=BDlibnl-2.0 =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
-=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BDli=
-bnl - Convenience library for
->      netlink
->      > =EF=BF=BD =EF=BF=BDsockets
->      >
-> =
+--
+1.8.0
 
->      so, libnl-3.0.pc and libnl-2.0.pc are there, but there are no eviden=
-ce
->      of, for example,
->      libnl-genl
-> =
 
->      pkg-config output on Arch
->      libnl-3.0 =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
-=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD libnl - Convenience library for netlink
->      sockets
->      libnl-cli-3.0 =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
-=BF=BD =EF=BF=BD libnl-cli - Command Line Interface library
->      for netlink sockets
->      libnl-nf-3.0 =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
-=BF=BD =EF=BF=BD =EF=BF=BDlibnl-nf - Netfilter Netlink Library
->      libnl-route-3.0 =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =
-=EF=BF=BD libnl-route - Netlink Routing Family Library
->      libnl-genl-3.0 =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
-=BF=BD =EF=BF=BDlibnl-genl - Generic Netlink Library
-> =
-
->      in case if we remove libnl-genl from PKG_CHECK_MODULES, we'll break =
-the
->      build, because LIBNL_LIBS
->      should be '-lnl-genl-3 -lnl-3', not just '-lnl-3'.
-> =
-
->      [..]
->      src/tuning/iw.c:89: undefined reference to `genl_connect'
->      src/tuning/iw.c:95: undefined reference to `genl_ctrl_alloc_cache'
->      src/tuning/iw.c:101: undefined reference to `genl_ctrl_search_by_nam=
-e'
->      and so on...
-> =
-
->      looks like we need to workaround ubuntu.
-> =
-
->      =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD -ss
-> =
-
-> References
-> =
-
->    Visible links
->    1. mailto:sergey.senozhatsky(a)gmail.com
-
---===============3060534164881251880==--
+--===============6375606808717152810==--
 
