@@ -1,124 +1,87 @@
-Content-Type: multipart/mixed; boundary="===============3689132663529778258=="
+Content-Type: multipart/mixed; boundary="===============3216367612668195509=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Allow frequency stats when cpuidle is not
- enabled
-Date: Thu, 29 Nov 2012 08:04:20 -0800
-Message-ID: <50B78784.6070808@linux.intel.com>
-In-Reply-To: 20121123153051.GA3236@swordfish.minsk.epam.com
+From: Ivan Shapovalov <intelfx100 at gmail.com>
+Subject: [Powertop] [RFC] [PATCH 08/11] Deduplication: remove
+ nhm_package::calculate_freq() identical to cpu_package::calculate_freq()
+Date: Mon, 05 Nov 2012 15:12:30 +0400
+Message-ID: <1352113953-24687-9-git-send-email-intelfx100@gmail.com>
+In-Reply-To: 1352113953-24687-1-git-send-email-intelfx100@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3689132663529778258==
+--===============3216367612668195509==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 11/23/2012 07:30 AM, Sergey Senozhatsky wrote:
-> On (11/22/12 13:05), Rajagopal Venkat wrote:
->> Powertop fails to display frequency stats when cpuidle subsystem
->> is not enabled. Fix it.
->>
->> Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
->> ---
->>   src/cpu/cpu_linux.cpp | 6 ++++--
->>   1 file changed, 4 insertions(+), 2 deletions(-)
->>
-> thanks for your patch.
->
-> frankly, looking at measurement_start()/measurement_end() I've a feeling =
-that it's
-> better to refactor these functions. both of them are performing different=
- parsings of
-> P/C states, and with your patch we jump over 50% of functionality, which =
-looks to me
-> like a reason to make measurement_start()/measurement_end() smaller by mo=
-ving
-> P/C states parsing to separate functions:
-Sorry for the late response, but I think i agree with Sergey is connect =
+Trivial - remove an identical override wrt. direct base class.
 
-here. Besides I personally am not a huge fan of using "goto" statements =
+Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
+---
+ src/cpu/intel_cpus.cpp | 27 ---------------------------
+ src/cpu/intel_cpus.h   |  3 ---
+ 2 files changed, 30 deletions(-)
 
-unless there really no other alternatives.
->
-> for example (a bit ugly function names)
->
-> measurement_start()
-> {
-> 	parse_idle_on_measure_start();
-> 	parse_stats_on_measure_start();
-> }
->
-> and similar for measurement_end().
-I think this concept may work just fine.
->
->
->
-> what do you, guys, think?
-Can you refactor your change to eliminate the "goto" statements, and =
+diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
+index 688e95b..89eefee 100644
+--- a/src/cpu/intel_cpus.cpp
++++ b/src/cpu/intel_cpus.cpp
+@@ -320,33 +320,6 @@ void nhm_package::measurement_end(void)
+ =
 
-apply something like what Sergey has suggested?
->
-> 	-ss
->
->
->> diff --git a/src/cpu/cpu_linux.cpp b/src/cpu/cpu_linux.cpp
->> index d6caf45..b8dbbc5 100644
->> --- a/src/cpu/cpu_linux.cpp
->> +++ b/src/cpu/cpu_linux.cpp
->> @@ -63,7 +63,7 @@ void cpu_linux::measurement_start(void)
->>   =
+ }
+ =
 
->>   	dir =3D opendir(filename);
->>   	if (!dir)
->> -		return;
->> +		goto cpufreq;
->>   =
+-
+-void nhm_package::calculate_freq(uint64_t time)
+-{
+-	uint64_t freq =3D 0;
+-	bool is_idle =3D true;
+-	unsigned int i;
+-
+-	/* calculate the maximum frequency of all children */
+-	for (i =3D 0; i < children.size(); i++)
+-		if (children[i]) {
+-			uint64_t f =3D 0;
+-			if (!children[i]->idle) {
+-				f =3D children[i]->current_frequency;
+-				is_idle =3D false;
+-			}
+-			if (f > freq)
+-				freq =3D f;
+-		}
+-
+-	current_frequency =3D freq;
+-	idle =3D is_idle;
+-	if (parent)
+-		parent->calculate_freq(time);
+-	change_effective_frequency(time, current_frequency);
+-	old_idle =3D idle;
+-}
+-
+ void nhm_cpu::measurement_start(void)
+ {
+ 	ifstream file;
+diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
+index f41d589..a4c0852 100644
+--- a/src/cpu/intel_cpus.h
++++ b/src/cpu/intel_cpus.h
+@@ -59,9 +59,6 @@ public:
+ 	virtual int     can_collapse(void) { return 0;};
+ =
 
->>   	/* For each C-state, there is a stateX directory which
->>   	 * contains a 'usage' and a 'time' (duration) file */
->> @@ -112,6 +112,7 @@ void cpu_linux::measurement_start(void)
->>   	}
->>   	closedir(dir);
->>   =
+ 	virtual char *  fill_pstate_line(int line_nr, char *buffer);
+-
+-	virtual void    calculate_freq(uint64_t time);
+-
+ };
+ =
 
->> +cpufreq:
->>   	last_stamp =3D 0;
->>   =
+ class nhm_core: public cpu_core
+-- =
 
->>   	for (i =3D 0; i < children.size(); i++)
->> @@ -149,7 +150,7 @@ void cpu_linux::measurement_end(void)
->>   =
-
->>   	dir =3D opendir(filename);
->>   	if (!dir)
->> -		return;
->> +		goto cpufreq;
->>   =
-
->>   	/* For each C-state, there is a stateX directory which
->>   	 * contains a 'usage' and a 'time' (duration) file */
->> @@ -188,6 +189,7 @@ void cpu_linux::measurement_end(void)
->>   	}
->>   	closedir(dir);
->>   =
-
->> +cpufreq:
->>   	sprintf(filename, "/sys/devices/system/cpu/cpu%i/cpufreq/stats/time_i=
-n_state", number);
->>   =
-
->>   	file.open(filename, ios::in);
->> -- =
-
->> 1.7.11.3
->>
->> _______________________________________________
->> PowerTop mailing list
->> PowerTop(a)lists.01.org
->> https://lists.01.org/mailman/listinfo/powertop
->>
+1.8.0
 
 
---===============3689132663529778258==--
+--===============3216367612668195509==--
 
