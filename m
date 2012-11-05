@@ -1,80 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============2240647536535792931=="
+Content-Type: multipart/mixed; boundary="===============3732444411310600915=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Strange Behavior - PowerTOP 2.0 Seg Fault
-Date: Tue, 13 Nov 2012 22:28:39 +0300
-Message-ID: <20121113192839.GB3314@swordfish>
-In-Reply-To: 179380942.45470.1352685662441.JavaMail.root@sz0055a.westchester.pa.mail.comcast.net
+Subject: Re: [Powertop] [PATCH] Change library/pkg search condition for
+ libnl2/3
+Date: Mon, 05 Nov 2012 13:24:18 +0300
+Message-ID: <20121105102418.GA3123@swordfish>
+In-Reply-To: CAMFVxVjb4p0u8WxhKS+o-FE_1B21m5O35_ui19PHg1mPhad_WA@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2240647536535792931==
+--===============3732444411310600915==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (11/12/12 02:01), cshanahan(a)comcast.net wrote:
-> > hm, that's something. seems like enumerate_cpus(); failed
-> > because perf_bundle was NULL in cpu by the time of =
+Hello,
+sorry for long reply
 
-> >	perf_events->start();
-> >
-> > call, but it did not crashed on any of enumerate_cpus()
-> >
-> > 332         perf_events =3D new perf_power_bundle();
-> > 333 =
+Can you please help testing this one?
 
-> > 334         if (!perf_events->add_event("power:cpu_idle")){
-> > 335                 perf_events->add_event("power:power_start");
-> > 336                 perf_events->add_event("power:power_end");
-> > 337         }
-> > 338         if (!perf_events->add_event("power:cpu_frequency"))
-> > 339                 perf_events->add_event("power:power_frequency");
-> >
-> >
-> > so it leaves only one suspect: enumerate_cpus()
-> >
-> > 269         file.open("/proc/cpuinfo",  ios::in);
-> > 270 =
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
 
-> > 271         if (!file)
-> > 272                 return;
-> >
-> >
-> > is that happeninig all the time?
-> =
+---
 
-> Yes. Happens all the time.
-> =
+ configure.ac | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
->
-
-hm. this is very-very early stages of calibration process, and it's very
-unlikely that powertop has done something to your system.
+diff --git a/configure.ac b/configure.ac
+index b8c183f..cf01279 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -54,13 +54,11 @@ PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=3D1]=
+,[
+  =
 
  =
 
-> > a *very* stupid question - do you have /proc/cpuinfo file?
-> =
-
-> Yes, I do.
-> =
-
-> Any idea about my problem?
-> =
-
-
-are you talking about WIFI button?
-
-
-may I ask you to do two things
-
-	$ ls  /proc/cpuinfo
-and
-	$ cat /proc/cpuinfo
+ has_libnl_ver=3D0
+-PKG_CHECK_MODULES([LIBNL], [libnl-3.0 libnl-genl-3.0], [
++AC_SEARCH_LIBS([nl_socket_alloc], [nl-3 nl-genl-3], [
+ 	has_libnl_ver=3D3], [
+-	AC_SEARCH_LIBS([nl_socket_alloc], [nl-3 nl-genl-3], [
+-		has_libnl_ver=3D3], [
+-		AC_SEARCH_LIBS([nl_socket_alloc], [nl], [
+-			has_libnl_ver=3D2], [
+-			PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [])])])])
++	AC_SEARCH_LIBS([nl_socket_alloc], [nl], [
++		has_libnl_ver=3D2], [
++		PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [])])])
+ if (test "$has_libnl_ver" -eq 0); then
+ 	AC_MSG_ERROR(libnl is required but not found)
+ fi
 
 
-	-ss
-
---===============2240647536535792931==--
+--===============3732444411310600915==--
 
