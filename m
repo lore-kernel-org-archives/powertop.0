@@ -1,160 +1,217 @@
-Content-Type: multipart/mixed; boundary="===============6775550665323735224=="
+Content-Type: multipart/mixed; boundary="===============3969091754028126711=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [RFC][PATCH 1/2] Adding report generator facility
-Date: Tue, 09 Oct 2012 12:03:26 -0700
-Message-ID: <20121009190326.GB3633@swordfish>
-In-Reply-To: 20121009185555.GA3633@swordfish
+From: Ivan Shapovalov <intelfx100 at gmail.com>
+Subject: [Powertop] [RFC] [PATCH 06/11] Deduplication: merge cpu_{core, linux,
+ package}::change_effective_frequency() into
+ abstract_cpu::change_effective_frequency()
+Date: Mon, 05 Nov 2012 15:12:28 +0400
+Message-ID: <1352113953-24687-7-git-send-email-intelfx100@gmail.com>
+In-Reply-To: 1352113953-24687-1-git-send-email-intelfx100@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6775550665323735224==
+--===============3969091754028126711==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/09/12 11:55), Sergey Senozhatsky wrote:
-> =
+The mentioned overrides differ only in assigning 0 to effective_frequency
+prior to calling abstract_cpu::change_effective_frequency(), which reassign=
+s real frequency
+to the same field.
+Moreover, the field value is never used between assignments.
 
-> so we still can call formatter =3D new report_formatter() and use it as w=
-e did before.
-> the obvious problem is that we waste memory and CPU cycles on add* calls =
-for basic
-> class. in other words, if we take a look on the problem from a different =
-angle,
-> among all functions we have 3 types of functions (counting from 1):
-> #1 those that must be NULL in base class - derived class implementation s=
-pecific
-> #2 those that must be same for all derived classes, but NULL in base class
-> #3 those that must be derived with basic implementation
-> =
+So it shall be safe to merge these overrides into the base definition as sh=
+own:
+* immediately assign real frequency to field effective_frequency;
+* remove post-assignment to the same field.
 
-> =
+Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
+---
+ src/cpu/abstract_cpu.cpp | 17 +++++++++++++++--
+ src/cpu/cpu.h            |  4 ----
+ src/cpu/cpu_core.cpp     | 23 -----------------------
+ src/cpu/cpu_linux.cpp    | 19 -------------------
+ src/cpu/cpu_package.cpp  | 20 --------------------
+ 5 files changed, 15 insertions(+), 68 deletions(-)
 
-> =
-
-> that leads to a quick solution (meaning that it may not be perfect nor be=
-autiful). we define and
-> implement base class with all function being both virtual and empty, let'=
-s call it base (report_formatter).
-> then we define base_impl class, and implement only type #1 functions, for=
- example, in our case a family of
-> add*() functions plus get/clear result() and so on.
-> =
-
-> then we define and implement formatter clases, that should inherit from b=
-ase_impl, and override
-> class #2 functions (for example, escaping).
->
-
-Oh, I messed up there. should be "and implement only type #2 functions" and=
- "override class #1 functions".
-
-	=
-
-	-ss
+diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
+index 894a7b8..083a1e0 100644
+--- a/src/cpu/abstract_cpu.cpp
++++ b/src/cpu/abstract_cpu.cpp
+@@ -393,14 +393,27 @@ void abstract_cpu::calculate_freq(uint64_t time)
+ void abstract_cpu::change_effective_frequency(uint64_t time, uint64_t freq=
+uency)
+ {
+ 	unsigned int i;
++	uint64_t time_delta, fr;
++
++	if (last_stamp)
++		time_delta =3D time - last_stamp;
++	else
++		time_delta =3D 1;
++
++	fr =3D effective_frequency;
++	if (old_idle)
++		fr =3D 0;
++
++	account_freq(fr, time_delta);
++
++	effective_frequency =3D frequency;
++	last_stamp =3D time;
  =
 
-> =
+ 	/* propagate to all children */
+ 	for (i =3D 0; i < children.size(); i++)
+ 		if (children[i]) {
+ 			children[i]->change_effective_frequency(time, frequency);
+ 		}
+-
+-	effective_frequency =3D frequency;
+ }
+ =
 
-> from the top of my head, schematically is something like this:
-> =
+ =
 
-> class base {
->         public:
->                 base() {}
->                 virtual ~base() {}
->                 virtual void foo(const char *p)
->                 {
->                         printf("base foo call\n");
->                 }
->                 virtual void bar()
->                 {
->                         printf("base bar call\n");
->                 }
->                 virtual void xyz()
->                 {
->                         printf("base xyz call\n");
->                 }
->                 virtual void begin_table()
->                 {
->                         printf("base begin table call\n");
->                 }
-> };
-> =
+diff --git a/src/cpu/cpu.h b/src/cpu/cpu.h
+index 8b9c9f9..c99d4ea 100644
+--- a/src/cpu/cpu.h
++++ b/src/cpu/cpu.h
+@@ -173,7 +173,6 @@ public:
+ 	virtual char *  fill_pstate_name(int line_nr, char *buffer);
+ =
 
-> class base_impl : public base {
->         public:
->                 std::string data;
->                 virtual void foo(const char *p)
->                 {
->                         printf("impl foo call\n");
->                         data.append(p);
->                 }
-> =
+ 	virtual void    change_freq(uint64_t time, int freq);
+-	virtual void	change_effective_frequency(uint64_t time, uint64_t freq);
+ 	virtual void    go_idle(uint64_t time);
+ 	virtual void    go_unidle(uint64_t time);
+ =
 
->                 virtual void bar()
->                 {
->                         printf("impl bar call: %s\n", data.c_str());
->                 }
-> };
-> =
+@@ -190,7 +189,6 @@ public:
+ =
 
-> class derived : public base_impl {
->         public:
->                 virtual void begin_table()
->                 {
->                         printf("derived begin table call\n");
->                 }
-> };
-> =
+ 	virtual int     can_collapse(void) { return childcount =3D=3D 1;};
+ 	virtual void    calculate_freq(uint64_t time);
+-	virtual void	change_effective_frequency(uint64_t time, uint64_t freq);
+ };
+ =
 
-> =
+ class cpu_package: public abstract_cpu
+@@ -204,8 +202,6 @@ public:
+ 	virtual int     can_collapse(void) { return childcount =3D=3D 1;};
+ =
 
-> int main()
-> {
->         class derived *d =3D new derived();
->         d->foo("test");
->         d->bar();
->         d->xyz();
->         d->begin_table();
-> =
+ 	virtual void    calculate_freq(uint64_t time);
+-	virtual void	change_effective_frequency(uint64_t time, uint64_t freq);
+-
+ };
+ =
 
->         class base *b =3D new base();
->         b->foo("test");
->         b->bar();
->         b->xyz();
->         b->begin_table();
-> =
+ extern void enumerate_cpus(void);
+diff --git a/src/cpu/cpu_core.cpp b/src/cpu/cpu_core.cpp
+index 93740b7..b19ca2c 100644
+--- a/src/cpu/cpu_core.cpp
++++ b/src/cpu/cpu_core.cpp
+@@ -98,29 +98,6 @@ void cpu_core::calculate_freq(uint64_t time)
+ 	old_idle =3D idle;
+ }
+ =
 
->         delete d;
->         delete b;
->         return 0;
-> }
-> =
+-void cpu_core::change_effective_frequency(uint64_t time, uint64_t frequenc=
+y)
+-{
+-	uint64_t freq =3D 0;
+-	uint64_t time_delta, fr;
+-
+-
+-	if (last_stamp)
+-		time_delta =3D time - last_stamp;
+-	else
+-		time_delta =3D 1;
+-
+-	fr =3D effective_frequency;
+-
+-	if (old_idle)
+-		fr =3D 0;
+-
+-	account_freq(fr, time_delta);
+-
+-	effective_frequency =3D freq;
+-	last_stamp =3D time;
+-	abstract_cpu::change_effective_frequency(time, frequency);
+-}
+-
+ char * cpu_core::fill_pstate_line(int line_nr, char *buffer)
+ {
+ 	buffer[0] =3D 0;
+diff --git a/src/cpu/cpu_linux.cpp b/src/cpu/cpu_linux.cpp
+index c820238..24fbcb3 100644
+--- a/src/cpu/cpu_linux.cpp
++++ b/src/cpu/cpu_linux.cpp
+@@ -331,25 +331,6 @@ void cpu_linux::change_freq(uint64_t time, int frequen=
+cy)
+ 	old_idle =3D idle;
+ }
+ =
 
-> $g++ -O2 test.cpp -o a.out
-> =
+-void cpu_linux::change_effective_frequency(uint64_t time, uint64_t frequen=
+cy)
+-{
+-	uint64_t time_delta, fr;
+-
+-	if (last_stamp)
+-		time_delta =3D time - last_stamp;
+-	else
+-		time_delta =3D 1;
+-
+-	fr =3D effective_frequency;
+-	if (old_idle)
+-		fr =3D 0;
+-
+-	account_freq(fr, time_delta);
+-
+-	effective_frequency =3D frequency;
+-	last_stamp =3D time;
+-}
+-
+ void cpu_linux::go_idle(uint64_t time)
+ {
+ =
 
-> $./a.out =
+diff --git a/src/cpu/cpu_package.cpp b/src/cpu/cpu_package.cpp
+index d154b90..0ad5bdd 100644
+--- a/src/cpu/cpu_package.cpp
++++ b/src/cpu/cpu_package.cpp
+@@ -117,23 +117,3 @@ void cpu_package::calculate_freq(uint64_t time)
+ 	old_idle =3D idle;
+ }
+ =
 
-> impl foo call
-> impl bar call: test
-> base xyz call
-> derived begin table call
-> =
+-void cpu_package::change_effective_frequency(uint64_t time, uint64_t frequ=
+ency)
+-{
+-	uint64_t time_delta, fr;
+-
+-	if (last_stamp)
+-		time_delta =3D time - last_stamp;
+-	else
+-		time_delta =3D 1;
+-
+-	fr =3D effective_frequency;
+-	if (old_idle)
+-		fr =3D 0;
+-
+-	account_freq(fr, time_delta);
+-
+-	effective_frequency =3D frequency;
+-	last_stamp =3D time;
+-
+-	abstract_cpu::change_effective_frequency(time, frequency);
+-}
+-- =
 
-> base foo call
-> base bar call
-> base xyz call
-> base begin table call
-> =
+1.8.0
 
-> =
 
-> =
-
-> 	-ss
-
---===============6775550665323735224==--
+--===============3969091754028126711==--
 
