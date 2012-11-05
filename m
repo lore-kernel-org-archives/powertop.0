@@ -1,76 +1,106 @@
-Content-Type: multipart/mixed; boundary="===============0471486546060584058=="
+Content-Type: multipart/mixed; boundary="===============9009971685809316634=="
 MIME-Version: 1.0
-From: Namhyung Kim <namhyung at gmail.com>
-Subject: [Powertop] [PATCH 1/3] Suppress compiler warnings on write()
-Date: Tue, 04 Dec 2012 00:13:18 +0900
-Message-ID: <1354547600-1743-1-git-send-email-namhyung@gmail.com>
+From: Ivan Shapovalov <intelfx100 at gmail.com>
+Subject: [Powertop] [RFC] [PATCH 01/11] Fix includes: do not include
+ intel_cpus.h inside cpu.h
+Date: Mon, 05 Nov 2012 15:12:23 +0400
+Message-ID: <1352113953-24687-2-git-send-email-intelfx100@gmail.com>
+In-Reply-To: 1352113953-24687-1-git-send-email-intelfx100@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0471486546060584058==
+--===============9009971685809316634==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Modern linux distribution forces to check result of write() call.
-It emits following warnings:
+The file "cpu.h" is generic (unlike "intel_cpus.h"), so the existing order =
+seems
+illogical. Also it broke KDevelop's code completion.
 
-  CXX    calibrate/powertop-calibrate.o
-calibrate/calibrate.cpp: In function =E2=80=98void* burn_disk(void*)=E2=80=
-=99:
-calibrate/calibrate.cpp:297: warning: ignoring return value of =E2=80=98ssi=
-ze_t write(int, const void*, size_t)=E2=80=99, declared with attribute warn=
-_unused_result
-...
-  CXX    measurement/powertop-extech.o
-measurement/extech.cpp: In member function =E2=80=98void extech_power_meter=
-::measure()=E2=80=99:
-measurement/extech.cpp:290: warning: ignoring return value of =E2=80=98ssiz=
-e_t write(int, const void*, size_t)=E2=80=99, declared with attribute warn_=
-unused_result
-
-Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
 ---
- src/calibrate/calibrate.cpp |    3 ++-
- src/measurement/extech.cpp  |    3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ src/cpu/cpu.cpp        | 1 +
+ src/cpu/cpu.h          | 2 --
+ src/cpu/intel_cpus.cpp | 2 +-
+ src/cpu/intel_cpus.h   | 2 ++
+ src/cpu/intel_gpu.cpp  | 2 +-
+ 5 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/src/calibrate/calibrate.cpp b/src/calibrate/calibrate.cpp
-index 5457cf8..2d4c1af 100644
---- a/src/calibrate/calibrate.cpp
-+++ b/src/calibrate/calibrate.cpp
-@@ -294,7 +294,8 @@ static void *burn_disk(void *dummy)
+diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+index 7f3af69..3314e82 100644
+--- a/src/cpu/cpu.cpp
++++ b/src/cpu/cpu.cpp
+@@ -31,6 +31,7 @@
+ #include <unistd.h>
+ #include "cpu.h"
+ #include "cpudevice.h"
++#include "intel_cpus.h"
+ #include "../parameters/parameters.h"
  =
 
- 	while (!stop_measurement) {
- 		lseek(fd, 0, SEEK_SET);
--		write(fd, buffer, 64*1024);
-+		if (write(fd, buffer, 64*1024))
-+			/* make gcc silent */;
- 		fdatasync(fd);
- 	}
- 	close(fd);
-diff --git a/src/measurement/extech.cpp b/src/measurement/extech.cpp
-index 4e8bf8a..b9e95ca 100644
---- a/src/measurement/extech.cpp
-+++ b/src/measurement/extech.cpp
-@@ -287,7 +287,8 @@ extech_power_meter::extech_power_meter(const char *exte=
-ch_name)
- void extech_power_meter::measure(void)
- {
- 	/* trigger the extech to send data */
--	write(fd, " ", 1);
-+	if (write(fd, " ", 1) < 0)
-+		return;
+ #include "../perf/perf_bundle.h"
+diff --git a/src/cpu/cpu.h b/src/cpu/cpu.h
+index 4480b11..a9f258a 100644
+--- a/src/cpu/cpu.h
++++ b/src/cpu/cpu.h
+@@ -210,8 +210,6 @@ public:
  =
 
- 	rate =3D extech_read(fd);
+ };
  =
 
+-#include "intel_cpus.h"
+-
+ extern void enumerate_cpus(void);
+ =
+
+ extern void report_display_cpu_pstates(void);
+diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
+index 24465a0..a5684aa 100644
+--- a/src/cpu/intel_cpus.cpp
++++ b/src/cpu/intel_cpus.cpp
+@@ -22,7 +22,7 @@
+  * Authors:
+  *	Arjan van de Ven <arjan(a)linux.intel.com>
+  */
+-#include "cpu.h"
++#include "intel_cpus.h"
+ #include <iostream>
+ #include <fstream>
+ #include <stdlib.h>
+diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
+index 1949af1..a8bb892 100644
+--- a/src/cpu/intel_cpus.h
++++ b/src/cpu/intel_cpus.h
+@@ -25,6 +25,8 @@
+ #include <stdint.h>
+ #include <sys/time.h>
+ =
+
++#include "cpu.h"
++
+ =
+
+ #define MSR_TSC				0x10
+ #define MSR_NEHALEM_PLATFORM_INFO	0xCE
+diff --git a/src/cpu/intel_gpu.cpp b/src/cpu/intel_gpu.cpp
+index 57474f1..e0f4ac2 100644
+--- a/src/cpu/intel_gpu.cpp
++++ b/src/cpu/intel_gpu.cpp
+@@ -22,7 +22,7 @@
+  * Authors:
+  *	Arjan van de Ven <arjan(a)linux.intel.com>
+  */
+-#include "cpu.h"
++#include "intel_cpus.h"
+ #include <iostream>
+ #include <fstream>
+ #include <stdlib.h>
 -- =
 
-1.7.9.2
+1.8.0
 
 
---===============0471486546060584058==--
+--===============9009971685809316634==--
 
