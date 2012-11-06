@@ -1,141 +1,186 @@
-Content-Type: multipart/mixed; boundary="===============3715907034994582223=="
+Content-Type: multipart/mixed; boundary="===============5098826204616346475=="
 MIME-Version: 1.0
-From: Ferron, Chris E <chris.e.ferron at intel.com>
-Subject: Re: [Powertop] [RFC][PATCH 2/2] Convert powertop to use new report
- generator facility
-Date: Tue, 09 Oct 2012 13:25:30 -0700
-Message-ID: <CAMFVxVhepL+G4mYjjAiuRwKg0c5SE9gwEbUJES=e-EUQm_uRpQ@mail.gmail.com>
-In-Reply-To: 50745C1E.6060503@samsung.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [RFC] [PATCH 09/11] Deduplication: properly merge
+ cpu_package::calculate_freq() into abstract_cpu::calculate_freq()
+Date: Tue, 06 Nov 2012 23:30:19 +0300
+Message-ID: <20121106203018.GA3326@swordfish>
+In-Reply-To: 1352113953-24687-10-git-send-email-intelfx100@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3715907034994582223==
+--===============5098826204616346475==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 9, 2012 at 10:17 AM, Igor Zhbanov <i.zhbanov(a)samsung.com> wro=
-te:
-> Hi Chris,
->
-> Please check the new version of the patch set (when it will be approved
-> by mailing list moderator because of its size).
-Sorry about that, I have approved.
->
->
-> Chris Ferron wrote:
->>
->> Couple of things,
->>
->> #1 I noticed that the scripts section of Software Settings in need of
->> Tuning is missing. I see the nice header, but not data.
->
-> Done.
->
->> #2 C0 active table cells are not aligned , and the CPU's are also not
->> aligned correctly in the Processor Idle state report section.
->
-> Done. I hope. :-) I have aligned table headers as in original Powertop
-> If you mean something else please tell.
->
->> #3 I get some warning compiling, I know PowerTOP is not warning less, but
->> would like to attempt to prevent adding more. (and fixing exiting ones of
->> course)
->> report/report-maker.cpp: In destructor =E2=80=98report_maker::~report_ma=
-ker()=E2=80=99:
->> report/report-maker.cpp:51:10: warning: deleting object of abstract class
->> type =E2=80=98report_formatter=E2=80=99 which has non-virtual destructor=
- will cause
->> undefined behaviour [-Wdelete-non-virtual-dtor]
->> report/report-maker.cpp: In member function =E2=80=98void
->> report_maker::setup_report_formatter()=E2=80=99:
->> report/report-maker.cpp:110:10: warning: deleting object of abstract cla=
-ss
->> type =E2=80=98report_formatter=E2=80=99 which has non-virtual destructor=
- will cause
->> undefined behaviour [-Wdelete-non-virtual-dtor]
->
-> Done.
->
->> #4 report[c,h] should probable just go in your new sub/dir (report).
->
-> I will send this patch later because it will make my patch bigger and that
-> could
-> make the understanding more difficult. It could be a separated patch to
-> easily
-> see changes.
->
->> #5 csv report has alignment issues for both the cpu Idle and Freq. Even =
-if
->> they are machine readable, they need to be easily parsed using open offi=
-ce
->> or MS excel and look aligned with the http report.
->
-> CSV has a lots of questions. First of all, what CSV standard to follow?
-> Should it be readable by parsers or by Offices?
->
-> I have tried to make report maker to be CSV RFC compliant, but as I see
-> Offices doesn't like that CSV. They both prefer to use semicolon as
-> separator,
-> and not to quote strings because of spaces inside of them, and not to quo=
-te
-> empty strings. The only reason to quote is when the string contains
-> semicolon
-> inside of it.
->
-> So I have tuned CSV report maker to produce CSVs to be read by Offices.
-> Both (MS and Open) can read it with default settings.
->
-> The other question is formatting inside the CSV. In my opinion there shou=
-ld
-> not
-> be any space padding for values inside the CSV. First of all, is is a
-> machine-readable
-> format. Second, MS Office ignores it totally.
->
-> By the way, as I see, both offices uses following text alignment rules: if
-> the cell
-> consists of text (letters) then it will be shown aligned to the left, and=
- if
-> the cell
-> is a number, then it will be shown aligned to the right. This formatting
-> rules
-> are reasonable, so we could totally remove any padding by space in CSV (a=
-nd
-> still
-> have pretty table in Offices).
->
-> What you think?
-Sounds reasonable to me.
->
-> And if we need report in human readable text format, we could create TXT
-> report
-> formatter.
-As long as CSV can be parsed nicely (FOR THE MOST PART) in (MS/Open
-office) that will be fine.
+On (11/05/12 15:12), Ivan Shapovalov wrote:
+> =
 
-I will test your latest patches and if Sergey also satisfied I will
-start to merge.
--C
-THANKS AGAIN, this is looking great.
+> The overridden method "cpu_package::calculate_freq()" differs from a gene=
+ric implementation in
+> that it propagates the package's frequency to all in-package cores by
+> calling change_effective_frequency().
+> =
 
->
-> --
-> Best regards,
-> Igor Zhbanov,
-> Expert Software Engineer,
-> phone: +7 (495) 797 25 00 ext 3806
-> e-mail: i.zhbanov(a)samsung.com
->
-> ASWG, Moscow R&D center, Samsung Electronics
-> 12 Dvintsev street, building 1
-> 127018, Moscow, Russian Federation
->
->
+> Instead of duplicating the code, introduce a small virtual function
+> freq_updated() which normally propagates frequency changes upwards and
+> override it for cpu_package, retaining the correct behavior. Then remove =
+the override of
+> calculate_freq().
+> =
+
+> Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
+> ---
+>  src/cpu/abstract_cpu.cpp | 11 ++++++++---
+>  src/cpu/cpu.h            |  5 +++--
+>  src/cpu/cpu_package.cpp  | 38 +++++++++++---------------------------
+>  3 files changed, 22 insertions(+), 32 deletions(-)
+> =
+
+> diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
+> index 083a1e0..d64cb24 100644
+> --- a/src/cpu/abstract_cpu.cpp
+> +++ b/src/cpu/abstract_cpu.cpp
+> @@ -69,6 +69,13 @@ void abstract_cpu::account_freq(uint64_t freq, uint64_=
+t duration)
+>  =
+
+>  }
+>  =
+
+> +void abstract_cpu::freq_updated(uint64_t time)
+> +{
+> +	if(parent)
+> +		parent->calculate_freq(time);
+> +	old_idle =3D idle;
+> +}
+> +
+
+why is this function called something_updatED?
+
+	=
+
+	-ss
+
+>  void abstract_cpu::measurement_start(void)
+>  {
+>  	unsigned int i;
+> @@ -385,9 +392,7 @@ void abstract_cpu::calculate_freq(uint64_t time)
+>  =
+
+>  	current_frequency =3D freq;
+>  	idle =3D is_idle;
+> -	if (parent)
+> -		parent->calculate_freq(time);
+> -	old_idle =3D idle;
+> +	freq_updated(time);
+>  }
+>  =
+
+>  void abstract_cpu::change_effective_frequency(uint64_t time, uint64_t fr=
+equency)
+> diff --git a/src/cpu/cpu.h b/src/cpu/cpu.h
+> index 1e9d771..498447b 100644
+> --- a/src/cpu/cpu.h
+> +++ b/src/cpu/cpu.h
+> @@ -85,6 +85,7 @@ protected:
+>  	uint64_t max_minus_one_frequency;
+>  =
+
+>  	virtual void	account_freq(uint64_t frequency, uint64_t duration);
+> +	virtual void	freq_updated(uint64_t time);
+>  public:
+>  	uint64_t	last_stamp;
+>  	uint64_t	total_stamp;
+> @@ -192,6 +193,8 @@ public:
+>  =
+
+>  class cpu_package: public abstract_cpu
+>  {
+> +protected:
+> +	virtual void	freq_updated(uint64_t time);
+>  public:
+>  	virtual char *  fill_cstate_line(int line_nr, char *buffer, const char =
+*separator=3D"");
+>  	virtual char *  fill_cstate_name(int line_nr, char *buffer);
+> @@ -199,8 +202,6 @@ public:
+>  	virtual char *  fill_pstate_line(int line_nr, char *buffer);
+>  	virtual char *  fill_pstate_name(int line_nr, char *buffer);
+>  	virtual int     can_collapse(void) { return childcount =3D=3D 1;};
+> -
+> -	virtual void    calculate_freq(uint64_t time);
+>  };
+>  =
+
+>  extern void enumerate_cpus(void);
+> diff --git a/src/cpu/cpu_package.cpp b/src/cpu/cpu_package.cpp
+> index 0ad5bdd..277b55f 100644
+> --- a/src/cpu/cpu_package.cpp
+> +++ b/src/cpu/cpu_package.cpp
+> @@ -27,6 +27,17 @@
+>  #include "../lib.h"
+>  #include "../parameters/parameters.h"
+>  =
+
+> +void cpu_package::freq_updated(uint64_t time)
+> +{
+> +	if (parent)
+> +		parent->calculate_freq(time);
+> +	/*
+> +	 * Make the frequency changes to propagate to all cores in a package.
+> +	 */
+> +	change_effective_frequency(time, current_frequency);
+> +	old_idle =3D idle;
+> +}
+> +
+>  char * cpu_package::fill_cstate_line(int line_nr, char *buffer, const ch=
+ar *separator)
+>  {
+>  	unsigned int i;
+> @@ -90,30 +101,3 @@ char * cpu_package::fill_pstate_line(int line_nr, cha=
+r *buffer)
+>  	sprintf(buffer," %5.1f%% ", percentage(1.0* (pstates[line_nr]->time_aft=
+er) / total_stamp));
+>  	return buffer;
+>  }
+> -
+> -void cpu_package::calculate_freq(uint64_t time)
+> -{
+> -	uint64_t freq =3D 0;
+> -	bool is_idle =3D true;
+> -	unsigned int i;
+> -
+> -	/* calculate the maximum frequency of all children */
+> -	for (i =3D 0; i < children.size(); i++)
+> -		if (children[i]) {
+> -			uint64_t f =3D 0;
+> -			if (!children[i]->idle) {
+> -				f =3D children[i]->current_frequency;
+> -				is_idle =3D false;
+> -			}
+> -			if (f > freq)
+> -				freq =3D f;
+> -		}
+> -
+> -	current_frequency =3D freq;
+> -	idle =3D is_idle;
+> -	if (parent)
+> -		parent->calculate_freq(time);
+> -	change_effective_frequency(time, current_frequency);
+> -	old_idle =3D idle;
+> -}
+> -
+> -- =
+
+> 1.8.0
+> =
+
 > _______________________________________________
 > PowerTop mailing list
 > PowerTop(a)lists.01.org
 > https://lists.01.org/mailman/listinfo/powertop
+>=20
 
---===============3715907034994582223==--
+--===============5098826204616346475==--
 
