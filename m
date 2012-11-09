@@ -1,149 +1,101 @@
-Content-Type: multipart/mixed; boundary="===============2778512398725706117=="
+Content-Type: multipart/mixed; boundary="===============3060534164881251880=="
 MIME-Version: 1.0
-From: Namhyung Kim <namhyung at gmail.com>
-Subject: [Powertop] [PATCH 2/3] Suppress compiler warnings on system()
-Date: Tue, 04 Dec 2012 00:13:19 +0900
-Message-ID: <1354547600-1743-2-git-send-email-namhyung@gmail.com>
-In-Reply-To: 1354547600-1743-1-git-send-email-namhyung@gmail.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH] Change library/pkg search condition for
+ libnl2/3
+Date: Fri, 09 Nov 2012 14:47:44 +0300
+Message-ID: <20121109114744.GC3239@swordfish.minsk.epam.com>
+In-Reply-To: CAGLu0vNzi+Gbum7R+MWZvmXVFd3Pu8tN5Vr33U8WGYKiTBTDZg@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2778512398725706117==
+--===============3060534164881251880==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-As system(3) requires to check its return value, make a wrapper
-do_system() to suppress following warnings:
+On (11/09/12 19:43), Austin Zhang wrote:
+>    >=EF=BF=BDbut there are no evidence of,
+>    nl-gen will only impact compile rather than configure, right?
+>    Those above build time error will happen in upstream version if you on=
+ly
+>    install libnl3 but libnl-genl-3 for libnl3 case.
+>    But anyway, it shouldn't impact 'configure' action.=EF=BF=BD
+>
 
-  CXX    tuning/powertop-bluetooth.o
-tuning/bluetooth.cpp: In member function =E2=80=98virtual void bt_tunable::=
-toggle()=E2=80=99:
-tuning/bluetooth.cpp:179: warning: ignoring return value of =E2=80=98int sy=
-stem(const char*)=E2=80=99, declared with attribute warn_unused_result
-tuning/bluetooth.cpp:182: warning: ignoring return value of =E2=80=98int sy=
-stem(const char*)=E2=80=99, declared with attribute warn_unused_result
-  CXX    tuning/powertop-cpufreq.o
-tuning/cpufreq.cpp: In member function =E2=80=98virtual void cpufreq_tunabl=
-e::toggle()=E2=80=99:
-tuning/cpufreq.cpp:118: warning: ignoring return value of =E2=80=98int syst=
-em(const char*)=E2=80=99, declared with attribute warn_unused_result
-...
-  CXX    calibrate/powertop-calibrate.o
-calibrate/calibrate.cpp: In function =E2=80=98void backlight_calibration()=
-=E2=80=99:
-calibrate/calibrate.cpp:408: warning: ignoring return value of =E2=80=98int=
- system(const char*)=E2=80=99, declared with attribute warn_unused_result
-calibrate/calibrate.cpp:410: warning: ignoring return value of =E2=80=98int=
- system(const char*)=E2=80=99, declared with attribute warn_unused_result
-calibrate/calibrate.cpp: In function =E2=80=98void idle_calibration()=E2=80=
-=99:
-calibrate/calibrate.cpp:416: warning: ignoring return value of =E2=80=98int=
- system(const char*)=E2=80=99, declared with attribute warn_unused_result
-calibrate/calibrate.cpp:418: warning: ignoring return value of =E2=80=98int=
- system(const char*)=E2=80=99, declared with attribute warn_unused_result
+disagree, successful configure itself is useless, build is the one that mat=
+ters.
+if one does not have all requirements for build, failed configure is ok.
 
-Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
----
- src/calibrate/calibrate.cpp |    8 ++++----
- src/lib.cpp                 |    5 +++++
- src/lib.h                   |    1 +
- src/tuning/bluetooth.cpp    |    4 ++--
- src/tuning/cpufreq.cpp      |    2 +-
- 5 files changed, 13 insertions(+), 7 deletions(-)
-
-diff --git a/src/calibrate/calibrate.cpp b/src/calibrate/calibrate.cpp
-index 2d4c1af..c886b73 100644
---- a/src/calibrate/calibrate.cpp
-+++ b/src/calibrate/calibrate.cpp
-@@ -406,17 +406,17 @@ static void backlight_calibration(void)
- 		sleep(1);
- 	}
- 	printf(_("Calibrating idle\n"));
--	system("DISPLAY=3D:0 /usr/bin/xset dpms force off");
-+	do_system("DISPLAY=3D:0 /usr/bin/xset dpms force off");
- 	one_measurement(15, NULL);
--	system("DISPLAY=3D:0 /usr/bin/xset dpms force on");
-+	do_system("DISPLAY=3D:0 /usr/bin/xset dpms force on");
- }
- =
-
- static void idle_calibration(void)
- {
- 	printf(_("Calibrating idle\n"));
--	system("DISPLAY=3D:0 /usr/bin/xset dpms force off");
-+	do_system("DISPLAY=3D:0 /usr/bin/xset dpms force off");
- 	one_measurement(15, NULL);
--	system("DISPLAY=3D:0 /usr/bin/xset dpms force on");
-+	do_system("DISPLAY=3D:0 /usr/bin/xset dpms force on");
- }
- =
+	-ss
 
  =
 
-diff --git a/src/lib.cpp b/src/lib.cpp
-index 9838c0b..ccba414 100644
---- a/src/lib.cpp
-+++ b/src/lib.cpp
-@@ -441,3 +441,8 @@ int get_user_input(char *buf, unsigned sz)
- 	/* to distinguish between getnstr error and empty line */
- 	return ret || strlen(buf);
- }
-+
-+int do_system(const char *command)
-+{
-+	return system(command); /* make gcc slient */
-+}
-diff --git a/src/lib.h b/src/lib.h
-index 209421a..7002f14 100644
---- a/src/lib.h
-+++ b/src/lib.h
-@@ -73,5 +73,6 @@ typedef void (*callback)(const char*);
- extern void process_directory(const char *d_name, callback fn);
- extern int utf_ok;
- extern int get_user_input(char *buf, unsigned sz);
-+extern int do_system(const char *cmd);
- =
+>    2012/11/9 Sergey Senozhatsky <[1]sergey.senozhatsky(a)gmail.com>
+> =
 
- #endif
-diff --git a/src/tuning/bluetooth.cpp b/src/tuning/bluetooth.cpp
-index e0bdf12..b717610 100644
---- a/src/tuning/bluetooth.cpp
-+++ b/src/tuning/bluetooth.cpp
-@@ -176,10 +176,10 @@ void bt_tunable::toggle(void)
- 	good =3D good_bad();
- =
+>      On (11/09/12 19:17), Austin Zhang wrote:
+>      > =EF=BF=BD =EF=BF=BDlibnl3:
+>      > =EF=BF=BD =EF=BF=BDlibnl-3.0 =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
+=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BDli=
+bnl - Convenience library for
+>      netlink
+>      > =EF=BF=BD =EF=BF=BDsockets
+>      > =EF=BF=BD =EF=BF=BDlibnl2:
+>      > =EF=BF=BD =EF=BF=BDlibnl-2.0 =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
+=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BDli=
+bnl - Convenience library for
+>      netlink
+>      > =EF=BF=BD =EF=BF=BDsockets
+>      >
+> =
 
- 	if (good =3D=3D TUNE_GOOD) {
--		system("/usr/sbin/hciconfig hci0 up &> /dev/null &");
-+		do_system("/usr/sbin/hciconfig hci0 up &> /dev/null &");
- 		return;
- 	}
--	system("/usr/sbin/hciconfig hci0 down &> /dev/null");
-+	do_system("/usr/sbin/hciconfig hci0 down &> /dev/null");
- }
- =
+>      so, libnl-3.0.pc and libnl-2.0.pc are there, but there are no eviden=
+ce
+>      of, for example,
+>      libnl-genl
+> =
 
- const char *bt_tunable::toggle_script(void)
-diff --git a/src/tuning/cpufreq.cpp b/src/tuning/cpufreq.cpp
-index df245ad..8a8d1c5 100644
---- a/src/tuning/cpufreq.cpp
-+++ b/src/tuning/cpufreq.cpp
-@@ -115,7 +115,7 @@ void cpufreq_tunable::toggle(void)
- 	int good;
- 	good =3D good_bad();
- =
+>      pkg-config output on Arch
+>      libnl-3.0 =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
+=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD libnl - Convenience library for netlink
+>      sockets
+>      libnl-cli-3.0 =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
+=BF=BD =EF=BF=BD libnl-cli - Command Line Interface library
+>      for netlink sockets
+>      libnl-nf-3.0 =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
+=BF=BD =EF=BF=BD =EF=BF=BDlibnl-nf - Netfilter Netlink Library
+>      libnl-route-3.0 =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =
+=EF=BF=BD libnl-route - Netlink Routing Family Library
+>      libnl-genl-3.0 =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
+=BF=BD =EF=BF=BDlibnl-genl - Generic Netlink Library
+> =
 
--	system("/sbin/modprobe cpufreq_ondemand > /dev/null 2>&1");
-+	do_system("/sbin/modprobe cpufreq_ondemand > /dev/null 2>&1");
- =
+>      in case if we remove libnl-genl from PKG_CHECK_MODULES, we'll break =
+the
+>      build, because LIBNL_LIBS
+>      should be '-lnl-genl-3 -lnl-3', not just '-lnl-3'.
+> =
 
- 	if (good =3D=3D TUNE_GOOD) {
- 		dir =3D opendir("/sys/devices/system/cpu");
--- =
+>      [..]
+>      src/tuning/iw.c:89: undefined reference to `genl_connect'
+>      src/tuning/iw.c:95: undefined reference to `genl_ctrl_alloc_cache'
+>      src/tuning/iw.c:101: undefined reference to `genl_ctrl_search_by_nam=
+e'
+>      and so on...
+> =
 
-1.7.9.2
+>      looks like we need to workaround ubuntu.
+> =
 
+>      =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD -ss
+> =
 
---===============2778512398725706117==--
+> References
+> =
+
+>    Visible links
+>    1. mailto:sergey.senozhatsky(a)gmail.com
+
+--===============3060534164881251880==--
 
