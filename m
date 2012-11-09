@@ -1,79 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============3564235712058011910=="
+Content-Type: multipart/mixed; boundary="===============7150979224941919183=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [FYI][RFC][PATCH 0/2] MALI GPU profiling support
-Date: Fri, 21 Dec 2012 12:58:06 +0300
-Message-ID: <20121221095806.GA2914@swordfish.minsk.epam.com>
-In-Reply-To: 50D4269D.7020500@samsung.com
+Subject: Re: [Powertop] [PATCH] Change library/pkg search condition for
+ libnl2/3
+Date: Fri, 09 Nov 2012 14:01:29 +0300
+Message-ID: <20121109110129.GA3239@swordfish.minsk.epam.com>
+In-Reply-To: CAGLu0vOxoPD_1vXqbyh_CtbQTxyXi2uRTusASzBDAe=t9x=KAQ@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3564235712058011910==
+--===============7150979224941919183==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (12/21/12 13:06), Igor Zhbanov wrote:
-> Hi all,
+On (11/09/12 18:56), Austin Zhang wrote:
+>    Hi, Sergey,
+>    Sorry for late reply.
+>    I just tried it in my ubuntu11.04 x86-64 box, but it doesn't work.
+>    for libnl2 and libnl3 cases, both failed in configure and with the same
+>    error like : No Package 'libnl-1' found.
+>    So I didn't try it in other box anymore.=EF=BF=BD
 > =
 
-> It is just a ping. :-)
-> The list is quiet about these patches. Will you integrate it or not?
-> What should be changed before it?
->
 
-Hello, Igor
-sorry, didn't have much free time.
-are there any updates scheduled?
+Hello,
 
-I'll take a look during holidays.
+hm... can you please run
+
+	pkg-config --list-all | grep -i nl
+
+and send me output. thanks.
 
 
 	-ss
- =
 
-> Igor Zhbanov wrote:
-> >This patch-set adds the ability of profiling MALI GPU in Powertop.
-> ...
-> >
-> >Igor Zhbanov (2):
-> >   Introducing process scanner facility
-> >   MALI GPU profiling support
-> >
-> >  src/Makefile.am                                   |    2 +
-> >  src/main.cpp                                      |   17 +-
-> >  src/mali-internal-events/mali-events.h            |  143 +++
-> >  src/mali-internal-events/mali-internal-events.cpp | 1279 +++++++++++++=
-++++++++
-> >  src/mali-internal-events/proc-scan.cpp            |  316 +++++
-> >  src/mali-internal-events/proc-scan.h              |   59 +
-> >  src/process/process.cpp                           |   43 +
-> >  7 files changed, 1857 insertions(+), 2 deletions(-)
-> >  create mode 100644 src/mali-internal-events/mali-events.h
-> >  create mode 100644 src/mali-internal-events/mali-internal-events.cpp
-> >  create mode 100644 src/mali-internal-events/proc-scan.cpp
-> >  create mode 100644 src/mali-internal-events/proc-scan.h
-> =
-
-> -- =
-
-> Best regards,
-> Igor Zhbanov,
-> Technical Leader,
-> phone: +7 (495) 797 25 00 ext 3806
-> e-mail: i.zhbanov(a)samsung.com
-> =
-
-> Mobile group, Moscow R&D center, Samsung Electronics
-> 12 Dvintsev street, building 1
-> 127018, Moscow, Russian Federation
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============3564235712058011910==--
+--===============7150979224941919183==--
 
