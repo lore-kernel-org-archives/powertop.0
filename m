@@ -1,147 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============7054602612500023281=="
+Content-Type: multipart/mixed; boundary="===============6572891439624686262=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] csstoh.sh shell script fixes cross compiling
- issues
-Date: Tue, 04 Dec 2012 23:01:22 +0300
-Message-ID: <20121204200122.GA3874@swordfish>
-In-Reply-To: 1354279587-20606-1-git-send-email-thomas.waldecker@gmail.com
+Subject: Re: [Powertop] [PATCH] Change library/pkg search condition for
+ libnl2/3
+Date: Mon, 12 Nov 2012 12:09:18 +0300
+Message-ID: <20121112090918.GC3851@swordfish>
+In-Reply-To: CAGLu0vOCbyZsB1HX7bQ33K+817nRd+ioKo9ObgU8xRCVdNfA7w@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7054602612500023281==
+--===============6572891439624686262==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (11/30/12 13:46), Thomas Waldecker wrote:
-> Date: Fri, 30 Nov 2012 13:46:27 +0100
-> From: Thomas Waldecker <thomas.waldecker(a)gmail.com>
-> To: powertop(a)lists.01.org
-> Cc: Thomas Waldecker <thomas.waldecker(a)tqs.de>
-> Subject: [Powertop] [PATCH] csstoh.sh shell script fixes cross compiling
->  issues
-> X-Mailer: git-send-email 1.7.11.7
-> =
-
-> From: Thomas Waldecker <thomas.waldecker(a)tqs.de>
-> =
-
-> Added the csstoh.sh shell script from Igor Zhbanov found here:
-> http://lists.01.org/pipermail/powertop/2012-July/000151.html
-> also patched the Makefile.am to use the csstoh.sh script.
-> The compiled csstoh binary doesn't work for cross compiling,
-> however Igors Patch never got applied upstream.
-> ---
->  src/Makefile.am |    8 +++-----
->  src/csstoh.sh   |   45 +++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 48 insertions(+), 5 deletions(-)
->  create mode 100755 src/csstoh.sh
-> =
+Hello,
+may I ask you ti test the following one?
 
 
-looks good to me, thanks.
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+
+---
+
+ configure.ac | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b8c183f..cee5bf3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -54,15 +54,20 @@ PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=3D1]=
+,[
+  =
+
+ =
+
+ has_libnl_ver=3D0
+-PKG_CHECK_MODULES([LIBNL], [libnl-3.0 libnl-genl-3.0], [
+-	has_libnl_ver=3D3], [
+-	AC_SEARCH_LIBS([nl_socket_alloc], [nl-3 nl-genl-3], [
+-		has_libnl_ver=3D3], [
+-		AC_SEARCH_LIBS([nl_socket_alloc], [nl], [
+-			has_libnl_ver=3D2], [
+-			PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [])])])])
++
++PKG_CHECK_MODULES([LIBNL], [libnl-3.0 >=3D 3.0], [has_libnl_ver=3D3], [
++	PKG_CHECK_MODULES([LIBNL], [libnl-2.0 >=3D 2.0], [has_libnl_ver=3D2], [
++		PKG_CHECK_MODULES([LIBNL], [libnl-1.0], [has_libnl_ver=3D1], [has_libnl_=
+ver=3D0])])])
++
++#Austin Zhang reported failed configure on Ubuntu. It tourned out that ubu=
+ntu does
++#not provide genl pkg-config files, thus PKG_CHECK_MODULES fails to check =
+for
++#libnl-genl.
++#NOTE: AC_SEARCH_LIBS append -lnl-genl to LIBS, not to LIBNL_LIBS.
++#
++AC_SEARCH_LIBS([genl_connect], [nl-genl], [], [has_libnl_ver=3D0])
++
+ if (test "$has_libnl_ver" -eq 0); then
+-	AC_MSG_ERROR(libnl is required but not found)
++	AC_MSG_ERROR(libnl and libnl-genl are required but were not found)
+ fi
+ if (test "$has_libnl_ver" -gt 1); then
+ 	AC_DEFINE([HAVE_LIBNL20], [1], [Define if you have libnl-2.0 or higher])
 
 
-	-ss
-
-
-
-
-> diff --git a/src/Makefile.am b/src/Makefile.am
-> index f60426a..a53d942 100644
-> --- a/src/Makefile.am
-> +++ b/src/Makefile.am
-> @@ -1,9 +1,6 @@
->  AUTOMAKE_OPTIONS =3D subdir-objects
->  ACLOCAL_AMFLAGS =3D -I ../m4 =
-
->  =
-
-> -noinst_PROGRAMS =3D csstoh
-> -csstoh_SOURCES =3D csstoh.c =
-
-> -
->  sbin_PROGRAMS =3D powertop
->  nodist_powertop_SOURCES =3D css.h
->  =
-
-> @@ -48,6 +45,7 @@ AM_LDFLAGS =3D $(LIBS) $(NCURSES_LIBS) $(PCIUTILS_LIBS)=
- $(LIBNL_LIBS) $(LIBZ_LIBS)
->  =
-
->  BUILT_SOURCES =3D css.h
->  CLEANFILES =3D css.h
-> -css.h: csstoh powertop.css
-> -	./csstoh "$(srcdir)"/powertop.css css.h
-> +css.h: powertop.css
-> +	chmod +x ./csstoh.sh
-> +	./csstoh.sh "$(srcdir)"/powertop.css css.h
->  =
-
-> diff --git a/src/csstoh.sh b/src/csstoh.sh
-> new file mode 100755
-> index 0000000..5918d12
-> --- /dev/null
-> +++ b/src/csstoh.sh
-> @@ -0,0 +1,45 @@
-> +#!/bin/bash
-> +#
-> +# This program file is free software; you can redistribute it and/or mod=
-ify it
-> +# under the terms of the GNU General Public License as published by the
-> +# Free Software Foundation; version 2 of the License.
-> +#
-> +# This program is distributed in the hope that it will be useful, but WI=
-THOUT
-> +# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> +# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-> +# for more details.
-> +#
-> +# You should have received a copy of the GNU General Public License
-> +# along with this program in a file named COPYING; if not, write to the
-> +# Free Software Foundation, Inc,
-> +# 51 Franklin Street, Fifth Floor,
-> +# Boston, MA 02110-1301 USA
-> +# or just google for it.
-> +#
-> +# Written by Igor Zhbanov<i.zhbanov at samsung.com>
-> +
-> +
-> +if [ $# -lt 2 ]; then
-> +	echo "Usage: csstoh.sh cssfile header.h"
-> +	exit 1
-> +fi
-> +
-> +if [ ! -r $1 ]; then
-> +	echo "Can't find file $1"
-> +	exit 1
-> +fi
-> +
-> +if ! echo -n>$2; then
-> +	echo "Can't open file $2 for writing."
-> +	exit 1
-> +fi
-> +
-> +echo "#ifndef __INCLUDE_GUARD_CCS_H">>  $2
-> +echo "#define __INCLUDE_GUARD_CCS_H">>  $2
-> +echo>>  $2
-> +echo "const char css[] =3D ">>  $2
-> +
-> +sed -r 's/^(.*)$/\t\"\1\\n\"/' $1>>  $2
-> +
-> +echo ";">>  $2
-> +echo "#endif">>  $2
-> -- =
-
-> 1.7.9.5
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============7054602612500023281==--
+--===============6572891439624686262==--
 
