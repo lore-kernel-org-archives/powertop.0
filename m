@@ -1,217 +1,113 @@
-Content-Type: multipart/mixed; boundary="===============3443783532813971025=="
+Content-Type: multipart/mixed; boundary="===============8865713066783161250=="
 MIME-Version: 1.0
-From: Ivan Shapovalov <intelfx100 at gmail.com>
-Subject: [Powertop] [RFC] [PATCHv2 06/10] Deduplication: merge cpu_{core, linux,
- package}::change_effective_frequency() into
- abstract_cpu::change_effective_frequency()
-Date: Mon, 24 Dec 2012 03:08:48 +0400
-Message-ID: <1356304132-3889-7-git-send-email-intelfx100@gmail.com>
-In-Reply-To: 1356304132-3889-1-git-send-email-intelfx100@gmail.com
+From: Namhyung Kim <namhyung at gmail.com>
+Subject: Re: [Powertop] [PATCH] Change library/pkg search condition for
+ libnl2/3
+Date: Wed, 14 Nov 2012 00:30:59 +0900
+Message-ID: <1352820659.1811.5.camel@leonhard>
+In-Reply-To: 20121113101840.GB2621@swordfish.minsk.epam.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3443783532813971025==
+--===============8865713066783161250==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The mentioned overrides differ only in assigning 0 to effective_frequency
-prior to calling abstract_cpu::change_effective_frequency(), which reassign=
-s real frequency
-to the same field.
-Moreover, the field value is never used between assignments.
+2012-11-13 (=ED=99=94), 13:18 +0300, Sergey Senozhatsky:
+> On (11/13/12 17:47), Austin Zhang wrote:
+> > =
 
-So it shall be safe to merge these overrides into the base definition as sh=
-own:
-* immediately assign real frequency to field effective_frequency;
-* remove post-assignment to the same field.
+> >    > why we check 'libnl-3.0 >=3D 3.0 libnl-genl-3.0 >=3D 3.0' and only
+> >    'libnl-2.0',
+> >    Because for v2, it just have=EF=BF=BDseparated=EF=BF=BDlibnl-genl li=
+brary, but there were
+> >    no=EF=BF=BDseparated pkg named=EF=BF=BDlibnl-genl-2.0.
+> >    >+AC_SEARCH_LIBS([genl_connect], [nl-genl nl], [], [has_libnl_ver=3D=
+0])
+> >    With additional 'nl' checking, It doesn't help. Failed with same err=
+or
+> >    under both v3 and v2 cases for 12.04 (doesn't try others).=EF=BF=BD
+> >    If fact, genl_connect is in nl-genl both for v2 and v3. Not sure if =
+it is
+> >    some search path issue.=EF=BF=BD
+> > =
 
-Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
----
- src/cpu/abstract_cpu.cpp | 17 +++++++++++++++--
- src/cpu/cpu.h            |  4 ----
- src/cpu/cpu_core.cpp     | 23 -----------------------
- src/cpu/cpu_linux.cpp    | 19 -------------------
- src/cpu/cpu_package.cpp  | 20 --------------------
- 5 files changed, 15 insertions(+), 68 deletions(-)
+> =
 
-diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
-index 5618761..ec52f55 100644
---- a/src/cpu/abstract_cpu.cpp
-+++ b/src/cpu/abstract_cpu.cpp
-@@ -393,14 +393,27 @@ void abstract_cpu::calculate_freq(uint64_t time)
- void abstract_cpu::change_effective_frequency(uint64_t time, uint64_t freq=
-uency)
- {
- 	unsigned int i;
-+	uint64_t time_delta, fr;
-+
-+	if (last_stamp)
-+		time_delta =3D time - last_stamp;
-+	else
-+		time_delta =3D 1;
-+
-+	fr =3D effective_frequency;
-+	if (old_idle)
-+		fr =3D 0;
-+
-+	account_freq(fr, time_delta);
-+
-+	effective_frequency =3D frequency;
-+	last_stamp =3D time;
- =
+> hm. ok, thanks for info. I'll check libnl 2.0 repo if they ever had pkg-c=
+onfig file
+> other than libnl-2.0.pc. If the only one they provide is libnl-2.0.pc the=
+n we'll stick
+> with inital PKG_CHECK_MODULES rework and your adjustment to libnl-2.0 cas=
+e.
+> =
 
- 	/* propagate to all children */
- 	for (i =3D 0; i < children.size(); i++)
- 		if (children[i]) {
- 			children[i]->change_effective_frequency(time, frequency);
- 		}
--
--	effective_frequency =3D frequency;
- }
- =
+> thanks for your patience and help!
+> =
 
- =
+> =
 
-diff --git a/src/cpu/cpu.h b/src/cpu/cpu.h
-index 8b9c9f9..c99d4ea 100644
---- a/src/cpu/cpu.h
-+++ b/src/cpu/cpu.h
-@@ -173,7 +173,6 @@ public:
- 	virtual char *  fill_pstate_name(int line_nr, char *buffer);
- =
+> Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+> =
 
- 	virtual void    change_freq(uint64_t time, int freq);
--	virtual void	change_effective_frequency(uint64_t time, uint64_t freq);
- 	virtual void    go_idle(uint64_t time);
- 	virtual void    go_unidle(uint64_t time);
- =
+> ---
+> =
 
-@@ -190,7 +189,6 @@ public:
- =
+>  configure.ac | 12 ++++--------
+>  1 file changed, 4 insertions(+), 8 deletions(-)
+> =
 
- 	virtual int     can_collapse(void) { return childcount =3D=3D 1;};
- 	virtual void    calculate_freq(uint64_t time);
--	virtual void	change_effective_frequency(uint64_t time, uint64_t freq);
- };
- =
+> diff --git a/configure.ac b/configure.ac
+> index b8c183f..e6ae3ce 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -54,15 +54,11 @@ PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=3D=
+1],[
+>   =
 
- class cpu_package: public abstract_cpu
-@@ -204,8 +202,6 @@ public:
- 	virtual int     can_collapse(void) { return childcount =3D=3D 1;};
- =
+>  =
 
- 	virtual void    calculate_freq(uint64_t time);
--	virtual void	change_effective_frequency(uint64_t time, uint64_t freq);
--
- };
- =
+>  has_libnl_ver=3D0
+> -PKG_CHECK_MODULES([LIBNL], [libnl-3.0 libnl-genl-3.0], [
+> -	has_libnl_ver=3D3], [
+> -	AC_SEARCH_LIBS([nl_socket_alloc], [nl-3 nl-genl-3], [
+> -		has_libnl_ver=3D3], [
+> -		AC_SEARCH_LIBS([nl_socket_alloc], [nl], [
+> -			has_libnl_ver=3D2], [
+> -			PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [])])])])
+> +PKG_CHECK_MODULES([LIBNL], [libnl-3.0 >=3D 3.0 libnl-genl-3.0 >=3D 3.0],=
+ [has_libnl_ver=3D3], [
+> +	PKG_CHECK_MODULES([LIBNL], [libnl-2.0 >=3D 2.0], [has_libnl_ver=3D2], [
+> +		PKG_CHECK_MODULES([LIBNL], [libnl-1.0], [has_libnl_ver=3D1], [has_libn=
+l_ver=3D0])])])
 
- extern void enumerate_cpus(void);
-diff --git a/src/cpu/cpu_core.cpp b/src/cpu/cpu_core.cpp
-index 8249d83..7ec498d 100644
---- a/src/cpu/cpu_core.cpp
-+++ b/src/cpu/cpu_core.cpp
-@@ -102,29 +102,6 @@ void cpu_core::calculate_freq(uint64_t time)
- 	old_idle =3D idle;
- }
- =
+On my ubuntu 10.04, "libnl-1.0" didn't work but "libnl-1" did.
 
--void cpu_core::change_effective_frequency(uint64_t time, uint64_t frequenc=
-y)
--{
--	uint64_t freq =3D 0;
--	uint64_t time_delta, fr;
--
--
--	if (last_stamp)
--		time_delta =3D time - last_stamp;
--	else
--		time_delta =3D 1;
--
--	fr =3D effective_frequency;
--
--	if (old_idle)
--		fr =3D 0;
--
--	account_freq(fr, time_delta);
--
--	effective_frequency =3D freq;
--	last_stamp =3D time;
--	abstract_cpu::change_effective_frequency(time, frequency);
--}
--
- char * cpu_core::fill_pstate_line(int line_nr, char *buffer)
- {
- 	buffer[0] =3D 0;
-diff --git a/src/cpu/cpu_linux.cpp b/src/cpu/cpu_linux.cpp
-index 41a2238..a2e6cb9 100644
---- a/src/cpu/cpu_linux.cpp
-+++ b/src/cpu/cpu_linux.cpp
-@@ -359,25 +359,6 @@ void cpu_linux::change_freq(uint64_t time, int frequen=
-cy)
- 	old_idle =3D idle;
- }
- =
+Thanks,
+Namhyung
 
--void cpu_linux::change_effective_frequency(uint64_t time, uint64_t frequen=
-cy)
--{
--	uint64_t time_delta, fr;
--
--	if (last_stamp)
--		time_delta =3D time - last_stamp;
--	else
--		time_delta =3D 1;
--
--	fr =3D effective_frequency;
--	if (old_idle)
--		fr =3D 0;
--
--	account_freq(fr, time_delta);
--
--	effective_frequency =3D frequency;
--	last_stamp =3D time;
--}
--
- void cpu_linux::go_idle(uint64_t time)
- {
- =
 
-diff --git a/src/cpu/cpu_package.cpp b/src/cpu/cpu_package.cpp
-index 6794a38..ef54524 100644
---- a/src/cpu/cpu_package.cpp
-+++ b/src/cpu/cpu_package.cpp
-@@ -128,23 +128,3 @@ void cpu_package::calculate_freq(uint64_t time)
- 	old_idle =3D idle;
- }
- =
+>  if (test "$has_libnl_ver" -eq 0); then
+> -	AC_MSG_ERROR(libnl is required but not found)
+> +	AC_MSG_ERROR(libnl and libnl-genl are required but were not found)
+>  fi
+>  if (test "$has_libnl_ver" -gt 1); then
+>  	AC_DEFINE([HAVE_LIBNL20], [1], [Define if you have libnl-2.0 or higher])
+> =
 
--void cpu_package::change_effective_frequency(uint64_t time, uint64_t frequ=
-ency)
--{
--	uint64_t time_delta, fr;
--
--	if (last_stamp)
--		time_delta =3D time - last_stamp;
--	else
--		time_delta =3D 1;
--
--	fr =3D effective_frequency;
--	if (old_idle)
--		fr =3D 0;
--
--	account_freq(fr, time_delta);
--
--	effective_frequency =3D frequency;
--	last_stamp =3D time;
--
--	abstract_cpu::change_effective_frequency(time, frequency);
--}
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+
+
 -- =
 
-1.8.0.2
+Regards,
+Namhyung Kim
 
 
---===============3443783532813971025==--
+
+--===============8865713066783161250==--
 
