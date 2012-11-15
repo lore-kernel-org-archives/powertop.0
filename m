@@ -1,118 +1,67 @@
-Content-Type: multipart/mixed; boundary="===============8875575603389035684=="
+Content-Type: multipart/mixed; boundary="===============7833521572188797366=="
 MIME-Version: 1.0
-From: Thomas Waldecker <thomas.waldecker at gmail.com>
-Subject: [Powertop] [PATCH] csstoh.sh shell script fixes cross compiling issues
-Date: Fri, 30 Nov 2012 13:46:27 +0100
-Message-ID: <1354279587-20606-1-git-send-email-thomas.waldecker@gmail.com>
+From: Namhyung Kim <namhyung at gmail.com>
+Subject: [Powertop] [PATCH] cpu: Fix leftovers from the P state cpu frequency
+ calculation
+Date: Fri, 16 Nov 2012 00:17:56 +0900
+Message-ID: <1352992676-14940-1-git-send-email-namhyung@gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8875575603389035684==
+--===============7833521572188797366==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Thomas Waldecker <thomas.waldecker(a)tqs.de>
+The commit 15b8bfb ("Ignore non-P-state-enabled CPUs when calculating
+frequency") and 29f42b5 ("fixed issues with p-state reported CPU
+frequencies") fixed frequency calculation for cpu packages but missed
+it for cpu cores.  Add it.
 
-Added the csstoh.sh shell script from Igor Zhbanov found here:
-http://lists.01.org/pipermail/powertop/2012-July/000151.html
-also patched the Makefile.am to use the csstoh.sh script.
-The compiled csstoh binary doesn't work for cross compiling,
-however Igors Patch never got applied upstream.
+This fixes wrong frequency report on my quad-core box: 2072.5% -> 100.0%
+
+Cc: Ivan Shapovalov <intelfx100(a)gmail.com>
+Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
 ---
- src/Makefile.am |    8 +++-----
- src/csstoh.sh   |   45 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 48 insertions(+), 5 deletions(-)
- create mode 100755 src/csstoh.sh
+ src/cpu/cpu_core.cpp   |    3 +--
+ src/cpu/intel_cpus.cpp |    2 +-
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/src/Makefile.am b/src/Makefile.am
-index f60426a..a53d942 100644
---- a/src/Makefile.am
-+++ b/src/Makefile.am
-@@ -1,9 +1,6 @@
- AUTOMAKE_OPTIONS =3D subdir-objects
- ACLOCAL_AMFLAGS =3D -I ../m4 =
-
+diff --git a/src/cpu/cpu_core.cpp b/src/cpu/cpu_core.cpp
+index b0dd4da..2caa58d 100644
+--- a/src/cpu/cpu_core.cpp
++++ b/src/cpu/cpu_core.cpp
+@@ -131,10 +131,9 @@ void cpu_core::calculate_freq(uint64_t time)
+ 	bool is_idle =3D true;
+ 	unsigned int i;
  =
-
--noinst_PROGRAMS =3D csstoh
--csstoh_SOURCES =3D csstoh.c =
 
 -
- sbin_PROGRAMS =3D powertop
- nodist_powertop_SOURCES =3D css.h
+ 	/* calculate the maximum frequency of all children */
+ 	for (i =3D 0; i < children.size(); i++)
+-		if (children[i]) {
++		if (children[i] && children[i]->has_pstates()) {
+ 			uint64_t f =3D 0;
+ 			if (!children[i]->idle) {
+ 				f =3D children[i]->current_frequency;
+diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
+index f7b86bc..19ad85c 100644
+--- a/src/cpu/intel_cpus.cpp
++++ b/src/cpu/intel_cpus.cpp
+@@ -240,7 +240,7 @@ void nhm_core::calculate_freq(uint64_t time)
  =
 
-@@ -48,6 +45,7 @@ AM_LDFLAGS =3D $(LIBS) $(NCURSES_LIBS) $(PCIUTILS_LIBS) $=
-(LIBNL_LIBS) $(LIBZ_LIBS)
- =
-
- BUILT_SOURCES =3D css.h
- CLEANFILES =3D css.h
--css.h: csstoh powertop.css
--	./csstoh "$(srcdir)"/powertop.css css.h
-+css.h: powertop.css
-+	chmod +x ./csstoh.sh
-+	./csstoh.sh "$(srcdir)"/powertop.css css.h
- =
-
-diff --git a/src/csstoh.sh b/src/csstoh.sh
-new file mode 100755
-index 0000000..5918d12
---- /dev/null
-+++ b/src/csstoh.sh
-@@ -0,0 +1,45 @@
-+#!/bin/bash
-+#
-+# This program file is free software; you can redistribute it and/or modif=
-y it
-+# under the terms of the GNU General Public License as published by the
-+# Free Software Foundation; version 2 of the License.
-+#
-+# This program is distributed in the hope that it will be useful, but WITH=
-OUT
-+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-+# for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program in a file named COPYING; if not, write to the
-+# Free Software Foundation, Inc,
-+# 51 Franklin Street, Fifth Floor,
-+# Boston, MA 02110-1301 USA
-+# or just google for it.
-+#
-+# Written by Igor Zhbanov<i.zhbanov at samsung.com>
-+
-+
-+if [ $# -lt 2 ]; then
-+	echo "Usage: csstoh.sh cssfile header.h"
-+	exit 1
-+fi
-+
-+if [ ! -r $1 ]; then
-+	echo "Can't find file $1"
-+	exit 1
-+fi
-+
-+if ! echo -n>$2; then
-+	echo "Can't open file $2 for writing."
-+	exit 1
-+fi
-+
-+echo "#ifndef __INCLUDE_GUARD_CCS_H">>  $2
-+echo "#define __INCLUDE_GUARD_CCS_H">>  $2
-+echo>>  $2
-+echo "const char css[] =3D ">>  $2
-+
-+sed -r 's/^(.*)$/\t\"\1\\n\"/' $1>>  $2
-+
-+echo ";">>  $2
-+echo "#endif">>  $2
+ 	/* calculate the maximum frequency of all children */
+ 	for (i =3D 0; i < children.size(); i++)
+-		if (children[i]) {
++		if (children[i] && children[i]->has_pstates()) {
+ 			uint64_t f =3D 0;
+ 			if (!children[i]->idle) {
+ 				f =3D children[i]->current_frequency;
 -- =
 
-1.7.9.5
+1.7.9.2
 
 
---===============8875575603389035684==--
+--===============7833521572188797366==--
 
