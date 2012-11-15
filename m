@@ -1,74 +1,104 @@
-Content-Type: multipart/mixed; boundary="===============6375606808717152810=="
+Content-Type: multipart/mixed; boundary="===============4503802440155927967=="
 MIME-Version: 1.0
-From: Ivan Shapovalov <intelfx100 at gmail.com>
-Subject: [Powertop] [RFC] [PATCH 00/11] Code deduplication and a single i965
- P-states accounting bugfix in cpu/*
-Date: Mon, 05 Nov 2012 15:12:22 +0400
-Message-ID: <1352113953-24687-1-git-send-email-intelfx100@gmail.com>
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: [Powertop] [Announcement] Release of PowerTOP v2.2
+Date: Thu, 15 Nov 2012 13:08:25 -0800
+Message-ID: <50A559C9.8040303@linux.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6375606808717152810==
+--===============4503802440155927967==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This is a series of refactor (well, mainly deduplication) of cpu/* code fol=
-lowed with a
-single bugfix patch.
+PowerTOP v2.2 Release
+We are pleased to announce the release of PowerTOP v2.2, which concludes =
 
-The bugfix itself may be applied even without applying refactoring, but then
-the same change shall be applied to all copies of calculate_freq().
+a minor release.
 
-So the whole purpose of the series is to
- 1) mercilessly purge those method overrides which are identical to the met=
-hods in base
-    classes, and
- 2) prefer defining a helper function and overriding it rather than copy-pa=
-sting
-    the whole big function whose behavior needs to be altered and changing =
-one-two lines in it.
+About PowerTOP
+PowerTOP is a Linux tool to diagnose issues with power consumption and =
 
-Ivan Shapovalov (11):
-  Fix includes: do not include intel_cpus.h inside cpu.h
-  Deduplication: move is_turbo() function to lib
-  Deduplication: move all instances of account_freq() to
-    abstract_cpu::account_freq()
-  Deduplication: remove nhm_cpu::account_freq() almost identical to
-    abstract_cpu::account_freq()
-  Deduplication: remove
-    nhm_{cpu,core,package}::change_effective_frequency() identical to
-    cpu_{linux,core,package}::change_effective_frequency()
-  Deduplication: merge
-    cpu_{core,linux,package}::change_effective_frequency() into
-    abstract_cpu::change_effective_frequency()
-  Deduplication: remove {cpu,nhm}_core::calculate_freq() identical to
-    abstract_cpu::calculate_freq()
-  Deduplication: remove nhm_package::calculate_freq() identical to
-    cpu_package::calculate_freq()
-  Deduplication: properly merge cpu_package::calculate_freq() into
-    abstract_cpu::calculate_freq()
-  Deduplication: merge go_idle()/go_unidle()/change_freq() overrides
-    into abstract_cpu() class
-  Ignore non-P-state-enabled CPUs when calculating frequency.
+power management. In addition to being a diagnostic tool, PowerTOP also =
 
- src/cpu/abstract_cpu.cpp |  69 ++++++++++--
- src/cpu/cpu.cpp          |   1 +
- src/cpu/cpu.h            |  29 ++----
- src/cpu/cpu_core.cpp     |  97 -----------------
- src/cpu/cpu_linux.cpp    |  98 ------------------
- src/cpu/cpu_package.cpp  | 102 ++----------------
- src/cpu/intel_cpus.cpp   | 265 +------------------------------------------=
-----
- src/cpu/intel_cpus.h     |  23 +---
- src/cpu/intel_gpu.cpp    |   2 +-
- src/lib.cpp              |   9 ++
- src/lib.h                |   1 +
- 11 files changed, 94 insertions(+), 602 deletions(-)
+has an interactive mode you can use to experiment with various power =
 
---
-1.8.0
+management settings, for cases where the Linux distribution has not =
+
+enabled those settings.
+
+PowerTOP reports which components in the system are most likely to blame =
+
+for higher-than-needed power consumption, ranging from software =
+
+applications to active components in the system. Detailed screens are =
+
+available for CPU C and P states, device activity, and software activity.
+
+For many years, PowerTOP has been used heavily by Intel, Linux =
+
+distributors, and various parts of the open source community. We're =
+
+hoping that our users find the second generation even more useful for =
+
+their needs.
+
+Highlights
+Continued Transifex inclusions
+Added localization of the UI, with 15 languages in progress and active.
+Added UI navigation enhancement for scrolling and tab navigation.
+     "Arrow Keys" now scroll the tab windows
+
+     "Page up/down" scroll tab windows up and down
+
+     "TAB" cycles the next window tab
+
+     "SHIFT+TAB" cycles the previous window tab
+
+     "ENTER" toggles tunables
+
+     "SPACE BAR" toggles tunables
+
+     "r KEY" refresh results and resets view of tab window
+
+Added new report generator facility.
+Added tuning suggestions for updated libata driver.
+Added fixes for autoconf to better support distributions.
+Added additional ARM support work.
+Bug fixes and clean up
+
+Project Details
+URL: https://01.org/powertop
+Download: https://01.org/powertop/downloads/2012/PowerTOP-v2.2
+Mailing list:
+Discussions about PowerTOP occur on the PowerTOP(a)lists.01.org mailing lis=
+t.
+Subscribe to the list at https://lists.01.org/mailman/listinfo/powertop
+Archives are found at http://lists.01.org/pipermail/powertop
+The development PowerTOP git repositories are hosted at GitHub.
+
+URL: https://github.com/fenrus75/powertop
+HTTP: https://github.com/fenrus75/powertop.git
+GIT-readonly: git://github.com/fenrus75/powertop.git
+Note: We will not use any of GitHub's integrate, merge, or tracking =
+
+functions, so please continue to use the provided lists.
 
 
---===============6375606808717152810==--
+For localization support and contributions, we are using Transifex.
+Transifex URL: https://www.transifex.com/projects/p/PowerTOP/
+
+Our thanks
+For this release, we would like to give a special thanks to the =
+
+following contributors, and all contributors to PowerTOP. In no =
+
+particular order:
+Mikko Rapeli, Colin Ian King, Namhyung Kim, Igor Zhbanov, Sergey =
+
+Senozhatsky, Rajagopal Venkat, Joerg Mayer, Chris E Ferron
+
+
+--===============4503802440155927967==--
 
