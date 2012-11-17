@@ -1,58 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============3901417814489299063=="
+Content-Type: multipart/mixed; boundary="===============4459577931682927465=="
 MIME-Version: 1.0
-From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: Re: [Powertop] [FYI][RFC][PATCH 0/2] MALI GPU profiling support
-Date: Fri, 21 Dec 2012 13:06:37 +0400
-Message-ID: <50D4269D.7020500@samsung.com>
-In-Reply-To: 1351771239-18925-1-git-send-email-i.zhbanov@samsung.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH] Use PACKAGE_VERSION for POWERTOP_VERSION
+Date: Sat, 17 Nov 2012 19:03:00 +0300
+Message-ID: <20121117160300.GA2943@swordfish>
+In-Reply-To: 1353166967-24095-1-git-send-email-namhyung@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3901417814489299063==
+--===============4459577931682927465==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+On (11/18/12 00:42), Namhyung Kim wrote:
+> It was missed to update POWERTOP_VERSION macro so that the
+> new v2.2 release still shows v2.1 string on the header of
+> ncurses window.  Convert to use PACKAGE_VERSION macro which
+> set by autotools to the AC_INIT version so that it cannot
+> be missed anymore.
+> =
 
-It is just a ping. :-)
-The list is quiet about these patches. Will you integrate it or not?
-What should be changed before it?
-
-Igor Zhbanov wrote:
-> This patch-set adds the ability of profiling MALI GPU in Powertop.
-...
->
-> Igor Zhbanov (2):
->    Introducing process scanner facility
->    MALI GPU profiling support
->
->   src/Makefile.am                                   |    2 +
->   src/main.cpp                                      |   17 +-
->   src/mali-internal-events/mali-events.h            |  143 +++
->   src/mali-internal-events/mali-internal-events.cpp | 1279 ++++++++++++++=
-+++++++
->   src/mali-internal-events/proc-scan.cpp            |  316 +++++
->   src/mali-internal-events/proc-scan.h              |   59 +
->   src/process/process.cpp                           |   43 +
->   7 files changed, 1857 insertions(+), 2 deletions(-)
->   create mode 100644 src/mali-internal-events/mali-events.h
->   create mode 100644 src/mali-internal-events/mali-internal-events.cpp
->   create mode 100644 src/mali-internal-events/proc-scan.cpp
->   create mode 100644 src/mali-internal-events/proc-scan.h
-
--- =
-
-Best regards,
-Igor Zhbanov,
-Technical Leader,
-phone: +7 (495) 797 25 00 ext 3806
-e-mail: i.zhbanov(a)samsung.com
-
-Mobile group, Moscow R&D center, Samsung Electronics
-12 Dvintsev street, building 1
-127018, Moscow, Russian Federation
+> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+> ---
 
 
---===============3901417814489299063==--
+looks good to me, thanks.
+
+	-ss
+
+
+>  src/lib.h |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> =
+
+> diff --git a/src/lib.h b/src/lib.h
+> index 8cf4632..209421a 100644
+> --- a/src/lib.h
+> +++ b/src/lib.h
+> @@ -35,8 +35,8 @@
+>  =
+
+>  #define _(STRING)    gettext(STRING)
+>  =
+
+> -#define POWERTOP_VERSION "v2.1"
+> -#define POWERTOP_SHORT_VERSION "2.1"
+> +#define POWERTOP_VERSION "v"PACKAGE_VERSION
+> +#define POWERTOP_SHORT_VERSION PACKAGE_VERSION
+>  =
+
+>  =
+
+>  extern int get_max_cpu(void);
+> -- =
+
+> 1.7.9.2
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>=20
+
+--===============4459577931682927465==--
 
