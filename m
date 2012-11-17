@@ -1,130 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============4260374744155173680=="
+Content-Type: multipart/mixed; boundary="===============5219601399038546002=="
 MIME-Version: 1.0
-From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: Re: [Powertop] [RFC][PATCH 2/2] Convert powertop to use new report
- generator facility
-Date: Tue, 09 Oct 2012 21:17:18 +0400
-Message-ID: <50745C1E.6060503@samsung.com>
-In-Reply-To: 507319DF.5000607@linux.intel.com
+From: Namhyung Kim <namhyung at gmail.com>
+Subject: [Powertop] [PATCH] Use PACKAGE_VERSION for POWERTOP_VERSION
+Date: Sun, 18 Nov 2012 00:42:47 +0900
+Message-ID: <1353166967-24095-1-git-send-email-namhyung@gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4260374744155173680==
+--===============5219601399038546002==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Chris,
+It was missed to update POWERTOP_VERSION macro so that the
+new v2.2 release still shows v2.1 string on the header of
+ncurses window.  Convert to use PACKAGE_VERSION macro which
+set by autotools to the AC_INIT version so that it cannot
+be missed anymore.
 
-Please check the new version of the patch set (when it will be approved
-by mailing list moderator because of its size).
+Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+---
+ src/lib.h |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Chris Ferron wrote:
-> Couple of things,
->
-> #1 I noticed that the scripts section of Software Settings in need of =
+diff --git a/src/lib.h b/src/lib.h
+index 8cf4632..209421a 100644
+--- a/src/lib.h
++++ b/src/lib.h
+@@ -35,8 +35,8 @@
+ =
 
-> Tuning is missing. I see the nice header, but not data.
-Done.
-> #2 C0 active table cells are not aligned , and the CPU's are also not =
+ #define _(STRING)    gettext(STRING)
+ =
 
-> aligned correctly in the Processor Idle state report section.
-Done. I hope. :-) I have aligned table headers as in original Powertop
-If you mean something else please tell.
-> #3 I get some warning compiling, I know PowerTOP is not warning less, =
+-#define POWERTOP_VERSION "v2.1"
+-#define POWERTOP_SHORT_VERSION "2.1"
++#define POWERTOP_VERSION "v"PACKAGE_VERSION
++#define POWERTOP_SHORT_VERSION PACKAGE_VERSION
+ =
 
-> but would like to attempt to prevent adding more. (and fixing exiting =
+ =
 
-> ones of course)
-> report/report-maker.cpp: In destructor =E2=80=98report_maker::~report_mak=
-er()=E2=80=99:
-> report/report-maker.cpp:51:10: warning: deleting object of abstract =
-
-> class type =E2=80=98report_formatter=E2=80=99 which has non-virtual destr=
-uctor will =
-
-> cause undefined behaviour [-Wdelete-non-virtual-dtor]
-> report/report-maker.cpp: In member function =E2=80=98void =
-
-> report_maker::setup_report_formatter()=E2=80=99:
-> report/report-maker.cpp:110:10: warning: deleting object of abstract =
-
-> class type =E2=80=98report_formatter=E2=80=99 which has non-virtual destr=
-uctor will =
-
-> cause undefined behaviour [-Wdelete-non-virtual-dtor]
-Done.
-> #4 report[c,h] should probable just go in your new sub/dir (report).
-I will send this patch later because it will make my patch bigger and =
-
-that could
-make the understanding more difficult. It could be a separated patch to =
-
-easily
-see changes.
-> #5 csv report has alignment issues for both the cpu Idle and Freq. =
-
-> Even if they are machine readable, they need to be easily parsed using =
-
-> open office or MS excel and look aligned with the http report. =
-
-CSV has a lots of questions. First of all, what CSV standard to follow?
-Should it be readable by parsers or by Offices?
-
-I have tried to make report maker to be CSV RFC compliant, but as I see
-Offices doesn't like that CSV. They both prefer to use semicolon as =
-
-separator,
-and not to quote strings because of spaces inside of them, and not to quote
-empty strings. The only reason to quote is when the string contains =
-
-semicolon
-inside of it.
-
-So I have tuned CSV report maker to produce CSVs to be read by Offices.
-Both (MS and Open) can read it with default settings.
-
-The other question is formatting inside the CSV. In my opinion there =
-
-should not
-be any space padding for values inside the CSV. First of all, is is a =
-
-machine-readable
-format. Second, MS Office ignores it totally.
-
-By the way, as I see, both offices uses following text alignment rules: =
-
-if the cell
-consists of text (letters) then it will be shown aligned to the left, =
-
-and if the cell
-is a number, then it will be shown aligned to the right. This formatting =
-
-rules
-are reasonable, so we could totally remove any padding by space in CSV =
-
-(and still
-have pretty table in Offices).
-
-What you think?
-
-And if we need report in human readable text format, we could create TXT =
-
-report
-formatter.
-
+ extern int get_max_cpu(void);
 -- =
 
-Best regards,
-Igor Zhbanov,
-Expert Software Engineer,
-phone: +7 (495) 797 25 00 ext 3806
-e-mail: i.zhbanov(a)samsung.com
-
-ASWG, Moscow R&D center, Samsung Electronics
-12 Dvintsev street, building 1
-127018, Moscow, Russian Federation
+1.7.9.2
 
 
---===============4260374744155173680==--
+--===============5219601399038546002==--
 
