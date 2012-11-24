@@ -1,104 +1,73 @@
-Content-Type: multipart/mixed; boundary="===============4503802440155927967=="
+Content-Type: multipart/mixed; boundary="===============8202132161667100233=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: [Powertop] [Announcement] Release of PowerTOP v2.2
-Date: Thu, 15 Nov 2012 13:08:25 -0800
-Message-ID: <50A559C9.8040303@linux.intel.com>
+From: Justin Brown <justin.brown at fandingo.org>
+Subject: [Powertop] Multiple Batteries
+Date: Fri, 23 Nov 2012 22:55:48 -0600
+Message-ID: <CAKZK7uy6QP7xHvUpbhzz-Yh+SK2rBdzVNDcsBTgHG+=eiqGp4w@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4503802440155927967==
+--===============8202132161667100233==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-PowerTOP v2.2 Release
-We are pleased to announce the release of PowerTOP v2.2, which concludes =
+Hello,
 
-a minor release.
+I'm using Powertop 2.1, and I've noticed a somewhat minor bug. (I couldn't
+find a public bug tracker, but would be more than happy to move this
+discussion to one if someone could send me a URL.)
 
-About PowerTOP
-PowerTOP is a Linux tool to diagnose issues with power consumption and =
+I have two batteries in my laptop, but Powertop does not recognize both
+when calculating battery life remaining. For example Gnome-Shell reports
+that my batteries are at 66% and 100% (85% combined) giving me 10 hours and
+11 minutes of estimated time remaining. On the other hand, Powertop reports
+just 3 hours 17  minutes of time. Both programs are reporting the proper
+discharge rate. It just seems like Powertop is only using my smaller
+battery (the currently active one).
 
-power management. In addition to being a diagnostic tool, PowerTOP also =
+I'm not sure if this issue has been reported, or if the developers even
+have equipment with which to test. I'm more than willing to provide any
+sort of debugging output or testing as needed. I could also probably create
+a patch, but that's likely to take a lot longer for me to get setup with
+development on this project.
+It may be as simple as iterating over a directory in /sys/ or /proc to
+gather stats on multiple batteries. An experienced dev might be able to fix
+it quickly.
 
-has an interactive mode you can use to experiment with various power =
+Cheers,
+Justin
 
-management settings, for cases where the Linux distribution has not =
+--===============8202132161667100233==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
-enabled those settings.
+SGVsbG8sPGRpdj48YnI+PC9kaXY+PGRpdj5JJiMzOTttIHVzaW5nIFBvd2VydG9wIDIuMSwgYW5k
+IEkmIzM5O3ZlIG5vdGljZWQgYSBzb21ld2hhdCBtaW5vciBidWcuIChJIGNvdWxkbiYjMzk7dCBm
+aW5kIGEgcHVibGljIGJ1ZyB0cmFja2VyLCBidXQgd291bGQgYmUgbW9yZSB0aGFuIGhhcHB5IHRv
+IG1vdmUgdGhpcyBkaXNjdXNzaW9uIHRvIG9uZSBpZiBzb21lb25lIGNvdWxkIHNlbmQgbWUgYSBV
+UkwuKTwvZGl2Pgo8ZGl2Pjxicj48L2Rpdj48ZGl2PkkgaGF2ZSB0d28gYmF0dGVyaWVzIGluIG15
+IGxhcHRvcCwgYnV0IFBvd2VydG9wIGRvZXMgbm90IHJlY29nbml6ZSBib3RoIHdoZW4gY2FsY3Vs
+YXRpbmcgYmF0dGVyeSBsaWZlIHJlbWFpbmluZy4gRm9yIGV4YW1wbGUgR25vbWUtU2hlbGwgcmVw
+b3J0cyB0aGF0IG15IGJhdHRlcmllcyBhcmUgYXQgNjYlIGFuZCAxMDAlICg4NSUgY29tYmluZWQp
+IGdpdmluZyBtZSAxMCBob3VycyBhbmQgMTEgbWludXRlcyBvZiBlc3RpbWF0ZWQgdGltZSByZW1h
+aW5pbmcuIE9uIHRoZSBvdGhlciBoYW5kLCBQb3dlcnRvcCByZXBvcnRzIGp1c3QgMyBob3VycyAx
+NyCgbWludXRlcyBvZiB0aW1lLiBCb3RoIHByb2dyYW1zIGFyZSByZXBvcnRpbmcgdGhlIHByb3Bl
+ciBkaXNjaGFyZ2UgcmF0ZS4gSXQganVzdCBzZWVtcyBsaWtlIFBvd2VydG9wIGlzIG9ubHkgdXNp
+bmcgbXkgc21hbGxlciBiYXR0ZXJ5ICh0aGUgY3VycmVudGx5IGFjdGl2ZSBvbmUpLjwvZGl2Pgo8
+ZGl2Pjxicj48L2Rpdj48ZGl2PkkmIzM5O20gbm90IHN1cmUgaWYgdGhpcyBpc3N1ZSBoYXMgYmVl
+biByZXBvcnRlZCwgb3IgaWYgdGhlIGRldmVsb3BlcnMgZXZlbiBoYXZlIGVxdWlwbWVudCB3aXRo
+IHdoaWNoIHRvIHRlc3QuIEkmIzM5O20gbW9yZSB0aGFuIHdpbGxpbmcgdG8gcHJvdmlkZSBhbnkg
+c29ydCBvZiBkZWJ1Z2dpbmcgb3V0cHV0IG9yIHRlc3RpbmcgYXMgbmVlZGVkLiBJIGNvdWxkIGFs
+c28gcHJvYmFibHkgY3JlYXRlIGEgcGF0Y2gsIGJ1dCB0aGF0JiMzOTtzIGxpa2VseSB0byB0YWtl
+IGEgbG90IGxvbmdlciBmb3IgbWUgdG8gZ2V0IHNldHVwIHdpdGggZGV2ZWxvcG1lbnQgb24gdGhp
+cyBwcm9qZWN0LqA8L2Rpdj4KPGRpdj5JdCBtYXkgYmUgYXMgc2ltcGxlIGFzIGl0ZXJhdGluZyBv
+dmVyIGEgZGlyZWN0b3J5IGluIC9zeXMvIG9yIC9wcm9jIHRvIGdhdGhlciBzdGF0cyBvbiBtdWx0
+aXBsZSBiYXR0ZXJpZXMuIEFuIGV4cGVyaWVuY2VkIGRldiBtaWdodCBiZSBhYmxlIHRvIGZpeCBp
+dCBxdWlja2x5LjwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+Q2hlZXJzLDwvZGl2PjxkaXY+SnVz
+dGluPC9kaXY+Cg==
 
-PowerTOP reports which components in the system are most likely to blame =
-
-for higher-than-needed power consumption, ranging from software =
-
-applications to active components in the system. Detailed screens are =
-
-available for CPU C and P states, device activity, and software activity.
-
-For many years, PowerTOP has been used heavily by Intel, Linux =
-
-distributors, and various parts of the open source community. We're =
-
-hoping that our users find the second generation even more useful for =
-
-their needs.
-
-Highlights
-Continued Transifex inclusions
-Added localization of the UI, with 15 languages in progress and active.
-Added UI navigation enhancement for scrolling and tab navigation.
-     "Arrow Keys" now scroll the tab windows
-
-     "Page up/down" scroll tab windows up and down
-
-     "TAB" cycles the next window tab
-
-     "SHIFT+TAB" cycles the previous window tab
-
-     "ENTER" toggles tunables
-
-     "SPACE BAR" toggles tunables
-
-     "r KEY" refresh results and resets view of tab window
-
-Added new report generator facility.
-Added tuning suggestions for updated libata driver.
-Added fixes for autoconf to better support distributions.
-Added additional ARM support work.
-Bug fixes and clean up
-
-Project Details
-URL: https://01.org/powertop
-Download: https://01.org/powertop/downloads/2012/PowerTOP-v2.2
-Mailing list:
-Discussions about PowerTOP occur on the PowerTOP(a)lists.01.org mailing lis=
-t.
-Subscribe to the list at https://lists.01.org/mailman/listinfo/powertop
-Archives are found at http://lists.01.org/pipermail/powertop
-The development PowerTOP git repositories are hosted at GitHub.
-
-URL: https://github.com/fenrus75/powertop
-HTTP: https://github.com/fenrus75/powertop.git
-GIT-readonly: git://github.com/fenrus75/powertop.git
-Note: We will not use any of GitHub's integrate, merge, or tracking =
-
-functions, so please continue to use the provided lists.
-
-
-For localization support and contributions, we are using Transifex.
-Transifex URL: https://www.transifex.com/projects/p/PowerTOP/
-
-Our thanks
-For this release, we would like to give a special thanks to the =
-
-following contributors, and all contributors to PowerTOP. In no =
-
-particular order:
-Mikko Rapeli, Colin Ian King, Namhyung Kim, Igor Zhbanov, Sergey =
-
-Senozhatsky, Rajagopal Venkat, Joerg Mayer, Chris E Ferron
-
-
---===============4503802440155927967==--
+--===============8202132161667100233==--
 
