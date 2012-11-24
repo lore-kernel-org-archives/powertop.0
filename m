@@ -1,140 +1,59 @@
-Content-Type: multipart/mixed; boundary="===============1029392750708590590=="
+Content-Type: multipart/mixed; boundary="===============6926773272115538667=="
 MIME-Version: 1.0
-From: Ivan Shapovalov <intelfx100 at gmail.com>
-Subject: [Powertop] [RFC] [PATCH 07/11] Deduplication: remove {cpu,
- nhm}_core::calculate_freq() identical to
- abstract_cpu::calculate_freq()
-Date: Mon, 05 Nov 2012 15:12:29 +0400
-Message-ID: <1352113953-24687-8-git-send-email-intelfx100@gmail.com>
-In-Reply-To: 1352113953-24687-1-git-send-email-intelfx100@gmail.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] Multiple Batteries
+Date: Sat, 24 Nov 2012 15:29:13 +0300
+Message-ID: <20121124122731.GA7100@swordfish>
+In-Reply-To: CAKZK7uy6QP7xHvUpbhzz-Yh+SK2rBdzVNDcsBTgHG+=eiqGp4w@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1029392750708590590==
+--===============6926773272115538667==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Trivial: remove identical overrides wrt. direct base class.
+On (11/23/12 22:55), Justin Brown wrote:
+>    Hello,
+>    I'm using Powertop 2.1, and I've noticed a somewhat minor bug. (I coul=
+dn't
+>    find a public bug tracker, but would be more than happy to move this
+>    discussion to one if someone could send me a URL.)
 
-Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
----
- src/cpu/cpu.h          |  1 -
- src/cpu/cpu_core.cpp   | 26 --------------------------
- src/cpu/intel_cpus.cpp | 26 --------------------------
- src/cpu/intel_cpus.h   |  2 --
- 4 files changed, 55 deletions(-)
+Hello, Justin
+thanks for reporting.
 
-diff --git a/src/cpu/cpu.h b/src/cpu/cpu.h
-index c99d4ea..1e9d771 100644
---- a/src/cpu/cpu.h
-+++ b/src/cpu/cpu.h
-@@ -188,7 +188,6 @@ public:
- 	virtual char *  fill_pstate_name(int line_nr, char *buffer);
- =
+>    I have two batteries in my laptop, but Powertop does not recognize both
+>    when calculating battery life remaining. For example Gnome-Shell repor=
+ts
+>    that my batteries are at 66% and 100% (85% combined) giving me 10 hours
+>    and 11 minutes of estimated time remaining. On the other hand, Powertop
+>    reports just 3 hours 17 =EF=BF=BDminutes of time. Both programs are re=
+porting the
+>    proper discharge rate. It just seems like Powertop is only using my
+>    smaller battery (the currently active one).
 
- 	virtual int     can_collapse(void) { return childcount =3D=3D 1;};
--	virtual void    calculate_freq(uint64_t time);
- };
- =
+can you please post files
 
- class cpu_package: public abstract_cpu
-diff --git a/src/cpu/cpu_core.cpp b/src/cpu/cpu_core.cpp
-index b19ca2c..03acdb1 100644
---- a/src/cpu/cpu_core.cpp
-+++ b/src/cpu/cpu_core.cpp
-@@ -72,32 +72,6 @@ char * cpu_core::fill_pstate_name(int line_nr, char *buf=
-fer)
- 	return buffer;
- }
- =
+cat /sys/class/power_supply/BAT0/uevent
+cat /sys/class/power_supply/BAT1/uevent
 
--void cpu_core::calculate_freq(uint64_t time)
--{
--	uint64_t freq =3D 0;
--	bool is_idle =3D true;
--	unsigned int i;
--
--
--	/* calculate the maximum frequency of all children */
--	for (i =3D 0; i < children.size(); i++)
--		if (children[i]) {
--			uint64_t f =3D 0;
--			if (!children[i]->idle) {
--				f =3D children[i]->current_frequency;
--				is_idle =3D false;
--			}
--			if (f > freq)
--				freq =3D f;
--		}
--
--	current_frequency =3D freq;
--	idle =3D is_idle;
--	if (parent)
--		parent->calculate_freq(time);
--	old_idle =3D idle;
--}
--
- char * cpu_core::fill_pstate_line(int line_nr, char *buffer)
- {
- 	buffer[0] =3D 0;
-diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
-index 30f2d38..688e95b 100644
---- a/src/cpu/intel_cpus.cpp
-+++ b/src/cpu/intel_cpus.cpp
-@@ -185,32 +185,6 @@ void nhm_core::measurement_end(void)
- 	total_stamp =3D 0;
- }
- =
+while on battery.
 
--void nhm_core::calculate_freq(uint64_t time)
--{
--	uint64_t freq =3D 0;
--	bool is_idle =3D true;
--	unsigned int i;
--
--
--	/* calculate the maximum frequency of all children */
--	for (i =3D 0; i < children.size(); i++)
--		if (children[i]) {
--			uint64_t f =3D 0;
--			if (!children[i]->idle) {
--				f =3D children[i]->current_frequency;
--				is_idle =3D false;
--			}
--			if (f > freq)
--				freq =3D f;
--		}
--
--	current_frequency =3D freq;
--	idle =3D is_idle;
--	if (parent)
--		parent->calculate_freq(time);
--	old_idle =3D idle;
--}
--
- char * nhm_core::fill_pstate_line(int line_nr, char *buffer)
- {
- 	buffer[0] =3D 0;
-diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
-index 53cadab..f41d589 100644
---- a/src/cpu/intel_cpus.h
-+++ b/src/cpu/intel_cpus.h
-@@ -80,8 +80,6 @@ public:
- 	virtual int     can_collapse(void) { return 0;};
- =
+thanks,
+	-ss
 
- 	virtual char *  fill_pstate_line(int line_nr, char *buffer);
--
--	virtual void    calculate_freq(uint64_t time);
- };
- =
+>    I'm not sure if this issue has been reported, or if the developers even
+>    have equipment with which to test. I'm more than willing to provide any
+>    sort of debugging output or testing as needed. I could also probably
+>    create a patch, but that's likely to take a lot longer for me to get s=
+etup
+>    with development on this project.=EF=BF=BD
+>    It may be as simple as iterating over a directory in /sys/ or /proc to
+>    gather stats on multiple batteries. An experienced dev might be able to
+>    fix it quickly.
+>    Cheers,
+>    Justin
 
- class nhm_cpu: public cpu_linux
--- =
-
-1.8.0
-
-
---===============1029392750708590590==--
+--===============6926773272115538667==--
 
