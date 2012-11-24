@@ -1,186 +1,87 @@
-Content-Type: multipart/mixed; boundary="===============5098826204616346475=="
+Content-Type: multipart/mixed; boundary="===============8650527058360992872=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [RFC] [PATCH 09/11] Deduplication: properly merge
- cpu_package::calculate_freq() into abstract_cpu::calculate_freq()
-Date: Tue, 06 Nov 2012 23:30:19 +0300
-Message-ID: <20121106203018.GA3326@swordfish>
-In-Reply-To: 1352113953-24687-10-git-send-email-intelfx100@gmail.com
+Subject: Re: [Powertop] Multiple Batteries
+Date: Sat, 24 Nov 2012 15:50:27 +0300
+Message-ID: <20121124125027.GB7100@swordfish>
+In-Reply-To: CAKZK7uy6QP7xHvUpbhzz-Yh+SK2rBdzVNDcsBTgHG+=eiqGp4w@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5098826204616346475==
+--===============8650527058360992872==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (11/05/12 15:12), Ivan Shapovalov wrote:
-> =
+On (11/23/12 22:55), Justin Brown wrote:
+>    Hello,
+>    I'm using Powertop 2.1, and I've noticed a somewhat minor bug. (I coul=
+dn't
+>    find a public bug tracker, but would be more than happy to move this
+>    discussion to one if someone could send me a URL.)
+>    I have two batteries in my laptop, but Powertop does not recognize both
+>    when calculating battery life remaining. For example Gnome-Shell repor=
+ts
+>    that my batteries are at 66% and 100% (85% combined) giving me 10 hours
+>    and 11 minutes of estimated time remaining. On the other hand, Powertop
+>    reports just 3 hours 17 =EF=BF=BDminutes of time. Both programs are re=
+porting the
+>    proper discharge rate. It just seems like Powertop is only using my
+>    smaller battery (the currently active one).
+>    I'm not sure if this issue has been reported, or if the developers even
+>    have equipment with which to test. I'm more than willing to provide any
+>    sort of debugging output or testing as needed. I could also probably
+>    create a patch, but that's likely to take a lot longer for me to get s=
+etup
+>    with development on this project.=EF=BF=BD
+>    It may be as simple as iterating over a directory in /sys/ or /proc to
+>    gather stats on multiple batteries. An experienced dev might be able to
+>    fix it quickly.
+>    Cheers,
+>    Justin
 
-> The overridden method "cpu_package::calculate_freq()" differs from a gene=
-ric implementation in
-> that it propagates the package's frequency to all in-package cores by
-> calling change_effective_frequency().
-> =
 
-> Instead of duplicating the code, introduce a small virtual function
-> freq_updated() which normally propagates frequency changes upwards and
-> override it for cpu_package, retaining the correct behavior. Then remove =
-the override of
-> calculate_freq().
-> =
+can you please test the following patch?
 
-> Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
-> ---
->  src/cpu/abstract_cpu.cpp | 11 ++++++++---
->  src/cpu/cpu.h            |  5 +++--
->  src/cpu/cpu_package.cpp  | 38 +++++++++++---------------------------
->  3 files changed, 22 insertions(+), 32 deletions(-)
-> =
 
-> diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
-> index 083a1e0..d64cb24 100644
-> --- a/src/cpu/abstract_cpu.cpp
-> +++ b/src/cpu/abstract_cpu.cpp
-> @@ -69,6 +69,13 @@ void abstract_cpu::account_freq(uint64_t freq, uint64_=
-t duration)
->  =
+----
 
->  }
->  =
+power_supply rate could be 0.00, so we need to take care in power_meter::ti=
+me_left() =
 
-> +void abstract_cpu::freq_updated(uint64_t time)
-> +{
-> +	if(parent)
-> +		parent->calculate_freq(time);
-> +	old_idle =3D idle;
-> +}
-> +
+while perform dev_capacity()/joules_consumed() =3D=3D inf operation.
 
-why is this function called something_updatED?
 
-	=
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
 
-	-ss
+---
 
->  void abstract_cpu::measurement_start(void)
->  {
->  	unsigned int i;
-> @@ -385,9 +392,7 @@ void abstract_cpu::calculate_freq(uint64_t time)
->  =
+diff --git a/src/measurement/measurement.cpp b/src/measurement/measurement.=
+cpp
+index 4a33db9..f65cb0c 100644
+--- a/src/measurement/measurement.cpp
++++ b/src/measurement/measurement.cpp
+@@ -65,12 +65,13 @@ double power_meter::time_left(void)
+ 	if (cap < 0.001)
+ 		return 0.0;
+ =
 
->  	current_frequency =3D freq;
->  	idle =3D is_idle;
-> -	if (parent)
-> -		parent->calculate_freq(time);
-> -	old_idle =3D idle;
-> +	freq_updated(time);
->  }
->  =
+-	left =3D cap / rate;
++	if (rate < 0.001)
++		rate =3D 1.0;
+ =
 
->  void abstract_cpu::change_effective_frequency(uint64_t time, uint64_t fr=
-equency)
-> diff --git a/src/cpu/cpu.h b/src/cpu/cpu.h
-> index 1e9d771..498447b 100644
-> --- a/src/cpu/cpu.h
-> +++ b/src/cpu/cpu.h
-> @@ -85,6 +85,7 @@ protected:
->  	uint64_t max_minus_one_frequency;
->  =
++	left =3D cap / rate;
+ 	return left;
+ }
+ =
 
->  	virtual void	account_freq(uint64_t frequency, uint64_t duration);
-> +	virtual void	freq_updated(uint64_t time);
->  public:
->  	uint64_t	last_stamp;
->  	uint64_t	total_stamp;
-> @@ -192,6 +193,8 @@ public:
->  =
+-
+ vector<class power_meter *> power_meters;
+ =
 
->  class cpu_package: public abstract_cpu
->  {
-> +protected:
-> +	virtual void	freq_updated(uint64_t time);
->  public:
->  	virtual char *  fill_cstate_line(int line_nr, char *buffer, const char =
-*separator=3D"");
->  	virtual char *  fill_cstate_name(int line_nr, char *buffer);
-> @@ -199,8 +202,6 @@ public:
->  	virtual char *  fill_pstate_line(int line_nr, char *buffer);
->  	virtual char *  fill_pstate_name(int line_nr, char *buffer);
->  	virtual int     can_collapse(void) { return childcount =3D=3D 1;};
-> -
-> -	virtual void    calculate_freq(uint64_t time);
->  };
->  =
+ void start_power_measurement(void)
 
->  extern void enumerate_cpus(void);
-> diff --git a/src/cpu/cpu_package.cpp b/src/cpu/cpu_package.cpp
-> index 0ad5bdd..277b55f 100644
-> --- a/src/cpu/cpu_package.cpp
-> +++ b/src/cpu/cpu_package.cpp
-> @@ -27,6 +27,17 @@
->  #include "../lib.h"
->  #include "../parameters/parameters.h"
->  =
 
-> +void cpu_package::freq_updated(uint64_t time)
-> +{
-> +	if (parent)
-> +		parent->calculate_freq(time);
-> +	/*
-> +	 * Make the frequency changes to propagate to all cores in a package.
-> +	 */
-> +	change_effective_frequency(time, current_frequency);
-> +	old_idle =3D idle;
-> +}
-> +
->  char * cpu_package::fill_cstate_line(int line_nr, char *buffer, const ch=
-ar *separator)
->  {
->  	unsigned int i;
-> @@ -90,30 +101,3 @@ char * cpu_package::fill_pstate_line(int line_nr, cha=
-r *buffer)
->  	sprintf(buffer," %5.1f%% ", percentage(1.0* (pstates[line_nr]->time_aft=
-er) / total_stamp));
->  	return buffer;
->  }
-> -
-> -void cpu_package::calculate_freq(uint64_t time)
-> -{
-> -	uint64_t freq =3D 0;
-> -	bool is_idle =3D true;
-> -	unsigned int i;
-> -
-> -	/* calculate the maximum frequency of all children */
-> -	for (i =3D 0; i < children.size(); i++)
-> -		if (children[i]) {
-> -			uint64_t f =3D 0;
-> -			if (!children[i]->idle) {
-> -				f =3D children[i]->current_frequency;
-> -				is_idle =3D false;
-> -			}
-> -			if (f > freq)
-> -				freq =3D f;
-> -		}
-> -
-> -	current_frequency =3D freq;
-> -	idle =3D is_idle;
-> -	if (parent)
-> -		parent->calculate_freq(time);
-> -	change_effective_frequency(time, current_frequency);
-> -	old_idle =3D idle;
-> -}
-> -
-> -- =
-
-> 1.8.0
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============5098826204616346475==--
+--===============8650527058360992872==--
 
