@@ -1,36 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============9114843874340417911=="
+Content-Type: multipart/mixed; boundary="===============7129617746658834358=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] [Powertop ]compiling issue and running issue
-Date: Wed, 31 Oct 2012 08:24:03 -0700
-Message-ID: <50914293.80704@linux.intel.com>
-In-Reply-To: CAGLu0vNFFArQ4oLhBaApRNgN=3zrmNm9G-qWgdiEoTjw4b6o=A@mail.gmail.com
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Use PACKAGE_VERSION for POWERTOP_VERSION
+Date: Thu, 29 Nov 2012 07:58:57 -0800
+Message-ID: <50B78641.8060503@linux.intel.com>
+In-Reply-To: 1353166967-24095-1-git-send-email-namhyung@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============9114843874340417911==
+--===============7129617746658834358==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 10/31/2012 7:11 AM, Austin Zhang wrote:
-> Hi, =
+On 11/17/2012 07:42 AM, Namhyung Kim wrote:
+> It was missed to update POWERTOP_VERSION macro so that the
+> new v2.2 release still shows v2.1 string on the header of
+> ncurses window.  Convert to use PACKAGE_VERSION macro which
+> set by autotools to the AC_INIT version so that it cannot
+> be missed anymore.
+>
+> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+> ---
+>   src/lib.h |    4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/src/lib.h b/src/lib.h
+> index 8cf4632..209421a 100644
+> --- a/src/lib.h
+> +++ b/src/lib.h
+> @@ -35,8 +35,8 @@
+>   =
 
-> =
+>   #define _(STRING)    gettext(STRING)
+>   =
 
-> I am trying to compile powertop on my box: ubuntu 12.04, X86-64.
-> =
+> -#define POWERTOP_VERSION "v2.1"
+> -#define POWERTOP_SHORT_VERSION "2.1"
+> +#define POWERTOP_VERSION "v"PACKAGE_VERSION
+> +#define POWERTOP_SHORT_VERSION PACKAGE_VERSION
+>   =
 
-> (1)compiling issue
-> =
+>   =
 
-> Here, my system didn=E2=80=99t install libnl-1, but I installed libnl2 (u=
-nder /usr/lib) and libnl-3 (under /lib).
-
-
-on a 64 bit system, that should have been /usr/lib64 and  /lib64
-otherwise you got 32 bit libraries ;-)
+>   extern int get_max_cpu(void);
+Your patch has been applied
+-Chris
 
 
---===============9114843874340417911==--
+--===============7129617746658834358==--
 
