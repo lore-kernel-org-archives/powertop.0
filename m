@@ -1,60 +1,59 @@
-Content-Type: multipart/mixed; boundary="===============5682173900611813286=="
+Content-Type: multipart/mixed; boundary="===============4690164022983352136=="
 MIME-Version: 1.0
-From: kernel kernel <kernel at kenobrien.org>
-Subject: [Powertop] Project request
-Date: Wed, 12 Dec 2012 09:58:32 +0000
-Message-ID: <CAG=jzgAgjkiVX9rgCMudrwQSwe7ybPpVAsrvjCsVDtH03tHPiw@mail.gmail.com>
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] report: fixed crash when writing report to RO
+ filesystem
+Date: Thu, 29 Nov 2012 07:57:33 -0800
+Message-ID: <50B785ED.6000505@linux.intel.com>
+In-Reply-To: 1354117361-29155-1-git-send-email-jskarvad@redhat.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5682173900611813286==
+--===============4690164022983352136==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On 11/28/2012 07:42 AM, Jaroslav =C5=A0karvada wrote:
+> Signed-off-by: Jaroslav =C5=A0karvada <jskarvad(a)redhat.com>
+> ---
+>   src/report/report.cpp | 11 +++++++----
+>   1 file changed, 7 insertions(+), 4 deletions(-)
+>
+> diff --git a/src/report/report.cpp b/src/report/report.cpp
+> index 51bc6a7..c018bb1 100644
+> --- a/src/report/report.cpp
+> +++ b/src/report/report.cpp
+> @@ -183,13 +183,16 @@ void init_report_output(char *filename_str, int ite=
+rations)
+>   =
 
-I'd like to contribute to powertop as part of my PhD research on energy
-efficient heterogeneous hpc. I've been looking through the TODO file in the
-git repo. Is there any particular task which you can recommend for a
-newcomer to the project?
+>   void finish_report_output(void)
+>   {
+> -	fprintf(stderr, _("PowerTOP outputing using base filename %s\n"), repor=
+tout.filename);
+>   	if (reporttype =3D=3D REPORT_OFF)
+>   		return;
+>   =
 
-Thanks,
+>   	report.finish_report();
+> -	fputs(report.get_result(), reportout.report_file);
+> -	fdatasync(fileno(reportout.report_file));
+> -	fclose(reportout.report_file);
+> +	if (reportout.report_file)
+> +	{
+> +		fprintf(stderr, _("PowerTOP outputing using base filename %s\n"), repo=
+rtout.filename);
+> +		fputs(report.get_result(), reportout.report_file);
+> +		fdatasync(fileno(reportout.report_file));
+> +		fclose(reportout.report_file);
+> +	}
+>   	report.clear_result();
+>   }
+You patch has been merged.
+Thank You
+Chris
 
-Ken
 
--- =
-
-Ken O'Brien
-PhD Researcher
-Simulation Science and Extreme Events Cluster,
-3B1, UCD CASL,
-8 Belfield Business Park,
-Dublin 4,
-Ireland.
-
---===============5682173900611813286==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
-
-PHNwYW4gc3R5bGU9ImZvbnQtZmFtaWx5OmFyaWFsLHNhbnMtc2VyaWY7Zm9udC1zaXplOjEzcHgi
-PkhpLDwvc3Bhbj48ZGl2IHN0eWxlPSJmb250LWZhbWlseTphcmlhbCxzYW5zLXNlcmlmO2ZvbnQt
-c2l6ZToxM3B4Ij48YnI+PC9kaXY+PGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6YXJpYWwsc2Fucy1z
-ZXJpZjtmb250LXNpemU6MTNweCI+SSYjMzk7ZCBsaWtlIHRvIGNvbnRyaWJ1dGUgdG8gcG93ZXJ0
-b3AgYXMgcGFydCBvZiBteSBQaEQgcmVzZWFyY2ggb24gZW5lcmd5IGVmZmljaWVudCBoZXRlcm9n
-ZW5lb3VzIGhwYy4gSSYjMzk7dmUgYmVlbiBsb29raW5nIHRocm91Z2ggdGhlIFRPRE8gZmlsZSBp
-biB0aGUgZ2l0IHJlcG8uIElzIHRoZXJlIGFueSBwYXJ0aWN1bGFyIHRhc2sgd2hpY2ggeW91IGNh
-biByZWNvbW1lbmQgZm9yIGEgbmV3Y29tZXIgdG8gdGhlIHByb2plY3Q/PC9kaXY+CjxkaXYgc3R5
-bGU9ImZvbnQtZmFtaWx5OmFyaWFsLHNhbnMtc2VyaWY7Zm9udC1zaXplOjEzcHgiPjxicj48L2Rp
-dj48ZGl2IHN0eWxlPSJmb250LWZhbWlseTphcmlhbCxzYW5zLXNlcmlmO2ZvbnQtc2l6ZToxM3B4
-Ij5UaGFua3MsPC9kaXY+PGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6YXJpYWwsc2Fucy1zZXJpZjtm
-b250LXNpemU6MTNweCI+PGJyPjwvZGl2PjxkaXYgc3R5bGU9ImZvbnQtZmFtaWx5OmFyaWFsLHNh
-bnMtc2VyaWY7Zm9udC1zaXplOjEzcHgiPgpLZW48L2Rpdj48ZGl2Pjxicj48L2Rpdj4tLSA8YnI+
-S2VuIE8mIzM5O0JyaWVuPGJyPlBoRCBSZXNlYXJjaGVyPGJyPlNpbXVsYXRpb24gU2NpZW5jZSBh
-bmQgRXh0cmVtZSBFdmVudHMgQ2x1c3Rlciw8YnI+M0IxLCBVQ0QgQ0FTTCw8YnI+OCBCZWxmaWVs
-ZCBCdXNpbmVzcyBQYXJrLDxicj5EdWJsaW4gNCw8YnI+SXJlbGFuZC48YnI+PGJyPgo=
-
---===============5682173900611813286==--
+--===============4690164022983352136==--
 
