@@ -1,134 +1,118 @@
-Content-Type: multipart/mixed; boundary="===============2955985079269536946=="
+Content-Type: multipart/mixed; boundary="===============8875575603389035684=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] Fix C states and P states presentation issue.
-Date: Tue, 15 Jan 2013 14:23:53 +0300
-Message-ID: <20130115112353.GA2344@swordfish.minsk.epam.com>
-In-Reply-To: 1358247918-31031-1-git-send-email-zhang.austin@gmail.com
+From: Thomas Waldecker <thomas.waldecker at gmail.com>
+Subject: [Powertop] [PATCH] csstoh.sh shell script fixes cross compiling issues
+Date: Fri, 30 Nov 2012 13:46:27 +0100
+Message-ID: <1354279587-20606-1-git-send-email-thomas.waldecker@gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2955985079269536946==
+--===============8875575603389035684==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (01/15/13 19:05), Austin Zhang wrote:
-> If using '10' in this 'for' loop, for P states, once the processor
-> provides more than 10 P states, those additional ones cannot been
-> presented; and for C states, once the processor provides maximize
-> C states level more than 9, for example, it only has POLL, C1, C3,
-> C6, C10, the additional one like C10 also cannot be presented.
->
+From: Thomas Waldecker <thomas.waldecker(a)tqs.de>
 
-Hm, I'm sure I've seen this before. Was it the same patch from
-you?
+Added the csstoh.sh shell script from Igor Zhbanov found here:
+http://lists.01.org/pipermail/powertop/2012-July/000151.html
+also patched the Makefile.am to use the csstoh.sh script.
+The compiled csstoh binary doesn't work for cross compiling,
+however Igors Patch never got applied upstream.
+---
+ src/Makefile.am |    8 +++-----
+ src/csstoh.sh   |   45 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 48 insertions(+), 5 deletions(-)
+ create mode 100755 src/csstoh.sh
 
-I recall Igor patched html report for pstate, but I also remember we had
-something about c states as well.
+diff --git a/src/Makefile.am b/src/Makefile.am
+index f60426a..a53d942 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -1,9 +1,6 @@
+ AUTOMAKE_OPTIONS =3D subdir-objects
+ ACLOCAL_AMFLAGS =3D -I ../m4 =
 
-	-ss
  =
 
-> Now we get the loop numbers from the system information we had got
-> before.
-> =
+-noinst_PROGRAMS =3D csstoh
+-csstoh_SOURCES =3D csstoh.c =
 
-> Signed-off-by: Austin Zhang <zhang.austin(a)gmail.com>
-> ---
->  src/cpu/cpu.cpp |   35 +++++++++++++++++++++++++++++------
->  1 files changed, 29 insertions(+), 6 deletions(-)
-> =
+-
+ sbin_PROGRAMS =3D powertop
+ nodist_powertop_SOURCES =3D css.h
+ =
 
-> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-> index 7f3af69..28f77b7 100644
-> --- a/src/cpu/cpu.cpp
-> +++ b/src/cpu/cpu.cpp
-> @@ -404,6 +404,15 @@ void report_display_cpu_cstates(void)
->  	unsigned int package, core, cpu;
->  	int line;
->  	class abstract_cpu *_package, * _core, * _cpu;
-> +	unsigned int i, j, cstates_num;
-> +
-> +	for (i =3D 0, cstates_num =3D 0; i < all_cpus.size(); i++) {
-> +		if (all_cpus[i])
-> +			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
-> +				if ((all_cpus[i]->cstates[j])->line_level >=3D 0 &&
-> +				    (all_cpus[i]->cstates[j])->line_level > cstates_num)
-> +					cstates_num =3D (all_cpus[i]->cstates[j])->line_level;
-> +	}
->  =
+@@ -48,6 +45,7 @@ AM_LDFLAGS =3D $(LIBS) $(NCURSES_LIBS) $(PCIUTILS_LIBS) $=
+(LIBNL_LIBS) $(LIBZ_LIBS)
+ =
 
->  	report.begin_section(SECTION_CPUIDLE);
->  	report.add_header("Processor Idle state report");
-> @@ -421,7 +430,7 @@ void report_display_cpu_cstates(void)
->  			if (!_core)
->  				continue;
->  =
+ BUILT_SOURCES =3D css.h
+ CLEANFILES =3D css.h
+-css.h: csstoh powertop.css
+-	./csstoh "$(srcdir)"/powertop.css css.h
++css.h: powertop.css
++	chmod +x ./csstoh.sh
++	./csstoh.sh "$(srcdir)"/powertop.css css.h
+ =
 
-> -			for (line =3D LEVEL_HEADER; line < 10; line++) {
-> +			for (line =3D LEVEL_HEADER; line <=3D (int)cstates_num; line++) {
->  				bool first_cpu =3D true;
->  =
+diff --git a/src/csstoh.sh b/src/csstoh.sh
+new file mode 100755
+index 0000000..5918d12
+--- /dev/null
++++ b/src/csstoh.sh
+@@ -0,0 +1,45 @@
++#!/bin/bash
++#
++# This program file is free software; you can redistribute it and/or modif=
+y it
++# under the terms of the GNU General Public License as published by the
++# Free Software Foundation; version 2 of the License.
++#
++# This program is distributed in the hope that it will be useful, but WITH=
+OUT
++# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
++# for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program in a file named COPYING; if not, write to the
++# Free Software Foundation, Inc,
++# 51 Franklin Street, Fifth Floor,
++# Boston, MA 02110-1301 USA
++# or just google for it.
++#
++# Written by Igor Zhbanov<i.zhbanov at samsung.com>
++
++
++if [ $# -lt 2 ]; then
++	echo "Usage: csstoh.sh cssfile header.h"
++	exit 1
++fi
++
++if [ ! -r $1 ]; then
++	echo "Can't find file $1"
++	exit 1
++fi
++
++if ! echo -n>$2; then
++	echo "Can't open file $2 for writing."
++	exit 1
++fi
++
++echo "#ifndef __INCLUDE_GUARD_CCS_H">>  $2
++echo "#define __INCLUDE_GUARD_CCS_H">>  $2
++echo>>  $2
++echo "const char css[] =3D ">>  $2
++
++sed -r 's/^(.*)$/\t\"\1\\n\"/' $1>>  $2
++
++echo ";">>  $2
++echo "#endif">>  $2
+-- =
 
->  				if (!_package->has_cstate_level(line))
-> @@ -628,14 +637,29 @@ void impl_w_display_cpu_states(int state)
->  	char buffer[128];
->  	char linebuf[1024];
->  	unsigned int package, core, cpu;
-> -	int line;
-> +	int line, loop;
->  	class abstract_cpu *_package, * _core, * _cpu;
->  	int ctr =3D 0;
-> +	unsigned int i, j, cstates_num, pstates_num;
-> +
-> +	for (i =3D 0, cstates_num =3D 0, pstates_num =3D 0; i < all_cpus.size()=
-; i++) {
-> +		if (all_cpus[i] && all_cpus[i]->pstates.size() > pstates_num)
-> +			pstates_num =3D all_cpus[i]->pstates.size();
->  =
+1.7.9.5
 
-> -	if (state =3D=3D PSTATE)
-> +		if (all_cpus[i])
-> +			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
-> +				if ((all_cpus[i]->cstates[j])->line_level >=3D 0 &&
-> +				    (all_cpus[i]->cstates[j])->line_level > cstates_num)
-> +					cstates_num =3D (all_cpus[i]->cstates[j])->line_level;
-> +	}
-> +
-> +	if (state =3D=3D PSTATE) {
->  		win =3D get_ncurses_win("Frequency stats");
-> -	else
-> +		loop =3D (int)pstates_num;
-> +	} else {
->  		win =3D get_ncurses_win("Idle stats");
-> +		loop =3D (int)cstates_num;
-> +	}
->  =
 
->  	if (!win)
->  		return;
-> @@ -656,8 +680,7 @@ void impl_w_display_cpu_states(int state)
->  			if (!_core->has_pstates() && state =3D=3D PSTATE)
->  				continue;
->  =
-
-> -
-> -			for (line =3D LEVEL_HEADER; line < 10; line++) {
-> +			for (line =3D LEVEL_HEADER; line <=3D loop; line++) {
->  				int first =3D 1;
->  				ctr =3D 0;
->  				linebuf[0] =3D 0;
-> -- =
-
-> 1.7.5.4
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============2955985079269536946==--
+--===============8875575603389035684==--
 
