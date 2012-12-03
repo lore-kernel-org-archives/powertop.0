@@ -1,41 +1,67 @@
-Content-Type: multipart/mixed; boundary="===============5662851039365978958=="
+Content-Type: multipart/mixed; boundary="===============6263551969486019920=="
 MIME-Version: 1.0
-From: =?utf-8?q?Jaroslav_=C5=A0karvada_=3Cjskarvad_at_redhat=2Ecom=3E?=
-Subject: [Powertop] [PATCH] Do not call abstract_cpu::wiggle for GPU
-Date: Mon, 14 Jan 2013 17:41:58 +0100
-Message-ID: <1358181718-17761-1-git-send-email-jskarvad@redhat.com>
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH 3/3] process: Get rid of unused
+ dbg_printf_pevent_info()
+Date: Mon, 03 Dec 2012 19:16:21 +0300
+Message-ID: <20121203161621.GA2623@swordfish>
+In-Reply-To: 1354547600-1743-3-git-send-email-namhyung@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5662851039365978958==
+--===============6263551969486019920==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-first_cpu is uninitialized there which results in:
-open("/sys/devices/system/cpu/cpu1330597711/cpufreq/scaling_max_freq", O_RD=
-ONLY)
----
- src/cpu/intel_cpus.h | 1 +
- 1 file changed, 1 insertion(+)
+On (12/04/12 00:13), Namhyung Kim wrote:
+> This function is not used, just remove it.
+> This fixes following warning:
+> =
 
-diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
-index 1949af1..752e8d0 100644
---- a/src/cpu/intel_cpus.h
-+++ b/src/cpu/intel_cpus.h
-@@ -158,5 +158,6 @@ public:
- 	virtual char *  fill_cstate_line(int line_nr, char *buffer, const char *s=
-eparator);
- 	virtual int	has_pstate_level(int level) { return 0; };
- 	virtual int	has_pstates(void) { return 0; };
-+	virtual void	wiggle(void) { };
- =
+>   CXX    process/powertop-do_process.o
+> process/do_process.cpp:190: warning: =E2=80=98void dbg_printf_pevent_info=
+(event_format*, pevent_record*)=E2=80=99 defined but not used
+> =
 
- };
--- =
+> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+> ---
+>  src/process/do_process.cpp |   13 -------------
+>  1 file changed, 13 deletions(-)
+> =
 
-1.7.11.7
+> diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
+> index 6ac0fae..a07b3f3 100644
+> --- a/src/process/do_process.cpp
+> +++ b/src/process/do_process.cpp
+> @@ -187,19 +187,6 @@ int dont_blame_me(char *comm)
+>  	return 0;
+>  }
+>  =
+
+> -static void dbg_printf_pevent_info(struct event_format *event, struct pe=
+vent_record *rec)
+> -{
+> -	static struct trace_seq s;
+> -
+> -	event->pevent->print_raw =3D 1;
+> -	trace_seq_init(&s);
+> -	pevent_event_info(&s, event, rec);
+> -	trace_seq_putc(&s, '\n');
+> -	trace_seq_terminate(&s);
+> -	fprintf(stderr, "%.*s", s.len, s.buffer);
+> -	trace_seq_destroy(&s);
+> -}
+> -
+>  static char * get_pevent_field_str(void *trace, struct event_format *eve=
+nt, struct format_field *field)
+>  {
+>  	unsigned long long offset, len;
 
 
---===============5662851039365978958==--
+this one looks good to me.
+
+	-ss
+
+--===============6263551969486019920==--
 
