@@ -1,96 +1,149 @@
-Content-Type: multipart/mixed; boundary="===============7388783128151424779=="
+Content-Type: multipart/mixed; boundary="===============2778512398725706117=="
 MIME-Version: 1.0
-From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: Re: [Powertop] [RFC][PATCH 1/2] Adding report generator facility
-Date: Tue, 09 Oct 2012 21:02:28 +0400
-Message-ID: <507458A4.8090403@samsung.com>
-In-Reply-To: 20121008165743.GA21958@swordfish.datadirect.datadirectnet.com
+From: Namhyung Kim <namhyung at gmail.com>
+Subject: [Powertop] [PATCH 2/3] Suppress compiler warnings on system()
+Date: Tue, 04 Dec 2012 00:13:19 +0900
+Message-ID: <1354547600-1743-2-git-send-email-namhyung@gmail.com>
+In-Reply-To: 1354547600-1743-1-git-send-email-namhyung@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7388783128151424779==
+--===============2778512398725706117==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Sergey,
+As system(3) requires to check its return value, make a wrapper
+do_system() to suppress following warnings:
 
-Sergey Senozhatsky wrote:
+  CXX    tuning/powertop-bluetooth.o
+tuning/bluetooth.cpp: In member function =E2=80=98virtual void bt_tunable::=
+toggle()=E2=80=99:
+tuning/bluetooth.cpp:179: warning: ignoring return value of =E2=80=98int sy=
+stem(const char*)=E2=80=99, declared with attribute warn_unused_result
+tuning/bluetooth.cpp:182: warning: ignoring return value of =E2=80=98int sy=
+stem(const char*)=E2=80=99, declared with attribute warn_unused_result
+  CXX    tuning/powertop-cpufreq.o
+tuning/cpufreq.cpp: In member function =E2=80=98virtual void cpufreq_tunabl=
+e::toggle()=E2=80=99:
+tuning/cpufreq.cpp:118: warning: ignoring return value of =E2=80=98int syst=
+em(const char*)=E2=80=99, declared with attribute warn_unused_result
+...
+  CXX    calibrate/powertop-calibrate.o
+calibrate/calibrate.cpp: In function =E2=80=98void backlight_calibration()=
+=E2=80=99:
+calibrate/calibrate.cpp:408: warning: ignoring return value of =E2=80=98int=
+ system(const char*)=E2=80=99, declared with attribute warn_unused_result
+calibrate/calibrate.cpp:410: warning: ignoring return value of =E2=80=98int=
+ system(const char*)=E2=80=99, declared with attribute warn_unused_result
+calibrate/calibrate.cpp: In function =E2=80=98void idle_calibration()=E2=80=
+=99:
+calibrate/calibrate.cpp:416: warning: ignoring return value of =E2=80=98int=
+ system(const char*)=E2=80=99, declared with attribute warn_unused_result
+calibrate/calibrate.cpp:418: warning: ignoring return value of =E2=80=98int=
+ system(const char*)=E2=80=99, declared with attribute warn_unused_result
 
-> Hello,
->
-> - can we please avoid code duplication? for example, both html and csv
-> reporters contain identical implementations of
->
-> clear_result()/get_result()/add*() and friends.
+Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+---
+ src/calibrate/calibrate.cpp |    8 ++++----
+ src/lib.cpp                 |    5 +++++
+ src/lib.h                   |    1 +
+ src/tuning/bluetooth.cpp    |    4 ++--
+ src/tuning/cpufreq.cpp      |    2 +-
+ 5 files changed, 13 insertions(+), 7 deletions(-)
 
-Done. Please check v2 patchset (after list moderator will approve those big=
- letters).
+diff --git a/src/calibrate/calibrate.cpp b/src/calibrate/calibrate.cpp
+index 2d4c1af..c886b73 100644
+--- a/src/calibrate/calibrate.cpp
++++ b/src/calibrate/calibrate.cpp
+@@ -406,17 +406,17 @@ static void backlight_calibration(void)
+ 		sleep(1);
+ 	}
+ 	printf(_("Calibrating idle\n"));
+-	system("DISPLAY=3D:0 /usr/bin/xset dpms force off");
++	do_system("DISPLAY=3D:0 /usr/bin/xset dpms force off");
+ 	one_measurement(15, NULL);
+-	system("DISPLAY=3D:0 /usr/bin/xset dpms force on");
++	do_system("DISPLAY=3D:0 /usr/bin/xset dpms force on");
+ }
+ =
 
-> - I think null formatter could be a basic class with default
-> implementation (null) of virtual functions, rather than separate
-> implementation of basic formatter interface (abstract class).
+ static void idle_calibration(void)
+ {
+ 	printf(_("Calibrating idle\n"));
+-	system("DISPLAY=3D:0 /usr/bin/xset dpms force off");
++	do_system("DISPLAY=3D:0 /usr/bin/xset dpms force off");
+ 	one_measurement(15, NULL);
+-	system("DISPLAY=3D:0 /usr/bin/xset dpms force on");
++	do_system("DISPLAY=3D:0 /usr/bin/xset dpms force on");
+ }
+ =
 
-The null formatter is needed only because the code that uses the report
-facility is called even when the reports are not needed.
+ =
 
-The function one_measurement() (which calls to other reporting functions) f=
-irst
-called from make_report() with 1 second parameter. And that report will be =
-thrown
-away. In the comments there is a note that this is to warm-up the system. I=
- don't know
-whether it is really needed.
+diff --git a/src/lib.cpp b/src/lib.cpp
+index 9838c0b..ccba414 100644
+--- a/src/lib.cpp
++++ b/src/lib.cpp
+@@ -441,3 +441,8 @@ int get_user_input(char *buf, unsigned sz)
+ 	/* to distinguish between getnstr error and empty line */
+ 	return ret || strlen(buf);
+ }
++
++int do_system(const char *command)
++{
++	return system(command); /* make gcc slient */
++}
+diff --git a/src/lib.h b/src/lib.h
+index 209421a..7002f14 100644
+--- a/src/lib.h
++++ b/src/lib.h
+@@ -73,5 +73,6 @@ typedef void (*callback)(const char*);
+ extern void process_directory(const char *d_name, callback fn);
+ extern int utf_ok;
+ extern int get_user_input(char *buf, unsigned sz);
++extern int do_system(const char *cmd);
+ =
 
-After that make_report() produces real reports inside the loop by calling
-the one_measurement() function.
+ #endif
+diff --git a/src/tuning/bluetooth.cpp b/src/tuning/bluetooth.cpp
+index e0bdf12..b717610 100644
+--- a/src/tuning/bluetooth.cpp
++++ b/src/tuning/bluetooth.cpp
+@@ -176,10 +176,10 @@ void bt_tunable::toggle(void)
+ 	good =3D good_bad();
+ =
 
-Also one_measurement() is called from calibration code, and that code doesn=
-'t need
-any reports too.
+ 	if (good =3D=3D TUNE_GOOD) {
+-		system("/usr/sbin/hciconfig hci0 up &> /dev/null &");
++		do_system("/usr/sbin/hciconfig hci0 up &> /dev/null &");
+ 		return;
+ 	}
+-	system("/usr/sbin/hciconfig hci0 down &> /dev/null");
++	do_system("/usr/sbin/hciconfig hci0 down &> /dev/null");
+ }
+ =
 
-So we need to decide when to call reporting functions from one_measurement(=
-).
-We could check the report_type there. But what type of report maker should =
-we create
-when we don't need the reports? HTML? CSV? Sounds no good.
+ const char *bt_tunable::toggle_script(void)
+diff --git a/src/tuning/cpufreq.cpp b/src/tuning/cpufreq.cpp
+index df245ad..8a8d1c5 100644
+--- a/src/tuning/cpufreq.cpp
++++ b/src/tuning/cpufreq.cpp
+@@ -115,7 +115,7 @@ void cpufreq_tunable::toggle(void)
+ 	int good;
+ 	good =3D good_bad();
+ =
 
-Providing a flag inside the report maker whether we need to produce the rep=
-orts
-and check it upon entry to every method is no good too.
+-	system("/sbin/modprobe cpufreq_ondemand > /dev/null 2>&1");
++	do_system("/sbin/modprobe cpufreq_ondemand > /dev/null 2>&1");
+ =
 
-We could create report maker and provide it to the needed functions by poin=
-ter.
-But what to provide when we need not report? NULL? Then we have to check fo=
-r it
-in every function. Lot's of unnecessary checks.
-
-We could combine two mentioned approaches -- create report maker only when
-we actually need to produce the report, and call report creating functions =
-from
-one_measurement() with non-NULL pointer to report (and pass it down to all
-other functions that need it).
-
-Then we could get rid of null report-maker. But now it is easier way to dea=
-l with
-such usage of report facility.
-
-What you think?
-
-It is very hard to refactor this code.
-
+ 	if (good =3D=3D TUNE_GOOD) {
+ 		dir =3D opendir("/sys/devices/system/cpu");
 -- =
 
-Best regards,
-Igor Zhbanov,
-Expert Software Engineer,
-phone: +7 (495) 797 25 00 ext 3806
-e-mail: i.zhbanov(a)samsung.com
-
-ASWG, Moscow R&D center, Samsung Electronics
-12 Dvintsev street, building 1
-127018, Moscow, Russian Federation
+1.7.9.2
 
 
---===============7388783128151424779==--
+--===============2778512398725706117==--
 
