@@ -1,66 +1,76 @@
-Content-Type: multipart/mixed; boundary="===============0496288223461014293=="
+Content-Type: multipart/mixed; boundary="===============0471486546060584058=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] main: Fix output when running workload
-Date: Mon, 14 Jan 2013 18:49:12 +0300
-Message-ID: <20130114154912.GA2402@swordfish.minsk.epam.com>
-In-Reply-To: 1358174972-18163-1-git-send-email-namhyung@gmail.com
+From: Namhyung Kim <namhyung at gmail.com>
+Subject: [Powertop] [PATCH 1/3] Suppress compiler warnings on write()
+Date: Tue, 04 Dec 2012 00:13:18 +0900
+Message-ID: <1354547600-1743-1-git-send-email-namhyung@gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0496288223461014293==
+--===============0471486546060584058==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (01/14/13 23:49), Namhyung Kim wrote:
-> Date: Mon, 14 Jan 2013 23:49:32 +0900
-> From: Namhyung Kim <namhyung(a)gmail.com>
-> To: powertop(a)lists.01.org
-> Subject: [Powertop] [PATCH] main: Fix output when running workload
-> X-Mailer: git-send-email 1.7.9.2
-> =
+Modern linux distribution forces to check result of write() call.
+It emits following warnings:
 
-> Currently one_measurement() function prints following message after
-> a successful run of the workload.
-> =
+  CXX    calibrate/powertop-calibrate.o
+calibrate/calibrate.cpp: In function =E2=80=98void* burn_disk(void*)=E2=80=
+=99:
+calibrate/calibrate.cpp:297: warning: ignoring return value of =E2=80=98ssi=
+ze_t write(int, const void*, size_t)=E2=80=99, declared with attribute warn=
+_unused_result
+...
+  CXX    measurement/powertop-extech.o
+measurement/extech.cpp: In member function =E2=80=98void extech_power_meter=
+::measure()=E2=80=99:
+measurement/extech.cpp:290: warning: ignoring return value of =E2=80=98ssiz=
+e_t write(int, const void*, size_t)=E2=80=99, declared with attribute warn_=
+unused_result
 
->   $ sudo powertop --html --workload=3D"sleep 1"
->   Loaded 1 prior measurements
->   Preparing to take measurements
->   Measuring workload sleep 1.
->   Unknown issue running workload!                         <-- here
->   PowerTOP outputing using base filename powertop.html
-> =
+Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+---
+ src/calibrate/calibrate.cpp |    3 ++-
+ src/measurement/extech.cpp  |    3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-> It seems this was because it wrongly checks return value of system.
-> The return value of the system() call is the status of wait() call
-> so that it should be zero if things went well.
->
-
-looks good to me, thanks.
+diff --git a/src/calibrate/calibrate.cpp b/src/calibrate/calibrate.cpp
+index 5457cf8..2d4c1af 100644
+--- a/src/calibrate/calibrate.cpp
++++ b/src/calibrate/calibrate.cpp
+@@ -294,7 +294,8 @@ static void *burn_disk(void *dummy)
  =
 
-> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
-> ---
->  src/main.cpp |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> =
+ 	while (!stop_measurement) {
+ 		lseek(fd, 0, SEEK_SET);
+-		write(fd, buffer, 64*1024);
++		if (write(fd, buffer, 64*1024))
++			/* make gcc silent */;
+ 		fdatasync(fd);
+ 	}
+ 	close(fd);
+diff --git a/src/measurement/extech.cpp b/src/measurement/extech.cpp
+index 4e8bf8a..b9e95ca 100644
+--- a/src/measurement/extech.cpp
++++ b/src/measurement/extech.cpp
+@@ -287,7 +287,8 @@ extech_power_meter::extech_power_meter(const char *exte=
+ch_name)
+ void extech_power_meter::measure(void)
+ {
+ 	/* trigger the extech to send data */
+-	write(fd, " ", 1);
++	if (write(fd, " ", 1) < 0)
++		return;
+ =
 
-> diff --git a/src/main.cpp b/src/main.cpp
-> index b22d11d..0883424 100644
-> --- a/src/main.cpp
-> +++ b/src/main.cpp
-> @@ -191,7 +191,7 @@ void one_measurement(int seconds, char *workload)
->  	start_cpu_measurement();
->  =
+ 	rate =3D extech_read(fd);
+ =
 
->  	if (workload && workload[0]) {
-> -		if (!system(workload))
-> +		if (system(workload))
->  			fprintf(stderr, _("Unknown issue running workload!\n"));
->  	} else {
->  		do_sleep(seconds);
+-- =
 
---===============0496288223461014293==--
+1.7.9.2
+
+
+--===============0471486546060584058==--
 
