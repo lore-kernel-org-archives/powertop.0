@@ -1,70 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============0040791914939205629=="
+Content-Type: multipart/mixed; boundary="===============2023312884642899922=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Strange Behavior - PowerTOP 2.0 Seg Fault
-Date: Sun, 11 Nov 2012 22:49:46 +0300
-Message-ID: <20121111194946.GB3851@swordfish>
-In-Reply-To: 20121111194528.GA3851@swordfish
+From: Namhyung Kim <namhyung at gmail.com>
+Subject: Re: [Powertop] [PATCH 1/3] Suppress compiler warnings on write()
+Date: Tue, 04 Dec 2012 01:18:14 +0900
+Message-ID: <1354551494.1506.1.camel@leonhard>
+In-Reply-To: 50BCCFF6.8070608@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0040791914939205629==
+--===============2023312884642899922==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (11/11/12 22:45), Sergey Senozhatsky wrote:
-> hm, that's something. seems like enumerate_cpus(); failed
-> because perf_bundle was NULL in cpu by the time of =
+Hi Arjan,
 
-> 	perf_events->start();
+2012-12-03 (=EC=9B=94), 08:14 -0800, Arjan van de Ven:
+> On 12/3/2012 7:13 AM, Namhyung Kim wrote:
+> > -		write(fd, buffer, 64*1024);
+> > +		if (write(fd, buffer, 64*1024))
+> > +			/* make gcc silent */;
+> >   		fdatasync(fd);
 > =
 
-> call, but it did not crashed on any of enumerate_cpus()
-> =
-
-> 332         perf_events =3D new perf_power_bundle();
-> 333 =
-
-> 334         if (!perf_events->add_event("power:cpu_idle")){
-> 335                 perf_events->add_event("power:power_start");
-> 336                 perf_events->add_event("power:power_end");
-> 337         }
-> 338         if (!perf_events->add_event("power:cpu_frequency"))
-> 339                 perf_events->add_event("power:power_frequency");
-> =
-
-> =
-
-> so it leaves only one suspect: enumerate_cpus()
-> =
-
-> 269         file.open("/proc/cpuinfo",  ios::in);
-> 270 =
-
-> 271         if (!file)
-> 272                 return;
-> =
-
-> =
-
-> =
-
-> is that happeninig all the time? =
-
-> a *very* stupid question - do you have /proc/cpuinfo file?
+> I'm sorry, but no.
+> This is waaaaaaaaaaay worse than leaving the compiler warning.
+> The compiler warning is real, and is a reminder that we need to improve t=
+he code
+> "just make it shut up" patches are a really bad idea, and this is the per=
+fect example of that.
 > =
 
 
-sorry for mistakes and typos.
+So how can we improve the code then?
+
+-- =
+
+Regards,
+Namhyung Kim
 
 
 
- "# CONFIG_PROC_FS is not set" case?
- =
-
-
-	-ss
-
---===============0040791914939205629==--
+--===============2023312884642899922==--
 
