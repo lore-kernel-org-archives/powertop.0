@@ -1,69 +1,161 @@
-Content-Type: multipart/mixed; boundary="===============1693157646896109184=="
+Content-Type: multipart/mixed; boundary="===============5565995157856452240=="
 MIME-Version: 1.0
-From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: Re: [Powertop] [FYI][RFC][PATCH 0/2] MALI GPU profiling support
-Date: Fri, 21 Dec 2012 14:38:40 +0400
-Message-ID: <50D43C30.6080804@samsung.com>
-In-Reply-To: 20121221095806.GA2914@swordfish.minsk.epam.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH v1] Allow frequency stats when cpuidle is not
+ enabled
+Date: Tue, 04 Dec 2012 17:10:55 +0300
+Message-ID: <20121204141055.GA2833@swordfish.minsk.epam.com>
+In-Reply-To: 1354601251-5722-1-git-send-email-rajagopal.venkat@linaro.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1693157646896109184==
+--===============5565995157856452240==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello, Sergey.
+On (12/04/12 11:37), Rajagopal Venkat wrote:
+> Powertop fails to display frequency stats when cpuidle subsystem
+> is not enabled. Fix it.
+> =
 
-The base code stays the same.
+> Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
+> ---
 
-Sergey Senozhatsky wrote:
+looks good to me, thanks.
 
-> On (12/21/12 13:06), Igor Zhbanov wrote:
->> Hi all,
->>
->> It is just a ping. :-)
->> The list is quiet about these patches. Will you integrate it or not?
->> What should be changed before it?
-> Hello, Igor
-> sorry, didn't have much free time.
-> are there any updates scheduled?
->
-> I'll take a look during holidays.
-> 	-ss
->> Igor Zhbanov wrote:
->>> This patch-set adds the ability of profiling MALI GPU in Powertop.
->> ...
->>> Igor Zhbanov (2):
->>>    Introducing process scanner facility
->>>    MALI GPU profiling support
->>>
->>>   src/Makefile.am                                   |    2 +
->>>   src/main.cpp                                      |   17 +-
->>>   src/mali-internal-events/mali-events.h            |  143 +++
->>>   src/mali-internal-events/mali-internal-events.cpp | 1279 ++++++++++++=
-+++++++++
->>>   src/mali-internal-events/proc-scan.cpp            |  316 +++++
->>>   src/mali-internal-events/proc-scan.h              |   59 +
->>>   src/process/process.cpp                           |   43 +
->>>   7 files changed, 1857 insertions(+), 2 deletions(-)
->>>   create mode 100644 src/mali-internal-events/mali-events.h
->>>   create mode 100644 src/mali-internal-events/mali-internal-events.cpp
->>>   create mode 100644 src/mali-internal-events/proc-scan.cpp
->>>   create mode 100644 src/mali-internal-events/proc-scan.h
-
--- =
-
-Best regards,
-Igor Zhbanov,
-Technical Leader,
-phone: +7 (495) 797 25 00 ext 3806
-e-mail: i.zhbanov(a)samsung.com
-
-Mobile group, Moscow R&D center, Samsung Electronics
-12 Dvintsev street, building 1
-127018, Moscow, Russian Federation
+	-ss
 
 
---===============1693157646896109184==--
+>  src/cpu/cpu.h         |  7 ++++++-
+>  src/cpu/cpu_linux.cpp | 36 +++++++++++++++++++++++++++---------
+>  2 files changed, 33 insertions(+), 10 deletions(-)
+> =
+
+> diff --git a/src/cpu/cpu.h b/src/cpu/cpu.h
+> index 4480b11..781e33c 100644
+> --- a/src/cpu/cpu.h
+> +++ b/src/cpu/cpu.h
+> @@ -159,7 +159,12 @@ extern vector<class abstract_cpu *> all_cpus;
+>  class cpu_linux: public abstract_cpu
+>  {
+>  =
+
+> -	void		account_freq(uint64_t frequency, uint64_t duration);
+> +	void	account_freq(uint64_t frequency, uint64_t duration);
+> +	void 	parse_pstates_start(void);
+> +	void 	parse_cstates_start(void);
+> +	void 	parse_pstates_end(void);
+> +	void 	parse_cstates_end(void);
+> +
+>  public:
+>  	virtual void	measurement_start(void);
+>  	virtual void	measurement_end(void);
+> diff --git a/src/cpu/cpu_linux.cpp b/src/cpu/cpu_linux.cpp
+> index d6caf45..e7a3d37 100644
+> --- a/src/cpu/cpu_linux.cpp
+> +++ b/src/cpu/cpu_linux.cpp
+> @@ -47,17 +47,13 @@ static int is_turbo(uint64_t freq, uint64_t max, uint=
+64_t maxmo)
+>  	return 1;
+>  }
+>  =
+
+> -void cpu_linux::measurement_start(void)
+> +void cpu_linux::parse_cstates_start(void)
+>  {
+>  	ifstream file;
+> -
+>  	DIR *dir;
+>  	struct dirent *entry;
+>  	char filename[256];
+>  	int len;
+> -	unsigned int i;
+> -
+> -	abstract_cpu::measurement_start();
+>  =
+
+>  	len =3D sprintf(filename, "/sys/devices/system/cpu/cpu%i/cpuidle", numb=
+er);
+>  =
+
+> @@ -111,9 +107,16 @@ void cpu_linux::measurement_start(void)
+>  =
+
+>  	}
+>  	closedir(dir);
+> +}
+>  =
+
+> -	last_stamp =3D 0;
+>  =
+
+> +void cpu_linux::parse_pstates_start(void)
+> +{
+> +	ifstream file;
+> +	char filename[256];
+> +	unsigned int i;
+> +
+> +	last_stamp =3D 0;
+>  	for (i =3D 0; i < children.size(); i++)
+>  		if (children[i])
+>  			children[i]->wiggle();
+> @@ -136,8 +139,14 @@ void cpu_linux::measurement_start(void)
+>  	account_freq(0, 0);
+>  }
+>  =
+
+> +void cpu_linux::measurement_start(void)
+> +{
+> +	abstract_cpu::measurement_start();
+> +	parse_cstates_start();
+> +	parse_pstates_start();
+> +}
+>  =
+
+> -void cpu_linux::measurement_end(void)
+> +void cpu_linux::parse_cstates_end(void)
+>  {
+>  	DIR *dir;
+>  	struct dirent *entry;
+> @@ -187,6 +196,12 @@ void cpu_linux::measurement_end(void)
+>  =
+
+>  	}
+>  	closedir(dir);
+> +}
+> +
+> +void cpu_linux::parse_pstates_end(void)
+> +{
+> +	char filename[256];
+> +	ifstream file;
+>  =
+
+>  	sprintf(filename, "/sys/devices/system/cpu/cpu%i/cpufreq/stats/time_in_=
+state", number);
+>  =
+
+> @@ -216,12 +231,15 @@ void cpu_linux::measurement_end(void)
+>  		}
+>  		file.close();
+>  	}
+> +}
+>  =
+
+> -
+> +void cpu_linux::measurement_end(void)
+> +{
+> +	parse_cstates_end();
+> +	parse_pstates_end();
+>  	abstract_cpu::measurement_end();
+>  }
+>  =
+
+> -
+>  char * cpu_linux::fill_cstate_line(int line_nr, char *buffer, const char=
+ *separator)
+>  {
+>  	unsigned int i;
+
+--===============5565995157856452240==--
 
