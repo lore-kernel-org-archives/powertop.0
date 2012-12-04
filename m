@@ -1,47 +1,155 @@
-Content-Type: multipart/mixed; boundary="===============8638333524650741328=="
+Content-Type: multipart/mixed; boundary="===============7650672188864184307=="
 MIME-Version: 1.0
-From: cshanahan at comcast.net
-Subject: [Powertop] Strange Behavior - PowerTOP 2.0 Seg Fault
-Date: Sun, 04 Nov 2012 15:51:23 +0000
-Message-ID: <596858900.1109759.1352044283776.JavaMail.root@sz0055a.westchester.pa.mail.comcast.net>
-In-Reply-To: 182829271.1109641.1352044001375.JavaMail.root@sz0055a.westchester.pa.mail.comcast.net
+From: Rajagopal Venkat <rajagopal.venkat at linaro.org>
+Subject: [Powertop] [PATCH v1] Allow frequency stats when cpuidle is not
+ enabled
+Date: Tue, 04 Dec 2012 11:37:31 +0530
+Message-ID: <1354601251-5722-1-git-send-email-rajagopal.venkat@linaro.org>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8638333524650741328==
+--===============7650672188864184307==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Powertop fails to display frequency stats when cpuidle subsystem
+is not enabled. Fix it.
 
-I was reading PowerTOP documentation and was curious whether it could help =
-me better manage power on my HP EliteBook 6930p laptop. I am running PowerT=
-OP v.2.0 on openSUSE 12.2 64-bit. After looking at some of my options from =
-the Overview and Stats tabs, I elected to run 'powertop --calibrate' as the=
- docs suggest. PowerTOP did not complete the calibration process; it exited=
- with a seg fault. Now the hardware button for WiFi (small button along the=
- top of the laptop near the screen) flashes constantly. I'm concerned that =
-PowerTOP caused some sort of hardware problem and damaged my laptop.
+Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)linaro.org>
+---
+ src/cpu/cpu.h         |  7 ++++++-
+ src/cpu/cpu_linux.cpp | 36 +++++++++++++++++++++++++++---------
+ 2 files changed, 33 insertions(+), 10 deletions(-)
 
-Is there a way for me to check what PowerTOP did to my machine?
-Is there a way for me to completely revert any changes made by PowerTOP?
+diff --git a/src/cpu/cpu.h b/src/cpu/cpu.h
+index 4480b11..781e33c 100644
+--- a/src/cpu/cpu.h
++++ b/src/cpu/cpu.h
+@@ -159,7 +159,12 @@ extern vector<class abstract_cpu *> all_cpus;
+ class cpu_linux: public abstract_cpu
+ {
+ =
 
-uname -a
-Linux 6930p.site 3.4.11-2.16-desktop #1 SMP PREEMPT Wed Sep 26 17:05:00 UTC=
- 2012 (259fc87) x86_64 x86_64 x86_64 GNU/Linux
+-	void		account_freq(uint64_t frequency, uint64_t duration);
++	void	account_freq(uint64_t frequency, uint64_t duration);
++	void 	parse_pstates_start(void);
++	void 	parse_cstates_start(void);
++	void 	parse_pstates_end(void);
++	void 	parse_cstates_end(void);
++
+ public:
+ 	virtual void	measurement_start(void);
+ 	virtual void	measurement_end(void);
+diff --git a/src/cpu/cpu_linux.cpp b/src/cpu/cpu_linux.cpp
+index d6caf45..e7a3d37 100644
+--- a/src/cpu/cpu_linux.cpp
++++ b/src/cpu/cpu_linux.cpp
+@@ -47,17 +47,13 @@ static int is_turbo(uint64_t freq, uint64_t max, uint64=
+_t maxmo)
+ 	return 1;
+ }
+ =
 
-6930p:~ # powertop --calibrate
-Starting PowerTOP power estimate calibration =
+-void cpu_linux::measurement_start(void)
++void cpu_linux::parse_cstates_start(void)
+ {
+ 	ifstream file;
+-
+ 	DIR *dir;
+ 	struct dirent *entry;
+ 	char filename[256];
+ 	int len;
+-	unsigned int i;
+-
+-	abstract_cpu::measurement_start();
+ =
 
-Calibrating idle
-Segmentation fault
+ 	len =3D sprintf(filename, "/sys/devices/system/cpu/cpu%i/cpuidle", number=
+);
+ =
+
+@@ -111,9 +107,16 @@ void cpu_linux::measurement_start(void)
+ =
+
+ 	}
+ 	closedir(dir);
++}
+ =
+
+-	last_stamp =3D 0;
+ =
+
++void cpu_linux::parse_pstates_start(void)
++{
++	ifstream file;
++	char filename[256];
++	unsigned int i;
++
++	last_stamp =3D 0;
+ 	for (i =3D 0; i < children.size(); i++)
+ 		if (children[i])
+ 			children[i]->wiggle();
+@@ -136,8 +139,14 @@ void cpu_linux::measurement_start(void)
+ 	account_freq(0, 0);
+ }
+ =
+
++void cpu_linux::measurement_start(void)
++{
++	abstract_cpu::measurement_start();
++	parse_cstates_start();
++	parse_pstates_start();
++}
+ =
+
+-void cpu_linux::measurement_end(void)
++void cpu_linux::parse_cstates_end(void)
+ {
+ 	DIR *dir;
+ 	struct dirent *entry;
+@@ -187,6 +196,12 @@ void cpu_linux::measurement_end(void)
+ =
+
+ 	}
+ 	closedir(dir);
++}
++
++void cpu_linux::parse_pstates_end(void)
++{
++	char filename[256];
++	ifstream file;
+ =
+
+ 	sprintf(filename, "/sys/devices/system/cpu/cpu%i/cpufreq/stats/time_in_st=
+ate", number);
+ =
+
+@@ -216,12 +231,15 @@ void cpu_linux::measurement_end(void)
+ 		}
+ 		file.close();
+ 	}
++}
+ =
+
+-
++void cpu_linux::measurement_end(void)
++{
++	parse_cstates_end();
++	parse_pstates_end();
+ 	abstract_cpu::measurement_end();
+ }
+ =
+
+-
+ char * cpu_linux::fill_cstate_line(int line_nr, char *buffer, const char *=
+separator)
+ {
+ 	unsigned int i;
+-- =
+
+1.7.11.3
 
 
-Any help would be greatly appreciated.
-
---
-Chris
-
---===============8638333524650741328==--
+--===============7650672188864184307==--
 
