@@ -1,94 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============2575967254143109868=="
+Content-Type: multipart/mixed; boundary="===============5682173900611813286=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: [Powertop] Fwd: RE: [RFC] [PATCHv2 00/10] Code deduplication in cpu/*
-Date: Wed, 26 Dec 2012 12:56:08 -0800
-Message-ID: <50DB6468.5050804@linux.intel.com>
-In-Reply-To: E351AD52FA1E154C8FFF4F9FCD2CA8431B3CD913@ORSMSX108.amr.corp.intel.com
+From: kernel kernel <kernel at kenobrien.org>
+Subject: [Powertop] Project request
+Date: Wed, 12 Dec 2012 09:58:32 +0000
+Message-ID: <CAG=jzgAgjkiVX9rgCMudrwQSwe7ybPpVAsrvjCsVDtH03tHPiw@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2575967254143109868==
+--===============5682173900611813286==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Hi,
 
-Arjan,
-   Can you take a look at this patch set. It looks good to me, but I =
+I'd like to contribute to powertop as part of my PhD research on energy
+efficient heterogeneous hpc. I've been looking through the TODO file in the
+git repo. Is there any particular task which you can recommend for a
+newcomer to the project?
 
-wanted to make sure I am not missing something.  There is duplication =
+Thanks,
 
-there, but not all.
+Ken
 
-I have built and run some tests. Seems OK at a glance.
--Chris
+-- =
 
+Ken O'Brien
+PhD Researcher
+Simulation Science and Extreme Events Cluster,
+3B1, UCD CASL,
+8 Belfield Business Park,
+Dublin 4,
+Ireland.
 
--------- Original Message --------
-Subject: 	RE: [Powertop] [RFC] [PATCHv2 00/10] Code deduplication in cpu/*
-Date: 	Mon, 24 Dec 2012 20:17:54 +0000
-From: 	Ferron, Chris E <chris.e.ferron(a)intel.com>
-To: 	Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>, Chris Ferron =
+--===============5682173900611813286==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
-<chris.e.ferron(a)linux.intel.com>
-CC: 	powertop(a)lists.01.org <powertop(a)lists.01.org>
+PHNwYW4gc3R5bGU9ImZvbnQtZmFtaWx5OmFyaWFsLHNhbnMtc2VyaWY7Zm9udC1zaXplOjEzcHgi
+PkhpLDwvc3Bhbj48ZGl2IHN0eWxlPSJmb250LWZhbWlseTphcmlhbCxzYW5zLXNlcmlmO2ZvbnQt
+c2l6ZToxM3B4Ij48YnI+PC9kaXY+PGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6YXJpYWwsc2Fucy1z
+ZXJpZjtmb250LXNpemU6MTNweCI+SSYjMzk7ZCBsaWtlIHRvIGNvbnRyaWJ1dGUgdG8gcG93ZXJ0
+b3AgYXMgcGFydCBvZiBteSBQaEQgcmVzZWFyY2ggb24gZW5lcmd5IGVmZmljaWVudCBoZXRlcm9n
+ZW5lb3VzIGhwYy4gSSYjMzk7dmUgYmVlbiBsb29raW5nIHRocm91Z2ggdGhlIFRPRE8gZmlsZSBp
+biB0aGUgZ2l0IHJlcG8uIElzIHRoZXJlIGFueSBwYXJ0aWN1bGFyIHRhc2sgd2hpY2ggeW91IGNh
+biByZWNvbW1lbmQgZm9yIGEgbmV3Y29tZXIgdG8gdGhlIHByb2plY3Q/PC9kaXY+CjxkaXYgc3R5
+bGU9ImZvbnQtZmFtaWx5OmFyaWFsLHNhbnMtc2VyaWY7Zm9udC1zaXplOjEzcHgiPjxicj48L2Rp
+dj48ZGl2IHN0eWxlPSJmb250LWZhbWlseTphcmlhbCxzYW5zLXNlcmlmO2ZvbnQtc2l6ZToxM3B4
+Ij5UaGFua3MsPC9kaXY+PGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6YXJpYWwsc2Fucy1zZXJpZjtm
+b250LXNpemU6MTNweCI+PGJyPjwvZGl2PjxkaXYgc3R5bGU9ImZvbnQtZmFtaWx5OmFyaWFsLHNh
+bnMtc2VyaWY7Zm9udC1zaXplOjEzcHgiPgpLZW48L2Rpdj48ZGl2Pjxicj48L2Rpdj4tLSA8YnI+
+S2VuIE8mIzM5O0JyaWVuPGJyPlBoRCBSZXNlYXJjaGVyPGJyPlNpbXVsYXRpb24gU2NpZW5jZSBh
+bmQgRXh0cmVtZSBFdmVudHMgQ2x1c3Rlciw8YnI+M0IxLCBVQ0QgQ0FTTCw8YnI+OCBCZWxmaWVs
+ZCBCdXNpbmVzcyBQYXJrLDxicj5EdWJsaW4gNCw8YnI+SXJlbGFuZC48YnI+PGJyPgo=
 
-
-
-Thanks, I will attend to outstanding patches on Wednesday (GMT+8) when I re=
-turn to the office.
--Chris
-
------Original Message-----
-From: powertop-bounces(a)lists.01.org [mailto:powertop-bounces(a)lists.01.o=
-rg] On Behalf Of Sergey Senozhatsky
-Sent: Monday, December 24, 2012 8:25 AM
-To: Chris Ferron
-Cc: powertop(a)lists.01.org
-Subject: Re: [Powertop] [RFC] [PATCHv2 00/10] Code deduplication in cpu/*
-
-On (12/24/12 03:08), Ivan Shapovalov wrote:
-> This is a resend (unchanged but rebased) of the patch series about
-> refactoring code in cpu/* by deduplication. From this series, only the
-> last bugfix patch has been applied so far due to a code freeze.
->
-> Ivan Shapovalov (10):
->       Fix includes: do not include intel_cpus.h inside cpu.h
->       Deduplication: move is_turbo() function to lib
->       Deduplication: move all instances of account_freq() to abstract_cpu=
-::account_freq()
->       Deduplication: remove nhm_cpu::account_freq() almost identical to a=
-bstract_cpu::account_freq()
->       Deduplication: remove nhm_{cpu,core,package}::change_effective_freq=
-uency() identical to cpu_{linux,core,package}::change_effective_frequency()
->       Deduplication: merge cpu_{core,linux,package}::change_effective_fre=
-quency() into abstract_cpu::change_effective_frequency()
->       Deduplication: remove {cpu,nhm}_core::calculate_freq() identical to=
- abstract_cpu::calculate_freq()
->       Deduplication: remove nhm_package::calculate_freq() identical to cp=
-u_package::calculate_freq()
->       Deduplication: properly merge cpu_package::calculate_freq() into ab=
-stract_cpu::calculate_freq()
->       Deduplication: merge go_idle()/go_unidle()/change_freq()
-> overrides into abstract_cpu() class
->
-
-Hello Chris,
-patch series looks good to me. thanks to Ivan.
-
-please note V3 of 02 and 03 patches.
-
-
-	-ss
-_______________________________________________
-PowerTop mailing list
-PowerTop(a)lists.01.org
-https://lists.01.org/mailman/listinfo/powertop
-
-
-
-
-
---===============2575967254143109868==--
+--===============5682173900611813286==--
 
