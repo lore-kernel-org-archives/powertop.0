@@ -1,52 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============2838794404026899939=="
+Content-Type: multipart/mixed; boundary="===============4353882697836588510=="
 MIME-Version: 1.0
-From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: Re: [Powertop] [FYI][RFC][PATCH 0/2] MALI GPU profiling support
-Date: Thu, 01 Nov 2012 18:56:34 +0400
-Message-ID: <50928DA2.1090403@samsung.com>
-In-Reply-To: 1351771239-18925-1-git-send-email-i.zhbanov@samsung.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] cpufreq: only try to open files under cpuX
+Date: Wed, 12 Dec 2012 10:21:43 -0800
+Message-ID: <50C8CB37.3040406@linux.intel.com>
+In-Reply-To: 1308422363.328395.1355335523877.JavaMail.root@redhat.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2838794404026899939==
+--===============4353882697836588510==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The second patch is over 40 Kb and waiting for list moderator approval.
-
-Igor Zhbanov wrote:
-
-> Igor Zhbanov (2):
->    Introducing process scanner facility
->    MALI GPU profiling support
+On 12/12/2012 10:05 AM, Jaroslav Skarvada wrote:
+> -
+>> Hello,
+>> thanks for your patch. however, I'm afraid it does not fix all the
+>> cases. looking at src/tuning/cpufreq.cpp we
+>> have several more places with exactly the same cpuX detection --
+>> ::toggle*().
+>>
+> NP, I will try to fix them all, I will post new version of the patch soon.
 >
->   src/Makefile.am                                   |    2 +
->   src/main.cpp                                      |   17 +-
->   src/mali-internal-events/mali-events.h            |  143 +++
->   src/mali-internal-events/mali-internal-events.cpp | 1279 ++++++++++++++=
-+++++++
->   src/mali-internal-events/proc-scan.cpp            |  316 +++++
->   src/mali-internal-events/proc-scan.h              |   59 +
->   src/process/process.cpp                           |   43 +
->   7 files changed, 1857 insertions(+), 2 deletions(-)
->   create mode 100644 src/mali-internal-events/mali-events.h
->   create mode 100644 src/mali-internal-events/mali-internal-events.cpp
->   create mode 100644 src/mali-internal-events/proc-scan.cpp
->   create mode 100644 src/mali-internal-events/proc-scan.h
+>> could you also please remove 'strlen(dirent->d_name) < 4', looks loke
+>> a small overhead there.
+>>
+> Right :)
 
--- =
+it makes sense to clean this up indeed
 
-Best regards,
-Igor Zhbanov,
-Technical Leader,
-phone: +7 (495) 797 25 00 ext 3806
-e-mail: i.zhbanov(a)samsung.com
-
-Mobile group, Moscow R&D center, Samsung Electronics
-12 Dvintsev street, building 1
-127018, Moscow, Russian Federation
+now, I'm still wanting to rewrite the whole frequency side... it's not grea=
+t code right now,
+and makes assumptions that aren't going to be true going forward.
+but until that's done.. by all means lets do improvements like this to the =
+existing code.
 
 
---===============2838794404026899939==--
+
+--===============4353882697836588510==--
 
