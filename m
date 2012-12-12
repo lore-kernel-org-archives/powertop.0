@@ -1,143 +1,35 @@
-Content-Type: multipart/mixed; boundary="===============6164999587709352235=="
+Content-Type: multipart/mixed; boundary="===============7987650662766528475=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] Fix C states and P states presentation issue.
-Date: Mon, 21 Jan 2013 15:31:12 +0300
-Message-ID: <20130121123112.GA2360@swordfish.minsk.epam.com>
-In-Reply-To: 1358247918-31031-1-git-send-email-zhang.austin@gmail.com
+From: Jaroslav Skarvada <jskarvad at redhat.com>
+Subject: Re: [Powertop] [PATCH] cpufreq: only try to open files under cpuX
+Date: Wed, 12 Dec 2012 13:05:23 -0500
+Message-ID: <1308422363.328395.1355335523877.JavaMail.root@redhat.com>
+In-Reply-To: 20121212175657.GA5332@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6164999587709352235==
+--===============7987650662766528475==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (01/15/13 19:05), Austin Zhang wrote:
-> Date: Tue, 15 Jan 2013 19:05:18 +0800
-> From: Austin Zhang <zhang.austin(a)gmail.com>
-> To: powertop(a)lists.01.org
-> Subject: [Powertop] [PATCH] Fix C states and P states presentation issue.
-> X-Mailer: git-send-email 1.7.5.4
+-
+> Hello,
+> thanks for your patch. however, I'm afraid it does not fix all the
+> cases. looking at src/tuning/cpufreq.cpp we
+> have several more places with exactly the same cpuX detection --
+> ::toggle*().
 > =
 
-> If using '10' in this 'for' loop, for P states, once the processor
-> provides more than 10 P states, those additional ones cannot been
-> presented; and for C states, once the processor provides maximize
-> C states level more than 9, for example, it only has POLL, C1, C3,
-> C6, C10, the additional one like C10 also cannot be presented.
+NP, I will try to fix them all, I will post new version of the patch soon.
+
+> could you also please remove 'strlen(dirent->d_name) < 4', looks loke
+> a small overhead there.
 > =
 
-> Now we get the loop numbers from the system information we had got
-> before.
-> =
+Right :)
 
-> Signed-off-by: Austin Zhang <zhang.austin(a)gmail.com>
-> ---
->  src/cpu/cpu.cpp |   35 +++++++++++++++++++++++++++++------
->  1 files changed, 29 insertions(+), 6 deletions(-)
-> =
+Jaroslav
 
-> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-> index 7f3af69..28f77b7 100644
-> --- a/src/cpu/cpu.cpp
-> +++ b/src/cpu/cpu.cpp
-> @@ -404,6 +404,15 @@ void report_display_cpu_cstates(void)
->  	unsigned int package, core, cpu;
->  	int line;
->  	class abstract_cpu *_package, * _core, * _cpu;
-> +	unsigned int i, j, cstates_num;
-> +
-> +	for (i =3D 0, cstates_num =3D 0; i < all_cpus.size(); i++) {
-> +		if (all_cpus[i])
-> +			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
-> +				if ((all_cpus[i]->cstates[j])->line_level >=3D 0 &&
-> +				    (all_cpus[i]->cstates[j])->line_level > cstates_num)
-> +					cstates_num =3D (all_cpus[i]->cstates[j])->line_level;
-> +	}
->  =
-
->  	report.begin_section(SECTION_CPUIDLE);
->  	report.add_header("Processor Idle state report");
-> @@ -421,7 +430,7 @@ void report_display_cpu_cstates(void)
->  			if (!_core)
->  				continue;
->  =
-
-> -			for (line =3D LEVEL_HEADER; line < 10; line++) {
-> +			for (line =3D LEVEL_HEADER; line <=3D (int)cstates_num; line++) {
->  				bool first_cpu =3D true;
->  =
-
->  				if (!_package->has_cstate_level(line))
-> @@ -628,14 +637,29 @@ void impl_w_display_cpu_states(int state)
->  	char buffer[128];
->  	char linebuf[1024];
->  	unsigned int package, core, cpu;
-> -	int line;
-> +	int line, loop;
->  	class abstract_cpu *_package, * _core, * _cpu;
->  	int ctr =3D 0;
-> +	unsigned int i, j, cstates_num, pstates_num;
-> +
-> +	for (i =3D 0, cstates_num =3D 0, pstates_num =3D 0; i < all_cpus.size()=
-; i++) {
-> +		if (all_cpus[i] && all_cpus[i]->pstates.size() > pstates_num)
-> +			pstates_num =3D all_cpus[i]->pstates.size();
->  =
-
-> -	if (state =3D=3D PSTATE)
-> +		if (all_cpus[i])
-> +			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
-> +				if ((all_cpus[i]->cstates[j])->line_level >=3D 0 &&
-> +				    (all_cpus[i]->cstates[j])->line_level > cstates_num)
-> +					cstates_num =3D (all_cpus[i]->cstates[j])->line_level;
-> +	}
-> +
-
-Hm, I think it'd be better to have these (cstates_num, pstates_num) as a cp=
-u members and set max =
-
-P/C state when we insert new P/C state. Iterating through constant data on =
-every display(/report)
-seems like overkill.
-
-	-ss
-
-
-> +	if (state =3D=3D PSTATE) {
->  		win =3D get_ncurses_win("Frequency stats");
-> -	else
-> +		loop =3D (int)pstates_num;
-> +	} else {
->  		win =3D get_ncurses_win("Idle stats");
-> +		loop =3D (int)cstates_num;
-> +	}
->  =
-
->  	if (!win)
->  		return;
-> @@ -656,8 +680,7 @@ void impl_w_display_cpu_states(int state)
->  			if (!_core->has_pstates() && state =3D=3D PSTATE)
->  				continue;
->  =
-
-> -
-> -			for (line =3D LEVEL_HEADER; line < 10; line++) {
-> +			for (line =3D LEVEL_HEADER; line <=3D loop; line++) {
->  				int first =3D 1;
->  				ctr =3D 0;
->  				linebuf[0] =3D 0;
-> -- =
-
-> 1.7.5.4
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============6164999587709352235==--
+--===============7987650662766528475==--
 
