@@ -1,93 +1,63 @@
-Content-Type: multipart/mixed; boundary="===============6385176738575280704=="
+Content-Type: multipart/mixed; boundary="===============1652384935151203875=="
 MIME-Version: 1.0
-From: Ivan Shapovalov <intelfx100 at gmail.com>
-Subject: [Powertop] [RFC] [PATCHv2 04/10] Deduplication: remove
- nhm_cpu::account_freq() almost identical to abstract_cpu::account_freq()
-Date: Mon, 24 Dec 2012 03:08:46 +0400
-Message-ID: <1356304132-3889-5-git-send-email-intelfx100@gmail.com>
-In-Reply-To: 1356304132-3889-1-git-send-email-intelfx100@gmail.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH] Correct script for tuning wifi power_save with
+ iw
+Date: Fri, 14 Dec 2012 13:42:22 +0300
+Message-ID: <20121214104222.GA2983@swordfish.minsk.epam.com>
+In-Reply-To: 1355460779-23060-1-git-send-email-dkg@fifthhorseman.net
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6385176738575280704==
+--===============1652384935151203875==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-See previous commit for explanation.
-
-Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
----
- src/cpu/intel_cpus.cpp | 36 ------------------------------------
- src/cpu/intel_cpus.h   |  2 --
- 2 files changed, 38 deletions(-)
-
-diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
-index 4d52206..57cb43b 100644
---- a/src/cpu/intel_cpus.cpp
-+++ b/src/cpu/intel_cpus.cpp
-@@ -544,42 +544,6 @@ int nhm_cpu::has_pstate_level(int level)
- 	return cpu_linux::has_pstate_level(level);
- }
- =
-
--void nhm_cpu::account_freq(uint64_t freq, uint64_t duration)
--{
--	struct frequency *state =3D NULL;
--	unsigned int i;
--
--
--	for (i =3D 0; i < pstates.size(); i++) {
--		if (freq =3D=3D pstates[i]->freq) {
--			state =3D pstates[i];
--			break;
--		}
--	}
--
--	if (!state) {
--		state =3D new(std::nothrow) struct frequency;
--
--		if (!state)
--			return;
--
--		memset(state, 0, sizeof(*state));
--
--		pstates.push_back(state);
--
--		state->freq =3D freq;
--		hz_to_human(freq, state->human_name);
--		if (freq =3D=3D 0)
--			strcpy(state->human_name, _("Idle"));
--		state->after_count =3D 1;
--	}
--
--
--	state->time_after +=3D duration;
--
--
--}
--
- void nhm_cpu::change_freq(uint64_t time, int frequency)
- {
- 	current_frequency =3D frequency;
-diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
-index 181ffc4..cfa46ec 100644
---- a/src/cpu/intel_cpus.h
-+++ b/src/cpu/intel_cpus.h
-@@ -98,8 +98,6 @@ private:
- =
-
- 	uint64_t	last_stamp;
- 	uint64_t	total_stamp;
--
--	void		account_freq(uint64_t frequency, uint64_t duration);
- public:
- 	virtual void	measurement_start(void);
- 	virtual void	measurement_end(void);
--- =
-
-1.8.0.2
+On (12/13/12 23:52), Daniel Kahn Gillmor wrote:
+> The logic for the script to run to fix the power_save state of a
+> wireless device was inverted.
+> =
 
 
---===============6385176738575280704==--
+good catch. thanks.
+
+	-ss
+
+> Signed-off-by: Daniel Kahn Gillmor <dkg(a)fifthhorseman.net>
+> ---
+>  src/tuning/wifi.cpp |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> =
+
+> diff --git a/src/tuning/wifi.cpp b/src/tuning/wifi.cpp
+> index 38d9be6..77cdfcc 100644
+> --- a/src/tuning/wifi.cpp
+> +++ b/src/tuning/wifi.cpp
+> @@ -47,8 +47,8 @@ wifi_tunable::wifi_tunable(const char *_iface) : tunabl=
+e("", 1.5, _("Good"), _("
+>  	strcpy(iface, _iface);
+>  	sprintf(desc, _("Wireless Power Saving for interface %s"), iface);
+>  =
+
+> -	sprintf(toggle_good, "iw dev %s set power_save off", iface);
+> -	sprintf(toggle_bad, "iw dev %s set power_save on", iface);
+> +	sprintf(toggle_good, "iw dev %s set power_save on", iface);
+> +	sprintf(toggle_bad, "iw dev %s set power_save off", iface);
+>  }
+>  =
+
+>  int wifi_tunable::good_bad(void)
+> -- =
+
+> 1.7.10.4
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>=20
+
+--===============1652384935151203875==--
 
