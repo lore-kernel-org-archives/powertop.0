@@ -1,40 +1,47 @@
-Content-Type: multipart/mixed; boundary="===============5772980196332433946=="
+Content-Type: multipart/mixed; boundary="===============2647459747311794689=="
 MIME-Version: 1.0
-From: Paul Menzel <paulepanter at users.sourceforge.net>
-Subject: [Powertop] Consistent spelling of PowerTOP
-Date: Sun, 04 Nov 2012 12:31:02 +0100
-Message-ID: <1352028662.4710.10.camel@mattotaupa>
+From: Daniel Kahn Gillmor <dkg at fifthhorseman.net>
+Subject: [Powertop] [PATCH] Correct script for tuning wifi power_save with iw
+Date: Thu, 13 Dec 2012 23:52:59 -0500
+Message-ID: <1355460779-23060-1-git-send-email-dkg@fifthhorseman.net>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5772980196332433946==
+--===============2647459747311794689==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Dear PowerTOP folks,
+The logic for the script to run to fix the power_save state of a
+wireless device was inverted.
+
+Signed-off-by: Daniel Kahn Gillmor <dkg(a)fifthhorseman.net>
+---
+ src/tuning/wifi.cpp |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/tuning/wifi.cpp b/src/tuning/wifi.cpp
+index 38d9be6..77cdfcc 100644
+--- a/src/tuning/wifi.cpp
++++ b/src/tuning/wifi.cpp
+@@ -47,8 +47,8 @@ wifi_tunable::wifi_tunable(const char *_iface) : tunable(=
+"", 1.5, _("Good"), _("
+ 	strcpy(iface, _iface);
+ 	sprintf(desc, _("Wireless Power Saving for interface %s"), iface);
+ =
+
+-	sprintf(toggle_good, "iw dev %s set power_save off", iface);
+-	sprintf(toggle_bad, "iw dev %s set power_save on", iface);
++	sprintf(toggle_good, "iw dev %s set power_save on", iface);
++	sprintf(toggle_bad, "iw dev %s set power_save off", iface);
+ }
+ =
+
+ int wifi_tunable::good_bad(void)
+-- =
+
+1.7.10.4
 
 
-the spelling in the README is PowerTOP. If this is the preferred
-spelling =E2=80=93 I=E2=80=99d like Powertop better =E2=80=93 could this al=
-so be used in the
-mailing list tag(?), which is currently [Powertop].
-
-
-Thanks,
-
-Paul
-
---===============5772980196332433946==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
-L0xpbnV4KQoKaUVZRUFCRUNBQVlGQWxDV1VmWUFDZ2tRUFgxYUsyd09IVmdLeXdDZEcrTTk3emxC
-RFhpNGpTaURQUGxVbmRqaApuZHNBbjBsZzd6eXBhNjFpSEN3UkVxYTFqb3FIRTNIWgo9ZUdiUgot
-LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
-
---===============5772980196332433946==--
+--===============2647459747311794689==--
 
