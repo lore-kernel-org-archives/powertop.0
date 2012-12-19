@@ -1,51 +1,59 @@
-Content-Type: multipart/mixed; boundary="===============5219601399038546002=="
+Content-Type: multipart/mixed; boundary="===============5376198710560711561=="
 MIME-Version: 1.0
-From: Namhyung Kim <namhyung at gmail.com>
-Subject: [Powertop] [PATCH] Use PACKAGE_VERSION for POWERTOP_VERSION
-Date: Sun, 18 Nov 2012 00:42:47 +0900
-Message-ID: <1353166967-24095-1-git-send-email-namhyung@gmail.com>
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: [Powertop] [PATCH 2/2] runtime_pm: register parameters
+Date: Wed, 19 Dec 2012 18:13:23 +0300
+Message-ID: <20121219151323.GB3200@swordfish.minsk.epam.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5219601399038546002==
+--===============5376198710560711561==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-It was missed to update POWERTOP_VERSION macro so that the
-new v2.2 release still shows v2.1 string on the header of
-ncurses window.  Convert to use PACKAGE_VERSION macro which
-set by autotools to the AC_INIT version so that it cannot
-be missed anymore.
+register parameter during runtime_pmdevice() construction, making =
 
-Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+call to get_parameter_value() in power_usage() valid.
+
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+
 ---
- src/lib.h |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/lib.h b/src/lib.h
-index 8cf4632..209421a 100644
---- a/src/lib.h
-+++ b/src/lib.h
-@@ -35,8 +35,8 @@
+ src/devices/runtime_pm.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/devices/runtime_pm.cpp b/src/devices/runtime_pm.cpp
+index 0d13cab..bbc3bf0 100644
+--- a/src/devices/runtime_pm.cpp
++++ b/src/devices/runtime_pm.cpp
+@@ -49,11 +49,11 @@ runtime_pmdevice::runtime_pmdevice(const char *_name, c=
+onst char *path) : device
  =
 
- #define _(STRING)    gettext(STRING)
+ 	before_suspended_time =3D 0;
+ 	before_active_time =3D 0;
+-        after_suspended_time =3D 0;
++	after_suspended_time =3D 0;
+ 	after_active_time =3D 0;
+-}
+-
  =
 
--#define POWERTOP_VERSION "v2.1"
--#define POWERTOP_SHORT_VERSION "2.1"
-+#define POWERTOP_VERSION "v"PACKAGE_VERSION
-+#define POWERTOP_SHORT_VERSION PACKAGE_VERSION
++	register_parameter(humanname);
++}
  =
 
- =
+ void runtime_pmdevice::start_measurement(void)
+ {
+@@ -237,4 +237,4 @@ void create_all_runtime_pm_devices(void)
+ 	do_bus("spi");
+ 	do_bus("platform");
+ 	do_bus("i2c");
+-}
+\ No newline at end of file
++}
 
- extern int get_max_cpu(void);
--- =
 
-1.7.9.2
-
-
---===============5219601399038546002==--
+--===============5376198710560711561==--
 
