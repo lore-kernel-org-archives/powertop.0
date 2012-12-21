@@ -1,69 +1,80 @@
-Content-Type: multipart/mixed; boundary="===============0938514088720072331=="
+Content-Type: multipart/mixed; boundary="===============4331226596232452024=="
 MIME-Version: 1.0
-From: Namhyung Kim <namhyung at gmail.com>
-Subject: Re: [Powertop] [PATCH] cpu: Fix abstract_cpu::calculate_freq
-Date: Mon, 15 Oct 2012 23:22:08 +0900
-Message-ID: <1350310928.1507.8.camel@leonhard>
-In-Reply-To: 20120920144644.GC3237@swordfish.minsk.epam.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [FYI][RFC][PATCH 0/2] MALI GPU profiling support
+Date: Fri, 21 Dec 2012 13:49:17 +0300
+Message-ID: <20121221104917.GB2914@swordfish.minsk.epam.com>
+In-Reply-To: 50D43C30.6080804@samsung.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0938514088720072331==
+--===============4331226596232452024==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-2012-09-20 (=EB=AA=A9), 17:46 +0300, Sergey Senozhatsky:
-> On (09/20/12 23:33), Namhyung Kim wrote:
-> > The 'freq' should have the maximun frequency value of all children.
-> > But the current code does not update the freq properly.  Fix it.
-> > =
-
-> > Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+On (12/21/12 14:38), Igor Zhbanov wrote:
+> Hello, Sergey.
 > =
 
-> looks good to me, thanks.
+> The base code stays the same.
+>
+
+good, thanks.
+
+	-ss
+ =
+
+> Sergey Senozhatsky wrote:
 > =
 
-> 	-ss
-
-Ping.  =
-
-
-It seems that it's not merged yet.  Chris, could you please merge this?
-
-Thanks,
-Namhyung
-
+> >On (12/21/12 13:06), Igor Zhbanov wrote:
+> >>Hi all,
+> >>
+> >>It is just a ping. :-)
+> >>The list is quiet about these patches. Will you integrate it or not?
+> >>What should be changed before it?
+> >Hello, Igor
+> >sorry, didn't have much free time.
+> >are there any updates scheduled?
+> >
+> >I'll take a look during holidays.
+> >	-ss
+> >>Igor Zhbanov wrote:
+> >>>This patch-set adds the ability of profiling MALI GPU in Powertop.
+> >>...
+> >>>Igor Zhbanov (2):
+> >>>   Introducing process scanner facility
+> >>>   MALI GPU profiling support
+> >>>
+> >>>  src/Makefile.am                                   |    2 +
+> >>>  src/main.cpp                                      |   17 +-
+> >>>  src/mali-internal-events/mali-events.h            |  143 +++
+> >>>  src/mali-internal-events/mali-internal-events.cpp | 1279 +++++++++++=
+++++++++++
+> >>>  src/mali-internal-events/proc-scan.cpp            |  316 +++++
+> >>>  src/mali-internal-events/proc-scan.h              |   59 +
+> >>>  src/process/process.cpp                           |   43 +
+> >>>  7 files changed, 1857 insertions(+), 2 deletions(-)
+> >>>  create mode 100644 src/mali-internal-events/mali-events.h
+> >>>  create mode 100644 src/mali-internal-events/mali-internal-events.cpp
+> >>>  create mode 100644 src/mali-internal-events/proc-scan.cpp
+> >>>  create mode 100644 src/mali-internal-events/proc-scan.h
 > =
 
-> > ---
-> >  src/cpu/abstract_cpu.cpp |    2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > =
+> -- =
 
-> > diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
-> > index 386d981..de55cf2 100644
-> > --- a/src/cpu/abstract_cpu.cpp
-> > +++ b/src/cpu/abstract_cpu.cpp
-> > @@ -341,7 +341,7 @@ void abstract_cpu::calculate_freq(uint64_t time)
-> >  				is_idle =3D false;
-> >  			}
-> >  			if (f > freq)
-> > -				f =3D freq;
-> > +				freq =3D f;
-> >  		}
-> >  =
+> Best regards,
+> Igor Zhbanov,
+> Technical Leader,
+> phone: +7 (495) 797 25 00 ext 3806
+> e-mail: i.zhbanov(a)samsung.com
+> =
 
-> >  	current_frequency =3D freq;
+> Mobile group, Moscow R&D center, Samsung Electronics
+> 12 Dvintsev street, building 1
+> 127018, Moscow, Russian Federation
+>=20
 
-
--- =
-
-Regards,
-Namhyung Kim
-
-
-
---===============0938514088720072331==--
+--===============4331226596232452024==--
 
