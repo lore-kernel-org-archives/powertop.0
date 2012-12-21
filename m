@@ -1,114 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============7992034276093604765=="
+Content-Type: multipart/mixed; boundary="===============1693157646896109184=="
 MIME-Version: 1.0
-From: Austin Zhang <zhang.austin at gmail.com>
-Subject: [Powertop] [PATCH] Fix C states and P states presentation issue.
-Date: Tue, 15 Jan 2013 19:05:18 +0800
-Message-ID: <1358247918-31031-1-git-send-email-zhang.austin@gmail.com>
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: Re: [Powertop] [FYI][RFC][PATCH 0/2] MALI GPU profiling support
+Date: Fri, 21 Dec 2012 14:38:40 +0400
+Message-ID: <50D43C30.6080804@samsung.com>
+In-Reply-To: 20121221095806.GA2914@swordfish.minsk.epam.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7992034276093604765==
+--===============1693157646896109184==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-If using '10' in this 'for' loop, for P states, once the processor
-provides more than 10 P states, those additional ones cannot been
-presented; and for C states, once the processor provides maximize
-C states level more than 9, for example, it only has POLL, C1, C3,
-C6, C10, the additional one like C10 also cannot be presented.
+Hello, Sergey.
 
-Now we get the loop numbers from the system information we had got
-before.
+The base code stays the same.
 
-Signed-off-by: Austin Zhang <zhang.austin(a)gmail.com>
----
- src/cpu/cpu.cpp |   35 +++++++++++++++++++++++++++++------
- 1 files changed, 29 insertions(+), 6 deletions(-)
+Sergey Senozhatsky wrote:
 
-diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-index 7f3af69..28f77b7 100644
---- a/src/cpu/cpu.cpp
-+++ b/src/cpu/cpu.cpp
-@@ -404,6 +404,15 @@ void report_display_cpu_cstates(void)
- 	unsigned int package, core, cpu;
- 	int line;
- 	class abstract_cpu *_package, * _core, * _cpu;
-+	unsigned int i, j, cstates_num;
-+
-+	for (i =3D 0, cstates_num =3D 0; i < all_cpus.size(); i++) {
-+		if (all_cpus[i])
-+			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
-+				if ((all_cpus[i]->cstates[j])->line_level >=3D 0 &&
-+				    (all_cpus[i]->cstates[j])->line_level > cstates_num)
-+					cstates_num =3D (all_cpus[i]->cstates[j])->line_level;
-+	}
- =
+> On (12/21/12 13:06), Igor Zhbanov wrote:
+>> Hi all,
+>>
+>> It is just a ping. :-)
+>> The list is quiet about these patches. Will you integrate it or not?
+>> What should be changed before it?
+> Hello, Igor
+> sorry, didn't have much free time.
+> are there any updates scheduled?
+>
+> I'll take a look during holidays.
+> 	-ss
+>> Igor Zhbanov wrote:
+>>> This patch-set adds the ability of profiling MALI GPU in Powertop.
+>> ...
+>>> Igor Zhbanov (2):
+>>>    Introducing process scanner facility
+>>>    MALI GPU profiling support
+>>>
+>>>   src/Makefile.am                                   |    2 +
+>>>   src/main.cpp                                      |   17 +-
+>>>   src/mali-internal-events/mali-events.h            |  143 +++
+>>>   src/mali-internal-events/mali-internal-events.cpp | 1279 ++++++++++++=
++++++++++
+>>>   src/mali-internal-events/proc-scan.cpp            |  316 +++++
+>>>   src/mali-internal-events/proc-scan.h              |   59 +
+>>>   src/process/process.cpp                           |   43 +
+>>>   7 files changed, 1857 insertions(+), 2 deletions(-)
+>>>   create mode 100644 src/mali-internal-events/mali-events.h
+>>>   create mode 100644 src/mali-internal-events/mali-internal-events.cpp
+>>>   create mode 100644 src/mali-internal-events/proc-scan.cpp
+>>>   create mode 100644 src/mali-internal-events/proc-scan.h
 
- 	report.begin_section(SECTION_CPUIDLE);
- 	report.add_header("Processor Idle state report");
-@@ -421,7 +430,7 @@ void report_display_cpu_cstates(void)
- 			if (!_core)
- 				continue;
- =
-
--			for (line =3D LEVEL_HEADER; line < 10; line++) {
-+			for (line =3D LEVEL_HEADER; line <=3D (int)cstates_num; line++) {
- 				bool first_cpu =3D true;
- =
-
- 				if (!_package->has_cstate_level(line))
-@@ -628,14 +637,29 @@ void impl_w_display_cpu_states(int state)
- 	char buffer[128];
- 	char linebuf[1024];
- 	unsigned int package, core, cpu;
--	int line;
-+	int line, loop;
- 	class abstract_cpu *_package, * _core, * _cpu;
- 	int ctr =3D 0;
-+	unsigned int i, j, cstates_num, pstates_num;
-+
-+	for (i =3D 0, cstates_num =3D 0, pstates_num =3D 0; i < all_cpus.size(); =
-i++) {
-+		if (all_cpus[i] && all_cpus[i]->pstates.size() > pstates_num)
-+			pstates_num =3D all_cpus[i]->pstates.size();
- =
-
--	if (state =3D=3D PSTATE)
-+		if (all_cpus[i])
-+			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
-+				if ((all_cpus[i]->cstates[j])->line_level >=3D 0 &&
-+				    (all_cpus[i]->cstates[j])->line_level > cstates_num)
-+					cstates_num =3D (all_cpus[i]->cstates[j])->line_level;
-+	}
-+
-+	if (state =3D=3D PSTATE) {
- 		win =3D get_ncurses_win("Frequency stats");
--	else
-+		loop =3D (int)pstates_num;
-+	} else {
- 		win =3D get_ncurses_win("Idle stats");
-+		loop =3D (int)cstates_num;
-+	}
- =
-
- 	if (!win)
- 		return;
-@@ -656,8 +680,7 @@ void impl_w_display_cpu_states(int state)
- 			if (!_core->has_pstates() && state =3D=3D PSTATE)
- 				continue;
- =
-
--
--			for (line =3D LEVEL_HEADER; line < 10; line++) {
-+			for (line =3D LEVEL_HEADER; line <=3D loop; line++) {
- 				int first =3D 1;
- 				ctr =3D 0;
- 				linebuf[0] =3D 0;
 -- =
 
-1.7.5.4
+Best regards,
+Igor Zhbanov,
+Technical Leader,
+phone: +7 (495) 797 25 00 ext 3806
+e-mail: i.zhbanov(a)samsung.com
+
+Mobile group, Moscow R&D center, Samsung Electronics
+12 Dvintsev street, building 1
+127018, Moscow, Russian Federation
 
 
---===============7992034276093604765==--
+--===============1693157646896109184==--
 
