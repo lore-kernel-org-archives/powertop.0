@@ -1,67 +1,87 @@
-Content-Type: multipart/mixed; boundary="===============6263551969486019920=="
+Content-Type: multipart/mixed; boundary="===============0057162322806011079=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH 3/3] process: Get rid of unused
- dbg_printf_pevent_info()
-Date: Mon, 03 Dec 2012 19:16:21 +0300
-Message-ID: <20121203161621.GA2623@swordfish>
-In-Reply-To: 1354547600-1743-3-git-send-email-namhyung@gmail.com
+From: Ivan Shapovalov <intelfx100 at gmail.com>
+Subject: [Powertop] [RFC] [PATCHv2 08/10] Deduplication: remove
+ nhm_package::calculate_freq() identical to cpu_package::calculate_freq()
+Date: Mon, 24 Dec 2012 03:08:50 +0400
+Message-ID: <1356304132-3889-9-git-send-email-intelfx100@gmail.com>
+In-Reply-To: 1356304132-3889-1-git-send-email-intelfx100@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6263551969486019920==
+--===============0057162322806011079==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (12/04/12 00:13), Namhyung Kim wrote:
-> This function is not used, just remove it.
-> This fixes following warning:
-> =
+Trivial - remove an identical override wrt. direct base class.
 
->   CXX    process/powertop-do_process.o
-> process/do_process.cpp:190: warning: =E2=80=98void dbg_printf_pevent_info=
-(event_format*, pevent_record*)=E2=80=99 defined but not used
-> =
+Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
+---
+ src/cpu/intel_cpus.cpp | 27 ---------------------------
+ src/cpu/intel_cpus.h   |  3 ---
+ 2 files changed, 30 deletions(-)
 
-> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
-> ---
->  src/process/do_process.cpp |   13 -------------
->  1 file changed, 13 deletions(-)
-> =
+diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
+index 031c7ac..a898c06 100644
+--- a/src/cpu/intel_cpus.cpp
++++ b/src/cpu/intel_cpus.cpp
+@@ -331,33 +331,6 @@ void nhm_package::measurement_end(void)
+ =
 
-> diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
-> index 6ac0fae..a07b3f3 100644
-> --- a/src/process/do_process.cpp
-> +++ b/src/process/do_process.cpp
-> @@ -187,19 +187,6 @@ int dont_blame_me(char *comm)
->  	return 0;
->  }
->  =
+ }
+ =
 
-> -static void dbg_printf_pevent_info(struct event_format *event, struct pe=
-vent_record *rec)
-> -{
-> -	static struct trace_seq s;
-> -
-> -	event->pevent->print_raw =3D 1;
-> -	trace_seq_init(&s);
-> -	pevent_event_info(&s, event, rec);
-> -	trace_seq_putc(&s, '\n');
-> -	trace_seq_terminate(&s);
-> -	fprintf(stderr, "%.*s", s.len, s.buffer);
-> -	trace_seq_destroy(&s);
-> -}
-> -
->  static char * get_pevent_field_str(void *trace, struct event_format *eve=
-nt, struct format_field *field)
->  {
->  	unsigned long long offset, len;
+-
+-void nhm_package::calculate_freq(uint64_t time)
+-{
+-	uint64_t freq =3D 0;
+-	bool is_idle =3D true;
+-	unsigned int i;
+-
+-	/* calculate the maximum frequency of all children */
+-	for (i =3D 0; i < children.size(); i++)
+-		if (children[i] && children[i]->has_pstates()) {
+-			uint64_t f =3D 0;
+-			if (!children[i]->idle) {
+-				f =3D children[i]->current_frequency;
+-				is_idle =3D false;
+-			}
+-			if (f > freq)
+-				freq =3D f;
+-		}
+-
+-	current_frequency =3D freq;
+-	idle =3D is_idle;
+-	if (parent)
+-		parent->calculate_freq(time);
+-	change_effective_frequency(time, current_frequency);
+-	old_idle =3D idle;
+-}
+-
+ void nhm_cpu::measurement_start(void)
+ {
+ 	ifstream file;
+diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
+index f41d589..a4c0852 100644
+--- a/src/cpu/intel_cpus.h
++++ b/src/cpu/intel_cpus.h
+@@ -59,9 +59,6 @@ public:
+ 	virtual int     can_collapse(void) { return 0;};
+ =
+
+ 	virtual char *  fill_pstate_line(int line_nr, char *buffer);
+-
+-	virtual void    calculate_freq(uint64_t time);
+-
+ };
+ =
+
+ class nhm_core: public cpu_core
+-- =
+
+1.8.0.2
 
 
-this one looks good to me.
-
-	-ss
-
---===============6263551969486019920==--
+--===============0057162322806011079==--
 
