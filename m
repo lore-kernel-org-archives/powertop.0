@@ -1,67 +1,106 @@
-Content-Type: multipart/mixed; boundary="===============7833521572188797366=="
+Content-Type: multipart/mixed; boundary="===============8419819391168275291=="
 MIME-Version: 1.0
-From: Namhyung Kim <namhyung at gmail.com>
-Subject: [Powertop] [PATCH] cpu: Fix leftovers from the P state cpu frequency
- calculation
-Date: Fri, 16 Nov 2012 00:17:56 +0900
-Message-ID: <1352992676-14940-1-git-send-email-namhyung@gmail.com>
+From: Ivan Shapovalov <intelfx100 at gmail.com>
+Subject: [Powertop] [RFC] [PATCHv2 01/10] Fix includes: do not include
+ intel_cpus.h inside cpu.h
+Date: Mon, 24 Dec 2012 03:08:43 +0400
+Message-ID: <1356304132-3889-2-git-send-email-intelfx100@gmail.com>
+In-Reply-To: 1356304132-3889-1-git-send-email-intelfx100@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7833521572188797366==
+--===============8419819391168275291==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The commit 15b8bfb ("Ignore non-P-state-enabled CPUs when calculating
-frequency") and 29f42b5 ("fixed issues with p-state reported CPU
-frequencies") fixed frequency calculation for cpu packages but missed
-it for cpu cores.  Add it.
+The file "cpu.h" is generic (unlike "intel_cpus.h"), so the existing order =
+seems
+illogical.
 
-This fixes wrong frequency report on my quad-core box: 2072.5% -> 100.0%
-
-Cc: Ivan Shapovalov <intelfx100(a)gmail.com>
-Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
 ---
- src/cpu/cpu_core.cpp   |    3 +--
- src/cpu/intel_cpus.cpp |    2 +-
- 2 files changed, 2 insertions(+), 3 deletions(-)
+ src/cpu/cpu.cpp        | 1 +
+ src/cpu/cpu.h          | 2 --
+ src/cpu/intel_cpus.cpp | 2 +-
+ src/cpu/intel_cpus.h   | 2 ++
+ src/cpu/intel_gpu.cpp  | 2 +-
+ 5 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/src/cpu/cpu_core.cpp b/src/cpu/cpu_core.cpp
-index b0dd4da..2caa58d 100644
---- a/src/cpu/cpu_core.cpp
-+++ b/src/cpu/cpu_core.cpp
-@@ -131,10 +131,9 @@ void cpu_core::calculate_freq(uint64_t time)
- 	bool is_idle =3D true;
- 	unsigned int i;
+diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+index 7f3af69..3314e82 100644
+--- a/src/cpu/cpu.cpp
++++ b/src/cpu/cpu.cpp
+@@ -31,6 +31,7 @@
+ #include <unistd.h>
+ #include "cpu.h"
+ #include "cpudevice.h"
++#include "intel_cpus.h"
+ #include "../parameters/parameters.h"
  =
 
+ #include "../perf/perf_bundle.h"
+diff --git a/src/cpu/cpu.h b/src/cpu/cpu.h
+index 781e33c..2304cd5 100644
+--- a/src/cpu/cpu.h
++++ b/src/cpu/cpu.h
+@@ -215,8 +215,6 @@ public:
+ =
+
+ };
+ =
+
+-#include "intel_cpus.h"
 -
- 	/* calculate the maximum frequency of all children */
- 	for (i =3D 0; i < children.size(); i++)
--		if (children[i]) {
-+		if (children[i] && children[i]->has_pstates()) {
- 			uint64_t f =3D 0;
- 			if (!children[i]->idle) {
- 				f =3D children[i]->current_frequency;
+ extern void enumerate_cpus(void);
+ =
+
+ extern void report_display_cpu_pstates(void);
 diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
-index f7b86bc..19ad85c 100644
+index 19ad85c..d43e917 100644
 --- a/src/cpu/intel_cpus.cpp
 +++ b/src/cpu/intel_cpus.cpp
-@@ -240,7 +240,7 @@ void nhm_core::calculate_freq(uint64_t time)
+@@ -22,7 +22,7 @@
+  * Authors:
+  *	Arjan van de Ven <arjan(a)linux.intel.com>
+  */
+-#include "cpu.h"
++#include "intel_cpus.h"
+ #include <iostream>
+ #include <fstream>
+ #include <stdlib.h>
+diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
+index 1949af1..a8bb892 100644
+--- a/src/cpu/intel_cpus.h
++++ b/src/cpu/intel_cpus.h
+@@ -25,6 +25,8 @@
+ #include <stdint.h>
+ #include <sys/time.h>
  =
 
- 	/* calculate the maximum frequency of all children */
- 	for (i =3D 0; i < children.size(); i++)
--		if (children[i]) {
-+		if (children[i] && children[i]->has_pstates()) {
- 			uint64_t f =3D 0;
- 			if (!children[i]->idle) {
- 				f =3D children[i]->current_frequency;
++#include "cpu.h"
++
+ =
+
+ #define MSR_TSC				0x10
+ #define MSR_NEHALEM_PLATFORM_INFO	0xCE
+diff --git a/src/cpu/intel_gpu.cpp b/src/cpu/intel_gpu.cpp
+index 57474f1..e0f4ac2 100644
+--- a/src/cpu/intel_gpu.cpp
++++ b/src/cpu/intel_gpu.cpp
+@@ -22,7 +22,7 @@
+  * Authors:
+  *	Arjan van de Ven <arjan(a)linux.intel.com>
+  */
+-#include "cpu.h"
++#include "intel_cpus.h"
+ #include <iostream>
+ #include <fstream>
+ #include <stdlib.h>
 -- =
 
-1.7.9.2
+1.8.0.2
 
 
---===============7833521572188797366==--
+--===============8419819391168275291==--
 
