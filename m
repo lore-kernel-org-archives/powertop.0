@@ -1,872 +1,217 @@
-Content-Type: multipart/mixed; boundary="===============2545806327714303535=="
+Content-Type: multipart/mixed; boundary="===============3443783532813971025=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [RFC][PATCH] Small rework on report formatter side
-Date: Wed, 10 Oct 2012 16:03:22 -0700
-Message-ID: <20121010230322.GD4628@swordfish.datadirect.datadirectnet.com>
-In-Reply-To: 20121010181352.GA4628@swordfish.datadirect.datadirectnet.com
+From: Ivan Shapovalov <intelfx100 at gmail.com>
+Subject: [Powertop] [RFC] [PATCHv2 06/10] Deduplication: merge cpu_{core, linux,
+ package}::change_effective_frequency() into
+ abstract_cpu::change_effective_frequency()
+Date: Mon, 24 Dec 2012 03:08:48 +0400
+Message-ID: <1356304132-3889-7-git-send-email-intelfx100@gmail.com>
+In-Reply-To: 1356304132-3889-1-git-send-email-intelfx100@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2545806327714303535==
+--===============3443783532813971025==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/10/12 11:13), Sergey Senozhatsky wrote:
-> =
+The mentioned overrides differ only in assigning 0 to effective_frequency
+prior to calling abstract_cpu::change_effective_frequency(), which reassign=
+s real frequency
+to the same field.
+Moreover, the field value is never used between assignments.
 
-> Hello,
-> =
+So it shall be safe to merge these overrides into the base definition as sh=
+own:
+* immediately assign real frequency to field effective_frequency;
+* remove post-assignment to the same field.
 
-> below is initial version of rework I was talking about. Igor did most par=
-t of it (introduced =
-
-> report_formatter_base class), so mine are just minor tweaks. I'm glad sti=
-ll no one mentioned
-> templates, just kidding.
-> =
-
-> one thing I don't really like so far is
-> =
-
->         else if (type =3D=3D REPORT_OFF)
->                formatter =3D new report_formatter();
-> =
-
-> which is just cryptic and thus look wrong.
-> perhaps we need something like `new report_formatter_basic()' here (which=
- will require header
-> file rename).
-> =
-
-> please review and comment.
-> =
-
-> ------------------------------------------------------------------------
-> =
-
->     Small rework on report formatter side:
->     =
-
->     - make report_formatter a basic class (previously was interface). hen=
-ce we can
->     remove empty report_formatter interface implementation.
->     =
-
->     - drop report-formatter-null class
->     =
-
->     - in report maker now we create report_formatter instance for REPORT_=
-OFF mode
->     =
-
->     - rename report_formatter_base to report_formatter_string_base, so cl=
-ass name tells
->     a bit more, later we can create report_formatter_xml_base/report_form=
-atter_json_base/etc.
-> =
-
-> =
-
-> Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
-> =
-
-
-
-plus:
-
--- renamed report_formatter to basic_report_formatter, so now
-
-         else if (type =3D=3D REPORT_OFF)
-                formatter =3D new basic_report_formatter();
-
-look a bit better (yeah, we have basic_report_formatter and report_formatte=
-r_string_base. ugly!!!)
-
-
--- removed some empty function from CSV/HTML classes. like
-
-	void report_formatter_csv::add_empty_cell()
-	{
-		/* Do nothing special */
-	}
-
-we don't really need such functions in derived classes, they're already doi=
-ng nothing in base class.
-
-
+Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
 ---
- src/Makefile.am                      |   1 -
- src/report/basic-report-formatter.h  |  65 +++++++++++++
- src/report/report-formatter-base.cpp |  14 +--
- src/report/report-formatter-base.h   |   4 +-
- src/report/report-formatter-csv.cpp  |  42 --------
- src/report/report-formatter-csv.h    |  10 +-
- src/report/report-formatter-html.h   |   2 +-
- src/report/report-formatter-null.cpp | 179 -------------------------------=
-----
- src/report/report-formatter-null.h   |  66 -------------
- src/report/report-formatter.h        |  65 -------------
- src/report/report-maker.cpp          |   3 +-
- src/report/report-maker.h            |   4 +-
- 12 files changed, 79 insertions(+), 376 deletions(-)
+ src/cpu/abstract_cpu.cpp | 17 +++++++++++++++--
+ src/cpu/cpu.h            |  4 ----
+ src/cpu/cpu_core.cpp     | 23 -----------------------
+ src/cpu/cpu_linux.cpp    | 19 -------------------
+ src/cpu/cpu_package.cpp  | 20 --------------------
+ 5 files changed, 15 insertions(+), 68 deletions(-)
 
-diff --git a/src/Makefile.am b/src/Makefile.am
-index ccf3f0c..1a64622 100644
---- a/src/Makefile.am
-+++ b/src/Makefile.am
-@@ -34,7 +34,6 @@ powertop_SOURCES =3D parameters/persistent.cpp parameters=
-/learn.cpp parameters/par
- 		report/report-formatter-base.cpp report/report-formatter-base.h \
- 		report/report-formatter-csv.cpp report/report-formatter-csv.h \
- 		report/report-formatter-html.cpp report/report-formatter-html.h \
--		report/report-formatter-null.cpp report/report-formatter-null.h \
- 		main.cpp css.h powertop.css cpu/intel_gpu.cpp
- =
-
- =
-
-diff --git a/src/report/basic-report-formatter.h b/src/report/basic-report-=
-formatter.h
-new file mode 100644
-index 0000000..5134bf5
---- /dev/null
-+++ b/src/report/basic-report-formatter.h
-@@ -0,0 +1,65 @@
-+/* Copyright (c) 2012 Samsung Electronics Co., Ltd.
-+ *	http://www.samsung.com/
-+ *
-+ * This file is part of PowerTOP
-+ *
-+ * This program file is free software; you can redistribute it and/or modi=
-fy it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; version 2 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WIT=
-HOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-+ * for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program in a file named COPYING; if not, write to the
-+ * Free Software Foundation, Inc,
-+ * 51 Franklin Street, Fifth Floor,
-+ * Boston, MA 02110-1301 USA
-+ * or just google for it.
-+ *
-+ * report_formatter interface.
-+ * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
-+ * 2012.10 */
-+
-+#ifndef _REPORT_FORMATTER_H_
-+#define _REPORT_FORMATTER_H_
-+
-+#include "report-maker.h"
-+
-+class basic_report_formatter
-+{
-+public:
-+	virtual ~basic_report_formatter() {}
-+
-+	virtual void finish_report() {};
-+	virtual const char *get_result() {return "Basic report_formatter::get_res=
-ul call\n";};
-+	virtual void clear_result() {};
-+
-+	virtual void add(const char *str) {};
-+	virtual void addv(const char *fmt, va_list ap) {};
-+
-+	virtual void add_header(const char *header, int level) {};
-+
-+	virtual void begin_section(section_type stype) {};
-+	virtual void end_section() {};
-+
-+	virtual void begin_table(table_type ttype) {};
-+	virtual void end_table() {};
-+
-+	virtual void begin_row(row_type rtype) {};
-+	virtual void end_row() {};
-+
-+	virtual void begin_cell(cell_type ctype) {};
-+	virtual void end_cell() {};
-+	virtual void add_empty_cell() {};
-+
-+	virtual void begin_paragraph() {};
-+	virtual void end_paragraph() {};
-+
-+	/* For quad-colouring CPU tables in HTML */
-+	virtual void set_cpu_number(int nr) {};
-+};
-+
-+#endif /* _REPORT_FORMATTER_H_ */
-diff --git a/src/report/report-formatter-base.cpp b/src/report/report-forma=
-tter-base.cpp
-index 4b448be..c6d5d9d 100644
---- a/src/report/report-formatter-base.cpp
-+++ b/src/report/report-formatter-base.cpp
-@@ -36,7 +36,7 @@
- /* ***********************************************************************=
-* */
- =
-
- const char *
--report_formatter_base::get_result()
-+report_formatter_string_base::get_result()
+diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
+index 5618761..ec52f55 100644
+--- a/src/cpu/abstract_cpu.cpp
++++ b/src/cpu/abstract_cpu.cpp
+@@ -393,14 +393,27 @@ void abstract_cpu::calculate_freq(uint64_t time)
+ void abstract_cpu::change_effective_frequency(uint64_t time, uint64_t freq=
+uency)
  {
- 	return result.c_str();
- }
-@@ -44,7 +44,7 @@ report_formatter_base::get_result()
- /* ***********************************************************************=
-* */
+ 	unsigned int i;
++	uint64_t time_delta, fr;
++
++	if (last_stamp)
++		time_delta =3D time - last_stamp;
++	else
++		time_delta =3D 1;
++
++	fr =3D effective_frequency;
++	if (old_idle)
++		fr =3D 0;
++
++	account_freq(fr, time_delta);
++
++	effective_frequency =3D frequency;
++	last_stamp =3D time;
  =
 
- void
--report_formatter_base::clear_result()
-+report_formatter_string_base::clear_result()
- {
- 	result.clear();
- }
-@@ -52,7 +52,7 @@ report_formatter_base::clear_result()
- /* ***********************************************************************=
-* */
- =
-
- void
--report_formatter_base::add(const char *str)
-+report_formatter_string_base::add(const char *str)
- {
- 	assert(str);
- =
-
-@@ -62,7 +62,7 @@ report_formatter_base::add(const char *str)
- /* ***********************************************************************=
-* */
- =
-
- void
--report_formatter_base::add_exact(const char *str)
-+report_formatter_string_base::add_exact(const char *str)
- {
- 	assert(str);
- =
-
-@@ -74,7 +74,7 @@ report_formatter_base::add_exact(const char *str)
- #define LINE_SIZE 8192
- =
-
- void
--report_formatter_base::addv(const char *fmt, va_list ap)
-+report_formatter_string_base::addv(const char *fmt, va_list ap)
- {
- 	char str[LINE_SIZE];
- =
-
-@@ -87,7 +87,7 @@ report_formatter_base::addv(const char *fmt, va_list ap)
- /* ***********************************************************************=
-* */
- =
-
- void
--report_formatter_base::addf(const char *fmt, ...)
-+report_formatter_string_base::addf(const char *fmt, ...)
- {
- 	va_list ap;
- =
-
-@@ -101,7 +101,7 @@ report_formatter_base::addf(const char *fmt, ...)
- /* ***********************************************************************=
-* */
- =
-
- void
--report_formatter_base::addf_exact(const char *fmt, ...)
-+report_formatter_string_base::addf_exact(const char *fmt, ...)
- {
- 	char str[LINE_SIZE];
- 	va_list ap;
-diff --git a/src/report/report-formatter-base.h b/src/report/report-formatt=
-er-base.h
-index 7063174..61cf1ba 100644
---- a/src/report/report-formatter-base.h
-+++ b/src/report/report-formatter-base.h
-@@ -26,9 +26,9 @@
- #ifndef _REPORT_FORMATTER_BASE_H_
- #define _REPORT_FORMATTER_BASE_H_
- =
-
--#include "report-formatter.h"
-+#include "basic-report-formatter.h"
- =
-
--class report_formatter_base: public report_formatter
-+class report_formatter_string_base: public basic_report_formatter
- {
- public:
- 	virtual const char *get_result();
-diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-format=
-ter-csv.cpp
-index 9b154b5..893c92a 100644
---- a/src/report/report-formatter-csv.cpp
-+++ b/src/report/report-formatter-csv.cpp
-@@ -45,14 +45,6 @@ report_formatter_csv::report_formatter_csv()
- /* ***********************************************************************=
-* */
- =
-
- void
--report_formatter_csv::finish_report()
--{
--	/* Do nothing special */
--}
+ 	/* propagate to all children */
+ 	for (i =3D 0; i < children.size(); i++)
+ 		if (children[i]) {
+ 			children[i]->change_effective_frequency(time, frequency);
+ 		}
 -
--/* ***********************************************************************=
-* */
--
--void
- report_formatter_csv::add_doc_header()
- {
- 	add_header(report_csv_header, 1);
-@@ -72,24 +64,6 @@ report_formatter_csv::add_header(const char *header, int=
- level)
- 	add_exact("\n");
+-	effective_frequency =3D frequency;
  }
  =
 
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_csv::begin_section(section_type stype)
--{
--	/* Do nothing special */
--}
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_csv::end_section()
--{
--	/* Do nothing special */
--}
--
--/* ***********************************************************************=
-* */
--
- void
- report_formatter_csv::begin_table(table_type ttype)
- {
-@@ -163,14 +137,6 @@ report_formatter_csv::end_cell()
- /* ***********************************************************************=
-* */
  =
 
- void
--report_formatter_csv::add_empty_cell()
--{
--	/* Do nothing special */
--}
--
--/* ***********************************************************************=
-* */
--
--void
- report_formatter_csv::begin_paragraph()
- {
- 	text_start =3D result.length();
-@@ -213,11 +179,3 @@ report_formatter_csv::escape_string(const char *str)
+diff --git a/src/cpu/cpu.h b/src/cpu/cpu.h
+index 8b9c9f9..c99d4ea 100644
+--- a/src/cpu/cpu.h
++++ b/src/cpu/cpu.h
+@@ -173,7 +173,6 @@ public:
+ 	virtual char *  fill_pstate_name(int line_nr, char *buffer);
  =
 
- 	return res;
- }
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_csv::set_cpu_number(int nr UNUSED)
--{
--	/* Do nothing */
--}
-diff --git a/src/report/report-formatter-csv.h b/src/report/report-formatte=
-r-csv.h
-index fbec0c9..8db9839 100644
---- a/src/report/report-formatter-csv.h
-+++ b/src/report/report-formatter-csv.h
-@@ -44,18 +44,13 @@
+ 	virtual void    change_freq(uint64_t time, int freq);
+-	virtual void	change_effective_frequency(uint64_t time, uint64_t freq);
+ 	virtual void    go_idle(uint64_t time);
+ 	virtual void    go_unidle(uint64_t time);
  =
 
- /* ***********************************************************************=
-* */
+@@ -190,7 +189,6 @@ public:
  =
 
--class report_formatter_csv: public report_formatter_base
-+class report_formatter_csv: public report_formatter_string_base
- {
- public:
- 	report_formatter_csv();
- =
-
--	void finish_report();
--
- 	void add_header(const char *header, int level);
- =
-
--	void begin_section(section_type stype);
--	void end_section();
--
- 	void begin_table(table_type ttype);
- 	void end_table();
- =
-
-@@ -64,13 +59,10 @@ public:
- =
-
- 	void begin_cell(cell_type ctype);
- 	void end_cell();
--	void add_empty_cell();
- =
-
- 	void begin_paragraph();
- 	void end_paragraph();
- =
-
--	void set_cpu_number(int nr);
--
- private:
- 	void add_doc_header();
- =
-
-diff --git a/src/report/report-formatter-html.h b/src/report/report-formatt=
-er-html.h
-index 1c3eb4a..4d00efe 100644
---- a/src/report/report-formatter-html.h
-+++ b/src/report/report-formatter-html.h
-@@ -55,7 +55,7 @@ struct html_cell {
- =
-
- /* ***********************************************************************=
-* */
- =
-
--class report_formatter_html: public report_formatter_base
-+class report_formatter_html: public report_formatter_string_base
- {
- public:
- 	report_formatter_html();
-diff --git a/src/report/report-formatter-null.cpp b/src/report/report-forma=
-tter-null.cpp
-deleted file mode 100644
-index 22da7a0..0000000
---- a/src/report/report-formatter-null.cpp
-+++ /dev/null
-@@ -1,179 +0,0 @@
--/* Copyright (c) 2012 Samsung Electronics Co., Ltd.
-- *	http://www.samsung.com/
-- *
-- * This file is part of PowerTOP
-- *
-- * This program file is free software; you can redistribute it and/or modi=
-fy it
-- * under the terms of the GNU General Public License as published by the
-- * Free Software Foundation; version 2 of the License.
-- *
-- * This program is distributed in the hope that it will be useful, but WIT=
-HOUT
-- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-- * for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with this program in a file named COPYING; if not, write to the
-- * Free Software Foundation, Inc,
-- * 51 Franklin Street, Fifth Floor,
-- * Boston, MA 02110-1301 USA
-- * or just google for it.
-- *
-- * Null report generator.
-- * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
-- * 2012.10 */
--
--#include <stdarg.h>
--
--#include "report-formatter-null.h"
--
--/* ***********************************************************************=
-* */
--
--report_formatter_null::report_formatter_null()
--{
--	/* Do nothing */
--}
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_null::finish_report()
--{
--	/* Do nothing */
--}
--
--/* ***********************************************************************=
-* */
--
--const char *
--report_formatter_null::get_result()
--{
--	return "";
--}
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_null::clear_result()
--{
--	/* Do nothing */
--}
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_null::add(const char *str UNUSED)
--{
--	/* Do nothing */
--}
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_null::addv(const char *fmt UNUSED, va_list ap UNUSED)
--{
--	/* Do nothing */
--}
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_null::add_header(const char *header UNUSED, int level UNU=
-SED)
--{
--	/* Do nothing */
--}
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_null::begin_section(section_type stype UNUSED)
--{
--	/* Do nothing */
--}
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_null::end_section()
--{
--	/* Do nothing */
--}
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_null::begin_table(table_type ttype UNUSED)
--{
--	/* Do nothing */
--}
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_null::end_table()
--{
--	/* Do nothing */
--}
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_null::begin_row(row_type rtype UNUSED)
--{
--	/* Do nothing */
--}
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_null::end_row()
--{
--	/* Do nothing */
--}
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_null::begin_cell(cell_type ctype UNUSED)
--{
--	/* Do nothing */
--}
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_null::end_cell()
--{
--	/* Do nothing */
--}
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_null::add_empty_cell()
--{
--	/* Do nothing */
--}
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_null::begin_paragraph()
--{
--	/* Do nothing */
--}
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_null::end_paragraph()
--{
--	/* Do nothing */
--}
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_null::set_cpu_number(int nr UNUSED)
--{
--	/* Do nothing */
--}
-diff --git a/src/report/report-formatter-null.h b/src/report/report-formatt=
-er-null.h
-deleted file mode 100644
-index 51493ee..0000000
---- a/src/report/report-formatter-null.h
-+++ /dev/null
-@@ -1,66 +0,0 @@
--/* Copyright (c) 2012 Samsung Electronics Co., Ltd.
-- *	http://www.samsung.com/
-- *
-- * This file is part of PowerTOP
-- *
-- * This program file is free software; you can redistribute it and/or modi=
-fy it
-- * under the terms of the GNU General Public License as published by the
-- * Free Software Foundation; version 2 of the License.
-- *
-- * This program is distributed in the hope that it will be useful, but WIT=
-HOUT
-- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-- * for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with this program in a file named COPYING; if not, write to the
-- * Free Software Foundation, Inc,
-- * 51 Franklin Street, Fifth Floor,
-- * Boston, MA 02110-1301 USA
-- * or just google for it.
-- *
-- * Null report generator.
-- * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
-- * 2012.10 */
--
--#ifndef _REPORT_FORMATTER_NULL_H_
--#define _REPORT_FORMATTER_NULL_H_
--
--#include "report-formatter.h"
--
--/* ***********************************************************************=
-* */
--
--class report_formatter_null: public report_formatter
--{
--public:
--	report_formatter_null();
--
--	void finish_report();
--	const char *get_result();
--	void clear_result();
--
--	void add(const char *str);
--	void addv(const char *fmt, va_list ap);
--
--	void add_header(const char *header, int level);
--
--	void begin_section(section_type stype);
--	void end_section();
--
--	void begin_table(table_type ttype);
--	void end_table();
--
--	void begin_row(row_type rtype);
--	void end_row();
--
--	void begin_cell(cell_type ctype);
--	void end_cell();
--	void add_empty_cell();
--
--	void begin_paragraph();
--	void end_paragraph();
--
--	void set_cpu_number(int nr);
--};
--
--#endif /* _REPORT_FORMATTER_NULL_H_ */
-diff --git a/src/report/report-formatter.h b/src/report/report-formatter.h
-deleted file mode 100644
-index cec0796..0000000
---- a/src/report/report-formatter.h
-+++ /dev/null
-@@ -1,65 +0,0 @@
--/* Copyright (c) 2012 Samsung Electronics Co., Ltd.
-- *	http://www.samsung.com/
-- *
-- * This file is part of PowerTOP
-- *
-- * This program file is free software; you can redistribute it and/or modi=
-fy it
-- * under the terms of the GNU General Public License as published by the
-- * Free Software Foundation; version 2 of the License.
-- *
-- * This program is distributed in the hope that it will be useful, but WIT=
-HOUT
-- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-- * for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with this program in a file named COPYING; if not, write to the
-- * Free Software Foundation, Inc,
-- * 51 Franklin Street, Fifth Floor,
-- * Boston, MA 02110-1301 USA
-- * or just google for it.
-- *
-- * report_formatter interface.
-- * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
-- * 2012.10 */
--
--#ifndef _REPORT_FORMATTER_H_
--#define _REPORT_FORMATTER_H_
--
--#include "report-maker.h"
--
--class report_formatter /* Interface */
--{
--public:
--	virtual ~report_formatter() {}
--
--	virtual void finish_report() =3D 0;
--	virtual const char *get_result() =3D 0;
--	virtual void clear_result() =3D 0;
--
--	virtual void add(const char *str) =3D 0;
--	virtual void addv(const char *fmt, va_list ap) =3D 0;
--
--	virtual void add_header(const char *header, int level) =3D 0;
--
--	virtual void begin_section(section_type stype) =3D 0;
--	virtual void end_section() =3D 0;
--
--	virtual void begin_table(table_type ttype) =3D 0;
--	virtual void end_table() =3D 0;
--
--	virtual void begin_row(row_type rtype) =3D 0;
--	virtual void end_row() =3D 0;
--
--	virtual void begin_cell(cell_type ctype) =3D 0;
--	virtual void end_cell() =3D 0;
--	virtual void add_empty_cell() =3D 0;
--
--	virtual void begin_paragraph() =3D 0;
--	virtual void end_paragraph() =3D 0;
--
--	/* For quad-colouring CPU tables in HTML */
--	virtual void set_cpu_number(int nr) =3D 0;
--};
--
--#endif /* _REPORT_FORMATTER_H_ */
-diff --git a/src/report/report-maker.cpp b/src/report/report-maker.cpp
-index 4a68a8c..6d0989a 100644
---- a/src/report/report-maker.cpp
-+++ b/src/report/report-maker.cpp
-@@ -31,7 +31,6 @@
- #include "report-maker.h"
- #include "report-formatter-csv.h"
- #include "report-formatter-html.h"
--#include "report-formatter-null.h"
- =
-
- /* ***********************************************************************=
-* */
- =
-
-@@ -114,7 +113,7 @@ report_maker::setup_report_formatter()
- 	else if (type =3D=3D REPORT_CSV)
- 		formatter =3D new report_formatter_csv();
- 	else if (type =3D=3D REPORT_OFF)
--		formatter =3D new report_formatter_null();
-+		formatter =3D new basic_report_formatter();
- 	else
- 		assert(false);
- }
-diff --git a/src/report/report-maker.h b/src/report/report-maker.h
-index 75e0d06..df8d20c 100644
---- a/src/report/report-maker.h
-+++ b/src/report/report-maker.h
-@@ -162,7 +162,7 @@ enum cell_type {
- =
-
- /* ***********************************************************************=
-* */
- =
-
--class report_formatter;
-+class basic_report_formatter;
- =
-
- class report_maker
- {
-@@ -202,7 +202,7 @@ private:
- 	void end_paragraph();
- =
-
- 	report_type type;
--	report_formatter *formatter;
-+	basic_report_formatter *formatter;
- 	bool cell_opened, row_opened, table_opened, section_opened,
- 	     paragraph_opened;
+ 	virtual int     can_collapse(void) { return childcount =3D=3D 1;};
+ 	virtual void    calculate_freq(uint64_t time);
+-	virtual void	change_effective_frequency(uint64_t time, uint64_t freq);
  };
+ =
+
+ class cpu_package: public abstract_cpu
+@@ -204,8 +202,6 @@ public:
+ 	virtual int     can_collapse(void) { return childcount =3D=3D 1;};
+ =
+
+ 	virtual void    calculate_freq(uint64_t time);
+-	virtual void	change_effective_frequency(uint64_t time, uint64_t freq);
+-
+ };
+ =
+
+ extern void enumerate_cpus(void);
+diff --git a/src/cpu/cpu_core.cpp b/src/cpu/cpu_core.cpp
+index 8249d83..7ec498d 100644
+--- a/src/cpu/cpu_core.cpp
++++ b/src/cpu/cpu_core.cpp
+@@ -102,29 +102,6 @@ void cpu_core::calculate_freq(uint64_t time)
+ 	old_idle =3D idle;
+ }
+ =
+
+-void cpu_core::change_effective_frequency(uint64_t time, uint64_t frequenc=
+y)
+-{
+-	uint64_t freq =3D 0;
+-	uint64_t time_delta, fr;
+-
+-
+-	if (last_stamp)
+-		time_delta =3D time - last_stamp;
+-	else
+-		time_delta =3D 1;
+-
+-	fr =3D effective_frequency;
+-
+-	if (old_idle)
+-		fr =3D 0;
+-
+-	account_freq(fr, time_delta);
+-
+-	effective_frequency =3D freq;
+-	last_stamp =3D time;
+-	abstract_cpu::change_effective_frequency(time, frequency);
+-}
+-
+ char * cpu_core::fill_pstate_line(int line_nr, char *buffer)
+ {
+ 	buffer[0] =3D 0;
+diff --git a/src/cpu/cpu_linux.cpp b/src/cpu/cpu_linux.cpp
+index 41a2238..a2e6cb9 100644
+--- a/src/cpu/cpu_linux.cpp
++++ b/src/cpu/cpu_linux.cpp
+@@ -359,25 +359,6 @@ void cpu_linux::change_freq(uint64_t time, int frequen=
+cy)
+ 	old_idle =3D idle;
+ }
+ =
+
+-void cpu_linux::change_effective_frequency(uint64_t time, uint64_t frequen=
+cy)
+-{
+-	uint64_t time_delta, fr;
+-
+-	if (last_stamp)
+-		time_delta =3D time - last_stamp;
+-	else
+-		time_delta =3D 1;
+-
+-	fr =3D effective_frequency;
+-	if (old_idle)
+-		fr =3D 0;
+-
+-	account_freq(fr, time_delta);
+-
+-	effective_frequency =3D frequency;
+-	last_stamp =3D time;
+-}
+-
+ void cpu_linux::go_idle(uint64_t time)
+ {
+ =
+
+diff --git a/src/cpu/cpu_package.cpp b/src/cpu/cpu_package.cpp
+index 6794a38..ef54524 100644
+--- a/src/cpu/cpu_package.cpp
++++ b/src/cpu/cpu_package.cpp
+@@ -128,23 +128,3 @@ void cpu_package::calculate_freq(uint64_t time)
+ 	old_idle =3D idle;
+ }
+ =
+
+-void cpu_package::change_effective_frequency(uint64_t time, uint64_t frequ=
+ency)
+-{
+-	uint64_t time_delta, fr;
+-
+-	if (last_stamp)
+-		time_delta =3D time - last_stamp;
+-	else
+-		time_delta =3D 1;
+-
+-	fr =3D effective_frequency;
+-	if (old_idle)
+-		fr =3D 0;
+-
+-	account_freq(fr, time_delta);
+-
+-	effective_frequency =3D frequency;
+-	last_stamp =3D time;
+-
+-	abstract_cpu::change_effective_frequency(time, frequency);
+-}
+-- =
+
+1.8.0.2
 
 
-
---===============2545806327714303535==--
+--===============3443783532813971025==--
 
