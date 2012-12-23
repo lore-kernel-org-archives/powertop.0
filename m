@@ -1,59 +1,162 @@
-Content-Type: multipart/mixed; boundary="===============4690164022983352136=="
+Content-Type: multipart/mixed; boundary="===============1183009234718837369=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] report: fixed crash when writing report to RO
- filesystem
-Date: Thu, 29 Nov 2012 07:57:33 -0800
-Message-ID: <50B785ED.6000505@linux.intel.com>
-In-Reply-To: 1354117361-29155-1-git-send-email-jskarvad@redhat.com
+From: Ivan Shapovalov <intelfx100 at gmail.com>
+Subject: [Powertop] [RFC] [PATCHv2 02/10] Deduplication: move is_turbo()
+ function to lib
+Date: Mon, 24 Dec 2012 03:08:44 +0400
+Message-ID: <1356304132-3889-3-git-send-email-intelfx100@gmail.com>
+In-Reply-To: 1356304132-3889-1-git-send-email-intelfx100@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4690164022983352136==
+--===============1183009234718837369==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 11/28/2012 07:42 AM, Jaroslav =C5=A0karvada wrote:
-> Signed-off-by: Jaroslav =C5=A0karvada <jskarvad(a)redhat.com>
-> ---
->   src/report/report.cpp | 11 +++++++----
->   1 file changed, 7 insertions(+), 4 deletions(-)
->
-> diff --git a/src/report/report.cpp b/src/report/report.cpp
-> index 51bc6a7..c018bb1 100644
-> --- a/src/report/report.cpp
-> +++ b/src/report/report.cpp
-> @@ -183,13 +183,16 @@ void init_report_output(char *filename_str, int ite=
-rations)
->   =
+Trivial: remove 4 identical static definitions of is_turbo().
 
->   void finish_report_output(void)
->   {
-> -	fprintf(stderr, _("PowerTOP outputing using base filename %s\n"), repor=
-tout.filename);
->   	if (reporttype =3D=3D REPORT_OFF)
->   		return;
->   =
+Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
+---
+ src/cpu/cpu_core.cpp    |  9 ---------
+ src/cpu/cpu_linux.cpp   | 11 +----------
+ src/cpu/cpu_package.cpp | 10 ----------
+ src/cpu/intel_cpus.cpp  |  8 --------
+ src/lib.cpp             |  9 +++++++++
+ src/lib.h               |  1 +
+ 6 files changed, 11 insertions(+), 37 deletions(-)
 
->   	report.finish_report();
-> -	fputs(report.get_result(), reportout.report_file);
-> -	fdatasync(fileno(reportout.report_file));
-> -	fclose(reportout.report_file);
-> +	if (reportout.report_file)
-> +	{
-> +		fprintf(stderr, _("PowerTOP outputing using base filename %s\n"), repo=
-rtout.filename);
-> +		fputs(report.get_result(), reportout.report_file);
-> +		fdatasync(fileno(reportout.report_file));
-> +		fclose(reportout.report_file);
-> +	}
->   	report.clear_result();
->   }
-You patch has been merged.
-Thank You
-Chris
+diff --git a/src/cpu/cpu_core.cpp b/src/cpu/cpu_core.cpp
+index 2caa58d..8aba60b 100644
+--- a/src/cpu/cpu_core.cpp
++++ b/src/cpu/cpu_core.cpp
+@@ -28,15 +28,6 @@
+ =
+
+ #include "../parameters/parameters.h"
+ =
+
+-static int is_turbo(uint64_t freq, uint64_t max, uint64_t maxmo)
+-{
+-	if (freq !=3D max)
+-		return 0;
+-	if (maxmo + 1000 !=3D max)
+-		return 0;
+-	return 1;
+-}
+-
+ char * cpu_core::fill_cstate_line(int line_nr, char *buffer, const char *s=
+eparator)
+ {
+ 	unsigned int i;
+diff --git a/src/cpu/cpu_linux.cpp b/src/cpu/cpu_linux.cpp
+index e7a3d37..034263b 100644
+--- a/src/cpu/cpu_linux.cpp
++++ b/src/cpu/cpu_linux.cpp
+@@ -38,16 +38,7 @@
+ #include <sys/stat.h>
+ #include <dirent.h>
+ =
+
+-static int is_turbo(uint64_t freq, uint64_t max, uint64_t maxmo)
+-{
+-	if (freq !=3D max)
+-		return 0;
+-	if (maxmo + 1000 !=3D max)
+-		return 0;
+-	return 1;
+-}
+-
+-void cpu_linux::parse_cstates_start(void)
++void cpu_linux::measurement_start(void)
+ {
+ 	ifstream file;
+ 	DIR *dir;
+diff --git a/src/cpu/cpu_package.cpp b/src/cpu/cpu_package.cpp
+index b9d4c19..61ce050 100644
+--- a/src/cpu/cpu_package.cpp
++++ b/src/cpu/cpu_package.cpp
+@@ -27,16 +27,6 @@
+ #include "../lib.h"
+ #include "../parameters/parameters.h"
+ =
+
+-static int is_turbo(uint64_t freq, uint64_t max, uint64_t maxmo)
+-{
+-	if (freq !=3D max)
+-		return 0;
+-	if (maxmo + 1000 !=3D max)
+-		return 0;
+-	return 1;
+-}
+-
+-
+ char * cpu_package::fill_cstate_line(int line_nr, char *buffer, const char=
+ *separator)
+ {
+ 	unsigned int i;
+diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
+index d43e917..640a0d5 100644
+--- a/src/cpu/intel_cpus.cpp
++++ b/src/cpu/intel_cpus.cpp
+@@ -40,14 +40,6 @@
+ #include "../parameters/parameters.h"
+ #include "../display.h"
+ =
+
+-static int is_turbo(uint64_t freq, uint64_t max, uint64_t maxmo)
+-{
+-	if (freq !=3D max)
+-		return 0;
+-	if (maxmo + 1000 !=3D max)
+-		return 0;
+-	return 1;
+-}
+ =
+
+ int has_c2c7_res;
+ =
+
+diff --git a/src/lib.cpp b/src/lib.cpp
+index 9838c0b..723517a 100644
+--- a/src/lib.cpp
++++ b/src/lib.cpp
+@@ -59,6 +59,15 @@ extern "C" {
+ =
+
+ static int kallsyms_read =3D 0;
+ =
+
++int is_turbo(uint64_t freq, uint64_t max, uint64_t maxmo)
++{
++	if (freq !=3D max)
++		return 0;
++	if (maxmo + 1000 !=3D max)
++		return 0;
++	return 1;
++}
++
+ double percentage(double F)
+ {
+ 	F =3D F * 100.0;
+diff --git a/src/lib.h b/src/lib.h
+index 209421a..de2de5a 100644
+--- a/src/lib.h
++++ b/src/lib.h
+@@ -38,6 +38,7 @@
+ #define POWERTOP_VERSION "v"PACKAGE_VERSION
+ #define POWERTOP_SHORT_VERSION PACKAGE_VERSION
+ =
+
++extern int is_turbo(uint64_t freq, uint64_t max, uint64_t maxmo);
+ =
+
+ extern int get_max_cpu(void);
+ extern void set_max_cpu(int cpu);
+-- =
+
+1.8.0.2
 
 
---===============4690164022983352136==--
+--===============1183009234718837369==--
 
