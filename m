@@ -1,59 +1,73 @@
-Content-Type: multipart/mixed; boundary="===============6926773272115538667=="
+Content-Type: multipart/mixed; boundary="===============3956594586167474172=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Multiple Batteries
-Date: Sat, 24 Nov 2012 15:29:13 +0300
-Message-ID: <20121124122731.GA7100@swordfish>
-In-Reply-To: CAKZK7uy6QP7xHvUpbhzz-Yh+SK2rBdzVNDcsBTgHG+=eiqGp4w@mail.gmail.com
+From: Ferron, Chris E <chris.e.ferron at intel.com>
+Subject: Re: [Powertop] [RFC] [PATCHv2 00/10] Code deduplication in cpu/*
+Date: Mon, 24 Dec 2012 20:17:54 +0000
+Message-ID: <E351AD52FA1E154C8FFF4F9FCD2CA8431B3CD913@ORSMSX108.amr.corp.intel.com>
+In-Reply-To: 20121224162528.GC3307@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6926773272115538667==
+--===============3956594586167474172==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (11/23/12 22:55), Justin Brown wrote:
->    Hello,
->    I'm using Powertop 2.1, and I've noticed a somewhat minor bug. (I coul=
-dn't
->    find a public bug tracker, but would be more than happy to move this
->    discussion to one if someone could send me a URL.)
+Thanks, I will attend to outstanding patches on Wednesday (GMT+8) when I re=
+turn to the office. =
 
-Hello, Justin
-thanks for reporting.
+-Chris
 
->    I have two batteries in my laptop, but Powertop does not recognize both
->    when calculating battery life remaining. For example Gnome-Shell repor=
-ts
->    that my batteries are at 66% and 100% (85% combined) giving me 10 hours
->    and 11 minutes of estimated time remaining. On the other hand, Powertop
->    reports just 3 hours 17 =EF=BF=BDminutes of time. Both programs are re=
-porting the
->    proper discharge rate. It just seems like Powertop is only using my
->    smaller battery (the currently active one).
+-----Original Message-----
+From: powertop-bounces(a)lists.01.org [mailto:powertop-bounces(a)lists.01.o=
+rg] On Behalf Of Sergey Senozhatsky
+Sent: Monday, December 24, 2012 8:25 AM
+To: Chris Ferron
+Cc: powertop(a)lists.01.org
+Subject: Re: [Powertop] [RFC] [PATCHv2 00/10] Code deduplication in cpu/*
 
-can you please post files
+On (12/24/12 03:08), Ivan Shapovalov wrote:
+> This is a resend (unchanged but rebased) of the patch series about =
 
-cat /sys/class/power_supply/BAT0/uevent
-cat /sys/class/power_supply/BAT1/uevent
+> refactoring code in cpu/* by deduplication. From this series, only the =
 
-while on battery.
+> last bugfix patch has been applied so far due to a code freeze.
+> =
 
-thanks,
+> Ivan Shapovalov (10):
+>       Fix includes: do not include intel_cpus.h inside cpu.h
+>       Deduplication: move is_turbo() function to lib
+>       Deduplication: move all instances of account_freq() to abstract_cpu=
+::account_freq()
+>       Deduplication: remove nhm_cpu::account_freq() almost identical to a=
+bstract_cpu::account_freq()
+>       Deduplication: remove nhm_{cpu,core,package}::change_effective_freq=
+uency() identical to cpu_{linux,core,package}::change_effective_frequency()
+>       Deduplication: merge cpu_{core,linux,package}::change_effective_fre=
+quency() into abstract_cpu::change_effective_frequency()
+>       Deduplication: remove {cpu,nhm}_core::calculate_freq() identical to=
+ abstract_cpu::calculate_freq()
+>       Deduplication: remove nhm_package::calculate_freq() identical to cp=
+u_package::calculate_freq()
+>       Deduplication: properly merge cpu_package::calculate_freq() into ab=
+stract_cpu::calculate_freq()
+>       Deduplication: merge go_idle()/go_unidle()/change_freq() =
+
+> overrides into abstract_cpu() class
+> =
+
+
+Hello Chris,
+patch series looks good to me. thanks to Ivan.
+
+please note V3 of 02 and 03 patches.
+
+
 	-ss
+_______________________________________________
+PowerTop mailing list
+PowerTop(a)lists.01.org
+https://lists.01.org/mailman/listinfo/powertop
 
->    I'm not sure if this issue has been reported, or if the developers even
->    have equipment with which to test. I'm more than willing to provide any
->    sort of debugging output or testing as needed. I could also probably
->    create a patch, but that's likely to take a lot longer for me to get s=
-etup
->    with development on this project.=EF=BF=BD
->    It may be as simple as iterating over a directory in /sys/ or /proc to
->    gather stats on multiple batteries. An experienced dev might be able to
->    fix it quickly.
->    Cheers,
->    Justin
-
---===============6926773272115538667==--
+--===============3956594586167474172==--
 
