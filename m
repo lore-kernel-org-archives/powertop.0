@@ -1,217 +1,94 @@
-Content-Type: multipart/mixed; boundary="===============3969091754028126711=="
+Content-Type: multipart/mixed; boundary="===============2575967254143109868=="
 MIME-Version: 1.0
-From: Ivan Shapovalov <intelfx100 at gmail.com>
-Subject: [Powertop] [RFC] [PATCH 06/11] Deduplication: merge cpu_{core, linux,
- package}::change_effective_frequency() into
- abstract_cpu::change_effective_frequency()
-Date: Mon, 05 Nov 2012 15:12:28 +0400
-Message-ID: <1352113953-24687-7-git-send-email-intelfx100@gmail.com>
-In-Reply-To: 1352113953-24687-1-git-send-email-intelfx100@gmail.com
+From: Chris Ferron <chris.e.ferron at linux.intel.com>
+Subject: [Powertop] Fwd: RE: [RFC] [PATCHv2 00/10] Code deduplication in cpu/*
+Date: Wed, 26 Dec 2012 12:56:08 -0800
+Message-ID: <50DB6468.5050804@linux.intel.com>
+In-Reply-To: E351AD52FA1E154C8FFF4F9FCD2CA8431B3CD913@ORSMSX108.amr.corp.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3969091754028126711==
+--===============2575967254143109868==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The mentioned overrides differ only in assigning 0 to effective_frequency
-prior to calling abstract_cpu::change_effective_frequency(), which reassign=
-s real frequency
-to the same field.
-Moreover, the field value is never used between assignments.
 
-So it shall be safe to merge these overrides into the base definition as sh=
-own:
-* immediately assign real frequency to field effective_frequency;
-* remove post-assignment to the same field.
+Arjan,
+   Can you take a look at this patch set. It looks good to me, but I =
 
-Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
----
- src/cpu/abstract_cpu.cpp | 17 +++++++++++++++--
- src/cpu/cpu.h            |  4 ----
- src/cpu/cpu_core.cpp     | 23 -----------------------
- src/cpu/cpu_linux.cpp    | 19 -------------------
- src/cpu/cpu_package.cpp  | 20 --------------------
- 5 files changed, 15 insertions(+), 68 deletions(-)
+wanted to make sure I am not missing something.  There is duplication =
 
-diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
-index 894a7b8..083a1e0 100644
---- a/src/cpu/abstract_cpu.cpp
-+++ b/src/cpu/abstract_cpu.cpp
-@@ -393,14 +393,27 @@ void abstract_cpu::calculate_freq(uint64_t time)
- void abstract_cpu::change_effective_frequency(uint64_t time, uint64_t freq=
-uency)
- {
- 	unsigned int i;
-+	uint64_t time_delta, fr;
-+
-+	if (last_stamp)
-+		time_delta =3D time - last_stamp;
-+	else
-+		time_delta =3D 1;
-+
-+	fr =3D effective_frequency;
-+	if (old_idle)
-+		fr =3D 0;
-+
-+	account_freq(fr, time_delta);
-+
-+	effective_frequency =3D frequency;
-+	last_stamp =3D time;
- =
+there, but not all.
 
- 	/* propagate to all children */
- 	for (i =3D 0; i < children.size(); i++)
- 		if (children[i]) {
- 			children[i]->change_effective_frequency(time, frequency);
- 		}
--
--	effective_frequency =3D frequency;
- }
- =
-
- =
-
-diff --git a/src/cpu/cpu.h b/src/cpu/cpu.h
-index 8b9c9f9..c99d4ea 100644
---- a/src/cpu/cpu.h
-+++ b/src/cpu/cpu.h
-@@ -173,7 +173,6 @@ public:
- 	virtual char *  fill_pstate_name(int line_nr, char *buffer);
- =
-
- 	virtual void    change_freq(uint64_t time, int freq);
--	virtual void	change_effective_frequency(uint64_t time, uint64_t freq);
- 	virtual void    go_idle(uint64_t time);
- 	virtual void    go_unidle(uint64_t time);
- =
-
-@@ -190,7 +189,6 @@ public:
- =
-
- 	virtual int     can_collapse(void) { return childcount =3D=3D 1;};
- 	virtual void    calculate_freq(uint64_t time);
--	virtual void	change_effective_frequency(uint64_t time, uint64_t freq);
- };
- =
-
- class cpu_package: public abstract_cpu
-@@ -204,8 +202,6 @@ public:
- 	virtual int     can_collapse(void) { return childcount =3D=3D 1;};
- =
-
- 	virtual void    calculate_freq(uint64_t time);
--	virtual void	change_effective_frequency(uint64_t time, uint64_t freq);
--
- };
- =
-
- extern void enumerate_cpus(void);
-diff --git a/src/cpu/cpu_core.cpp b/src/cpu/cpu_core.cpp
-index 93740b7..b19ca2c 100644
---- a/src/cpu/cpu_core.cpp
-+++ b/src/cpu/cpu_core.cpp
-@@ -98,29 +98,6 @@ void cpu_core::calculate_freq(uint64_t time)
- 	old_idle =3D idle;
- }
- =
-
--void cpu_core::change_effective_frequency(uint64_t time, uint64_t frequenc=
-y)
--{
--	uint64_t freq =3D 0;
--	uint64_t time_delta, fr;
--
--
--	if (last_stamp)
--		time_delta =3D time - last_stamp;
--	else
--		time_delta =3D 1;
--
--	fr =3D effective_frequency;
--
--	if (old_idle)
--		fr =3D 0;
--
--	account_freq(fr, time_delta);
--
--	effective_frequency =3D freq;
--	last_stamp =3D time;
--	abstract_cpu::change_effective_frequency(time, frequency);
--}
--
- char * cpu_core::fill_pstate_line(int line_nr, char *buffer)
- {
- 	buffer[0] =3D 0;
-diff --git a/src/cpu/cpu_linux.cpp b/src/cpu/cpu_linux.cpp
-index c820238..24fbcb3 100644
---- a/src/cpu/cpu_linux.cpp
-+++ b/src/cpu/cpu_linux.cpp
-@@ -331,25 +331,6 @@ void cpu_linux::change_freq(uint64_t time, int frequen=
-cy)
- 	old_idle =3D idle;
- }
- =
-
--void cpu_linux::change_effective_frequency(uint64_t time, uint64_t frequen=
-cy)
--{
--	uint64_t time_delta, fr;
--
--	if (last_stamp)
--		time_delta =3D time - last_stamp;
--	else
--		time_delta =3D 1;
--
--	fr =3D effective_frequency;
--	if (old_idle)
--		fr =3D 0;
--
--	account_freq(fr, time_delta);
--
--	effective_frequency =3D frequency;
--	last_stamp =3D time;
--}
--
- void cpu_linux::go_idle(uint64_t time)
- {
- =
-
-diff --git a/src/cpu/cpu_package.cpp b/src/cpu/cpu_package.cpp
-index d154b90..0ad5bdd 100644
---- a/src/cpu/cpu_package.cpp
-+++ b/src/cpu/cpu_package.cpp
-@@ -117,23 +117,3 @@ void cpu_package::calculate_freq(uint64_t time)
- 	old_idle =3D idle;
- }
- =
-
--void cpu_package::change_effective_frequency(uint64_t time, uint64_t frequ=
-ency)
--{
--	uint64_t time_delta, fr;
--
--	if (last_stamp)
--		time_delta =3D time - last_stamp;
--	else
--		time_delta =3D 1;
--
--	fr =3D effective_frequency;
--	if (old_idle)
--		fr =3D 0;
--
--	account_freq(fr, time_delta);
--
--	effective_frequency =3D frequency;
--	last_stamp =3D time;
--
--	abstract_cpu::change_effective_frequency(time, frequency);
--}
--- =
-
-1.8.0
+I have built and run some tests. Seems OK at a glance.
+-Chris
 
 
---===============3969091754028126711==--
+-------- Original Message --------
+Subject: 	RE: [Powertop] [RFC] [PATCHv2 00/10] Code deduplication in cpu/*
+Date: 	Mon, 24 Dec 2012 20:17:54 +0000
+From: 	Ferron, Chris E <chris.e.ferron(a)intel.com>
+To: 	Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>, Chris Ferron =
+
+<chris.e.ferron(a)linux.intel.com>
+CC: 	powertop(a)lists.01.org <powertop(a)lists.01.org>
+
+
+
+Thanks, I will attend to outstanding patches on Wednesday (GMT+8) when I re=
+turn to the office.
+-Chris
+
+-----Original Message-----
+From: powertop-bounces(a)lists.01.org [mailto:powertop-bounces(a)lists.01.o=
+rg] On Behalf Of Sergey Senozhatsky
+Sent: Monday, December 24, 2012 8:25 AM
+To: Chris Ferron
+Cc: powertop(a)lists.01.org
+Subject: Re: [Powertop] [RFC] [PATCHv2 00/10] Code deduplication in cpu/*
+
+On (12/24/12 03:08), Ivan Shapovalov wrote:
+> This is a resend (unchanged but rebased) of the patch series about
+> refactoring code in cpu/* by deduplication. From this series, only the
+> last bugfix patch has been applied so far due to a code freeze.
+>
+> Ivan Shapovalov (10):
+>       Fix includes: do not include intel_cpus.h inside cpu.h
+>       Deduplication: move is_turbo() function to lib
+>       Deduplication: move all instances of account_freq() to abstract_cpu=
+::account_freq()
+>       Deduplication: remove nhm_cpu::account_freq() almost identical to a=
+bstract_cpu::account_freq()
+>       Deduplication: remove nhm_{cpu,core,package}::change_effective_freq=
+uency() identical to cpu_{linux,core,package}::change_effective_frequency()
+>       Deduplication: merge cpu_{core,linux,package}::change_effective_fre=
+quency() into abstract_cpu::change_effective_frequency()
+>       Deduplication: remove {cpu,nhm}_core::calculate_freq() identical to=
+ abstract_cpu::calculate_freq()
+>       Deduplication: remove nhm_package::calculate_freq() identical to cp=
+u_package::calculate_freq()
+>       Deduplication: properly merge cpu_package::calculate_freq() into ab=
+stract_cpu::calculate_freq()
+>       Deduplication: merge go_idle()/go_unidle()/change_freq()
+> overrides into abstract_cpu() class
+>
+
+Hello Chris,
+patch series looks good to me. thanks to Ivan.
+
+please note V3 of 02 and 03 patches.
+
+
+	-ss
+_______________________________________________
+PowerTop mailing list
+PowerTop(a)lists.01.org
+https://lists.01.org/mailman/listinfo/powertop
+
+
+
+
+
+--===============2575967254143109868==--
 
