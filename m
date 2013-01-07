@@ -1,87 +1,23 @@
-Content-Type: multipart/mixed; boundary="===============8650527058360992872=="
+Content-Type: multipart/mixed; boundary="===============7407794151642519845=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Multiple Batteries
-Date: Sat, 24 Nov 2012 15:50:27 +0300
-Message-ID: <20121124125027.GB7100@swordfish>
-In-Reply-To: CAKZK7uy6QP7xHvUpbhzz-Yh+SK2rBdzVNDcsBTgHG+=eiqGp4w@mail.gmail.com
+From: Ismail Alan <ialan at buffalo.edu>
+Subject: [Powertop] Power estimations on PC
+Date: Mon, 07 Jan 2013 14:56:39 -0500
+Message-ID: <CAM_ef78p-zxRu1yz4ggTo6ao6WxGHrVRw=17EqL=HM4pvGuZ_A@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8650527058360992872==
+--===============7407794151642519845==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (11/23/12 22:55), Justin Brown wrote:
->    Hello,
->    I'm using Powertop 2.1, and I've noticed a somewhat minor bug. (I coul=
-dn't
->    find a public bug tracker, but would be more than happy to move this
->    discussion to one if someone could send me a URL.)
->    I have two batteries in my laptop, but Powertop does not recognize both
->    when calculating battery life remaining. For example Gnome-Shell repor=
-ts
->    that my batteries are at 66% and 100% (85% combined) giving me 10 hours
->    and 11 minutes of estimated time remaining. On the other hand, Powertop
->    reports just 3 hours 17 =EF=BF=BDminutes of time. Both programs are re=
-porting the
->    proper discharge rate. It just seems like Powertop is only using my
->    smaller battery (the currently active one).
->    I'm not sure if this issue has been reported, or if the developers even
->    have equipment with which to test. I'm more than willing to provide any
->    sort of debugging output or testing as needed. I could also probably
->    create a patch, but that's likely to take a lot longer for me to get s=
-etup
->    with development on this project.=EF=BF=BD
->    It may be as simple as iterating over a directory in /sys/ or /proc to
->    gather stats on multiple batteries. An experienced dev might be able to
->    fix it quickly.
->    Cheers,
->    Justin
+Hi,
+I want to see power estimations on PC. I have a yokogawa power meter.
+Is there any way?
 
+Best regars,
+Ismail
 
-can you please test the following patch?
-
-
-----
-
-power_supply rate could be 0.00, so we need to take care in power_meter::ti=
-me_left() =
-
-while perform dev_capacity()/joules_consumed() =3D=3D inf operation.
-
-
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
-
----
-
-diff --git a/src/measurement/measurement.cpp b/src/measurement/measurement.=
-cpp
-index 4a33db9..f65cb0c 100644
---- a/src/measurement/measurement.cpp
-+++ b/src/measurement/measurement.cpp
-@@ -65,12 +65,13 @@ double power_meter::time_left(void)
- 	if (cap < 0.001)
- 		return 0.0;
- =
-
--	left =3D cap / rate;
-+	if (rate < 0.001)
-+		rate =3D 1.0;
- =
-
-+	left =3D cap / rate;
- 	return left;
- }
- =
-
--
- vector<class power_meter *> power_meters;
- =
-
- void start_power_measurement(void)
-
-
---===============8650527058360992872==--
+--===============7407794151642519845==--
 
