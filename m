@@ -1,46 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============9066790263062125076=="
+Content-Type: multipart/mixed; boundary="===============6639872730400521121=="
 MIME-Version: 1.0
-From: Chris Ferron <chris.e.ferron at linux.intel.com>
-Subject: Re: [Powertop] [RFC] [PATCH 11/11] Ignore non-P-state-enabled CPUs
- when calculating frequency.
-Date: Tue, 13 Nov 2012 11:14:52 -0800
-Message-ID: <50A29C2C.8020609@linux.intel.com>
-In-Reply-To: 1352113953-24687-12-git-send-email-intelfx100@gmail.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: [Powertop] [pull] pending patches
+Date: Sun, 13 Jan 2013 23:10:36 +0300
+Message-ID: <20130113201036.GA2715@swordfish>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============9066790263062125076==
+--===============6639872730400521121==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 11/05/2012 03:12 AM, Ivan Shapovalov wrote:
-> This fixes bogus reported CPU frequencies (actually, uninitialized
-> values from i965_core) when i965 monitoring is used.
->
-> Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
-> ---
->   src/cpu/abstract_cpu.cpp | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
-> index d64cb24..fea377b 100644
-> --- a/src/cpu/abstract_cpu.cpp
-> +++ b/src/cpu/abstract_cpu.cpp
-> @@ -380,7 +380,7 @@ void abstract_cpu::calculate_freq(uint64_t time)
->   =
+Hello, Chris
+Hope you're fine.
 
->   	/* calculate the maximum frequency of all children */
->   	for (i =3D 0; i < children.size(); i++)
-> -		if (children[i]) {
-> +		if (children[i] && children[i]->has_pstates()) {
->   			uint64_t f =3D 0;
->   			if (!children[i]->idle) {
->   				f =3D children[i]->current_frequency;
-This patch for the bug fix has been merged.
-Thanks,
-Chris
+Did you have any chance to take a look at pending patches?
+A short list is below (hope, I didn't miss anything):
+
+Ivan Shapovalov (10):
+   Fix includes: do not include intel_cpus.h inside cpu.h
+   Deduplication: move is_turbo() function to lib
+   Deduplication: move all instances of account_freq() to abstract_cpu::acc=
+ount_freq()
+   Deduplication: remove nhm_cpu::account_freq() almost identical to abstra=
+ct_cpu::account_freq()
+   Deduplication: remove nhm_{cpu,core,package}::change_effective_frequency=
+() identical to cpu_{linux,core,package}::change_effective_frequency()
+   Deduplication: merge cpu_{core,linux,package}::change_effective_frequenc=
+y() into abstract_cpu::change_effective_frequency()
+   Deduplication: remove {cpu,nhm}_core::calculate_freq() identical to abst=
+ract_cpu::calculate_freq()
+   Deduplication: remove nhm_package::calculate_freq() identical to cpu_pac=
+kage::calculate_freq()
+   Deduplication: properly merge cpu_package::calculate_freq() into abstrac=
+t_cpu::calculate_freq()
+   Deduplication: merge go_idle()/go_unidle()/change_freq() overrides into =
+abstract_cpu() class
 
 
---===============9066790263062125076==--
+Sergey Senozhatsky (3):
+   tab_window: null members on construction
+   runtime_pm: register parameters
+   parameters: fix uninitialized values in param/result getters
+
+
+Thomas Waldecker/Igor Zhbanov (1):
+   csstoh.sh shell script fixes cross compiling issues
+
+
+	-ss
+
+--===============6639872730400521121==--
 
