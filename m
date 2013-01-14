@@ -1,40 +1,66 @@
-Content-Type: multipart/mixed; boundary="===============8333659482377187938=="
+Content-Type: multipart/mixed; boundary="===============0496288223461014293=="
 MIME-Version: 1.0
-From: Namhyung Kim <namhyung at gmail.com>
-Subject: [Powertop] [PATCH] main: 'quiet' option does not take an argument
-Date: Mon, 14 Jan 2013 23:25:32 +0900
-Message-ID: <1358173532-17751-1-git-send-email-namhyung@gmail.com>
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH] main: Fix output when running workload
+Date: Mon, 14 Jan 2013 18:49:12 +0300
+Message-ID: <20130114154912.GA2402@swordfish.minsk.epam.com>
+In-Reply-To: 1358174972-18163-1-git-send-email-namhyung@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8333659482377187938==
+--===============0496288223461014293==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
----
- src/main.cpp |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On (01/14/13 23:49), Namhyung Kim wrote:
+> Date: Mon, 14 Jan 2013 23:49:32 +0900
+> From: Namhyung Kim <namhyung(a)gmail.com>
+> To: powertop(a)lists.01.org
+> Subject: [Powertop] [PATCH] main: Fix output when running workload
+> X-Mailer: git-send-email 1.7.9.2
+> =
 
-diff --git a/src/main.cpp b/src/main.cpp
-index e6036ae..b22d11d 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -77,7 +77,7 @@ static const struct option long_options[] =3D
- 	{"time", optional_argument, NULL, 't'},
- 	{"iteration", optional_argument, NULL, 'i'},
- 	{"workload", optional_argument, NULL, 'w'},
--	{"quiet", optional_argument, NULL, 'q'},
-+	{"quiet", no_argument, NULL, 'q'},
- 	{NULL, 0, NULL, 0}
- };
+> Currently one_measurement() function prints following message after
+> a successful run of the workload.
+> =
+
+>   $ sudo powertop --html --workload=3D"sleep 1"
+>   Loaded 1 prior measurements
+>   Preparing to take measurements
+>   Measuring workload sleep 1.
+>   Unknown issue running workload!                         <-- here
+>   PowerTOP outputing using base filename powertop.html
+> =
+
+> It seems this was because it wrongly checks return value of system.
+> The return value of the system() call is the status of wait() call
+> so that it should be zero if things went well.
+>
+
+looks good to me, thanks.
  =
 
--- =
+> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+> ---
+>  src/main.cpp |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> =
 
-1.7.9.2
+> diff --git a/src/main.cpp b/src/main.cpp
+> index b22d11d..0883424 100644
+> --- a/src/main.cpp
+> +++ b/src/main.cpp
+> @@ -191,7 +191,7 @@ void one_measurement(int seconds, char *workload)
+>  	start_cpu_measurement();
+>  =
 
+>  	if (workload && workload[0]) {
+> -		if (!system(workload))
+> +		if (system(workload))
+>  			fprintf(stderr, _("Unknown issue running workload!\n"));
+>  	} else {
+>  		do_sleep(seconds);
 
---===============8333659482377187938==--
+--===============0496288223461014293==--
 
