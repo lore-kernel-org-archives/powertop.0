@@ -1,34 +1,149 @@
-Content-Type: multipart/mixed; boundary="===============2506338167325703143=="
+Content-Type: multipart/mixed; boundary="===============0697731677019656260=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] [RFC/PATCH] devices: Use new(std::nothrow) for
- creating devices
-Date: Thu, 18 Oct 2012 08:36:05 -0700
-Message-ID: <508021E5.8070209@linux.intel.com>
-In-Reply-To: 1350574368-4657-1-git-send-email-namhyung@gmail.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH] Fix C states and P states presentation issue.
+Date: Tue, 15 Jan 2013 14:28:17 +0300
+Message-ID: <20130115112817.GB2344@swordfish.minsk.epam.com>
+In-Reply-To: 20130115112353.GA2344@swordfish.minsk.epam.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2506338167325703143==
+--===============0697731677019656260==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 10/18/2012 8:32 AM, Namhyung Kim wrote:
-> When allocation fails, just skip the device and proceed if possible.
-> This is also for consistency with others.
+On (01/15/13 14:23), Sergey Senozhatsky wrote:
+> On (01/15/13 19:05), Austin Zhang wrote:
+> > If using '10' in this 'for' loop, for P states, once the processor
+> > provides more than 10 P states, those additional ones cannot been
+> > presented; and for C states, once the processor provides maximize
+> > C states level more than 9, for example, it only has POLL, C1, C3,
+> > C6, C10, the additional one like C10 also cannot be presented.
+> >
+> =
 
-hmm...
-if we're that low on memory something is so seriously wrong, exiting is the=
- right answer really.
+> Hm, I'm sure I've seen this before. Was it the same patch from
+> you?
+> =
 
-I'm getting strong advice from other userspace coders that checking allocat=
-ions like this is actually
-pointless...
-based on that, I'd say we need to go for better code readability, not more =
-complexity for no actual gain.
+> I recall Igor patched html report for pstate, but I also remember we had
+> something about c states as well.
+> =
 
+> 	-ss
+>
 
+Ok, I found it: "Display all P-states in HTML-report"
+(http://lists.01.org/pipermail/powertop/2012-July/000161.html).
+There was a note from Igor
+" The same issue may affect the function report_display_cpu_cstates()
+but I'm not sure that CPUs with more than 10 C-states exists. "
 
---===============2506338167325703143==--
+I'll take a look at your patch, thanks.
+
+	-ss
+  =
+
+> > Now we get the loop numbers from the system information we had got
+> > before.
+> > =
+
+> > Signed-off-by: Austin Zhang <zhang.austin(a)gmail.com>
+> > ---
+> >  src/cpu/cpu.cpp |   35 +++++++++++++++++++++++++++++------
+> >  1 files changed, 29 insertions(+), 6 deletions(-)
+> > =
+
+> > diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+> > index 7f3af69..28f77b7 100644
+> > --- a/src/cpu/cpu.cpp
+> > +++ b/src/cpu/cpu.cpp
+> > @@ -404,6 +404,15 @@ void report_display_cpu_cstates(void)
+> >  	unsigned int package, core, cpu;
+> >  	int line;
+> >  	class abstract_cpu *_package, * _core, * _cpu;
+> > +	unsigned int i, j, cstates_num;
+> > +
+> > +	for (i =3D 0, cstates_num =3D 0; i < all_cpus.size(); i++) {
+> > +		if (all_cpus[i])
+> > +			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
+> > +				if ((all_cpus[i]->cstates[j])->line_level >=3D 0 &&
+> > +				    (all_cpus[i]->cstates[j])->line_level > cstates_num)
+> > +					cstates_num =3D (all_cpus[i]->cstates[j])->line_level;
+> > +	}
+> >  =
+
+> >  	report.begin_section(SECTION_CPUIDLE);
+> >  	report.add_header("Processor Idle state report");
+> > @@ -421,7 +430,7 @@ void report_display_cpu_cstates(void)
+> >  			if (!_core)
+> >  				continue;
+> >  =
+
+> > -			for (line =3D LEVEL_HEADER; line < 10; line++) {
+> > +			for (line =3D LEVEL_HEADER; line <=3D (int)cstates_num; line++) {
+> >  				bool first_cpu =3D true;
+> >  =
+
+> >  				if (!_package->has_cstate_level(line))
+> > @@ -628,14 +637,29 @@ void impl_w_display_cpu_states(int state)
+> >  	char buffer[128];
+> >  	char linebuf[1024];
+> >  	unsigned int package, core, cpu;
+> > -	int line;
+> > +	int line, loop;
+> >  	class abstract_cpu *_package, * _core, * _cpu;
+> >  	int ctr =3D 0;
+> > +	unsigned int i, j, cstates_num, pstates_num;
+> > +
+> > +	for (i =3D 0, cstates_num =3D 0, pstates_num =3D 0; i < all_cpus.size=
+(); i++) {
+> > +		if (all_cpus[i] && all_cpus[i]->pstates.size() > pstates_num)
+> > +			pstates_num =3D all_cpus[i]->pstates.size();
+> >  =
+
+> > -	if (state =3D=3D PSTATE)
+> > +		if (all_cpus[i])
+> > +			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
+> > +				if ((all_cpus[i]->cstates[j])->line_level >=3D 0 &&
+> > +				    (all_cpus[i]->cstates[j])->line_level > cstates_num)
+> > +					cstates_num =3D (all_cpus[i]->cstates[j])->line_level;
+> > +	}
+> > +
+> > +	if (state =3D=3D PSTATE) {
+> >  		win =3D get_ncurses_win("Frequency stats");
+> > -	else
+> > +		loop =3D (int)pstates_num;
+> > +	} else {
+> >  		win =3D get_ncurses_win("Idle stats");
+> > +		loop =3D (int)cstates_num;
+> > +	}
+> >  =
+
+> >  	if (!win)
+> >  		return;
+> > @@ -656,8 +680,7 @@ void impl_w_display_cpu_states(int state)
+> >  			if (!_core->has_pstates() && state =3D=3D PSTATE)
+> >  				continue;
+> >  =
+
+> > -
+> > -			for (line =3D LEVEL_HEADER; line < 10; line++) {
+> > +			for (line =3D LEVEL_HEADER; line <=3D loop; line++) {
+> >  				int first =3D 1;
+> >  				ctr =3D 0;
+> >  				linebuf[0] =3D 0;
+> > -- =
+
+> > 1.7.5.4
+> > =
+
+> > _______________________________________________
+> > PowerTop mailing list
+> > PowerTop(a)lists.01.org
+> > https://lists.01.org/mailman/listinfo/powertop
+> >=20
+
+--===============0697731677019656260==--
 
