@@ -1,113 +1,134 @@
-Content-Type: multipart/mixed; boundary="===============8865713066783161250=="
+Content-Type: multipart/mixed; boundary="===============2955985079269536946=="
 MIME-Version: 1.0
-From: Namhyung Kim <namhyung at gmail.com>
-Subject: Re: [Powertop] [PATCH] Change library/pkg search condition for
- libnl2/3
-Date: Wed, 14 Nov 2012 00:30:59 +0900
-Message-ID: <1352820659.1811.5.camel@leonhard>
-In-Reply-To: 20121113101840.GB2621@swordfish.minsk.epam.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH] Fix C states and P states presentation issue.
+Date: Tue, 15 Jan 2013 14:23:53 +0300
+Message-ID: <20130115112353.GA2344@swordfish.minsk.epam.com>
+In-Reply-To: 1358247918-31031-1-git-send-email-zhang.austin@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8865713066783161250==
+--===============2955985079269536946==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-2012-11-13 (=ED=99=94), 13:18 +0300, Sergey Senozhatsky:
-> On (11/13/12 17:47), Austin Zhang wrote:
-> > =
+On (01/15/13 19:05), Austin Zhang wrote:
+> If using '10' in this 'for' loop, for P states, once the processor
+> provides more than 10 P states, those additional ones cannot been
+> presented; and for C states, once the processor provides maximize
+> C states level more than 9, for example, it only has POLL, C1, C3,
+> C6, C10, the additional one like C10 also cannot be presented.
+>
 
-> >    > why we check 'libnl-3.0 >=3D 3.0 libnl-genl-3.0 >=3D 3.0' and only
-> >    'libnl-2.0',
-> >    Because for v2, it just have=EF=BF=BDseparated=EF=BF=BDlibnl-genl li=
-brary, but there were
-> >    no=EF=BF=BDseparated pkg named=EF=BF=BDlibnl-genl-2.0.
-> >    >+AC_SEARCH_LIBS([genl_connect], [nl-genl nl], [], [has_libnl_ver=3D=
-0])
-> >    With additional 'nl' checking, It doesn't help. Failed with same err=
-or
-> >    under both v3 and v2 cases for 12.04 (doesn't try others).=EF=BF=BD
-> >    If fact, genl_connect is in nl-genl both for v2 and v3. Not sure if =
-it is
-> >    some search path issue.=EF=BF=BD
-> > =
+Hm, I'm sure I've seen this before. Was it the same patch from
+you?
 
+I recall Igor patched html report for pstate, but I also remember we had
+something about c states as well.
+
+	-ss
+ =
+
+> Now we get the loop numbers from the system information we had got
+> before.
 > =
 
-> hm. ok, thanks for info. I'll check libnl 2.0 repo if they ever had pkg-c=
-onfig file
-> other than libnl-2.0.pc. If the only one they provide is libnl-2.0.pc the=
-n we'll stick
-> with inital PKG_CHECK_MODULES rework and your adjustment to libnl-2.0 cas=
-e.
-> =
-
-> thanks for your patience and help!
-> =
-
-> =
-
-> Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
-> =
-
+> Signed-off-by: Austin Zhang <zhang.austin(a)gmail.com>
 > ---
+>  src/cpu/cpu.cpp |   35 +++++++++++++++++++++++++++++------
+>  1 files changed, 29 insertions(+), 6 deletions(-)
 > =
 
->  configure.ac | 12 ++++--------
->  1 file changed, 4 insertions(+), 8 deletions(-)
-> =
-
-> diff --git a/configure.ac b/configure.ac
-> index b8c183f..e6ae3ce 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -54,15 +54,11 @@ PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=3D=
-1],[
->   =
-
+> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+> index 7f3af69..28f77b7 100644
+> --- a/src/cpu/cpu.cpp
+> +++ b/src/cpu/cpu.cpp
+> @@ -404,6 +404,15 @@ void report_display_cpu_cstates(void)
+>  	unsigned int package, core, cpu;
+>  	int line;
+>  	class abstract_cpu *_package, * _core, * _cpu;
+> +	unsigned int i, j, cstates_num;
+> +
+> +	for (i =3D 0, cstates_num =3D 0; i < all_cpus.size(); i++) {
+> +		if (all_cpus[i])
+> +			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
+> +				if ((all_cpus[i]->cstates[j])->line_level >=3D 0 &&
+> +				    (all_cpus[i]->cstates[j])->line_level > cstates_num)
+> +					cstates_num =3D (all_cpus[i]->cstates[j])->line_level;
+> +	}
 >  =
 
->  has_libnl_ver=3D0
-> -PKG_CHECK_MODULES([LIBNL], [libnl-3.0 libnl-genl-3.0], [
-> -	has_libnl_ver=3D3], [
-> -	AC_SEARCH_LIBS([nl_socket_alloc], [nl-3 nl-genl-3], [
-> -		has_libnl_ver=3D3], [
-> -		AC_SEARCH_LIBS([nl_socket_alloc], [nl], [
-> -			has_libnl_ver=3D2], [
-> -			PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [])])])])
-> +PKG_CHECK_MODULES([LIBNL], [libnl-3.0 >=3D 3.0 libnl-genl-3.0 >=3D 3.0],=
- [has_libnl_ver=3D3], [
-> +	PKG_CHECK_MODULES([LIBNL], [libnl-2.0 >=3D 2.0], [has_libnl_ver=3D2], [
-> +		PKG_CHECK_MODULES([LIBNL], [libnl-1.0], [has_libnl_ver=3D1], [has_libn=
-l_ver=3D0])])])
+>  	report.begin_section(SECTION_CPUIDLE);
+>  	report.add_header("Processor Idle state report");
+> @@ -421,7 +430,7 @@ void report_display_cpu_cstates(void)
+>  			if (!_core)
+>  				continue;
+>  =
 
-On my ubuntu 10.04, "libnl-1.0" didn't work but "libnl-1" did.
+> -			for (line =3D LEVEL_HEADER; line < 10; line++) {
+> +			for (line =3D LEVEL_HEADER; line <=3D (int)cstates_num; line++) {
+>  				bool first_cpu =3D true;
+>  =
 
-Thanks,
-Namhyung
+>  				if (!_package->has_cstate_level(line))
+> @@ -628,14 +637,29 @@ void impl_w_display_cpu_states(int state)
+>  	char buffer[128];
+>  	char linebuf[1024];
+>  	unsigned int package, core, cpu;
+> -	int line;
+> +	int line, loop;
+>  	class abstract_cpu *_package, * _core, * _cpu;
+>  	int ctr =3D 0;
+> +	unsigned int i, j, cstates_num, pstates_num;
+> +
+> +	for (i =3D 0, cstates_num =3D 0, pstates_num =3D 0; i < all_cpus.size()=
+; i++) {
+> +		if (all_cpus[i] && all_cpus[i]->pstates.size() > pstates_num)
+> +			pstates_num =3D all_cpus[i]->pstates.size();
+>  =
 
+> -	if (state =3D=3D PSTATE)
+> +		if (all_cpus[i])
+> +			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
+> +				if ((all_cpus[i]->cstates[j])->line_level >=3D 0 &&
+> +				    (all_cpus[i]->cstates[j])->line_level > cstates_num)
+> +					cstates_num =3D (all_cpus[i]->cstates[j])->line_level;
+> +	}
+> +
+> +	if (state =3D=3D PSTATE) {
+>  		win =3D get_ncurses_win("Frequency stats");
+> -	else
+> +		loop =3D (int)pstates_num;
+> +	} else {
+>  		win =3D get_ncurses_win("Idle stats");
+> +		loop =3D (int)cstates_num;
+> +	}
+>  =
 
->  if (test "$has_libnl_ver" -eq 0); then
-> -	AC_MSG_ERROR(libnl is required but not found)
-> +	AC_MSG_ERROR(libnl and libnl-genl are required but were not found)
->  fi
->  if (test "$has_libnl_ver" -gt 1); then
->  	AC_DEFINE([HAVE_LIBNL20], [1], [Define if you have libnl-2.0 or higher])
+>  	if (!win)
+>  		return;
+> @@ -656,8 +680,7 @@ void impl_w_display_cpu_states(int state)
+>  			if (!_core->has_pstates() && state =3D=3D PSTATE)
+>  				continue;
+>  =
+
+> -
+> -			for (line =3D LEVEL_HEADER; line < 10; line++) {
+> +			for (line =3D LEVEL_HEADER; line <=3D loop; line++) {
+>  				int first =3D 1;
+>  				ctr =3D 0;
+>  				linebuf[0] =3D 0;
+> -- =
+
+> 1.7.5.4
 > =
 
 > _______________________________________________
 > PowerTop mailing list
 > PowerTop(a)lists.01.org
 > https://lists.01.org/mailman/listinfo/powertop
+>=20
 
-
--- =
-
-Regards,
-Namhyung Kim
-
-
-
---===============8865713066783161250==--
+--===============2955985079269536946==--
 
