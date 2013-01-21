@@ -1,159 +1,143 @@
-Content-Type: multipart/mixed; boundary="===============1812756579481939185=="
+Content-Type: multipart/mixed; boundary="===============6164999587709352235=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: [Powertop] [PATCH] clean up csv report formatter
-Date: Thu, 11 Oct 2012 15:33:08 -0700
-Message-ID: <20121011223308.GA3045@swordfish.datadirect.datadirectnet.com>
+Subject: Re: [Powertop] [PATCH] Fix C states and P states presentation issue.
+Date: Mon, 21 Jan 2013 15:31:12 +0300
+Message-ID: <20130121123112.GA2360@swordfish.minsk.epam.com>
+In-Reply-To: 1358247918-31031-1-git-send-email-zhang.austin@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1812756579481939185==
+--===============6164999587709352235==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-[PATCH] clean up csv report formatter
+On (01/15/13 19:05), Austin Zhang wrote:
+> Date: Tue, 15 Jan 2013 19:05:18 +0800
+> From: Austin Zhang <zhang.austin(a)gmail.com>
+> To: powertop(a)lists.01.org
+> Subject: [Powertop] [PATCH] Fix C states and P states presentation issue.
+> X-Mailer: git-send-email 1.7.5.4
+> =
 
-Do not re-define/re-implement unused basic formatter functions in csv repor=
-ter
-(e.g. report_formatter_csv::finish_report()).
+> If using '10' in this 'for' loop, for P states, once the processor
+> provides more than 10 P states, those additional ones cannot been
+> presented; and for C states, once the processor provides maximize
+> C states level more than 9, for example, it only has POLL, C1, C3,
+> C6, C10, the additional one like C10 also cannot be presented.
+> =
 
+> Now we get the loop numbers from the system information we had got
+> before.
+> =
 
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+> Signed-off-by: Austin Zhang <zhang.austin(a)gmail.com>
+> ---
+>  src/cpu/cpu.cpp |   35 +++++++++++++++++++++++++++++------
+>  1 files changed, 29 insertions(+), 6 deletions(-)
+> =
 
----
+> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+> index 7f3af69..28f77b7 100644
+> --- a/src/cpu/cpu.cpp
+> +++ b/src/cpu/cpu.cpp
+> @@ -404,6 +404,15 @@ void report_display_cpu_cstates(void)
+>  	unsigned int package, core, cpu;
+>  	int line;
+>  	class abstract_cpu *_package, * _core, * _cpu;
+> +	unsigned int i, j, cstates_num;
+> +
+> +	for (i =3D 0, cstates_num =3D 0; i < all_cpus.size(); i++) {
+> +		if (all_cpus[i])
+> +			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
+> +				if ((all_cpus[i]->cstates[j])->line_level >=3D 0 &&
+> +				    (all_cpus[i]->cstates[j])->line_level > cstates_num)
+> +					cstates_num =3D (all_cpus[i]->cstates[j])->line_level;
+> +	}
+>  =
 
- src/report/report-formatter-csv.cpp | 40 ---------------------------------=
-----
- src/report/report-formatter-csv.h   |  8 --------
- 2 files changed, 48 deletions(-)
+>  	report.begin_section(SECTION_CPUIDLE);
+>  	report.add_header("Processor Idle state report");
+> @@ -421,7 +430,7 @@ void report_display_cpu_cstates(void)
+>  			if (!_core)
+>  				continue;
+>  =
 
-diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-format=
-ter-csv.cpp
-index 9b154b5..37ac86b 100644
---- a/src/report/report-formatter-csv.cpp
-+++ b/src/report/report-formatter-csv.cpp
-@@ -45,14 +45,6 @@ report_formatter_csv::report_formatter_csv()
- /* ***********************************************************************=
-* */
- =
+> -			for (line =3D LEVEL_HEADER; line < 10; line++) {
+> +			for (line =3D LEVEL_HEADER; line <=3D (int)cstates_num; line++) {
+>  				bool first_cpu =3D true;
+>  =
 
- void
--report_formatter_csv::finish_report()
--{
--	/* Do nothing special */
--}
--
--/* ***********************************************************************=
-* */
--
--void
- report_formatter_csv::add_doc_header()
- {
- 	add_header(report_csv_header, 1);
-@@ -75,22 +67,6 @@ report_formatter_csv::add_header(const char *header, int=
- level)
- /* ***********************************************************************=
-* */
- =
+>  				if (!_package->has_cstate_level(line))
+> @@ -628,14 +637,29 @@ void impl_w_display_cpu_states(int state)
+>  	char buffer[128];
+>  	char linebuf[1024];
+>  	unsigned int package, core, cpu;
+> -	int line;
+> +	int line, loop;
+>  	class abstract_cpu *_package, * _core, * _cpu;
+>  	int ctr =3D 0;
+> +	unsigned int i, j, cstates_num, pstates_num;
+> +
+> +	for (i =3D 0, cstates_num =3D 0, pstates_num =3D 0; i < all_cpus.size()=
+; i++) {
+> +		if (all_cpus[i] && all_cpus[i]->pstates.size() > pstates_num)
+> +			pstates_num =3D all_cpus[i]->pstates.size();
+>  =
 
- void
--report_formatter_csv::begin_section(section_type stype)
--{
--	/* Do nothing special */
--}
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_csv::end_section()
--{
--	/* Do nothing special */
--}
--
--/* ***********************************************************************=
-* */
--
--void
- report_formatter_csv::begin_table(table_type ttype)
- {
- 	add_exact("\n");
-@@ -163,14 +139,6 @@ report_formatter_csv::end_cell()
- /* ***********************************************************************=
-* */
- =
+> -	if (state =3D=3D PSTATE)
+> +		if (all_cpus[i])
+> +			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
+> +				if ((all_cpus[i]->cstates[j])->line_level >=3D 0 &&
+> +				    (all_cpus[i]->cstates[j])->line_level > cstates_num)
+> +					cstates_num =3D (all_cpus[i]->cstates[j])->line_level;
+> +	}
+> +
 
- void
--report_formatter_csv::add_empty_cell()
--{
--	/* Do nothing special */
--}
--
--/* ***********************************************************************=
-* */
--
--void
- report_formatter_csv::begin_paragraph()
- {
- 	text_start =3D result.length();
-@@ -213,11 +181,3 @@ report_formatter_csv::escape_string(const char *str)
- =
+Hm, I think it'd be better to have these (cstates_num, pstates_num) as a cp=
+u members and set max =
 
- 	return res;
- }
--
--/* ***********************************************************************=
-* */
--
--void
--report_formatter_csv::set_cpu_number(int nr UNUSED)
--{
--	/* Do nothing */
--}
-diff --git a/src/report/report-formatter-csv.h b/src/report/report-formatte=
-r-csv.h
-index 8dd2976..8db9839 100644
---- a/src/report/report-formatter-csv.h
-+++ b/src/report/report-formatter-csv.h
-@@ -49,13 +49,8 @@ class report_formatter_csv: public report_formatter_stri=
-ng_base
- public:
- 	report_formatter_csv();
- =
+P/C state when we insert new P/C state. Iterating through constant data on =
+every display(/report)
+seems like overkill.
 
--	void finish_report();
--
- 	void add_header(const char *header, int level);
- =
-
--	void begin_section(section_type stype);
--	void end_section();
--
- 	void begin_table(table_type ttype);
- 	void end_table();
- =
-
-@@ -64,13 +59,10 @@ public:
- =
-
- 	void begin_cell(cell_type ctype);
- 	void end_cell();
--	void add_empty_cell();
- =
-
- 	void begin_paragraph();
- 	void end_paragraph();
- =
-
--	void set_cpu_number(int nr);
--
- private:
- 	void add_doc_header();
- =
+	-ss
 
 
+> +	if (state =3D=3D PSTATE) {
+>  		win =3D get_ncurses_win("Frequency stats");
+> -	else
+> +		loop =3D (int)pstates_num;
+> +	} else {
+>  		win =3D get_ncurses_win("Idle stats");
+> +		loop =3D (int)cstates_num;
+> +	}
+>  =
 
+>  	if (!win)
+>  		return;
+> @@ -656,8 +680,7 @@ void impl_w_display_cpu_states(int state)
+>  			if (!_core->has_pstates() && state =3D=3D PSTATE)
+>  				continue;
+>  =
 
---===============1812756579481939185==--
+> -
+> -			for (line =3D LEVEL_HEADER; line < 10; line++) {
+> +			for (line =3D LEVEL_HEADER; line <=3D loop; line++) {
+>  				int first =3D 1;
+>  				ctr =3D 0;
+>  				linebuf[0] =3D 0;
+> -- =
+
+> 1.7.5.4
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>=20
+
+--===============6164999587709352235==--
 
