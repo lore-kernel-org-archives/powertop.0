@@ -1,168 +1,150 @@
-Content-Type: multipart/mixed; boundary="===============0520098770462022103=="
+Content-Type: multipart/mixed; boundary="===============7033011702067854900=="
 MIME-Version: 1.0
-From: Ivan Shapovalov <intelfx100 at gmail.com>
-Subject: [Powertop] [RFC] [PATCH 10/11] Deduplication: merge
- go_idle()/go_unidle()/change_freq() overrides into abstract_cpu() class
-Date: Mon, 05 Nov 2012 15:12:32 +0400
-Message-ID: <1352113953-24687-11-git-send-email-intelfx100@gmail.com>
-In-Reply-To: 1352113953-24687-1-git-send-email-intelfx100@gmail.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH] V2: Fix C states and P states presentation
+ issue.
+Date: Tue, 22 Jan 2013 20:09:26 +0300
+Message-ID: <20130122170926.GB2320@swordfish>
+In-Reply-To: 1358855012-23798-1-git-send-email-zhang.austin@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0520098770462022103==
+--===============7033011702067854900==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-When merging, also (while at it) use the new freq_updated() method in
-these functions.
+On (01/22/13 19:43), Austin Zhang wrote:
+> Date: Tue, 22 Jan 2013 19:43:32 +0800
+> From: Austin Zhang <zhang.austin(a)gmail.com>
+> To: powertop(a)lists.01.org
+> Subject: [Powertop] [PATCH] V2: Fix C states and P states presentation
+>  issue.
+> X-Mailer: git-send-email 1.7.5.4
+> =
 
-Signed-off-by: Ivan Shapovalov <intelfx100(a)gmail.com>
----
- src/cpu/cpu.h          | 11 +++--------
- src/cpu/cpu_linux.cpp  | 31 -------------------------------
- src/cpu/intel_cpus.cpp | 28 ----------------------------
- src/cpu/intel_cpus.h   |  5 -----
- 4 files changed, 3 insertions(+), 72 deletions(-)
+> If using '10' in this 'for' loop, for P states, once the processor
+> provides more than 10 P states, those additional ones cannot been
+> presented; and for C states, once the processor provides maximize
+> C states level more than 9, for example, it only has POLL, C1, C3,
+> C6, C10, the additional one like C10 also cannot be presented.
+> =
 
-diff --git a/src/cpu/cpu.h b/src/cpu/cpu.h
-index 498447b..9c61641 100644
---- a/src/cpu/cpu.h
-+++ b/src/cpu/cpu.h
-@@ -143,9 +143,9 @@ public:
- =
+> Now we get the loop numbers from the system information we had got
+> before.
+> =
 
- 	/* Frequency micro accounting methods */
- 	virtual void    calculate_freq(uint64_t time);
--	virtual void    go_idle(uint64_t time) { idle =3D true; if (parent) paren=
-t->calculate_freq(time);};
--	virtual void    go_unidle(uint64_t time) { idle =3D false; if (parent) pa=
-rent->calculate_freq(time);};;
--	virtual void    change_freq(uint64_t time, int freq) { current_frequency =
-=3D freq; if (parent) parent->calculate_freq(time);};
-+	virtual void    go_idle(uint64_t time) { idle =3D true; freq_updated(time=
-); }
-+	virtual void    go_unidle(uint64_t time) { idle =3D false; freq_updated(t=
-ime); }
-+	virtual void    change_freq(uint64_t time, int freq) { current_frequency =
-=3D freq; freq_updated(time); }
- =
+> Changes from V1:
+> Using std:max to simplify codes
+> =
 
- 	virtual void	change_effective_frequency(uint64_t time, uint64_t freq);
- =
+> Signed-off-by: Austin Zhang <zhang.austin(a)gmail.com>
+> ---
+>  src/cpu/cpu.cpp |   36 +++++++++++++++++++++++++++++-------
+>  1 files changed, 29 insertions(+), 7 deletions(-)
+> =
 
-@@ -172,11 +172,6 @@ public:
- =
+> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+> index 7f3af69..1bae255 100644
+> --- a/src/cpu/cpu.cpp
+> +++ b/src/cpu/cpu.cpp
+> @@ -402,8 +402,16 @@ void report_display_cpu_cstates(void)
+>  {
+>  	char buffer[512], buffer2[512];
+>  	unsigned int package, core, cpu;
+> -	int line;
+> +	int line, cstates_num;
+>  	class abstract_cpu *_package, * _core, * _cpu;
+> +	unsigned int i, j;
+> +
+> +	for (i =3D 0, cstates_num =3D 0; i < all_cpus.size(); i++) {
+> +		if (all_cpus[i])
+> +			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
+> +				cstates_num =3D std::max(cstates_num,
+> +						(all_cpus[i]->cstates[j])->line_level);
+> +	}
+>  =
 
- 	virtual char *  fill_pstate_line(int line_nr, char *buffer);
- 	virtual char *  fill_pstate_name(int line_nr, char *buffer);
--
--	virtual void    change_freq(uint64_t time, int freq);
--	virtual void    go_idle(uint64_t time);
--	virtual void    go_unidle(uint64_t time);
--
- };
- =
+>  	report.begin_section(SECTION_CPUIDLE);
+>  	report.add_header("Processor Idle state report");
+> @@ -421,7 +429,7 @@ void report_display_cpu_cstates(void)
+>  			if (!_core)
+>  				continue;
+>  =
 
- class cpu_core: public abstract_cpu
-diff --git a/src/cpu/cpu_linux.cpp b/src/cpu/cpu_linux.cpp
-index 24fbcb3..4025880 100644
---- a/src/cpu/cpu_linux.cpp
-+++ b/src/cpu/cpu_linux.cpp
-@@ -318,34 +318,3 @@ char * cpu_linux::fill_pstate_line(int line_nr, char *=
-buffer)
- 	sprintf(buffer," %5.1f%% ", percentage(1.0* (pstates[line_nr]->time_after=
-) / total_stamp));
- 	return buffer;
- }
--
--
--
--
--void cpu_linux::change_freq(uint64_t time, int frequency)
--{
--	current_frequency =3D frequency;
--
--	if (parent)
--		parent->calculate_freq(time);
--	old_idle =3D idle;
--}
--
--void cpu_linux::go_idle(uint64_t time)
--{
--
--	idle =3D true;
--
--	if (parent)
--		parent->calculate_freq(time);
--	old_idle =3D idle;
--}
--
--
--void cpu_linux::go_unidle(uint64_t time)
--{
--	idle =3D false;
--	if (parent)
--		parent->calculate_freq(time);
--	old_idle =3D idle;
--}
-diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
-index 89eefee..c49102b 100644
---- a/src/cpu/intel_cpus.cpp
-+++ b/src/cpu/intel_cpus.cpp
-@@ -429,31 +429,3 @@ int nhm_cpu::has_pstate_level(int level)
- 		return 1;
- 	return cpu_linux::has_pstate_level(level);
- }
--
--void nhm_cpu::change_freq(uint64_t time, int frequency)
--{
--	current_frequency =3D frequency;
--
--	if (parent)
--		parent->calculate_freq(time);
--	old_idle =3D idle;
--}
--
--void nhm_cpu::go_idle(uint64_t time)
--{
--
--	idle =3D true;
--
--	if (parent)
--		parent->calculate_freq(time);
--	old_idle =3D idle;
--}
--
--
--void nhm_cpu::go_unidle(uint64_t time)
--{
--	idle =3D false;
--	if (parent)
--		parent->calculate_freq(time);
--	old_idle =3D idle;
--}
-diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
-index a4c0852..a125540 100644
---- a/src/cpu/intel_cpus.h
-+++ b/src/cpu/intel_cpus.h
-@@ -98,11 +98,6 @@ public:
- 	virtual char *  fill_pstate_name(int line_nr, char *buffer);
- 	virtual char *  fill_pstate_line(int line_nr, char *buffer);
- 	virtual int	has_pstate_level(int level);
--
--	virtual void    change_freq(uint64_t time, int freq);
--	virtual void    go_idle(uint64_t time);
--	virtual void    go_unidle(uint64_t time);
--
- };
- =
+> -			for (line =3D LEVEL_HEADER; line < 10; line++) {
+> +			for (line =3D LEVEL_HEADER; line <=3D cstates_num; line++) {
+>  				bool first_cpu =3D true;
+>  =
 
- class atom_package: public cpu_package
--- =
+>  				if (!_package->has_cstate_level(line))
+> @@ -628,14 +636,29 @@ void impl_w_display_cpu_states(int state)
+>  	char buffer[128];
+>  	char linebuf[1024];
+>  	unsigned int package, core, cpu;
+> -	int line;
+> +	int line, loop, cstates_num, pstates_num;
+>  	class abstract_cpu *_package, * _core, * _cpu;
+>  	int ctr =3D 0;
+> +	unsigned int i, j;
+> +
+> +	for (i =3D 0, cstates_num =3D 0, pstates_num =3D 0; i < all_cpus.size()=
+; i++) {
+> +		if (!all_cpus[i])
+> +			continue;
+>  =
 
-1.8.0
+> -	if (state =3D=3D PSTATE)
+> +		pstates_num =3D std::max<int>(pstates_num, all_cpus[i]->pstates.size()=
+);
+> +
 
 
---===============0520098770462022103==--
+just for note, perhaps we can do the same for pstates_num in report_display=
+_cpu_pstates(),
+to keep it similar.
+
+	-ss
+
+
+> +		for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
+> +			cstates_num =3D std::max(cstates_num,
+> +						(all_cpus[i]->cstates[j])->line_level);
+> +	}
+> +
+> +	if (state =3D=3D PSTATE) {
+>  		win =3D get_ncurses_win("Frequency stats");
+> -	else
+> +		loop =3D pstates_num;
+> +	} else {
+>  		win =3D get_ncurses_win("Idle stats");
+> +		loop =3D cstates_num;
+> +	}
+>  =
+
+>  	if (!win)
+>  		return;
+> @@ -656,8 +679,7 @@ void impl_w_display_cpu_states(int state)
+>  			if (!_core->has_pstates() && state =3D=3D PSTATE)
+>  				continue;
+>  =
+
+> -
+> -			for (line =3D LEVEL_HEADER; line < 10; line++) {
+> +			for (line =3D LEVEL_HEADER; line <=3D loop; line++) {
+>  				int first =3D 1;
+>  				ctr =3D 0;
+>  				linebuf[0] =3D 0;
+> -- =
+
+> 1.7.5.4
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>=20
+
+--===============7033011702067854900==--
 
