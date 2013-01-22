@@ -1,87 +1,132 @@
-Content-Type: multipart/mixed; boundary="===============2087183438880564683=="
+Content-Type: multipart/mixed; boundary="===============4568750244754274421=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [RFC] [PATCH 00/11] Code deduplication and a single
- i965 P-states accounting bugfix in cpu/*
-Date: Mon, 05 Nov 2012 14:30:37 +0300
-Message-ID: <20121105113037.GE3123@swordfish>
-In-Reply-To: 1352113953-24687-1-git-send-email-intelfx100@gmail.com
+Subject: Re: [Powertop] [PATCH] V2: Fix C states and P states presentation
+ issue.
+Date: Tue, 22 Jan 2013 20:07:24 +0300
+Message-ID: <20130122170724.GA2320@swordfish>
+In-Reply-To: 1358855012-23798-1-git-send-email-zhang.austin@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2087183438880564683==
+--===============4568750244754274421==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (11/05/12 15:12), Ivan Shapovalov wrote:
-> This is a series of refactor (well, mainly deduplication) of cpu/* code f=
-ollowed with a
-> single bugfix patch.
->
+On (01/22/13 19:43), Austin Zhang wrote:
+> If using '10' in this 'for' loop, for P states, once the processor
+> provides more than 10 P states, those additional ones cannot been
+> presented; and for C states, once the processor provides maximize
+> C states level more than 9, for example, it only has POLL, C1, C3,
+> C6, C10, the additional one like C10 also cannot be presented.
+> =
 
-thanks for patches, we'll review. code is frozen for a release, so it'll ta=
-ke some time. =
+> Now we get the loop numbers from the system information we had got
+> before.
+> =
 
+> Changes from V1:
+> Using std:max to simplify codes
+> =
+
+> Signed-off-by: Austin Zhang <zhang.austin(a)gmail.com>
+> ---
+
+
+looks good to me.
 
 	-ss
 
-> The bugfix itself may be applied even without applying refactoring, but t=
-hen
-> the same change shall be applied to all copies of calculate_freq().
+>  src/cpu/cpu.cpp |   36 +++++++++++++++++++++++++++++-------
+>  1 files changed, 29 insertions(+), 7 deletions(-)
 > =
 
-> So the whole purpose of the series is to
->  1) mercilessly purge those method overrides which are identical to the m=
-ethods in base
->     classes, and
->  2) prefer defining a helper function and overriding it rather than copy-=
-pasting
->     the whole big function whose behavior needs to be altered and changin=
-g one-two lines in it.
-> =
+> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+> index 7f3af69..1bae255 100644
+> --- a/src/cpu/cpu.cpp
+> +++ b/src/cpu/cpu.cpp
+> @@ -402,8 +402,16 @@ void report_display_cpu_cstates(void)
+>  {
+>  	char buffer[512], buffer2[512];
+>  	unsigned int package, core, cpu;
+> -	int line;
+> +	int line, cstates_num;
+>  	class abstract_cpu *_package, * _core, * _cpu;
+> +	unsigned int i, j;
+> +
+> +	for (i =3D 0, cstates_num =3D 0; i < all_cpus.size(); i++) {
+> +		if (all_cpus[i])
+> +			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
+> +				cstates_num =3D std::max(cstates_num,
+> +						(all_cpus[i]->cstates[j])->line_level);
+> +	}
+>  =
 
-> Ivan Shapovalov (11):
->   Fix includes: do not include intel_cpus.h inside cpu.h
->   Deduplication: move is_turbo() function to lib
->   Deduplication: move all instances of account_freq() to
->     abstract_cpu::account_freq()
->   Deduplication: remove nhm_cpu::account_freq() almost identical to
->     abstract_cpu::account_freq()
->   Deduplication: remove
->     nhm_{cpu,core,package}::change_effective_frequency() identical to
->     cpu_{linux,core,package}::change_effective_frequency()
->   Deduplication: merge
->     cpu_{core,linux,package}::change_effective_frequency() into
->     abstract_cpu::change_effective_frequency()
->   Deduplication: remove {cpu,nhm}_core::calculate_freq() identical to
->     abstract_cpu::calculate_freq()
->   Deduplication: remove nhm_package::calculate_freq() identical to
->     cpu_package::calculate_freq()
->   Deduplication: properly merge cpu_package::calculate_freq() into
->     abstract_cpu::calculate_freq()
->   Deduplication: merge go_idle()/go_unidle()/change_freq() overrides
->     into abstract_cpu() class
->   Ignore non-P-state-enabled CPUs when calculating frequency.
-> =
+>  	report.begin_section(SECTION_CPUIDLE);
+>  	report.add_header("Processor Idle state report");
+> @@ -421,7 +429,7 @@ void report_display_cpu_cstates(void)
+>  			if (!_core)
+>  				continue;
+>  =
 
->  src/cpu/abstract_cpu.cpp |  69 ++++++++++--
->  src/cpu/cpu.cpp          |   1 +
->  src/cpu/cpu.h            |  29 ++----
->  src/cpu/cpu_core.cpp     |  97 -----------------
->  src/cpu/cpu_linux.cpp    |  98 ------------------
->  src/cpu/cpu_package.cpp  | 102 ++----------------
->  src/cpu/intel_cpus.cpp   | 265 +----------------------------------------=
-------
->  src/cpu/intel_cpus.h     |  23 +---
->  src/cpu/intel_gpu.cpp    |   2 +-
->  src/lib.cpp              |   9 ++
->  src/lib.h                |   1 +
->  11 files changed, 94 insertions(+), 602 deletions(-)
-> =
+> -			for (line =3D LEVEL_HEADER; line < 10; line++) {
+> +			for (line =3D LEVEL_HEADER; line <=3D cstates_num; line++) {
+>  				bool first_cpu =3D true;
+>  =
 
-> --
-> 1.8.0
+>  				if (!_package->has_cstate_level(line))
+> @@ -628,14 +636,29 @@ void impl_w_display_cpu_states(int state)
+>  	char buffer[128];
+>  	char linebuf[1024];
+>  	unsigned int package, core, cpu;
+> -	int line;
+> +	int line, loop, cstates_num, pstates_num;
+>  	class abstract_cpu *_package, * _core, * _cpu;
+>  	int ctr =3D 0;
+> +	unsigned int i, j;
+> +
+> +	for (i =3D 0, cstates_num =3D 0, pstates_num =3D 0; i < all_cpus.size()=
+; i++) {
+> +		if (!all_cpus[i])
+> +			continue;
+>  =
+
+> -	if (state =3D=3D PSTATE)
+> +		pstates_num =3D std::max<int>(pstates_num, all_cpus[i]->pstates.size()=
+);
+> +
+> +		for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
+> +			cstates_num =3D std::max(cstates_num,
+> +						(all_cpus[i]->cstates[j])->line_level);
+> +	}
+> +
+> +	if (state =3D=3D PSTATE) {
+>  		win =3D get_ncurses_win("Frequency stats");
+> -	else
+> +		loop =3D pstates_num;
+> +	} else {
+>  		win =3D get_ncurses_win("Idle stats");
+> +		loop =3D cstates_num;
+> +	}
+>  =
+
+>  	if (!win)
+>  		return;
+> @@ -656,8 +679,7 @@ void impl_w_display_cpu_states(int state)
+>  			if (!_core->has_pstates() && state =3D=3D PSTATE)
+>  				continue;
+>  =
+
+> -
+> -			for (line =3D LEVEL_HEADER; line < 10; line++) {
+> +			for (line =3D LEVEL_HEADER; line <=3D loop; line++) {
+>  				int first =3D 1;
+>  				ctr =3D 0;
+>  				linebuf[0] =3D 0;
+> -- =
+
+> 1.7.5.4
 > =
 
 > _______________________________________________
@@ -90,5 +135,5 @@ g one-two lines in it.
 > https://lists.01.org/mailman/listinfo/powertop
 >=20
 
---===============2087183438880564683==--
+--===============4568750244754274421==--
 
