@@ -1,41 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============2427033922273263421=="
+Content-Type: multipart/mixed; boundary="===============0698010837398512435=="
 MIME-Version: 1.0
-From: Paul Menzel <paulepanter at users.sourceforge.net>
-Subject: Re: [Powertop] [Announcement] Roadmap for next release 2.2 and 2.3
- planning (was: PowerTOP Announcement)
-Date: Sun, 04 Nov 2012 12:28:50 +0100
-Message-ID: <1352028530.4710.8.camel@mattotaupa>
-In-Reply-To: 5092A5E3.5070303@linux.intel.com
+From: Austin Zhang <zhang.austin at gmail.com>
+Subject: [Powertop] [PATCH] Using std::max to handle all such kind of logic
+Date: Wed, 23 Jan 2013 11:54:47 +0800
+Message-ID: <1358913287-8694-1-git-send-email-zhang.austin@gmail.com>
+In-Reply-To: 20130122170926.GB2320@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2427033922273263421==
+--===============0698010837398512435==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Dear Chris,
+Signed-off-by: Austin Zhang <zhang.austin(a)gmail.com>
+---
+ src/cpu/cpu.cpp |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+index 7f3af69..38540a5 100644
+--- a/src/cpu/cpu.cpp
++++ b/src/cpu/cpu.cpp
+@@ -525,8 +525,9 @@ void report_display_cpu_pstates(void)
+ 	unsigned int i, pstates_num;
+ =
+
+ 	for (i =3D 0, pstates_num =3D 0; i < all_cpus.size(); i++)
+-		if (all_cpus[i] && all_cpus[i]->pstates.size() > pstates_num)
+-			pstates_num =3D all_cpus[i]->pstates.size();
++		if (all_cpus[i])
++			pstates_num =3D std::max<unsigned int>(pstates_num,
++								all_cpus[i]->pstates.size());
+ =
+
+ 	report.begin_section(SECTION_CPUFREQ);
+ 	report.add_header("Processor Frequency Report");
+-- =
+
+1.7.5.4
 
 
-could you please use better subjects in the future. This is very
-important for people reading the archive and wanting to easily overview
-their mail inbox.
-
-
-Thanks and good luck for the next release,
-
-Paul
-
---===============2427033922273263421==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
-L0xpbnV4KQoKaUVZRUFCRUNBQVlGQWxDV1VYSUFDZ2tRUFgxYUsyd09IVmloUmdDZ2pLT09BVXVV
-TTJYZVpsdTJ0cmZSMy9FMwpmSGNBbjFnWElNZFlmRFRNVVhvd01HeUw5VEx6dkJkago9bzBkMQot
-LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
-
---===============2427033922273263421==--
+--===============0698010837398512435==--
 
