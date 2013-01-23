@@ -1,76 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============5654291235577210501=="
+Content-Type: multipart/mixed; boundary="===============2251238120285143930=="
 MIME-Version: 1.0
-From: Paul Menzel <paulepanter at users.sourceforge.net>
-Subject: [Powertop] [PATCH] src/cpu/cpu.cpp: Add suffix `u` to `4294967295` to
- signify an unsigned number
-Date: Sat, 02 Feb 2013 23:19:22 +0100
-Message-ID: <1359843562.5545.18.camel@mattotaupa>
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: Re: [Powertop] [PATCH] V2: Fix C states and P states presentation
+ issue.
+Date: Wed, 23 Jan 2013 18:57:14 +0400
+Message-ID: <50FFFA4A.1030201@samsung.com>
+In-Reply-To: 20130122170926.GB2320@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5654291235577210501==
+--===============2251238120285143930==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Date: Sat, 2 Feb 2013 22:27:58 +0100
+Sergey Senozhatsky wrote:
 
-The C++ compiler
+> just for note, perhaps we can do the same for pstates_num in report_displ=
+ay_cpu_pstates(),
+> to keep it similar.
 
-        $ g++ --version
-        g++-4.7.real (Debian 4.7.2-15) 4.7.2
-        Copyright (C) 2012 Free Software Foundation, Inc.
-        This is free software; see the source for copying conditions.  Ther=
-e is NO
-        warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR =
-PURPOSE.
+I don't have any objection. It could be the same for pstates.
+I didn't send the patch for cstates because was not sure that there
+are architectures with more than 10 cstates. Austin pointed that IA is.
+So both pstates and cstates handling could be fixed in the same way.
 
-reports the following warning.
-
-        $ make
-        [=E2=80=A6]
-          CXX    cpu/powertop-cpu.o
-        cpu/cpu.cpp:776:3: warning: this decimal constant is unsigned only =
-in ISO C90 [enabled by default]
-        [=E2=80=A6]
-
-Adding the suffix to the constant gets rid of the warning [1].
-
-[1] http://stackoverflow.com/questions/2347936/cant-get-rid-of-this-decimal=
--constant-is-unsigned-only-in-iso-c90-warning
----
- src/cpu/cpu.cpp |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-index f875e45..401bade 100644
---- a/src/cpu/cpu.cpp
-+++ b/src/cpu/cpu.cpp
-@@ -797,7 +797,7 @@ void perf_power_bundle::handle_trace_point(void *trace,=
- int cpunr, uint64_t time
-                         exit(-1);
-                 }
- =
-
--		if (val =3D=3D 4294967295)
-+		if (val =3D=3D 4294967295u)
- 			cpu->go_unidle(time);
- 		else
- 			cpu->go_idle(time);
 -- =
 
-1.7.10.4
+Best regards,
+Igor Zhbanov,
+Technical Leader,
+phone: +7 (495) 797 25 00 ext 3806
+e-mail: i.zhbanov(a)samsung.com
 
---===============5654291235577210501==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
+Mobile group, Moscow R&D center, Samsung Electronics
+12 Dvintsev street, building 1
+127018, Moscow, Russian Federation
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
-L0xpbnV4KQoKaUVVRUFCRUNBQVlGQWxFTmtPc0FDZ2tRUFgxYUsyd09IVmo1YmdDWXlYaHR0dFg3
-L1psdFR3ak5YTitUQTlYMgo2d0NmY0tpcUttY0xkeVloaDMzcnptNDAyMGNwSEQ0PQo9bE1qUQot
-LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
 
---===============5654291235577210501==--
+--===============2251238120285143930==--
 
