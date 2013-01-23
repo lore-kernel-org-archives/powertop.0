@@ -1,34 +1,61 @@
-Content-Type: multipart/mixed; boundary="===============8807210110595186307=="
+Content-Type: multipart/mixed; boundary="===============0205519820713470764=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] regarding cpuidle stats
-Date: Mon, 29 Jul 2013 06:09:12 -0700
-Message-ID: <51F66978.8070301@linux.intel.com>
-In-Reply-To: CAKjcEiXF=FmKaUo6g_gW7s8R4hh5jjG-XpMQMm+A5eBez--Hwg@mail.gmail.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH] Using std::max to handle all such kind of logic
+Date: Wed, 23 Jan 2013 10:11:43 +0300
+Message-ID: <20130123071143.GA2461@swordfish.minsk.epam.com>
+In-Reply-To: 1358913287-8694-1-git-send-email-zhang.austin@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8807210110595186307==
+--===============0205519820713470764==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 7/29/2013 3:52 AM, remu kelly wrote:
-> Hi powertop team,
-> I have few questions about powertop as below:-
-> 1) Does powertop use "<debugfs>/cpuidle/stats" for retriving the C state =
-information.
+On (01/23/13 11:54), Austin Zhang wrote:
+> Date: Wed, 23 Jan 2013 11:54:47 +0800
+> From: Austin Zhang <zhang.austin(a)gmail.com>
+> To: powertop(a)lists.01.org
+> Cc: sergey.senozhatsky(a)gmail.com, i.zhbanov(a)samsung.com, Austin Zhang
+>  <zhang.austin(a)gmail.com>
+> Subject: [PATCH] Using std::max to handle all such kind of logic
+> X-Mailer: git-send-email 1.7.5.4
+> =
 
-no
+> Signed-off-by: Austin Zhang <zhang.austin(a)gmail.com>
+> ---
+>  src/cpu/cpu.cpp |    5 +++--
+>  1 files changed, 3 insertions(+), 2 deletions(-)
+>
 
-it uses various kernel trace points to collect things as they happen
+looks good to me.
 
-> 2) Is it possible that on "cat <debugfs>/cpuidle/stats" , we see the C3 s=
-tate is having '0' count. but at same time powertop show the C3 state being=
- hit?
+	-ss
+ =
 
-I am not sure how well cpuidle stats work; never used them.
+> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+> index 7f3af69..38540a5 100644
+> --- a/src/cpu/cpu.cpp
+> +++ b/src/cpu/cpu.cpp
+> @@ -525,8 +525,9 @@ void report_display_cpu_pstates(void)
+>  	unsigned int i, pstates_num;
+>  =
 
+>  	for (i =3D 0, pstates_num =3D 0; i < all_cpus.size(); i++)
+> -		if (all_cpus[i] && all_cpus[i]->pstates.size() > pstates_num)
+> -			pstates_num =3D all_cpus[i]->pstates.size();
+> +		if (all_cpus[i])
+> +			pstates_num =3D std::max<unsigned int>(pstates_num,
+> +								all_cpus[i]->pstates.size());
+>  =
 
---===============8807210110595186307==--
+>  	report.begin_section(SECTION_CPUFREQ);
+>  	report.add_header("Processor Frequency Report");
+> -- =
+
+> 1.7.5.4
+>=20
+
+--===============0205519820713470764==--
 
