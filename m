@@ -1,120 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============3084432181268098912=="
+Content-Type: multipart/mixed; boundary="===============8975470348660172541=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: [Powertop] [PATCH] remove csstoh.c
-Date: Fri, 01 Feb 2013 10:26:34 +0300
-Message-ID: <20130201072634.GA2587@swordfish>
+From: Kristen Carlson Accardi <kristen at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] tab_window: null members on construction
+Date: Thu, 31 Jan 2013 14:45:45 -0800
+Message-ID: <20130131144545.63b126c5@bluebird.jf.intel.com>
+In-Reply-To: 20121219160652.GC3200@swordfish.minsk.epam.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3084432181268098912==
+--===============8975470348660172541==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Remove csstoh.c since we use csstoh.sh.
+On Wed, 19 Dec 2012 19:06:52 +0300
+Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com> wrote:
 
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+> introduce tab_window ctor and null memebers during construction.
+> show_tab() may be called before window_refresh() [which sets ypad_pos
+> and xpad_pos to 0], causing prefresh() call with uninit
+> win->ypad_pos, win->xpad_pos args.
+> =
 
----
- .gitignore   |  1 -
- src/csstoh.c | 69 --------------------------------------------------------=
-----
- 2 files changed, 70 deletions(-)
+> Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+> =
 
-diff --git a/.gitignore b/.gitignore
-index 96ffdba..35d41c2 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -39,7 +39,6 @@ po/*.gmo
- po/stamp-po
- src/powertop
- src/css.h
--src/csstoh
- src/Makefile.in
- src/.deps/
- src/Makefile
-diff --git a/src/csstoh.c b/src/csstoh.c
-deleted file mode 100644
-index 28858f5..0000000
---- a/src/csstoh.c
-+++ /dev/null
-@@ -1,69 +0,0 @@
--/*
-- * Copyright 2010, Intel Corporation
-- *
-- * This file is part of PowerTOP
-- *
-- * This program file is free software; you can redistribute it and/or modi=
-fy it
-- * under the terms of the GNU General Public License as published by the
-- * Free Software Foundation; version 2 of the License.
-- *
-- * This program is distributed in the hope that it will be useful, but WIT=
-HOUT
-- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-- * for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with this program in a file named COPYING; if not, write to the
-- * Free Software Foundation, Inc,
-- * 51 Franklin Street, Fifth Floor,
-- * Boston, MA 02110-1301 USA
-- * or just google for it.
-- *
-- * Authors:
-- *	Arjan van de Ven <arjan(a)linux.intel.com>
-- */
--
--#include <stdio.h>
--#include <stdlib.h>
--#include <errno.h>
--#include <string.h>
--
--int main(int argc, char **argv)
--{
--	FILE *in, *out;
--	char line[4096];
--
--	if (argc < 2) {
--		printf("Usage:  csstoh cssfile header.h \n");
--		exit(0);
--	}
--	in =3D fopen(argv[1], "rm");
--	if (!in) {
--		printf("Failed to open input file %s (%s) \n", argv[1], strerror(errno));
--		return EXIT_FAILURE;
--	}
--	out =3D fopen(argv[2], "wm");
--	if (!out) {
--		printf("Failed to open output file %s (%s) \n", argv[1], strerror(errno)=
-);
--		return EXIT_FAILURE;
--	}
--
--	fprintf(out, "#ifndef __INCLUDE_GUARD_CCS_H\n");
--	fprintf(out, "#define __INCLUDE_GUARD_CCS_H\n");
--	fprintf(out, "\n");
--	fprintf(out, "const char css[] =3D \n");
--
--	while (!feof(in)) {
--		char *c;
--		if (fgets(line, 4095, in) =3D=3D NULL)
--			break;
--		c =3D strchr(line, '\n');
--		if (c) *c =3D 0;
--		fprintf(out, "\t\"%s\\n\"\n", line);
--	}	=
+> ---
+> =
 
--	fprintf(out, ";\n");	=
+>  src/display.h | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> =
 
--	fprintf(out, "#endif\n");
--	fclose(out);
--	fclose(in);
--	return EXIT_SUCCESS;
--}
+> diff --git a/src/display.h b/src/display.h
+> index b450f8b..9af3ec0 100644
+> --- a/src/display.h
+> +++ b/src/display.h
+> @@ -53,6 +53,14 @@ public:
+>  	short int xpad_pos, ypad_pos; =
 
+>  	WINDOW *win;
+>  =
 
---===============3084432181268098912==--
+> +	tab_window() {
+> +		cursor_pos =3D 0;
+> +		cursor_max =3D 0;
+> +		xpad_pos =3D0;
+> +		ypad_pos =3D 0;
+> +		win =3D NULL;
+> +	}
+> +
+>  	virtual void cursor_down(void) { =
+
+>  		if (cursor_pos < cursor_max ) cursor_pos++;
+> repaint(); } ;
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+
+applied, thanks.
+
+Kristen
+
+--===============8975470348660172541==--
 
