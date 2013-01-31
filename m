@@ -1,125 +1,122 @@
-Content-Type: multipart/mixed; boundary="===============9202846956857208941=="
+Content-Type: multipart/mixed; boundary="===============1870963274050624560=="
 MIME-Version: 1.0
-From: Srinivas Pandruvada <srinivas.pandruvada at linux.intel.com>
-Subject: [Powertop] [PATCH 1/8] Common read/write MSR API
-Date: Fri, 12 Apr 2013 08:47:01 -0700
-Message-ID: <1365781628-11053-2-git-send-email-srinivas.pandruvada@linux.intel.com>
-In-Reply-To: 1365781628-11053-1-git-send-email-srinivas.pandruvada@linux.intel.com
+From: Kristen Carlson Accardi <kristen at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] csstoh.sh shell script fixes cross compiling
+ issues
+Date: Thu, 31 Jan 2013 14:46:32 -0800
+Message-ID: <20130131144632.7520998a@bluebird.jf.intel.com>
+In-Reply-To: 1354279587-20606-1-git-send-email-thomas.waldecker@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============9202846956857208941==
+--===============1870963274050624560==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Added two new interfaces:
-extern int read_msr(int cpu, uint64_t offset, uint64_t *value);
-extern int write_msr(int cpu, uint64_t offset, uint64_t value);
+On Fri, 30 Nov 2012 13:46:27 +0100
+Thomas Waldecker <thomas.waldecker(a)gmail.com> wrote:
 
-This way all MSR interface can use this instead of reimplementing.
+> From: Thomas Waldecker <thomas.waldecker(a)tqs.de>
+> =
 
-Signed-off-by: Srinivas Pandruvada <srinivas.pandruvada(a)linux.intel.com>
----
- src/lib.cpp | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++
- src/lib.h   |  3 ++-
- 2 files changed, 63 insertions(+), 1 deletion(-)
+> Added the csstoh.sh shell script from Igor Zhbanov found here:
+> http://lists.01.org/pipermail/powertop/2012-July/000151.html
+> also patched the Makefile.am to use the csstoh.sh script.
+> The compiled csstoh binary doesn't work for cross compiling,
+> however Igors Patch never got applied upstream.
+> ---
+>  src/Makefile.am |    8 +++-----
+>  src/csstoh.sh   |   45 +++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 48 insertions(+), 5 deletions(-)
+>  create mode 100755 src/csstoh.sh
+> =
 
-diff --git a/src/lib.cpp b/src/lib.cpp
-index 723517a..21d72d3 100644
---- a/src/lib.cpp
-+++ b/src/lib.cpp
-@@ -56,6 +56,7 @@ extern "C" {
- #include <limits>
- #include <math.h>
- #include <ncurses.h>
-+#include <fcntl.h>
- =
+> diff --git a/src/Makefile.am b/src/Makefile.am
+> index f60426a..a53d942 100644
+> --- a/src/Makefile.am
+> +++ b/src/Makefile.am
+> @@ -1,9 +1,6 @@
+>  AUTOMAKE_OPTIONS =3D subdir-objects
+>  ACLOCAL_AMFLAGS =3D -I ../m4 =
 
- static int kallsyms_read =3D 0;
- =
+>  =
 
-@@ -450,3 +451,63 @@ int get_user_input(char *buf, unsigned sz)
- 	/* to distinguish between getnstr error and empty line */
- 	return ret || strlen(buf);
- }
-+
-+int read_msr(int cpu, uint64_t offset, uint64_t *value)
-+{
-+	ssize_t retval;
-+	uint64_t msr;
-+	int fd;
-+	char msr_path[256];
-+
-+	fd =3D sprintf(msr_path, "/dev/cpu/%d/msr", cpu);
-+
-+	if (access(msr_path, R_OK) !=3D 0){
-+		fd =3D sprintf(msr_path, "/dev/msr%d", cpu);
-+
-+		if (access(msr_path, R_OK) !=3D 0){
-+			fprintf(stderr, _("msr reg not found"));
-+			return -1;
-+		}
-+	}
-+
-+	fd =3D open(msr_path, O_RDONLY);
-+	if (fd < 0)
-+		return -1;
-+	retval =3D pread(fd, &msr, sizeof msr, offset);
-+	close(fd);
-+	if (retval !=3D sizeof msr) {
-+		return -1;
-+	}
-+	*value =3D msr;
-+
-+	return retval;
-+}
-+
-+int write_msr(int cpu, uint64_t offset, uint64_t value)
-+{
-+	ssize_t retval;
-+	int fd;
-+	char msr_path[256];
-+
-+	fd =3D sprintf(msr_path, "/dev/cpu/%d/msr", cpu);
-+
-+	if (access(msr_path, R_OK) !=3D 0){
-+		fd =3D sprintf(msr_path, "/dev/msr%d", cpu);
-+
-+		if (access(msr_path, R_OK) !=3D 0){
-+			fprintf(stderr, _("msr reg not found"));
-+			return -1;
-+		}
-+	}
-+
-+	fd =3D open(msr_path, O_WRONLY);
-+	if (fd < 0)
-+		return -1;
-+	retval =3D pwrite(fd, &value, sizeof value, offset);
-+	close(fd);
-+	if (retval !=3D sizeof value) {
-+		return -1;
-+	}
-+
-+	return retval;
-+}
-diff --git a/src/lib.h b/src/lib.h
-index de2de5a..2b0e5f5 100644
---- a/src/lib.h
-+++ b/src/lib.h
-@@ -74,5 +74,6 @@ typedef void (*callback)(const char*);
- extern void process_directory(const char *d_name, callback fn);
- extern int utf_ok;
- extern int get_user_input(char *buf, unsigned sz);
--
-+extern int read_msr(int cpu, uint64_t offset, uint64_t *value);
-+extern int write_msr(int cpu, uint64_t offset, uint64_t value);
- #endif
--- =
+> -noinst_PROGRAMS =3D csstoh
+> -csstoh_SOURCES =3D csstoh.c =
 
-1.7.11.7
+> -
+>  sbin_PROGRAMS =3D powertop
+>  nodist_powertop_SOURCES =3D css.h
+>  =
 
+> @@ -48,6 +45,7 @@ AM_LDFLAGS =3D $(LIBS) $(NCURSES_LIBS)
+> $(PCIUTILS_LIBS) $(LIBNL_LIBS) $(LIBZ_LIBS) =
 
---===============9202846956857208941==--
+>  BUILT_SOURCES =3D css.h
+>  CLEANFILES =3D css.h
+> -css.h: csstoh powertop.css
+> -	./csstoh "$(srcdir)"/powertop.css css.h
+> +css.h: powertop.css
+> +	chmod +x ./csstoh.sh
+> +	./csstoh.sh "$(srcdir)"/powertop.css css.h
+>  =
+
+> diff --git a/src/csstoh.sh b/src/csstoh.sh
+> new file mode 100755
+> index 0000000..5918d12
+> --- /dev/null
+> +++ b/src/csstoh.sh
+> @@ -0,0 +1,45 @@
+> +#!/bin/bash
+> +#
+> +# This program file is free software; you can redistribute it and/or
+> modify it +# under the terms of the GNU General Public License as
+> published by the +# Free Software Foundation; version 2 of the
+> License. +#
+> +# This program is distributed in the hope that it will be useful,
+> but WITHOUT +# ANY WARRANTY; without even the implied warranty of
+> MERCHANTABILITY or +# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> General Public License +# for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program in a file named COPYING; if not, write to
+> the +# Free Software Foundation, Inc,
+> +# 51 Franklin Street, Fifth Floor,
+> +# Boston, MA 02110-1301 USA
+> +# or just google for it.
+> +#
+> +# Written by Igor Zhbanov<i.zhbanov at samsung.com>
+> +
+> +
+> +if [ $# -lt 2 ]; then
+> +	echo "Usage: csstoh.sh cssfile header.h"
+> +	exit 1
+> +fi
+> +
+> +if [ ! -r $1 ]; then
+> +	echo "Can't find file $1"
+> +	exit 1
+> +fi
+> +
+> +if ! echo -n>$2; then
+> +	echo "Can't open file $2 for writing."
+> +	exit 1
+> +fi
+> +
+> +echo "#ifndef __INCLUDE_GUARD_CCS_H">>  $2
+> +echo "#define __INCLUDE_GUARD_CCS_H">>  $2
+> +echo>>  $2
+> +echo "const char css[] =3D ">>  $2
+> +
+> +sed -r 's/^(.*)$/\t\"\1\\n\"/' $1>>  $2
+> +
+> +echo ";">>  $2
+> +echo "#endif">>  $2
+
+Applied, thanks.
+
+Kristen
+
+--===============1870963274050624560==--
 
