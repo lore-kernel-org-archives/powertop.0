@@ -1,38 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============7235599242483230198=="
+Content-Type: multipart/mixed; boundary="===============8105463180687637160=="
 MIME-Version: 1.0
-From: sirquijote at lavabit.com
-Subject: [Powertop] Managing an nVidia G86 [Quadro NVS 140M]
-Date: Tue, 06 Aug 2013 03:59:11 -0400
-Message-ID: <44693.82.44.24.160.1375775951.squirrel@lavabit.com>
+From: Kristen Carlson Accardi <kristen at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] main: 'quiet' option does not take an argument
+Date: Thu, 31 Jan 2013 15:27:59 -0800
+Message-ID: <20130131152759.10cbf73e@bluebird.jf.intel.com>
+In-Reply-To: 1358173532-17751-1-git-send-email-namhyung@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7235599242483230198==
+--===============8105463180687637160==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Mon, 14 Jan 2013 23:25:32 +0900
+Namhyung Kim <namhyung(a)gmail.com> wrote:
 
-Dell Latitude D830; Debian 7 "Wheezy" 64-bit running as a CLI; PowerTOP
-2.0 (latest version available for Debian's Stable branch)
+> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
+> ---
+>  src/main.cpp |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> =
 
-I use this laptop for some basic home server duties, and the screen is off
-most of the time through the use of the "vbetool dpms off" command. =
-
-However, my GPU still displays as 100% usage at all times in PowerTOP's
-Device Stats tab, even with all Tunables set to "Good".
-
-I occasionally need to directly access the laptop using its built-in
-keyboard, say if I screw up my SSH connection somehow, and during boot
-when I need to enter some LUKS passwords, so the display needs to be
-accessible at those times.  Other than that, the display is largely
-superfluous, and is switched off 47 out of 48 hours.
-
-Is there anything I can do to minimise the GPU's power draw during its 47
-idle hours?
-
+> diff --git a/src/main.cpp b/src/main.cpp
+> index e6036ae..b22d11d 100644
+> --- a/src/main.cpp
+> +++ b/src/main.cpp
+> @@ -77,7 +77,7 @@ static const struct option long_options[] =3D
+>  	{"time", optional_argument, NULL, 't'},
+>  	{"iteration", optional_argument, NULL, 'i'},
+>  	{"workload", optional_argument, NULL, 'w'},
+> -	{"quiet", optional_argument, NULL, 'q'},
+> +	{"quiet", no_argument, NULL, 'q'},
+>  	{NULL, 0, NULL, 0}
+>  };
+>  =
 
 
---===============7235599242483230198==--
+Applied, thanks.
+
+Kristen
+
+--===============8105463180687637160==--
 
