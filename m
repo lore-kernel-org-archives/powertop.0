@@ -1,33 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============7964658280607916153=="
+Content-Type: multipart/mixed; boundary="===============1393633388078089384=="
 MIME-Version: 1.0
-From: pascal at diogoantunes.org
-Subject: [Powertop] Power Estimation
-Date: Tue, 09 Jul 2013 17:41:05 +0200
-Message-ID: <20130709174105.147646vcd24yzjeo@ssl0.ovh.net>
+From: Kristen Carlson Accardi <kristen at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Using std::max to handle all such kind of logic
+Date: Thu, 31 Jan 2013 15:39:50 -0800
+Message-ID: <20130131153950.6f2d0548@bluebird.jf.intel.com>
+In-Reply-To: 1358913287-8694-1-git-send-email-zhang.austin@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7964658280607916153==
+--===============1393633388078089384==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
-I installed powertop, a great program. But I see on the
-https://01.org/powertop/sites/default/files/powertop.png picture that
-is possible to have a power estimation.
-Great, but I don't have no power indication available.
+On Wed, 23 Jan 2013 11:54:47 +0800
+Austin Zhang <zhang.austin(a)gmail.com> wrote:
 
-What can I do?
+> Signed-off-by: Austin Zhang <zhang.austin(a)gmail.com>
+> ---
+>  src/cpu/cpu.cpp |    5 +++--
+>  1 files changed, 3 insertions(+), 2 deletions(-)
+> =
 
--- =
+> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+> index 7f3af69..38540a5 100644
+> --- a/src/cpu/cpu.cpp
+> +++ b/src/cpu/cpu.cpp
+> @@ -525,8 +525,9 @@ void report_display_cpu_pstates(void)
+>  	unsigned int i, pstates_num;
+>  =
 
-Libere,
-Pascal Diogo Antunes.
+>  	for (i =3D 0, pstates_num =3D 0; i < all_cpus.size(); i++)
+> -		if (all_cpus[i] && all_cpus[i]->pstates.size() >
+> pstates_num)
+> -			pstates_num =3D all_cpus[i]->pstates.size();
+> +		if (all_cpus[i])
+> +			pstates_num =3D std::max<unsigned
+> int>(pstates_num,
+> +
+> all_cpus[i]->pstates.size()); =
 
-"Les grandes puissances n'ont pas de principes, seulement des
-int=C3=A9r=C3=AAts."- Henry Kissinger.
+>  	report.begin_section(SECTION_CPUFREQ);
+>  	report.add_header("Processor Frequency Report");
 
+Applied, thanks.
 
---===============7964658280607916153==--
+Kristen
+
+--===============1393633388078089384==--
 
