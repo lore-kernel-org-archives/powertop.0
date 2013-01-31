@@ -1,62 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============4040757497403702002=="
+Content-Type: multipart/mixed; boundary="===============7011477401149593834=="
 MIME-Version: 1.0
 From: Kristen Carlson Accardi <kristen at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] main: Fix output when running workload
-Date: Thu, 31 Jan 2013 15:28:26 -0800
-Message-ID: <20130131152826.0238be9b@bluebird.jf.intel.com>
-In-Reply-To: 1358174972-18163-1-git-send-email-namhyung@gmail.com
+Subject: Re: [Powertop] [RFC] [PATCHv2 00/10] Code deduplication in cpu/*
+Date: Thu, 31 Jan 2013 14:25:47 -0800
+Message-ID: <20130131142547.04f4b6f5@bluebird.jf.intel.com>
+In-Reply-To: 1356304132-3889-1-git-send-email-intelfx100@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4040757497403702002==
+--===============7011477401149593834==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 14 Jan 2013 23:49:32 +0900
-Namhyung Kim <namhyung(a)gmail.com> wrote:
+On Mon, 24 Dec 2012 03:08:42 +0400
+Ivan Shapovalov <intelfx100(a)gmail.com> wrote:
 
-> Currently one_measurement() function prints following message after
-> a successful run of the workload.
+> This is a resend (unchanged but rebased) of the patch series about
+> refactoring code in cpu/* by deduplication. From this series, only
+> the last bugfix patch has been applied so far due to a code freeze.
 > =
 
->   $ sudo powertop --html --workload=3D"sleep 1"
->   Loaded 1 prior measurements
->   Preparing to take measurements
->   Measuring workload sleep 1.
->   Unknown issue running workload!                         <-- here
->   PowerTOP outputing using base filename powertop.html
-> =
+> Ivan Shapovalov (10):
+>       Fix includes: do not include intel_cpus.h inside cpu.h
+>       Deduplication: move is_turbo() function to lib
+>       Deduplication: move all instances of account_freq() to
+> abstract_cpu::account_freq() Deduplication: remove
+> nhm_cpu::account_freq() almost identical to
+> abstract_cpu::account_freq() Deduplication: remove
+> nhm_{cpu,core,package}::change_effective_frequency() identical to
+> cpu_{linux,core,package}::change_effective_frequency() Deduplication:
+> merge cpu_{core,linux,package}::change_effective_frequency() into
+> abstract_cpu::change_effective_frequency() Deduplication: remove
+> {cpu,nhm}_core::calculate_freq() identical to
+> abstract_cpu::calculate_freq() Deduplication: remove
+> nhm_package::calculate_freq() identical to
+> cpu_package::calculate_freq() Deduplication: properly merge
+> cpu_package::calculate_freq() into abstract_cpu::calculate_freq()
+> Deduplication: merge go_idle()/go_unidle()/change_freq() overrides
+> into abstract_cpu() class
+> _______________________________________________ PowerTop mailing list
+> PowerTop(a)lists.01.org https://lists.01.org/mailman/listinfo/powertop
 
-> It seems this was because it wrongly checks return value of system.
-> The return value of the system() call is the status of wait() call
-> so that it should be zero if things went well.
-> =
-
-> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
-> ---
->  src/main.cpp |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> =
-
-> diff --git a/src/main.cpp b/src/main.cpp
-> index b22d11d..0883424 100644
-> --- a/src/main.cpp
-> +++ b/src/main.cpp
-> @@ -191,7 +191,7 @@ void one_measurement(int seconds, char *workload)
->  	start_cpu_measurement();
->  =
-
->  	if (workload && workload[0]) {
-> -		if (!system(workload))
-> +		if (system(workload))
->  			fprintf(stderr, _("Unknown issue running
-> workload!\n")); } else {
->  		do_sleep(seconds);
-
-applied, thanks.
+Hi, I applied your patches.  Thanks for the cleanup.
 
 Kristen
 
---===============4040757497403702002==--
+--===============7011477401149593834==--
 
