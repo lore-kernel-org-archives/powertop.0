@@ -1,43 +1,120 @@
-Content-Type: multipart/mixed; boundary="===============0691802185413431813=="
+Content-Type: multipart/mixed; boundary="===============3084432181268098912=="
 MIME-Version: 1.0
-From: Suyambulingam R M <lingam.suyambu at gmail.com>
-Subject: [Powertop] Regarding Missed power est. column in powertop
-Date: Wed, 03 Jul 2013 14:47:24 +0530
-Message-ID: <CANCOGtgUibNa88Lxujdmk6=fyKQ=E3otCNuO-ydzhHR+ANttCw@mail.gmail.com>
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: [Powertop] [PATCH] remove csstoh.c
+Date: Fri, 01 Feb 2013 10:26:34 +0300
+Message-ID: <20130201072634.GA2587@swordfish>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0691802185413431813==
+--===============3084432181268098912==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Remove csstoh.c since we use csstoh.sh.
 
-I am using powertop command in my pc. But "power est" column is missing.
-What is the way to enable that column ? Am using powerto pversion 2.3
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
 
-Is there any way to measure the exact power in mW for a particular process
-using powertop ??
+---
+ .gitignore   |  1 -
+ src/csstoh.c | 69 --------------------------------------------------------=
+----
+ 2 files changed, 70 deletions(-)
+
+diff --git a/.gitignore b/.gitignore
+index 96ffdba..35d41c2 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -39,7 +39,6 @@ po/*.gmo
+ po/stamp-po
+ src/powertop
+ src/css.h
+-src/csstoh
+ src/Makefile.in
+ src/.deps/
+ src/Makefile
+diff --git a/src/csstoh.c b/src/csstoh.c
+deleted file mode 100644
+index 28858f5..0000000
+--- a/src/csstoh.c
++++ /dev/null
+@@ -1,69 +0,0 @@
+-/*
+- * Copyright 2010, Intel Corporation
+- *
+- * This file is part of PowerTOP
+- *
+- * This program file is free software; you can redistribute it and/or modi=
+fy it
+- * under the terms of the GNU General Public License as published by the
+- * Free Software Foundation; version 2 of the License.
+- *
+- * This program is distributed in the hope that it will be useful, but WIT=
+HOUT
+- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+- * for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program in a file named COPYING; if not, write to the
+- * Free Software Foundation, Inc,
+- * 51 Franklin Street, Fifth Floor,
+- * Boston, MA 02110-1301 USA
+- * or just google for it.
+- *
+- * Authors:
+- *	Arjan van de Ven <arjan(a)linux.intel.com>
+- */
+-
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <errno.h>
+-#include <string.h>
+-
+-int main(int argc, char **argv)
+-{
+-	FILE *in, *out;
+-	char line[4096];
+-
+-	if (argc < 2) {
+-		printf("Usage:  csstoh cssfile header.h \n");
+-		exit(0);
+-	}
+-	in =3D fopen(argv[1], "rm");
+-	if (!in) {
+-		printf("Failed to open input file %s (%s) \n", argv[1], strerror(errno));
+-		return EXIT_FAILURE;
+-	}
+-	out =3D fopen(argv[2], "wm");
+-	if (!out) {
+-		printf("Failed to open output file %s (%s) \n", argv[1], strerror(errno)=
+);
+-		return EXIT_FAILURE;
+-	}
+-
+-	fprintf(out, "#ifndef __INCLUDE_GUARD_CCS_H\n");
+-	fprintf(out, "#define __INCLUDE_GUARD_CCS_H\n");
+-	fprintf(out, "\n");
+-	fprintf(out, "const char css[] =3D \n");
+-
+-	while (!feof(in)) {
+-		char *c;
+-		if (fgets(line, 4095, in) =3D=3D NULL)
+-			break;
+-		c =3D strchr(line, '\n');
+-		if (c) *c =3D 0;
+-		fprintf(out, "\t\"%s\\n\"\n", line);
+-	}	=
+
+-	fprintf(out, ";\n");	=
+
+-	fprintf(out, "#endif\n");
+-	fclose(out);
+-	fclose(in);
+-	return EXIT_SUCCESS;
+-}
 
 
-Regards,
-Suyambulingam.R.M
-
---===============0691802185413431813==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
-
-PGRpdiBkaXI9Imx0ciI+PGRpdj48ZGl2PkhpLDxicj48YnI+PC9kaXY+SSBhbSB1c2luZyBwb3dl
-cnRvcCBjb21tYW5kIGluIG15IHBjLiBCdXQgJnF1b3Q7cG93ZXIgZXN0JnF1b3Q7IGNvbHVtbiBp
-cyBtaXNzaW5nLiBXaGF0IGlzIHRoZSB3YXkgdG8gZW5hYmxlIHRoYXQgY29sdW1uID8gQW0gdXNp
-bmcgcG93ZXJ0byBwdmVyc2lvbiAyLjM8YnI+PGJyPjwvZGl2PklzIHRoZXJlIGFueSB3YXkgdG8g
-bWVhc3VyZSB0aGUgZXhhY3QgcG93ZXIgaW4gbVcgZm9yIGEgcGFydGljdWxhciBwcm9jZXNzIHVz
-aW5nIHBvd2VydG9wID8/PGJyPgoKPGJyPjxiciBjbGVhcj0iYWxsIj48ZGl2PjxkaXY+PGRpdj48
-ZGl2PlJlZ2FyZHMsPGJyPlN1eWFtYnVsaW5nYW0uUi5NPGJyPjwvZGl2Pgo8L2Rpdj48L2Rpdj48
-L2Rpdj48L2Rpdj4K
-
---===============0691802185413431813==--
+--===============3084432181268098912==--
 
