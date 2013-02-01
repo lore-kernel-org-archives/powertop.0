@@ -1,67 +1,108 @@
-Content-Type: multipart/mixed; boundary="===============8716443283995537507=="
+Content-Type: multipart/mixed; boundary="===============8579629540872364381=="
 MIME-Version: 1.0
-From: Kristen Carlson Accardi <kristen at linux.intel.com>
-Subject: Re: [Powertop] [PATCH 3/3] process: Get rid of unused
- dbg_printf_pevent_info()
-Date: Thu, 31 Jan 2013 15:27:41 -0800
-Message-ID: <20130131152741.5e9ecff7@bluebird.jf.intel.com>
-In-Reply-To: 1354547600-1743-3-git-send-email-namhyung@gmail.com
+From: Thomas Waldecker <thomas.waldecker at gmail.com>
+Subject: [Powertop] [PATCH] csstoh shell-script for cross-compiling
+Date: Fri, 01 Feb 2013 21:37:09 +0100
+Message-ID: <1359751029-7114-1-git-send-email-thomas.waldecker@gmail.com>
+In-Reply-To: 20130131230555.GA7209@bacon.lysator.liu.se
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8716443283995537507==
+--===============8579629540872364381==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Tue,  4 Dec 2012 00:13:20 +0900
-Namhyung Kim <namhyung(a)gmail.com> wrote:
+Updated the shellscript with changes made by Igor posted in mailing list
+https://lists.01.org/pipermail/powertop/2012-July/000165.html
+---
+ .gitignore      |  1 -
+ src/Makefile.am |  3 +--
+ src/csstoh.sh   | 21 ++++++++++-----------
+ 3 files changed, 11 insertions(+), 14 deletions(-)
 
-> This function is not used, just remove it.
-> This fixes following warning:
-> =
+diff --git a/.gitignore b/.gitignore
+index 96ffdba..35d41c2 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -39,7 +39,6 @@ po/*.gmo
+ po/stamp-po
+ src/powertop
+ src/css.h
+-src/csstoh
+ src/Makefile.in
+ src/.deps/
+ src/Makefile
+diff --git a/src/Makefile.am b/src/Makefile.am
+index a53d942..398b8a7 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -46,6 +46,5 @@ AM_LDFLAGS =3D $(LIBS) $(NCURSES_LIBS) $(PCIUTILS_LIBS) $=
+(LIBNL_LIBS) $(LIBZ_LIBS)
+ BUILT_SOURCES =3D css.h
+ CLEANFILES =3D css.h
+ css.h: powertop.css
+-	chmod +x ./csstoh.sh
+-	./csstoh.sh "$(srcdir)"/powertop.css css.h
++	$(SHELL) ./csstoh.sh powertop.css css.h
+ =
 
->   CXX    process/powertop-do_process.o
-> process/do_process.cpp:190: warning: =E2=80=98void
-> dbg_printf_pevent_info(event_format*, pevent_record*)=E2=80=99 defined but
-> not used
-> =
+diff --git a/src/csstoh.sh b/src/csstoh.sh
+index 5918d12..9d4100b 100755
+--- a/src/csstoh.sh
++++ b/src/csstoh.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ #
+ # This program file is free software; you can redistribute it and/or modif=
+y it
+ # under the terms of the GNU General Public License as published by the
+@@ -16,8 +16,7 @@
+ # Boston, MA 02110-1301 USA
+ # or just google for it.
+ #
+-# Written by Igor Zhbanov<i.zhbanov at samsung.com>
+-
++# Written by Igor Zhbanov <i.zhbanov at samsung.com>
+ =
 
-> Signed-off-by: Namhyung Kim <namhyung(a)gmail.com>
-> ---
->  src/process/do_process.cpp |   13 -------------
->  1 file changed, 13 deletions(-)
-> =
+ if [ $# -lt 2 ]; then
+ 	echo "Usage: csstoh.sh cssfile header.h"
+@@ -29,17 +28,17 @@ if [ ! -r $1 ]; then
+ 	exit 1
+ fi
+ =
 
-> diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
-> index 6ac0fae..a07b3f3 100644
-> --- a/src/process/do_process.cpp
-> +++ b/src/process/do_process.cpp
-> @@ -187,19 +187,6 @@ int dont_blame_me(char *comm)
->  	return 0;
->  }
->  =
+-if ! echo -n>$2; then
++if ! echo -n >$2; then
+ 	echo "Can't open file $2 for writing."
+ 	exit 1
+ fi
+ =
 
-> -static void dbg_printf_pevent_info(struct event_format *event,
-> struct pevent_record *rec) -{
-> -	static struct trace_seq s;
-> -
-> -	event->pevent->print_raw =3D 1;
-> -	trace_seq_init(&s);
-> -	pevent_event_info(&s, event, rec);
-> -	trace_seq_putc(&s, '\n');
-> -	trace_seq_terminate(&s);
-> -	fprintf(stderr, "%.*s", s.len, s.buffer);
-> -	trace_seq_destroy(&s);
-> -}
-> -
->  static char * get_pevent_field_str(void *trace, struct event_format
-> *event, struct format_field *field) {
->  	unsigned long long offset, len;
+-echo "#ifndef __INCLUDE_GUARD_CCS_H">>  $2
+-echo "#define __INCLUDE_GUARD_CCS_H">>  $2
+-echo>>  $2
+-echo "const char css[] =3D ">>  $2
++echo "#ifndef __INCLUDE_GUARD_CCS_H" >> $2
++echo "#define __INCLUDE_GUARD_CCS_H" >> $2
++echo >> $2
++echo "const char css[] =3D " >> $2
+ =
 
-Applied, thanks.
+-sed -r 's/^(.*)$/\t\"\1\\n\"/' $1>>  $2
++sed -r 's/^(.*)$/\t\"\1\\n\"/' $1 >> $2
+ =
 
-Kristen
+-echo ";">>  $2
+-echo "#endif">>  $2
++echo ";" >> $2
++echo "#endif" >> $2
+-- =
 
---===============8716443283995537507==--
+1.8.1
+
+
+--===============8579629540872364381==--
 
