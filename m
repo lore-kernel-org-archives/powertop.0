@@ -1,112 +1,76 @@
-Content-Type: multipart/mixed; boundary="===============5803095449705468883=="
+Content-Type: multipart/mixed; boundary="===============5654291235577210501=="
 MIME-Version: 1.0
-From: Kristen Carlson Accardi <kristen at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] csstoh shell-script for cross-compiling
-Date: Tue, 05 Feb 2013 10:06:55 -0800
-Message-ID: <20130205100655.1adcf596@bluebird.jf.intel.com>
-In-Reply-To: 5110D5EA.8040107@samsung.com
+From: Paul Menzel <paulepanter at users.sourceforge.net>
+Subject: [Powertop] [PATCH] src/cpu/cpu.cpp: Add suffix `u` to `4294967295` to
+ signify an unsigned number
+Date: Sat, 02 Feb 2013 23:19:22 +0100
+Message-ID: <1359843562.5545.18.camel@mattotaupa>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5803095449705468883==
+--===============5654291235577210501==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 05 Feb 2013 13:50:34 +0400
-Igor Zhbanov <i.zhbanov(a)samsung.com> wrote:
+Date: Sat, 2 Feb 2013 22:27:58 +0100
 
-> Thomas Waldecker wrote:
-> > Updated the shellscript with changes made by Igor posted in mailing list
-> > https://lists.01.org/pipermail/powertop/2012-July/000165.html
-> >
-> > Signed-off-by: Thomas Waldecker <thomas.waldecker(a)gmail.com>
-> > ---
-> >   src/Makefile.am |  3 +--
-> >   src/csstoh.sh   | 21 ++++++++++-----------
-> >   2 files changed, 11 insertions(+), 13 deletions(-)
-> >
-> > diff --git a/src/Makefile.am b/src/Makefile.am
-> > index a53d942..398b8a7 100644
-> > --- a/src/Makefile.am
-> > +++ b/src/Makefile.am
-> > @@ -46,6 +46,5 @@ AM_LDFLAGS =3D $(LIBS) $(NCURSES_LIBS) $(PCIUTILS_LIB=
-S) $(LIBNL_LIBS) $(LIBZ_LIBS)
-> >   BUILT_SOURCES =3D css.h
-> >   CLEANFILES =3D css.h
-> >   css.h: powertop.css
-> > -	chmod +x ./csstoh.sh
-> > -	./csstoh.sh "$(srcdir)"/powertop.css css.h
-> > +	$(SHELL) ./csstoh.sh powertop.css css.h
-> >   =
+The C++ compiler
 
-> > diff --git a/src/csstoh.sh b/src/csstoh.sh
-> > index 5918d12..9d4100b 100755
-> > --- a/src/csstoh.sh
-> > +++ b/src/csstoh.sh
-> > @@ -1,4 +1,4 @@
-> > -#!/bin/bash
-> > +#!/bin/sh
-> >   #
-> >   # This program file is free software; you can redistribute it and/or =
-modify it
-> >   # under the terms of the GNU General Public License as published by t=
-he
-> > @@ -16,8 +16,7 @@
-> >   # Boston, MA 02110-1301 USA
-> >   # or just google for it.
-> >   #
-> > -# Written by Igor Zhbanov<i.zhbanov at samsung.com>
-> > -
-> > +# Written by Igor Zhbanov <i.zhbanov at samsung.com>
-> >   =
+        $ g++ --version
+        g++-4.7.real (Debian 4.7.2-15) 4.7.2
+        Copyright (C) 2012 Free Software Foundation, Inc.
+        This is free software; see the source for copying conditions.  Ther=
+e is NO
+        warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR =
+PURPOSE.
 
-> >   if [ $# -lt 2 ]; then
-> >   	echo "Usage: csstoh.sh cssfile header.h"
-> > @@ -29,17 +28,17 @@ if [ ! -r $1 ]; then
-> >   	exit 1
-> >   fi
-> >   =
+reports the following warning.
 
-> > -if ! echo -n>$2; then
-> > +if ! echo -n >$2; then
-> >   	echo "Can't open file $2 for writing."
-> >   	exit 1
-> >   fi
-> >   =
+        $ make
+        [=E2=80=A6]
+          CXX    cpu/powertop-cpu.o
+        cpu/cpu.cpp:776:3: warning: this decimal constant is unsigned only =
+in ISO C90 [enabled by default]
+        [=E2=80=A6]
 
-> > -echo "#ifndef __INCLUDE_GUARD_CCS_H">>  $2
-> > -echo "#define __INCLUDE_GUARD_CCS_H">>  $2
-> > -echo>>  $2
-> > -echo "const char css[] =3D ">>  $2
-> > +echo "#ifndef __INCLUDE_GUARD_CCS_H" >> $2
-> > +echo "#define __INCLUDE_GUARD_CCS_H" >> $2
-> > +echo >> $2
-> > +echo "const char css[] =3D " >> $2
-> >   =
+Adding the suffix to the constant gets rid of the warning [1].
 
-> > -sed -r 's/^(.*)$/\t\"\1\\n\"/' $1>>  $2
-> > +sed -r 's/^(.*)$/\t\"\1\\n\"/' $1 >> $2
-> >   =
+[1] http://stackoverflow.com/questions/2347936/cant-get-rid-of-this-decimal=
+-constant-is-unsigned-only-in-iso-c90-warning
+---
+ src/cpu/cpu.cpp |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> > -echo ";">>  $2
-> > -echo "#endif">>  $2
-> > +echo ";" >> $2
-> > +echo "#endif" >> $2
-> The space characters issue was because of bad mail-client.
-> The spaces were always there. :-)
-> Last patch was sent by git, so it was transmitted exactly.
-> =
+diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+index f875e45..401bade 100644
+--- a/src/cpu/cpu.cpp
++++ b/src/cpu/cpu.cpp
+@@ -797,7 +797,7 @@ void perf_power_bundle::handle_trace_point(void *trace,=
+ int cpunr, uint64_t time
+                         exit(-1);
+                 }
+ =
 
-> Also it the last version of the patch /bin/bash was changed to /bin/sh
-> for better portability. So the (this) last version is better. :-)
-> I use it for cross-compilation. My own version is the same except
-> of my e-mail. I have "@" instead of "at" in it. The "at" word was created
-> by bad mail client. But this is not important. :-)
-> =
+-		if (val =3D=3D 4294967295)
++		if (val =3D=3D 4294967295u)
+ 			cpu->go_unidle(time);
+ 		else
+ 			cpu->go_idle(time);
+-- =
 
+1.7.10.4
 
-So would you like us to go ahead and apply this patch?
+--===============5654291235577210501==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="signature.asc"
 
---===============5803095449705468883==--
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
+L0xpbnV4KQoKaUVVRUFCRUNBQVlGQWxFTmtPc0FDZ2tRUFgxYUsyd09IVmo1YmdDWXlYaHR0dFg3
+L1psdFR3ak5YTitUQTlYMgo2d0NmY0tpcUttY0xkeVloaDMzcnptNDAyMGNwSEQ0PQo9bE1qUQot
+LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
+
+--===============5654291235577210501==--
 
