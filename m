@@ -1,86 +1,93 @@
-Content-Type: multipart/mixed; boundary="===============4379347124569203551=="
+Content-Type: multipart/mixed; boundary="===============3904010106919282821=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] (BUG) powertop-1.13 fails to kernel-3.10.7
-Date: Tue, 03 Sep 2013 08:58:50 +0300
-Message-ID: <20130903055850.GA2464@swordfish>
-In-Reply-To: CAAEzAp-9iZSPDkntiguA9mez+xk+n0ZLbDV-N79P0s8Lx7eUgg@mail.gmail.com
+Subject: Re: [Powertop] [PATCH] src/process/do_process.cpp: Add suffix `u` to
+ `4294967295` to signify an unsigned number
+Date: Sun, 03 Feb 2013 18:10:12 +0300
+Message-ID: <20130203151012.GB2470@swordfish>
+In-Reply-To: 1359843789.5545.21.camel@mattotaupa
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4379347124569203551==
+--===============3904010106919282821==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (08/24/13 09:35), Dennis Jenkins wrote:
->    Hello,
+On (02/02/13 23:23), Paul Menzel wrote:
 > =
 
->    =EF=BF=BD=EF=BF=BD I recently updated my Gentoo linux kernel from 3.8.=
-18 to 3.10.7.=EF=BF=BD
->    powertop now hangs while starting up.=EF=BF=BD "strace" shows that pow=
-ertop is
->    reading the contents of "/proc/timer_list" over and over (but with no=
-=EF=BF=BD
->    "seek" call, which is weird to me).
-
-Hello,
-sorry for long response. this one really looks like a kernel bug
-fixed by 84a78a6504f5c5394a8e558702e5b54131f01d14 upstream (3.11)
-
-	-ss
-
->    ostara ~ # powertop --version
->    powertop version 1.13
+> The C++ compiler
 > =
 
->    ostara ~ # uname -r
->    3.10.7-gentoo
+>         $ g++ --version
+>         g++-4.7.real (Debian 4.7.2-15) 4.7.2
+>         Copyright (C) 2012 Free Software Foundation, Inc.
+>         This is free software; see the source for copying conditions.  Th=
+ere is NO
+>         warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULA=
+R PURPOSE.
 > =
 
->    ostara ~ # zgrep TIMER /proc/config.gz
->    CONFIG_HIGH_RES_TIMERS=3Dy
->    CONFIG_TIMERFD=3Dy
->    CONFIG_OPROFILE_NMI_TIMER=3Dy
->    CONFIG_HPET_TIMER=3Dy
->    # CONFIG_X86_PM_TIMER is not set
->    CONFIG_NETFILTER_XT_TARGET_IDLETIMER=3Dm
->    # CONFIG_HW_RANDOM_TIMERIOMEM is not set
->    # CONFIG_HANGCHECK_TIMER is not set
->    # CONFIG_PPS_CLIENT_KTIMER is not set
->    CONFIG_SND_TIMER=3Dm
->    # CONFIG_SND_HRTIMER is not set
->    CONFIG_TIMER_STATS=3Dy
+> reports the following warning.
 > =
 
->    ostara ~ # wc /proc/timer_list
->    387 1569 16282 /proc/timer_list
+>         $ make
+>         [=E2=80=A6]
+>           CXX    process/powertop-do_process.o
+>         process/do_process.cpp:595:3: warning: this decimal constant is u=
+nsigned only in ISO C90 [enabled by default]
+>         [=E2=80=A6]
 > =
 
->    ostara ~ # strace -e\!read powertop
->    (tailing...)
->    open("/proc/interrupts", O_RDONLY)=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=
-=EF=BF=BD =3D 3
->    fstat(3, {st_mode=3DS_IFREG|0444, st_size=3D0, ...}) =3D 0
->    mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, =
-0) =3D
->    0x7fcfdd7c3000
->    open("/proc/timer_list", O_RDONLY)=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=
-=EF=BF=BD =3D 4
->    fstat(4, {st_mode=3DS_IFREG|0444, st_size=3D0, ...}) =3D 0
->    mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, =
-0) =3D
->    0x7fcfdd7c2000
->    ^CProcess 22238 detached
+> Adding the suffix to the constant gets rid of the warning [1].
 > =
 
->    Now run "strace" again, but without the "-e\!read" and watch it read f=
-d #4
->    over and over and over again.
+> [1] http://stackoverflow.com/questions/2347936/cant-get-rid-of-this-decim=
+al-constant-is-unsigned-only-in-iso-c90-warning
+> ---
+>  src/process/do_process.cpp |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > =
 
->    If you need any additional info, please let me know.
+> diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
+> index 322ad4c..3bb1573 100644
+> --- a/src/process/do_process.cpp
+> +++ b/src/process/do_process.cpp
+> @@ -579,7 +579,7 @@ void perf_process_bundle::handle_trace_point(void *tr=
+ace, int cpu, uint64_t time
+>  	}
+>  	else if (strcmp(event->name, "cpu_idle") =3D=3D 0) {
+>  		ret =3D pevent_get_field_val(NULL, event, "state", &rec, &val, 0);
+> -		if (val =3D=3D 4294967295)
+> +		if (val =3D=3D 4294967295u)
+
+NACK.
+
+the same point: cpu_idle tracepoint defined as    =
+
+
+         TP_PROTO(unsigned int state, unsigned int cpu_id)
+please use `=3D=3D (unsigned int)-1'.
+   =
+
+
++ we need there `-1' return code check from pevent_get_field_val() before
+we test val.
+
+               =
+
+        -ss
+
+
+>  			consume_blame(cpu);
+>  		else
+>  			set_wakeup_pending(cpu);
+> -- =
+
+> 1.7.10.4
+
+
 
 > _______________________________________________
 > PowerTop mailing list
@@ -88,5 +95,5 @@ d #4
 > https://lists.01.org/mailman/listinfo/powertop
 
 
---===============4379347124569203551==--
+--===============3904010106919282821==--
 
