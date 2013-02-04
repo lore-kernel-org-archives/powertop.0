@@ -1,75 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============5376567451660472960=="
+Content-Type: multipart/mixed; boundary="===============3540905107834128765=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] ia64 builds fails (and maybe alpha too?)
-Date: Tue, 03 Sep 2013 16:09:26 -0700
-Message-ID: <52266C26.4070705@linux.intel.com>
-In-Reply-To: 52266AFD.4000301@debian.org
+From: Thomas Waldecker <thomas.waldecker at gmail.com>
+Subject: Re: [Powertop] [PATCH] csstoh shell-script for cross-compiling
+Date: Mon, 04 Feb 2013 10:40:01 +0100
+Message-ID: <CAHgBLoqxiG5SvuK-TV-DtTLkZ5C9fHFBuJh8O7MwFW+5uX_0fQ@mail.gmail.com>
+In-Reply-To: 20130202150140.GA2676@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5376567451660472960==
+--===============3540905107834128765==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 9/3/2013 4:04 PM, Jose Luis Rivas wrote:
-> -----BEGIN PGP SIGNED MESSAGE-----
-> Hash: RIPEMD160
->
-> [Please keep Julian CC'd since I don't know if he's subscribed to this
-> list, I am.]
->
-> Hi,
->
-> During the packaging of PowerTOP for Debian we have come across and
-> issue in the building for `ia64`[0][1]. Julian (co-maintainer at
-> Debian) made a patch for it [2][3].
->
-> Doing some research it looks like this was removed on `9ce9ec6`[4]
-> altogether with `alpha` support. What are those older kernels
-> mentioned in the commit message? Maybe our build-daemons for ia64 have
-> older kernels in that case please let us know which is the minimum
-> kernel version for this to work.
->
-> If is not the case and in fact we need the patch, can this be included
-> upstream before and we can make a new release of PowerTOP with this?
->
-> Kind regards,
-> Keep up the good work!
->
-> [0]
-> https://buildd.debian.org/status/fetch.php?pkg=3Dpowertop&arch=3Dia64&ver=
-=3D2.4-1&stamp=3D1377923202
->
-> [1] Excerpt from the build log:
-> ```
-> g++ -DHAVE_CONFIG_H -I. -I..  -D_FORTIFY_SOURCE=3D2
-> - -I/usr/include/libnl3     -DLOCALEDIR=3D\"/usr/share/locale\"
-> - -D_FORTIFY_SOURCE=3D2 -fno-omit-frame-pointer -fstack-protector -Wall
-> - -Wshadow -Wformat   -I/usr/include/libnl3    -g -O2 -Wformat
-> - -Werror=3Dformat-security -c -o perf/powertop-perf.o `test -f
-> 'perf/perf.cpp' || echo './'`perf/perf.cpp
-> perf/perf.cpp:1:0: warning: -fstack-protector not supported for this
-> target [enabled by default]
-> perf/perf.cpp: In function 'int sys_perf_event_open(perf_event_attr*,
-> pid_t, int, int, long unsigned int)':
-> perf/perf.cpp:67:17: error: '__NR_perf_event_open' was not declared in
-> this scope
-> perf/perf.cpp:69:1: warning: control reaches end of non-void function
-> [-Wreturn-type]
-> make[4]: *** [perf/powertop-perf.o] Error 1
-> make[3]: *** [all] Error 2
-> ```
+Hi Sergey,
 
-if your kernel does not have "perf", there is no point in using powertop....
-really; it will not work at all.
+> well, the whole situation is confusing. we've pushed Igor's patch on beha=
+lf of Thomas and
+> now we are about to do similar thing (diff between two Igor's patches) ag=
+ain.
+> I'm sorry Thomas, I appreciate your help, but I can't ACK your patch with=
+out Igor's
+> ACK/patch of his own/etc.
 
-(including anything asm-generic/foo also is the wrong answer; that director=
-y is not architectural
-from a kernel perspective, only for indirect inclusion)
+I don't understand your patch apply policy. I also don't understand
+why nobody didn't apply
+Igors patch first time.
 
+I just applied the changes which he did in his V2. I think it is a
+reasonable change.
+It would be also ok for me if you just use the patch and change the author.
 
+P.S. Sorry for double post, forgot to include mailing list again
 
---===============5376567451660472960==--
+Kind regards,
+Thomas
+
+--===============3540905107834128765==--
 
