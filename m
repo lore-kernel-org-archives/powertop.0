@@ -1,62 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============7145296036131785015=="
+Content-Type: multipart/mixed; boundary="===============6381177574275604934=="
 MIME-Version: 1.0
-From: Jaroslav Skarvada <jskarvad at redhat.com>
-Subject: [Powertop] patch: tell user if the system is running out of FDs
-Date: Thu, 19 Sep 2013 11:23:21 -0400
-Message-ID: <808108042.17411093.1379604201988.JavaMail.root@redhat.com>
-In-Reply-To: 1812437942.17407873.1379603934162.JavaMail.root@redhat.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] Changes in project leadership?
+Date: Mon, 04 Feb 2013 08:17:15 -0800
+Message-ID: <510FDF0B.1060107@linux.intel.com>
+In-Reply-To: 1359839416.5545.3.camel@mattotaupa
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7145296036131785015==
+--===============6381177574275604934==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+On 2/2/2013 1:10 PM, Paul Menzel wrote:
+> Dear PowerTOP community,
+>
+>
+> did I miss something or did project leadership change again. Did Kristen
+> Carlson Accardi replace Chris Ferron? Or was Kristen just granted
+> commit/write access and pushes the patches from the list?
+>
+> If leadership indeed changed, it would be great to keep the community
+> informed by announcing such things to the list and blog about it.
+>
 Hi,
+sorry about not mailing this out earlier.
 
-complex servers can run out of FDs easily (due to perf).
-In such case tell user that more FDs are needed instead
-of the generic message (that kernel doesn't support
-the perf)
+Chris has taken a somewhat different role inside Intel, and his time to wor=
+k on PowerTOP is now more limited.
+Because of that, I've asked Kristen to help out with the maintenance of Pow=
+erTOP.
 
-regards
 
-Jaroslav
 
---===============7145296036131785015==
-Content-Type: text/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="powertop-2.4-fd-limit-err.patch"
-
-ZGlmZiAtdXAgcG93ZXJ0b3AtMi40L3NyYy9wZXJmL3BlcmYuY3BwLm9yaWcgcG93ZXJ0b3AtMi40
-L3NyYy9wZXJmL3BlcmYuY3BwCi0tLSBwb3dlcnRvcC0yLjQvc3JjL3BlcmYvcGVyZi5jcHAub3Jp
-ZwkyMDEzLTAxLTMxIDE2OjM5OjI3LjAwMDAwMDAwMCAtMDUwMAorKysgcG93ZXJ0b3AtMi40L3Ny
-Yy9wZXJmL3BlcmYuY3BwCTIwMTMtMDktMTkgMTA6MzY6MDIuMjk4ODM5MjQ4IC0wNDAwCkBAIC0y
-Niw2ICsyNiw3IEBACiAjaW5jbHVkZSA8aW9zdHJlYW0+CiAjaW5jbHVkZSA8ZnN0cmVhbT4KIAor
-I2luY2x1ZGUgPGVycm5vLmg+CiAjaW5jbHVkZSA8dW5pc3RkLmg+CiAjaW5jbHVkZSA8c3RkaW8u
-aD4KICNpbmNsdWRlIDxzdGRsaWIuaD4KQEAgLTcyLDYgKzczLDcgQEAgdm9pZCBwZXJmX2V2ZW50
-OjpjcmVhdGVfcGVyZl9ldmVudChjaGFyIAogewogCXN0cnVjdCBwZXJmX2V2ZW50X2F0dHIgYXR0
-cjsKIAlpbnQgcmV0OworCWludCBlcnI7CiAKIAlzdHJ1Y3QgewogCQlfX3U2NCBjb3VudDsKQEAg
-LTEwNywxMCArMTA5LDE1IEBAIHZvaWQgcGVyZl9ldmVudDo6Y3JlYXRlX3BlcmZfZXZlbnQoY2hh
-ciAKIAlwZXJmX2ZkID0gc3lzX3BlcmZfZXZlbnRfb3BlbigmYXR0ciwgLTEsIF9jcHUsIC0xLCAw
-KTsKIAogCWlmIChwZXJmX2ZkIDwgMCkgeworCQllcnIgPSBlcnJubzsKIAkJcmVzZXRfZGlzcGxh
-eSgpOwotCQlmcHJpbnRmKHN0ZGVyciwgXygiUG93ZXJUT1AgJXMgbmVlZHMgdGhlIGtlcm5lbCB0
-byBzdXBwb3J0IHRoZSAncGVyZicgc3Vic3lzdGVtXG4iKSwgUE9XRVJUT1BfVkVSU0lPTik7Ci0J
-CWZwcmludGYoc3RkZXJyLCBfKCJhcyB3ZWxsIGFzIHN1cHBvcnQgZm9yIHRyYWNlIHBvaW50cyBp
-biB0aGUga2VybmVsOlxuIikpOwotCQlmcHJpbnRmKHN0ZGVyciwgIkNPTkZJR19QRVJGX0VWRU5U
-Uz15XG5DT05GSUdfUEVSRl9DT1VOVEVSUz15XG5DT05GSUdfVFJBQ0VQT0lOVFM9eVxuQ09ORklH
-X1RSQUNJTkc9eVxuIik7CisJCWlmIChlcnIgPT0gRU1GSUxFKQorCQkJZnByaW50ZihzdGRlcnIs
-IF8oIlRvbyBtYW55IG9wZW4gZmlsZXMsIHBsZWFzZSBpbmNyZWFzZSB0aGUgbGltaXQgb2Ygb3Bl
-biBmaWxlIGRlc2NyaXB0b3JzLlxuIikpOworCQllbHNlIHsKKwkJCWZwcmludGYoc3RkZXJyLCBf
-KCJQb3dlclRPUCAlcyBuZWVkcyB0aGUga2VybmVsIHRvIHN1cHBvcnQgdGhlICdwZXJmJyBzdWJz
-eXN0ZW1cbiIpLCBQT1dFUlRPUF9WRVJTSU9OKTsKKwkJCWZwcmludGYoc3RkZXJyLCBfKCJhcyB3
-ZWxsIGFzIHN1cHBvcnQgZm9yIHRyYWNlIHBvaW50cyBpbiB0aGUga2VybmVsOlxuIikpOworCQkJ
-ZnByaW50ZihzdGRlcnIsICJDT05GSUdfUEVSRl9FVkVOVFM9eVxuQ09ORklHX1BFUkZfQ09VTlRF
-UlM9eVxuQ09ORklHX1RSQUNFUE9JTlRTPXlcbkNPTkZJR19UUkFDSU5HPXlcbiIpOworCQl9CiAJ
-CWV4aXQoRVhJVF9GQUlMVVJFKTsKIAl9CiAJaWYgKHJlYWQocGVyZl9mZCwgJnJlYWRfZGF0YSwg
-c2l6ZW9mKHJlYWRfZGF0YSkpID09IC0xKSB7Cg==
-
---===============7145296036131785015==--
+--===============6381177574275604934==--
 
