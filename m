@@ -1,55 +1,95 @@
-Content-Type: multipart/mixed; boundary="===============5289324255204156637=="
+Content-Type: multipart/mixed; boundary="===============6170885827780018430=="
 MIME-Version: 1.0
-From: Magnus Fromreide <magfr at lysator.liu.se>
-Subject: Re: [Powertop] [PATCH] Using std::max to handle all such kind of logic
-Date: Wed, 23 Jan 2013 08:53:12 +0100
-Message-ID: <1358927592.3289.31.camel@sara>
-In-Reply-To: 1358913287-8694-1-git-send-email-zhang.austin@gmail.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: [Powertop] [PATCH] measurement: handle multiple batteries in
+ global_time_left()
+Date: Tue, 05 Feb 2013 12:17:16 +0300
+Message-ID: <20130205091716.GA20948@swordfish.minsk.epam.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5289324255204156637==
+--===============6170885827780018430==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2013-01-23 at 11:54 +0800, Austin Zhang wrote:
-> Signed-off-by: Austin Zhang <zhang.austin(a)gmail.com>
-> ---
->  src/cpu/cpu.cpp |    5 +++--
->  1 files changed, 3 insertions(+), 2 deletions(-)
-> =
+global_time_left() calculates total time left by summing up time_left()s of=
+ each battery. =
 
-> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-> index 7f3af69..38540a5 100644
-> --- a/src/cpu/cpu.cpp
-> +++ b/src/cpu/cpu.cpp
-> @@ -525,8 +525,9 @@ void report_display_cpu_pstates(void)
->  	unsigned int i, pstates_num;
->  =
+usually only one battery is `active', thus others have rate close to 0.0 an=
+d, as a result,
+`cap / rate' reaching `INF+'.
 
->  	for (i =3D 0, pstates_num =3D 0; i < all_cpus.size(); i++)
-> -		if (all_cpus[i] && all_cpus[i]->pstates.size() > pstates_num)
-> -			pstates_num =3D all_cpus[i]->pstates.size();
-> +		if (all_cpus[i])
-> +			pstates_num =3D std::max<unsigned int>(pstates_num,
-> +								all_cpus[i]->pstates.size());
+accumulate total capacity and divide by total rate instead.
 
-There should be no need to specify the template argument if pstates_num
-is declared to the right type.
-The return type of vector<T>::size() is vector<T>::size_type.
-Thus I think this is a nicer version:
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
 
-vector<frequency*>::size_type pstates_num;
+---
 
-for (i =3D 0, pstates_num =3D 0; i < all_cpus.size(); ++i)
-	if (all_cpus[i])
-		pstates_num =3D max(pstates_num, all_cpus[i]->pstates.size());
+ src/measurement/measurement.cpp | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
 
-What do you think?
+diff --git a/src/measurement/measurement.cpp b/src/measurement/measurement.=
+cpp
+index 4a33db9..0b68940 100644
+--- a/src/measurement/measurement.cpp
++++ b/src/measurement/measurement.cpp
+@@ -57,7 +57,6 @@ double power_meter::joules_consumed(void)
+ double power_meter::time_left(void)
+ {
+ 	double cap, rate;
+-	double left;
+ =
 
-/MF
+ 	cap =3D dev_capacity();
+ 	rate =3D joules_consumed();
+@@ -65,12 +64,13 @@ double power_meter::time_left(void)
+ 	if (cap < 0.001)
+ 		return 0.0;
+ =
+
+-	left =3D cap / rate;
++	/* return 0.0 instead of INF+ */
++	if (rate < 0.001)
++		return 0.0;
+ =
+
+-	return left;
++	return cap / rate;
+ }
+ =
+
+-
+ vector<class power_meter *> power_meters;
+ =
+
+ void start_power_measurement(void)
+@@ -101,12 +101,17 @@ double global_joules_consumed(void)
+ =
+
+ double global_time_left(void)
+ {
+-	double total =3D 0.0;
++	double total_capacity =3D 0.0;
++	double total_rate =3D 0.0;
+ 	unsigned int i;
+-	for (i =3D 0; i < power_meters.size(); i++)
+-		total +=3D power_meters[i]->time_left();
+-
+-	return total;
++	for (i =3D 0; i < power_meters.size(); i++) {
++		total_capacity +=3D power_meters[i]->dev_capacity();
++		total_rate +=3D power_meters[i]->joules_consumed();
++	}
++	/* return 0.0 instead of INF+ */
++	if (total_rate < 0.001)
++		return 0.0;
++	return total_capacity / total_rate;
+ }
+ =
+
+ void sysfs_power_meters_callback(const char *d_name)
 
 
---===============5289324255204156637==--
+--===============6170885827780018430==--
 
