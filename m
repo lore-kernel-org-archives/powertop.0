@@ -1,247 +1,63 @@
-Content-Type: multipart/mixed; boundary="===============3313916803436858758=="
+Content-Type: multipart/mixed; boundary="===============0496579754152415295=="
 MIME-Version: 1.0
-From: Srinivas Pandruvada <srinivas.pandruvada at linux.intel.com>
-Subject: [Powertop] [PATCH 7/8] Add RAPL DRAM domain
-Date: Mon, 15 Apr 2013 09:09:28 -0700
-Message-ID: <1366042169-14523-8-git-send-email-srinivas.pandruvada@linux.intel.com>
-In-Reply-To: 1366042169-14523-1-git-send-email-srinivas.pandruvada@linux.intel.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH] src/cpu/cpu.cpp: Fix typo in error message:
+ freque*nc*y
+Date: Tue, 05 Feb 2013 12:27:19 +0300
+Message-ID: <20130205092719.GA23602@swordfish.minsk.epam.com>
+In-Reply-To: CAE4GLsvkgQe7nCwq7SF+jX8ifys4xg7zSdDPm6AxMbLGjWovtg@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3313916803436858758==
+--===============0496579754152415295==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Added DRAM RAPL domain as core CPU power. This will display as
-"DRAM" in the device stats, if present.
+On (02/05/13 10:18), Thomas Spura wrote:
+> Byt then all translations will be marked as fuzzy and won't work
+> anymore. When also updating the typo in the translations, this won't
+> be needed.
+> =
 
-Signed-off-by: Srinivas Pandruvada <srinivas.pandruvada(a)linux.intel.com>
----
- src/Makefile.am              |  3 +-
- src/cpu/cpu.cpp              |  7 +++++
- src/cpu/dram_rapl_device.cpp | 75 ++++++++++++++++++++++++++++++++++++++++=
-++++
- src/cpu/dram_rapl_device.h   | 57 +++++++++++++++++++++++++++++++++
- 4 files changed, 141 insertions(+), 1 deletion(-)
- create mode 100644 src/cpu/dram_rapl_device.cpp
- create mode 100644 src/cpu/dram_rapl_device.h
+> =
 
-diff --git a/src/Makefile.am b/src/Makefile.am
-index fde079a..cc4b6d7 100644
---- a/src/Makefile.am
-+++ b/src/Makefile.am
-@@ -32,7 +32,8 @@ powertop_SOURCES =3D parameters/persistent.cpp parameters=
-/learn.cpp parameters/par
- 		report/report-formatter-csv.cpp report/report-formatter-csv.h \
- 		report/report-formatter-html.cpp report/report-formatter-html.h \
- 		main.cpp css.h powertop.css cpu/intel_gpu.cpp \
--		cpu/rapl/rapl_interface.cpp cpu/cpu_rapl_device.cpp
-+		cpu/rapl/rapl_interface.cpp cpu/cpu_rapl_device.cpp \
-+		cpu/dram_rapl_device.cpp
- =
-
- =
-
- powertop_CXXFLAGS =3D -fno-omit-frame-pointer -fstack-protector -Wall -Wsh=
-adow -Wformat $(NCURSES_CFLAGS) $(PCIUTILS_CFLAGS) $(LIBNL_CFLAGS) $(GLIB2_=
-CFLAGS)
-diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-index 685f067..5d0db28 100644
---- a/src/cpu/cpu.cpp
-+++ b/src/cpu/cpu.cpp
-@@ -32,6 +32,7 @@
- #include "cpu.h"
- #include "cpudevice.h"
- #include "cpu_rapl_device.h"
-+#include "dram_rapl_device.h"
- #include "intel_cpus.h"
- #include "../parameters/parameters.h"
- =
-
-@@ -61,6 +62,7 @@ static class abstract_cpu * new_package(int package, int =
-cpu, char * vendor, int
- 	class abstract_cpu *ret =3D NULL;
- 	class cpudevice *cpudev;
- 	class cpu_rapl_device *cpu_rapl_dev;
-+	class dram_rapl_device *dram_rapl_dev;
- =
-
- 	char packagename[128];
- 	if (strcmp(vendor, "GenuineIntel") =3D=3D 0) {
-@@ -108,6 +110,11 @@ static class abstract_cpu * new_package(int package, i=
-nt cpu, char * vendor, int
- 	if (cpu_rapl_dev->device_present())
- 		all_devices.push_back(cpu_rapl_dev);
- =
-
-+	sprintf(packagename, _("dram rapl package %i"), cpu);
-+	dram_rapl_dev =3D new class dram_rapl_device(cpudev, _("dram rapl package=
-"), packagename, ret);
-+	if (dram_rapl_dev->device_present())
-+		all_devices.push_back(dram_rapl_dev);
-+
- 	return ret;
- }
- =
-
-diff --git a/src/cpu/dram_rapl_device.cpp b/src/cpu/dram_rapl_device.cpp
-new file mode 100644
-index 0000000..fd31cb5
---- /dev/null
-+++ b/src/cpu/dram_rapl_device.cpp
-@@ -0,0 +1,75 @@
-+/*
-+ * Copyright 2010, Intel Corporation
-+ *
-+ * This file is part of PowerTOP
-+ *
-+ * This program file is free software; you can redistribute it and/or modi=
-fy it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; version 2 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WIT=
-HOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-+ * for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program in a file named COPYING; if not, write to the
-+ * Free Software Foundation, Inc,
-+ * 51 Franklin Street, Fifth Floor,
-+ * Boston, MA 02110-1301 USA
-+ * or just google for it.
-+ *
-+ * Authors:
-+ *	Srinivas Pandruvada <Srinivas.Pandruvada(a)linux.intel.com>
-+ */
-+#include <stdlib.h>
-+#include <stdio.h>
-+#include <string.h>
-+#include "../parameters/parameters.h"
-+#include "dram_rapl_device.h"
-+
-+
-+dram_rapl_device::dram_rapl_device(cpudevice *parent, const char *classnam=
-e, const char *dev_name, class abstract_cpu *_cpu)
-+	: cpudevice(classname, dev_name, _cpu),
-+	  device_valid(false)
-+{
-+	if (_cpu)
-+		rapl =3D new c_rapl_interface(cpu->get_first_cpu());
-+	else
-+		rapl =3D new c_rapl_interface(0);
-+	last_time =3D time(NULL);
-+	if (rapl->dram_domain_present()) {
-+		device_valid =3D true;
-+		parent->add_child(this);
-+		rapl->get_dram_energy_status(&last_energy);
-+	}
-+}
-+
-+void dram_rapl_device::start_measurement(void)
-+{
-+	last_time =3D time(NULL);
-+
-+	rapl->get_dram_energy_status(&last_energy);
-+}
-+
-+void dram_rapl_device::end_measurement(void)
-+{
-+	time_t		curr_time =3D time(NULL);
-+	double energy;
-+
-+	consumed_power =3D 0.0;
-+	if ((curr_time - last_time) > 0) {
-+		rapl->get_dram_energy_status(&energy);
-+		consumed_power =3D (energy-last_energy)/(curr_time-last_time);
-+		last_energy =3D energy;
-+		last_time =3D curr_time;
-+	}
-+}
-+
-+double dram_rapl_device::power_usage(struct result_bundle *result, struct =
-parameter_bundle *bundle)
-+{
-+	if (rapl->dram_domain_present())
-+		return consumed_power;
-+	else
-+		return 0.0;
-+}
-diff --git a/src/cpu/dram_rapl_device.h b/src/cpu/dram_rapl_device.h
-new file mode 100644
-index 0000000..dc53094
---- /dev/null
-+++ b/src/cpu/dram_rapl_device.h
-@@ -0,0 +1,57 @@
-+/*
-+ * Copyright 2010, Intel Corporation
-+ *
-+ * This file is part of PowerTOP
-+ *
-+ * This program file is free software; you can redistribute it and/or modi=
-fy it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; version 2 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WIT=
-HOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-+ * for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program in a file named COPYING; if not, write to the
-+ * Free Software Foundation, Inc,
-+ * 51 Franklin Street, Fifth Floor,
-+ * Boston, MA 02110-1301 USA
-+ * or just google for it.
-+ *
-+ * Authors:
-+ *	Srinivas Pandruvada <Srinivas.Pandruvada(a)linux.intel.com>
-+ */
-+#ifndef _INCLUDE_GUARD_DRAM_RAPL_DEVICE_H
-+#define _INCLUDE_GUARD_DRAM_RAPL_DEVICE_H
-+
-+#include <vector>
-+#include <string>
-+
-+using namespace std;
-+
-+#include <sys/time.h>
-+#include "cpudevice.h"
-+#include "rapl/rapl_interface.h"
-+
-+class dram_rapl_device: public cpudevice {
-+
-+	c_rapl_interface *rapl;
-+	time_t		last_time;
-+	double		last_energy;
-+	double 		consumed_power;
-+	bool		device_valid;
-+
-+public:
-+	dram_rapl_device(cpudevice *parent, const char *classname =3D "dram_core"=
-, const char *device_name =3D "dram_core", class abstract_cpu *_cpu =3D NUL=
-L);
-+	~dram_rapl_device() { delete rapl; }
-+	virtual const char * device_name(void) {return "DRAM";};
-+	bool device_present() { return device_valid;}
-+	virtual double power_usage(struct result_bundle *result, struct parameter=
-_bundle *bundle);
-+	void start_measurement(void);
-+	void end_measurement(void);
-+
-+};
-+
-+
-+#endif
--- =
-
-1.7.11.7
+> Greetings,
+>    Tom
+> =
 
 
---===============3313916803436858758==--
+Just for note, are we on a schedule or will it be adjusted/shifted?
+According to https://01.org/powertop/community :
+
+	Schedule 2013
+
+	Feb 1st (string freeze)
+	Feb 15th (release v2.3)
+
+
+> >>  po/bn_IN.po     |    4 ++--
+> >>  po/ca.po        |    4 ++--
+> >>  po/cs_CZ.po     |    4 ++--
+> >>  po/de_DE.po     |    2 +-
+> >>  po/en_GB.po     |    2 +-
+> >>  po/en_US.po     |    2 +-
+> >>  po/es_ES.po     |    2 +-
+> >>  po/hi.po        |    2 +-
+> >>  po/hu_HU.po     |    2 +-
+> >>  po/id_ID.po     |    2 +-
+> >>  po/lt.po        |    2 +-
+> >>  po/nl_NL.po     |    2 +-
+> >>  po/pl_PL.po     |    2 +-
+> >>  po/powertop.pot |    2 +-
+> >>  po/zh_CN.po     |    2 +-
+> >>  po/zh_TW.po     |    4 ++--
+> >>  src/cpu/cpu.cpp |    2 +-
+> >>  17 files changed, 21 insertions(+), 21 deletions(-)
+> >>
+
+
+	-ss
+
+--===============0496579754152415295==--
 
