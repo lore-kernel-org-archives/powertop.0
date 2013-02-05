@@ -1,50 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============5428192761384781811=="
+Content-Type: multipart/mixed; boundary="===============7289408085061734412=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Seg Fault due to function format_watts in file
- src/lib.cpp
-Date: Mon, 20 May 2013 16:26:39 +0300
-Message-ID: <20130520132639.GC2238@swordfish>
-In-Reply-To: CABa1t5xZAVYvWagoJR8n-K1iMUZGSJzWtsfmm3HC-FXF-B9hXw@mail.gmail.com
+From: Paul Menzel <paulepanter at users.sourceforge.net>
+Subject: Re: [Powertop] [PATCH] src/cpu/cpu.cpp: Fix typo in error message:
+ freque*nc*y
+Date: Tue, 05 Feb 2013 17:06:37 +0100
+Message-ID: <1360080397.5110.0.camel@mattotaupa>
+In-Reply-To: CAE4GLsvkgQe7nCwq7SF+jX8ifys4xg7zSdDPm6AxMbLGjWovtg@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5428192761384781811==
+--===============7289408085061734412==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (02/28/13 14:45), Ganapati Bhat wrote:
->    Dear All,
->    I was compiling powertop as an Android external module and using the
->    option powertop --html. However, there used to be a segmentation fault.
->    When i looked into it, I observed that in the function format_watts in
->    src/lib.cpp, the last=EF=BF=BDargument=EF=BF=BDto mbstows was zero. By=
- changing the
->    argument to len, which is itself an argument to the function format_wa=
-tts,
->    powertop worked properly? Does this also happen on an x86 machine? ( I=
- am
->    unable to verify this due to some problems in my laptop which I have n=
-ot
->    yet resolved.) If not then can someone explain to me why is it happeni=
-ng
->    in the case of android?
->    Thanks and Regards,
->    Ganapati
+Am Dienstag, den 05.02.2013, 10:18 +0100 schrieb Thomas Spura:
+> By then all translations will be marked as fuzzy and won't work
+> anymore. When also updating the typo in the translations, this won't
+> be needed.
 
-Hello,
-
-did you have any chance to test the patch?
+The question is if Transifex is able to deal with that, that means, it
+notices the changes of translation files in the repository. Do you know
+if it does?
 
 
-	-ss
+Thanks,
 
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
+Paul
 
+--===============7289408085061734412==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="signature.asc"
 
---===============5428192761384781811==--
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
+L0xpbnV4KQoKaUVZRUFCRUNBQVlGQWxFUkxnMEFDZ2tRUFgxYUsyd09IVmk1WFFDYUExbEZmaXZp
+blFkRVQ2dmRaM1NmeXc3SQpTUUFBbmloS0hTeWwxYW1BQ0Z4Z1dkb1hIdDJ5WTZ0SAo9YWl3Kwot
+LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
+
+--===============7289408085061734412==--
 
