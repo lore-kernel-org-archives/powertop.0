@@ -1,51 +1,97 @@
-Content-Type: multipart/mixed; boundary="===============1415785529003082680=="
+Content-Type: multipart/mixed; boundary="===============0652696428409277117=="
 MIME-Version: 1.0
-From: jani.nikula at linux.intel.com
-Subject: [Powertop] [PATCH] Add a more informative error message about MSR not
- found
-Date: Thu, 21 Feb 2013 11:27:34 +0200
-Message-ID: <1361438855-14060-1-git-send-email-jani.nikula@linux.intel.com>
+From: Thomas Waldecker <thomas.waldecker at gmail.com>
+Subject: [Powertop] [PATCH] csstoh shell-script for cross-compiling
+Date: Tue, 05 Feb 2013 09:36:49 +0100
+Message-ID: <1360053409-29101-1-git-send-email-thomas.waldecker@gmail.com>
+In-Reply-To: 20130204115902.70694592@bluebird.jf.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1415785529003082680==
+--===============0652696428409277117==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Jani Nikula <jani.nikula(a)intel.com>
+Updated the shellscript with changes made by Igor posted in mailing list
+https://lists.01.org/pipermail/powertop/2012-July/000165.html
 
-Suggest enabling CONFIG_X86_MSR. Add \n at the end of the error message.
-
-Signed-off-by: Jani Nikula <jani.nikula(a)intel.com>
-
+Signed-off-by: Thomas Waldecker <thomas.waldecker(a)gmail.com>
 ---
+ src/Makefile.am |  3 +--
+ src/csstoh.sh   | 21 ++++++++++-----------
+ 2 files changed, 11 insertions(+), 13 deletions(-)
 
-Note: This breaks translations looking for msgid "msr reg not found". I'm
-unsure how you want this kind of changes handled.
----
- src/cpu/intel_cpus.cpp |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
-index 2b78d31..30c311f 100644
---- a/src/cpu/intel_cpus.cpp
-+++ b/src/cpu/intel_cpus.cpp
-@@ -58,7 +58,7 @@ static uint64_t get_msr(int cpu, uint64_t offset)
- 		fd =3D sprintf(msr_path, "/dev/msr%d", cpu);
+diff --git a/src/Makefile.am b/src/Makefile.am
+index a53d942..398b8a7 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -46,6 +46,5 @@ AM_LDFLAGS =3D $(LIBS) $(NCURSES_LIBS) $(PCIUTILS_LIBS) $=
+(LIBNL_LIBS) $(LIBZ_LIBS)
+ BUILT_SOURCES =3D css.h
+ CLEANFILES =3D css.h
+ css.h: powertop.css
+-	chmod +x ./csstoh.sh
+-	./csstoh.sh "$(srcdir)"/powertop.css css.h
++	$(SHELL) ./csstoh.sh powertop.css css.h
  =
 
- 		if (access(msr_path, R_OK) !=3D 0){
--			fprintf(stderr, _("msr reg not found"));
-+			fprintf(stderr, _("Model-specific registers (MSR) not found (try enabli=
-ng CONFIG_X86_MSR).\n"));
- 			exit(-2);
- 		}
- 	}
+diff --git a/src/csstoh.sh b/src/csstoh.sh
+index 5918d12..9d4100b 100755
+--- a/src/csstoh.sh
++++ b/src/csstoh.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ #
+ # This program file is free software; you can redistribute it and/or modif=
+y it
+ # under the terms of the GNU General Public License as published by the
+@@ -16,8 +16,7 @@
+ # Boston, MA 02110-1301 USA
+ # or just google for it.
+ #
+-# Written by Igor Zhbanov<i.zhbanov at samsung.com>
+-
++# Written by Igor Zhbanov <i.zhbanov at samsung.com>
+ =
+
+ if [ $# -lt 2 ]; then
+ 	echo "Usage: csstoh.sh cssfile header.h"
+@@ -29,17 +28,17 @@ if [ ! -r $1 ]; then
+ 	exit 1
+ fi
+ =
+
+-if ! echo -n>$2; then
++if ! echo -n >$2; then
+ 	echo "Can't open file $2 for writing."
+ 	exit 1
+ fi
+ =
+
+-echo "#ifndef __INCLUDE_GUARD_CCS_H">>  $2
+-echo "#define __INCLUDE_GUARD_CCS_H">>  $2
+-echo>>  $2
+-echo "const char css[] =3D ">>  $2
++echo "#ifndef __INCLUDE_GUARD_CCS_H" >> $2
++echo "#define __INCLUDE_GUARD_CCS_H" >> $2
++echo >> $2
++echo "const char css[] =3D " >> $2
+ =
+
+-sed -r 's/^(.*)$/\t\"\1\\n\"/' $1>>  $2
++sed -r 's/^(.*)$/\t\"\1\\n\"/' $1 >> $2
+ =
+
+-echo ";">>  $2
+-echo "#endif">>  $2
++echo ";" >> $2
++echo "#endif" >> $2
 -- =
 
-1.7.9.5
+1.8.1
 
 
---===============1415785529003082680==--
+--===============0652696428409277117==--
 
