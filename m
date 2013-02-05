@@ -1,75 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============7882545119713183576=="
+Content-Type: multipart/mixed; boundary="===============0616128808940138767=="
 MIME-Version: 1.0
-From: Youquan Song <youquan.song at intel.com>
-Subject: [Powertop] [PATCH] Fix running failure when > 69 CPUs for open file
- limitation
-Date: Wed, 29 May 2013 11:44:07 -0400
-Message-ID: <1369842247-11442-1-git-send-email-youquan.song@intel.com>
+From: Kristen Carlson Accardi <kristen at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] src/cpu/cpu.cpp: Fix typo in error message:
+ freque*nc*y
+Date: Tue, 05 Feb 2013 10:03:26 -0800
+Message-ID: <20130205100326.3556a292@bluebird.jf.intel.com>
+In-Reply-To: 20130205092719.GA23602@swordfish.minsk.epam.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7882545119713183576==
+--===============0616128808940138767==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Powertop 2.3 fails to run on machine with > 69 CPUs because system open fil=
-es
-limitation of one process is 1024 default,  While powertop will open one fi=
-le
-for every monitored perf_event (at least 15) each CPU.
+On Tue, 5 Feb 2013 12:27:19 +0300
+Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com> wrote:
 
-Like on 80 CPUs Westmere-EX machine, powertop will fail to run with below:
+> On (02/05/13 10:18), Thomas Spura wrote:
+> > Byt then all translations will be marked as fuzzy and won't work
+> > anymore. When also updating the typo in the translations, this won't
+> > be needed.
+> > =
 
-PowerTOP v2.3 needs the kernel to support the 'perf' subsystem
-as well as support for trace points in the kernel:
-CONFIG_PERF_EVENTS=3Dy
-CONFIG_PERF_COUNTERS=3Dy
-CONFIG_TRACEPOINTS=3Dy
-CONFIG_TRACING=3Dy
+> > =
 
-This patch is to change RLIMIT_NOFILE from default (1024) to max limition.
+> > Greetings,
+> >    Tom
+> > =
 
+> =
 
-Signed-off-by: Youquan Song <youquan.song(a)intel.com>
----
- src/main.cpp |    6 ++++++
- 1 files changed, 6 insertions(+), 0 deletions(-)
+> Just for note, are we on a schedule or will it be adjusted/shifted?
+> According to https://01.org/powertop/community :
+> =
 
-diff --git a/src/main.cpp b/src/main.cpp
-index 0883424..8cd97a2 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -36,6 +36,7 @@
- #include <getopt.h>
- #include <unistd.h>
- #include <locale.h>
-+#include <sys/resource.h>
- =
+> 	Schedule 2013
+> =
 
- #include "cpu/cpu.h"
- #include "process/process.h"
-@@ -283,9 +284,14 @@ static void powertop_init(void)
- 	static char initialized =3D 0;
- 	int ret;
- 	struct statfs st_fs;
-+	struct rlimit rlmt;
- =
+> 	Feb 1st (string freeze)
+> 	Feb 15th (release v2.3)
 
- 	if (initialized)
- 		return;
-+
-+	getrlimit (RLIMIT_NOFILE, &rlmt);
-+	rlmt.rlim_cur =3D rlmt.rlim_max;
-+	setrlimit (RLIMIT_NOFILE, &rlmt);
- =
-
- 	checkroot();
- 	ret =3D system("/sbin/modprobe cpufreq_stats > /dev/null 2>&1");
--- =
-
-1.7.7.4
+I'm delaying string freeze for a short period of time - we'll probably
+do it next week.  I'll send an updated schedule when I solidify the
+date.
 
 
---===============7882545119713183576==--
+--===============0616128808940138767==--
 
