@@ -1,69 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============1360384897504479135=="
+Content-Type: multipart/mixed; boundary="===============5225164723783597699=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] csstoh shell-script for cross-compiling
-Date: Mon, 04 Feb 2013 13:42:45 +0300
-Message-ID: <20130204104245.GA3712@swordfish.minsk.epam.com>
-In-Reply-To: CAHgBLoqxiG5SvuK-TV-DtTLkZ5C9fHFBuJh8O7MwFW+5uX_0fQ@mail.gmail.com
+From: Thomas Spura <thomas.spura at gmail.com>
+Subject: Re: [Powertop] [PATCH] src/cpu/cpu.cpp: Fix typo in error message:
+ freque*nc*y
+Date: Wed, 06 Feb 2013 11:50:26 +0100
+Message-ID: <CAE4GLsukpGOJxhPtzea6TCK3fE6H59rAjPAO3FTTayeYi23f8A@mail.gmail.com>
+In-Reply-To: 1360080397.5110.0.camel@mattotaupa
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1360384897504479135==
+--===============5225164723783597699==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (02/04/13 10:40), Thomas Waldecker wrote:
-> Hi Sergey,
-> =
-
-> > well, the whole situation is confusing. we've pushed Igor's patch on be=
-half of Thomas and
-> > now we are about to do similar thing (diff between two Igor's patches) =
-again.
-> > I'm sorry Thomas, I appreciate your help, but I can't ACK your patch wi=
-thout Igor's
-> > ACK/patch of his own/etc.
-> =
-
-> I don't understand your patch apply policy. =
-
-
-Apparently, I do mistakes or, at least, not very attentive sometimes.
-My word is not the last one, and project owners may have different opinion/=
-decision, =
-
-I just said I don't think this is completely right.
-
-
-> I also don't understand why nobody didn't apply Igors patch first time.
+On Tue, Feb 5, 2013 at 5:06 PM, Paul Menzel
+<paulepanter(a)users.sourceforge.net> wrote:
+> Am Dienstag, den 05.02.2013, 10:18 +0100 schrieb Thomas Spura:
+>> By then all translations will be marked as fuzzy and won't work
+>> anymore. When also updating the typo in the translations, this won't
+>> be needed.
 >
+> The question is if Transifex is able to deal with that, that means, it
+> notices the changes of translation files in the repository. Do you know
+> if it does?
 
-I can't tell.
+IIUC, you need to send the "what to translate" files manually to
+Transifex so it should be a manually step by the powertop translations
+manager.
+But I'm just guessing here as I only used Transifex, when it did most
+of the task on its own. I have no experience of Transifex after
+switching to the manual push&pull system...
 
- =
+Greetings,
+   Tom
 
-> I just applied the changes which he did in his V2. I think it is a
-> reasonable change.
-
-
-> It would be also ok for me if you just use the patch and change the autho=
-r.
->
-
-Not sure I got this.
-
-
-	-ss
-
- =
-
-> P.S. Sorry for double post, forgot to include mailing list again
-> =
-
-> Kind regards,
-> Thomas
->=20
-
---===============1360384897504479135==--
+--===============5225164723783597699==--
 
