@@ -1,37 +1,127 @@
-Content-Type: multipart/mixed; boundary="===============2824805445893512680=="
+Content-Type: multipart/mixed; boundary="===============0081272808428403227=="
 MIME-Version: 1.0
-From: Magnus Fromreide <magfr at lysator.liu.se>
-Subject: Re: [Powertop] [PATCH] csstoh.sh shell script fixes cross compiling
- issues
-Date: Fri, 01 Feb 2013 00:05:55 +0100
-Message-ID: <20130131230555.GA7209@bacon.lysator.liu.se>
-In-Reply-To: 20130131144632.7520998a@bluebird.jf.intel.com
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: Re: [Powertop] [PATCH] csstoh shell-script for cross-compiling
+Date: Wed, 06 Feb 2013 12:05:03 +0400
+Message-ID: <51120EAF.1010206@samsung.com>
+In-Reply-To: 20130205100655.1adcf596@bluebird.jf.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2824805445893512680==
+--===============0081272808428403227==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 31, 2013 at 02:46:32PM -0800, Kristen Carlson Accardi wrote:
-> On Fri, 30 Nov 2012 13:46:27 +0100
-> Thomas Waldecker <thomas.waldecker(a)gmail.com> wrote:
-> =
+Kristen Carlson Accardi wrote:
+> On Tue, 05 Feb 2013 13:50:34 +0400
+> Igor Zhbanov <i.zhbanov(a)samsung.com> wrote:
+>
+>> Thomas Waldecker wrote:
+>>> Updated the shellscript with changes made by Igor posted in mailing list
+>>> https://lists.01.org/pipermail/powertop/2012-July/000165.html
+>>>
+>>> Signed-off-by: Thomas Waldecker <thomas.waldecker(a)gmail.com>
+>>> ---
+>>>    src/Makefile.am |  3 +--
+>>>    src/csstoh.sh   | 21 ++++++++++-----------
+>>>    2 files changed, 11 insertions(+), 13 deletions(-)
+>>>
+>>> diff --git a/src/Makefile.am b/src/Makefile.am
+>>> index a53d942..398b8a7 100644
+>>> --- a/src/Makefile.am
+>>> +++ b/src/Makefile.am
+>>> @@ -46,6 +46,5 @@ AM_LDFLAGS =3D $(LIBS) $(NCURSES_LIBS) $(PCIUTILS_LIB=
+S) $(LIBNL_LIBS) $(LIBZ_LIBS)
+>>>    BUILT_SOURCES =3D css.h
+>>>    CLEANFILES =3D css.h
+>>>    css.h: powertop.css
+>>> -	chmod +x ./csstoh.sh
+>>> -	./csstoh.sh "$(srcdir)"/powertop.css css.h
+>>> +	$(SHELL) ./csstoh.sh powertop.css css.h
+>>>    =
 
-> > From: Thomas Waldecker <thomas.waldecker(a)tqs.de>
-> > =
+>>> diff --git a/src/csstoh.sh b/src/csstoh.sh
+>>> index 5918d12..9d4100b 100755
+>>> --- a/src/csstoh.sh
+>>> +++ b/src/csstoh.sh
+>>> @@ -1,4 +1,4 @@
+>>> -#!/bin/bash
+>>> +#!/bin/sh
+>>>    #
+>>>    # This program file is free software; you can redistribute it and/or=
+ modify it
+>>>    # under the terms of the GNU General Public License as published by =
+the
+>>> @@ -16,8 +16,7 @@
+>>>    # Boston, MA 02110-1301 USA
+>>>    # or just google for it.
+>>>    #
+>>> -# Written by Igor Zhbanov<i.zhbanov at samsung.com>
+>>> -
+>>> +# Written by Igor Zhbanov <i.zhbanov at samsung.com>
+>>>    =
 
-> > Added the csstoh.sh shell script from Igor Zhbanov found here:
-> > http://lists.01.org/pipermail/powertop/2012-July/000151.html
-> > also patched the Makefile.am to use the csstoh.sh script.
-> > The compiled csstoh binary doesn't work for cross compiling,
-> > however Igors Patch never got applied upstream.
+>>>    if [ $# -lt 2 ]; then
+>>>    	echo "Usage: csstoh.sh cssfile header.h"
+>>> @@ -29,17 +28,17 @@ if [ ! -r $1 ]; then
+>>>    	exit 1
+>>>    fi
+>>>    =
 
-Why the one from 151.html and not the one at the end of the thread in
-http://lists.01.org/pipermail/powertop/2012-July/000165.html
+>>> -if ! echo -n>$2; then
+>>> +if ! echo -n >$2; then
+>>>    	echo "Can't open file $2 for writing."
+>>>    	exit 1
+>>>    fi
+>>>    =
 
-/MF
+>>> -echo "#ifndef __INCLUDE_GUARD_CCS_H">>  $2
+>>> -echo "#define __INCLUDE_GUARD_CCS_H">>  $2
+>>> -echo>>  $2
+>>> -echo "const char css[] =3D ">>  $2
+>>> +echo "#ifndef __INCLUDE_GUARD_CCS_H" >> $2
+>>> +echo "#define __INCLUDE_GUARD_CCS_H" >> $2
+>>> +echo >> $2
+>>> +echo "const char css[] =3D " >> $2
+>>>    =
 
---===============2824805445893512680==--
+>>> -sed -r 's/^(.*)$/\t\"\1\\n\"/' $1>>  $2
+>>> +sed -r 's/^(.*)$/\t\"\1\\n\"/' $1 >> $2
+>>>    =
+
+>>> -echo ";">>  $2
+>>> -echo "#endif">>  $2
+>>> +echo ";" >> $2
+>>> +echo "#endif" >> $2
+>> The space characters issue was because of bad mail-client.
+>> The spaces were always there. :-)
+>> Last patch was sent by git, so it was transmitted exactly.
+>>
+>> Also it the last version of the patch /bin/bash was changed to /bin/sh
+>> for better portability. So the (this) last version is better. :-)
+>> I use it for cross-compilation. My own version is the same except
+>> of my e-mail. I have "@" instead of "at" in it. The "at" word was created
+>> by bad mail client. But this is not important. :-)
+>>
+> So would you like us to go ahead and apply this patch?
+>
+Yes. :-) With correct white-space characters, /bin/bash -> /bin/sh
+and added $(SHELL) to Makefile, this patch would be better than first versi=
+on.
+
+-- =
+
+Best regards,
+Igor Zhbanov,
+Sub-Project Leader,
+phone: +7 (495) 797 25 00 ext 3981
+e-mail: i.zhbanov(a)samsung.com
+
+Mobile group, Moscow R&D center, Samsung Electronics
+12 Dvintsev street, building 1
+127018, Moscow, Russian Federation
+
+
+--===============0081272808428403227==--
 
