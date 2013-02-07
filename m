@@ -1,59 +1,27 @@
-Content-Type: multipart/mixed; boundary="===============0721734373682969937=="
+Content-Type: multipart/mixed; boundary="===============7384185724680153859=="
 MIME-Version: 1.0
-From: Nathan Van Ymeren <nathan.vany at gmail.com>
-Subject: Re: [Powertop] Bug under Fedora 19 x86_64: Requesting Unregistered
- Parameters 63 and 58
-Date: Thu, 04 Jul 2013 14:47:26 +0000
-Message-ID: <1263270461-1372949241-cardhu_decombobulator_blackberry.rim.net-1236638658-@b3.c1.bise6.blackberry>
+From: Thomas Waldecker <Thomas.Waldecker at tqs.de>
+Subject: Re: [Powertop] Fwd: powertop is not showing power usage but everything
+Date: Thu, 07 Feb 2013 16:26:28 +0000
+Message-ID: <B88C075EE1324644BA0452D5EFDD582813952736@TQ-MAIL.tq-net.de>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0721734373682969937==
+--===============7384185724680153859==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Actually I've figured it out:
+Hi Royy,
 
-It was necessary to delete the cache files under /var
+I don't see something missing in your output.
+My output looks similar than yours.
 
-I didn't think it could have been a cache issue because I specifically aske=
-d my package manager (yum in this case) to do a reinstall of powertop after=
- I upgraded my distro.
+Normally you don't have to do configure anything if you are using the defau=
+lt kernel.
 
-Apparently I needed to be reminded what happens when you ASSuME :)
+Regards,
+Thomas
 
-Thanks for your help
-
-N
-------Original Message------
-From: Sergey Senozhatsky
-To: Nathan Van Ymeren
-Cc: powertop(a)lists.01.org
-Subject: Re: [Powertop] Bug under Fedora 19 x86_64: Requesting Unregistered=
- Parameters 63 and 58
-Sent: Jul 4, 2013 2:25 AM
-
-On (07/03/13 11:47), Nathan Van Ymeren wrote:
->    Hi Sergey,
->    Here are the listings of those directories =C2=A0
->    [1]http://pastebin.com/wJdxSN5B
-> =
-
->    On Wed, Jul 3, 2013 at 4:55 AM, Sergey Senozhatsky
->    <[2]sergey.senozhatsky(a)gmail.com> wrote:
-> =
-
->      > =C2=A0 =C2=A0BUG: requesting unregistered parameter 58
->      > =C2=A0 =C2=A0BUG: requesting unregistered parameter 63
->      >
-
-Hello, thanks.
-
-I assume you run powertop 2.3?
-
-	-ss
-
-
---===============0721734373682969937==--
+--===============7384185724680153859==--
 
