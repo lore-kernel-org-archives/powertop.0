@@ -1,62 +1,63 @@
-Content-Type: multipart/mixed; boundary="===============2631868563144448247=="
+Content-Type: multipart/mixed; boundary="===============1459640724333309308=="
 MIME-Version: 1.0
-From: Kristen Carlson Accardi <kristen at linux.intel.com>
-Subject: Re: [Powertop] [PATCH 0/8] Power Top RAPL interface v04
-Date: Fri, 19 Apr 2013 13:11:47 -0700
-Message-ID: <20130419131147.6f8e7aba@bluebird.jf.intel.com>
-In-Reply-To: 20130415203543.GE2301@swordfish
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] Powertop --claibrate doesn't run
+Date: Wed, 13 Feb 2013 22:03:49 +0300
+Message-ID: <20130213190349.GA2507@swordfish>
+In-Reply-To: 1360781220.12424.YahooMailNeo@web122502.mail.ne1.yahoo.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2631868563144448247==
+--===============1459640724333309308==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 15 Apr 2013 23:35:43 +0300
-Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com> wrote:
+Hello,
 
-> On (04/15/13 09:09), Srinivas Pandruvada wrote:
-> > This patch adds RAPL interface to powertop. RAPL can give energy consum=
-ed for a domain. For
-> > client platform, domain are "PKG", "PP0" and "PP1". For servers "PKG", =
-"DRAM" and "PP0".
-> > PP0 refers to CPU energy comsumtion and PP1 refers to GPUs. DRAM is for=
- DRAM in servers only.
-> > =
+On (02/13/13 10:47), Don Rhummy wrote:
+> When I run the command "powertop =
 
-> > Powertop estimates how much power CPU and GPU is consuming based on the=
- measured power and
-> > load. This patch splits this into the following:
-> > - Actual CPU/GPU power reported by RAPL
-> > - DRAM power for servers
-> > - Remaining as "misc" usage for CPU/GPU
-> > =
+> --calibrate --debug" it turns my screen black but then does nothing =
 
-> > As more domain are getting added, this patch creates a parent/child rel=
-ationship for CPU/GPU.
-> > This way when new domains are added these files don't need change. Only=
- inherit CPU/GPU class,
-> > and implement virtual method for consumed power.
-> >
-> =
+> (even if I leave it for 30 minutes) and when I touch the mousepad, it =
 
-> Hello,
-> looks good to me. thanks.
+> shows the command simply returned with no output like this:
 > =
 
 > =
 
-> any objections/inputs/etc. from list members are welcomed.
+> myuser:~>kdesu /usr/sbin/powertop --calibrate --debug=C2=A0
+> myuser:~>
 > =
 
-> 	-ss
+> =
+
+> I'm using:
+> openSUSE 12.2
+> KDE 4.8.5
+> Kernel: 3.4.11 (64bit)
+> 8GB RAM (6.5GB free)
+> Intel i5 1.7 quad core
 > =
 
 
-Applied.
+and powertop version?
 
-Thanks!
 
---===============2631868563144448247==--
+> =
+
+> How do I fix this? What could be wrong?
+> =
+
+
+well, let's try:
+
+ sudo gdb /usr/sbin/powertop
+ run --calibrate --debug
+
+
+	-ss
+
+--===============1459640724333309308==--
 
