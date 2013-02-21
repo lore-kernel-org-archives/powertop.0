@@ -1,43 +1,72 @@
-Content-Type: multipart/mixed; boundary="===============7289408085061734412=="
+Content-Type: multipart/mixed; boundary="===============6037932332186011678=="
 MIME-Version: 1.0
-From: Paul Menzel <paulepanter at users.sourceforge.net>
-Subject: Re: [Powertop] [PATCH] src/cpu/cpu.cpp: Fix typo in error message:
- freque*nc*y
-Date: Tue, 05 Feb 2013 17:06:37 +0100
-Message-ID: <1360080397.5110.0.camel@mattotaupa>
-In-Reply-To: CAE4GLsvkgQe7nCwq7SF+jX8ifys4xg7zSdDPm6AxMbLGjWovtg@mail.gmail.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH] Add a more informative error message about MSR
+ not found
+Date: Thu, 21 Feb 2013 12:37:38 +0300
+Message-ID: <20130221093738.GA2325@swordfish.minsk.epam.com>
+In-Reply-To: 1361438855-14060-1-git-send-email-jani.nikula@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7289408085061734412==
+--===============6037932332186011678==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Am Dienstag, den 05.02.2013, 10:18 +0100 schrieb Thomas Spura:
-> By then all translations will be marked as fuzzy and won't work
-> anymore. When also updating the typo in the translations, this won't
-> be needed.
+On (02/21/13 11:27), jani.nikula(a)linux.intel.com wrote:
+> From: Jani Nikula <jani.nikula(a)intel.com>
+> =
 
-The question is if Transifex is able to deal with that, that means, it
-notices the changes of translation files in the repository. Do you know
-if it does?
+> Suggest enabling CONFIG_X86_MSR. Add \n at the end of the error message.
+> =
+
+> Signed-off-by: Jani Nikula <jani.nikula(a)intel.com>
+> =
+
+> ---
+> =
+
+> Note: This breaks translations looking for msgid "msr reg not found". I'm
+> unsure how you want this kind of changes handled.
+> ---
+>  src/cpu/intel_cpus.cpp |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> =
+
+> diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
+> index 2b78d31..30c311f 100644
+> --- a/src/cpu/intel_cpus.cpp
+> +++ b/src/cpu/intel_cpus.cpp
+> @@ -58,7 +58,7 @@ static uint64_t get_msr(int cpu, uint64_t offset)
+>  		fd =3D sprintf(msr_path, "/dev/msr%d", cpu);
+>  =
+
+>  		if (access(msr_path, R_OK) !=3D 0){
+> -			fprintf(stderr, _("msr reg not found"));
+> +			fprintf(stderr, _("Model-specific registers (MSR) not found (try enab=
+ling CONFIG_X86_MSR).\n"));
+>  			exit(-2);
+>  		}
+>  	}
+> -- =
 
 
-Thanks,
+I think we're beyond the `string freeze' date, most likely it will not get =
+into upcoming release.
 
-Paul
 
---===============7289408085061734412==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
+	-ss
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
-L0xpbnV4KQoKaUVZRUFCRUNBQVlGQWxFUkxnMEFDZ2tRUFgxYUsyd09IVmk1WFFDYUExbEZmaXZp
-blFkRVQ2dmRaM1NmeXc3SQpTUUFBbmloS0hTeWwxYW1BQ0Z4Z1dkb1hIdDJ5WTZ0SAo9YWl3Kwot
-LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
 
---===============7289408085061734412==--
+> 1.7.9.5
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>=20
+
+--===============6037932332186011678==--
 
