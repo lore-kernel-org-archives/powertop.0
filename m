@@ -1,38 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============3827586479422395135=="
+Content-Type: multipart/mixed; boundary="===============1840189626472020547=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Bug under Fedora 19 x86_64: Requesting Unregistered
- Parameters 63 and 58
-Date: Thu, 04 Jul 2013 12:25:41 +0300
-Message-ID: <20130704092541.GB2269@swordfish>
-In-Reply-To: CAEKyVWMGL4AqhxTKYFsaxr3K8WO3zMAXxtRTyaf8EOhgSMi_9Q@mail.gmail.com
+Subject: Re: [Powertop] [PATCH] Add a more informative error message about MSR
+ not found
+Date: Thu, 21 Feb 2013 15:52:59 +0300
+Message-ID: <20130221125259.GA9471@swordfish.minsk.epam.com>
+In-Reply-To: 87621lq5jv.fsf@intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3827586479422395135==
+--===============1840189626472020547==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (07/03/13 11:47), Nathan Van Ymeren wrote:
->    Hi Sergey,
->    Here are the listings of those directories =C2=A0
->    [1]http://pastebin.com/wJdxSN5B
+On (02/21/13 13:17), Jani Nikula wrote:
+> On Thu, 21 Feb 2013, Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com> =
+wrote:
+> > I think we're beyond the `string freeze' date, most likely it will not
+> > get into upcoming release.
 > =
 
->    On Wed, Jul 3, 2013 at 4:55 AM, Sergey Senozhatsky
->    <[2]sergey.senozhatsky(a)gmail.com> wrote:
+> I'm ignorant about powertop release practices, and don't mind whether it
+> makes the next release or not; hopefully some release after that though.
 > =
 
->      > =C2=A0 =C2=A0BUG: requesting unregistered parameter 58
->      > =C2=A0 =C2=A0BUG: requesting unregistered parameter 63
->      >
+> I'm just trying to give a hint to the next developer hitting the issue,
+> so he won't have to first grep the powertop sources to figure out what
+> the error really is about, and then the kernel sources to figure out
+> who's responsible for creating /dev/cpu/%d/msr, and what config knob to
+> turn to enable that... The README patch I sent of course helps too.
+>
 
-Hello, thanks.
-
-I assume you run powertop 2.3?
+sure, thanks.
 
 	-ss
+ =
 
---===============3827586479422395135==--
+> BR,
+> Jani.
+>=20
+
+--===============1840189626472020547==--
 
