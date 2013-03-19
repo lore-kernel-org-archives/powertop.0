@@ -1,59 +1,37 @@
-Content-Type: multipart/mixed; boundary="===============0713831538006383115=="
+Content-Type: multipart/mixed; boundary="===============5299329376712383062=="
 MIME-Version: 1.0
-From: Kristen Carlson Accardi <kristen at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] csstoh shell-script for cross-compiling
-Date: Mon, 04 Feb 2013 11:52:13 -0800
-Message-ID: <20130204115213.0f472495@bluebird.jf.intel.com>
-In-Reply-To: 20130202062656.GA2397@swordfish
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [powertop] ::wiggle() - what does that do?
+Date: Tue, 19 Mar 2013 12:53:26 -0700
+Message-ID: <5148C236.8080200@linux.intel.com>
+In-Reply-To: 2702081.CWDp0UbVS9@intelfx-laptop
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0713831538006383115==
+--===============5299329376712383062==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, 2 Feb 2013 09:26:56 +0300
-Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com> wrote:
+On 3/19/2013 12:51 PM, Ivan Shapovalov wrote:
+> Hello all,
+>
+> I've been wondering on what does the abstract_cpu::wiggle() function does=
+ and
+> why it is needed?.. All the code says is that it is needed to "have a rec=
+ord
+> of CPU at the start and end of the perf trace".
+>
+> I'm asking just because I feel somewhat uncomfortable to have powertop
+> changing my scaling frequency back and forth each N seconds. :)
 
-> On (02/01/13 21:37), Thomas Waldecker wrote:
-> > Updated the shellscript with changes made by Igor posted in mailing list
-> > https://lists.01.org/pipermail/powertop/2012-July/000165.html
-> > ---
-> =
+the reason this exists is that powertop wants to track what frequency the c=
+pu is at for the duration...
+... and there's no way to ask for "current", only to get change notificatio=
+ns
 
-> Cc Igor
-> =
-
-> All right, first, my bad, I should admit that I overlooked this patch. So=
-rry Igor, and
-> thanks to Thomas.
-> =
-
-> Second, Thomas, were you aware of the V2 patch by the time you submitted =
-Igor's V1?
-> =
-
-> =
-
-> =
-
-> From ethical point of view, I think only original author can change this =
-line
-> =
-
->  -# Written by Igor Zhbanov<i.zhbanov at samsung.com>
->  -
->  +# Written by Igor Zhbanov <i.zhbanov at samsung.com>
-> =
-
-> =
-
-> 	-ss
-> =
+so wiggle() forces a change... and from then on we know what it's at.
 
 
-It's just a whitespace change. I see no issue.
-
---===============0713831538006383115==--
+--===============5299329376712383062==--
 
