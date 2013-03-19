@@ -1,50 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============7011477401149593834=="
+Content-Type: multipart/mixed; boundary="===============8302070904376269037=="
 MIME-Version: 1.0
-From: Kristen Carlson Accardi <kristen at linux.intel.com>
-Subject: Re: [Powertop] [RFC] [PATCHv2 00/10] Code deduplication in cpu/*
-Date: Thu, 31 Jan 2013 14:25:47 -0800
-Message-ID: <20130131142547.04f4b6f5@bluebird.jf.intel.com>
-In-Reply-To: 1356304132-3889-1-git-send-email-intelfx100@gmail.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [powertop] ::wiggle() - what does that do?
+Date: Tue, 19 Mar 2013 12:58:49 -0700
+Message-ID: <5148C379.7000002@linux.intel.com>
+In-Reply-To: 1756753.dFRy6JGU15@intelfx-laptop
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7011477401149593834==
+--===============8302070904376269037==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 24 Dec 2012 03:08:42 +0400
-Ivan Shapovalov <intelfx100(a)gmail.com> wrote:
+On 3/19/2013 12:57 PM, Ivan Shapovalov wrote:
+> On 19 March 2013 12:53:26 Arjan van de Ven wrote:
+>> On 3/19/2013 12:51 PM, Ivan Shapovalov wrote:
+>>> Hello all,
+>>>
+>>> I've been wondering on what does the abstract_cpu::wiggle() function do=
+es
+>>> and why it is needed?.. All the code says is that it is needed to "have=
+ a
+>>> record of CPU at the start and end of the perf trace".
+>>>
+>>> I'm asking just because I feel somewhat uncomfortable to have powertop
+>>> changing my scaling frequency back and forth each N seconds. :)
+>>
+>> the reason this exists is that powertop wants to track what frequency the
+>> cpu is at for the duration... ... and there's no way to ask for "current=
+",
+>> only to get change notifications
+>>
+>> so wiggle() forces a change... and from then on we know what it's at.
+>
+> ...And why isn't it possible to keep the value from last notification?
 
-> This is a resend (unchanged but rebased) of the patch series about
-> refactoring code in cpu/* by deduplication. From this series, only
-> the last bugfix patch has been applied so far due to a code freeze.
-> =
+there may not have been one...
 
-> Ivan Shapovalov (10):
->       Fix includes: do not include intel_cpus.h inside cpu.h
->       Deduplication: move is_turbo() function to lib
->       Deduplication: move all instances of account_freq() to
-> abstract_cpu::account_freq() Deduplication: remove
-> nhm_cpu::account_freq() almost identical to
-> abstract_cpu::account_freq() Deduplication: remove
-> nhm_{cpu,core,package}::change_effective_frequency() identical to
-> cpu_{linux,core,package}::change_effective_frequency() Deduplication:
-> merge cpu_{core,linux,package}::change_effective_frequency() into
-> abstract_cpu::change_effective_frequency() Deduplication: remove
-> {cpu,nhm}_core::calculate_freq() identical to
-> abstract_cpu::calculate_freq() Deduplication: remove
-> nhm_package::calculate_freq() identical to
-> cpu_package::calculate_freq() Deduplication: properly merge
-> cpu_package::calculate_freq() into abstract_cpu::calculate_freq()
-> Deduplication: merge go_idle()/go_unidle()/change_freq() overrides
-> into abstract_cpu() class
-> _______________________________________________ PowerTop mailing list
-> PowerTop(a)lists.01.org https://lists.01.org/mailman/listinfo/powertop
+> Because time can pass between measurement end and new measurement start?
 
-Hi, I applied your patches.  Thanks for the cleanup.
+yep
 
-Kristen
 
---===============7011477401149593834==--
+
+--===============8302070904376269037==--
 
