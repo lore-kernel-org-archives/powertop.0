@@ -1,61 +1,137 @@
-Content-Type: multipart/mixed; boundary="===============7058140482067981134=="
+Content-Type: multipart/mixed; boundary="===============3686258083506043062=="
 MIME-Version: 1.0
-From: Yates, Alexandra <alexandra.yates at intel.com>
-Subject: Re: [Powertop] ahci-alpm-with-devslp-accounting
-Date: Fri, 02 Aug 2013 16:23:00 +0000
-Message-ID: <5B3EBE90AD716C428A6F03AC478C54067FB3399F@ORSMSX105.amr.corp.intel.com>
-In-Reply-To: 1375292849-11452-1-git-send-email-alexandra.yates@intel.com
+From: Kristen Carlson Accardi <kristen at linux.intel.com>
+Subject: [Powertop] [Announce] PowerTOP v2.3 release
+Date: Tue, 19 Mar 2013 11:58:23 -0700
+Message-ID: <20130319115823.380e8e5e@bluebird.jf.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7058140482067981134==
+--===============3686258083506043062==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-I suspect it is.  This is a patch Kristen asked me to submit since it was c=
-hanged on my box. =
+We are pleased to announce the release of PowerTOP v2.3. This is a maintena=
+nce release.
 
+About PowerTOP
 
-Kristen, can you elaborate? =
+PowerTOP is a Linux tool used to diagnose issues with power consumption and=
+ power management. In addition to being a diagnostic tool, PowerTOP also ha=
+s an interactive mode you can use to experiment with various power manageme=
+nt settings, for cases where the Linux distribution has not enabled those s=
+ettings.
 
+PowerTOP reports which system components are most likely to blame for highe=
+r-than-needed power consumption, ranging from software applications to acti=
+ve hardware components. Detailed screens are available for CPU C and P stat=
+es, device activity, and software activity.
 
-Thank you, =
+Highlights
 
+* Reduced duplication in CPU code
+* Improved ARM build support
+* Various bug fixes and cleanups
 
-Alexandra. =
+Thank you to everyone who contributed to this release!
 
+Austin Zhang (2):
+      V2: Fix C states and P states presentation issue.
+      Using std::max to handle all such kind of logic
+ =
 
------Original Message-----
-From: powertop-bounces(a)lists.01.org [mailto:powertop-bounces(a)lists.01.o=
-rg] On Behalf Of ayates1
-Sent: Wednesday, July 31, 2013 10:47 AM
-To: powertop(a)lists.01.org
-Cc: ayates1
-Subject: [Powertop] ahci-alpm-with-devslp-accounting
+Daniel Kahn Gillmor (1):
+      Correct script for tuning wifi power_save with iw
+ =
 
-From: ayates1 <alexandra.yates(a)linux.intel.com>
+Ivan Shapovalov (10):
+      Fix includes: do not include intel_cpus.h inside cpu.h
+      Deduplication: move is_turbo() function to lib
+      Deduplication: move all instances of account_freq() to abstract_cpu::=
+account_freq()
+      Deduplication: remove nhm_cpu::account_freq() almost identical to abs=
+tract_cpu::account_freq()
+      Deduplication: remove nhm_{cpu, core, package}::change_effective_freq=
+uency() identical to cpu_{linux, core, package}::change_effective_frequency=
+()
+      Deduplication: merge cpu_{core, linux, package}::change_effective_fre=
+quency() into abstract_cpu::change_effective_frequency()
+      Deduplication: remove {cpu, nhm}_core::calculate_freq() identical to =
+abstract_cpu::calculate_freq()
+      Deduplication: remove nhm_package::calculate_freq() identical to cpu_=
+package::calculate_freq()
+      Deduplication: properly merge cpu_package::calculate_freq() into abst=
+ract_cpu::calculate_freq()
+      Deduplication: merge go_idle()/go_unidle()/change_freq() overrides in=
+to abstract_cpu() class
+ =
 
-Added AHCI ALPM accounting for Device Sleep to use with PowerTop to output =
-AHCI ALPM. =
+Jaroslav Skarvada (1):
+      cpufreq: only try to open files under cpuX
+ =
 
+Jaroslav =C5=A0karvada (2):
+      report: fixed crash when writing report to RO filesystem
+      Do not call abstract_cpu::wiggle for GPU
+ =
 
-ayates1 (1):
-  linux-3.9.0-ahci-alpm-with-devslp-accounting
+Kristen Carlson Accardi (4):
+      pot update: changes required for transifex due to string change
+      new and modified po files from transifex
+      change version for 2.3
+      fix issue with string termination
+ =
 
- drivers/ata/ahci.h    |  17 ++++
- drivers/ata/libahci.c | 211 ++++++++++++++++++++++++++++++++++++++++++++++=
-+++-
- 2 files changed, 226 insertions(+), 2 deletions(-)
+Namhyung Kim (4):
+      Use PACKAGE_VERSION for POWERTOP_VERSION
+      process: Get rid of unused dbg_printf_pevent_info()
+      main: 'quiet' option does not take an argument
+      main: Fix output when running workload
+ =
 
--- =
+Paul Menzel (1):
+      src/cpu/cpu.cpp: Fix typo in error message: freque*nc*y
+ =
 
-1.8.1.2
+Rajagopal Venkat (1):
+      Allow frequency stats when cpuidle is not enabled
+ =
 
-_______________________________________________
-PowerTop mailing list
-PowerTop(a)lists.01.org
-https://lists.01.org/mailman/listinfo/powertop
+Sergey Senozhatsky (5):
+      tab_window: null members on construction
+      parameters: fix uninitialized values in param/result getters
+      runtime_pm: register parameters
+      remove csstoh.c
+      measurement: handle multiple batteries in global_time_left()
+ =
 
---===============7058140482067981134==--
+Thomas Waldecker (2):
+      csstoh.sh shell script fixes cross compiling issues
+      csstoh shell-script for cross-compiling
+ =
+
+Project Details
+URL: https://01.org/powertop
+Download: https://01.org/powertop/downloads/2012/PowerTOP-v2.2
+Mailing list:
+Discussions about PowerTOP occur on the PowerTOP at lists.01.org mailing li=
+st.
+Subscribe to the list at https://lists.01.org/mailman/listinfo/powertop
+Archives are found at http://lists.01.org/pipermail/powertop
+The development PowerTOP git repositories are hosted at GitHub.
+ =
+
+URL: https://github.com/fenrus75/powertop
+HTTP: https://github.com/fenrus75/powertop.git
+GIT-readonly: git://github.com/fenrus75/powertop.git
+Note: We will not use any of GitHub's integrate, merge, or tracking =
+
+functions, so please continue to use the provided lists.
+ =
+
+For localization support and contributions, we are using Transifex.
+Transifex URL: https://www.transifex.com/projects/p/PowerTOP/
+
+--===============3686258083506043062==--
 
