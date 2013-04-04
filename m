@@ -1,143 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============7582240185601164878=="
+Content-Type: multipart/mixed; boundary="===============7600212085807927448=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: [Powertop] [PATCH 6/8] usb: use process_directory()
-Date: Thu, 19 Sep 2013 15:44:31 +0300
-Message-ID: <20130919124431.GF2300@swordfish.minsk.epam.com>
-In-Reply-To: 20130919123537.GA2300@swordfish.minsk.epam.com
+From: =?utf-8?q?=E9=99=B3=E9=9F=8B=E4=BB=BB_=28Wei-Ren_Chen=29_=3Cchenwj_at_iis?=
+ =?utf-8?q?=2Esinica=2Eedu=2Etw=3E?=
+Subject: [Powertop] How to make powertop auto-tun when AC power is unpluged?
+Date: Thu, 04 Apr 2013 22:14:35 +0800
+Message-ID: <20130404141435.GA89863@cs.nctu.edu.tw>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7582240185601164878==
+--===============7600212085807927448==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-use process_directory() helper
+Hi all,
 
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+  powertop is a great tool, and I love it. However, there is a place I
+would like to know if it can be improved or done. When the AC power is
+off, I always have to turn on those tunable options shown in powertop
+to save power. Is it possible to make powertop do that automatically
+for me?
 
----
+  T.I.A.
 
- src/devices/usb.cpp | 79 +++++++++++++++++++++----------------------------=
-----
- 1 file changed, 31 insertions(+), 48 deletions(-)
+Regards,
+chenwj
 
-diff --git a/src/devices/usb.cpp b/src/devices/usb.cpp
-index e7542a8..2c5d38b 100644
---- a/src/devices/usb.cpp
-+++ b/src/devices/usb.cpp
-@@ -25,11 +25,9 @@
- #include "usb.h"
- =
+-- =
 
- #include <string.h>
--
- #include <stdio.h>
- #include <unistd.h>
- #include <sys/types.h>
--#include <dirent.h>
- =
+Wei-Ren Chen (=E9=99=B3=E9=9F=8B=E4=BB=BB)
+Computer Systems Lab, Institute of Information Science,
+Academia Sinica, Taiwan (R.O.C.)
+Tel:886-2-2788-3799 #1667
+Homepage: http://people.cs.nctu.edu.tw/~chenwj
 
- #include "../lib.h"
- #include "../parameters/parameters.h"
-@@ -186,57 +184,42 @@ double usbdevice::power_usage(struct result_bundle *r=
-esult, struct parameter_bun
- 	return power;
- }
- =
-
--
--void create_all_usb_devices(void)
-+static void create_all_usb_devices_callback(const char *d_name)
- {
--	struct dirent *entry;
--	DIR *dir;
- 	char filename[4096];
--
--	dir =3D opendir("/sys/bus/usb/devices/");
--	if (!dir)
-+	ifstream file;
-+	class usbdevice *usb;
-+	char device_name[4096];
-+	char vendorid[64], devid[64];
-+	char devid_name[4096];
-+
-+	sprintf(filename, "/sys/bus/usb/devices/%s", d_name);
-+	sprintf(device_name, "%s/power/active_duration", filename);
-+	if (access(device_name, R_OK) !=3D 0)
- 		return;
--	while (1) {
--		ifstream file;
--		class usbdevice *usb;
--		char device_name[4096];
--		char vendorid[64], devid[64];
--		char devid_name[4096];
--		entry =3D readdir(dir);
--
--		if (!entry)
--			break;
--		if (entry->d_name[0] =3D=3D '.')
--			continue;
--
--		sprintf(filename, "/sys/bus/usb/devices/%s", entry->d_name);
--
--		sprintf(device_name, "%s/power/active_duration", filename);
--		if (access(device_name, R_OK)!=3D0)
--			continue;
--
--		sprintf(device_name, "%s/idVendor", filename);
--		file.open(device_name, ios::in);
--		if (file)
--			file.getline(vendorid, 64);
--		file.close();
--		sprintf(device_name, "%s/idProduct", filename);
--		file.open(device_name, ios::in);
--		if (file)
--			file.getline(devid, 64);
--		file.close();
--
--		sprintf(devid_name, "usb-device-%s-%s", vendorid, devid);
- =
-
--		sprintf(device_name, "usb-device-%s-%s-%s", entry->d_name, vendorid, dev=
-id);
-+	sprintf(device_name, "%s/idVendor", filename);
-+	file.open(device_name, ios::in);
-+	if (file)
-+		file.getline(vendorid, 64);
-+	file.close();
-+	sprintf(device_name, "%s/idProduct", filename);
-+	file.open(device_name, ios::in);
-+	if (file)
-+		file.getline(devid, 64);
-+	file.close();
- =
-
--		if (result_device_exists(device_name))
--			continue;
-+	sprintf(devid_name, "usb-device-%s-%s", vendorid, devid);
-+	sprintf(device_name, "usb-device-%s-%s-%s", d_name, vendorid, devid);
-+	if (result_device_exists(device_name))
-+		return;
- =
-
--		usb =3D new class usbdevice(device_name, filename, devid_name);
--		all_devices.push_back(usb);
-+	usb =3D new class usbdevice(device_name, filename, devid_name);
-+	all_devices.push_back(usb);
-+	register_parameter(devid_name, 0.1);
-+}
- =
-
--		register_parameter(devid_name, 0.1);
--	}
--	closedir(dir);
-+void create_all_usb_devices(void)
-+{
-+	process_directory("/sys/bus/usb/devices/", create_all_usb_devices_callbac=
-k);
- }
-
---===============7582240185601164878==--
+--===============7600212085807927448==--
 
