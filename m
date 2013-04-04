@@ -1,85 +1,100 @@
-Content-Type: multipart/mixed; boundary="===============9169389918189436308=="
+Content-Type: multipart/mixed; boundary="===============5851487907046941210=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] Fix running failure when > 69 CPUs for open
- file limitation
-Date: Thu, 30 May 2013 00:00:14 +0300
-Message-ID: <20130529210013.GA3075@swordfish>
-In-Reply-To: 1369842247-11442-1-git-send-email-youquan.song@intel.com
+From: Yuan Chao <yuanchao at gmail.com>
+Subject: Re: [Powertop] How to make powertop auto-tun when AC power is
+ unpluged?
+Date: Fri, 05 Apr 2013 04:50:56 +0800
+Message-ID: <CAADKi7nrhpaYY4gMEpz9e2g=8Dv77oRHzzuiArfBVdM2d=tPFA@mail.gmail.com>
+In-Reply-To: 20130404141435.GA89863@cs.nctu.edu.tw
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============9169389918189436308==
+--===============5851487907046941210==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (05/29/13 11:44), Youquan Song wrote:
-> Powertop 2.3 fails to run on machine with > 69 CPUs because system open f=
-iles
-> limitation of one process is 1024 default,  While powertop will open one =
-file
-> for every monitored perf_event (at least 15) each CPU.
-> =
+Hi,
 
-> Like on 80 CPUs Westmere-EX machine, powertop will fail to run with below:
-> =
-
-> PowerTOP v2.3 needs the kernel to support the 'perf' subsystem
-> as well as support for trace points in the kernel:
-> CONFIG_PERF_EVENTS=3Dy
-> CONFIG_PERF_COUNTERS=3Dy
-> CONFIG_TRACEPOINTS=3Dy
-> CONFIG_TRACING=3Dy
-> =
-
-> This patch is to change RLIMIT_NOFILE from default (1024) to max limition.
-> =
-
-> =
+  Obviously powertop is not meant to be an automatic tool to tune the power
+settings for you. :) From the information gathered with powertop, you can
+try tools like laptop-mode-tools or other dbus hooks available in the
+distro you use and see what's missing.
 
 
-Hello,
-I'd like to ask you to try out the following patch. We leak fd in read_file=
-().
+On Thu, Apr 4, 2013 at 10:14 PM, =E9=99=B3=E9=9F=8B=E4=BB=BB (Wei-Ren Chen)=
+ <
+chenwj(a)iis.sinica.edu.tw> wrote:
+
+> Hi all,
+>
+>   powertop is a great tool, and I love it. However, there is a place I
+> would like to know if it can be improved or done. When the AC power is
+> off, I always have to turn on those tunable options shown in powertop
+> to save power. Is it possible to make powertop do that automatically
+> for me?
+>
+>   T.I.A.
+>
+> Regards,
+> chenwj
+>
+> --
+> Wei-Ren Chen (=E9=99=B3=E9=9F=8B=E4=BB=BB)
+> Computer Systems Lab, Institute of Information Science,
+> Academia Sinica, Taiwan (R.O.C.)
+> Tel:886-2-2788-3799 #1667
+> Homepage: http://people.cs.nctu.edu.tw/~chenwj
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>
 
 
 
+-- =
 
-------8<--------8<--------
+Best regards,
+Yuan Chao
 
-- Do not leak file descriptor in perf_bundle read_file().
-- Clear perf event (unmap memory and close fd) on event destruction.
+--===============5851487907046941210==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
+PGRpdiBkaXI9Imx0ciI+PGRpdj5IaSw8YnI+PGJyPjwvZGl2PsKgIE9idmlvdXNseSBwb3dlcnRv
+cCBpcyBub3QgbWVhbnQgdG8gYmUgYW4gYXV0b21hdGljIHRvb2wgdG8gdHVuZSB0aGUgcG93ZXIg
+c2V0dGluZ3MgZm9yIHlvdS4gOikgRnJvbSB0aGUgaW5mb3JtYXRpb24gZ2F0aGVyZWQgd2l0aCBw
+b3dlcnRvcCwgeW91IGNhbiB0cnkgdG9vbHMgbGlrZSBsYXB0b3AtbW9kZS10b29scyBvciBvdGhl
+ciBkYnVzIGhvb2tzIGF2YWlsYWJsZSBpbiB0aGUgZGlzdHJvIHlvdSB1c2UgYW5kIHNlZSB3aGF0
+JiMzOTtzIG1pc3NpbmcuPGJyPgoKPGRpdj48ZGl2PjxkaXYgY2xhc3M9ImdtYWlsX2V4dHJhIj48
+YnI+PGJyPjxkaXYgY2xhc3M9ImdtYWlsX3F1b3RlIj5PbiBUaHUsIEFwciA0LCAyMDEzIGF0IDEw
+OjE0IFBNLCDpmbPpn4vku7sgKFdlaS1SZW4gQ2hlbikgPHNwYW4gZGlyPSJsdHIiPiZsdDs8YSBo
+cmVmPSJtYWlsdG86Y2hlbndqQGlpcy5zaW5pY2EuZWR1LnR3IiB0YXJnZXQ9Il9ibGFuayI+Y2hl
+bndqQGlpcy5zaW5pY2EuZWR1LnR3PC9hPiZndDs8L3NwYW4+IHdyb3RlOjxicj4KCjxibG9ja3F1
+b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9Im1hcmdpbjowIDAgMCAuOGV4O2JvcmRlci1s
+ZWZ0OjFweCAjY2NjIHNvbGlkO3BhZGRpbmctbGVmdDoxZXgiPkhpIGFsbCw8YnI+Cjxicj4KwqAg
+cG93ZXJ0b3AgaXMgYSBncmVhdCB0b29sLCBhbmQgSSBsb3ZlIGl0LiBIb3dldmVyLCB0aGVyZSBp
+cyBhIHBsYWNlIEk8YnI+CndvdWxkIGxpa2UgdG8ga25vdyBpZiBpdCBjYW4gYmUgaW1wcm92ZWQg
+b3IgZG9uZS4gV2hlbiB0aGUgQUMgcG93ZXIgaXM8YnI+Cm9mZiwgSSBhbHdheXMgaGF2ZSB0byB0
+dXJuIG9uIHRob3NlIHR1bmFibGUgb3B0aW9ucyBzaG93biBpbiBwb3dlcnRvcDxicj4KdG8gc2F2
+ZSBwb3dlci4gSXMgaXQgcG9zc2libGUgdG8gbWFrZSBwb3dlcnRvcCBkbyB0aGF0IGF1dG9tYXRp
+Y2FsbHk8YnI+CmZvciBtZT88YnI+Cjxicj4KwqAgVC5JLkEuPGJyPgo8YnI+ClJlZ2FyZHMsPGJy
+PgpjaGVud2o8YnI+CjxzcGFuIGNsYXNzPSJIT0VuWmIiPjxmb250IGNvbG9yPSIjODg4ODg4Ij48
+YnI+Ci0tPGJyPgpXZWktUmVuIENoZW4gKOmZs+mfi+S7uyk8YnI+CkNvbXB1dGVyIFN5c3RlbXMg
+TGFiLCBJbnN0aXR1dGUgb2YgSW5mb3JtYXRpb24gU2NpZW5jZSw8YnI+CkFjYWRlbWlhIFNpbmlj
+YSwgVGFpd2FuIChSLk8uQy4pPGJyPgpUZWw6ODg2LTItMjc4OC0zNzk5ICMxNjY3PGJyPgpIb21l
+cGFnZTogPGEgaHJlZj0iaHR0cDovL3Blb3BsZS5jcy5uY3R1LmVkdS50dy9+Y2hlbndqIiB0YXJn
+ZXQ9Il9ibGFuayI+aHR0cDovL3Blb3BsZS5jcy5uY3R1LmVkdS50dy9+Y2hlbndqPC9hPjxicj4K
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX188YnI+ClBvd2Vy
+VG9wIG1haWxpbmcgbGlzdDxicj4KPGEgaHJlZj0ibWFpbHRvOlBvd2VyVG9wQGxpc3RzLjAxLm9y
+ZyI+UG93ZXJUb3BAbGlzdHMuMDEub3JnPC9hPjxicj4KPGEgaHJlZj0iaHR0cHM6Ly9saXN0cy4w
+MS5vcmcvbWFpbG1hbi9saXN0aW5mby9wb3dlcnRvcCIgdGFyZ2V0PSJfYmxhbmsiPmh0dHBzOi8v
+bGlzdHMuMDEub3JnL21haWxtYW4vbGlzdGluZm8vcG93ZXJ0b3A8L2E+PGJyPgo8L2ZvbnQ+PC9z
+cGFuPjwvYmxvY2txdW90ZT48L2Rpdj48YnI+PGJyIGNsZWFyPSJhbGwiPjxicj4tLSA8YnI+QmVz
+dCByZWdhcmRzLDxicj5ZdWFuIENoYW8KPC9kaXY+PC9kaXY+PC9kaXY+PC9kaXY+Cg==
 
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
-
----
-
-diff --git a/src/perf/perf.cpp b/src/perf/perf.cpp
-index 35b4017..e919741 100644
---- a/src/perf/perf.cpp
-+++ b/src/perf/perf.cpp
-@@ -167,6 +167,7 @@ perf_event::~perf_event(void)
- 	if (perf_event::pevent->ref_count =3D=3D 1) {
- 		pevent_free(perf_event::pevent);
- 		perf_event::pevent =3D NULL;
-+		clear();
- 	} else
- 		pevent_unref(perf_event::pevent);
- }
-diff --git a/src/perf/perf_bundle.cpp b/src/perf/perf_bundle.cpp
-index 38e1e91..8d480e8 100644
---- a/src/perf/perf_bundle.cpp
-+++ b/src/perf/perf_bundle.cpp
-@@ -123,6 +123,7 @@ static char * read_file(const char *file)
- 		buffer[len] =3D '\0';
- 	}
- out:
-+	close(fd);
- 	return buffer;
- }
-=20
-
---===============9169389918189436308==--
+--===============5851487907046941210==--
 
