@@ -1,120 +1,121 @@
-Content-Type: multipart/mixed; boundary="===============6405995821087868250=="
+Content-Type: multipart/mixed; boundary="===============1036176613130953113=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Seg Fault due to function format_watts in file
- src/lib.cpp
-Date: Tue, 21 May 2013 10:34:58 +0300
-Message-ID: <20130521073458.GA2653@swordfish.datadirectnet.com>
-In-Reply-To: CABa1t5y47pWK3V-vsZKhm8Ks4yYz0FTtJ9dAP=tNW15c-j00=g@mail.gmail.com
+From: Srinivas Pandruvada <srinivas.pandruvada at linux.intel.com>
+Subject: [Powertop] [PATCH 2/5] cpu device as parent class
+Date: Tue, 09 Apr 2013 09:20:08 -0700
+Message-ID: <1365524411-11566-3-git-send-email-srinivas.pandruvada@linux.intel.com>
+In-Reply-To: 1365524411-11566-1-git-send-email-srinivas.pandruvada@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6405995821087868250==
+--===============1036176613130953113==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (05/21/13 12:20), Ganapati Bhat wrote:
->    Dear Sergey,
->    Powertop --html is working fine with the patch applied. I am able to
->    successfully execute the command and get the results. However, still
->    trying to understand the patch and the difference when I changed the 0=
- to
->    len in=C2=A0while (mbstowcs(NULL,buffer,0) < len) inside src/lib.cpp f=
-ile.
->    Now, will try to adopt the latest version of powertop for android.
->    Thanks for all the help and sorry for the delay.
->    Regards,
->    Ganapati Bhat
->
+Added members and methods so that it can have children. Other cpu type
+device can inherit and overide functionality.
+If there are children, the power_usage method will not include the
+power reported by children, as they will be reporting as its own device.
 
-Thanks Ganapati!
+Signed-off-by: Srinivas Pandruvada <srinivas.pandruvada(a)linux.intel.com>
+---
+ src/cpu/cpudevice.cpp | 14 ++++++++++++++
+ src/cpu/cpudevice.h   |  6 +++++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-Kristen, could you please take a look if we can land it in upcoming
-release?
+diff --git a/src/cpu/cpudevice.cpp b/src/cpu/cpudevice.cpp
+index 48fbcf5..371d8a8 100644
+--- a/src/cpu/cpudevice.cpp
++++ b/src/cpu/cpudevice.cpp
+@@ -40,12 +40,20 @@ cpudevice::cpudevice(const char *classname, const char =
+*dev_name, class abstract
+ 	r_consumption_index =3D get_result_index("cpu-consumption");;
+ }
+ =
 
-https://lists.01.org/pipermail/powertop/2013-February/000782.html
++const char * cpudevice::device_name(void)
++{
++	if (child_devices.size())
++		return "CPU misc";
++	else
++		return "CPU use";
++}
+ =
 
+ double cpudevice::power_usage(struct result_bundle *result, struct paramet=
+er_bundle *bundle)
+ {
+ 	double power;
+ 	double factor;
+ 	double _utilization;
++	double child_power;
+ =
 
-Reported-and-Tested-by: Ganapati Bhat <life.mytake(a)gmail.com>
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+ 	power =3D 0;
+ 	factor =3D get_parameter_value(wake_index, bundle);
+@@ -58,6 +66,12 @@ double cpudevice::power_usage(struct result_bundle *resu=
+lt, struct parameter_bun
+ =
 
+ 	power +=3D _utilization * factor;
+ =
 
-	-ss
++	for (unsigned int i =3D 0; i < child_devices.size(); ++i) {
++		child_power =3D child_devices[i]->power_usage(result, bundle);
++		if ((power - child_power) > 0.0)
++			power -=3D child_power;
++	}
++
+ 	return power;
+ }
+ =
 
+diff --git a/src/cpu/cpudevice.h b/src/cpu/cpudevice.h
+index 6a5636f..841a101 100644
+--- a/src/cpu/cpudevice.h
++++ b/src/cpu/cpudevice.h
+@@ -34,6 +34,7 @@ using namespace std;
+ #include "cpu.h"
+ =
+
+ class cpudevice: public device {
++protected:
+ 	char _class[128];
+ 	char _cpuname[128];
+ =
+
+@@ -44,15 +45,18 @@ class cpudevice: public device {
+ 	int r_wake_index;
+ 	int r_consumption_index;
+ =
+
++	vector<device *>child_devices;
++
+ public:
+ 	cpudevice(const char *classname =3D "cpu", const char *device_name =3D "c=
+pu0", class abstract_cpu *_cpu =3D NULL);
+ 	virtual const char * class_name(void) { return _class;};
+ =
+
+-	virtual const char * device_name(void) {return "CPU use";};
++	virtual const char * device_name(void);
+ =
+
+ 	virtual double power_usage(struct result_bundle *result, struct parameter=
+_bundle *bundle);
+ 	virtual bool show_in_list(void) {return false;};
+ 	virtual double	utilization(void); /* percentage */
++	void add_child(device *dev_ptr) { child_devices.push_back(dev_ptr);}
+ };
+ =
 
  =
 
->    On Tue, May 21, 2013 at 11:23 AM, Ganapati Bhat <[1]life.mytake(a)gmai=
-l.com>
->    wrote:
-> =
+-- =
 
->      Hello,
->      I am really sorry. i was involved in some other tasks. Will get back=
- to
->      you in a couple of days.
->      Ganapati Bhat
-> =
+1.7.11.7
 
->      On Mon, May 20, 2013 at 6:56 PM, Sergey Senozhatsky
->      <[2]sergey.senozhatsky(a)gmail.com> wrote:
-> =
 
->        On (02/28/13 14:45), Ganapati Bhat wrote:
->        > =C2=A0 =C2=A0Dear All,
->        > =C2=A0 =C2=A0I was compiling powertop as an Android external mod=
-ule and using
->        the
->        > =C2=A0 =C2=A0option powertop --html. However, there used to be a=
- segmentation
->        fault.
->        > =C2=A0 =C2=A0When i looked into it, I observed that in the funct=
-ion
->        format_watts in
->        > =C2=A0 =C2=A0src/lib.cpp, the last=EF=BF=BDargument=EF=BF=BDto m=
-bstows was zero. By changing
->        the
->        > =C2=A0 =C2=A0argument to len, which is itself an argument to the=
- function
->        format_watts,
->        > =C2=A0 =C2=A0powertop worked properly? Does this also happen on =
-an x86
->        machine? ( I am
->        > =C2=A0 =C2=A0unable to verify this due to some problems in my la=
-ptop which I
->        have not
->        > =C2=A0 =C2=A0yet resolved.) If not then can someone explain to m=
-e why is it
->        happening
->        > =C2=A0 =C2=A0in the case of android?
->        > =C2=A0 =C2=A0Thanks and Regards,
->        > =C2=A0 =C2=A0Ganapati
-> =
-
->        Hello,
-> =
-
->        did you have any chance to test the patch?
-> =
-
->        =C2=A0 =C2=A0 =C2=A0 =C2=A0 -ss
-> =
-
->        > _______________________________________________
->        > PowerTop mailing list
->        > [3]PowerTop(a)lists.01.org
->        > [4]https://lists.01.org/mailman/listinfo/powertop
-> =
-
-> References
-> =
-
->    Visible links
->    1. mailto:life.mytake(a)gmail.com
->    2. mailto:sergey.senozhatsky(a)gmail.com
->    3. mailto:PowerTop(a)lists.01.org
->    4. https://lists.01.org/mailman/listinfo/powertop
-
---===============6405995821087868250==--
+--===============1036176613130953113==--
 
