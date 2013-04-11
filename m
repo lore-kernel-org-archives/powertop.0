@@ -1,14 +1,14 @@
-Content-Type: multipart/mixed; boundary="===============8836465373598279929=="
+Content-Type: multipart/mixed; boundary="===============3412074837228960712=="
 MIME-Version: 1.0
 From: Srinivas Pandruvada <srinivas.pandruvada at linux.intel.com>
 Subject: [Powertop] [PATCH 1/8] Common read/write MSR API
-Date: Mon, 15 Apr 2013 09:09:22 -0700
-Message-ID: <1366042169-14523-2-git-send-email-srinivas.pandruvada@linux.intel.com>
-In-Reply-To: 1366042169-14523-1-git-send-email-srinivas.pandruvada@linux.intel.com
+Date: Thu, 11 Apr 2013 16:58:49 -0700
+Message-ID: <1365724736-411-2-git-send-email-srinivas.pandruvada@linux.intel.com>
+In-Reply-To: 1365724736-411-1-git-send-email-srinivas.pandruvada@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8836465373598279929==
+--===============3412074837228960712==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -21,13 +21,13 @@ This way all MSR interface can use this instead of reimplementing.
 
 Signed-off-by: Srinivas Pandruvada <srinivas.pandruvada(a)linux.intel.com>
 ---
- src/lib.cpp | 65 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++=
+ src/lib.cpp | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++=
 ++++
  src/lib.h   |  3 ++-
- 2 files changed, 67 insertions(+), 1 deletion(-)
+ 2 files changed, 63 insertions(+), 1 deletion(-)
 
 diff --git a/src/lib.cpp b/src/lib.cpp
-index 723517a..028f893 100644
+index 723517a..98d9aac 100644
 --- a/src/lib.cpp
 +++ b/src/lib.cpp
 @@ -56,6 +56,7 @@ extern "C" {
@@ -40,7 +40,7 @@ index 723517a..028f893 100644
  static int kallsyms_read =3D 0;
  =
 
-@@ -450,3 +451,67 @@ int get_user_input(char *buf, unsigned sz)
+@@ -450,3 +451,63 @@ int get_user_input(char *buf, unsigned sz)
  	/* to distinguish between getnstr error and empty line */
  	return ret || strlen(buf);
  }
@@ -58,9 +58,7 @@ index 723517a..028f893 100644
 +		fd =3D sprintf(msr_path, "/dev/msr%d", cpu);
 +
 +		if (access(msr_path, R_OK) !=3D 0){
-+			fprintf(stderr,
-+			 _("Model-specific registers (MSR)\
-+			 not found (try enabling CONFIG_X86_MSR).\n"));
++			fprintf(stderr, _("msr reg not found"));
 +			return -1;
 +		}
 +	}
@@ -69,10 +67,10 @@ index 723517a..028f893 100644
 +	if (fd < 0)
 +		return -1;
 +	retval =3D pread(fd, &msr, sizeof msr, offset);
-+	close(fd);
 +	if (retval !=3D sizeof msr) {
 +		return -1;
 +	}
++	close(fd);
 +	*value =3D msr;
 +
 +	return retval;
@@ -90,9 +88,7 @@ index 723517a..028f893 100644
 +		fd =3D sprintf(msr_path, "/dev/msr%d", cpu);
 +
 +		if (access(msr_path, R_OK) !=3D 0){
-+			fprintf(stderr,
-+			 _("Model-specific registers (MSR)\
-+			 not found (try enabling CONFIG_X86_MSR).\n"));
++			fprintf(stderr, _("msr reg not found"));
 +			return -1;
 +		}
 +	}
@@ -101,10 +97,10 @@ index 723517a..028f893 100644
 +	if (fd < 0)
 +		return -1;
 +	retval =3D pwrite(fd, &value, sizeof value, offset);
-+	close(fd);
 +	if (retval !=3D sizeof value) {
 +		return -1;
 +	}
++	close(fd);
 +
 +	return retval;
 +}
@@ -125,5 +121,5 @@ index de2de5a..2b0e5f5 100644
 1.7.11.7
 
 
---===============8836465373598279929==--
+--===============3412074837228960712==--
 
