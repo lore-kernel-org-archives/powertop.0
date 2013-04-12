@@ -1,91 +1,90 @@
-Content-Type: multipart/mixed; boundary="===============2978464956582417205=="
+Content-Type: multipart/mixed; boundary="===============3569931943338642583=="
 MIME-Version: 1.0
-From: Paul Menzel <paulepanter at users.sourceforge.net>
-Subject: Re: [Powertop] Version info in lib.h file: v2.1 instead of v2.2 for
- release 2.2
-Date: Wed, 27 Feb 2013 12:25:33 +0100
-Message-ID: <1361964333.9870.34.camel@mattotaupa>
-In-Reply-To: CABa1t5xkZRFG4W6FOiQTXMbaWwciXCqzo8fVoqknMiUjD48VVA@mail.gmail.com
+From: Srinivas Pandruvada <srinivas.pandruvada at linux.intel.com>
+Subject: [Powertop] [PATCH 0/8]  Power Top RAPL interface v03
+Date: Fri, 12 Apr 2013 08:47:00 -0700
+Message-ID: <1365781628-11053-1-git-send-email-srinivas.pandruvada@linux.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2978464956582417205==
+--===============3569931943338642583==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Dear Ganapati,
+This patch adds RAPL interface to powertop. RAPL can give energy consumed f=
+or a domain. For
+client platform, domain are "PKG", "PP0" and "PP1". For servers "PKG", "DRA=
+M" and "PP0".
+PP0 refers to CPU energy comsumtion and PP1 refers to GPUs. DRAM is for DRA=
+M in servers only.
+
+Powertop estimates how much power CPU and GPU is consuming based on the mea=
+sured power and
+load. This patch splits this into the following:
+- Actual CPU/GPU power reported by RAPL
+- DRAM power for servers
+- Remaining as "misc" usage for CPU/GPU
+
+As more domain are getting added, this patch creates a parent/child relatio=
+nship for CPU/GPU.
+This way when new domains are added these files don't need change. Only inh=
+erit CPU/GPU class,
+and implement virtual method for consumed power.
+
+v03 changes:
+	close fd when pread/pwrite fails.
+
+v02 changes:
+	Addressed review comments
+	Moved MSR handling to library
+	Added interface to get the first CPU in a package
+	Fix error in reading RAPL when system has multiple packages
 
 
-Am Mittwoch, den 27.02.2013, 16:22 +0530 schrieb Ganapati Bhat:
+Srinivas Pandruvada (8):
+  Common read/write MSR API
+  Use MSR Lib MSR functions
+  RAPL Interface
+  cpu device as parent class
+  Interface to get first cpu
+  Added PP0 RAPL domain for CPU
+  Add RAPL DRAM domain
+  Add RAPL PP1 domain for GPU
 
-> I was just going through the code of the release 2.2 of powertop
+ src/Makefile.am                 |   4 +-
+ src/cpu/cpu.cpp                 |  16 ++
+ src/cpu/cpu.h                   |   1 +
+ src/cpu/cpu_rapl_device.cpp     |  74 +++++
+ src/cpu/cpu_rapl_device.h       |  57 ++++
+ src/cpu/cpudevice.cpp           |  14 +
+ src/cpu/cpudevice.h             |   6 +-
+ src/cpu/dram_rapl_device.cpp    |  75 +++++
+ src/cpu/dram_rapl_device.h      |  57 ++++
+ src/cpu/intel_cpus.cpp          |  23 +-
+ src/cpu/rapl/rapl_interface.cpp | 611 ++++++++++++++++++++++++++++++++++++=
+++++
+ src/cpu/rapl/rapl_interface.h   |  85 ++++++
+ src/devices/gpu_rapl_device.cpp |  70 +++++
+ src/devices/gpu_rapl_device.h   |  57 ++++
+ src/devices/i915-gpu.cpp        |  21 ++
+ src/devices/i915-gpu.h          |   6 +-
+ src/lib.cpp                     |  61 ++++
+ src/lib.h                       |   3 +-
+ 18 files changed, 1218 insertions(+), 23 deletions(-)
+ create mode 100644 src/cpu/cpu_rapl_device.cpp
+ create mode 100644 src/cpu/cpu_rapl_device.h
+ create mode 100644 src/cpu/dram_rapl_device.cpp
+ create mode 100644 src/cpu/dram_rapl_device.h
+ create mode 100644 src/cpu/rapl/rapl_interface.cpp
+ create mode 100644 src/cpu/rapl/rapl_interface.h
+ create mode 100644 src/devices/gpu_rapl_device.cpp
+ create mode 100644 src/devices/gpu_rapl_device.h
 
-from where did you download it?
+-- =
 
-> and in the lib.h file in src/ directory POWERTOP_VERSION is defined as
-> v2.1 and not v2.2. Why is it so? Has it been modified in some
-> subsequent patches?
-
-you can check yourself checking out the latest source from Git [1].
-
-There you see in `src/lib.h`
-
-        #define POWERTOP_VERSION "v"PACKAGE_VERSION
-        #define POWERTOP_SHORT_VERSION PACKAGE_VERSION
-
-Searching for these strings they are only found in that file.
-
-        $ git grep -i PACKAGE_VERSION
-        src/lib.h:#define POWERTOP_VERSION "v"PACKAGE_VERSION
-        src/lib.h:#define POWERTOP_SHORT_VERSION PACKAGE_VERSION
-
-So I guess PACKAGE_VERSION is provided by Autotools which reads
-
-        commit 78956bdcd91c1e1c49e0462b64dda9c11a8ae53d
-        Author: Chris E Ferron <chris.e.ferron(a)linux.intel.com>
-        Date:   Thu Nov 15 08:27:14 2012 -0800
-        =
-
-            up version for v2.2 release
-        =
-
-        diff --git a/configure.ac b/configure.ac
-        index 02952b3..3a7a83c 100644
-        --- a/configure.ac
-        +++ b/configure.ac
-        @@ -2,7 +2,7 @@
-         # Process this file with autoconf to produce a configure script.
-         =
-
-         AC_PREREQ([2.68])
-        -AC_INIT([powertop], [2.1], [powertop(a)lists.01.org])
-        +AC_INIT([powertop], [2.2], [powertop(a)lists.01.org])
-         AM_INIT_AUTOMAKE([-Wall foreign ])
-         AC_LANG([C++])
-         AC_CONFIG_FILES([Makefile src/Makefile traceevent/Makefile po/Make=
-file.in doc/Makefile])
-
-So I am not sure what went wrong in the release tarball.
+1.7.11.7
 
 
-Thanks,
-
-Paul
-
-
-[1] https://github.com/fenrus75/powertop
-
---===============2978464956582417205==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
-L0xpbnV4KQoKaUVZRUFCRUNBQVlGQWxFdDdTMEFDZ2tRUFgxYUsyd09IVmc0NEFDZmVZeXptZFM3
-NlBOMjZXMXFvcU45am1ZNwpPTTBBbjFKMS94YUw5WUNDSVhoU1lEVXNNNWhoK1p0RQo9SlZjWAot
-LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
-
---===============2978464956582417205==--
+--===============3569931943338642583==--
 
