@@ -1,91 +1,121 @@
-Content-Type: multipart/mixed; boundary="===============4571556429484949302=="
+Content-Type: multipart/mixed; boundary="===============8596351631886255407=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] Fix running failure when > 69 CPUs for open
- file limitation
-Date: Thu, 30 May 2013 00:20:17 +0300
-Message-ID: <20130529212016.GB3075@swordfish>
-In-Reply-To: 1369842247-11442-1-git-send-email-youquan.song@intel.com
+From: Srinivas Pandruvada <srinivas.pandruvada at linux.intel.com>
+Subject: [Powertop] [PATCH 4/8] cpu device as parent class
+Date: Mon, 15 Apr 2013 09:09:25 -0700
+Message-ID: <1366042169-14523-5-git-send-email-srinivas.pandruvada@linux.intel.com>
+In-Reply-To: 1366042169-14523-1-git-send-email-srinivas.pandruvada@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4571556429484949302==
+--===============8596351631886255407==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (05/29/13 11:44), Youquan Song wrote:
-> Powertop 2.3 fails to run on machine with > 69 CPUs because system open f=
-iles
-> limitation of one process is 1024 default,  While powertop will open one =
-file
-> for every monitored perf_event (at least 15) each CPU.
->
+Added members and methods so that it can have children. Other cpu type
+device can inherit and overide functionality.
+If there are children, the power_usage method will not include the
+power reported by children, as they will be reporting as its own device.
 
-how about, say, 2048? unlimited resource steals possibility to detect =
+Signed-off-by: Srinivas Pandruvada <srinivas.pandruvada(a)linux.intel.com>
+---
+ src/cpu/cpudevice.cpp | 14 ++++++++++++++
+ src/cpu/cpudevice.h   |  6 +++++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-error/bug/leak/etc.
+diff --git a/src/cpu/cpudevice.cpp b/src/cpu/cpudevice.cpp
+index 48fbcf5..371d8a8 100644
+--- a/src/cpu/cpudevice.cpp
++++ b/src/cpu/cpudevice.cpp
+@@ -40,12 +40,20 @@ cpudevice::cpudevice(const char *classname, const char =
+*dev_name, class abstract
+ 	r_consumption_index =3D get_result_index("cpu-consumption");;
+ }
+ =
 
++const char * cpudevice::device_name(void)
++{
++	if (child_devices.size())
++		return "CPU misc";
++	else
++		return "CPU use";
++}
+ =
 
-and let's make rlimit change after checkroot() call.
+ double cpudevice::power_usage(struct result_bundle *result, struct paramet=
+er_bundle *bundle)
+ {
+ 	double power;
+ 	double factor;
+ 	double _utilization;
++	double child_power;
+ =
 
-	-ss
+ 	power =3D 0;
+ 	factor =3D get_parameter_value(wake_index, bundle);
+@@ -58,6 +66,12 @@ double cpudevice::power_usage(struct result_bundle *resu=
+lt, struct parameter_bun
+ =
+
+ 	power +=3D _utilization * factor;
+ =
+
++	for (unsigned int i =3D 0; i < child_devices.size(); ++i) {
++		child_power =3D child_devices[i]->power_usage(result, bundle);
++		if ((power - child_power) > 0.0)
++			power -=3D child_power;
++	}
++
+ 	return power;
+ }
+ =
+
+diff --git a/src/cpu/cpudevice.h b/src/cpu/cpudevice.h
+index 6a5636f..841a101 100644
+--- a/src/cpu/cpudevice.h
++++ b/src/cpu/cpudevice.h
+@@ -34,6 +34,7 @@ using namespace std;
+ #include "cpu.h"
+ =
+
+ class cpudevice: public device {
++protected:
+ 	char _class[128];
+ 	char _cpuname[128];
+ =
+
+@@ -44,15 +45,18 @@ class cpudevice: public device {
+ 	int r_wake_index;
+ 	int r_consumption_index;
+ =
+
++	vector<device *>child_devices;
++
+ public:
+ 	cpudevice(const char *classname =3D "cpu", const char *device_name =3D "c=
+pu0", class abstract_cpu *_cpu =3D NULL);
+ 	virtual const char * class_name(void) { return _class;};
+ =
+
+-	virtual const char * device_name(void) {return "CPU use";};
++	virtual const char * device_name(void);
+ =
+
+ 	virtual double power_usage(struct result_bundle *result, struct parameter=
+_bundle *bundle);
+ 	virtual bool show_in_list(void) {return false;};
+ 	virtual double	utilization(void); /* percentage */
++	void add_child(device *dev_ptr) { child_devices.push_back(dev_ptr);}
+ };
+ =
 
  =
 
-> Like on 80 CPUs Westmere-EX machine, powertop will fail to run with below:
-> =
+-- =
 
-> PowerTOP v2.3 needs the kernel to support the 'perf' subsystem
-> as well as support for trace points in the kernel:
-> CONFIG_PERF_EVENTS=3Dy
-> CONFIG_PERF_COUNTERS=3Dy
-> CONFIG_TRACEPOINTS=3Dy
-> CONFIG_TRACING=3Dy
-> =
+1.7.11.7
 
-> This patch is to change RLIMIT_NOFILE from default (1024) to max limition.
-> =
 
-> =
-
-> Signed-off-by: Youquan Song <youquan.song(a)intel.com>
-> ---
->  src/main.cpp |    6 ++++++
->  1 files changed, 6 insertions(+), 0 deletions(-)
-> =
-
-> diff --git a/src/main.cpp b/src/main.cpp
-> index 0883424..8cd97a2 100644
-> --- a/src/main.cpp
-> +++ b/src/main.cpp
-> @@ -36,6 +36,7 @@
->  #include <getopt.h>
->  #include <unistd.h>
->  #include <locale.h>
-> +#include <sys/resource.h>
->  =
-
->  #include "cpu/cpu.h"
->  #include "process/process.h"
-> @@ -283,9 +284,14 @@ static void powertop_init(void)
->  	static char initialized =3D 0;
->  	int ret;
->  	struct statfs st_fs;
-> +	struct rlimit rlmt;
->  =
-
->  	if (initialized)
->  		return;
-> +
-> +	getrlimit (RLIMIT_NOFILE, &rlmt);
-> +	rlmt.rlim_cur =3D rlmt.rlim_max;
-> +	setrlimit (RLIMIT_NOFILE, &rlmt);
->  =
-
->  	checkroot();
->  	ret =3D system("/sbin/modprobe cpufreq_stats > /dev/null 2>&1");
->
-
---===============4571556429484949302==--
+--===============8596351631886255407==--
 
