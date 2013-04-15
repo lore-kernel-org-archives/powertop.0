@@ -1,94 +1,123 @@
-Content-Type: multipart/mixed; boundary="===============7395806753686252889=="
+Content-Type: multipart/mixed; boundary="===============3570729993659916190=="
 MIME-Version: 1.0
-From: Nathan Van Ymeren <nathan.vany at gmail.com>
-Subject: Re: [Powertop] Bug under Fedora 19 x86_64: Requesting Unregistered
- Parameters 63 and 58
-Date: Wed, 03 Jul 2013 11:47:47 -0700
-Message-ID: <CAEKyVWMGL4AqhxTKYFsaxr3K8WO3zMAXxtRTyaf8EOhgSMi_9Q@mail.gmail.com>
-In-Reply-To: 20130703115526.GB2225@swordfish
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH 0/8] Power Top RAPL interface v04
+Date: Mon, 15 Apr 2013 23:35:43 +0300
+Message-ID: <20130415203543.GE2301@swordfish>
+In-Reply-To: 1366042169-14523-1-git-send-email-srinivas.pandruvada@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7395806753686252889==
+--===============3570729993659916190==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Sergey,
+On (04/15/13 09:09), Srinivas Pandruvada wrote:
+> This patch adds RAPL interface to powertop. RAPL can give energy consumed=
+ for a domain. For
+> client platform, domain are "PKG", "PP0" and "PP1". For servers "PKG", "D=
+RAM" and "PP0".
+> PP0 refers to CPU energy comsumtion and PP1 refers to GPUs. DRAM is for D=
+RAM in servers only.
+> =
 
-Here are the listings of those directories
+> Powertop estimates how much power CPU and GPU is consuming based on the m=
+easured power and
+> load. This patch splits this into the following:
+> - Actual CPU/GPU power reported by RAPL
+> - DRAM power for servers
+> - Remaining as "misc" usage for CPU/GPU
+> =
 
-http://pastebin.com/wJdxSN5B
-
-
-On Wed, Jul 3, 2013 at 4:55 AM, Sergey Senozhatsky <
-sergey.senozhatsky(a)gmail.com> wrote:
-
-> On (07/02/13 23:12), Nathan Van Ymeren wrote:
-> >    Hi folks,
-> >    I recently upgraded to Fedora 19 and noticed my thinkpad was running=
- a
-> >    little hotter than usual. =EF=BF=BDTried to open powertop and instea=
-d of the
-> >    familiar menu I was greeted with endless spam of the same two lines,
-> >    repeated:
-> >    BUG: requesting unregistered parameter 58
-> >    BUG: requesting unregistered parameter 63
-> >    Running with --debug had no discernible effect. =EF=BF=BDDoes powert=
-op leave
-> a log
-> >    file anywhere for investigation?
-> >    N
->
-> Hello,
->
-> /** sorry, broken mail headers in previous email*/
->
->
-> could you please show content of
->
->         /sys/devices/platform/thinkpad_hwmon/
-> and
->         /sys/devices/platform/thinkpad_acpi/leds/
->
->
->         -ss
+> As more domain are getting added, this patch creates a parent/child relat=
+ionship for CPU/GPU.
+> This way when new domains are added these files don't need change. Only i=
+nherit CPU/GPU class,
+> and implement virtual method for consumed power.
 >
 
---===============7395806753686252889==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+Hello,
+looks good to me. thanks.
 
-PGRpdiBkaXI9Imx0ciI+SGkgU2VyZ2V5LDxkaXY+PGJyPjwvZGl2PjxkaXY+SGVyZSBhcmUgdGhl
-IGxpc3RpbmdzIG9mIHRob3NlIGRpcmVjdG9yaWVzIMKgPC9kaXY+PGRpdj48YnI+PC9kaXY+PGRp
-dj48YSBocmVmPSJodHRwOi8vcGFzdGViaW4uY29tL3dKZHhTTjVCIj5odHRwOi8vcGFzdGViaW4u
-Y29tL3dKZHhTTjVCPC9hPjwvZGl2PjwvZGl2PjxkaXYgY2xhc3M9ImdtYWlsX2V4dHJhIj4KPGJy
-Pjxicj48ZGl2IGNsYXNzPSJnbWFpbF9xdW90ZSI+T24gV2VkLCBKdWwgMywgMjAxMyBhdCA0OjU1
-IEFNLCBTZXJnZXkgU2Vub3poYXRza3kgPHNwYW4gZGlyPSJsdHIiPiZsdDs8YSBocmVmPSJtYWls
-dG86c2VyZ2V5LnNlbm96aGF0c2t5QGdtYWlsLmNvbSIgdGFyZ2V0PSJfYmxhbmsiPnNlcmdleS5z
-ZW5vemhhdHNreUBnbWFpbC5jb208L2E+Jmd0Ozwvc3Bhbj4gd3JvdGU6PGJyPjxibG9ja3F1b3Rl
-IGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9Im1hcmdpbjowIDAgMCAuOGV4O2JvcmRlci1sZWZ0
-OjFweCAjY2NjIHNvbGlkO3BhZGRpbmctbGVmdDoxZXgiPgo8ZGl2IGNsYXNzPSJIT0VuWmIiPjxk
-aXYgY2xhc3M9Img1Ij5PbiAoMDcvMDIvMTMgMjM6MTIpLCBOYXRoYW4gVmFuIFltZXJlbiB3cm90
-ZTo8YnI+CiZndDsgwqAgwqBIaSBmb2xrcyw8YnI+CiZndDsgwqAgwqBJIHJlY2VudGx5IHVwZ3Jh
-ZGVkIHRvIEZlZG9yYSAxOSBhbmQgbm90aWNlZCBteSB0aGlua3BhZCB3YXMgcnVubmluZyBhPGJy
-PgomZ3Q7IMKgIMKgbGl0dGxlIGhvdHRlciB0aGFuIHVzdWFsLiDvv71UcmllZCB0byBvcGVuIHBv
-d2VydG9wIGFuZCBpbnN0ZWFkIG9mIHRoZTxicj4KJmd0OyDCoCDCoGZhbWlsaWFyIG1lbnUgSSB3
-YXMgZ3JlZXRlZCB3aXRoIGVuZGxlc3Mgc3BhbSBvZiB0aGUgc2FtZSB0d28gbGluZXMsPGJyPgom
-Z3Q7IMKgIMKgcmVwZWF0ZWQ6PGJyPgomZ3Q7IMKgIMKgQlVHOiByZXF1ZXN0aW5nIHVucmVnaXN0
-ZXJlZCBwYXJhbWV0ZXIgNTg8YnI+CiZndDsgwqAgwqBCVUc6IHJlcXVlc3RpbmcgdW5yZWdpc3Rl
-cmVkIHBhcmFtZXRlciA2Mzxicj4KJmd0OyDCoCDCoFJ1bm5pbmcgd2l0aCAtLWRlYnVnIGhhZCBu
-byBkaXNjZXJuaWJsZSBlZmZlY3QuIO+/vURvZXMgcG93ZXJ0b3AgbGVhdmUgYSBsb2c8YnI+CiZn
-dDsgwqAgwqBmaWxlIGFueXdoZXJlIGZvciBpbnZlc3RpZ2F0aW9uPzxicj4KJmd0OyDCoCDCoE48
-YnI+Cjxicj4KPC9kaXY+PC9kaXY+SGVsbG8sPGJyPgo8YnI+Ci8qKiBzb3JyeSwgYnJva2VuIG1h
-aWwgaGVhZGVycyBpbiBwcmV2aW91cyBlbWFpbCovPGJyPgo8YnI+Cjxicj4KY291bGQgeW91IHBs
-ZWFzZSBzaG93IGNvbnRlbnQgb2Y8YnI+Cjxicj4KwqAgwqAgwqAgwqAgL3N5cy9kZXZpY2VzL3Bs
-YXRmb3JtL3RoaW5rcGFkX2h3bW9uLzxicj4KYW5kPGJyPgrCoCDCoCDCoCDCoCAvc3lzL2Rldmlj
-ZXMvcGxhdGZvcm0vdGhpbmtwYWRfYWNwaS9sZWRzLzxicj4KPHNwYW4gY2xhc3M9IkhPRW5aYiI+
-PGZvbnQgY29sb3I9IiM4ODg4ODgiPjxicj4KPGJyPgrCoCDCoCDCoCDCoCAtc3M8YnI+CjwvZm9u
-dD48L3NwYW4+PC9ibG9ja3F1b3RlPjwvZGl2Pjxicj48L2Rpdj4K
 
---===============7395806753686252889==--
+any objections/inputs/etc. from list members are welcomed.
+
+	-ss
+
+ =
+
+> v04 changes:
+> 	Rebase with the latest git tree
+> 	Add MSR access error message from previous commit to lib.cpp MSR api
+> 	"_("Model-specific registers (MSR) not found (try enabling CONFIG_X86_MS=
+R)"
+> =
+
+> v03 changes:
+> 	close fd when pread/pwrite fails.
+> =
+
+> v02 changes:
+> 	Addressed review comments
+> 	Moved MSR handling to library
+> 	Added interface to get the first CPU in a package
+> 	Fix error in reading RAPL when system has multiple packages
+> =
+
+> =
+
+> Srinivas Pandruvada (8):
+>   Common read/write MSR API
+>   Use MSR Lib MSR functions
+>   RAPL Interface
+>   cpu device as parent class
+>   Interface to get first cpu
+>   Added PP0 RAPL domain for CPU
+>   Add RAPL DRAM domain
+>   Add RAPL PP1 domain for GPU
+> =
+
+>  src/Makefile.am                 |   4 +-
+>  src/cpu/cpu.cpp                 |  16 ++
+>  src/cpu/cpu.h                   |   1 +
+>  src/cpu/cpu_rapl_device.cpp     |  74 +++++
+>  src/cpu/cpu_rapl_device.h       |  57 ++++
+>  src/cpu/cpudevice.cpp           |  14 +
+>  src/cpu/cpudevice.h             |   6 +-
+>  src/cpu/dram_rapl_device.cpp    |  75 +++++
+>  src/cpu/dram_rapl_device.h      |  57 ++++
+>  src/cpu/intel_cpus.cpp          |  23 +-
+>  src/cpu/rapl/rapl_interface.cpp | 611 ++++++++++++++++++++++++++++++++++=
+++++++
+>  src/cpu/rapl/rapl_interface.h   |  85 ++++++
+>  src/devices/gpu_rapl_device.cpp |  70 +++++
+>  src/devices/gpu_rapl_device.h   |  57 ++++
+>  src/devices/i915-gpu.cpp        |  21 ++
+>  src/devices/i915-gpu.h          |   6 +-
+>  src/lib.cpp                     |  65 +++++
+>  src/lib.h                       |   3 +-
+>  18 files changed, 1222 insertions(+), 23 deletions(-)
+>  create mode 100644 src/cpu/cpu_rapl_device.cpp
+>  create mode 100644 src/cpu/cpu_rapl_device.h
+>  create mode 100644 src/cpu/dram_rapl_device.cpp
+>  create mode 100644 src/cpu/dram_rapl_device.h
+>  create mode 100644 src/cpu/rapl/rapl_interface.cpp
+>  create mode 100644 src/cpu/rapl/rapl_interface.h
+>  create mode 100644 src/devices/gpu_rapl_device.cpp
+>  create mode 100644 src/devices/gpu_rapl_device.h
+> =
+
+> -- =
+
+> 1.7.11.7
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>=20
+
+--===============3570729993659916190==--
 
