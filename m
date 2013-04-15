@@ -1,349 +1,774 @@
-Content-Type: multipart/mixed; boundary="===============7933216047590164122=="
+Content-Type: multipart/mixed; boundary="===============0656400726924333814=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Intel GPU statistics on multi-GPU systems
-Date: Mon, 08 Jul 2013 13:09:17 +0300
-Message-ID: <20130708100917.GA2422@swordfish.minsk.epam.com>
-In-Reply-To: 51D5BFE0.5050100@penneman.org
+From: Srinivas Pandruvada <srinivas.pandruvada at linux.intel.com>
+Subject: [Powertop] [PATCH 3/8] RAPL Interface
+Date: Mon, 15 Apr 2013 09:09:24 -0700
+Message-ID: <1366042169-14523-4-git-send-email-srinivas.pandruvada@linux.intel.com>
+In-Reply-To: 1366042169-14523-1-git-send-email-srinivas.pandruvada@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7933216047590164122==
+--===============0656400726924333814==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (07/04/13 20:33), Niels Penneman wrote:
-> Hi again,
-> =
+Added RAPL interface class. This provides methods to get the status
+of RAPL domains and get energy and power status.
 
-> I've noticed most of the code in powertop deals with sysfs directly, so
-> I guess 'scanning' sysfs looking for an Intel GPU is the way to go. I've
-> checked the latest version of xf86-video-intel (2.21.11) and it looks
-> like Intel GPUs all have the same PCI vendor ID (0x8086). Below is a
-> patch that looks for all items /sys/class/drm/card[0-9]+ and checks
-> whether the vendor is Intel. It then checks whether it can find the
-> power/rc6_residency_ms file like it did earlier and uses the first GPU
-> that passes all these checks.
-> =
+Signed-off-by: Srinivas Pandruvada <srinivas.pandruvada(a)linux.intel.com>
+---
+ src/Makefile.am                 |   3 +-
+ src/cpu/rapl/rapl_interface.cpp | 611 ++++++++++++++++++++++++++++++++++++=
+++++
+ src/cpu/rapl/rapl_interface.h   |  85 ++++++
+ 3 files changed, 698 insertions(+), 1 deletion(-)
+ create mode 100644 src/cpu/rapl/rapl_interface.cpp
+ create mode 100644 src/cpu/rapl/rapl_interface.h
 
-> What it does not fix:
-> - Situations where there may be multiple Intel GPUs. I don't know
-> whether such systems exist, and in that case each GPU would need to be
-> tied to a specific processor (socket).
-> - Hardcoded paths used to retrieve backlight information.
-> =
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 398b8a7..0983b51 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -31,7 +31,8 @@ powertop_SOURCES =3D parameters/persistent.cpp parameters=
+/learn.cpp parameters/par
+ 		report/report-formatter-base.cpp report/report-formatter-base.h \
+ 		report/report-formatter-csv.cpp report/report-formatter-csv.h \
+ 		report/report-formatter-html.cpp report/report-formatter-html.h \
+-		main.cpp css.h powertop.css cpu/intel_gpu.cpp
++		main.cpp css.h powertop.css cpu/intel_gpu.cpp \
++		cpu/rapl/rapl_interface.cpp
+ =
 
-> Side effects:
-> - In the case that any video driver other than Intel's exposed a
-> 'power/rc6_residency_ms' file, the patch below will not consider the
-> device because it checks vendor ID. If that is not desired, the vendor
-> ID check should be omitted.
-> =
+ =
+
+ powertop_CXXFLAGS =3D -fno-omit-frame-pointer -fstack-protector -Wall -Wsh=
+adow -Wformat $(NCURSES_CFLAGS) $(PCIUTILS_CFLAGS) $(LIBNL_CFLAGS) $(GLIB2_=
+CFLAGS)
+diff --git a/src/cpu/rapl/rapl_interface.cpp b/src/cpu/rapl/rapl_interface.=
+cpp
+new file mode 100644
+index 0000000..8f236eb
+--- /dev/null
++++ b/src/cpu/rapl/rapl_interface.cpp
+@@ -0,0 +1,611 @@
++/* rapl_interface.cpp: rapl interface for power top implementation
++ *
++ * Copyright (C) 2012 Intel Corporation. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License version
++ * 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++ * 02110-1301, USA.
++ *
++ *
++ * Author Name <Srinivas.Pandruvada(a)linux.intel.com>
++ *
++ */
++#include <stdio.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <errno.h>
++#include <math.h>
++#include "lib.h"
++#include "rapl_interface.h"
++
++#ifdef DEBUG
++#define RAPL_DBG_PRINT printf
++#define RAPL_ERROR_PRINT printf
++#else
++#define RAPL_DBG_PRINT(...)	((void) 0)
++#define RAPL_ERROR_PRINT(...) ((void) 0)
++#endif
++#define RAPL_INFO_PRINT printf
++
++#define MAX_TEMP_STR_SIZE	20
++
++// RAPL interface
++#define MSR_RAPL_POWER_UNIT	0x606
++#define MSR_PKG_POWER_LIMIT	0x610
++
++#define MSR_PKG_ENERY_STATUS	0x611
++#define MSR_PKG_POWER_INFO	0x614
++#define MSR_PKG_PERF_STATUS	0x613
++
++#define MSR_DRAM_POWER_LIMIT	0x618
++#define MSR_DRAM_ENERY_STATUS	0x619
++#define MSR_DRAM_PERF_STATUS	0x61B
++#define MSR_DRAM_POWER_INFO	0x61c
++
++#define MSR_PP0_POWER_LIMIT	0x638
++#define MSR_PP0_ENERY_STATUS	0x639
++#define MSR_PP0_POLICY		0x63A
++#define MSR_PP0_PERF_STATUS	0x63B
++
++#define MSR_PP1_POWER_LIMIT	0x640
++#define MSR_PP1_ENERY_STATUS	0x641
++#define MSR_PP1_POLICY		0x642
++
++#define PKG_DOMAIN_PRESENT	0x01
++#define DRAM_DOMAIN_PRESENT	0x02
++#define PP0_DOMAIN_PRESENT	0x04
++#define PP1_DOMAIN_PRESENT	0x08
++
++c_rapl_interface::c_rapl_interface(int cpu) :
++	measurment_interval(def_sampling_interval),
++	first_cpu(cpu),
++	last_pkg_energy_status(0.0),
++	last_dram_energy_status(0.0),
++	last_pp0_energy_status(0.0),
++	last_pp1_energy_status(0.0)
++{
++	uint64_t value;
++	int ret;
++
++	RAPL_INFO_PRINT("RAPL device for cpu %d\n", cpu);
++
++	rapl_domains =3D 0;
++	// presence of each domain
++	// Check presence of PKG domain
++	ret =3D read_msr(first_cpu, MSR_PKG_ENERY_STATUS, &value);
++	if (ret > 0) {
++		rapl_domains |=3D PKG_DOMAIN_PRESENT;
++		RAPL_DBG_PRINT("Domain : PKG present\n");
++	} else {
++		RAPL_DBG_PRINT("Domain : PKG Not present\n");
++	}
++
++	// Check presence of DRAM domain
++	ret =3D read_msr(first_cpu, MSR_DRAM_ENERY_STATUS, &value);
++	if (ret > 0) {
++		rapl_domains |=3D DRAM_DOMAIN_PRESENT;
++		RAPL_DBG_PRINT("Domain : DRAM present\n");
++	} else {
++		RAPL_DBG_PRINT("Domain : DRAM Not present\n");
++	}
++
++	// Check presence of PP0 domain
++	ret =3D read_msr(first_cpu, MSR_PP0_ENERY_STATUS, &value);
++	if (ret > 0) {
++		rapl_domains |=3D PP0_DOMAIN_PRESENT;
++		RAPL_DBG_PRINT("Domain : PP0 present\n");
++	} else {
++		RAPL_DBG_PRINT("Domain : PP0 Not present\n");
++	}
++
++	// Check presence of PP1 domain
++	ret =3D read_msr(first_cpu, MSR_PP1_ENERY_STATUS, &value);
++	if (ret > 0) {
++		rapl_domains |=3D PP1_DOMAIN_PRESENT;
++		RAPL_DBG_PRINT("Domain : PP1 present\n");
++	} else {
++		RAPL_DBG_PRINT("Domain : PP1 Not present\n");
++	}
++
++	power_units =3D get_power_unit();
++	energy_status_units =3D get_energy_status_unit();
++	time_units =3D get_time_unit();
++
++	RAPL_DBG_PRINT("RAPL Domain mask: %x\n", rapl_domains);
++}
++
++bool c_rapl_interface::pkg_domain_present()
++{
++	if ((rapl_domains & PKG_DOMAIN_PRESENT)) {
++		return true;
++	}
++
++	return false;
++}
++
++bool c_rapl_interface::dram_domain_present()
++{
++	if ((rapl_domains & DRAM_DOMAIN_PRESENT)) {
++		return true;
++	}
++
++	return false;
++}
++
++bool c_rapl_interface::pp0_domain_present()
++{
++	if ((rapl_domains & PP0_DOMAIN_PRESENT)) {
++		return true;
++	}
++
++	return false;
++}
++
++bool c_rapl_interface::pp1_domain_present()
++{
++	if ((rapl_domains & PP1_DOMAIN_PRESENT)) {
++		return true;
++	}
++
++	return false;
++}
++
++int c_rapl_interface::read_msr(int cpu, unsigned int idx, uint64_t *val)
++{
++	return ::read_msr(cpu, idx, val);
++}
++
++int c_rapl_interface::write_msr(int cpu, unsigned int idx, uint64_t val)
++{
++	return ::write_msr(cpu, idx, val);
++}
++
++int c_rapl_interface::get_rapl_power_unit(uint64_t *value)
++{
++	int ret;
++
++	ret =3D read_msr(first_cpu, MSR_RAPL_POWER_UNIT, value);
++
++	return ret;
++}
++
++double c_rapl_interface::get_power_unit()
++{
++	int ret;
++	uint64_t value;
++
++	ret =3D get_rapl_power_unit(&value);
++	if(ret < 0)
++	{
++		return ret;
++	}
++
++	return (double) 1/pow(2, value & 0xf);
++}
++
++double c_rapl_interface::get_energy_status_unit()
++{
++	int ret;
++	uint64_t value;
++
++	ret =3D get_rapl_power_unit(&value);
++	if(ret < 0)
++	{
++		return ret;
++	}
++
++	return (double)1/ pow(2, (value & 0x1f00) >> 8);
++}
++
++double c_rapl_interface::get_time_unit()
++{
++	int ret;
++	uint64_t value;
++
++	ret =3D get_rapl_power_unit(&value);
++	if(ret < 0)
++	{
++		return ret;
++	}
++
++	return (double)1 / pow(2, (value & 0xf0000) >> 16);
++}
++
++int c_rapl_interface::get_pkg_energy_status(double *status)
++{
++	int ret;
++	uint64_t value;
++
++	if (!pkg_domain_present()) {
++		return -1;
++	}
++
++	ret =3D read_msr(first_cpu, MSR_PKG_ENERY_STATUS, &value);
++	if(ret < 0)
++	{
++		RAPL_ERROR_PRINT("get_pkg_energy_status failed\n");
++		return ret;
++	}
++
++	*status =3D (double) (value & 0xffffffff) * get_energy_status_unit();
++
++	return ret;
++}
++
++int c_rapl_interface::get_pkg_power_info(double *thermal_spec_power,
++			double *max_power, double *min_power, double *max_time_window)
++{
++	int ret;
++	uint64_t value;
++
++	if (!pkg_domain_present()) {
++		return -1;
++	}
++	ret =3D read_msr(first_cpu, MSR_PKG_POWER_INFO, &value);
++	if(ret < 0)
++	{
++		RAPL_ERROR_PRINT("get_pkg_power_info failed\n");
++		return ret;
++	}
++	*thermal_spec_power =3D  (value & 0x7FFF) * power_units;
++	*min_power =3D  ((value & 0x7FFF0000) >> 16) * power_units;
++	*max_power =3D  ((value & 0x7FFF00000000) >> 32) * power_units;
++	*max_time_window =3D ((value & 0x3f000000000000)>>48) * time_units;
++
++	return ret;
++}
++
++int c_rapl_interface::get_pkg_power_limit(uint64_t *value)
++{
++	int ret;
++
++	if (!pkg_domain_present()) {
++		return -1;
++	}
++
++	ret =3D read_msr(first_cpu, MSR_PKG_POWER_LIMIT, value);
++	if(ret < 0)
++	{
++		RAPL_ERROR_PRINT("get_pkg_power_limit failed\n");
++		return ret;
++	}
++
++	return ret;
++}
++
++int c_rapl_interface::set_pkg_power_limit(uint64_t value)
++{
++	int ret;
++
++	if (!pkg_domain_present()) {
++		return -1;
++	}
++
++	ret =3D write_msr(first_cpu, MSR_PKG_POWER_LIMIT, value);
++	if(ret < 0)
++	{
++		RAPL_ERROR_PRINT("set_pkg_power_limit failed\n");
++		return ret;
++	}
++
++	return ret;
++}
++
++int c_rapl_interface::get_dram_energy_status(double *status)
++{
++	int ret;
++	uint64_t value;
++
++	if (!dram_domain_present()) {
++		return -1;
++	}
++
++	ret =3D read_msr(first_cpu, MSR_DRAM_ENERY_STATUS, &value);
++	if(ret < 0)
++	{
++		RAPL_ERROR_PRINT("get_dram_energy_status failed\n");
++		return ret;
++	}
++
++	*status =3D (double) (value & 0xffffffff) * get_energy_status_unit();
++
++	return ret;
++}
++
++int c_rapl_interface::get_dram_power_info(double *thermal_spec_power,
++			double *max_power, double *min_power, double *max_time_window)
++{
++	int ret;
++	uint64_t value;
++
++	if (!dram_domain_present()) {
++		return -1;
++	}
++	ret =3D read_msr(first_cpu, MSR_DRAM_POWER_INFO, &value);
++	if(ret < 0)
++	{
++		RAPL_ERROR_PRINT("get_dram_power_info failed\n");
++		return ret;
++	}
++
++	*thermal_spec_power =3D  (value & 0x7FFF) * power_units;
++	*min_power =3D  ((value & 0x7FFF0000) >> 16) * power_units;
++	*max_power =3D  ((value & 0x7FFF00000000) >> 32) * power_units;
++	*max_time_window =3D ((value & 0x3f000000000000)>>48) * time_units;
++
++	return ret;
++}
++
++int c_rapl_interface::get_dram_power_limit(uint64_t *value)
++{
++	int ret;
++
++	if (!dram_domain_present()) {
++		return -1;
++	}
++
++	ret =3D read_msr(first_cpu, MSR_DRAM_POWER_LIMIT, value);
++	if(ret < 0)
++	{
++		RAPL_ERROR_PRINT("get_dram_power_limit failed\n");
++		return ret;
++	}
++
++	return ret;
++}
++
++int c_rapl_interface::set_dram_power_limit(uint64_t value)
++{
++	int ret;
++
++	if (!dram_domain_present()) {
++		return -1;
++	}
++
++	ret =3D write_msr(first_cpu, MSR_DRAM_POWER_LIMIT, value);
++	if(ret < 0)
++	{
++		RAPL_ERROR_PRINT("set_dram_power_limit failed\n");
++		return ret;
++	}
++
++	return ret;
++}
++
++int c_rapl_interface::get_pp0_energy_status(double *status)
++{
++	int ret;
++	uint64_t value;
++
++	if (!pp0_domain_present()) {
++		return -1;
++	}
++
++	ret =3D read_msr(first_cpu, MSR_PP0_ENERY_STATUS, &value);
++	if(ret < 0)
++	{
++		RAPL_ERROR_PRINT("get_pp0_energy_status failed\n");
++		return ret;
++	}
++
++	*status =3D (double) (value & 0xffffffff) * get_energy_status_unit();
++
++	return ret;
++}
++
++int c_rapl_interface::get_pp0_power_limit(uint64_t *value)
++{
++	int ret;
++
++	if (!pp0_domain_present()) {
++		return -1;
++	}
++
++	ret =3D read_msr(first_cpu, MSR_PP0_POWER_LIMIT, value);
++	if(ret < 0)
++	{
++		RAPL_ERROR_PRINT("get_pp0_power_limit failed\n");
++		return ret;
++	}
++
++	return ret;
++}
++
++int c_rapl_interface::set_pp0_power_limit(uint64_t value)
++{
++	int ret;
++
++	if (!pp0_domain_present()) {
++		return -1;
++	}
++
++	ret =3D write_msr(first_cpu, MSR_PP0_POWER_LIMIT, value);
++	if(ret < 0)
++	{
++		RAPL_ERROR_PRINT("set_pp0_power_limit failed\n");
++		return ret;
++	}
++
++	return ret;
++}
++
++int c_rapl_interface::get_pp0_power_policy(unsigned int *pp0_power_policy)
++{
++	int ret;
++	uint64_t value;
++
++	if (!pp0_domain_present()) {
++		return -1;
++	}
++
++	ret =3D read_msr(first_cpu, MSR_PP0_POLICY, &value);
++	if(ret < 0)
++	{
++		RAPL_ERROR_PRINT("get_pp0_power_policy failed\n");
++		return ret;
++	}
++
++	*pp0_power_policy =3D  value & 0x0f;
++
++	return ret;
++}
++
++int c_rapl_interface::get_pp1_energy_status(double *status)
++{
++	int ret;
++	uint64_t value;
++
++	if (!pp1_domain_present()) {
++		return -1;
++	}
++
++	ret =3D read_msr(first_cpu, MSR_PP1_ENERY_STATUS, &value);
++	if(ret < 0)
++	{
++		RAPL_ERROR_PRINT("get_pp1_energy_status failed\n");
++		return ret;
++	}
++
++	*status =3D (double) (value & 0xffffffff) * get_energy_status_unit();
++
++	return ret;
++}
++
++int c_rapl_interface::get_pp1_power_limit(uint64_t *value)
++{
++	int ret;
++
++	if (!pp1_domain_present()) {
++		return -1;
++	}
++
++	ret =3D read_msr(first_cpu, MSR_PP1_POWER_LIMIT, value);
++	if(ret < 0)
++	{
++		RAPL_ERROR_PRINT("get_pp1_power_info failed\n");
++		return ret;
++	}
++
++	return ret;
++}
++
++int c_rapl_interface::set_pp1_power_limit(uint64_t value)
++{
++	int ret;
++
++	if (!pp1_domain_present()) {
++		return -1;
++	}
++
++	ret =3D write_msr(first_cpu, MSR_PP1_POWER_LIMIT, value);
++	if(ret < 0)
++	{
++		RAPL_ERROR_PRINT("set_pp1_power_limit failed\n");
++		return ret;
++	}
++
++	return ret;
++}
++
++int c_rapl_interface::get_pp1_power_policy(unsigned int *pp1_power_policy)
++{
++	int ret;
++	uint64_t value;
++
++	if (!pp1_domain_present()) {
++		return -1;
++	}
++
++	ret =3D read_msr(first_cpu, MSR_PP1_POLICY, &value);
++	if(ret < 0)
++	{
++		RAPL_ERROR_PRINT("get_pp1_power_policy failed\n");
++		return ret;
++	}
++
++	*pp1_power_policy =3D  value & 0x0f;
++
++	return ret;
++}
++
++void c_rapl_interface::rapl_measure_energy()
++{
++#ifdef RAPL_TEST_MODE
++	int ret;
++	double energy_status;
++	double thermal_spec_power;
++	double max_power;
++	double min_power;
++	double max_time_window;
++	double pkg_watts =3D 0;
++	double dram_watts =3D 0;
++	double pp0_watts =3D 0;
++	double pp1_watts =3D 0;
++	double pkg_joules =3D 0;
++	double dram_joules =3D 0;
++	double pp0_joules =3D 0;
++	double pp1_joules =3D 0;
++
++	ret =3D get_pkg_power_info(&thermal_spec_power, &max_power, &min_power, &=
+max_time_window);
++	RAPL_DBG_PRINT("Pkg Power Info: Thermal spec %f watts, max %f watts, min =
+%f watts, max time window %f seconds\n", thermal_spec_power, max_power, min=
+_power, max_time_window);
++	ret =3D get_dram_power_info(&thermal_spec_power, &max_power, &min_power, =
+&max_time_window);
++	RAPL_DBG_PRINT("DRAM Power Info: Thermal spec %f watts, max %f watts, min=
+ %f watts, max time window %f seconds\n", thermal_spec_power, max_power, mi=
+n_power, max_time_window);
++
++	for (;;) {
++		if (pkg_domain_present()) {
++			ret =3D get_pkg_energy_status(&energy_status);
++			if (last_pkg_energy_status =3D=3D 0)
++				last_pkg_energy_status =3D energy_status;
++			if (ret > 0) {
++				pkg_joules =3D energy_status;
++				pkg_watts =3D (energy_status-last_pkg_energy_status)/measurment_interv=
+al;
++			}
++			last_pkg_energy_status =3D energy_status;
++		}
++		if (dram_domain_present()) {
++			ret =3D get_dram_energy_status(&energy_status);
++			if (last_dram_energy_status =3D=3D 0)
++				last_dram_energy_status =3D energy_status;
++			if (ret > 0){
++				dram_joules =3D energy_status;
++				dram_watts =3D (energy_status-last_dram_energy_status)/measurment_inte=
+rval;
++			}
++			last_dram_energy_status =3D energy_status;
++		}
++		if (pp0_domain_present()) {
++			ret =3D get_pp0_energy_status(&energy_status);
++			if (last_pp0_energy_status =3D=3D 0)
++				last_pp0_energy_status =3D energy_status;
++			if (ret > 0){
++				pp0_joules =3D energy_status;
++				pp0_watts =3D (energy_status-last_pp0_energy_status)/measurment_interv=
+al;
++			}
++			last_pp0_energy_status =3D energy_status;
++		}
++		if (pp1_domain_present()) {
++			ret =3D get_pp1_energy_status(&energy_status);
++			if (last_pp1_energy_status =3D=3D 0)
++				last_pp1_energy_status =3D energy_status;
++			if (ret > 0){
++				pp1_joules =3D energy_status;
++				pp1_watts =3D (energy_status-last_pp1_energy_status)/measurment_interv=
+al;
++			}
++			last_pp1_energy_status =3D energy_status;
++		}
++		RAPL_DBG_PRINT("%f, %f, %f, %f\n", pkg_watts, dram_watts, pp0_watts, pp1=
+_watts);
++		sleep(measurment_interval);
++	}
++#endif
++}
+diff --git a/src/cpu/rapl/rapl_interface.h b/src/cpu/rapl/rapl_interface.h
+new file mode 100644
+index 0000000..be863e2
+--- /dev/null
++++ b/src/cpu/rapl/rapl_interface.h
+@@ -0,0 +1,85 @@
++/* rapl_interface.h: rapl interface for power top
++ *
++ * Copyright (C) 2012 Intel Corporation. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License version
++ * 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++ * 02110-1301, USA.
++ *
++ *
++ * Author Name <Srinivas.Pandruvada(a)linux.intel.com>
++ *
++ */
++
++#ifndef RAPL_INTERFACE_H
++#define RAPL_INTERFACE_H
++
++class c_rapl_interface
++{
++private:
++	static const int def_sampling_interval =3D 1; //In seconds
++	unsigned char rapl_domains;
++	int measurment_interval;
++	int first_cpu;
++
++	double power_units;
++	double energy_status_units;
++	double time_units;
++
++	double last_pkg_energy_status;
++	double last_dram_energy_status;
++	double last_pp0_energy_status;
++	double last_pp1_energy_status;
++
++	int read_msr(int cpu, unsigned int idx, uint64_t *val);
++	int write_msr(int cpu, unsigned int idx, uint64_t val);
++
++public:
++	c_rapl_interface(int cpu =3D 0);
++
++	int get_rapl_power_unit(uint64_t *value);
++	double get_power_unit();
++	double get_energy_status_unit();
++	double get_time_unit();
++
++	int get_pkg_energy_status(double *status);
++	int get_pkg_power_info(double *thermal_spec_power,
++			double *max_power, double *min_power, double *max_time_window);
++	int get_pkg_power_limit(uint64_t *value);
++	int set_pkg_power_limit(uint64_t value);
++
++	int get_dram_energy_status(double *status);
++	int get_dram_power_info(double *thermal_spec_power,
++			double *max_power, double *min_power, double *max_time_window);
++	int get_dram_power_limit(uint64_t *value);
++	int set_dram_power_limit(uint64_t value);
++
++	int get_pp0_energy_status(double *status);
++	int get_pp0_power_limit(uint64_t *value);
++	int set_pp0_power_limit(uint64_t value);
++	int get_pp0_power_policy(unsigned int *pp0_power_policy);
++
++	int get_pp1_energy_status(double *status);
++	int get_pp1_power_limit(uint64_t *value);
++	int set_pp1_power_limit(uint64_t value);
++	int get_pp1_power_policy(unsigned int *pp1_power_policy);
++
++	bool pkg_domain_present();
++	bool dram_domain_present();
++	bool pp0_domain_present();
++	bool pp1_domain_present();
++
++	void rapl_measure_energy();
++};
++
++#endif
+-- =
+
+1.7.11.7
 
 
-thanks for your patch. I took a quick look, please see inlined.
-
-> From 71b0cea0b9b5cbe9ad7f673375004928ae842d9f Mon Sep 17 00:00:00 2001
-> From: Niels Penneman <niels.penneman(a)elis.ugent.be>
-> Date: Thu, 4 Jul 2013 20:20:01 +0200
-> Subject: [PATCH] Probe for Intel GPU
-> =
-
-> ---
->  src/cpu/cpu.cpp       | 60
-> ++++++++++++++++++++++++++++++++++++++++++++++-----
->  src/cpu/intel_cpus.h  |  2 ++
->  src/cpu/intel_gpu.cpp | 21 ++++++++++++------
->  3 files changed, 72 insertions(+), 11 deletions(-)
-> =
-
-> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-> index 5d0db28..7fe3f84 100644
-> --- a/src/cpu/cpu.cpp
-> +++ b/src/cpu/cpu.cpp
-> @@ -22,11 +22,13 @@
->   * Authors:
->   *    Arjan van de Ven <arjan(a)linux.intel.com>
->   */
-> +#include <cctype>
->  #include <iostream>
->  #include <fstream>
->  #include <vector>
->  #include <string.h>
->  #include <stdlib.h>
-> +#include <dirent.h>
->  #include <ncurses.h>
->  #include <unistd.h>
->  #include "cpu.h"
-> @@ -151,13 +153,14 @@ static class abstract_cpu * new_core(int core, int
-> cpu, char * vendor, int famil
->      return ret;
->  }
->  =
-
-> -static class abstract_cpu * new_i965_gpu(void)
-> +static class abstract_cpu * new_i965_gpu(const char *gpu)
->  {
->      class abstract_cpu *ret =3D NULL;
->  =
-
->      ret =3D new class i965_core;
->      ret->childcount =3D 0;
->      ret->set_type("GPU");
-> +    sprintf(static_cast<class i965_core *>(ret)->sysfs_dir,
-> "/sys/class/drm/%s/power/", gpu);
->  =
-
->      return ret;
->  }
-> @@ -260,7 +263,7 @@ static void handle_one_cpu(unsigned int number, char
-> *vendor, int family, int mo
->      all_cpus[number] =3D cpu;
->  }
->  =
-
-> -static void handle_i965_gpu(void)
-> +static void handle_i965_gpu(const char *gpu)
->  {
->      unsigned int core_number =3D 0;
->      class abstract_cpu *package;
-> @@ -274,11 +277,56 @@ static void handle_i965_gpu(void)
->          package->children.resize(core_number + 1, NULL);
->  =
-
->      if (!package->children[core_number]) {
-> -        package->children[core_number] =3D new_i965_gpu();
-> +        package->children[core_number] =3D new_i965_gpu(gpu);
->          package->childcount++;
->      }
->  }
->  =
-
-> +static bool probe_i965_gpu(char *gpu)
-> +{
-> +    DIR *dir;
-> +    struct dirent *entry;
-> +    bool found =3D false;
-> +
-> +    dir =3D opendir("/sys/class/drm");
-> +    if (!dir)
-> +        return false;
-> +    while ((entry =3D readdir(dir))) {
-> +        ifstream file;
-> +        char filename[4096];
-> +        char *p;
-> +        uint16_t vendor;
-> +
-> +        /* Match only cardN entries (N=3D0,1,...) */
-> +        if (strncmp(entry->d_name, "card", 4) !=3D 0)
-> +            continue;
-> +        p =3D &entry->d_name[4];
-> +        while (*p && std::isdigit(*p++));
-> +        if (*p)
-> +            continue;
-> +
-> +        /* Check for Intel vendor ID */
-> +        sprintf(filename, "/sys/class/drm/%s/device/vendor",
-> entry->d_name);
-> +        file.open(filename);
-> +        if (file) {
-> +            file >> hex >> vendor;
-> +            file.close();
-> +        }
-> +        if (vendor !=3D 0x8086)
-> +            continue;
-> +
-> +        /* Check for one of the interesting files */
-> +        sprintf(filename, "/sys/class/drm/%s/power/rc6_residency_ms",
-> entry->d_name);
-> +        if (access(filename, R_OK) =3D=3D 0) {
-> +            strcpy(gpu, entry->d_name);
-> +            found =3D true;
-> +            break;
-> +        }
-> +    }
-> +    closedir(dir);
-> +    return found;
-> +}
-> +
->  =
-
->  void enumerate_cpus(void)
->  {
-> @@ -290,6 +338,8 @@ void enumerate_cpus(void)
->      int family =3D 0;
->      int model =3D 0;
->  =
-
-> +    char gpu[256];
-> +
->      file.open("/proc/cpuinfo",  ios::in);
->  =
-
->      if (!file)
-> @@ -350,8 +400,8 @@ void enumerate_cpus(void)
->  =
-
->      file.close();
->  =
-
-> -    if (access("/sys/class/drm/card0/power/rc6_residency_ms", R_OK) =3D=
-=3D 0)
-> -        handle_i965_gpu();
-> +    if (probe_i965_gpu(gpu))
-> +        handle_i965_gpu(gpu);
->  =
-
->      perf_events =3D new perf_power_bundle();
->  =
-
-> diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
-> index 64d74f2..32679c1 100644
-> --- a/src/cpu/intel_cpus.h
-> +++ b/src/cpu/intel_cpus.h
-> @@ -137,6 +137,8 @@ private:
->      struct timeval    after;
->  =
-
->  public:
-> +    char sysfs_dir[512];
-> +
-
-do we really need to store 512 bytes instead of 4? as a public member?
-
-btw, why 512?
-
-
->      virtual void    measurement_start(void);
->      virtual void    measurement_end(void);
->      virtual int     can_collapse(void) { return 0;};
-> diff --git a/src/cpu/intel_gpu.cpp b/src/cpu/intel_gpu.cpp
-> index e0f4ac2..a579e28 100644
-> --- a/src/cpu/intel_gpu.cpp
-> +++ b/src/cpu/intel_gpu.cpp
-> @@ -43,11 +43,15 @@
->  void i965_core::measurement_start(void)
->  {
->      ifstream file;
-> +    char filename[512];
->  =
-
-
-4K
-
-
->      gettimeofday(&before, NULL);
-> -    rc6_before =3D
-> read_sysfs("/sys/class/drm/card0/power/rc6_residency_ms", NULL);
-> -    rc6p_before =3D
-> read_sysfs("/sys/class/drm/card0/power/rc6p_residency_ms", NULL);
-> -    rc6pp_before =3D
-> read_sysfs("/sys/class/drm/card0/power/rc6pp_residency_ms", NULL);
-> +    sprintf(filename, "%src6_residency_ms", sysfs_dir);
-> +    rc6_before =3D read_sysfs(filename, NULL);
-> +    sprintf(filename, "%src6p_residency_ms", sysfs_dir);
-> +    rc6p_before =3D read_sysfs(filename, NULL);
-> +    sprintf(filename, "%src6pp_residency_ms", sysfs_dir);
-> +    rc6pp_before =3D read_sysfs(filename, NULL);
-
-or we can sprintf gpu number?
-
-	/sys/class/drm/card%d/power/rc6_residency_ms
-
-
->      update_cstate("gpu c0", "Powered On", 0, 0, 1, 0);
->      update_cstate("gpu rc6", "RC6", 0, rc6_before, 1, 1);
-> @@ -101,11 +105,16 @@ char * i965_core::fill_cstate_line(int line_nr,
-> char *buffer, const char *separa
->  =
-
->  void i965_core::measurement_end(void)
->  {
-> +    char filename[512];
-> +
->      gettimeofday(&after, NULL);
->  =
-
-> -    rc6_after =3D
-> read_sysfs("/sys/class/drm/card0/power/rc6_residency_ms", NULL);
-> -    rc6p_after =3D
-> read_sysfs("/sys/class/drm/card0/power/rc6p_residency_ms", NULL);
-> -    rc6pp_after =3D
-> read_sysfs("/sys/class/drm/card0/power/rc6pp_residency_ms", NULL);
-> +    sprintf(filename, "%src6_residency_ms", sysfs_dir);
-> +    rc6_after =3D read_sysfs(filename, NULL);
-> +    sprintf(filename, "%src6p_residency_ms", sysfs_dir);
-> +    rc6p_after =3D read_sysfs(filename, NULL);
-> +    sprintf(filename, "%src6pp_residency_ms", sysfs_dir);
-> +    rc6pp_after =3D read_sysfs(filename, NULL);
->  }
->
-
-same as above.
-
-
-	-ss
-
->  =
-
->  char * i965_core::fill_pstate_line(int line_nr, char *buffer)
-> -- =
-
-> 1.8.1.5
-> =
-
-> =
-
-> =
-
-> =
-
-> Regards,
-> =
-
-> =
-
-> On 07/04/2013 09:47 AM, Niels Penneman wrote:
-> > Hi all,
-> >
-> > Currently powertop tries to find Intel GPU statistics in sysfs with a
-> > hardcoded path; in src/cpu/cpu.cpp:353-354:
-> >
-> > if (access("/sys/class/drm/card0/power/rc6_residency_ms", R_OK) =3D=3D =
-0)
-> >  handle_i965_gpu();
-> >
-> > In systems with multiple GPUs it is not guaranteed that the Intel GPU is
-> > labeled 'card0' in sysfs. In my system with both integrated Intel and
-> > discrete AMD Radeon the Intel GPU is 'card1', and powertop will not
-> > display GPU statistics.
-> >
-> > One possible solution would be to scan all /sys/class/drm/card[0-9]+
-> > folders and check the vendor & device IDs in 'device/vendor' and
-> > 'device/device'. Perhaps there is a better solution, e.g. by examining
-> > the PCI device tree.
-> >
-> >
-> > Regards,
-> >
-> =
-
-> --
-> Niels Penneman
-> Computer Systems Lab
-> Electronics and Information Systems Department
-> Ghent University
-> =
-
-
-
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
-
-
---===============7933216047590164122==--
+--===============0656400726924333814==--
 
