@@ -1,40 +1,244 @@
-Content-Type: multipart/mixed; boundary="===============5792195109516290868=="
+Content-Type: multipart/mixed; boundary="===============7770762491919855539=="
 MIME-Version: 1.0
-From: Kok, Auke-jan H <auke-jan.h.kok at intel.com>
-Subject: Re: [Powertop] Fwd: powertop 2.4 questions
-Date: Wed, 18 Sep 2013 12:42:17 -0700
-Message-ID: <CABsxX9+8LhnUWCmWfZq6uJp_J35X0F6C2gcf6n-1o9CA3PRxLQ@mail.gmail.com>
-In-Reply-To: 20130918192959.GE6886@merlins.org
+From: Srinivas Pandruvada <srinivas.pandruvada at linux.intel.com>
+Subject: [Powertop] [PATCH 6/8] Added PP0 RAPL domain for CPU
+Date: Mon, 15 Apr 2013 09:09:27 -0700
+Message-ID: <1366042169-14523-7-git-send-email-srinivas.pandruvada@linux.intel.com>
+In-Reply-To: 1366042169-14523-1-git-send-email-srinivas.pandruvada@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5792195109516290868==
+--===============7770762491919855539==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 18, 2013 at 12:29 PM, Marc MERLIN <marc_powertop(a)merlins.org>=
- wrote:
-> On Wed, Sep 18, 2013 at 09:33:53PM +0300, Sergey Senozhatsky wrote:
->> >  So, I got powertop 2.4 from
->> >  [5]https://01.org/powertop/downloads/2013/powertop-v2.4
->> >
->> >  Like I showed you on my laptop, when I go left and right with my arro=
-ws,
->> >  I'm on the Overview screen, and I can't move to Idle stats or Freq st=
-ats
->> >  like I could in older powertops:
->>
->> in order to move between tabs use TAB button.
->
-> That works indeed, I didn't realize it changed.
+Added PP0 RAPL domain as core CPU power. This will display as
+"cpu core" in the device stats.
 
-I think Chris had to do that since he implemented scrollable ncurses
-windows, and you need up/down/left/right to move the viewport around.
-It's been a while that this code was in and the announcement went
-out... sadly it's hard to get distros to pick up details like that.
+Signed-off-by: Srinivas Pandruvada <srinivas.pandruvada(a)linux.intel.com>
+---
+ src/Makefile.am             |  2 +-
+ src/cpu/cpu.cpp             |  9 ++++++
+ src/cpu/cpu_rapl_device.cpp | 74 +++++++++++++++++++++++++++++++++++++++++=
+++++
+ src/cpu/cpu_rapl_device.h   | 57 ++++++++++++++++++++++++++++++++++
+ 4 files changed, 141 insertions(+), 1 deletion(-)
+ create mode 100644 src/cpu/cpu_rapl_device.cpp
+ create mode 100644 src/cpu/cpu_rapl_device.h
 
-Auke
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 0983b51..fde079a 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -32,7 +32,7 @@ powertop_SOURCES =3D parameters/persistent.cpp parameters=
+/learn.cpp parameters/par
+ 		report/report-formatter-csv.cpp report/report-formatter-csv.h \
+ 		report/report-formatter-html.cpp report/report-formatter-html.h \
+ 		main.cpp css.h powertop.css cpu/intel_gpu.cpp \
+-		cpu/rapl/rapl_interface.cpp
++		cpu/rapl/rapl_interface.cpp cpu/cpu_rapl_device.cpp
+ =
 
---===============5792195109516290868==--
+ =
+
+ powertop_CXXFLAGS =3D -fno-omit-frame-pointer -fstack-protector -Wall -Wsh=
+adow -Wformat $(NCURSES_CFLAGS) $(PCIUTILS_CFLAGS) $(LIBNL_CFLAGS) $(GLIB2_=
+CFLAGS)
+diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+index 0a6d4dc..685f067 100644
+--- a/src/cpu/cpu.cpp
++++ b/src/cpu/cpu.cpp
+@@ -31,6 +31,7 @@
+ #include <unistd.h>
+ #include "cpu.h"
+ #include "cpudevice.h"
++#include "cpu_rapl_device.h"
+ #include "intel_cpus.h"
+ #include "../parameters/parameters.h"
+ =
+
+@@ -59,6 +60,8 @@ static class abstract_cpu * new_package(int package, int =
+cpu, char * vendor, int
+ {
+ 	class abstract_cpu *ret =3D NULL;
+ 	class cpudevice *cpudev;
++	class cpu_rapl_device *cpu_rapl_dev;
++
+ 	char packagename[128];
+ 	if (strcmp(vendor, "GenuineIntel") =3D=3D 0) {
+ 		if (family =3D=3D 6)
+@@ -99,6 +102,12 @@ static class abstract_cpu * new_package(int package, in=
+t cpu, char * vendor, int
+ 	sprintf(packagename, _("cpu package %i"), cpu);
+ 	cpudev =3D new class cpudevice(_("cpu package"), packagename, ret);
+ 	all_devices.push_back(cpudev);
++
++	sprintf(packagename, _("cpu rapl package %i"), cpu);
++	cpu_rapl_dev =3D new class cpu_rapl_device(cpudev, _("cpu rapl package"),=
+ packagename, ret);
++	if (cpu_rapl_dev->device_present())
++		all_devices.push_back(cpu_rapl_dev);
++
+ 	return ret;
+ }
+ =
+
+diff --git a/src/cpu/cpu_rapl_device.cpp b/src/cpu/cpu_rapl_device.cpp
+new file mode 100644
+index 0000000..be10d9e
+--- /dev/null
++++ b/src/cpu/cpu_rapl_device.cpp
+@@ -0,0 +1,74 @@
++/*
++ * Copyright 2010, Intel Corporation
++ *
++ * This file is part of PowerTOP
++ *
++ * This program file is free software; you can redistribute it and/or modi=
+fy it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; version 2 of the License.
++ *
++ * This program is distributed in the hope that it will be useful, but WIT=
+HOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
++ * for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program in a file named COPYING; if not, write to the
++ * Free Software Foundation, Inc,
++ * 51 Franklin Street, Fifth Floor,
++ * Boston, MA 02110-1301 USA
++ * or just google for it.
++ *
++ * Authors:
++ *	Srinivas Pandruvada<Srinivas.Pandruvada(a)linux.intel.com>
++ */
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include "../parameters/parameters.h"
++#include "cpu_rapl_device.h"
++
++cpu_rapl_device::cpu_rapl_device(cpudevice *parent, const char *classname,=
+ const char *dev_name, class abstract_cpu *_cpu)
++	: cpudevice(classname, dev_name, _cpu),
++	  device_valid(false)
++{
++	if (_cpu)
++		rapl =3D new c_rapl_interface(cpu->get_first_cpu());
++	else
++		rapl =3D new c_rapl_interface(0);
++	last_time =3D time(NULL);
++	if (rapl->pp0_domain_present()) {
++		device_valid =3D true;
++		parent->add_child(this);
++		rapl->get_pp0_energy_status(&last_energy);
++	}
++}
++
++void cpu_rapl_device::start_measurement(void)
++{
++	last_time =3D time(NULL);
++
++	rapl->get_pp0_energy_status(&last_energy);
++}
++
++void cpu_rapl_device::end_measurement(void)
++{
++	time_t		curr_time =3D time(NULL);
++	double energy;
++
++	consumed_power =3D 0.0;
++	if ((curr_time - last_time) > 0) {
++		rapl->get_pp0_energy_status(&energy);
++		consumed_power =3D (energy-last_energy)/(curr_time-last_time);
++		last_energy =3D energy;
++		last_time =3D curr_time;
++	}
++}
++
++double cpu_rapl_device::power_usage(struct result_bundle *result, struct p=
+arameter_bundle *bundle)
++{
++	if (rapl->pp0_domain_present())
++		return consumed_power;
++	else
++		return 0.0;
++}
+diff --git a/src/cpu/cpu_rapl_device.h b/src/cpu/cpu_rapl_device.h
+new file mode 100644
+index 0000000..407f2da
+--- /dev/null
++++ b/src/cpu/cpu_rapl_device.h
+@@ -0,0 +1,57 @@
++/*
++ * Copyright 2010, Intel Corporation
++ *
++ * This file is part of PowerTOP
++ *
++ * This program file is free software; you can redistribute it and/or modi=
+fy it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; version 2 of the License.
++ *
++ * This program is distributed in the hope that it will be useful, but WIT=
+HOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
++ * for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program in a file named COPYING; if not, write to the
++ * Free Software Foundation, Inc,
++ * 51 Franklin Street, Fifth Floor,
++ * Boston, MA 02110-1301 USA
++ * or just google for it.
++ *
++ * Authors:
++ *	Srinivas Pandruvada <Srinivas.Pandruvada(a)linux.intel.com>
++ */
++#ifndef _INCLUDE_GUARD_CPU_RAPL_DEVICE_H
++#define _INCLUDE_GUARD_CPU_RAPL_DEVICE_H
++
++#include <vector>
++#include <string>
++
++using namespace std;
++
++#include <sys/time.h>
++#include "cpudevice.h"
++#include "rapl/rapl_interface.h"
++
++class cpu_rapl_device: public cpudevice {
++
++	c_rapl_interface *rapl;
++	time_t		last_time;
++	double		last_energy;
++	double 		consumed_power;
++	bool		device_valid;
++
++public:
++	cpu_rapl_device(cpudevice *parent, const char *classname =3D "cpu_core", =
+const char *device_name =3D "cpu_core", class abstract_cpu *_cpu =3D NULL);
++	~cpu_rapl_device() { delete rapl; }
++	virtual const char * device_name(void) {return "CPU core";};
++	bool device_present() { return device_valid;}
++	virtual double power_usage(struct result_bundle *result, struct parameter=
+_bundle *bundle);
++	virtual void start_measurement(void);
++	virtual void end_measurement(void);
++
++};
++
++
++#endif
+-- =
+
+1.7.11.7
+
+
+--===============7770762491919855539==--
 
