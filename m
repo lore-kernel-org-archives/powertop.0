@@ -1,45 +1,62 @@
-Content-Type: multipart/mixed; boundary="===============1709101305592826221=="
+Content-Type: multipart/mixed; boundary="===============2631868563144448247=="
 MIME-Version: 1.0
-From: Srinivas Pandruvada <srinivas.pandruvada at linux.intel.com>
-Subject: [Powertop] [PATCH 5/8] Interface to get first cpu
-Date: Fri, 12 Apr 2013 08:47:05 -0700
-Message-ID: <1365781628-11053-6-git-send-email-srinivas.pandruvada@linux.intel.com>
-In-Reply-To: 1365781628-11053-1-git-send-email-srinivas.pandruvada@linux.intel.com
+From: Kristen Carlson Accardi <kristen at linux.intel.com>
+Subject: Re: [Powertop] [PATCH 0/8] Power Top RAPL interface v04
+Date: Fri, 19 Apr 2013 13:11:47 -0700
+Message-ID: <20130419131147.6f8e7aba@bluebird.jf.intel.com>
+In-Reply-To: 20130415203543.GE2301@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1709101305592826221==
+--===============2631868563144448247==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Added get interface to get the first cpu number for this
-cpu device.
+On Mon, 15 Apr 2013 23:35:43 +0300
+Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com> wrote:
 
-Signed-off-by: Srinivas Pandruvada <srinivas.pandruvada(a)linux.intel.com>
----
- src/cpu/cpu.h | 1 +
- 1 file changed, 1 insertion(+)
+> On (04/15/13 09:09), Srinivas Pandruvada wrote:
+> > This patch adds RAPL interface to powertop. RAPL can give energy consum=
+ed for a domain. For
+> > client platform, domain are "PKG", "PP0" and "PP1". For servers "PKG", =
+"DRAM" and "PP0".
+> > PP0 refers to CPU energy comsumtion and PP1 refers to GPUs. DRAM is for=
+ DRAM in servers only.
+> > =
 
-diff --git a/src/cpu/cpu.h b/src/cpu/cpu.h
-index a863b49..18ebeb7 100644
---- a/src/cpu/cpu.h
-+++ b/src/cpu/cpu.h
-@@ -105,6 +105,7 @@ public:
- 	class abstract_cpu *parent;
- =
+> > Powertop estimates how much power CPU and GPU is consuming based on the=
+ measured power and
+> > load. This patch splits this into the following:
+> > - Actual CPU/GPU power reported by RAPL
+> > - DRAM power for servers
+> > - Remaining as "misc" usage for CPU/GPU
+> > =
 
- =
+> > As more domain are getting added, this patch creates a parent/child rel=
+ationship for CPU/GPU.
+> > This way when new domains are added these files don't need change. Only=
+ inherit CPU/GPU class,
+> > and implement virtual method for consumed power.
+> >
+> =
 
-+	int	get_first_cpu() { return first_cpu; }
- 	void	set_number(int _number, int cpu) {this->number =3D _number; this->fi=
-rst_cpu =3D cpu;};
- 	void	set_type(const char* _name) {this->name =3D _name;};
- 	int	get_number(void) { return number; };
--- =
+> Hello,
+> looks good to me. thanks.
+> =
 
-1.7.11.7
+> =
+
+> any objections/inputs/etc. from list members are welcomed.
+> =
+
+> 	-ss
+> =
 
 
---===============1709101305592826221==--
+Applied.
+
+Thanks!
+
+--===============2631868563144448247==--
 
