@@ -1,136 +1,37 @@
-Content-Type: multipart/mixed; boundary="===============7918391593157072443=="
+Content-Type: multipart/mixed; boundary="===============5840825285691715673=="
 MIME-Version: 1.0
-From: Kristen Carlson Accardi <kristen at linux.intel.com>
-Subject: [Powertop] [PATCH] cpu: allow for more package than core cstates
-Date: Mon, 08 Apr 2013 16:35:41 -0700
-Message-ID: <1365464141-29750-1-git-send-email-kristen@linux.intel.com>
+From: Kevin Qiu <explodeandroid at gmail.com>
+Subject: [Powertop] How does powertop make power consumption estimation?
+Date: Thu, 09 May 2013 07:27:30 +0200
+Message-ID: <CAAq0_yrTMeNJ9HUSo=Gtp1rgwNUmnUH0BYOCi4SA1vL_DB-wVA@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7918391593157072443==
+--===============5840825285691715673==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Change reporting code to walk package, then core, the cpu to determine max
-number of cstate vs. just walking the logical cpus.
+I am looking into the source code, but it's a bunch of codes. And lack
+of knowledge of CPP itself brings me more troubles. Can some one
+described to me how powertop makes power consumption estimation. And
+which files does the job for make estimation for different devices? Are
+there similar linux open source software does the similar job?
+KevinQ
 
-change display function to obtain max cstate num the same way.
----
- src/cpu/cpu.cpp | 68 ++++++++++++++++++++++++++++++++++++++++++++++-------=
-----
- 1 file changed, 55 insertions(+), 13 deletions(-)
+--===============5840825285691715673==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
-diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-index afe6a8c..9e075bd 100644
---- a/src/cpu/cpu.cpp
-+++ b/src/cpu/cpu.cpp
-@@ -402,20 +402,64 @@ static const char * fill_state_line(class abstract_cp=
-u *acpu, int state, int lin
- 	return "-EINVAL";
- }
- =
+PHByZT5JIGFtIGxvb2tpbmcgaW50byB0aGUgc291cmNlIGNvZGUsIGJ1dCBpdCYjMzk7cyBhIGJ1
+bmNoIG9mIGNvZGVzLiBBbmQgbGFjawpvZiBrbm93bGVkZ2Ugb2YgQ1BQIGl0c2VsZiBicmluZ3Mg
+bWUgbW9yZSB0cm91Ymxlcy4gQ2FuIHNvbWUgb25lCmRlc2NyaWJlZCB0byBtZSBob3cgcG93ZXJ0
+b3AgbWFrZXMgcG93ZXIgY29uc3VtcHRpb24gZXN0aW1hdGlvbi4gQW5kCndoaWNoIGZpbGVzIGRv
+ZXMgdGhlIGpvYiBmb3IgbWFrZSBlc3RpbWF0aW9uIGZvciBkaWZmZXJlbnQgZGV2aWNlcz8gQXJl
+CnRoZXJlIHNpbWlsYXIgbGludXggb3BlbiBzb3VyY2Ugc29mdHdhcmUgZG9lcyB0aGUgc2ltaWxh
+ciBqb2I/CktldmluUTwvcHJlPgo=
 
-+static int get_cstates_num(void)
-+{
-+	unsigned int package, core, cpu;
-+	class abstract_cpu *_package, * _core, * _cpu;
-+	unsigned int i;
-+	int cstates_num;
-+
-+	for (package =3D 0, cstates_num =3D 0;
-+			package < system_level.children.size(); package++) {
-+		_package =3D system_level.children[package];
-+		if (_package =3D=3D NULL)
-+			continue;
-+
-+		/* walk package cstates and get largest cstates number */
-+		for (i =3D 0; i < _package->cstates.size(); i++)
-+			cstates_num =3D std::max(cstates_num,
-+						(_package->cstates[i])->line_level);
-+
-+		/*
-+		 * for each core in this package, walk core cstates and get
-+		 * largest cstates number
-+		 */
-+		for (core =3D 0; core < _package->children.size(); core++) {
-+			_core =3D _package->children[core];
-+			if (_core =3D=3D NULL)
-+				continue;
-+
-+			for (i =3D 0; i <  _core->cstates.size(); i++)
-+				cstates_num =3D std::max(cstates_num,
-+						(_core->cstates[i])->line_level);
-+
-+			/*
-+			 * for each core, walk the logical cpus in case
-+			 * there is are more linux cstates than hw cstates
-+			 */
-+			 for (cpu =3D 0; cpu < _core->children.size(); cpu++) {
-+				_cpu =3D _core->children[cpu];
-+				if (_cpu =3D=3D NULL)
-+					continue;
-+
-+				for (i =3D 0; i < _cpu->cstates.size(); i++)
-+					cstates_num =3D std::max(cstates_num,
-+						(_cpu->cstates[i])->line_level);
-+			}
-+		}
-+	}
-+
-+	return cstates_num;
-+}
-+
- void report_display_cpu_cstates(void)
- {
- 	char buffer[512], buffer2[512];
- 	unsigned int package, core, cpu;
- 	int line, cstates_num;
- 	class abstract_cpu *_package, * _core, * _cpu;
--	unsigned int i, j;
- =
-
--	for (i =3D 0, cstates_num =3D 0; i < all_cpus.size(); i++) {
--		if (all_cpus[i])
--			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
--				cstates_num =3D std::max(cstates_num,
--						(all_cpus[i]->cstates[j])->line_level);
--	}
-+	cstates_num =3D get_cstates_num();
- =
-
- 	report.begin_section(SECTION_CPUIDLE);
- 	report.add_header("Processor Idle state report");
-@@ -644,17 +688,15 @@ void impl_w_display_cpu_states(int state)
- 	int line, loop, cstates_num, pstates_num;
- 	class abstract_cpu *_package, * _core, * _cpu;
- 	int ctr =3D 0;
--	unsigned int i, j;
-+	unsigned int i;
- =
-
--	for (i =3D 0, cstates_num =3D 0, pstates_num =3D 0; i < all_cpus.size(); =
-i++) {
-+	cstates_num =3D get_cstates_num();
-+
-+	for (i =3D 0, pstates_num =3D 0; i < all_cpus.size(); i++) {
- 		if (!all_cpus[i])
- 			continue;
- =
-
- 		pstates_num =3D std::max<int>(pstates_num, all_cpus[i]->pstates.size());
--
--		for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
--			cstates_num =3D std::max(cstates_num,
--						(all_cpus[i]->cstates[j])->line_level);
- 	}
- =
-
- 	if (state =3D=3D PSTATE) {
--- =
-
-1.7.11.7
-
-
---===============7918391593157072443==--
+--===============5840825285691715673==--
 
