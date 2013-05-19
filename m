@@ -1,35 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============6605870139671505250=="
+Content-Type: multipart/mixed; boundary="===============6148413746809930657=="
 MIME-Version: 1.0
-From: Kok, Auke-jan H <auke-jan.h.kok at intel.com>
-Subject: Re: [Powertop] How to make powertop auto-tun when AC power is
- unpluged?
-Date: Thu, 04 Apr 2013 09:40:28 -0700
-Message-ID: <CABsxX9+xyF2xAD4_D7ey3xkUkp_3N4Wn3dJL=MBNWfQzNdXzmg@mail.gmail.com>
-In-Reply-To: 20130404141435.GA89863@cs.nctu.edu.tw
+From: Hans-Peter Deifel <hpdeifel at gmx.de>
+Subject: [Powertop] [PATCH 2/2] Document key bindings in man page
+Date: Sun, 19 May 2013 18:00:43 +0200
+Message-ID: <1368979243-3175-3-git-send-email-hpdeifel@gmx.de>
+In-Reply-To: 1368979243-3175-1-git-send-email-hpdeifel@gmx.de
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6605870139671505250==
+--===============6148413746809930657==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 4, 2013 at 7:14 AM, =E9=99=B3=E9=9F=8B=E4=BB=BB (Wei-Ren Chen)
-<chenwj(a)iis.sinica.edu.tw> wrote:
->   powertop is a great tool, and I love it. However, there is a place I
-> would like to know if it can be improved or done. When the AC power is
-> off, I always have to turn on those tunable options shown in powertop
-> to save power. Is it possible to make powertop do that automatically
-> for me?
+Signed-off-by: Hans-Peter Deifel <hpdeifel(a)gmx.de>
+---
+ doc/powertop.8 | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-please look at the previous threads on the mailinglist about this
-topic - the short answer is no - your linux distributions should be
-tuning these settings. PowerTOP is a diagnostics tool, and it is not
-the right place to set power bits permanently in the system.
+diff --git a/doc/powertop.8 b/doc/powertop.8
+index 8a70076..e6ec199 100644
+--- a/doc/powertop.8
++++ b/doc/powertop.8
+@@ -54,6 +54,38 @@ generate a report for a specified number of seconds.
+ .TP
+ \fB\-\-version
+ print version information and exit.
++.SH COMMANDS
++In interactive mode, the following key bindings are available:
++.TP
++\fBTab
++Show next tab
++.TP
++\fBBackTab
++Show previous tab
++.TP
++\fBRight Arrow
++Scroll to the right
++.TP
++\fBLeft Arrow
++Scroll to the left
++.TP
++\fBUp Arrow, PageUp
++Scroll up or select previous item
++.TP
++\fBDown Arrow, PageDown
++Scroll down or select next item
++.TP
++\fBSpace, Return
++Activate current item
++.TP
++\fBs
++Set refresh timeout
++.TP
++\fBr
++Refresh window
++.TP
++\fBq, Ctrl-C, Escape
++Exit powertop
+ .SH BUGS
+ Send bug reports to <powertop(a)lists.01.org>
+ .SH SEE ALSO
+-- =
 
-Cheers,
+1.8.1.5
 
-Auke
 
---===============6605870139671505250==--
+--===============6148413746809930657==--
 
