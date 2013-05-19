@@ -1,81 +1,73 @@
-Content-Type: multipart/mixed; boundary="===============1208721013089217848=="
+Content-Type: multipart/mixed; boundary="===============5510601373481414562=="
 MIME-Version: 1.0
-From: Marc MERLIN <marc_powertop at merlins.org>
-Subject: Re: [Powertop] Fwd: powertop 2.4 questions
-Date: Wed, 18 Sep 2013 12:53:52 -0700
-Message-ID: <20130918195352.GG6886@merlins.org>
-In-Reply-To: CABsxX9+8LhnUWCmWfZq6uJp_J35X0F6C2gcf6n-1o9CA3PRxLQ@mail.gmail.com
+From: Hans-Peter Deifel <hpdeifel at gmx.de>
+Subject: [Powertop] [PATCH 1/2] Use symbolic instead of numeric constants for
+ keys
+Date: Sun, 19 May 2013 18:00:42 +0200
+Message-ID: <1368979243-3175-2-git-send-email-hpdeifel@gmx.de>
+In-Reply-To: 1368979243-3175-1-git-send-email-hpdeifel@gmx.de
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1208721013089217848==
+--===============5510601373481414562==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 18, 2013 at 12:42:17PM -0700, Kok, Auke-jan H wrote:
-> On Wed, Sep 18, 2013 at 12:29 PM, Marc MERLIN <marc_powertop(a)merlins.or=
-g> wrote:
-> > On Wed, Sep 18, 2013 at 09:33:53PM +0300, Sergey Senozhatsky wrote:
-> >> >  So, I got powertop 2.4 from
-> >> >  [5]https://01.org/powertop/downloads/2013/powertop-v2.4
-> >> >
-> >> >  Like I showed you on my laptop, when I go left and right with my ar=
-rows,
-> >> >  I'm on the Overview screen, and I can't move to Idle stats or Freq =
-stats
-> >> >  like I could in older powertops:
-> >>
-> >> in order to move between tabs use TAB button.
-> >
-> > That works indeed, I didn't realize it changed.
-> =
+This improves the readability of the key handling code.
 
-> I think Chris had to do that since he implemented scrollable ncurses
-> windows, and you need up/down/left/right to move the viewport around.
-> It's been a while that this code was in and the announcement went
-> out... sadly it's hard to get distros to pick up details like that.
+Since there is no symbolic constant for Escape, a comment with an
+explanation is added.
 
-No worries at all, it happens :)
+Signed-off-by: Hans-Peter Deifel <hpdeifel(a)gmx.de>
+---
+ src/main.cpp | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-By the way, my more nagging question was, how can I stop the built in camera
-in my T530 from taking so much power? (I'm sure the number is wrong, but st=
-ill)
+diff --git a/src/main.cpp b/src/main.cpp
+index 0883424..46466b0 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -136,10 +136,10 @@ static void do_sleep(int seconds)
+ =
 
-The battery reports a discharge rate of 18.4 W
-The estimated remaining time is 4 hours, 18 minutes
+ 		c =3D getch();
+ 		switch (c) {
+-		case 353: =
 
-Summary: 657.6 wakeups/second,  28.4 GPU ops/seconds, 0.0 VFS ops/sec and 9=
-.3% CPU use
++		case KEY_BTAB:
+ 			show_prev_tab();
+ 			break;
+-		case 9:
++		case '\t':
+ 			show_next_tab(); =
 
-Power est.  Usage       Events/s   Category       Description
-  12.2 W    100.0%                 Device         USB device: Integrated Ca=
-mera (Chicony Electronics Co., Ltd.)
-  997 mW     60.0%                 Device         Display backlight
- 76.1 mW     34.9 =C2=B5s/s      34.8   Process        [rcu_preempt]
- 23.1 mW      1.5 ms/s      16.5   Process        xfce4-terminal -T window1=
-1 --role=3Dwindow11
- 9.20 mW     59.0 ms/s     347.4   Process        /usr/bin/enlightenment
-
-Note that tunables says:
-   Good          Autosuspend for USB device Integrated Camera [Chicony Elec=
-tronics Co., Ltd.]
-
-Kernel 3.10.6.
-
-Any ideas?
-
-Thanks,
-Marc
+ 			break;
+ 		case KEY_RIGHT:
+@@ -156,8 +156,8 @@ static void do_sleep(int seconds)
+ 		case KEY_UP:
+ 			cursor_up();
+ 			break;
+-		case 32:
+-		case 10:
++		case ' ':
++		case '\n':
+ 			cursor_enter();
+ 			break;
+ 		case 's':
+@@ -169,7 +169,7 @@ static void do_sleep(int seconds)
+ 			return;
+ 		case KEY_EXIT:
+ 		case 'q':
+-		case 27:
++		case 27:	// Escape
+ 			leave_powertop =3D 1;
+ 			return;
+ 		}
 -- =
 
-"A mouse is a device used to point at the xterm you want to type in" - A.S.=
-R.
-Microsoft is to operating systems ....
-                                      .... what McDonalds is to gourmet coo=
-king
-Home page: http://marc.merlins.org/                         | PGP 1024R/763=
-BE901
+1.8.1.5
 
---===============1208721013089217848==--
+
+--===============5510601373481414562==--
 
