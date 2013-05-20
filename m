@@ -1,145 +1,83 @@
-Content-Type: multipart/mixed; boundary="===============6655534886932665090=="
+Content-Type: multipart/mixed; boundary="===============3290756322583697884=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: [Powertop] [PATCH 2/8] alsa: use process_directory()
-Date: Thu, 19 Sep 2013 15:40:07 +0300
-Message-ID: <20130919124007.GC2300@swordfish.minsk.epam.com>
-In-Reply-To: 20130919123537.GA2300@swordfish.minsk.epam.com
+Subject: Re: [Powertop] [PATCH 2/2] Document key bindings in man page
+Date: Mon, 20 May 2013 16:26:00 +0300
+Message-ID: <20130520132600.GB2238@swordfish>
+In-Reply-To: 1368979243-3175-3-git-send-email-hpdeifel@gmx.de
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6655534886932665090==
+--===============3290756322583697884==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-use process_directory() helper
+On (05/19/13 18:00), Hans-Peter Deifel wrote:
+> Signed-off-by: Hans-Peter Deifel <hpdeifel(a)gmx.de>
+> ---
 
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+looks good.
 
----
+	-ss
 
- src/devices/alsa.cpp | 46 +++++++++++++++++-----------------------------
- src/devices/alsa.h   |  4 ++--
- 2 files changed, 19 insertions(+), 31 deletions(-)
+>  doc/powertop.8 | 32 ++++++++++++++++++++++++++++++++
+>  1 file changed, 32 insertions(+)
+> =
 
-diff --git a/src/devices/alsa.cpp b/src/devices/alsa.cpp
-index 33a52f5..5dee334 100644
---- a/src/devices/alsa.cpp
-+++ b/src/devices/alsa.cpp
-@@ -27,10 +27,8 @@
- =
+> diff --git a/doc/powertop.8 b/doc/powertop.8
+> index 8a70076..e6ec199 100644
+> --- a/doc/powertop.8
+> +++ b/doc/powertop.8
+> @@ -54,6 +54,38 @@ generate a report for a specified number of seconds.
+>  .TP
+>  \fB\-\-version
+>  print version information and exit.
+> +.SH COMMANDS
+> +In interactive mode, the following key bindings are available:
+> +.TP
+> +\fBTab
+> +Show next tab
+> +.TP
+> +\fBBackTab
+> +Show previous tab
+> +.TP
+> +\fBRight Arrow
+> +Scroll to the right
+> +.TP
+> +\fBLeft Arrow
+> +Scroll to the left
+> +.TP
+> +\fBUp Arrow, PageUp
+> +Scroll up or select previous item
+> +.TP
+> +\fBDown Arrow, PageDown
+> +Scroll down or select next item
+> +.TP
+> +\fBSpace, Return
+> +Activate current item
+> +.TP
+> +\fBs
+> +Set refresh timeout
+> +.TP
+> +\fBr
+> +Refresh window
+> +.TP
+> +\fBq, Ctrl-C, Escape
+> +Exit powertop
+>  .SH BUGS
+>  Send bug reports to <powertop(a)lists.01.org>
+>  .SH SEE ALSO
+> -- =
 
- #include <stdio.h>
- #include <sys/types.h>
--#include <dirent.h>
- #include <unistd.h>
- =
+> 1.8.1.5
+> =
 
--
- using namespace std;
- =
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>=20
 
- #include "device.h"
-@@ -42,7 +40,7 @@ using namespace std;
- #include <string.h>
- #include <unistd.h>
- =
-
--alsa::alsa(char *_name, char *path): device()
-+alsa::alsa(const char *_name, const char *path): device()
- {
- 	ifstream file;
- =
-
-@@ -152,39 +150,29 @@ const char * alsa::device_name(void)
- 	return name;
- }
- =
-
--void create_all_alsa(void)
-+static void create_all_alsa_callback(const char *d_name)
- {
--	struct dirent *entry;
--	DIR *dir;
- 	char filename[4096];
-+	class alsa *bl;
-+	ofstream file;
- =
-
--	dir =3D opendir("/sys/class/sound/card0/");
--	if (!dir)
-+	if (strncmp(d_name, "hwC", 3) !=3D 0)
- 		return;
--	while (1) {
--		class alsa *bl;
--		ofstream file;
--		entry =3D readdir(dir);
--		if (!entry)
--			break;
--		if (strncmp(entry->d_name, "hwC", 3) !=3D 0)
--			continue;
--		sprintf(filename, "/sys/class/sound/card0/%s/power_on_acct", entry->d_na=
-me);
--
--		if (access(filename, R_OK) !=3D 0)
--			continue;
--
--		sprintf(filename, "/sys/class/sound/card0/%s", entry->d_name);
--
--		bl =3D new class alsa(entry->d_name, filename);
--		all_devices.push_back(bl);
--		register_parameter("alsa-codec-power", 0.5);
--	}
--	closedir(dir);
- =
-
--}
-+	sprintf(filename, "/sys/class/sound/card0/%s/power_on_acct", d_name);
-+	if (access(filename, R_OK) !=3D 0)
-+		return;
- =
-
-+	sprintf(filename, "/sys/class/sound/card0/%s", d_name);
-+	bl =3D new class alsa(d_name, filename);
-+	all_devices.push_back(bl);
-+	register_parameter("alsa-codec-power", 0.5);
-+}
- =
-
-+void create_all_alsa(void)
-+{
-+	process_directory("/sys/class/sound/card0/", create_all_alsa_callback);
-+}
- =
-
- double alsa::power_usage(struct result_bundle *result, struct parameter_bu=
-ndle *bundle)
- {
-diff --git a/src/devices/alsa.h b/src/devices/alsa.h
-index 5aebfd7..f7b4b97 100644
---- a/src/devices/alsa.h
-+++ b/src/devices/alsa.h
-@@ -41,7 +41,7 @@ class alsa: public device {
- 	int rindex;
- public:
- =
-
--	alsa(char *_name, char *path);
-+	alsa(const char *_name, const char *path);
- =
-
- 	virtual void start_measurement(void);
- 	virtual void end_measurement(void);
-@@ -63,4 +63,4 @@ public:
- extern void create_all_alsa(void);
- =
-
- =
-
--#endif
-\ No newline at end of file
-+#endif
-
---===============6655534886932665090==--
+--===============3290756322583697884==--
 
