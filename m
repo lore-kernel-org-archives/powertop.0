@@ -1,45 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============1840189626472020547=="
+Content-Type: multipart/mixed; boundary="===============5428192761384781811=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] Add a more informative error message about MSR
- not found
-Date: Thu, 21 Feb 2013 15:52:59 +0300
-Message-ID: <20130221125259.GA9471@swordfish.minsk.epam.com>
-In-Reply-To: 87621lq5jv.fsf@intel.com
+Subject: Re: [Powertop] Seg Fault due to function format_watts in file
+ src/lib.cpp
+Date: Mon, 20 May 2013 16:26:39 +0300
+Message-ID: <20130520132639.GC2238@swordfish>
+In-Reply-To: CABa1t5xZAVYvWagoJR8n-K1iMUZGSJzWtsfmm3HC-FXF-B9hXw@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1840189626472020547==
+--===============5428192761384781811==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (02/21/13 13:17), Jani Nikula wrote:
-> On Thu, 21 Feb 2013, Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com> =
-wrote:
-> > I think we're beyond the `string freeze' date, most likely it will not
-> > get into upcoming release.
-> =
+On (02/28/13 14:45), Ganapati Bhat wrote:
+>    Dear All,
+>    I was compiling powertop as an Android external module and using the
+>    option powertop --html. However, there used to be a segmentation fault.
+>    When i looked into it, I observed that in the function format_watts in
+>    src/lib.cpp, the last=EF=BF=BDargument=EF=BF=BDto mbstows was zero. By=
+ changing the
+>    argument to len, which is itself an argument to the function format_wa=
+tts,
+>    powertop worked properly? Does this also happen on an x86 machine? ( I=
+ am
+>    unable to verify this due to some problems in my laptop which I have n=
+ot
+>    yet resolved.) If not then can someone explain to me why is it happeni=
+ng
+>    in the case of android?
+>    Thanks and Regards,
+>    Ganapati
 
-> I'm ignorant about powertop release practices, and don't mind whether it
-> makes the next release or not; hopefully some release after that though.
-> =
+Hello,
 
-> I'm just trying to give a hint to the next developer hitting the issue,
-> so he won't have to first grep the powertop sources to figure out what
-> the error really is about, and then the kernel sources to figure out
-> who's responsible for creating /dev/cpu/%d/msr, and what config knob to
-> turn to enable that... The README patch I sent of course helps too.
->
+did you have any chance to test the patch?
 
-sure, thanks.
 
 	-ss
- =
 
-> BR,
-> Jani.
->=20
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
 
---===============1840189626472020547==--
+
+--===============5428192761384781811==--
 
