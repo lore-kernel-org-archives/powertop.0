@@ -1,114 +1,85 @@
-Content-Type: multipart/mixed; boundary="===============4935307448139340320=="
+Content-Type: multipart/mixed; boundary="===============9169389918189436308=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: [Powertop] [PATCH 5/8] rfkill: use process_directory()
-Date: Thu, 19 Sep 2013 15:43:06 +0300
-Message-ID: <20130919124306.GE2300@swordfish.minsk.epam.com>
-In-Reply-To: 20130919123537.GA2300@swordfish.minsk.epam.com
+Subject: Re: [Powertop] [PATCH] Fix running failure when > 69 CPUs for open
+ file limitation
+Date: Thu, 30 May 2013 00:00:14 +0300
+Message-ID: <20130529210013.GA3075@swordfish>
+In-Reply-To: 1369842247-11442-1-git-send-email-youquan.song@intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4935307448139340320==
+--===============9169389918189436308==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-use process_directory() helper
+On (05/29/13 11:44), Youquan Song wrote:
+> Powertop 2.3 fails to run on machine with > 69 CPUs because system open f=
+iles
+> limitation of one process is 1024 default,  While powertop will open one =
+file
+> for every monitored perf_event (at least 15) each CPU.
+> =
+
+> Like on 80 CPUs Westmere-EX machine, powertop will fail to run with below:
+> =
+
+> PowerTOP v2.3 needs the kernel to support the 'perf' subsystem
+> as well as support for trace points in the kernel:
+> CONFIG_PERF_EVENTS=3Dy
+> CONFIG_PERF_COUNTERS=3Dy
+> CONFIG_TRACEPOINTS=3Dy
+> CONFIG_TRACING=3Dy
+> =
+
+> This patch is to change RLIMIT_NOFILE from default (1024) to max limition.
+> =
+
+> =
+
+
+Hello,
+I'd like to ask you to try out the following patch. We leak fd in read_file=
+().
+
+
+
+
+------8<--------8<--------
+
+- Do not leak file descriptor in perf_bundle read_file().
+- Clear perf event (unmap memory and close fd) on event destruction.
+
 
 Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
 
 ---
 
- src/devices/rfkill.cpp | 46 +++++++++++++++++-----------------------------
- 1 file changed, 17 insertions(+), 29 deletions(-)
-
-diff --git a/src/devices/rfkill.cpp b/src/devices/rfkill.cpp
-index 2404432..01aec23 100644
---- a/src/devices/rfkill.cpp
-+++ b/src/devices/rfkill.cpp
-@@ -27,7 +27,6 @@
- =
-
- #include <stdio.h>
- #include <sys/types.h>
--#include <dirent.h>
- #include <libgen.h>
- #include <unistd.h>
- =
-
-@@ -136,41 +135,30 @@ const char * rfkill::device_name(void)
- 	return name;
+diff --git a/src/perf/perf.cpp b/src/perf/perf.cpp
+index 35b4017..e919741 100644
+--- a/src/perf/perf.cpp
++++ b/src/perf/perf.cpp
+@@ -167,6 +167,7 @@ perf_event::~perf_event(void)
+ 	if (perf_event::pevent->ref_count =3D=3D 1) {
+ 		pevent_free(perf_event::pevent);
+ 		perf_event::pevent =3D NULL;
++		clear();
+ 	} else
+ 		pevent_unref(perf_event::pevent);
  }
- =
-
--void create_all_rfkills(void)
-+static void create_all_rfkills_callback(const char *d_name)
- {
--	struct dirent *entry;
--	DIR *dir;
- 	char filename[4096];
- 	char name[4096];
-+	class rfkill *bl;
-+	ifstream file;
- =
-
--	dir =3D opendir("/sys/class/rfkill/");
--	if (!dir)
--		return;
--	while (1) {
--		class rfkill *bl;
--		ifstream file;
--		entry =3D readdir(dir);
--		if (!entry)
--			break;
--		if (entry->d_name[0] =3D=3D '.')
--			continue;
--		sprintf(filename, "/sys/class/rfkill/%s/name", entry->d_name);
--		strcpy(name, entry->d_name);
--		file.open(filename, ios::in);
--		if (file) {
--			file.getline(name, 100);
--			file.close();
--		}
--
--		sprintf(filename, "/sys/class/rfkill/%s", entry->d_name);
--		bl =3D new class rfkill(name, filename);
--		all_devices.push_back(bl);
-+	sprintf(filename, "/sys/class/rfkill/%s/name", d_name);
-+	strcpy(name, d_name);
-+	file.open(filename, ios::in);
-+	if (file) {
-+		file.getline(name, 100);
-+		file.close();
+diff --git a/src/perf/perf_bundle.cpp b/src/perf/perf_bundle.cpp
+index 38e1e91..8d480e8 100644
+--- a/src/perf/perf_bundle.cpp
++++ b/src/perf/perf_bundle.cpp
+@@ -123,6 +123,7 @@ static char * read_file(const char *file)
+ 		buffer[len] =3D '\0';
  	}
--	closedir(dir);
- =
-
-+	sprintf(filename, "/sys/class/rfkill/%s", d_name);
-+	bl =3D new class rfkill(name, filename);
-+	all_devices.push_back(bl);
+ out:
++	close(fd);
+ 	return buffer;
  }
- =
+=20
 
--
-+void create_all_rfkills(void)
-+{
-+	process_directory("/sys/class/rfkill/", create_all_rfkills_callback);
-+}
- =
-
- double rfkill::power_usage(struct result_bundle *result, struct parameter_=
-bundle *bundle)
- {
-@@ -185,4 +173,4 @@ double rfkill::power_usage(struct result_bundle *result=
-, struct parameter_bundle
- 	power +=3D util * factor / 100.0;
- =
-
- 	return power;
--}
-\ No newline at end of file
-+}
-
---===============4935307448139340320==--
+--===============9169389918189436308==--
 
