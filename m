@@ -1,83 +1,99 @@
-Content-Type: multipart/mixed; boundary="===============3290756322583697884=="
+Content-Type: multipart/mixed; boundary="===============1033032492803525859=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH 2/2] Document key bindings in man page
-Date: Mon, 20 May 2013 16:26:00 +0300
-Message-ID: <20130520132600.GB2238@swordfish>
-In-Reply-To: 1368979243-3175-3-git-send-email-hpdeifel@gmx.de
+Subject: Re: [Powertop] [PATCH] Fix running failure when > 69 CPUs for open
+ file limitation
+Date: Tue, 04 Jun 2013 13:26:33 +0300
+Message-ID: <20130604102633.GB2323@swordfish>
+In-Reply-To: 20130604213123.GB14821@linux-youquan.bj.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3290756322583697884==
+--===============1033032492803525859==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (05/19/13 18:00), Hans-Peter Deifel wrote:
-> Signed-off-by: Hans-Peter Deifel <hpdeifel(a)gmx.de>
-> ---
+On (06/04/13 17:31), Youquan Song wrote:
+> > =
 
-looks good.
+> > how about, say, 2048? unlimited resource steals possibility to detect =
+
+> > error/bug/leak/etc.
+> =
+
+> I do not like it. If there are more CPUs on larger machine and if we
+> want to monitor more performance event for each CPU, the 2048 settting wi=
+ll
+>  be another issue.
+> =
+
+
+we may get the number of CPUs, multiply it by events number + probably add =
+some =
+
+extra fds, and set it as a limit. this is not a really big issue, though. m=
+y point =
+
+is that limited resource gives us better chances to detect resource leak in =
+
+powertop, however I agree that we just may fireup valgrind for that purpose.
+
 
 	-ss
 
->  doc/powertop.8 | 32 ++++++++++++++++++++++++++++++++
->  1 file changed, 32 insertions(+)
+> We just set it to the rlim_cur to rlim_max for the powertop application
+> and to cater to powertop requirement as large as possible.
 > =
 
-> diff --git a/doc/powertop.8 b/doc/powertop.8
-> index 8a70076..e6ec199 100644
-> --- a/doc/powertop.8
-> +++ b/doc/powertop.8
-> @@ -54,6 +54,38 @@ generate a report for a specified number of seconds.
->  .TP
->  \fB\-\-version
->  print version information and exit.
-> +.SH COMMANDS
-> +In interactive mode, the following key bindings are available:
-> +.TP
-> +\fBTab
-> +Show next tab
-> +.TP
-> +\fBBackTab
-> +Show previous tab
-> +.TP
-> +\fBRight Arrow
-> +Scroll to the right
-> +.TP
-> +\fBLeft Arrow
-> +Scroll to the left
-> +.TP
-> +\fBUp Arrow, PageUp
-> +Scroll up or select previous item
-> +.TP
-> +\fBDown Arrow, PageDown
-> +Scroll down or select next item
-> +.TP
-> +\fBSpace, Return
-> +Activate current item
-> +.TP
-> +\fBs
-> +Set refresh timeout
-> +.TP
-> +\fBr
-> +Refresh window
-> +.TP
-> +\fBq, Ctrl-C, Escape
-> +Exit powertop
->  .SH BUGS
->  Send bug reports to <powertop(a)lists.01.org>
->  .SH SEE ALSO
-> -- =
+> > and let's make rlimit change after checkroot() call.
+> > =
 
-> 1.8.1.5
 > =
 
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
+> Good point. Agree. Here is the modified patch.
+> =
+
+> =
+
+> diff --git a/src/main.cpp b/src/main.cpp
+> index 0883424..d24a3db 100644
+> --- a/src/main.cpp
+> +++ b/src/main.cpp
+> @@ -36,6 +36,7 @@
+>  #include <getopt.h>
+>  #include <unistd.h>
+>  #include <locale.h>
+> +#include <sys/resource.h>
+>  =
+
+>  #include "cpu/cpu.h"
+>  #include "process/process.h"
+> @@ -283,11 +284,17 @@ static void powertop_init(void)
+>  	static char initialized =3D 0;
+>  	int ret;
+>  	struct statfs st_fs;
+> +	struct rlimit rlmt;
+>  =
+
+>  	if (initialized)
+>  		return;
+>  =
+
+>  	checkroot();
+> +
+> +	getrlimit (RLIMIT_NOFILE, &rlmt);
+> +	rlmt.rlim_cur =3D rlmt.rlim_max;
+> +	setrlimit (RLIMIT_NOFILE, &rlmt);
+> +
+>  	ret =3D system("/sbin/modprobe cpufreq_stats > /dev/null 2>&1");
+>  	ret =3D system("/sbin/modprobe msr > /dev/null 2>&1");
+>  	statfs("/sys/kernel/debug", &st_fs);
+> =
+
+>  =
+
 >=20
 
---===============3290756322583697884==--
+--===============1033032492803525859==--
 
