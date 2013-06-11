@@ -1,46 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============2151725858426643571=="
+Content-Type: multipart/mixed; boundary="===============8031522537795784030=="
 MIME-Version: 1.0
-From: Jose Luis Rivas <ghostbar at debian.org>
-Subject: Re: [Powertop] ia64 builds fails (and maybe alpha too?)
-Date: Tue, 03 Sep 2013 18:48:16 -0430
-Message-ID: <52266E38.3030307@debian.org>
-In-Reply-To: 52266C26.4070705@linux.intel.com
+From: Srinivas Pandruvada <srinivas.pandruvada at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] READER: add CONFIG_DEBUG_FS to Kernel
+ Parameters
+Date: Tue, 11 Jun 2013 09:51:35 -0700
+Message-ID: <51B75597.30605@linux.intel.com>
+In-Reply-To: 20130611163108.GA2218@swordfish.datadirectnet.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2151725858426643571==
+--===============8031522537795784030==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Tue Sep  3 18:39:26 2013, Arjan van de Ven wrote:
+
+I think most distros turns on CONFIG_DEBUG_FS. But still this patch is good.
+
+Thanks,
+Srinivas
+
+On 06/11/2013 09:31 AM, Sergey Senozhatsky wrote:
+> Add CONFIG_DEBUG_FS to the Kernel Parameters README section.
 >
-> if your kernel does not have "perf", there is no point in using
-> powertop....
-> really; it will not work at all.
+> Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
 >
-> (including anything asm-generic/foo also is the wrong answer; that
-> directory is not architectural
-> from a kernel perspective, only for indirect inclusion)
+> ---
+>
+>   README | 1 +
+>   1 file changed, 1 insertion(+)
+>
+> diff --git a/README b/README
+> index 07bbea0..2961eba 100644
+> --- a/README
+> +++ b/README
+> @@ -45,6 +45,7 @@ CONFIG_TRACING
+>   CONFIG_EVENT_POWER_TRACING_DEPRECATED
+>   CONFIG_X86_MSR
+>   ACPI_PROCFS_POWER
+> +CONFIG_DEBUG_FS
+>   =
+
+>   The patches in the patches/ sub-directory are required for PowerTOP to =
+function
+>   fully.
 >
 >
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>
 
-It does. I was just writing to Julian about this. It seems like it is
-actually a bug in the kernel not having it defined in ia64's unistd.h[0]
-(checking Linus's master branch).
 
-[0]
-https://github.com/torvalds/linux/blob/master/arch/ia64/include/uapi/asm/un=
-istd.h
-
-Meaning that it wont fail in alpha, but's failing on ia64 because that
-line is missing.
-
-Seems like the right hint, Arjan?
--- =
-
-Jose Luis Rivas
-The Debian Project -- http://debian.org
-
---===============2151725858426643571==--
+--===============8031522537795784030==--
 
