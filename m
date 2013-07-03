@@ -1,57 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============9173181488105619380=="
+Content-Type: multipart/mixed; boundary="===============4284179920669861981=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] embed self-contained javascript
-Date: Wed, 18 Sep 2013 11:06:47 +0300
-Message-ID: <20130918080647.GA2404@swordfish.minsk.epam.com>
-In-Reply-To: 5238C619.6020404@debian.org
+From: Nathan Van Ymeren <nathan.vany at gmail.com>
+Subject: [Powertop] Bug under Fedora 19 x86_64: Requesting Unregistered
+ Parameters 63 and 58
+Date: Tue, 02 Jul 2013 23:12:26 -0700
+Message-ID: <CAEKyVWMcFA+LS3iODk3sAGDUthYFPFc_pyr35XKx=LfU8Dh_Ng@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============9173181488105619380==
+--===============4284179920669861981==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (09/17/13 16:44), Jose Luis Rivas wrote:
-> On 09/17/2013 03:11 PM, Sergey Senozhatsky wrote:
-> =
+Hi folks,
 
-> =
+I recently upgraded to Fedora 19 and noticed my thinkpad was running a
+little hotter than usual.  Tried to open powertop and instead of the
+familiar menu I was greeted with endless spam of the same two lines,
+repeated:
 
-> =
+BUG: requesting unregistered parameter 58
+BUG: requesting unregistered parameter 63
 
-> BTW, trying to apply this patch I saw the src/Makefile.am makes a call
-> to `src/csstoh.sh` which does not exists in the codebase. So it throws
-> errors applying this patch to Debian.
+Running with --debug had no discernible effect.  Does powertop leave a log
+file anywhere for investigation?
 
-hm, src/csstoh.sh exists in the codebase. where did you get source
-code from?
+N
 
-> ```
-> make[3]: Entering directory `/tmp/buildd/powertop-2.4/src'
-> /bin/bash ./csstoh.sh powertop.css css.h
-> /bin/bash: ./csstoh.sh: No such file or directory
-> make[3]: *** [css.h] Error 127
-> make[3]: Leaving directory `/tmp/buildd/powertop-2.4/src'
-> make[2]: *** [all-recursive] Error 1
-> make[2]: Leaving directory `/tmp/buildd/powertop-2.4'
-> make[1]: *** [all] Error 2
-> make[1]: Leaving directory `/tmp/buildd/powertop-2.4'
-> dh_auto_build: make -j1 returned exit code 2
-> make: *** [build] Error 2
-> dpkg-buildpackage: error: debian/rules build gave error exit status 2
-> ```
-> =
+--===============4284179920669861981==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
-> I guess it comes because of the change in the CSS so it needs to
-> update the `src/css.h`.
+PGRpdiBkaXI9Imx0ciI+SGkgZm9sa3MsPGRpdj48YnI+PC9kaXY+PGRpdj5JIHJlY2VudGx5IHVw
+Z3JhZGVkIHRvIEZlZG9yYSAxOSBhbmQgbm90aWNlZCBteSB0aGlua3BhZCB3YXMgcnVubmluZyBh
+IGxpdHRsZSBob3R0ZXIgdGhhbiB1c3VhbC4goFRyaWVkIHRvIG9wZW4gcG93ZXJ0b3AgYW5kIGlu
+c3RlYWQgb2YgdGhlIGZhbWlsaWFyIG1lbnUgSSB3YXMgZ3JlZXRlZCB3aXRoIGVuZGxlc3Mgc3Bh
+bSBvZiB0aGUgc2FtZSB0d28gbGluZXMsIHJlcGVhdGVkOjwvZGl2Pgo8ZGl2Pjxicj48L2Rpdj48
+ZGl2PjxkaXY+QlVHOiByZXF1ZXN0aW5nIHVucmVnaXN0ZXJlZCBwYXJhbWV0ZXIgNTg8L2Rpdj48
+ZGl2PkJVRzogcmVxdWVzdGluZyB1bnJlZ2lzdGVyZWQgcGFyYW1ldGVyIDYzPC9kaXY+PC9kaXY+
+PGRpdj48YnI+PC9kaXY+PGRpdj5SdW5uaW5nIHdpdGggLS1kZWJ1ZyBoYWQgbm8gZGlzY2Vybmli
+bGUgZWZmZWN0LiCgRG9lcyBwb3dlcnRvcCBsZWF2ZSBhIGxvZyBmaWxlIGFueXdoZXJlIGZvciBp
+bnZlc3RpZ2F0aW9uPzwvZGl2Pgo8ZGl2Pjxicj48L2Rpdj48ZGl2Pk48L2Rpdj48L2Rpdj4K
 
-css.h is generated from css file
-
-	$(SHELL) ./csstoh.sh powertop.css css.h
-
-	-ss
-
---===============9173181488105619380==--
+--===============4284179920669861981==--
 
