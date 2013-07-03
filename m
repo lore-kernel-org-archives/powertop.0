@@ -1,41 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============0830456303211957713=="
+Content-Type: multipart/mixed; boundary="===============6767671271851981886=="
 MIME-Version: 1.0
-From: Mark Boorer <markboo99 at gmail.com>
-Subject: Re: [Powertop] Command line set tunables option
-Date: Thu, 04 Jul 2013 23:21:18 +1000
-Message-ID: <CAAKyH8x8ZgMN8MqLOX-55T9GVX_hfVNEtD5mpg-ZTyy+NF2GmQ@mail.gmail.com>
-In-Reply-To: 20130704092921.GC2269@swordfish
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] Bug under Fedora 19 x86_64: Requesting Unregistered
+ Parameters 63 and 58
+Date: Wed, 03 Jul 2013 14:55:26 +0300
+Message-ID: <20130703115526.GB2225@swordfish>
+In-Reply-To: CAEKyVWMcFA+LS3iODk3sAGDUthYFPFc_pyr35XKx=LfU8Dh_Ng@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0830456303211957713==
+--===============6767671271851981886==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+On (07/02/13 23:12), Nathan Van Ymeren wrote:
+>    Hi folks,
+>    I recently upgraded to Fedora 19 and noticed my thinkpad was running a
+>    little hotter than usual. =EF=BF=BDTried to open powertop and instead =
+of the
+>    familiar menu I was greeted with endless spam of the same two lines,
+>    repeated:
+>    BUG: requesting unregistered parameter 58
+>    BUG: requesting unregistered parameter 63
+>    Running with --debug had no discernible effect. =EF=BF=BDDoes powertop=
+ leave a log
+>    file anywhere for investigation?
+>    N
+
 Hello,
 
-Paul Menzel wrote:
-> Using pastebin services to post patches is not the way to go as they are
-> hard to review and they are lost once the service shuts down.
-
-Apologies Paul, I thought I was following the rule from
-https://01.org/community/participation-guidelines#list , and I can
-totally see the problems that having patches on external sites would
-bring.
+/** sorry, broken mail headers in previous email*/
 
 
-Sergey Senozhatsky wrote:
-> I took your patch and did some adjustments. I also changes option name
-> to --auto-tune.
+could you please show content of
 
-Sergey, No worries. I didn't think that main was the best place for it
-either, but I also wasn't sure what kind of reception my hack might
-receive. Thanks for taking the time to better integrate it with the
-rest of the project!
+	/sys/devices/platform/thinkpad_hwmon/
+and
+	/sys/devices/platform/thinkpad_acpi/leds/
 
-Cheers,
-Mark
 
---===============0830456303211957713==--
+	-ss
+
+--===============6767671271851981886==--
 
