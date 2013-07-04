@@ -1,108 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============8579629540872364381=="
+Content-Type: multipart/mixed; boundary="===============1436489270460003597=="
 MIME-Version: 1.0
-From: Thomas Waldecker <thomas.waldecker at gmail.com>
-Subject: [Powertop] [PATCH] csstoh shell-script for cross-compiling
-Date: Fri, 01 Feb 2013 21:37:09 +0100
-Message-ID: <1359751029-7114-1-git-send-email-thomas.waldecker@gmail.com>
-In-Reply-To: 20130131230555.GA7209@bacon.lysator.liu.se
+From: Paul Menzel <paulepanter at users.sourceforge.net>
+Subject: Re: [Powertop] Command line set tunables option
+Date: Thu, 04 Jul 2013 10:40:11 +0200
+Message-ID: <1372927211.6008.13.camel@mattotaupa>
+In-Reply-To: CAAKyH8xsWuPUPtpLeHimD0r7=iH2NOv6RBU1eOnKV5O05kGpig@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8579629540872364381==
+--===============1436489270460003597==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Updated the shellscript with changes made by Igor posted in mailing list
-https://lists.01.org/pipermail/powertop/2012-July/000165.html
----
- .gitignore      |  1 -
- src/Makefile.am |  3 +--
- src/csstoh.sh   | 21 ++++++++++-----------
- 3 files changed, 11 insertions(+), 14 deletions(-)
-
-diff --git a/.gitignore b/.gitignore
-index 96ffdba..35d41c2 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -39,7 +39,6 @@ po/*.gmo
- po/stamp-po
- src/powertop
- src/css.h
--src/csstoh
- src/Makefile.in
- src/.deps/
- src/Makefile
-diff --git a/src/Makefile.am b/src/Makefile.am
-index a53d942..398b8a7 100644
---- a/src/Makefile.am
-+++ b/src/Makefile.am
-@@ -46,6 +46,5 @@ AM_LDFLAGS =3D $(LIBS) $(NCURSES_LIBS) $(PCIUTILS_LIBS) $=
-(LIBNL_LIBS) $(LIBZ_LIBS)
- BUILT_SOURCES =3D css.h
- CLEANFILES =3D css.h
- css.h: powertop.css
--	chmod +x ./csstoh.sh
--	./csstoh.sh "$(srcdir)"/powertop.css css.h
-+	$(SHELL) ./csstoh.sh powertop.css css.h
- =
-
-diff --git a/src/csstoh.sh b/src/csstoh.sh
-index 5918d12..9d4100b 100755
---- a/src/csstoh.sh
-+++ b/src/csstoh.sh
-@@ -1,4 +1,4 @@
--#!/bin/bash
-+#!/bin/sh
- #
- # This program file is free software; you can redistribute it and/or modif=
-y it
- # under the terms of the GNU General Public License as published by the
-@@ -16,8 +16,7 @@
- # Boston, MA 02110-1301 USA
- # or just google for it.
- #
--# Written by Igor Zhbanov<i.zhbanov at samsung.com>
--
-+# Written by Igor Zhbanov <i.zhbanov at samsung.com>
- =
-
- if [ $# -lt 2 ]; then
- 	echo "Usage: csstoh.sh cssfile header.h"
-@@ -29,17 +28,17 @@ if [ ! -r $1 ]; then
- 	exit 1
- fi
- =
-
--if ! echo -n>$2; then
-+if ! echo -n >$2; then
- 	echo "Can't open file $2 for writing."
- 	exit 1
- fi
- =
-
--echo "#ifndef __INCLUDE_GUARD_CCS_H">>  $2
--echo "#define __INCLUDE_GUARD_CCS_H">>  $2
--echo>>  $2
--echo "const char css[] =3D ">>  $2
-+echo "#ifndef __INCLUDE_GUARD_CCS_H" >> $2
-+echo "#define __INCLUDE_GUARD_CCS_H" >> $2
-+echo >> $2
-+echo "const char css[] =3D " >> $2
- =
-
--sed -r 's/^(.*)$/\t\"\1\\n\"/' $1>>  $2
-+sed -r 's/^(.*)$/\t\"\1\\n\"/' $1 >> $2
- =
-
--echo ";">>  $2
--echo "#endif">>  $2
-+echo ";" >> $2
-+echo "#endif" >> $2
--- =
-
-1.8.1
+Dear Mark,
 
 
---===============8579629540872364381==--
+thank you for your patch!
+
+
+Am Donnerstag, den 04.07.2013, 13:13 +1000 schrieb Mark Boorer:
+
+> I've written a small patch for powertop to add a command line option that
+> will set all of the tunables to GOOD, then exit.
+> =
+
+> I often find myself opening powertop, switching to the tunables tab and
+> clicking enter on each of the settings when I run my laptop. I do this
+> because I'm too lazy to go through and set everything up manually ;)
+> Not sure if this is the desired workflow for people to use this
+> application, but if you are interested is it possible for the patch to be
+> merged in?
+> =
+
+> Patch is located here.
+> http://pastebin.com/6ahAaBvk
+
+please send that patch formatted with `git format-patch -1` to the
+mailing list. Either by using `git send-email` or copy-pasting the file
+content in a mailer which does not automatically break lines.
+
+Using pastebin services to post patches is not the way to go as they are
+hard to review and they are lost once the service shuts down.
+
+
+Thanks,
+
+Paul
+
+
+PS: Could you please configure your Google Mail account to just send
+plain text message and to not include a HTML part [1]?
+
+
+[1] http://en.opensuse.org/openSUSE:Mailing_list_netiquette
+
+--===============1436489270460003597==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="signature.asc"
+
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
+L0xpbnV4KQoKaUVZRUFCRUNBQVlGQWxIVk5Pc0FDZ2tRUFgxYUsyd09IVmpKQmdDY0Q0TDNoWGtx
+cDl4cTNQMnVxaUVIRDgybQpYMDRBbjJpTUIwK3lMSUpJMmU0cHEzRUN6NHdvWWxwRwo9U3pZegot
+LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
+
+--===============1436489270460003597==--
 
