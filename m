@@ -1,51 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============1393633388078089384=="
+Content-Type: multipart/mixed; boundary="===============7928938695907403285=="
 MIME-Version: 1.0
-From: Kristen Carlson Accardi <kristen at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Using std::max to handle all such kind of logic
-Date: Thu, 31 Jan 2013 15:39:50 -0800
-Message-ID: <20130131153950.6f2d0548@bluebird.jf.intel.com>
-In-Reply-To: 1358913287-8694-1-git-send-email-zhang.austin@gmail.com
+From: Mark Boorer <markboo99 at gmail.com>
+Subject: [Powertop] Command line set tunables option
+Date: Thu, 04 Jul 2013 13:13:35 +1000
+Message-ID: <CAAKyH8xsWuPUPtpLeHimD0r7=iH2NOv6RBU1eOnKV5O05kGpig@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1393633388078089384==
+--===============7928938695907403285==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 23 Jan 2013 11:54:47 +0800
-Austin Zhang <zhang.austin(a)gmail.com> wrote:
+Hi,
 
-> Signed-off-by: Austin Zhang <zhang.austin(a)gmail.com>
-> ---
->  src/cpu/cpu.cpp |    5 +++--
->  1 files changed, 3 insertions(+), 2 deletions(-)
-> =
+I've written a small patch for powertop to add a command line option that
+will set all of the tunables to GOOD, then exit.
 
-> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-> index 7f3af69..38540a5 100644
-> --- a/src/cpu/cpu.cpp
-> +++ b/src/cpu/cpu.cpp
-> @@ -525,8 +525,9 @@ void report_display_cpu_pstates(void)
->  	unsigned int i, pstates_num;
->  =
+I often find myself opening powertop, switching to the tunables tab and
+clicking enter on each of the settings when I run my laptop. I do this
+because I'm too lazy to go through and set everything up manually ;)
+Not sure if this is the desired workflow for people to use this
+application, but if you are interested is it possible for the patch to be
+merged in?
 
->  	for (i =3D 0, pstates_num =3D 0; i < all_cpus.size(); i++)
-> -		if (all_cpus[i] && all_cpus[i]->pstates.size() >
-> pstates_num)
-> -			pstates_num =3D all_cpus[i]->pstates.size();
-> +		if (all_cpus[i])
-> +			pstates_num =3D std::max<unsigned
-> int>(pstates_num,
-> +
-> all_cpus[i]->pstates.size()); =
+Patch is located here.
+http://pastebin.com/6ahAaBvk
 
->  	report.begin_section(SECTION_CPUFREQ);
->  	report.add_header("Processor Frequency Report");
 
-Applied, thanks.
+Cheers,
+Mark
 
-Kristen
+--===============7928938695907403285==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
---===============1393633388078089384==--
+PGRpdiBkaXI9Imx0ciI+PGRpdj48ZGl2PkhpLDxicj48YnI+PC9kaXY+PGRpdj5JJiMzOTt2ZSB3
+cml0dGVuIGEgc21hbGwgcGF0Y2ggZm9yIHBvd2VydG9wIHRvIGFkZCBhIGNvbW1hbmQgbGluZSBv
+cHRpb24gdGhhdCB3aWxsIHNldCBhbGwgb2YgdGhlIHR1bmFibGVzIHRvIEdPT0QsIHRoZW4gZXhp
+dC48YnI+PGJyPjwvZGl2Pkkgb2Z0ZW4gZmluZCBteXNlbGYgb3BlbmluZyBwb3dlcnRvcCwgc3dp
+dGNoaW5nIHRvIHRoZSB0dW5hYmxlcyB0YWIgYW5kIGNsaWNraW5nIGVudGVyIG9uIGVhY2ggb2Yg
+dGhlIHNldHRpbmdzIHdoZW4gSSBydW4gbXkgbGFwdG9wLiBJIGRvIHRoaXMgYmVjYXVzZSBJJiMz
+OTttIHRvbyBsYXp5IHRvIGdvIHRocm91Z2ggYW5kIHNldCBldmVyeXRoaW5nIHVwIG1hbnVhbGx5
+IDspPGJyPgoKTm90IHN1cmUgaWYgdGhpcyBpcyB0aGUgZGVzaXJlZCB3b3JrZmxvdyBmb3IgcGVv
+cGxlIHRvIHVzZSB0aGlzIGFwcGxpY2F0aW9uLCBidXQgaWYgeW91IGFyZSBpbnRlcmVzdGVkIGlz
+IGl0IHBvc3NpYmxlIGZvciB0aGUgcGF0Y2ggdG8gYmUgbWVyZ2VkIGluPzxicj48YnI+UGF0Y2gg
+aXMgbG9jYXRlZCBoZXJlLjxicj48YSBocmVmPSJodHRwOi8vcGFzdGViaW4uY29tLzZhaEFhQnZr
+Ij5odHRwOi8vcGFzdGViaW4uY29tLzZhaEFhQnZrPC9hPjxicj4KCjxicj48YnI+PC9kaXY+Q2hl
+ZXJzLDxicj5NYXJrPGJyPjwvZGl2Pgo=
+
+--===============7928938695907403285==--
 
