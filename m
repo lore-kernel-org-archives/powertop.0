@@ -1,61 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============8033406887380071041=="
+Content-Type: multipart/mixed; boundary="===============1243983914924044658=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] README: add CONFIG_X86_MSR to the list of
- required kernel config options
-Date: Thu, 21 Feb 2013 12:40:16 +0300
-Message-ID: <20130221094015.GB2325@swordfish.minsk.epam.com>
-In-Reply-To: 1361438841-14026-1-git-send-email-jani.nikula@linux.intel.com
+Subject: Re: [Powertop] Intel GPU statistics on multi-GPU systems
+Date: Mon, 08 Jul 2013 13:39:34 +0300
+Message-ID: <20130708103934.GA4232@swordfish.minsk.epam.com>
+In-Reply-To: 51DAB101.4090100@penneman.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8033406887380071041==
+--===============1243983914924044658==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (02/21/13 11:27), jani.nikula(a)linux.intel.com wrote:
-> From: Jani Nikula <jani.nikula(a)intel.com>
+On (07/08/13 14:30), Niels Penneman wrote:
+[..]
+> >> +
+> > do we really need to store 512 bytes instead of 4? as a public member?
+> >
+> > btw, why 512?
 > =
 
-> PowerTOP fails on x86 without CONFIG_X86_MSR.
-> =
-
-> Signed-off-by: Jani Nikula <jani.nikula(a)intel.com>
-> ---
->  README |    1 +
->  1 file changed, 1 insertion(+)
-> =
-
-> diff --git a/README b/README
-> index 7e789e0..07bbea0 100644
-> --- a/README
-> +++ b/README
-> @@ -43,6 +43,7 @@ CONFIG_PERF_COUNTERS
->  CONFIG_TRACEPOINTS
->  CONFIG_TRACING
->  CONFIG_EVENT_POWER_TRACING_DEPRECATED
-> +CONFIG_X86_MSR
->  ACPI_PROCFS_POWER
+> Indeed, we can store GPU number instead. I looked at how paths were
+> stored throughout powertop and found buffer sizes of 256 for filenames,
+> so I doubled it to 512 when adding '/sys/class/drm' etc. GPU number is
+> better though, I'll edit the patch.
 >
 
-looks good to me.
+thanks.
+
+
+[..]
+> >> +    char filename[512];
+> >>  =
+
+> > 4K
+> Did you mean buffer size should be 4k ? It would be helpful if powertop
+> sources actually had constants for this.
+>
+
+better to use standard ones.
+
+
+linux/limits.h
+[..]
+#define NAME_MAX         255    /* # chars in a file name */
+#define PATH_MAX        4096    /* # chars in a path name including nul
+[..]
 
 	-ss
-  =
 
->  The patches in the patches/ sub-directory are required for PowerTOP to f=
-unction
-> -- =
-
-> 1.7.9.5
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============8033406887380071041==--
+--===============1243983914924044658==--
 
