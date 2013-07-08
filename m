@@ -1,66 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============7724423363408865788=="
+Content-Type: multipart/mixed; boundary="===============4848684590682069266=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] ia64 builds fails (and maybe alpha too?)
-Date: Wed, 04 Sep 2013 10:32:59 +0300
-Message-ID: <20130904073258.GA2616@swordfish>
-In-Reply-To: 52266C26.4070705@linux.intel.com
+From: Chris Samuel <chris at csamuel.org>
+Subject: Re: [Powertop] Command line set tunables option
+Date: Tue, 09 Jul 2013 08:47:43 +1000
+Message-ID: <51DB418F.3040602@csamuel.org>
+In-Reply-To: 51DAE379.1010605@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7724423363408865788==
+--===============4848684590682069266==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (09/03/13 16:09), Arjan van de Ven wrote:
-> >g++ -DHAVE_CONFIG_H -I. -I..  -D_FORTIFY_SOURCE=3D2
-> >- -I/usr/include/libnl3     -DLOCALEDIR=3D\"/usr/share/locale\"
-> >- -D_FORTIFY_SOURCE=3D2 -fno-omit-frame-pointer -fstack-protector -Wall
-> >- -Wshadow -Wformat   -I/usr/include/libnl3    -g -O2 -Wformat
-> >- -Werror=3Dformat-security -c -o perf/powertop-perf.o `test -f
-> >'perf/perf.cpp' || echo './'`perf/perf.cpp
-> >perf/perf.cpp:1:0: warning: -fstack-protector not supported for this
-> >target [enabled by default]
-> >perf/perf.cpp: In function 'int sys_perf_event_open(perf_event_attr*,
-> >pid_t, int, int, long unsigned int)':
-> >perf/perf.cpp:67:17: error: '__NR_perf_event_open' was not declared in
-> >this scope
-> >perf/perf.cpp:69:1: warning: control reaches end of non-void function
-> >[-Wreturn-type]
-> >make[4]: *** [perf/powertop-perf.o] Error 1
-> >make[3]: *** [all] Error 2
-> >```
-> =
+On 09/07/13 02:06, Arjan van de Ven wrote:
 
-> if your kernel does not have "perf", there is no point in using powertop.=
-...
-> really; it will not work at all.
-> =
+> the 2.3 release at least does this in the HTML report, but not on the
+> screen
 
-> (including anything asm-generic/foo also is the wrong answer; that direct=
-ory is not architectural
-> from a kernel perspective, only for indirect inclusion)
-> =
+Wonderful, thanks!  I'd not realised that, mea culpa.
 
+> (on the screen there's just very limited space, while in the
+> HTML report there is space...)
 
-we had this workaround some time ago, it was removed by
+Understood, though as Magnus has mentioned perhaps that could be
+revisited now the main window is scrollable?
 
-commit 9ce9ec662ce7b642967fd75222114b624b8a503a
-Author: Chris E Ferron <chris.e.ferron(a)linux.intel.com>
-Date:   Fri Jul 20 15:14:08 2012 -0700
+Thanks for a great tool.
 
-    removed re-define of __NR_perf_event_open, what was needed for stale
-    headers in older kernels. sys/syscall.h will not be correct.
+All the best,
+Chris
+-- =
 
+  Chris Samuel  :  http://www.csamuel.org/  :  Melbourne, VIC
 
--/* __NR_perf_event_open in ia64 and alpha is defined elsewhere */
--#ifdef __ia64__
--#include <asm-generic/unistd.h>
--#endif
-
-
-	-ss
-
---===============7724423363408865788==--
+--===============4848684590682069266==--
 
