@@ -1,55 +1,98 @@
-Content-Type: multipart/mixed; boundary="===============7928938695907403285=="
+Content-Type: multipart/mixed; boundary="===============1439393208383650112=="
 MIME-Version: 1.0
-From: Mark Boorer <markboo99 at gmail.com>
-Subject: [Powertop] Command line set tunables option
-Date: Thu, 04 Jul 2013 13:13:35 +1000
-Message-ID: <CAAKyH8xsWuPUPtpLeHimD0r7=iH2NOv6RBU1eOnKV5O05kGpig@mail.gmail.com>
+From: Pascal Diogo Antunes <pascal at diogoantunes.org>
+Subject: Re: [Powertop] Power Estimation
+Date: Wed, 10 Jul 2013 18:58:48 +0200
+Message-ID: <20130710185848.1d67b351d16140525c387d0d@diogoantunes.org>
+In-Reply-To: CABsxX9+V75mJrSjmB-A6BNnyPcHVb0UC8PJBqm7nS6zPEsyHww@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7928938695907403285==
+--===============1439393208383650112==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Tue, 9 Jul 2013 14:24:33 -0700
+"Kok, Auke-jan H" <auke-jan.h.kok(a)intel.com> wrote:
 
-I've written a small patch for powertop to add a command line option that
-will set all of the tunables to GOOD, then exit.
+> On Tue, Jul 9, 2013 at 1:36 PM, Pascal Diogo Antunes
+> <pascal(a)diogoantunes.org> wrote:
+> > On Tue, 9 Jul 2013 12:47:38 -0700
+> > "Kok, Auke-jan H" <auke-jan.h.kok(a)intel.com> wrote:
+> >
+> >> On Tue, Jul 9, 2013 at 8:41 AM,  <pascal(a)diogoantunes.org> wrote:
+> >> > Hi,
+> >> > I installed powertop, a great program. But I see on the
+> >> > https://01.org/powertop/sites/default/files/powertop.png picture that
+> >> > is possible to have a power estimation.
+> >> > Great, but I don't have no power indication available.
+> >> >
+> >> > What can I do?
+> >>
+> >> Power consumption can be estimated by running on the battery (draining
+> >> it and measuring the drain). So, logically, you should unplug your
+> >> power cable.
+> >>
+> >> If you do not have a battery in your system, you can use an external
+> >> power meter, but those can be costly.
+> >>
+> >> Cheers,
+> >>
+> >> Auke
+> >
+> > I unpluged and ...
+> > # acpi
+> > Battery 0: Discharging, 79%, rate information unavailable
+> > # powertop (powertop 2.0 /usr/local/sbin/powertop)
+> > Loaded 0 prior measurements
+> > Cannot load from file /var/cache/powertop/saved_parameters.powertop
+> >  [?1049h [1;58r (B [m [4l [?7h [39;49m [?1h =3D [39;49m (B [m [H
+> > [2Jterminate called after throwing an instance of
+> > 'std::ios_base::failure' what():  basic_filebuf::underflow error
+> > reading the file
+> =
 
-I often find myself opening powertop, switching to the tunables tab and
-clicking enter on each of the settings when I run my laptop. I do this
-because I'm too lazy to go through and set everything up manually ;)
-Not sure if this is the desired workflow for people to use this
-application, but if you are interested is it possible for the patch to be
-merged in?
+> it may be interesting to open a bug report and provide the details on
+> the system and the battery information that sysfs provides for your
+> system such that that crash can be fixed.
+> =
 
-Patch is located here.
-http://pastebin.com/6ahAaBvk
+> Cheers,
+> =
 
+> Auke
 
-Cheers,
-Mark
+I installed the last powertop release, and it works.
+But still no power indication available. It's blank instead.
+May be a program/package is missing?
 
---===============7928938695907403285==
-Content-Type: text/html
+-- =
+
+Libere,
+Pascal Diogo Antunes.
+
+--===============1439393208383650112==
+Content-Type: application/pgp-signature
 MIME-Version: 1.0
 Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+Content-Disposition: attachment; filename="attachment.sig"
 
-PGRpdiBkaXI9Imx0ciI+PGRpdj48ZGl2PkhpLDxicj48YnI+PC9kaXY+PGRpdj5JJiMzOTt2ZSB3
-cml0dGVuIGEgc21hbGwgcGF0Y2ggZm9yIHBvd2VydG9wIHRvIGFkZCBhIGNvbW1hbmQgbGluZSBv
-cHRpb24gdGhhdCB3aWxsIHNldCBhbGwgb2YgdGhlIHR1bmFibGVzIHRvIEdPT0QsIHRoZW4gZXhp
-dC48YnI+PGJyPjwvZGl2Pkkgb2Z0ZW4gZmluZCBteXNlbGYgb3BlbmluZyBwb3dlcnRvcCwgc3dp
-dGNoaW5nIHRvIHRoZSB0dW5hYmxlcyB0YWIgYW5kIGNsaWNraW5nIGVudGVyIG9uIGVhY2ggb2Yg
-dGhlIHNldHRpbmdzIHdoZW4gSSBydW4gbXkgbGFwdG9wLiBJIGRvIHRoaXMgYmVjYXVzZSBJJiMz
-OTttIHRvbyBsYXp5IHRvIGdvIHRocm91Z2ggYW5kIHNldCBldmVyeXRoaW5nIHVwIG1hbnVhbGx5
-IDspPGJyPgoKTm90IHN1cmUgaWYgdGhpcyBpcyB0aGUgZGVzaXJlZCB3b3JrZmxvdyBmb3IgcGVv
-cGxlIHRvIHVzZSB0aGlzIGFwcGxpY2F0aW9uLCBidXQgaWYgeW91IGFyZSBpbnRlcmVzdGVkIGlz
-IGl0IHBvc3NpYmxlIGZvciB0aGUgcGF0Y2ggdG8gYmUgbWVyZ2VkIGluPzxicj48YnI+UGF0Y2gg
-aXMgbG9jYXRlZCBoZXJlLjxicj48YSBocmVmPSJodHRwOi8vcGFzdGViaW4uY29tLzZhaEFhQnZr
-Ij5odHRwOi8vcGFzdGViaW4uY29tLzZhaEFhQnZrPC9hPjxicj4KCjxicj48YnI+PC9kaXY+Q2hl
-ZXJzLDxicj5NYXJrPGJyPjwvZGl2Pgo=
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMSAoR05V
+L0xpbnV4KQoKaVFJY0JBRUJBZ0FHQlFKUjNaTElBQW9KRVBnbXhyZTNYdFk0RE9jUC8yVjg3bis2
+eEQ3Z3c0Ym5RQllRajFMdApIcThwb1NnUlVsNkZ4bStJZW8yR1hpUEdjT0RYNHdNb2cyVUMyU05N
+cFNmdjMvc3JpcWhNYWxyZWg5Tk91Z2NICmx5bDAzaFFVVW45SXB5SGY3WXQ0RTFZTFNkeDBvaHZu
+c0s5Nmh4ak9oQUthdkN3bGllSE4zdzZrSERDa1JqN0wKdVJHR1I0dENreUFUQld2bDhWb3J1SHcr
+ZWJCRDMzYWNRM1hHdTIzQ0JubnlNRFdQRnczTDJPMkdySFRLcGM2YQpnSC9qdXdLUVNUZkFsOCtl
+N3FpdkNEYzhnRnp5V2p6cTJwcEdmZ1JiTVFnbUFVbVVCNkRUQnRZODd4T1ZJK3owClBDanRHVzJQ
+RTF3ZmM0VkNsTlBEaW9mZzduVzBRVXRrZWNOcCtMVVJheVBMN29kVWxnMzBIdUhGT0s0N0JsdXcK
+MDZBSzRrR2JITVRkcFdTcEhDK0lsQ2ExVlg4bWVhdXh5UUdFODBodkJCRmp0RStmMW50RXBBMTJU
+MmZxODRTSwpPMTN3czVqQWRFeC8xL3N6eHdnVmJEcDliaVFhV25CbEh4WVV1ZFFncXcvR1lBZUVR
+OGVRN3hhaW9xSkFvT3Q4CmVkeCtWTnZ0K3V0aTBHa0wwUkdyaE9lSXNFc1VycWgwMWxoVWpFZHZl
+dWxXMUo0VG4xaGdDcU9YVzVaZjM0RngKU2NoRGFtcEpkRGNQVUFNKy9wL2lqRVdEUy8xV0NDbnFl
+dER0Z3dKdExZSVpaa3R1cE5XeERPMWx6bUJjZWpxYQpNcjEwazJrbVNxZ3NUZHFiaVQxbUxGU01R
+eXl5eEs2VXRkRlNWUk0wQWJlRmRvZlBGZ1NSMXNQQjFmanBTMDZICkdQUFZ3NExyejB0Ni9DSkxZ
+bEdDCj1Zb0hhCi0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQo=
 
---===============7928938695907403285==--
+--===============1439393208383650112==--
 
