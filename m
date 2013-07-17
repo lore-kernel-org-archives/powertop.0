@@ -1,99 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============3904010106919282821=="
+Content-Type: multipart/mixed; boundary="===============1524924330082977676=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] src/process/do_process.cpp: Add suffix `u` to
- `4294967295` to signify an unsigned number
-Date: Sun, 03 Feb 2013 18:10:12 +0300
-Message-ID: <20130203151012.GB2470@swordfish>
-In-Reply-To: 1359843789.5545.21.camel@mattotaupa
+From: Miguel Ferreira <m.ferreira at sig.eu>
+Subject: Re: [Powertop] Process-level power estimation
+Date: Wed, 17 Jul 2013 14:16:01 +0200
+Message-ID: <3E48080A-34E1-407F-9FFC-911F84B144B1@sig.eu>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3904010106919282821==
+--===============1524924330082977676==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (02/02/13 23:23), Paul Menzel wrote:
+I forgot to mention that I'm using PowerTop 2.3
+
+And I'm sorry for the HTML message! These dam signatures...
+
+> Hi,
 > =
 
-> The C++ compiler
+> I'm currently doing research into power profiling tools and PowerTop is o=
+ne of the tools I would like to test.
 > =
 
->         $ g++ --version
->         g++-4.7.real (Debian 4.7.2-15) 4.7.2
->         Copyright (C) 2012 Free Software Foundation, Inc.
->         This is free software; see the source for copying conditions.  Th=
-ere is NO
->         warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULA=
-R PURPOSE.
+> Because the research I'm doing is on server hardware I had to use an exte=
+rnal power meter with PowerTop.
+> I've decided to use a Watts Up? Pro meter because I already had one, so I=
+ changed the code (in src/measurement/extech.cpp) that reads from the Extec=
+h to read from the Watts Up? Pro. =
+
+> As a result PowerTop now reports on energy drain and that seems correct.
 > =
 
-> reports the following warning.
+> I read in other threads that PowerTop needs to accumulate measurements be=
+fore it can provide process-level power estimates.
+> I also read that it should collect (roughly) over 100 measurements.
+> So I ran PowerTop in calibration mode and then left it running for over 3=
+0 minutes (with an update interval of 1 second).
+> Still I don't get the first column ("Power est.") shown in the About page=
+ of the website.
 > =
 
->         $ make
->         [=E2=80=A6]
->           CXX    process/powertop-do_process.o
->         process/do_process.cpp:595:3: warning: this decimal constant is u=
-nsigned only in ISO C90 [enabled by default]
->         [=E2=80=A6]
-> =
+> I'm wondering how can I check if PowerTop is collecting measurements at a=
+ll?
+> Or do I just need to let it run for longer?
 
-> Adding the suffix to the constant gets rid of the warning [1].
-> =
+Miguel
+_________________________
+Miguel Ferreira | Researcher
++31 20 314 09 50 | m.ferreira(a)sig.eu =
 
-> [1] http://stackoverflow.com/questions/2347936/cant-get-rid-of-this-decim=
-al-constant-is-unsigned-only-in-iso-c90-warning
-> ---
->  src/process/do_process.cpp |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> =
-
-> diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
-> index 322ad4c..3bb1573 100644
-> --- a/src/process/do_process.cpp
-> +++ b/src/process/do_process.cpp
-> @@ -579,7 +579,7 @@ void perf_process_bundle::handle_trace_point(void *tr=
-ace, int cpu, uint64_t time
->  	}
->  	else if (strcmp(event->name, "cpu_idle") =3D=3D 0) {
->  		ret =3D pevent_get_field_val(NULL, event, "state", &rec, &val, 0);
-> -		if (val =3D=3D 4294967295)
-> +		if (val =3D=3D 4294967295u)
-
-NACK.
-
-the same point: cpu_idle tracepoint defined as    =
-
-
-         TP_PROTO(unsigned int state, unsigned int cpu_id)
-please use `=3D=3D (unsigned int)-1'.
-   =
-
-
-+ we need there `-1' return code check from pevent_get_field_val() before
-we test val.
-
-               =
-
-        -ss
-
-
->  			consume_blame(cpu);
->  		else
->  			set_wakeup_pending(cpu);
-> -- =
-
-> 1.7.10.4
+Software Improvement Group | www.sig.eu
 
 
 
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
-
-
---===============3904010106919282821==--
+--===============1524924330082977676==--
 
