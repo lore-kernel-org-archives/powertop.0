@@ -1,116 +1,103 @@
-Content-Type: multipart/mixed; boundary="===============5567089871800444621=="
+Content-Type: multipart/mixed; boundary="===============0576461165415358703=="
 MIME-Version: 1.0
-From: Igor Zhbanov <i.zhbanov at samsung.com>
-Subject: Re: [Powertop] [PATCH] csstoh shell-script for cross-compiling
-Date: Tue, 05 Feb 2013 13:50:34 +0400
-Message-ID: <5110D5EA.8040107@samsung.com>
-In-Reply-To: 1360053409-29101-1-git-send-email-thomas.waldecker@gmail.com
+From: Kristen Carlson Accardi <kristen at linux.intel.com>
+Subject: [Powertop] PowerTOP 2.4 released!
+Date: Fri, 19 Jul 2013 10:13:21 -0700
+Message-ID: <20130719101321.5fe711bb@bluebird.jf.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5567089871800444621==
+--===============0576461165415358703==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Thomas Waldecker wrote:
-> Updated the shellscript with changes made by Igor posted in mailing list
-> https://lists.01.org/pipermail/powertop/2012-July/000165.html
->
-> Signed-off-by: Thomas Waldecker <thomas.waldecker(a)gmail.com>
-> ---
->   src/Makefile.am |  3 +--
->   src/csstoh.sh   | 21 ++++++++++-----------
->   2 files changed, 11 insertions(+), 13 deletions(-)
->
-> diff --git a/src/Makefile.am b/src/Makefile.am
-> index a53d942..398b8a7 100644
-> --- a/src/Makefile.am
-> +++ b/src/Makefile.am
-> @@ -46,6 +46,5 @@ AM_LDFLAGS =3D $(LIBS) $(NCURSES_LIBS) $(PCIUTILS_LIBS)=
- $(LIBNL_LIBS) $(LIBZ_LIBS)
->   BUILT_SOURCES =3D css.h
->   CLEANFILES =3D css.h
->   css.h: powertop.css
-> -	chmod +x ./csstoh.sh
-> -	./csstoh.sh "$(srcdir)"/powertop.css css.h
-> +	$(SHELL) ./csstoh.sh powertop.css css.h
->   =
+(sorry this took so long!)
 
-> diff --git a/src/csstoh.sh b/src/csstoh.sh
-> index 5918d12..9d4100b 100755
-> --- a/src/csstoh.sh
-> +++ b/src/csstoh.sh
-> @@ -1,4 +1,4 @@
-> -#!/bin/bash
-> +#!/bin/sh
->   #
->   # This program file is free software; you can redistribute it and/or mo=
-dify it
->   # under the terms of the GNU General Public License as published by the
-> @@ -16,8 +16,7 @@
->   # Boston, MA 02110-1301 USA
->   # or just google for it.
->   #
-> -# Written by Igor Zhbanov<i.zhbanov at samsung.com>
-> -
-> +# Written by Igor Zhbanov <i.zhbanov at samsung.com>
->   =
+PowerTOP v2.4 Release
+We are pleased to announce the release of PowerTOP v2.4.
 
->   if [ $# -lt 2 ]; then
->   	echo "Usage: csstoh.sh cssfile header.h"
-> @@ -29,17 +28,17 @@ if [ ! -r $1 ]; then
->   	exit 1
->   fi
->   =
+About PowerTOP
+PowerTOP is a Linux tool to diagnose issues with power consumption and =
 
-> -if ! echo -n>$2; then
-> +if ! echo -n >$2; then
->   	echo "Can't open file $2 for writing."
->   	exit 1
->   fi
->   =
+power management. In addition to being a diagnostic tool, PowerTOP also =
 
-> -echo "#ifndef __INCLUDE_GUARD_CCS_H">>  $2
-> -echo "#define __INCLUDE_GUARD_CCS_H">>  $2
-> -echo>>  $2
-> -echo "const char css[] =3D ">>  $2
-> +echo "#ifndef __INCLUDE_GUARD_CCS_H" >> $2
-> +echo "#define __INCLUDE_GUARD_CCS_H" >> $2
-> +echo >> $2
-> +echo "const char css[] =3D " >> $2
->   =
+has an interactive mode you can use to experiment with various power =
 
-> -sed -r 's/^(.*)$/\t\"\1\\n\"/' $1>>  $2
-> +sed -r 's/^(.*)$/\t\"\1\\n\"/' $1 >> $2
->   =
+management settings, for cases where the Linux distribution has not =
 
-> -echo ";">>  $2
-> -echo "#endif">>  $2
-> +echo ";" >> $2
-> +echo "#endif" >> $2
-The space characters issue was because of bad mail-client.
-The spaces were always there. :-)
-Last patch was sent by git, so it was transmitted exactly.
+enabled those settings.
 
-Also it the last version of the patch /bin/bash was changed to /bin/sh
-for better portability. So the (this) last version is better. :-)
-I use it for cross-compilation. My own version is the same except
-of my e-mail. I have "@" instead of "at" in it. The "at" word was created
-by bad mail client. But this is not important. :-)
+PowerTOP reports which components in the system are most likely to blame =
 
--- =
+for higher-than-needed power consumption, ranging from software =
 
-Best regards,
-Igor Zhbanov,
-Sub-Project Leader,
-phone: +7 (495) 797 25 00 ext 3981
-e-mail: i.zhbanov(a)samsung.com
+applications to active components in the system. Detailed screens are =
 
-Mobile group, Moscow R&D center, Samsung Electronics
-12 Dvintsev street, building 1
-127018, Moscow, Russian Federation
+available for CPU C and P states, device activity, and software activity.
+
+For many years, PowerTOP has been used heavily by Intel, Linux =
+
+distributors, and various parts of the open source community. =
 
 
---===============5567089871800444621==--
+Highlights
+* support for the Intel Haswell ULT CPU counters
+* support for reporting of SATA DEVSLP in the alpm accounting patch
+* RAPL support
+
+Thank you to everyone who contributed to this release!
+
+David Woodhouse (1):
+      Add devslp support to PowerTOP AHCI monitoring
+
+Jani Nikula (2):
+      README: add CONFIG_X86_MSR to the list of required kernel config opti=
+ons
+      Add a more informative error message about MSR not found
+
+Kristen Carlson Accardi (9):
+      cpu: add new Intel cpuid
+      patches: add refreshed alpm accounting patch
+      cpu: allow for more package than core cstates
+      cpu: add support for new package states
+      Add new patch which allows us to report devslp residency
+      Update po files from transifex
+      Fix termination issue in po file
+      Configure: update for 2.4
+      Fixes for build failures with the new rapl code
+
+Srinivas Pandruvada (8):
+      Common read/write MSR API
+      Use MSR Lib MSR functions
+      RAPL Interface
+      cpu device as parent class
+      Interface to get first cpu
+      Added PP0 RAPL domain for CPU
+      Add RAPL DRAM domain
+      Add RAPL PP1 domain for GPU
+
+Project Details
+URL: https://01.org/powertop
+Download: https://01.org/powertop/downloads/2013/PowerTOP-v2.4
+
+Mailing list:
+Discussions about PowerTOP occur on the PowerTOP at lists.01.org mailing li=
+st.
+Subscribe to the list at https://lists.01.org/mailman/listinfo/powertop
+Archives are found at http://lists.01.org/pipermail/powertop
+The development PowerTOP git repositories are hosted at GitHub.
+
+URL: https://github.com/fenrus75/powertop
+HTTP: https://github.com/fenrus75/powertop.git
+GIT-readonly: git://github.com/fenrus75/powertop.git
+Note: We will not use any of GitHub's integrate, merge, or tracking =
+
+functions, so please continue to use the provided lists.
+
+For localization support and contributions, we are using Transifex.
+Transifex URL: https://www.transifex.com/projects/p/PowerTOP/
+
+
+--===============0576461165415358703==--
 
