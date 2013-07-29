@@ -1,59 +1,34 @@
-Content-Type: multipart/mixed; boundary="===============7387269889867516975=="
+Content-Type: multipart/mixed; boundary="===============8807210110595186307=="
 MIME-Version: 1.0
-From: Ivan Shapovalov <intelfx100 at gmail.com>
-Subject: Re: [Powertop] [powertop] ::wiggle() - what does that do?
-Date: Wed, 20 Mar 2013 00:00:08 +0400
-Message-ID: <2252008.4yp4TNWOLD@intelfx-laptop>
-In-Reply-To: 5148C379.7000002@linux.intel.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] regarding cpuidle stats
+Date: Mon, 29 Jul 2013 06:09:12 -0700
+Message-ID: <51F66978.8070301@linux.intel.com>
+In-Reply-To: CAKjcEiXF=FmKaUo6g_gW7s8R4hh5jjG-XpMQMm+A5eBez--Hwg@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7387269889867516975==
+--===============8807210110595186307==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 19 March 2013 12:58:49 Arjan van de Ven wrote:
-> On 3/19/2013 12:57 PM, Ivan Shapovalov wrote:
-> > On 19 March 2013 12:53:26 Arjan van de Ven wrote:
-> >> On 3/19/2013 12:51 PM, Ivan Shapovalov wrote:
-> >>> Hello all,
-> >>> =
+On 7/29/2013 3:52 AM, remu kelly wrote:
+> Hi powertop team,
+> I have few questions about powertop as below:-
+> 1) Does powertop use "<debugfs>/cpuidle/stats" for retriving the C state =
+information.
 
-> >>> I've been wondering on what does the abstract_cpu::wiggle() function
-> >>> does
-> >>> and why it is needed?.. All the code says is that it is needed to "ha=
-ve
-> >>> a
-> >>> record of CPU at the start and end of the perf trace".
-> >>> =
+no
 
-> >>> I'm asking just because I feel somewhat uncomfortable to have powertop
-> >>> changing my scaling frequency back and forth each N seconds. :)
-> >> =
+it uses various kernel trace points to collect things as they happen
 
-> >> the reason this exists is that powertop wants to track what frequency =
-the
-> >> cpu is at for the duration... ... and there's no way to ask for
-> >> "current",
-> >> only to get change notifications
-> >> =
+> 2) Is it possible that on "cat <debugfs>/cpuidle/stats" , we see the C3 s=
+tate is having '0' count. but at same time powertop show the C3 state being=
+ hit?
 
-> >> so wiggle() forces a change... and from then on we know what it's at.
-> > =
+I am not sure how well cpuidle stats work; never used them.
 
-> > ...And why isn't it possible to keep the value from last notification?
-> =
 
-> there may not have been one...
-> =
-
-> > Because time can pass between measurement end and new measurement start?
-> =
-
-> yep
-
-Thanks. It's clear to me now.
-
---===============7387269889867516975==--
+--===============8807210110595186307==--
 
