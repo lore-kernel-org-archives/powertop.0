@@ -1,41 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============5248528329532376600=="
+Content-Type: multipart/mixed; boundary="===============2057531570929478643=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: [Powertop] [PATCH 0/8] use process_directory() to read dir
-Date: Thu, 19 Sep 2013 15:35:37 +0300
-Message-ID: <20130919123537.GA2300@swordfish.minsk.epam.com>
+From: Magnus Fromreide <magfr at lysator.liu.se>
+Subject: Re: [Powertop] [PATCH] Add support for device hierarchy. Preserves
+ backward compatibility with flat list of devices
+Date: Fri, 02 Aug 2013 21:36:22 +0200
+Message-ID: <1375472182.12505.2.camel@sara>
+In-Reply-To: 20130802110553.GB2322@XPBYMINW2233.minsk.epam.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5248528329532376600==
+--===============2057531570929478643==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Fri, 2013-08-02 at 14:05 +0300, Sergey Senozhatsky wrote:
+> > +std::vector<class alsa*> create_alsa_interface(const char *name,
+> const char *path) {
+> >       struct dirent *entry;
+> >       DIR *dir;
+> >       char filename[4096];
+> > +     char full_path[512];
+> > +     vector<class alsa*> result;
+> =
 
-This patch series removes some code duplication in trivial cases and
-replaces explicit opendir()/readdir() handling with existing common
-lib process_directory() helper.
+> I would prefer to return a pointer to allocated vector or pass vector
+> as a function
+> parameter. otherwise we copy existing one upon the return (yes, it's
+> just N * sizeof(pointer), but still).
+> =
 
- src/calibrate/calibrate.cpp | 151 ++++++++++++++++++++++++++++++++++++++++=
-++++++++-------------------------------------------------------------------=
-------------------------------------
- src/devices/alsa.cpp        |  46 +++++++++++++++++-----------------------=
-------
- src/devices/alsa.h          |   4 ++--
- src/devices/network.cpp     |   8 ++++----
- src/devices/rfkill.cpp      |  46 +++++++++++++++++-----------------------=
-------
- src/devices/usb.cpp         |  79 +++++++++++++++++++++++++++++++---------=
----------------------------------------
- src/lib.cpp                 |   4 ----
- src/tuning/ethernet.cpp     |  10 +++++-----
- src/tuning/tuningusb.cpp    |  46 ++++++++++++++--------------------------=
-------
+I think it would be nicer to go for C++11.
+Using that this would be a move from result to the return value.
 
- 9 files changed, 138 insertions(+), 256 deletions(-)
+/MF
 
 
---===============5248528329532376600==--
+--===============2057531570929478643==--
 
