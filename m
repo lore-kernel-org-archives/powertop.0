@@ -1,69 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============8975470348660172541=="
+Content-Type: multipart/mixed; boundary="===============4133597824939107555=="
 MIME-Version: 1.0
-From: Kristen Carlson Accardi <kristen at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] tab_window: null members on construction
-Date: Thu, 31 Jan 2013 14:45:45 -0800
-Message-ID: <20130131144545.63b126c5@bluebird.jf.intel.com>
-In-Reply-To: 20121219160652.GC3200@swordfish.minsk.epam.com
+From: Marc MERLIN <marc_powertop at merlins.org>
+Subject: [Powertop] Powertop 2.4 reports kW usage
+Date: Sun, 04 Aug 2013 06:29:43 -0700
+Message-ID: <20130804132943.GK30185@merlins.org>
+In-Reply-To: 20130802172738.GC6932@merlins.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8975470348660172541==
+--===============4133597824939107555==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 19 Dec 2012 19:06:52 +0300
-Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com> wrote:
+This went away after I restarted powertop (it had been running for a while)=
+. Sounds like =
 
-> introduce tab_window ctor and null memebers during construction.
-> show_tab() may be called before window_refresh() [which sets ypad_pos
-> and xpad_pos to 0], causing prefresh() call with uninit
-> win->ypad_pos, win->xpad_pos args.
-> =
+some counter wraps or something goes wrong after multiple hours of runtime.
 
-> Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
-> =
+PowerTOP 2.4      Overview   Idle stats   Frequency stats   Device stats   =
+Tunables                                     =
 
-> ---
-> =
+The battery reports a discharge rate of 14.8 W
+The estimated remaining time is 5 hours, 6 minutes
 
->  src/display.h | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> =
+Summary: 721.7 wakeups/second,  4.6 GPU ops/seconds, 0.0 VFS ops/sec and 14=
+.7% CPU use
 
-> diff --git a/src/display.h b/src/display.h
-> index b450f8b..9af3ec0 100644
-> --- a/src/display.h
-> +++ b/src/display.h
-> @@ -53,6 +53,14 @@ public:
->  	short int xpad_pos, ypad_pos; =
+Power est.              Usage       Events/s    Category       Description
+ 20.1 kW    101.2 ms/s     299.5        Process        /usr/bin/enlightenme=
+nt
+ 4.32 kW     27.9 ms/s       1.8        Process        /usr/bin/X :0 vt7 -br
+   142 W      0.7 ms/s       8.8        Process        gvim /home/merlin/l
+  7.29 W    100.0%                      Device         USB device: Integrat=
+ed Camera
+  4.99 W     22.8 =C2=B5s/s      0.30        Process        xscreensaver
+  2.51 W    120.2 =C2=B5s/s       1.9        Process        xfce4-terminal =
+-T window9
+  1.33 W     73.3%                      Device         Display backlight
+ 8.54 mW      5.0 ms/s      48.2        Interrupt      [7] sched(softirq)
+-- =
 
->  	WINDOW *win;
->  =
+"A mouse is a device used to point at the xterm you want to type in" - A.S.=
+R.
+Microsoft is to operating systems ....
+                                      .... what McDonalds is to gourmet coo=
+king
+Home page: http://marc.merlins.org/
 
-> +	tab_window() {
-> +		cursor_pos =3D 0;
-> +		cursor_max =3D 0;
-> +		xpad_pos =3D0;
-> +		ypad_pos =3D 0;
-> +		win =3D NULL;
-> +	}
-> +
->  	virtual void cursor_down(void) { =
-
->  		if (cursor_pos < cursor_max ) cursor_pos++;
-> repaint(); } ;
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
-
-applied, thanks.
-
-Kristen
-
---===============8975470348660172541==--
+--===============4133597824939107555==--
 
