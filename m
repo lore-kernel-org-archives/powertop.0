@@ -1,248 +1,84 @@
-Content-Type: multipart/mixed; boundary="===============5221195825077388498=="
+Content-Type: multipart/mixed; boundary="===============2201481635642872507=="
 MIME-Version: 1.0
 From: Srinivas Pandruvada <srinivas.pandruvada at linux.intel.com>
-Subject: [Powertop] [PATCH 7/8] Add RAPL DRAM domain
-Date: Fri, 12 Apr 2013 08:47:07 -0700
-Message-ID: <1365781628-11053-8-git-send-email-srinivas.pandruvada@linux.intel.com>
-In-Reply-To: 1365781628-11053-1-git-send-email-srinivas.pandruvada@linux.intel.com
+Subject: Re: [Powertop] Lenovo T530 battery saving
+Date: Tue, 13 Aug 2013 10:22:17 -0700
+Message-ID: <520A6B49.3020903@linux.intel.com>
+In-Reply-To: 20130813163602.GB11626@merlins.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5221195825077388498==
+--===============2201481635642872507==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Added DRAM RAPL domain as core CPU power. This will display as
-"DRAM" in the device stats, if present.
+On 08/13/2013 09:36 AM, Marc MERLIN wrote:
+> Mmmh, is there anyone here? Should I be sending this elsewhere?
+>
+> Thanks,
+> Marc
+>
+> On Fri, Aug 02, 2013 at 10:27:38AM -0700, Marc MERLIN wrote:
+>> Both powertop 2.1 and now powertop 2.4 tell me my onboard laptop camera
+>> is burning battery.
+>> This is a lenovo T530 with kernel 3.9.5.
+>>
+>> However, I've unloaded the module and that doesn't help:
+>>
+>> To save battery, I do:
+>> ifconfig eth0 down
+>> for i in videobuf2_core uvcvideo videodev e1000e
+>> do
+>>      rmmod $i
+>> done
+>>
+>>
+>> The battery reports a discharge rate of 14.5 W
+>> The estimated remaining time is 2 hours, 8 minutes
+>>
+>> Summary: 681.7 wakeups/second,  2.0 GPU ops/seconds, 0.0 VFS ops/sec and=
+ 19.4% CPU use
+>>
+>> Power est.              Usage       Events/s    Category       Descripti=
+on
+>>    6.13 W     73.3%                      Device         Display backlight
+>>    3.08 W    100.0%                      Device         USB device: Inte=
+grated Camera (Chicony Electronics Co., Ltd.)
+>>   71.2 mW    149.9 ms/s     240.0        Process        /usr/bin/enlight=
+enment
+>>   24.0 mW    175.6 =C2=B5s/s     144.5        Timer          menu_hrtime=
+r_notify
+>>   12.5 mW      1.0 ms/s      75.5        kWork          od_dbs_timer
+>>   12.1 mW     98.3 =C2=B5s/s      72.9        Process        [kworker/2:=
+0]
+>>
+>>
+>> Yet, powertop is still showing this below which is still visible in lsus=
+b after I unload
+>> uvcvideo:
+>> Bus 003 Device 004: ID 04f2:b2ea Chicony Electronics Co., Ltd
+Unload module doesn't stop usb to enumerate the device. You should check =
 
-Signed-off-by: Srinivas Pandruvada <srinivas.pandruvada(a)linux.intel.com>
----
- src/Makefile.am              |  3 +-
- src/cpu/cpu.cpp              |  7 +++++
- src/cpu/dram_rapl_device.cpp | 75 ++++++++++++++++++++++++++++++++++++++++=
-++++
- src/cpu/dram_rapl_device.h   | 57 +++++++++++++++++++++++++++++++++
- 4 files changed, 141 insertions(+), 1 deletion(-)
- create mode 100644 src/cpu/dram_rapl_device.cpp
- create mode 100644 src/cpu/dram_rapl_device.h
+with lsmod | grep "your module".
+It is possible that BIOS power up this camera. So you should check any =
 
-diff --git a/src/Makefile.am b/src/Makefile.am
-index fde079a..72971d8 100644
---- a/src/Makefile.am
-+++ b/src/Makefile.am
-@@ -32,7 +32,8 @@ powertop_SOURCES =3D parameters/persistent.cpp parameters=
-/learn.cpp parameters/par
- 		report/report-formatter-csv.cpp report/report-formatter-csv.h \
- 		report/report-formatter-html.cpp report/report-formatter-html.h \
- 		main.cpp css.h powertop.css cpu/intel_gpu.cpp \
--		cpu/rapl/rapl_interface.cpp cpu/cpu_rapl_device.cpp
-+		cpu/rapl/rapl_interface.cpp cpu/cpu_rapl_device.cpp \
-+		cpu/dram_rapl_device.cpp =
-
- =
-
- =
-
- powertop_CXXFLAGS =3D -fno-omit-frame-pointer -fstack-protector -Wall -Wsh=
-adow -Wformat $(NCURSES_CFLAGS) $(PCIUTILS_CFLAGS) $(LIBNL_CFLAGS) $(GLIB2_=
-CFLAGS)
-diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-index 5a11924..0ef4e9e 100644
---- a/src/cpu/cpu.cpp
-+++ b/src/cpu/cpu.cpp
-@@ -32,6 +32,7 @@
- #include "cpu.h"
- #include "cpudevice.h"
- #include "cpu_rapl_device.h"
-+#include "dram_rapl_device.h"
- #include "intel_cpus.h"
- #include "../parameters/parameters.h"
- =
-
-@@ -61,6 +62,7 @@ static class abstract_cpu * new_package(int package, int =
-cpu, char * vendor, int
- 	class abstract_cpu *ret =3D NULL;
- 	class cpudevice *cpudev;
- 	class cpu_rapl_device *cpu_rapl_dev;
-+	class dram_rapl_device *dram_rapl_dev;
- =
-
- 	char packagename[128];
- 	if (strcmp(vendor, "GenuineIntel") =3D=3D 0) {
-@@ -103,6 +105,11 @@ static class abstract_cpu * new_package(int package, i=
-nt cpu, char * vendor, int
- 	if (cpu_rapl_dev->device_present())
- 		all_devices.push_back(cpu_rapl_dev);
- =
-
-+	sprintf(packagename, _("dram rapl package %i"), cpu);
-+	dram_rapl_dev =3D new class dram_rapl_device(cpudev, _("dram rapl package=
-"), packagename, ret);
-+	if (dram_rapl_dev->device_present())
-+		all_devices.push_back(dram_rapl_dev);
-+
- 	return ret;
- }
- =
-
-diff --git a/src/cpu/dram_rapl_device.cpp b/src/cpu/dram_rapl_device.cpp
-new file mode 100644
-index 0000000..fd31cb5
---- /dev/null
-+++ b/src/cpu/dram_rapl_device.cpp
-@@ -0,0 +1,75 @@
-+/*
-+ * Copyright 2010, Intel Corporation
-+ *
-+ * This file is part of PowerTOP
-+ *
-+ * This program file is free software; you can redistribute it and/or modi=
-fy it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; version 2 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WIT=
-HOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-+ * for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program in a file named COPYING; if not, write to the
-+ * Free Software Foundation, Inc,
-+ * 51 Franklin Street, Fifth Floor,
-+ * Boston, MA 02110-1301 USA
-+ * or just google for it.
-+ *
-+ * Authors:
-+ *	Srinivas Pandruvada <Srinivas.Pandruvada(a)linux.intel.com>
-+ */
-+#include <stdlib.h>
-+#include <stdio.h>
-+#include <string.h>
-+#include "../parameters/parameters.h"
-+#include "dram_rapl_device.h"
-+
-+
-+dram_rapl_device::dram_rapl_device(cpudevice *parent, const char *classnam=
-e, const char *dev_name, class abstract_cpu *_cpu)
-+	: cpudevice(classname, dev_name, _cpu),
-+	  device_valid(false)
-+{
-+	if (_cpu)
-+		rapl =3D new c_rapl_interface(cpu->get_first_cpu());
-+	else
-+		rapl =3D new c_rapl_interface(0);
-+	last_time =3D time(NULL);
-+	if (rapl->dram_domain_present()) {
-+		device_valid =3D true;
-+		parent->add_child(this);
-+		rapl->get_dram_energy_status(&last_energy);
-+	}
-+}
-+
-+void dram_rapl_device::start_measurement(void)
-+{
-+	last_time =3D time(NULL);
-+
-+	rapl->get_dram_energy_status(&last_energy);
-+}
-+
-+void dram_rapl_device::end_measurement(void)
-+{
-+	time_t		curr_time =3D time(NULL);
-+	double energy;
-+
-+	consumed_power =3D 0.0;
-+	if ((curr_time - last_time) > 0) {
-+		rapl->get_dram_energy_status(&energy);
-+		consumed_power =3D (energy-last_energy)/(curr_time-last_time);
-+		last_energy =3D energy;
-+		last_time =3D curr_time;
-+	}
-+}
-+
-+double dram_rapl_device::power_usage(struct result_bundle *result, struct =
-parameter_bundle *bundle)
-+{
-+	if (rapl->dram_domain_present())
-+		return consumed_power;
-+	else
-+		return 0.0;
-+}
-diff --git a/src/cpu/dram_rapl_device.h b/src/cpu/dram_rapl_device.h
-new file mode 100644
-index 0000000..dc53094
---- /dev/null
-+++ b/src/cpu/dram_rapl_device.h
-@@ -0,0 +1,57 @@
-+/*
-+ * Copyright 2010, Intel Corporation
-+ *
-+ * This file is part of PowerTOP
-+ *
-+ * This program file is free software; you can redistribute it and/or modi=
-fy it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; version 2 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WIT=
-HOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-+ * for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program in a file named COPYING; if not, write to the
-+ * Free Software Foundation, Inc,
-+ * 51 Franklin Street, Fifth Floor,
-+ * Boston, MA 02110-1301 USA
-+ * or just google for it.
-+ *
-+ * Authors:
-+ *	Srinivas Pandruvada <Srinivas.Pandruvada(a)linux.intel.com>
-+ */
-+#ifndef _INCLUDE_GUARD_DRAM_RAPL_DEVICE_H
-+#define _INCLUDE_GUARD_DRAM_RAPL_DEVICE_H
-+
-+#include <vector>
-+#include <string>
-+
-+using namespace std;
-+
-+#include <sys/time.h>
-+#include "cpudevice.h"
-+#include "rapl/rapl_interface.h"
-+
-+class dram_rapl_device: public cpudevice {
-+
-+	c_rapl_interface *rapl;
-+	time_t		last_time;
-+	double		last_energy;
-+	double 		consumed_power;
-+	bool		device_valid;
-+
-+public:
-+	dram_rapl_device(cpudevice *parent, const char *classname =3D "dram_core"=
-, const char *device_name =3D "dram_core", class abstract_cpu *_cpu =3D NUL=
-L);
-+	~dram_rapl_device() { delete rapl; }
-+	virtual const char * device_name(void) {return "DRAM";};
-+	bool device_present() { return device_valid;}
-+	virtual double power_usage(struct result_bundle *result, struct parameter=
-_bundle *bundle);
-+	void start_measurement(void);
-+	void end_measurement(void);
-+
-+};
-+
-+
-+#endif
--- =
-
-1.7.11.7
+driver update for this, which sends some power down command to camera.
+>>
+>> I often have the same problem with my audio device too:
+>>    1.88 W    100.0%                      Device         Audio codec alsa=
+:hwC0D0: thinkpad (Realtek)
+>>
+>> Thankfully unloading some modules seems to fix this:
+>> for i in snd_hda_intel snd_hda_codec_realtek snd_hda_codec snd_hwdep; do=
+ rmmod $i; done
+>>
+>> Any idea how I can stop the camera from sucking power since unloading th=
+e module isn't enough?
+>>
+>> Thanks,
+>> Marc
 
 
---===============5221195825077388498==--
+--===============2201481635642872507==--
 
