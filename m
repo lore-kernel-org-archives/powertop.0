@@ -1,45 +1,86 @@
-Content-Type: multipart/mixed; boundary="===============0644180219155565602=="
+Content-Type: multipart/mixed; boundary="===============8796340874055476060=="
 MIME-Version: 1.0
-From: Ivan Shapovalov <intelfx100 at gmail.com>
-Subject: Re: [Powertop] [powertop] ::wiggle() - what does that do?
-Date: Tue, 19 Mar 2013 23:57:36 +0400
-Message-ID: <1756753.dFRy6JGU15@intelfx-laptop>
-In-Reply-To: 5148C236.8080200@linux.intel.com
+From: Jose Luis Rivas <ghostbar at debian.org>
+Subject: [Powertop] ia64 builds fails (and maybe alpha too?)
+Date: Tue, 03 Sep 2013 18:34:29 -0430
+Message-ID: <52266AFD.4000301@debian.org>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0644180219155565602==
+--===============8796340874055476060==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 19 March 2013 12:53:26 Arjan van de Ven wrote:
-> On 3/19/2013 12:51 PM, Ivan Shapovalov wrote:
-> > Hello all,
-> > =
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
 
-> > I've been wondering on what does the abstract_cpu::wiggle() function do=
-es
-> > and why it is needed?.. All the code says is that it is needed to "have=
- a
-> > record of CPU at the start and end of the perf trace".
-> > =
+[Please keep Julian CC'd since I don't know if he's subscribed to this
+list, I am.]
 
-> > I'm asking just because I feel somewhat uncomfortable to have powertop
-> > changing my scaling frequency back and forth each N seconds. :)
-> =
+Hi,
 
-> the reason this exists is that powertop wants to track what frequency the
-> cpu is at for the duration... ... and there's no way to ask for "current",
-> only to get change notifications
-> =
+During the packaging of PowerTOP for Debian we have come across and
+issue in the building for `ia64`[0][1]. Julian (co-maintainer at
+Debian) made a patch for it [2][3].
 
-> so wiggle() forces a change... and from then on we know what it's at.
+Doing some research it looks like this was removed on `9ce9ec6`[4]
+altogether with `alpha` support. What are those older kernels
+mentioned in the commit message? Maybe our build-daemons for ia64 have
+older kernels in that case please let us know which is the minimum
+kernel version for this to work.
 
-...And why isn't it possible to keep the value from last notification?
-Because time can pass between measurement end and new measurement start?
+If is not the case and in fact we need the patch, can this be included
+upstream before and we can make a new release of PowerTOP with this?
 
-Sorry for stupid questions.
+Kind regards,
+Keep up the good work!
 
---===============0644180219155565602==--
+[0]
+https://buildd.debian.org/status/fetch.php?pkg=3Dpowertop&arch=3Dia64&ver=
+=3D2.4-1&stamp=3D1377923202
+
+[1] Excerpt from the build log:
+```
+g++ -DHAVE_CONFIG_H -I. -I..  -D_FORTIFY_SOURCE=3D2
+- -I/usr/include/libnl3     -DLOCALEDIR=3D\"/usr/share/locale\"
+- -D_FORTIFY_SOURCE=3D2 -fno-omit-frame-pointer -fstack-protector -Wall
+- -Wshadow -Wformat   -I/usr/include/libnl3    -g -O2 -Wformat
+- -Werror=3Dformat-security -c -o perf/powertop-perf.o `test -f
+'perf/perf.cpp' || echo './'`perf/perf.cpp
+perf/perf.cpp:1:0: warning: -fstack-protector not supported for this
+target [enabled by default]
+perf/perf.cpp: In function 'int sys_perf_event_open(perf_event_attr*,
+pid_t, int, int, long unsigned int)':
+perf/perf.cpp:67:17: error: '__NR_perf_event_open' was not declared in
+this scope
+perf/perf.cpp:69:1: warning: control reaches end of non-void function
+[-Wreturn-type]
+make[4]: *** [perf/powertop-perf.o] Error 1
+make[3]: *** [all] Error 2
+```
+
+[2] https://github.com/ghostbar/powertop.deb/pull/2
+
+[3]
+https://github.com/juw/powertop.deb/blob/1a298734a297f83a72601fe0c2aab7f88b=
+cd6b3b/debian/patches/0001-Fix-build-on-ia64.patch
+
+[4]
+https://github.com/fenrus75/powertop/commit/9ce9ec662ce7b642967fd75222114b6=
+24b8a503a
+- -- =
+
+Jose Luis Rivas
+The Debian Project -- http://debian.org
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.19 (Darwin)
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iEYEAREDAAYFAlImav0ACgkQOKCtW8rKsRjqxwCgkk9dVz7MaYPZdJ8vZ2a/wodO
+GLYAnRkoeXYPiW4n805L2pL+YCgO8spV
+=3D2eeU
+-----END PGP SIGNATURE-----
+
+--===============8796340874055476060==--
 
