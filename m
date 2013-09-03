@@ -1,173 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============5971598179013945735=="
+Content-Type: multipart/mixed; boundary="===============2151725858426643571=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] cpu: add support for new package states
-Date: Tue, 09 Apr 2013 21:33:29 +0300
-Message-ID: <20130409183329.GB2244@swordfish>
-In-Reply-To: 1365464984-30047-1-git-send-email-kristen@linux.intel.com
+From: Jose Luis Rivas <ghostbar at debian.org>
+Subject: Re: [Powertop] ia64 builds fails (and maybe alpha too?)
+Date: Tue, 03 Sep 2013 18:48:16 -0430
+Message-ID: <52266E38.3030307@debian.org>
+In-Reply-To: 52266C26.4070705@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5971598179013945735==
+--===============2151725858426643571==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (04/08/13 16:49), Kristen Carlson Accardi wrote:
-> Date: Mon,  8 Apr 2013 16:49:44 -0700
-> From: Kristen Carlson Accardi <kristen(a)linux.intel.com>
-> To: powertop(a)lists.01.org
-> Subject: [Powertop] [PATCH] cpu: add support for new package states
-> X-Mailer: git-send-email 1.7.11.7
-> =
-
-> The next generation Intel cpu supports package states c8/c9/c10.
-> Add the code to read the relevant MSR counters.
-> ---
->  src/cpu/cpu.cpp        |  4 ++++
->  src/cpu/intel_cpus.cpp | 21 +++++++++++++++++++++
->  src/cpu/intel_cpus.h   |  7 +++++++
->  3 files changed, 32 insertions(+)
+On Tue Sep  3 18:39:26 2013, Arjan van de Ven wrote:
+>
+> if your kernel does not have "perf", there is no point in using
+> powertop....
+> really; it will not work at all.
+>
+> (including anything asm-generic/foo also is the wrong answer; that
+> directory is not architectural
+> from a kernel perspective, only for indirect inclusion)
+>
 >
 
-looks good to me.
+It does. I was just writing to Julian about this. It seems like it is
+actually a bug in the kernel not having it defined in ia64's unistd.h[0]
+(checking Linus's master branch).
 
-	-ss
+[0]
+https://github.com/torvalds/linux/blob/master/arch/ia64/include/uapi/asm/un=
+istd.h
 
- =
+Meaning that it wont fail in alpha, but's failing on ia64 because that
+line is missing.
 
-> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-> index 9e075bd..0a6d4dc 100644
-> --- a/src/cpu/cpu.cpp
-> +++ b/src/cpu/cpu.cpp
-> @@ -78,7 +78,11 @@ static class abstract_cpu * new_package(int package, i=
-nt cpu, char * vendor, int
->  			case 0x3A:      /* IVB */
->  			case 0x3C:
->  			case 0x3D:      /* IVB Xeon */
-> +				has_c2c7_res =3D 1;
-> +				ret =3D new class nhm_package;
-> +				break;
->  			case 0x45:	/* Next Gen Intel Core Processor */
-> +				has_c8c9c10_res =3D 1;
->  				has_c2c7_res =3D 1;
->  				ret =3D new class nhm_package;
->  				break;
-> diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
-> index 2b78d31..f50bc0b 100644
-> --- a/src/cpu/intel_cpus.cpp
-> +++ b/src/cpu/intel_cpus.cpp
-> @@ -42,6 +42,7 @@
->  =
+Seems like the right hint, Arjan?
+-- =
 
->  =
+Jose Luis Rivas
+The Debian Project -- http://debian.org
 
->  int has_c2c7_res;
-> +int has_c8c9c10_res;
->  =
-
->  =
-
->  =
-
-> @@ -248,6 +249,11 @@ void nhm_package::measurement_start(void)
->  	c6_before    =3D get_msr(number, MSR_PKG_C6_RESIDENCY);
->  	if (has_c2c7_res)
->  		c7_before    =3D get_msr(number, MSR_PKG_C7_RESIDENCY);
-> +	if (has_c8c9c10_res) {
-> +		c8_before    =3D get_msr(number, MSR_PKG_C8_RESIDENCY);
-> +		c9_before    =3D get_msr(number, MSR_PKG_C9_RESIDENCY);
-> +		c10_before    =3D get_msr(number, MSR_PKG_C10_RESIDENCY);
-> +	}
->  	tsc_before   =3D get_msr(first_cpu, MSR_TSC);
->  =
-
->  	if (has_c2c7_res)
-> @@ -257,6 +263,11 @@ void nhm_package::measurement_start(void)
->  	insert_cstate("pkg c6", "C6 (pc6)", 0, c6_before, 1);
->  	if (has_c2c7_res)
->  		insert_cstate("pkg c7", "C7 (pc7)", 0, c7_before, 1);
-> +	if (has_c8c9c10_res) {
-> +		insert_cstate("pkg c8", "C8 (pc8)", 0, c8_before, 1);
-> +		insert_cstate("pkg c9", "C9 (pc9)", 0, c9_before, 1);
-> +		insert_cstate("pkg c10", "C10 (pc10)", 0, c10_before, 1);
-> +	}
->  }
->  =
-
->  void nhm_package::measurement_end(void)
-> @@ -276,6 +287,11 @@ void nhm_package::measurement_end(void)
->  	c6_after    =3D get_msr(number, MSR_PKG_C6_RESIDENCY);
->  	if (has_c2c7_res)
->  		c7_after    =3D get_msr(number, MSR_PKG_C7_RESIDENCY);
-> +	if (has_c8c9c10_res) {
-> +		c8_after =3D get_msr(number, MSR_PKG_C8_RESIDENCY);
-> +		c9_after =3D get_msr(number, MSR_PKG_C9_RESIDENCY);
-> +		c10_after =3D get_msr(number, MSR_PKG_C10_RESIDENCY);
-> +	}
->  	tsc_after   =3D get_msr(first_cpu, MSR_TSC);
->  =
-
->  	gettimeofday(&stamp_after, NULL);
-> @@ -289,6 +305,11 @@ void nhm_package::measurement_end(void)
->  	finalize_cstate("pkg c6", 0, c6_after, 1);
->  	if (has_c2c7_res)
->  		finalize_cstate("pkg c7", 0, c7_after, 1);
-> +	if (has_c8c9c10_res) {
-> +		finalize_cstate("pkg c8", 0, c8_after, 1);
-> +		finalize_cstate("pkg c9", 0, c9_after, 1);
-> +		finalize_cstate("pkg c10", 0, c10_after, 1);
-> +	}
->  =
-
->  	for (i =3D 0; i < children.size(); i++)
->  		if (children[i])
-> diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
-> index a51a6d1..64d74f2 100644
-> --- a/src/cpu/intel_cpus.h
-> +++ b/src/cpu/intel_cpus.h
-> @@ -37,6 +37,9 @@
->  #define MSR_PKG_C3_RESIDENCY		0x3F8
->  #define MSR_PKG_C6_RESIDENCY		0x3F9
->  #define MSR_PKG_C7_RESIDENCY		0x3FA
-> +#define MSR_PKG_C8_RESIDENCY		0x630
-> +#define MSR_PKG_C9_RESIDENCY		0x631
-> +#define MSR_PKG_C10_RESIDENCY		0x632
->  #define MSR_CORE_C3_RESIDENCY		0x3FC
->  #define MSR_CORE_C6_RESIDENCY		0x3FD
->  #define MSR_CORE_C7_RESIDENCY		0x3FE
-> @@ -49,6 +52,9 @@ private:
->  	uint64_t	c3_before, c3_after;
->  	uint64_t	c6_before, c6_after;
->  	uint64_t	c7_before, c7_after;
-> +	uint64_t	c8_before, c8_after;
-> +	uint64_t	c9_before, c9_after;
-> +	uint64_t	c10_before, c10_after;
->  	uint64_t	tsc_before, tsc_after;
->  =
-
->  	uint64_t	last_stamp;
-> @@ -118,6 +124,7 @@ public:
->  =
-
->  =
-
->  extern int has_c2c7_res;
-> +extern int has_c8c9c10_res;
->  =
-
->  class i965_core: public cpu_core
->  {
-> -- =
-
-> 1.7.11.7
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============5971598179013945735==--
+--===============2151725858426643571==--
 
