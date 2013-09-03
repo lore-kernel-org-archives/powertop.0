@@ -1,95 +1,92 @@
-Content-Type: multipart/mixed; boundary="===============6170885827780018430=="
+Content-Type: multipart/mixed; boundary="===============4379347124569203551=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: [Powertop] [PATCH] measurement: handle multiple batteries in
- global_time_left()
-Date: Tue, 05 Feb 2013 12:17:16 +0300
-Message-ID: <20130205091716.GA20948@swordfish.minsk.epam.com>
+Subject: Re: [Powertop] (BUG) powertop-1.13 fails to kernel-3.10.7
+Date: Tue, 03 Sep 2013 08:58:50 +0300
+Message-ID: <20130903055850.GA2464@swordfish>
+In-Reply-To: CAAEzAp-9iZSPDkntiguA9mez+xk+n0ZLbDV-N79P0s8Lx7eUgg@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6170885827780018430==
+--===============4379347124569203551==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-global_time_left() calculates total time left by summing up time_left()s of=
- each battery. =
+On (08/24/13 09:35), Dennis Jenkins wrote:
+>    Hello,
+> =
 
-usually only one battery is `active', thus others have rate close to 0.0 an=
-d, as a result,
-`cap / rate' reaching `INF+'.
+>    =EF=BF=BD=EF=BF=BD I recently updated my Gentoo linux kernel from 3.8.=
+18 to 3.10.7.=EF=BF=BD
+>    powertop now hangs while starting up.=EF=BF=BD "strace" shows that pow=
+ertop is
+>    reading the contents of "/proc/timer_list" over and over (but with no=
+=EF=BF=BD
+>    "seek" call, which is weird to me).
 
-accumulate total capacity and divide by total rate instead.
+Hello,
+sorry for long response. this one really looks like a kernel bug
+fixed by 84a78a6504f5c5394a8e558702e5b54131f01d14 upstream (3.11)
 
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+	-ss
 
----
+>    ostara ~ # powertop --version
+>    powertop version 1.13
+> =
 
- src/measurement/measurement.cpp | 23 ++++++++++++++---------
- 1 file changed, 14 insertions(+), 9 deletions(-)
+>    ostara ~ # uname -r
+>    3.10.7-gentoo
+> =
 
-diff --git a/src/measurement/measurement.cpp b/src/measurement/measurement.=
-cpp
-index 4a33db9..0b68940 100644
---- a/src/measurement/measurement.cpp
-+++ b/src/measurement/measurement.cpp
-@@ -57,7 +57,6 @@ double power_meter::joules_consumed(void)
- double power_meter::time_left(void)
- {
- 	double cap, rate;
--	double left;
- =
+>    ostara ~ # zgrep TIMER /proc/config.gz
+>    CONFIG_HIGH_RES_TIMERS=3Dy
+>    CONFIG_TIMERFD=3Dy
+>    CONFIG_OPROFILE_NMI_TIMER=3Dy
+>    CONFIG_HPET_TIMER=3Dy
+>    # CONFIG_X86_PM_TIMER is not set
+>    CONFIG_NETFILTER_XT_TARGET_IDLETIMER=3Dm
+>    # CONFIG_HW_RANDOM_TIMERIOMEM is not set
+>    # CONFIG_HANGCHECK_TIMER is not set
+>    # CONFIG_PPS_CLIENT_KTIMER is not set
+>    CONFIG_SND_TIMER=3Dm
+>    # CONFIG_SND_HRTIMER is not set
+>    CONFIG_TIMER_STATS=3Dy
+> =
 
- 	cap =3D dev_capacity();
- 	rate =3D joules_consumed();
-@@ -65,12 +64,13 @@ double power_meter::time_left(void)
- 	if (cap < 0.001)
- 		return 0.0;
- =
+>    ostara ~ # wc /proc/timer_list
+>    387 1569 16282 /proc/timer_list
+> =
 
--	left =3D cap / rate;
-+	/* return 0.0 instead of INF+ */
-+	if (rate < 0.001)
-+		return 0.0;
- =
+>    ostara ~ # strace -e\!read powertop
+>    (tailing...)
+>    open("/proc/interrupts", O_RDONLY)=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=
+=EF=BF=BD =3D 3
+>    fstat(3, {st_mode=3DS_IFREG|0444, st_size=3D0, ...}) =3D 0
+>    mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, =
+0) =3D
+>    0x7fcfdd7c3000
+>    open("/proc/timer_list", O_RDONLY)=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=
+=EF=BF=BD =3D 4
+>    fstat(4, {st_mode=3DS_IFREG|0444, st_size=3D0, ...}) =3D 0
+>    mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, =
+0) =3D
+>    0x7fcfdd7c2000
+>    ^CProcess 22238 detached
+> =
 
--	return left;
-+	return cap / rate;
- }
- =
+>    Now run "strace" again, but without the "-e\!read" and watch it read f=
+d #4
+>    over and over and over again.
+> =
 
--
- vector<class power_meter *> power_meters;
- =
+>    If you need any additional info, please let me know.
 
- void start_power_measurement(void)
-@@ -101,12 +101,17 @@ double global_joules_consumed(void)
- =
-
- double global_time_left(void)
- {
--	double total =3D 0.0;
-+	double total_capacity =3D 0.0;
-+	double total_rate =3D 0.0;
- 	unsigned int i;
--	for (i =3D 0; i < power_meters.size(); i++)
--		total +=3D power_meters[i]->time_left();
--
--	return total;
-+	for (i =3D 0; i < power_meters.size(); i++) {
-+		total_capacity +=3D power_meters[i]->dev_capacity();
-+		total_rate +=3D power_meters[i]->joules_consumed();
-+	}
-+	/* return 0.0 instead of INF+ */
-+	if (total_rate < 0.001)
-+		return 0.0;
-+	return total_capacity / total_rate;
- }
- =
-
- void sysfs_power_meters_callback(const char *d_name)
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
 
 
---===============6170885827780018430==--
+--===============4379347124569203551==--
 
