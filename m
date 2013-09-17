@@ -1,50 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============8254782922525646784=="
+Content-Type: multipart/mixed; boundary="===============2779163281515026603=="
 MIME-Version: 1.0
-From: Patrick McCarty <patrick.mccarty at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] src/cpu/cpu.cpp: Fix typo in error message:
- freque*nc*y
-Date: Wed, 06 Feb 2013 11:49:14 -0800
-Message-ID: <20130206194914.GB1738@linux.intel.com>
-In-Reply-To: CAE4GLsukpGOJxhPtzea6TCK3fE6H59rAjPAO3FTTayeYi23f8A@mail.gmail.com
+From: Jose Luis Rivas <ghostbar at debian.org>
+Subject: Re: [Powertop] [PATCH] embed self-contained javascript
+Date: Tue, 17 Sep 2013 16:44:01 -0430
+Message-ID: <5238C619.6020404@debian.org>
+In-Reply-To: 20130917194129.GD2289@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8254782922525646784==
+--===============2779163281515026603==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 06, 2013 at 11:50:26AM +0100, Thomas Spura wrote:
-> On Tue, Feb 5, 2013 at 5:06 PM, Paul Menzel
-> <paulepanter(a)users.sourceforge.net> wrote:
-> > Am Dienstag, den 05.02.2013, 10:18 +0100 schrieb Thomas Spura:
-> >> By then all translations will be marked as fuzzy and won't work
-> >> anymore. When also updating the typo in the translations, this won't
-> >> be needed.
-> >
-> > The question is if Transifex is able to deal with that, that means, it
-> > notices the changes of translation files in the repository. Do you know
-> > if it does?
-> =
+On 09/17/2013 03:11 PM, Sergey Senozhatsky wrote:
 
-> IIUC, you need to send the "what to translate" files manually to
-> Transifex so it should be a manually step by the powertop translations
-> manager.
 
-At one point, we were pushing powertop.pot to Transifex manually, but
-now we have the Transifex project configured to automatically pull
-the raw POT file from the github repo. IIRC, it pulls the latest POT
-daily.
 
-So, as long as powertop.pot is up-to-date in the github repo, the
-maintainer does not need to update it anywhere else.
+BTW, trying to apply this patch I saw the src/Makefile.am makes a call
+to `src/csstoh.sh` which does not exists in the codebase. So it throws
+errors applying this patch to Debian.
 
-Integrating the *PO* files from Transifex into PowerTOP is the manual
-step, because Transifex no longer supports version-control integration,
-i.e. pushing automated commits that update translations.
+```
+make[3]: Entering directory `/tmp/buildd/powertop-2.4/src'
+/bin/bash ./csstoh.sh powertop.css css.h
+/bin/bash: ./csstoh.sh: No such file or directory
+make[3]: *** [css.h] Error 127
+make[3]: Leaving directory `/tmp/buildd/powertop-2.4/src'
+make[2]: *** [all-recursive] Error 1
+make[2]: Leaving directory `/tmp/buildd/powertop-2.4'
+make[1]: *** [all] Error 2
+make[1]: Leaving directory `/tmp/buildd/powertop-2.4'
+dh_auto_build: make -j1 returned exit code 2
+make: *** [build] Error 2
+dpkg-buildpackage: error: debian/rules build gave error exit status 2
+```
 
-Regards,
-Patrick
+I guess it comes because of the change in the CSS so it needs to
+update the `src/css.h`.
 
---===============8254782922525646784==--
+
+-- =
+
+The Debian Project - http://debian.org/
+Jose Luis Rivas - http://joseluisrivas.net/#ghostbar
+
+--===============2779163281515026603==--
 
