@@ -1,47 +1,87 @@
-Content-Type: multipart/mixed; boundary="===============4895476949868160548=="
+Content-Type: multipart/mixed; boundary="===============1965649949704333108=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
 Subject: Re: [Powertop] [PATCH] embed self-contained javascript
-Date: Tue, 10 Sep 2013 21:32:37 +0300
-Message-ID: <20130910183237.GB2396@swordfish>
-In-Reply-To: 1378583385-32426-1-git-send-email-dkg@fifthhorseman.net
+Date: Tue, 17 Sep 2013 22:41:29 +0300
+Message-ID: <20130917194129.GD2289@swordfish>
+In-Reply-To: 5238AD14.5060200@fifthhorseman.net
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4895476949868160548==
+--===============1965649949704333108==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (09/07/13 15:49), Daniel Kahn Gillmor wrote:
-> using self-contained javascript offers several improvements:
+On (09/17/13 15:27), Daniel Kahn Gillmor wrote:
+> On 09/17/2013 03:02 PM, Sergey Senozhatsky wrote:
+> > there is a number of trailing whitespaces, could you please fix that?
 > =
 
->  * powertop html report can be viewed offline
->  * less overall javascript code is loaded when online
->  * no opportunity for report leakage or modification by third parties
+> sure, see the attached patch.
 > =
 
-> These changes also make it simpler to update the html report when a
-> new section is added: just add a new entry to powertop.blocks
-> dictionary, with the section's human-readable string as its value.
+> > can we also use one coding style in js code?
+> > =
 
-Hello,
-thank you for your patch. I'll take a look.
+> > 	if (a)
+> > 		a-foo;
+> > =
+
+> > 	if (b) {
+> > 		b-foo;
+> > 		b-bar;
+> > 	}
+> =
+
+> It's not clear to me if you're suggesting only that the then clause
+> needs to be on a separate line (instead of one-liners), or if you're
+> suggesting that single-line if statements should also have curly brackets.
+
+sorry, the first one: then clause needs to be on a separate line.
+
+> The attached patch assumes that the former was your intent; if you want
+> curly-brackets on single-line if statements, let me know and i'll send
+> you v3 with that adjustment.
+
+looks good. applied to -next, thanks.
 
 	-ss
 
-> ---
->  src/powertop.css | 400 ++++++++++---------------------------------------=
-------
->  1 file changed, 72 insertions(+), 328 deletions(-)
+> thanks for your consideration.
+> =
+
+> Regards,
+> =
+
+> 	--dkg
+
+> commit b332a57a43d79b030a4de1dbd2f235c808d71c31
+> Author: Daniel Kahn Gillmor <dkg(a)fifthhorseman.net>
+> Date:   Sat Sep 7 15:42:57 2013 -0400
+> =
+
+>     embed self-contained javascript
+>     =
+
+>     using self-contained javascript offers several improvements:
+>     =
+
+>      * powertop html report can be viewed offline
+>      * less overall javascript code is loaded when online
+>      * no opportunity for report leakage or modification by third parties
+>     =
+
+>     These changes also make it simpler to update the html report when a
+>     new section is added: just add a new entry to powertop.blocks
+>     dictionary, with the section's human-readable string as its value.
 > =
 
 > diff --git a/src/powertop.css b/src/powertop.css
-> index c73d3e2..35f6571 100644
+> index c73d3e2..6d43e07 100644
 > --- a/src/powertop.css
 > +++ b/src/powertop.css
-> @@ -3,276 +3,70 @@
+> @@ -3,276 +3,73 @@
 >  <head>
 >  <title>PowerTOP report</title>
 >  <meta http-equiv=3D\"content-type\" content=3D\"text/html;charset=3Dutf-=
@@ -279,18 +319,18 @@ ing()\">Tuning</div>');
 > +  cpufreq: 'CPU Frequency',
 > +  software: 'Software Info',
 > +  device: 'Device Info',
-> +  tuning: 'Tuning' =
-
+> +  tuning: 'Tuning'
 > + },
-> + cadd: function(idx, c){ =
-
+> + cadd: function(idx, c){
 > +   var el =3D document.getElementById(idx);
-> +   if (el) el.classList.add(c);
+> +   if (el)
+> +     el.classList.add(c);
+> +
 > + },
-> + crm: function(id, c){ =
-
+> + crm: function(id, c){
 > +   var el =3D document.getElementById(id);
-> +   if (el) el.classList.remove(c);
+> +   if (el)
+> +     el.classList.remove(c);
 > + },
 > + newbutton: function(id, txt) {
 > +  var x =3D document.createElement('div');
@@ -316,8 +356,7 @@ ing()\">Tuning</div>');
 > +        powertop.crm(c, 'hide');
 > +      }
 > +   } else {
-> +      powertop.crm(b, 'hide'); =
-
+> +      powertop.crm(b, 'hide');
 > +   }
 > +   powertop.cadd(b + '_button', 'pressed');
 > + },
@@ -332,8 +371,7 @@ ing()\">Tuning</div>');
 > + onload: function() {
 > +   powertop.setupbuttons();
 > +   powertop.toggle('summary');
-> + } =
-
+> + }
 >  }
 >  =
 
@@ -395,7 +433,7 @@ ing()\">Tuning</div>');
 >  table
 >  {
 >  	background-color: #F8F8F8;
-> @@ -454,11 +248,7 @@ body {
+> @@ -454,11 +251,7 @@ body {
 >  	padding: 0;             /* Amount of negative space around the
 >                                     inside of the body */
 >  }
@@ -408,7 +446,7 @@ ing()\">Tuning</div>');
 >  	background-color: #ccc;
 >  	border-bottom: 1px solid #666;
 >  	color: #222;
-> @@ -483,72 +273,26 @@ body {
+> @@ -483,72 +276,26 @@ body {
 >  	line-height: 28px;
 >  	border-width:0px 8px 0px 8px;
 >  }
@@ -493,16 +531,9 @@ ing()\">Tuning</div>');
 >  </div>
 >  =
 
-> -- =
 
-> 1.8.4.rc3
-> =
 
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
 
---===============4895476949868160548==--
+
+--===============1965649949704333108==--
 
