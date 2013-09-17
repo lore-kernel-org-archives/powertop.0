@@ -1,133 +1,540 @@
-Content-Type: multipart/mixed; boundary="===============7741925714655841872=="
+Content-Type: multipart/mixed; boundary="===============3875495774276661820=="
 MIME-Version: 1.0
-From: Kristen Carlson Accardi <kristen at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] V2: Fix C states and P states presentation
- issue.
-Date: Thu, 31 Jan 2013 15:39:27 -0800
-Message-ID: <20130131153927.7a7e1aca@bluebird.jf.intel.com>
-In-Reply-To: 1358855012-23798-1-git-send-email-zhang.austin@gmail.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH] embed self-contained javascript
+Date: Tue, 17 Sep 2013 22:02:24 +0300
+Message-ID: <20130917190223.GB2289@swordfish>
+In-Reply-To: 1378583385-32426-1-git-send-email-dkg@fifthhorseman.net
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7741925714655841872==
+--===============3875495774276661820==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 22 Jan 2013 19:43:32 +0800
-Austin Zhang <zhang.austin(a)gmail.com> wrote:
-
-> If using '10' in this 'for' loop, for P states, once the processor
-> provides more than 10 P states, those additional ones cannot been
-> presented; and for C states, once the processor provides maximize
-> C states level more than 9, for example, it only has POLL, C1, C3,
-> C6, C10, the additional one like C10 also cannot be presented.
+On (09/07/13 15:49), Daniel Kahn Gillmor wrote:
+> using self-contained javascript offers several improvements:
 > =
 
-> Now we get the loop numbers from the system information we had got
-> before.
+>  * powertop html report can be viewed offline
+>  * less overall javascript code is loaded when online
+>  * no opportunity for report leakage or modification by third parties
 > =
 
-> Changes from V1:
-> Using std:max to simplify codes
-> =
-
-> Signed-off-by: Austin Zhang <zhang.austin(a)gmail.com>
+> These changes also make it simpler to update the html report when a
+> new section is added: just add a new entry to powertop.blocks
+> dictionary, with the section's human-readable string as its value.
 > ---
->  src/cpu/cpu.cpp |   36 +++++++++++++++++++++++++++++-------
->  1 files changed, 29 insertions(+), 7 deletions(-)
+>  src/powertop.css | 400 ++++++++++---------------------------------------=
+------
+>  1 file changed, 72 insertions(+), 328 deletions(-)
 > =
 
-> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-> index 7f3af69..1bae255 100644
-> --- a/src/cpu/cpu.cpp
-> +++ b/src/cpu/cpu.cpp
-> @@ -402,8 +402,16 @@ void report_display_cpu_cstates(void)
->  {
->  	char buffer[512], buffer2[512];
->  	unsigned int package, core, cpu;
-> -	int line;
-> +	int line, cstates_num;
->  	class abstract_cpu *_package, * _core, * _cpu;
-> +	unsigned int i, j;
-> +
-> +	for (i =3D 0, cstates_num =3D 0; i < all_cpus.size(); i++) {
-> +		if (all_cpus[i])
-> +			for (j =3D 0; j < all_cpus[i]->cstates.size();
-> j++)
-> +				cstates_num =3D std::max(cstates_num,
-> +
-> (all_cpus[i]->cstates[j])->line_level);
-> +	}
->  =
-
->  	report.begin_section(SECTION_CPUIDLE);
->  	report.add_header("Processor Idle state report");
-> @@ -421,7 +429,7 @@ void report_display_cpu_cstates(void)
->  			if (!_core)
->  				continue;
->  =
-
-> -			for (line =3D LEVEL_HEADER; line < 10; line++)
-> {
-> +			for (line =3D LEVEL_HEADER; line <=3D
-> cstates_num; line++) { bool first_cpu =3D true;
->  =
-
->  				if
-> (!_package->has_cstate_level(line)) @@ -628,14 +636,29 @@ void
-> impl_w_display_cpu_states(int state) char buffer[128];
->  	char linebuf[1024];
->  	unsigned int package, core, cpu;
-> -	int line;
-> +	int line, loop, cstates_num, pstates_num;
->  	class abstract_cpu *_package, * _core, * _cpu;
->  	int ctr =3D 0;
-> +	unsigned int i, j;
-> +
-> +	for (i =3D 0, cstates_num =3D 0, pstates_num =3D 0; i <
-> all_cpus.size(); i++) {
-> +		if (!all_cpus[i])
-> +			continue;
->  =
-
-> -	if (state =3D=3D PSTATE)
-> +		pstates_num =3D std::max<int>(pstates_num,
-> all_cpus[i]->pstates.size()); +
-> +		for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
-> +			cstates_num =3D std::max(cstates_num,
-> +
-> (all_cpus[i]->cstates[j])->line_level);
-> +	}
-> +
-> +	if (state =3D=3D PSTATE) {
->  		win =3D get_ncurses_win("Frequency stats");
-> -	else
-> +		loop =3D pstates_num;
-> +	} else {
->  		win =3D get_ncurses_win("Idle stats");
-> +		loop =3D cstates_num;
-> +	}
->  =
-
->  	if (!win)
->  		return;
-> @@ -656,8 +679,7 @@ void impl_w_display_cpu_states(int state)
->  			if (!_core->has_pstates() && state =3D=3D PSTATE)
->  				continue;
->  =
-
+> diff --git a/src/powertop.css b/src/powertop.css
+> index c73d3e2..35f6571 100644
+> --- a/src/powertop.css
+> +++ b/src/powertop.css
+> @@ -3,276 +3,70 @@
+>  <head>
+>  <title>PowerTOP report</title>
+>  <meta http-equiv=3D\"content-type\" content=3D\"text/html;charset=3Dutf-=
+8\">
+> -<script type=3D\"text/javascript\" src=3D\"http://ajax.googleapis.com/aj=
+ax/libs/jquery/1.7.2/jquery.min.js\"></script>
+> -<script type=3D\"text/javascript\">
+> -$(document).ready(function(){
 > -
-> -			for (line =3D LEVEL_HEADER; line < 10; line++)
-> {
-> +			for (line =3D LEVEL_HEADER; line <=3D loop;
-> line++) { int first =3D 1;
->  				ctr =3D 0;
->  				linebuf[0] =3D 0;
+> -	$('#system h2').addClass('hide');
+> -	$('#system table').addClass('hide');
+> -	$('#cpuidle h2').addClass('hide');
+> -	$('#cpuidle table').addClass('hide');
+> -	$('#cpufreq h2').addClass('hide');
+> -	$('#cpufreq table').addClass('hide');
+> -	$('#software h2').addClass('hide');
+> -	$('#software table').addClass('hide');
+> -	$('#device h2').addClass('hide');
+> -	$('#device table').addClass('hide');
+> -	$('#device p').addClass('hide');
+> -	$('#tuning h2').addClass('hide');
+> -	$('#tuning table').addClass('hide');
+> -
+> -	$('#top').append('<div class=3D\"SystemButton\"   onclick=3D\"toggleSys=
+tem()\">System Info</div>');
+> -	$('#top').append('<div class=3D\"SummaryButton\"  onclick=3D\"toggleSum=
+mary()\">Summary</div>');
+> -	$('#top').append('<div class=3D\"CpuidleButton\"  onclick=3D\"toggleCpu=
+idle()\">CPU Idle</div>');
+> -	$('#top').append('<div class=3D\"CpufreqButton\"  onclick=3D\"toggleCpu=
+freq()\">CPU Frequency</div>');
+> -	$('#top').append('<div class=3D\"SoftwareButton\" onclick=3D\"toggleSof=
+tware()\">Software info</div>');
+> -	$('#top').append('<div class=3D\"DeviceButton\"   onclick=3D\"toggleDev=
+ice()\">Device Info</div>');
+> -	$('#top').append('<div class=3D\"TuningButton\"   onclick=3D\"toggleTun=
+ing()\">Tuning</div>');
+> -	$('#top').append('<div class=3D\"AllButton\"      onclick=3D\"toggleAll=
+()\">All</div>');
+> -	$('#top .SummaryButton').toggleClass('pressed');
+> -
+> -    }
+> -	);
+> -function toggleDummy() {
+> -		$('#system table').toggleClass('hide', true);
+> -		$('#system h2').toggleClass('hide', true);
+> -		$('#summary table').toggleClass('hide', true);
+> -		$('#summary h2').toggleClass('hide', true);
+> -		$('#summary p').toggleClass('hide', true);
+> -		$('#cpuidle table').toggleClass('hide', true);
+> -		$('#cpuidle h2').toggleClass('hide', true);
+> -		$('#cpufreq table').toggleClass('hide', true);
+> -		$('#cpufreq h2').toggleClass('hide', true);
+> -		$('#software table').toggleClass('hide', true);
+> -		$('#software h2').toggleClass('hide', true);
+> -		$('#device table').toggleClass('hide', true);
+> -		$('#device h2').toggleClass('hide', true);
+> -		$('#device p').toggleClass('hide', true);
+> -		$('#tuning table').toggleClass('hide', true);
+> -		$('#tuning h2').toggleClass('hide', true);
+> -		$('#top .SystemButton').toggleClass('pressed', false);
+> -		$('#top .SummaryButton').toggleClass('pressed', false);
+> -		$('#top .CpuidleButton').toggleClass('pressed', false);
+> -		$('#top .CpufreqButton').toggleClass('pressed', false);
+> -		$('#top .SoftwareButton').toggleClass('pressed', false);
+> -		$('#top .DeviceButton').toggleClass('pressed', false);
+> -		$('#top .TuningButton').toggleClass('pressed', false);
+> -		$('#top .AllButton').toggleClass('pressed', false);
+> -}
+> -function toggleSystem() {
+> -		$('#system table').toggleClass('hide', false);
+> -		$('#system h2').toggleClass('hide', false);
+> -		$('#summary table').toggleClass('hide', true);
+> -		$('#summary h2').toggleClass('hide', true);
+> -		$('#summary p').toggleClass('hide', true);
+> -		$('#cpuidle table').toggleClass('hide', true);
+> -		$('#cpuidle h2').toggleClass('hide', true);
+> -		$('#cpufreq table').toggleClass('hide', true);
+> -		$('#cpufreq h2').toggleClass('hide', true);
+> -		$('#software table').toggleClass('hide', true);
+> -		$('#software h2').toggleClass('hide', true);
+> -		$('#device table').toggleClass('hide', true);
+> -		$('#device h2').toggleClass('hide', true);
+> -		$('#device p').toggleClass('hide', true);
+> -		$('#tuning table').toggleClass('hide', true);
+> -		$('#tuning h2').toggleClass('hide', true);
+> -		$('#top .SystemButton').toggleClass('pressed', true);
+> -		$('#top .SummaryButton').toggleClass('pressed', false);
+> -		$('#top .CpuidleButton').toggleClass('pressed', false);
+> -		$('#top .CpufreqButton').toggleClass('pressed', false);
+> -		$('#top .SoftwareButton').toggleClass('pressed', false);
+> -		$('#top .DeviceButton').toggleClass('pressed', false);
+> -		$('#top .TuningButton').toggleClass('pressed', false);
+> -		$('#top .AllButton').toggleClass('pressed', false);
+> -}
+> -function toggleSummary() {
+> -		$('#system table').toggleClass('hide', true);
+> -		$('#system h2').toggleClass('hide', true);
+> -		$('#summary table').toggleClass('hide', false);
+> -		$('#summary h2').toggleClass('hide', false);
+> -		$('#summary p').toggleClass('hide', false);
+> -		$('#cpuidle table').toggleClass('hide', true);
+> -		$('#cpuidle h2').toggleClass('hide', true);
+> -		$('#cpufreq table').toggleClass('hide', true);
+> -		$('#cpufreq h2').toggleClass('hide', true);
+> -		$('#software table').toggleClass('hide', true);
+> -		$('#software h2').toggleClass('hide', true);
+> -		$('#device table').toggleClass('hide', true);
+> -		$('#device h2').toggleClass('hide', true);
+> -		$('#device p').toggleClass('hide', true);
+> -		$('#tuning table').toggleClass('hide', true);
+> -		$('#tuning h2').toggleClass('hide', true);
+> -		$('#top .SystemButton').toggleClass('pressed', false);
+> -		$('#top .SummaryButton').toggleClass('pressed', true);
+> -		$('#top .CpuidleButton').toggleClass('pressed', false);
+> -		$('#top .CpufreqButton').toggleClass('pressed', false);
+> -		$('#top .SoftwareButton').toggleClass('pressed', false);
+> -		$('#top .DeviceButton').toggleClass('pressed', false);
+> -		$('#top .TuningButton').toggleClass('pressed', false);
+> -		$('#top .AllButton').toggleClass('pressed', false);
+> -}
+> -function toggleCpuidle() {
+> -		$('#system table').toggleClass('hide', true);
+> -		$('#system h2').toggleClass('hide', true);
+> -		$('#summary table').toggleClass('hide', true);
+> -		$('#summary h2').toggleClass('hide', true);
+> -		$('#summary p').toggleClass('hide', true);
+> -		$('#cpuidle table').toggleClass('hide', false);
+> -		$('#cpuidle h2').toggleClass('hide', false);
+> -		$('#cpufreq table').toggleClass('hide', true);
+> -		$('#cpufreq h2').toggleClass('hide', true);
+> -		$('#software table').toggleClass('hide', true);
+> -		$('#software h2').toggleClass('hide', true);
+> -		$('#device table').toggleClass('hide', true);
+> -		$('#device h2').toggleClass('hide', true);
+> -		$('#device p').toggleClass('hide', true);
+> -		$('#tuning table').toggleClass('hide', true);
+> -		$('#tuning h2').toggleClass('hide', true);
+> -		$('#top .SystemButton').toggleClass('pressed', false);
+> -		$('#top .SummaryButton').toggleClass('pressed', false);
+> -		$('#top .CpuidleButton').toggleClass('pressed', true);
+> -		$('#top .CpufreqButton').toggleClass('pressed', false);
+> -		$('#top .SoftwareButton').toggleClass('pressed', false);
+> -		$('#top .DeviceButton').toggleClass('pressed', false);
+> -		$('#top .TuningButton').toggleClass('pressed', false);
+> -		$('#top .AllButton').toggleClass('pressed', false);
+> -
+> -}
+> -function toggleCpufreq() {
+> -		$('#system table').toggleClass('hide', true);
+> -		$('#system h2').toggleClass('hide', true);
+> -		$('#summary table').toggleClass('hide', true);
+> -		$('#summary h2').toggleClass('hide', true);
+> -		$('#summary p').toggleClass('hide', true);
+> -		$('#cpuidle table').toggleClass('hide', true);
+> -		$('#cpuidle h2').toggleClass('hide', true);
+> -		$('#cpufreq table').toggleClass('hide', false);
+> -		$('#cpufreq h2').toggleClass('hide', false);
+> -		$('#software table').toggleClass('hide', true);
+> -		$('#software h2').toggleClass('hide', true);
+> -		$('#device table').toggleClass('hide', true);
+> -		$('#device h2').toggleClass('hide', true);
+> -		$('#device p').toggleClass('hide', true);
+> -		$('#tuning table').toggleClass('hide', true);
+> -		$('#tuning h2').toggleClass('hide', true);
+> -		$('#top .SystemButton').toggleClass('pressed', false);
+> -		$('#top .SummaryButton').toggleClass('pressed', false);
+> -		$('#top .CpuidleButton').toggleClass('pressed', false);
+> -		$('#top .CpufreqButton').toggleClass('pressed', true);
+> -		$('#top .SoftwareButton').toggleClass('pressed', false);
+> -		$('#top .DeviceButton').toggleClass('pressed', false);
+> -		$('#top .TuningButton').toggleClass('pressed', false);
+> -		$('#top .AllButton').toggleClass('pressed', false);
+> -}
+> -
+> -function toggleSoftware() {
+> -		$('#system table').toggleClass('hide', true);
+> -		$('#system h2').toggleClass('hide', true);
+> -		$('#summary table').toggleClass('hide', true);
+> -		$('#summary h2').toggleClass('hide', true);
+> -		$('#summary p').toggleClass('hide', true);
+> -		$('#cpuidle table').toggleClass('hide', true);
+> -		$('#cpuidle h2').toggleClass('hide', true);
+> -		$('#cpufreq table').toggleClass('hide', true);
+> -		$('#cpufreq h2').toggleClass('hide', true);
+> -		$('#software table').toggleClass('hide', false);
+> -		$('#software h2').toggleClass('hide', false);
+> -		$('#device table').toggleClass('hide', true);
+> -		$('#device h2').toggleClass('hide', true);
+> -		$('#device p').toggleClass('hide', true);
+> -		$('#tuning table').toggleClass('hide', true);
+> -		$('#tuning h2').toggleClass('hide', true);
+> -		$('#top .SystemButton').toggleClass('pressed', false);
+> -		$('#top .SummaryButton').toggleClass('pressed', false);
+> -		$('#top .CpuidleButton').toggleClass('pressed', false);
+> -		$('#top .CpufreqButton').toggleClass('pressed', false);
+> -		$('#top .SoftwareButton').toggleClass('pressed', true);
+> -		$('#top .DeviceButton').toggleClass('pressed', false);
+> -		$('#top .TuningButton').toggleClass('pressed', false);
+> -		$('#top .AllButton').toggleClass('pressed', false);
+> -}
+> -
+> -function toggleDevice() {
+> -		$('#system table').toggleClass('hide', true);
+> -		$('#system h2').toggleClass('hide', true);
+> -		$('#summary table').toggleClass('hide', true);
+> -		$('#summary h2').toggleClass('hide', true);
+> -		$('#summary p').toggleClass('hide', true);
+> -		$('#cpuidle table').toggleClass('hide', true);
+> -		$('#cpuidle h2').toggleClass('hide', true);
+> -		$('#cpufreq table').toggleClass('hide', true);
+> -		$('#cpufreq h2').toggleClass('hide', true);
+> -		$('#software table').toggleClass('hide', true);
+> -		$('#software h2').toggleClass('hide', true);
+> -		$('#device table').toggleClass('hide', false);
+> -		$('#device h2').toggleClass('hide', false);
+> -		$('#device p').toggleClass('hide', false);
+> -		$('#tuning table').toggleClass('hide', true);
+> -		$('#tuning h2').toggleClass('hide', true);
+> -		$('#top .SystemButton').toggleClass('pressed', false);
+> -		$('#top .SummaryButton').toggleClass('pressed', false);
+> -		$('#top .CpuidleButton').toggleClass('pressed', false);
+> -		$('#top .CpufreqButton').toggleClass('pressed', false);
+> -		$('#top .SoftwareButton').toggleClass('pressed', false);
+> -		$('#top .DeviceButton').toggleClass('pressed', true);
+> -		$('#top .TuningButton').toggleClass('pressed', false);
+> -		$('#top .AllButton').toggleClass('pressed', false);
+> +<script type=3D'text/javascript'>
+> +
+> +var powertop =3D {
+> + blocks: {
+> +  system: 'System Info',
+> +  summary: 'Summary',
+> +  cpuidle: 'CPU Idle',
+> +  cpufreq: 'CPU Frequency',
+> +  software: 'Software Info',
+> +  device: 'Device Info',
+> +  tuning: 'Tuning' =
 
-Applied, thanks.
+		^^^^^^^^
+> + },
+> + cadd: function(idx, c){ =
 
-Kristen
+			^^^^^^
+> +   var el =3D document.getElementById(idx);
+> +   if (el) el.classList.add(c);
+> + },
+> + crm: function(id, c){ =
 
---===============7741925714655841872==--
+			^^^
+> +   var el =3D document.getElementById(id);
+> +   if (el) el.classList.remove(c);
+> + },
+> + newbutton: function(id, txt) {
+> +  var x =3D document.createElement('div');
+> +  x.id =3D id + '_button';
+> +  x.className =3D 'nav_button';
+> +  x.textContent =3D txt;
+> +  x.onclick =3D function() { powertop.toggle(id); };
+> +  return x;
+> + },
+> + setupbuttons: function() {
+> +   var t =3D document.getElementById('top');
+> +   if (t) {
+> +     for (var b in powertop.blocks) {
+> +       t.appendChild(powertop.newbutton(b, powertop.blocks[b]));
+> +     }
+> +    t.appendChild(powertop.newbutton('all', 'All'));
+> +   }
+> + },
+> + toggle: function(b) {
+> +   powertop.baseall();
+> +   if (b =3D=3D 'all') {
+> +      for (var c in powertop.blocks) {
+> +        powertop.crm(c, 'hide');
+> +      }
+> +   } else {
+> +      powertop.crm(b, 'hide'); =
+
+				^^^^
+there is a number of trailing whitespaces, could you please fix that?
+
+.git/rebase-apply/patch:237: trailing whitespace.
+  tuning: 'Tuning' =
+
+.git/rebase-apply/patch:239: trailing whitespace.
+ cadd: function(idx, c){ =
+
+.git/rebase-apply/patch:243: trailing whitespace.
+ crm: function(id, c){ =
+
+.git/rebase-apply/patch:271: trailing whitespace.
+      powertop.crm(b, 'hide'); =
+
+.git/rebase-apply/patch:286: trailing whitespace.
+ } =
+
+
+
+can we also use one coding style in js code?
+
+	if (a)
+		a-foo;
+
+	if (b) {
+		b-foo;
+		b-bar;
+	}
+
+
+the rest loog good to me.
+
+	-ss
+
+> +   }
+> +   powertop.cadd(b + '_button', 'pressed');
+> + },
+> + baseall: function() {
+> +   for (var b in powertop.blocks) {
+> +     powertop.cadd(b, 'hide');
+> +     powertop.crm(b + '_button', 'pressed');
+> +   }
+> +   powertop.cadd('all', 'hide');
+> +   powertop.crm('all_button', 'pressed');
+> + },
+> + onload: function() {
+> +   powertop.setupbuttons();
+> +   powertop.toggle('summary');
+> + } =
+
+>  }
+>  =
+
+> -function toggleTuning() {
+> -		$('#system table').toggleClass('hide', true);
+> -		$('#system h2').toggleClass('hide', true);
+> -		$('#summary table').toggleClass('hide', true);
+> -		$('#summary h2').toggleClass('hide', true);
+> -		$('#summary p').toggleClass('hide', true);
+> -		$('#cpuidle table').toggleClass('hide', true);
+> -		$('#cpuidle h2').toggleClass('hide', true);
+> -		$('#cpufreq table').toggleClass('hide', true);
+> -		$('#cpufreq h2').toggleClass('hide', true);
+> -		$('#software table').toggleClass('hide', true);
+> -		$('#software h2').toggleClass('hide', true);
+> -		$('#device table').toggleClass('hide', true);
+> -		$('#device h2').toggleClass('hide', true);
+> -		$('#device p').toggleClass('hide', true);
+> -		$('#tuning table').toggleClass('hide', false);
+> -		$('#tuning h2').toggleClass('hide', false);
+> -		$('#top .SystemButton').toggleClass('pressed', false);
+> -		$('#top .SummaryButton').toggleClass('pressed', false);
+> -		$('#top .CpuidleButton').toggleClass('pressed', false);
+> -		$('#top .CpufreqButton').toggleClass('pressed', false);
+> -		$('#top .SoftwareButton').toggleClass('pressed', false);
+> -		$('#top .DeviceButton').toggleClass('pressed', false);
+> -		$('#top .TuningButton').toggleClass('pressed', true);
+> -		$('#top .AllButton').toggleClass('pressed', false);
+> -}
+> -function toggleAll() {
+> -		$('#system table').toggleClass('hide', false);
+> -		$('#system h2').toggleClass('hide', false);
+> -		$('#summary table').toggleClass('hide', false);
+> -		$('#summary h2').toggleClass('hide', false);
+> -		$('#summary p').toggleClass('hide', false);
+> -		$('#cpuidle table').toggleClass('hide', false);
+> -		$('#cpuidle h2').toggleClass('hide', false);
+> -		$('#cpufreq table').toggleClass('hide', false);
+> -		$('#cpufreq h2').toggleClass('hide', false);
+> -		$('#software table').toggleClass('hide', false);
+> -		$('#software h2').toggleClass('hide', false);
+> -		$('#device table').toggleClass('hide', false);
+> -		$('#device h2').toggleClass('hide', false);
+> -		$('#device p').toggleClass('hide', false);
+> -		$('#tuning table').toggleClass('hide', false);
+> -		$('#tuning h2').toggleClass('hide', false);
+> -		$('#top .SystemButton').toggleClass('pressed', false);
+> -		$('#top .SummaryButton').toggleClass('pressed', false);
+> -		$('#top .CpuidleButton').toggleClass('pressed', false);
+> -		$('#top .CpufreqButton').toggleClass('pressed', false);
+> -		$('#top .SoftwareButton').toggleClass('pressed', false);
+> -		$('#top .DeviceButton').toggleClass('pressed', false);
+> -		$('#top .TuningButton').toggleClass('pressed', false);
+> -		$('#top .AllButton').toggleClass('pressed', true);
+> -}
+>  </script>
+> -<style type=3D\"text/css\">
+> +<style type=3D'text/css'>
+>  table
+>  {
+>  	background-color: #F8F8F8;
+> @@ -454,11 +248,7 @@ body {
+>  	padding: 0;             /* Amount of negative space around the
+>                                     inside of the body */
+>  }
+> -#top h1 {
+> -	margin: 0;
+> -	padding: 0;
+> -}
+> -#top h1 a {
+> +#top {
+>  	background-color: #ccc;
+>  	border-bottom: 1px solid #666;
+>  	color: #222;
+> @@ -483,72 +273,26 @@ body {
+>  	line-height: 28px;
+>  	border-width:0px 8px 0px 8px;
+>  }
+> -#top div.SystemButton {
+> -	position: absolute;
+> -	top: 7px;
+> -	left: 6px;
+> -}
+> -#top div.SummaryButton {
+> -	position: absolute;
+> -	top: 7px;
+> -	left: 160px;
+> -}
+> -#top div.CpuidleButton {
+> -	position: absolute;
+> -	top: 7px;
+> -	left: 320px;
+> -}
+> -#top div.CpufreqButton {
+> -	position: absolute;
+> -	top: 7px;
+> -	left: 480px;
+> -}
+> -#top div.SoftwareButton {
+> -	position: absolute;
+> -	top: 7px;
+> -	left: 640px;
+> -}
+> -#top div.DeviceButton {
+> -	position: absolute;
+> -	top: 7px;
+> -	left: 800px;
+> -}
+> -#top div.TuningButton {
+> -	position: absolute;
+> -	top: 7px;
+> -	left: 960px;
+> -}
+> -#top div.AllButton {
+> -	position: absolute;
+> -	top: 7px;
+> -	left: 1120px;
+> +#top div.nav_button {
+> + display: inline;
+> + cursor: pointer;
+> + padding: 0.3em 0.5em;
+> + margin: 0 0.2em;
+>  }
+> +
+>  div.pressed {
+>  	background-color: #000000;
+>  	border: 1px solid #000000;
+>  	color: #000000;
+> -	display: block;
+> -	border-width:0px 8px 0px 8px;
+> -	-webkit-border-top-left-radius: 8px;
+> -	-webkit-border-top-right-radius: 8px;
+> -	-webkit-border-bottom-left-radius: 8px;
+> -	-webkit-border-bottom-right-radius: 8px;
+> -}
+> -table.hide {
+> -	display: none;
+> +	border-radius: 8px;
+>  }
+> -h2.hide {
+> -	display: none;
+> -}
+> -p.hide {
+> -	display: none
+> +div.hide {
+> + display: none;
+>  }
+>  </style>
+>  </head>
+>  =
+
+> -<body>
+> -
+> +<body onload=3D'powertop.onload();'>
+>  <div id=3D'top'>
+> -<h1><a href=3D'#top'>&nbsp;</a></h1>
+>  </div>
+>  =
+
+> -- =
+
+> 1.8.4.rc3
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>=20
+
+--===============3875495774276661820==--
 
