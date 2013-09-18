@@ -1,160 +1,81 @@
-Content-Type: multipart/mixed; boundary="===============3617338101483920495=="
+Content-Type: multipart/mixed; boundary="===============1208721013089217848=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] cpu: allow for more package than core cstates
-Date: Tue, 09 Apr 2013 21:33:59 +0300
-Message-ID: <20130409183359.GC2244@swordfish>
-In-Reply-To: 1365464141-29750-1-git-send-email-kristen@linux.intel.com
+From: Marc MERLIN <marc_powertop at merlins.org>
+Subject: Re: [Powertop] Fwd: powertop 2.4 questions
+Date: Wed, 18 Sep 2013 12:53:52 -0700
+Message-ID: <20130918195352.GG6886@merlins.org>
+In-Reply-To: CABsxX9+8LhnUWCmWfZq6uJp_J35X0F6C2gcf6n-1o9CA3PRxLQ@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3617338101483920495==
+--===============1208721013089217848==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (04/08/13 16:35), Kristen Carlson Accardi wrote:
-> Date: Mon,  8 Apr 2013 16:35:41 -0700
-> From: Kristen Carlson Accardi <kristen(a)linux.intel.com>
-> To: powertop(a)lists.01.org
-> Subject: [Powertop] [PATCH] cpu: allow for more package than core cstates
-> X-Mailer: git-send-email 1.7.11.7
+On Wed, Sep 18, 2013 at 12:42:17PM -0700, Kok, Auke-jan H wrote:
+> On Wed, Sep 18, 2013 at 12:29 PM, Marc MERLIN <marc_powertop(a)merlins.or=
+g> wrote:
+> > On Wed, Sep 18, 2013 at 09:33:53PM +0300, Sergey Senozhatsky wrote:
+> >> >  So, I got powertop 2.4 from
+> >> >  [5]https://01.org/powertop/downloads/2013/powertop-v2.4
+> >> >
+> >> >  Like I showed you on my laptop, when I go left and right with my ar=
+rows,
+> >> >  I'm on the Overview screen, and I can't move to Idle stats or Freq =
+stats
+> >> >  like I could in older powertops:
+> >>
+> >> in order to move between tabs use TAB button.
+> >
+> > That works indeed, I didn't realize it changed.
 > =
 
-> Change reporting code to walk package, then core, the cpu to determine max
-> number of cstate vs. just walking the logical cpus.
-> =
+> I think Chris had to do that since he implemented scrollable ncurses
+> windows, and you need up/down/left/right to move the viewport around.
+> It's been a while that this code was in and the announcement went
+> out... sadly it's hard to get distros to pick up details like that.
 
-> change display function to obtain max cstate num the same way.
-> ---
->  src/cpu/cpu.cpp | 68 ++++++++++++++++++++++++++++++++++++++++++++++-----=
-------
->  1 file changed, 55 insertions(+), 13 deletions(-)
->
+No worries at all, it happens :)
 
-looks good to me.
+By the way, my more nagging question was, how can I stop the built in camera
+in my T530 from taking so much power? (I'm sure the number is wrong, but st=
+ill)
 
-	-ss
+The battery reports a discharge rate of 18.4 W
+The estimated remaining time is 4 hours, 18 minutes
 
- =
+Summary: 657.6 wakeups/second,  28.4 GPU ops/seconds, 0.0 VFS ops/sec and 9=
+.3% CPU use
 
-> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-> index afe6a8c..9e075bd 100644
-> --- a/src/cpu/cpu.cpp
-> +++ b/src/cpu/cpu.cpp
-> @@ -402,20 +402,64 @@ static const char * fill_state_line(class abstract_=
-cpu *acpu, int state, int lin
->  	return "-EINVAL";
->  }
->  =
+Power est.  Usage       Events/s   Category       Description
+  12.2 W    100.0%                 Device         USB device: Integrated Ca=
+mera (Chicony Electronics Co., Ltd.)
+  997 mW     60.0%                 Device         Display backlight
+ 76.1 mW     34.9 =C2=B5s/s      34.8   Process        [rcu_preempt]
+ 23.1 mW      1.5 ms/s      16.5   Process        xfce4-terminal -T window1=
+1 --role=3Dwindow11
+ 9.20 mW     59.0 ms/s     347.4   Process        /usr/bin/enlightenment
 
-> +static int get_cstates_num(void)
-> +{
-> +	unsigned int package, core, cpu;
-> +	class abstract_cpu *_package, * _core, * _cpu;
-> +	unsigned int i;
-> +	int cstates_num;
-> +
-> +	for (package =3D 0, cstates_num =3D 0;
-> +			package < system_level.children.size(); package++) {
-> +		_package =3D system_level.children[package];
-> +		if (_package =3D=3D NULL)
-> +			continue;
-> +
-> +		/* walk package cstates and get largest cstates number */
-> +		for (i =3D 0; i < _package->cstates.size(); i++)
-> +			cstates_num =3D std::max(cstates_num,
-> +						(_package->cstates[i])->line_level);
-> +
-> +		/*
-> +		 * for each core in this package, walk core cstates and get
-> +		 * largest cstates number
-> +		 */
-> +		for (core =3D 0; core < _package->children.size(); core++) {
-> +			_core =3D _package->children[core];
-> +			if (_core =3D=3D NULL)
-> +				continue;
-> +
-> +			for (i =3D 0; i <  _core->cstates.size(); i++)
-> +				cstates_num =3D std::max(cstates_num,
-> +						(_core->cstates[i])->line_level);
-> +
-> +			/*
-> +			 * for each core, walk the logical cpus in case
-> +			 * there is are more linux cstates than hw cstates
-> +			 */
-> +			 for (cpu =3D 0; cpu < _core->children.size(); cpu++) {
-> +				_cpu =3D _core->children[cpu];
-> +				if (_cpu =3D=3D NULL)
-> +					continue;
-> +
-> +				for (i =3D 0; i < _cpu->cstates.size(); i++)
-> +					cstates_num =3D std::max(cstates_num,
-> +						(_cpu->cstates[i])->line_level);
-> +			}
-> +		}
-> +	}
-> +
-> +	return cstates_num;
-> +}
-> +
->  void report_display_cpu_cstates(void)
->  {
->  	char buffer[512], buffer2[512];
->  	unsigned int package, core, cpu;
->  	int line, cstates_num;
->  	class abstract_cpu *_package, * _core, * _cpu;
-> -	unsigned int i, j;
->  =
+Note that tunables says:
+   Good          Autosuspend for USB device Integrated Camera [Chicony Elec=
+tronics Co., Ltd.]
 
-> -	for (i =3D 0, cstates_num =3D 0; i < all_cpus.size(); i++) {
-> -		if (all_cpus[i])
-> -			for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
-> -				cstates_num =3D std::max(cstates_num,
-> -						(all_cpus[i]->cstates[j])->line_level);
-> -	}
-> +	cstates_num =3D get_cstates_num();
->  =
+Kernel 3.10.6.
 
->  	report.begin_section(SECTION_CPUIDLE);
->  	report.add_header("Processor Idle state report");
-> @@ -644,17 +688,15 @@ void impl_w_display_cpu_states(int state)
->  	int line, loop, cstates_num, pstates_num;
->  	class abstract_cpu *_package, * _core, * _cpu;
->  	int ctr =3D 0;
-> -	unsigned int i, j;
-> +	unsigned int i;
->  =
+Any ideas?
 
-> -	for (i =3D 0, cstates_num =3D 0, pstates_num =3D 0; i < all_cpus.size()=
-; i++) {
-> +	cstates_num =3D get_cstates_num();
-> +
-> +	for (i =3D 0, pstates_num =3D 0; i < all_cpus.size(); i++) {
->  		if (!all_cpus[i])
->  			continue;
->  =
+Thanks,
+Marc
+-- =
 
->  		pstates_num =3D std::max<int>(pstates_num, all_cpus[i]->pstates.size()=
-);
-> -
-> -		for (j =3D 0; j < all_cpus[i]->cstates.size(); j++)
-> -			cstates_num =3D std::max(cstates_num,
-> -						(all_cpus[i]->cstates[j])->line_level);
->  	}
->  =
+"A mouse is a device used to point at the xterm you want to type in" - A.S.=
+R.
+Microsoft is to operating systems ....
+                                      .... what McDonalds is to gourmet coo=
+king
+Home page: http://marc.merlins.org/                         | PGP 1024R/763=
+BE901
 
->  	if (state =3D=3D PSTATE) {
-> -- =
-
-> 1.7.11.7
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============3617338101483920495==--
+--===============1208721013089217848==--
 
