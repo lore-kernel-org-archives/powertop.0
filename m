@@ -1,151 +1,88 @@
-Content-Type: multipart/mixed; boundary="===============7986110875929985733=="
+Content-Type: multipart/mixed; boundary="===============3112071070361202484=="
 MIME-Version: 1.0
-From: Kristen Carlson Accardi <kristen at linux.intel.com>
-Subject: [Powertop] [PATCH] cpu: add support for new package states
-Date: Mon, 08 Apr 2013 16:49:44 -0700
-Message-ID: <1365464984-30047-1-git-send-email-kristen@linux.intel.com>
+From: Ferron, Chris E <chris.e.ferron at intel.com>
+Subject: Re: [Powertop] Fwd: powertop 2.4 questions
+Date: Wed, 18 Sep 2013 19:59:22 +0000
+Message-ID: <E351AD52FA1E154C8FFF4F9FCD2CA84336E441B1@ORSMSX101.amr.corp.intel.com>
+In-Reply-To: CABsxX9+8LhnUWCmWfZq6uJp_J35X0F6C2gcf6n-1o9CA3PRxLQ@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7986110875929985733==
+--===============3112071070361202484==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The next generation Intel cpu supports package states c8/c9/c10.
-Add the code to read the relevant MSR counters.
----
- src/cpu/cpu.cpp        |  4 ++++
- src/cpu/intel_cpus.cpp | 21 +++++++++++++++++++++
- src/cpu/intel_cpus.h   |  7 +++++++
- 3 files changed, 32 insertions(+)
-
-diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-index 9e075bd..0a6d4dc 100644
---- a/src/cpu/cpu.cpp
-+++ b/src/cpu/cpu.cpp
-@@ -78,7 +78,11 @@ static class abstract_cpu * new_package(int package, int=
- cpu, char * vendor, int
- 			case 0x3A:      /* IVB */
- 			case 0x3C:
- 			case 0x3D:      /* IVB Xeon */
-+				has_c2c7_res =3D 1;
-+				ret =3D new class nhm_package;
-+				break;
- 			case 0x45:	/* Next Gen Intel Core Processor */
-+				has_c8c9c10_res =3D 1;
- 				has_c2c7_res =3D 1;
- 				ret =3D new class nhm_package;
- 				break;
-diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
-index 2b78d31..f50bc0b 100644
---- a/src/cpu/intel_cpus.cpp
-+++ b/src/cpu/intel_cpus.cpp
-@@ -42,6 +42,7 @@
- =
-
- =
-
- int has_c2c7_res;
-+int has_c8c9c10_res;
- =
-
- =
-
- =
-
-@@ -248,6 +249,11 @@ void nhm_package::measurement_start(void)
- 	c6_before    =3D get_msr(number, MSR_PKG_C6_RESIDENCY);
- 	if (has_c2c7_res)
- 		c7_before    =3D get_msr(number, MSR_PKG_C7_RESIDENCY);
-+	if (has_c8c9c10_res) {
-+		c8_before    =3D get_msr(number, MSR_PKG_C8_RESIDENCY);
-+		c9_before    =3D get_msr(number, MSR_PKG_C9_RESIDENCY);
-+		c10_before    =3D get_msr(number, MSR_PKG_C10_RESIDENCY);
-+	}
- 	tsc_before   =3D get_msr(first_cpu, MSR_TSC);
- =
-
- 	if (has_c2c7_res)
-@@ -257,6 +263,11 @@ void nhm_package::measurement_start(void)
- 	insert_cstate("pkg c6", "C6 (pc6)", 0, c6_before, 1);
- 	if (has_c2c7_res)
- 		insert_cstate("pkg c7", "C7 (pc7)", 0, c7_before, 1);
-+	if (has_c8c9c10_res) {
-+		insert_cstate("pkg c8", "C8 (pc8)", 0, c8_before, 1);
-+		insert_cstate("pkg c9", "C9 (pc9)", 0, c9_before, 1);
-+		insert_cstate("pkg c10", "C10 (pc10)", 0, c10_before, 1);
-+	}
- }
- =
-
- void nhm_package::measurement_end(void)
-@@ -276,6 +287,11 @@ void nhm_package::measurement_end(void)
- 	c6_after    =3D get_msr(number, MSR_PKG_C6_RESIDENCY);
- 	if (has_c2c7_res)
- 		c7_after    =3D get_msr(number, MSR_PKG_C7_RESIDENCY);
-+	if (has_c8c9c10_res) {
-+		c8_after =3D get_msr(number, MSR_PKG_C8_RESIDENCY);
-+		c9_after =3D get_msr(number, MSR_PKG_C9_RESIDENCY);
-+		c10_after =3D get_msr(number, MSR_PKG_C10_RESIDENCY);
-+	}
- 	tsc_after   =3D get_msr(first_cpu, MSR_TSC);
- =
-
- 	gettimeofday(&stamp_after, NULL);
-@@ -289,6 +305,11 @@ void nhm_package::measurement_end(void)
- 	finalize_cstate("pkg c6", 0, c6_after, 1);
- 	if (has_c2c7_res)
- 		finalize_cstate("pkg c7", 0, c7_after, 1);
-+	if (has_c8c9c10_res) {
-+		finalize_cstate("pkg c8", 0, c8_after, 1);
-+		finalize_cstate("pkg c9", 0, c9_after, 1);
-+		finalize_cstate("pkg c10", 0, c10_after, 1);
-+	}
- =
-
- 	for (i =3D 0; i < children.size(); i++)
- 		if (children[i])
-diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
-index a51a6d1..64d74f2 100644
---- a/src/cpu/intel_cpus.h
-+++ b/src/cpu/intel_cpus.h
-@@ -37,6 +37,9 @@
- #define MSR_PKG_C3_RESIDENCY		0x3F8
- #define MSR_PKG_C6_RESIDENCY		0x3F9
- #define MSR_PKG_C7_RESIDENCY		0x3FA
-+#define MSR_PKG_C8_RESIDENCY		0x630
-+#define MSR_PKG_C9_RESIDENCY		0x631
-+#define MSR_PKG_C10_RESIDENCY		0x632
- #define MSR_CORE_C3_RESIDENCY		0x3FC
- #define MSR_CORE_C6_RESIDENCY		0x3FD
- #define MSR_CORE_C7_RESIDENCY		0x3FE
-@@ -49,6 +52,9 @@ private:
- 	uint64_t	c3_before, c3_after;
- 	uint64_t	c6_before, c6_after;
- 	uint64_t	c7_before, c7_after;
-+	uint64_t	c8_before, c8_after;
-+	uint64_t	c9_before, c9_after;
-+	uint64_t	c10_before, c10_after;
- 	uint64_t	tsc_before, tsc_after;
- =
-
- 	uint64_t	last_stamp;
-@@ -118,6 +124,7 @@ public:
- =
-
- =
-
- extern int has_c2c7_res;
-+extern int has_c8c9c10_res;
- =
-
- class i965_core: public cpu_core
- {
--- =
-
-1.7.11.7
 
 
---===============7986110875929985733==--
+
+>On Wed, Sep 18, 2013 at 12:29 PM, Marc MERLIN <marc_powertop(a)merlins.org=
+<mailto:marc_powertop(a)merlins.org>> wrote:
+>> On Wed, Sep 18, 2013 at 09:33:53PM +0300, Sergey Senozhatsky wrote:
+>>> >  So, I got powertop 2.4 from
+>>> >  [5]https://01.org/powertop/downloads/2013/powertop-v2.4
+>>> >
+>>> >  Like I showed you on my laptop, when I go left and right with my
+>>> > arrows,  I'm on the Overview screen, and I can't move to Idle stats
+>>> > or Freq stats  like I could in older powertops:
+>>>
+>>> in order to move between tabs use TAB button.
+>>
+>> That works indeed, I didn't realize it changed.
+>
+>I think Chris had to do that since he implemented scrollable ncurses windo=
+ws, and you need up/down/left/right to move the viewport around.
+>It's been a while that this code was in and the announcement went out... s=
+adly it's hard to get distros to pick up details like that.
+>
+>
+>Auke
+
+Yes it's been that way for a while now.
+
+
+
+
+--===============3112071070361202484==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+PGh0bWw+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNvbnRlbnQ9InRl
+eHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRvciIgY29udGVu
+dD0iTWljcm9zb2Z0IEV4Y2hhbmdlIFNlcnZlciI+CjwhLS0gY29udmVydGVkIGZyb20gcnRmIC0t
+Pgo8c3R5bGU+PCEtLSAuRW1haWxRdW90ZSB7IG1hcmdpbi1sZWZ0OiAxcHQ7IHBhZGRpbmctbGVm
+dDogNHB0OyBib3JkZXItbGVmdDogIzgwMDAwMCAycHggc29saWQ7IH0gLS0+PC9zdHlsZT4KPC9o
+ZWFkPgo8Ym9keT4KPGZvbnQgZmFjZT0iQ2FsaWJyaSIgc2l6ZT0iMiI+PHNwYW4gc3R5bGU9ImZv
+bnQtc2l6ZToxMXB0OyI+CjxkaXY+Jm5ic3A7PC9kaXY+CjxkaXY+Jm5ic3A7PC9kaXY+CjxkaXY+
+Jm5ic3A7PC9kaXY+CjxkaXY+Jmd0O09uIFdlZCwgU2VwIDE4LCAyMDEzIGF0IDEyOjI5IFBNLCBN
+YXJjIE1FUkxJTiAmbHQ7PGEgaHJlZj0ibWFpbHRvOm1hcmNfcG93ZXJ0b3BAbWVybGlucy5vcmci
+Pm1hcmNfcG93ZXJ0b3BAbWVybGlucy5vcmc8L2E+Jmd0OyB3cm90ZTo8L2Rpdj4KPGRpdj4mZ3Q7
+Jmd0OyBPbiBXZWQsIFNlcCAxOCwgMjAxMyBhdCAwOTozMzo1M1BNICYjNDM7MDMwMCwgU2VyZ2V5
+IFNlbm96aGF0c2t5IHdyb3RlOjwvZGl2Pgo8ZGl2PiZndDsmZ3Q7Jmd0OyAmZ3Q7Jm5ic3A7IFNv
+LCBJIGdvdCBwb3dlcnRvcCAyLjQgZnJvbTwvZGl2Pgo8ZGl2PiZndDsmZ3Q7Jmd0OyAmZ3Q7Jm5i
+c3A7IFs1XTxhIGhyZWY9Imh0dHBzOi8vMDEub3JnL3Bvd2VydG9wL2Rvd25sb2Fkcy8yMDEzL3Bv
+d2VydG9wLXYyLjQiPmh0dHBzOi8vMDEub3JnL3Bvd2VydG9wL2Rvd25sb2Fkcy8yMDEzL3Bvd2Vy
+dG9wLXYyLjQ8L2E+PC9kaXY+CjxkaXY+Jmd0OyZndDsmZ3Q7ICZndDs8L2Rpdj4KPGRpdj4mZ3Q7
+Jmd0OyZndDsgJmd0OyZuYnNwOyBMaWtlIEkgc2hvd2VkIHlvdSBvbiBteSBsYXB0b3AsIHdoZW4g
+SSBnbyBsZWZ0IGFuZCByaWdodCB3aXRoIG15IDwvZGl2Pgo8ZGl2PiZndDsmZ3Q7Jmd0OyAmZ3Q7
+IGFycm93cywmbmJzcDsgSSdtIG9uIHRoZSBPdmVydmlldyBzY3JlZW4sIGFuZCBJIGNhbid0IG1v
+dmUgdG8gSWRsZSBzdGF0cyA8L2Rpdj4KPGRpdj4mZ3Q7Jmd0OyZndDsgJmd0OyBvciBGcmVxIHN0
+YXRzJm5ic3A7IGxpa2UgSSBjb3VsZCBpbiBvbGRlciBwb3dlcnRvcHM6PC9kaXY+CjxkaXY+Jmd0
+OyZndDsmZ3Q7PC9kaXY+CjxkaXY+Jmd0OyZndDsmZ3Q7IGluIG9yZGVyIHRvIG1vdmUgYmV0d2Vl
+biB0YWJzIHVzZSBUQUIgYnV0dG9uLjwvZGl2Pgo8ZGl2PiZndDsmZ3Q7PC9kaXY+CjxkaXY+Jmd0
+OyZndDsgVGhhdCB3b3JrcyBpbmRlZWQsIEkgZGlkbid0IHJlYWxpemUgaXQgY2hhbmdlZC48L2Rp
+dj4KPGRpdj4mZ3Q7PC9kaXY+CjxkaXY+Jmd0O0kgdGhpbmsgQ2hyaXMgaGFkIHRvIGRvIHRoYXQg
+c2luY2UgaGUgaW1wbGVtZW50ZWQgc2Nyb2xsYWJsZSBuY3Vyc2VzIHdpbmRvd3MsIGFuZCB5b3Ug
+bmVlZCB1cC9kb3duL2xlZnQvcmlnaHQgdG8gbW92ZSB0aGUgdmlld3BvcnQgYXJvdW5kLjwvZGl2
+Pgo8ZGl2PiZndDtJdCdzIGJlZW4gYSB3aGlsZSB0aGF0IHRoaXMgY29kZSB3YXMgaW4gYW5kIHRo
+ZSBhbm5vdW5jZW1lbnQgd2VudCBvdXQuLi4gc2FkbHkgaXQncyBoYXJkIHRvIGdldCBkaXN0cm9z
+IHRvIHBpY2sgdXAgZGV0YWlscyBsaWtlIHRoYXQuPC9kaXY+CjxkaXY+Jmd0OzwvZGl2Pgo8ZGl2
+PiZndDs8L2Rpdj4KPGRpdj4mZ3Q7QXVrZTwvZGl2Pgo8ZGl2PiZuYnNwOzwvZGl2Pgo8ZGl2Plll
+cyBpdCdzIGJlZW4gdGhhdCB3YXkgZm9yIGEgd2hpbGUgbm93LiA8L2Rpdj4KPGRpdj4mbmJzcDs8
+L2Rpdj4KPGRpdj4mbmJzcDs8L2Rpdj4KPGRpdj4mbmJzcDs8L2Rpdj4KPC9zcGFuPjwvZm9udD4K
+PC9ib2R5Pgo8L2h0bWw+Cg==
+
+--===============3112071070361202484==--
 
