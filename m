@@ -1,46 +1,53 @@
-Content-Type: multipart/mixed; boundary="===============6767671271851981886=="
+Content-Type: multipart/mixed; boundary="===============8293820499930606771=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Bug under Fedora 19 x86_64: Requesting Unregistered
- Parameters 63 and 58
-Date: Wed, 03 Jul 2013 14:55:26 +0300
-Message-ID: <20130703115526.GB2225@swordfish>
-In-Reply-To: CAEKyVWMcFA+LS3iODk3sAGDUthYFPFc_pyr35XKx=LfU8Dh_Ng@mail.gmail.com
+From: Andika Triwidada <andika at gmail.com>
+Subject: Re: [Powertop] Fwd: powertop 2.4 questions
+Date: Thu, 19 Sep 2013 21:38:22 +0700
+Message-ID: <CANHSFsuzzDuKT+GRLyW8Vrjk30jDSADV_vq9u1T2jLYZUv36iA@mail.gmail.com>
+In-Reply-To: 20130918195352.GG6886@merlins.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6767671271851981886==
+--===============8293820499930606771==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (07/02/13 23:12), Nathan Van Ymeren wrote:
->    Hi folks,
->    I recently upgraded to Fedora 19 and noticed my thinkpad was running a
->    little hotter than usual. =EF=BF=BDTried to open powertop and instead =
-of the
->    familiar menu I was greeted with endless spam of the same two lines,
->    repeated:
->    BUG: requesting unregistered parameter 58
->    BUG: requesting unregistered parameter 63
->    Running with --debug had no discernible effect. =EF=BF=BDDoes powertop=
- leave a log
->    file anywhere for investigation?
->    N
+On Thu, Sep 19, 2013 at 2:53 AM, Marc MERLIN <marc_powertop(a)merlins.org> =
+wrote:
+> By the way, my more nagging question was, how can I stop the built in cam=
+era
+> in my T530 from taking so much power? (I'm sure the number is wrong, but =
+still)
 
-Hello,
+How about unloading/blacklisting its driver?
 
-/** sorry, broken mail headers in previous email*/
+>
+> The battery reports a discharge rate of 18.4 W
+> The estimated remaining time is 4 hours, 18 minutes
+>
+> Summary: 657.6 wakeups/second,  28.4 GPU ops/seconds, 0.0 VFS ops/sec and=
+ 9.3% CPU use
+>
+> Power est.  Usage       Events/s   Category       Description
+>   12.2 W    100.0%                 Device         USB device: Integrated =
+Camera (Chicony Electronics Co., Ltd.)
+>   997 mW     60.0%                 Device         Display backlight
+>  76.1 mW     34.9 =C2=B5s/s      34.8   Process        [rcu_preempt]
+>  23.1 mW      1.5 ms/s      16.5   Process        xfce4-terminal -T windo=
+w11 --role=3Dwindow11
+>  9.20 mW     59.0 ms/s     347.4   Process        /usr/bin/enlightenment
+>
+> Note that tunables says:
+>    Good          Autosuspend for USB device Integrated Camera [Chicony El=
+ectronics Co., Ltd.]
+>
+> Kernel 3.10.6.
+>
+> Any ideas?
+>
+> Thanks,
+> Marc
 
-
-could you please show content of
-
-	/sys/devices/platform/thinkpad_hwmon/
-and
-	/sys/devices/platform/thinkpad_acpi/leds/
-
-
-	-ss
-
---===============6767671271851981886==--
+--===============8293820499930606771==--
 
