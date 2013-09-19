@@ -1,125 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============3412074837228960712=="
+Content-Type: multipart/mixed; boundary="===============7792955728486762128=="
 MIME-Version: 1.0
-From: Srinivas Pandruvada <srinivas.pandruvada at linux.intel.com>
-Subject: [Powertop] [PATCH 1/8] Common read/write MSR API
-Date: Thu, 11 Apr 2013 16:58:49 -0700
-Message-ID: <1365724736-411-2-git-send-email-srinivas.pandruvada@linux.intel.com>
-In-Reply-To: 1365724736-411-1-git-send-email-srinivas.pandruvada@linux.intel.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH 1/8] lib: unify process_directory()
+Date: Thu, 19 Sep 2013 15:38:49 +0300
+Message-ID: <20130919123849.GB2300@swordfish.minsk.epam.com>
+In-Reply-To: 20130919123537.GA2300@swordfish.minsk.epam.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3412074837228960712==
+--===============7792955728486762128==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Added two new interfaces:
-extern int read_msr(int cpu, uint64_t offset, uint64_t *value);
-extern int write_msr(int cpu, uint64_t offset, uint64_t value);
+remove `lo' check from process_directory() and force net callers
+to check for passed d_name. since process_directory() called
+from different sites `lo' check is overhead.
 
-This way all MSR interface can use this instead of reimplementing.
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
 
-Signed-off-by: Srinivas Pandruvada <srinivas.pandruvada(a)linux.intel.com>
 ---
- src/lib.cpp | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++
- src/lib.h   |  3 ++-
- 2 files changed, 63 insertions(+), 1 deletion(-)
+
+ src/lib.cpp | 4 ----
+ 1 file changed, 4 deletions(-)
 
 diff --git a/src/lib.cpp b/src/lib.cpp
-index 723517a..98d9aac 100644
+index 881e52f..f27ec2f 100644
 --- a/src/lib.cpp
 +++ b/src/lib.cpp
-@@ -56,6 +56,7 @@ extern "C" {
- #include <limits>
- #include <math.h>
- #include <ncurses.h>
-+#include <fcntl.h>
- =
-
- static int kallsyms_read =3D 0;
- =
-
-@@ -450,3 +451,63 @@ int get_user_input(char *buf, unsigned sz)
- 	/* to distinguish between getnstr error and empty line */
- 	return ret || strlen(buf);
- }
-+
-+int read_msr(int cpu, uint64_t offset, uint64_t *value)
-+{
-+	ssize_t retval;
-+	uint64_t msr;
-+	int fd;
-+	char msr_path[256];
-+
-+	fd =3D sprintf(msr_path, "/dev/cpu/%d/msr", cpu);
-+
-+	if (access(msr_path, R_OK) !=3D 0){
-+		fd =3D sprintf(msr_path, "/dev/msr%d", cpu);
-+
-+		if (access(msr_path, R_OK) !=3D 0){
-+			fprintf(stderr, _("msr reg not found"));
-+			return -1;
-+		}
-+	}
-+
-+	fd =3D open(msr_path, O_RDONLY);
-+	if (fd < 0)
-+		return -1;
-+	retval =3D pread(fd, &msr, sizeof msr, offset);
-+	if (retval !=3D sizeof msr) {
-+		return -1;
-+	}
-+	close(fd);
-+	*value =3D msr;
-+
-+	return retval;
-+}
-+
-+int write_msr(int cpu, uint64_t offset, uint64_t value)
-+{
-+	ssize_t retval;
-+	int fd;
-+	char msr_path[256];
-+
-+	fd =3D sprintf(msr_path, "/dev/cpu/%d/msr", cpu);
-+
-+	if (access(msr_path, R_OK) !=3D 0){
-+		fd =3D sprintf(msr_path, "/dev/msr%d", cpu);
-+
-+		if (access(msr_path, R_OK) !=3D 0){
-+			fprintf(stderr, _("msr reg not found"));
-+			return -1;
-+		}
-+	}
-+
-+	fd =3D open(msr_path, O_WRONLY);
-+	if (fd < 0)
-+		return -1;
-+	retval =3D pwrite(fd, &value, sizeof value, offset);
-+	if (retval !=3D sizeof value) {
-+		return -1;
-+	}
-+	close(fd);
-+
-+	return retval;
-+}
-diff --git a/src/lib.h b/src/lib.h
-index de2de5a..2b0e5f5 100644
---- a/src/lib.h
-+++ b/src/lib.h
-@@ -74,5 +74,6 @@ typedef void (*callback)(const char*);
- extern void process_directory(const char *d_name, callback fn);
- extern int utf_ok;
- extern int get_user_input(char *buf, unsigned sz);
+@@ -448,12 +448,8 @@ void process_directory(const char *d_name, callback fn)
+ 			break;
+ 		if (entry->d_name[0] =3D=3D '.')
+ 			continue;
+-		if (strcmp(entry->d_name, "lo")=3D=3D0)
+-			continue;
 -
-+extern int read_msr(int cpu, uint64_t offset, uint64_t *value);
-+extern int write_msr(int cpu, uint64_t offset, uint64_t value);
- #endif
--- =
+ 		fn(entry->d_name);
+ 	}
+-
+ 	closedir(dir);
+ }
+=20
 
-1.7.11.7
-
-
---===============3412074837228960712==--
+--===============7792955728486762128==--
 
