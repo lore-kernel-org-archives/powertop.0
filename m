@@ -1,49 +1,62 @@
-Content-Type: multipart/mixed; boundary="===============2779163281515026603=="
+Content-Type: multipart/mixed; boundary="===============7145296036131785015=="
 MIME-Version: 1.0
-From: Jose Luis Rivas <ghostbar at debian.org>
-Subject: Re: [Powertop] [PATCH] embed self-contained javascript
-Date: Tue, 17 Sep 2013 16:44:01 -0430
-Message-ID: <5238C619.6020404@debian.org>
-In-Reply-To: 20130917194129.GD2289@swordfish
+From: Jaroslav Skarvada <jskarvad at redhat.com>
+Subject: [Powertop] patch: tell user if the system is running out of FDs
+Date: Thu, 19 Sep 2013 11:23:21 -0400
+Message-ID: <808108042.17411093.1379604201988.JavaMail.root@redhat.com>
+In-Reply-To: 1812437942.17407873.1379603934162.JavaMail.root@redhat.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2779163281515026603==
+--===============7145296036131785015==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 09/17/2013 03:11 PM, Sergey Senozhatsky wrote:
+Hi,
 
+complex servers can run out of FDs easily (due to perf).
+In such case tell user that more FDs are needed instead
+of the generic message (that kernel doesn't support
+the perf)
 
+regards
 
-BTW, trying to apply this patch I saw the src/Makefile.am makes a call
-to `src/csstoh.sh` which does not exists in the codebase. So it throws
-errors applying this patch to Debian.
+Jaroslav
 
-```
-make[3]: Entering directory `/tmp/buildd/powertop-2.4/src'
-/bin/bash ./csstoh.sh powertop.css css.h
-/bin/bash: ./csstoh.sh: No such file or directory
-make[3]: *** [css.h] Error 127
-make[3]: Leaving directory `/tmp/buildd/powertop-2.4/src'
-make[2]: *** [all-recursive] Error 1
-make[2]: Leaving directory `/tmp/buildd/powertop-2.4'
-make[1]: *** [all] Error 2
-make[1]: Leaving directory `/tmp/buildd/powertop-2.4'
-dh_auto_build: make -j1 returned exit code 2
-make: *** [build] Error 2
-dpkg-buildpackage: error: debian/rules build gave error exit status 2
-```
+--===============7145296036131785015==
+Content-Type: text/x-patch
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="powertop-2.4-fd-limit-err.patch"
 
-I guess it comes because of the change in the CSS so it needs to
-update the `src/css.h`.
+ZGlmZiAtdXAgcG93ZXJ0b3AtMi40L3NyYy9wZXJmL3BlcmYuY3BwLm9yaWcgcG93ZXJ0b3AtMi40
+L3NyYy9wZXJmL3BlcmYuY3BwCi0tLSBwb3dlcnRvcC0yLjQvc3JjL3BlcmYvcGVyZi5jcHAub3Jp
+ZwkyMDEzLTAxLTMxIDE2OjM5OjI3LjAwMDAwMDAwMCAtMDUwMAorKysgcG93ZXJ0b3AtMi40L3Ny
+Yy9wZXJmL3BlcmYuY3BwCTIwMTMtMDktMTkgMTA6MzY6MDIuMjk4ODM5MjQ4IC0wNDAwCkBAIC0y
+Niw2ICsyNiw3IEBACiAjaW5jbHVkZSA8aW9zdHJlYW0+CiAjaW5jbHVkZSA8ZnN0cmVhbT4KIAor
+I2luY2x1ZGUgPGVycm5vLmg+CiAjaW5jbHVkZSA8dW5pc3RkLmg+CiAjaW5jbHVkZSA8c3RkaW8u
+aD4KICNpbmNsdWRlIDxzdGRsaWIuaD4KQEAgLTcyLDYgKzczLDcgQEAgdm9pZCBwZXJmX2V2ZW50
+OjpjcmVhdGVfcGVyZl9ldmVudChjaGFyIAogewogCXN0cnVjdCBwZXJmX2V2ZW50X2F0dHIgYXR0
+cjsKIAlpbnQgcmV0OworCWludCBlcnI7CiAKIAlzdHJ1Y3QgewogCQlfX3U2NCBjb3VudDsKQEAg
+LTEwNywxMCArMTA5LDE1IEBAIHZvaWQgcGVyZl9ldmVudDo6Y3JlYXRlX3BlcmZfZXZlbnQoY2hh
+ciAKIAlwZXJmX2ZkID0gc3lzX3BlcmZfZXZlbnRfb3BlbigmYXR0ciwgLTEsIF9jcHUsIC0xLCAw
+KTsKIAogCWlmIChwZXJmX2ZkIDwgMCkgeworCQllcnIgPSBlcnJubzsKIAkJcmVzZXRfZGlzcGxh
+eSgpOwotCQlmcHJpbnRmKHN0ZGVyciwgXygiUG93ZXJUT1AgJXMgbmVlZHMgdGhlIGtlcm5lbCB0
+byBzdXBwb3J0IHRoZSAncGVyZicgc3Vic3lzdGVtXG4iKSwgUE9XRVJUT1BfVkVSU0lPTik7Ci0J
+CWZwcmludGYoc3RkZXJyLCBfKCJhcyB3ZWxsIGFzIHN1cHBvcnQgZm9yIHRyYWNlIHBvaW50cyBp
+biB0aGUga2VybmVsOlxuIikpOwotCQlmcHJpbnRmKHN0ZGVyciwgIkNPTkZJR19QRVJGX0VWRU5U
+Uz15XG5DT05GSUdfUEVSRl9DT1VOVEVSUz15XG5DT05GSUdfVFJBQ0VQT0lOVFM9eVxuQ09ORklH
+X1RSQUNJTkc9eVxuIik7CisJCWlmIChlcnIgPT0gRU1GSUxFKQorCQkJZnByaW50ZihzdGRlcnIs
+IF8oIlRvbyBtYW55IG9wZW4gZmlsZXMsIHBsZWFzZSBpbmNyZWFzZSB0aGUgbGltaXQgb2Ygb3Bl
+biBmaWxlIGRlc2NyaXB0b3JzLlxuIikpOworCQllbHNlIHsKKwkJCWZwcmludGYoc3RkZXJyLCBf
+KCJQb3dlclRPUCAlcyBuZWVkcyB0aGUga2VybmVsIHRvIHN1cHBvcnQgdGhlICdwZXJmJyBzdWJz
+eXN0ZW1cbiIpLCBQT1dFUlRPUF9WRVJTSU9OKTsKKwkJCWZwcmludGYoc3RkZXJyLCBfKCJhcyB3
+ZWxsIGFzIHN1cHBvcnQgZm9yIHRyYWNlIHBvaW50cyBpbiB0aGUga2VybmVsOlxuIikpOworCQkJ
+ZnByaW50ZihzdGRlcnIsICJDT05GSUdfUEVSRl9FVkVOVFM9eVxuQ09ORklHX1BFUkZfQ09VTlRF
+UlM9eVxuQ09ORklHX1RSQUNFUE9JTlRTPXlcbkNPTkZJR19UUkFDSU5HPXlcbiIpOworCQl9CiAJ
+CWV4aXQoRVhJVF9GQUlMVVJFKTsKIAl9CiAJaWYgKHJlYWQocGVyZl9mZCwgJnJlYWRfZGF0YSwg
+c2l6ZW9mKHJlYWRfZGF0YSkpID09IC0xKSB7Cg==
 
-
--- =
-
-The Debian Project - http://debian.org/
-Jose Luis Rivas - http://joseluisrivas.net/#ghostbar
-
---===============2779163281515026603==--
+--===============7145296036131785015==--
 
