@@ -1,40 +1,107 @@
-Content-Type: multipart/mixed; boundary="===============3540905107834128765=="
+Content-Type: multipart/mixed; boundary="===============6102087864681650741=="
 MIME-Version: 1.0
-From: Thomas Waldecker <thomas.waldecker at gmail.com>
-Subject: Re: [Powertop] [PATCH] csstoh shell-script for cross-compiling
-Date: Mon, 04 Feb 2013 10:40:01 +0100
-Message-ID: <CAHgBLoqxiG5SvuK-TV-DtTLkZ5C9fHFBuJh8O7MwFW+5uX_0fQ@mail.gmail.com>
-In-Reply-To: 20130202150140.GA2676@swordfish
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: [Powertop] [PATCH 8/8] tuningusb: use process_directory()
+Date: Thu, 19 Sep 2013 15:47:31 +0300
+Message-ID: <20130919124731.GH2300@swordfish.minsk.epam.com>
+In-Reply-To: 20130919123537.GA2300@swordfish.minsk.epam.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3540905107834128765==
+--===============6102087864681650741==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Sergey,
+use process_directory() helper
 
-> well, the whole situation is confusing. we've pushed Igor's patch on beha=
-lf of Thomas and
-> now we are about to do similar thing (diff between two Igor's patches) ag=
-ain.
-> I'm sorry Thomas, I appreciate your help, but I can't ACK your patch with=
-out Igor's
-> ACK/patch of his own/etc.
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
 
-I don't understand your patch apply policy. I also don't understand
-why nobody didn't apply
-Igors patch first time.
+---
 
-I just applied the changes which he did in his V2. I think it is a
-reasonable change.
-It would be also ok for me if you just use the patch and change the author.
+ src/tuning/tuningusb.cpp | 46 ++++++++++++++------------------------------=
+--
+ 1 file changed, 14 insertions(+), 32 deletions(-)
 
-P.S. Sorry for double post, forgot to include mailing list again
+diff --git a/src/tuning/tuningusb.cpp b/src/tuning/tuningusb.cpp
+index 74bbacf..27a6dca 100644
+--- a/src/tuning/tuningusb.cpp
++++ b/src/tuning/tuningusb.cpp
+@@ -31,9 +31,6 @@
+ #include <utility>
+ #include <iostream>
+ #include <fstream>
+-#include <unistd.h>
+-#include <sys/types.h>
+-#include <dirent.h>
+ =
 
-Kind regards,
-Thomas
+ #include "../lib.h"
+ =
 
---===============3540905107834128765==--
+@@ -116,40 +113,25 @@ const char *usb_tunable::toggle_script(void)
+ 	return toggle_good;
+ }
+ =
+
+-void add_usb_tunables(void)
++static void add_usb_callback(const char *d_name)
+ {
+-	struct dirent *entry;
+-	DIR *dir;
++	class usb_tunable *usb;
+ 	char filename[4096];
+ =
+
+-	dir =3D opendir("/sys/bus/usb/devices/");
+-	if (!dir)
++	sprintf(filename, "/sys/bus/usb/devices/%s/power/control", d_name);
++	if (access(filename, R_OK) !=3D 0)
+ 		return;
+-	while (1) {
+-		class usb_tunable *usb;
+-
+-		entry =3D readdir(dir);
+-
+-		if (!entry)
+-			break;
+-		if (entry->d_name[0] =3D=3D '.')
+-			continue;
+-
+-		sprintf(filename, "/sys/bus/usb/devices/%s/power/control", entry->d_name=
+);
+-
+-		if (access(filename, R_OK) !=3D 0)
+-			continue;
+-
+-		sprintf(filename, "/sys/bus/usb/devices/%s/power/active_duration", entry=
+->d_name);
+-		if (access(filename, R_OK)!=3D0)
+-			continue;
+ =
+
+-		sprintf(filename, "/sys/bus/usb/devices/%s", entry->d_name);
+-
+-		usb =3D new class usb_tunable(filename, entry->d_name);
++	sprintf(filename, "/sys/bus/usb/devices/%s/power/active_duration", d_name=
+);
++	if (access(filename, R_OK)!=3D0)
++		return;
+ =
+
+-		all_tunables.push_back(usb);
++	sprintf(filename, "/sys/bus/usb/devices/%s", d_name);
++	usb =3D new class usb_tunable(filename, d_name);
++	all_tunables.push_back(usb);
++}
+ =
+
+-	}
+-	closedir(dir);
++void add_usb_tunables(void)
++{
++	process_directory("/sys/bus/usb/devices/", add_usb_callback);
+ }
+
+--===============6102087864681650741==--
 
