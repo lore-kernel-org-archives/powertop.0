@@ -1,43 +1,114 @@
-Content-Type: multipart/mixed; boundary="===============6005453765450240032=="
+Content-Type: multipart/mixed; boundary="===============4935307448139340320=="
 MIME-Version: 1.0
-From: Paul Menzel <paulepanter at users.sourceforge.net>
-Subject: Re: [Powertop] [PATCH 2/2] Document key bindings in man page
-Date: Mon, 20 May 2013 12:44:11 +0200
-Message-ID: <1369046651.7582.6.camel@mattotaupa>
-In-Reply-To: 1368979243-3175-3-git-send-email-hpdeifel@gmx.de
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: [Powertop] [PATCH 5/8] rfkill: use process_directory()
+Date: Thu, 19 Sep 2013 15:43:06 +0300
+Message-ID: <20130919124306.GE2300@swordfish.minsk.epam.com>
+In-Reply-To: 20130919123537.GA2300@swordfish.minsk.epam.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6005453765450240032==
+--===============4935307448139340320==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Am Sonntag, den 19.05.2013, 18:00 +0200 schrieb Hans-Peter Deifel:
-> Signed-off-by: Hans-Peter Deifel <hpdeifel(a)gmx.de>
-> ---
->  doc/powertop.8 | 32 ++++++++++++++++++++++++++++++++
->  1 file changed, 32 insertions(+)
+use process_directory() helper
 
-[=E2=80=A6]
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
 
-Acked-by: Paul Menzel <paulepanter(a)users.sourceforge.net>
+---
 
+ src/devices/rfkill.cpp | 46 +++++++++++++++++-----------------------------
+ 1 file changed, 17 insertions(+), 29 deletions(-)
 
-Thanks,
+diff --git a/src/devices/rfkill.cpp b/src/devices/rfkill.cpp
+index 2404432..01aec23 100644
+--- a/src/devices/rfkill.cpp
++++ b/src/devices/rfkill.cpp
+@@ -27,7 +27,6 @@
+ =
 
-Paul
+ #include <stdio.h>
+ #include <sys/types.h>
+-#include <dirent.h>
+ #include <libgen.h>
+ #include <unistd.h>
+ =
 
---===============6005453765450240032==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
+@@ -136,41 +135,30 @@ const char * rfkill::device_name(void)
+ 	return name;
+ }
+ =
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEuNC4xMiAoR05V
-L0xpbnV4KQoKaUVZRUFCRUNBQVlGQWxHWi9uc0FDZ2tRUFgxYUsyd09IVmpheGdDZlJzWTZtOFMr
-aWo4Mm92RVJiYkIrcTRPZApxR1VBb0l4SCtpRGNONGc3NEVKaVlRSWZKNTJmTk9XLwo9M3h5Rgot
-LS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
+-void create_all_rfkills(void)
++static void create_all_rfkills_callback(const char *d_name)
+ {
+-	struct dirent *entry;
+-	DIR *dir;
+ 	char filename[4096];
+ 	char name[4096];
++	class rfkill *bl;
++	ifstream file;
+ =
 
---===============6005453765450240032==--
+-	dir =3D opendir("/sys/class/rfkill/");
+-	if (!dir)
+-		return;
+-	while (1) {
+-		class rfkill *bl;
+-		ifstream file;
+-		entry =3D readdir(dir);
+-		if (!entry)
+-			break;
+-		if (entry->d_name[0] =3D=3D '.')
+-			continue;
+-		sprintf(filename, "/sys/class/rfkill/%s/name", entry->d_name);
+-		strcpy(name, entry->d_name);
+-		file.open(filename, ios::in);
+-		if (file) {
+-			file.getline(name, 100);
+-			file.close();
+-		}
+-
+-		sprintf(filename, "/sys/class/rfkill/%s", entry->d_name);
+-		bl =3D new class rfkill(name, filename);
+-		all_devices.push_back(bl);
++	sprintf(filename, "/sys/class/rfkill/%s/name", d_name);
++	strcpy(name, d_name);
++	file.open(filename, ios::in);
++	if (file) {
++		file.getline(name, 100);
++		file.close();
+ 	}
+-	closedir(dir);
+ =
+
++	sprintf(filename, "/sys/class/rfkill/%s", d_name);
++	bl =3D new class rfkill(name, filename);
++	all_devices.push_back(bl);
+ }
+ =
+
+-
++void create_all_rfkills(void)
++{
++	process_directory("/sys/class/rfkill/", create_all_rfkills_callback);
++}
+ =
+
+ double rfkill::power_usage(struct result_bundle *result, struct parameter_=
+bundle *bundle)
+ {
+@@ -185,4 +173,4 @@ double rfkill::power_usage(struct result_bundle *result=
+, struct parameter_bundle
+ 	power +=3D util * factor / 100.0;
+ =
+
+ 	return power;
+-}
+\ No newline at end of file
++}
+
+--===============4935307448139340320==--
 
