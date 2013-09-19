@@ -1,88 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============7678598020989589438=="
+Content-Type: multipart/mixed; boundary="===============7640367267253726888=="
 MIME-Version: 1.0
-From: Srinivas Pandruvada <srinivas.pandruvada at linux.intel.com>
-Subject: [Powertop] [PATCH 0/8]  Power Top RAPL interface v02
-Date: Thu, 11 Apr 2013 16:58:48 -0700
-Message-ID: <1365724736-411-1-git-send-email-srinivas.pandruvada@linux.intel.com>
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: [Powertop] [PATCH 7/8] tuning ethernet: use updated
+ process_directory()
+Date: Thu, 19 Sep 2013 15:46:15 +0300
+Message-ID: <20130919124615.GG2300@swordfish.minsk.epam.com>
+In-Reply-To: 20130919123537.GA2300@swordfish.minsk.epam.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7678598020989589438==
+--===============7640367267253726888==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This patch adds RAPL interface to powertop. RAPL can give energy consumed f=
-or a domain. For
-client platform, domain are "PKG", "PP0" and "PP1". For servers "PKG", "DRA=
-M" and "PP0".
-PP0 refers to CPU energy comsumtion and PP1 refers to GPUs. DRAM is for DRA=
-M in servers only.
+check for `lo' d_name in ethtunable_callback()
 
-Powertop estimates how much power CPU and GPU is consuming based on the mea=
-sured power and
-load. This patch splits this into the following:
-- Actual CPU/GPU power reported by RAPL
-- DRAM power for servers
-- Remaining as "misc" usage for CPU/GPU
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
 
-As more domain are getting added, this patch creates a parent/child relatio=
-nship for CPU/GPU.
-This way when new domains are added these files don't need change. Only inh=
-erit CPU/GPU class,
-and implement virtual method for consumed power.
+---
 
+ src/tuning/ethernet.cpp | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-v02 changes:
-	Addressed review comments
-	Moved MSR handling to library
-	Added interface to get the first CPU in a package
-	Fix error in reading RAPL when system has multiple packages
+diff --git a/src/tuning/ethernet.cpp b/src/tuning/ethernet.cpp
+index 3164b31..3d36112 100644
+--- a/src/tuning/ethernet.cpp
++++ b/src/tuning/ethernet.cpp
+@@ -25,6 +25,7 @@
+ =
 
+ #include "tuning.h"
+ #include "tunable.h"
++#include <sys/types.h>
+ #include <unistd.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -32,12 +33,8 @@
+ #include <utility>
+ #include <iostream>
+ #include <fstream>
+-#include <unistd.h>
+-#include <dirent.h>
+ #include <sys/socket.h>
+ #include <errno.h>
+-#include <sys/types.h>
+-#include <dirent.h>
+ #include <linux/types.h>
+ #include <net/if.h>
+ #include <linux/sockios.h>
+@@ -146,7 +143,10 @@ const char *ethernet_tunable::toggle_script(void)
+ =
 
-Srinivas Pandruvada (8):
-  Common read/write MSR API
-  Use MSR Lib MSR functions
-  RAPL Interface
-  cpu device as parent class
-  Interface to get first cpu
-  Added PP0 RAPL domain for CPU
-  Add RAPL DRAM domain
-  Add RAPL PP1 domain for GPU
+ void ethtunable_callback(const char *d_name)
+ {
+-	class ethernet_tunable *eth =3D new(std::nothrow) class ethernet_tunable(=
+d_name);
++	class ethernet_tunable *eth;
++	if (strcmp(d_name, "lo") =3D=3D 0)
++		return;
++	eth =3D new(std::nothrow) class ethernet_tunable(d_name);
+ 	if (eth)
+ 		all_tunables.push_back(eth);
+ }
 
- src/Makefile.am                 |   4 +-
- src/cpu/cpu.cpp                 |  16 ++
- src/cpu/cpu.h                   |   1 +
- src/cpu/cpu_rapl_device.cpp     |  74 +++++
- src/cpu/cpu_rapl_device.h       |  57 ++++
- src/cpu/cpudevice.cpp           |  14 +
- src/cpu/cpudevice.h             |   6 +-
- src/cpu/dram_rapl_device.cpp    |  75 +++++
- src/cpu/dram_rapl_device.h      |  57 ++++
- src/cpu/intel_cpus.cpp          |  23 +-
- src/cpu/rapl/rapl_interface.cpp | 611 ++++++++++++++++++++++++++++++++++++=
-++++
- src/cpu/rapl/rapl_interface.h   |  85 ++++++
- src/devices/gpu_rapl_device.cpp |  70 +++++
- src/devices/gpu_rapl_device.h   |  57 ++++
- src/devices/i915-gpu.cpp        |  21 ++
- src/devices/i915-gpu.h          |   6 +-
- src/lib.cpp                     |  61 ++++
- src/lib.h                       |   3 +-
- 18 files changed, 1218 insertions(+), 23 deletions(-)
- create mode 100644 src/cpu/cpu_rapl_device.cpp
- create mode 100644 src/cpu/cpu_rapl_device.h
- create mode 100644 src/cpu/dram_rapl_device.cpp
- create mode 100644 src/cpu/dram_rapl_device.h
- create mode 100644 src/cpu/rapl/rapl_interface.cpp
- create mode 100644 src/cpu/rapl/rapl_interface.h
- create mode 100644 src/devices/gpu_rapl_device.cpp
- create mode 100644 src/devices/gpu_rapl_device.h
-
--- =
-
-1.7.11.7
-
-
---===============7678598020989589438==--
+--===============7640367267253726888==--
 
