@@ -1,97 +1,47 @@
-Content-Type: multipart/mixed; boundary="===============6993035717616774132=="
+Content-Type: multipart/mixed; boundary="===============2969477641028313143=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH v3 11/31] report-csv: modular table
-Date: Mon, 18 Nov 2013 12:27:02 -0800
-Message-ID: <1384806442-20294-12-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: 1384806442-20294-1-git-send-email-alexandra.yates@linux.intel.com
+From: Marc MERLIN <marc_powertop at merlins.org>
+Subject: Re: [Powertop] Fwd: powertop 2.4 questions
+Date: Fri, 20 Sep 2013 20:22:03 -0700
+Message-ID: <20130921032203.GA8125@merlins.org>
+In-Reply-To: CANHSFsuzzDuKT+GRLyW8Vrjk30jDSADV_vq9u1T2jLYZUv36iA@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6993035717616774132==
+--===============2969477641028313143==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Generates a modular table to the csv report using the table_size and a
-set of data stored in a single dimensional array stored in row major
-order.
+On Thu, Sep 19, 2013 at 09:38:22PM +0700, Andika Triwidada wrote:
+> On Thu, Sep 19, 2013 at 2:53 AM, Marc MERLIN <marc_powertop(a)merlins.org=
+> wrote:
+> > By the way, my more nagging question was, how can I stop the built in c=
+amera
+> > in my T530 from taking so much power? (I'm sure the number is wrong, bu=
+t still)
+> =
 
-Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
----
- src/report/report-formatter-csv.cpp |   28 ++++++++++++++++++++++++++++
- src/report/report-formatter-csv.h   |    2 ++
- 2 files changed, 30 insertions(+)
+> How about unloading/blacklisting its driver?
 
-diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-format=
-ter-csv.cpp
-index 2981940..b9336ad 100644
---- a/src/report/report-formatter-csv.cpp
-+++ b/src/report/report-formatter-csv.cpp
-@@ -33,6 +33,7 @@
- #include <stdarg.h>
- =
+That didn't help. =
 
- #include "report-formatter-csv.h"
-+#include "report-data-html.h"
- =
 
- static const char report_csv_header[] =3D "PowerTOP Report";
- =
+It might work if I blacklist the driver and never use it after boot, but
+that's not super compatible with google talk/hangouts.
 
-@@ -279,3 +280,30 @@ report_formatter_csv::add_summary_list(string *list, i=
-nt size)
- 	add_exact("\n");
- }
- =
+That said, if I can't get the driver/device to behave, I might do that.
 
-+void
-+report_formatter_csv::add_table(string *system_data, struct table_size *si=
-ze,
-+		struct table_attributes* tb_attr)
-+{
-+	int i, j;
-+	int offset=3D0;
-+	string tmp_str=3D"";
-+	int empty_row=3D0;
-+	add_exact("\n");
-+	for (i=3D0; i < size->rows; i++){
-+		for (j=3D0; j < size->cols; j++){
-+			offset =3D i * (size->cols) + j;
-+			tmp_str=3Dsystem_data[offset];
-+
-+			if(tmp_str =3D=3D "&nbsp;")
-+				empty_row+=3D1;
-+			else{
-+				addf_exact("%s", system_data[offset].c_str());
-+				if(j < (size->cols - 1))
-+					add_exact(",");
-+			}
-+		}
-+		if(empty_row < size->cols)
-+		add_exact("\n");
-+		empty_row=3D0;
-+	}
-+}
-diff --git a/src/report/report-formatter-csv.h b/src/report/report-formatte=
-r-csv.h
-index daf723e..994b765 100644
---- a/src/report/report-formatter-csv.h
-+++ b/src/report/report-formatter-csv.h
-@@ -82,6 +82,8 @@ public:
- 	void add_title(struct tag_attr *title_att, const char *title);
- 	void add_navigation();
- 	void add_summary_list(string *list, int size);
-+	void add_table(string *system_data, struct table_size *size,
-+			struct table_attributes *tb_attr);
- =
-
- private:
- 	void add_doc_header();
+Marc
 -- =
 
-1.7.9.5
+"A mouse is a device used to point at the xterm you want to type in" - A.S.=
+R.
+Microsoft is to operating systems ....
+                                      .... what McDonalds is to gourmet coo=
+king
+Home page: http://marc.merlins.org/                         | PGP 1024R/763=
+BE901
 
-
---===============6993035717616774132==--
+--===============2969477641028313143==--
 
