@@ -1,46 +1,111 @@
-Content-Type: multipart/mixed; boundary="===============8458272940296213105=="
+Content-Type: multipart/mixed; boundary="===============4033048448353409424=="
 MIME-Version: 1.0
-From: Kristen Carlson Accardi <kristen at linux.intel.com>
-Subject: Re: [Powertop] introduce powertop2 -next
-Date: Tue, 08 Oct 2013 14:58:15 -0700
-Message-ID: <20131008145815.0da005aa@bluebird.jf.intel.com>
-In-Reply-To: 20130923121318.4b24c0b2@bluebird.jf.intel.com
+From: Shaojie Sun <shaojie.sun at linaro.org>
+Subject: Re: [Powertop] [PATCH POWERTOP V3] resolve the bug that powertop
+ doesn't show correct frequency stats
+Date: Mon, 07 Oct 2013 22:54:49 +0800
+Message-ID: <CANHzE=1d-F1qkCSv+pN4pLu1HijgzTDDX_g5Px7LVdmXxxHwbw@mail.gmail.com>
+In-Reply-To: 20131007114000.GD2460@swordfish.minsk.epam.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8458272940296213105==
+--===============4033048448353409424==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 23 Sep 2013 12:13:18 -0700
-Kristen Carlson Accardi <kristen(a)linux.intel.com> wrote:
+add jon.medhurst(a)linaro.org
 
-> On Tue, 17 Sep 2013 22:30:33 +0300
-> Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com> wrote:
-> =
+On Mon, Oct 7, 2013 at 7:40 PM, Sergey Senozhatsky
+<sergey.senozhatsky(a)gmail.com> wrote:
+> On (10/07/13 19:31), Shaojie Sun wrote:
+>> Date: Mon, 7 Oct 2013 19:31:54 +0800
+>> From: Shaojie Sun <shaojie.sun(a)linaro.org>
+>> To: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+>> Cc: Sanjay Rawat <sanjay.rawat(a)linaro.org>, Jon Medhurst <tixy(a)linar=
+o.org>,
+>>  SunShaoJie <sunshaojie(a)huawei.com>, "Private-PMWG(a)Linaro"
+>>  <private-pmwg(a)linaro.org>
+>> Subject: Re: [Powertop] [PATCH POWERTOP V3] resolve the bug that powertop
+>>  doesn't show correct frequency stats
+>>
+>> Goog question.
+>> Could Tixy answer it?
+>
+> /** Removed Private-PMWG (no permissions), Cc'd powertop list. */
+>
+>
+>
+> the thing is that we tend to trust passed cpunr in many handle_trace_poin=
+t()-s.
+> so it would be better to fix all sample->trace.cpu users, because the
+> problme may be a bit bigger than that (e.g. src/process/do_process.cpp
+> perf_process_bundle::handle_trace_point()).
+>
+>
+>         -ss
+>
+>> On Mon, Oct 7, 2013 at 6:03 PM, Sergey Senozhatsky
+>> <sergey.senozhatsky(a)gmail.com> wrote:
+>> > On (10/07/13 17:26), Shaojie Sun wrote:
+>> >> From: Jon Medhurst <tixy(a)linaro.org>
+>> >>
+>> >> For cpu_frequency events, perf_power_bundle::handle_trace_point()
+>> >> is always being called with the same cpunr. so the parameter of
+>> >> cpunr is not equal to the cpu which cpu_frequency events happened.
+>> >> Lucky the trace event themselves have a cpu_id field to say to which
+>> >> CPU event it relates, we should use this cpu_id field.
+>> >>
+>> >> Signed-off-by:  Jon Medhurst <tixy(a)linaro.org>
+>> >>               Shaojie Sun <shaojie.sun(a)linaro.com>
+>> >> ---
+>> >>  src/cpu/cpu.cpp |    9 +++++++--
+>> >>  1 file changed, 7 insertions(+), 2 deletions(-)
+>> >>
+>> >> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+>> >> index 7f3af69..e304bbe 100644
+>> >> --- a/src/cpu/cpu.cpp
+>> >> +++ b/src/cpu/cpu.cpp
+>> >> @@ -781,10 +781,15 @@ void perf_power_bundle::handle_trace_point(void=
+ *trace, int cpunr, uint64_t time
+>> >>
+>> >>       if (strcmp(event->name, "power_frequency") =3D=3D 0
+>> >>       || strcmp(event->name, "cpu_frequency") =3D=3D 0){
+>> >> -
+>> >> +             ret =3D pevent_get_field_val(NULL, event, "cpu_id", &re=
+c, &val, 0);
+>> >> +             if (ret < 0) {
+>> >> +                     fprintf(stderr, _("power or cpu_frequency event=
+ returned no cpu?\n"));
+>> >> +                     exit(-1);
+>> >> +             }
+>> >> +             cpu =3D all_cpus[val];
+>> >>               ret =3D pevent_get_field_val(NULL, event, "state", &rec=
+, &val, 0);
+>> >>               if (ret < 0) {
+>> >> -                     fprintf(stderr, _("power or cpu_frequecny event=
+ returned no state?\n"));
+>> >> +                     fprintf(stderr, _("power or cpu_frequency event=
+ returned no state?\n"));
+>> >>                       exit(-1);
+>> >>               }
+>> >
+>> > Hello,
+>> > why not fixing it in src/perf/perf_bundle (perf_sample's perf_event_he=
+ader),
+>> > where we create data for handle_trace_point() ?
+>> >
+>> >         -ss
+>> >
+>> >> --
+>> >> 1.7.9.5
+>> >>
+>> >> _______________________________________________
+>> >> PowerTop mailing list
+>> >> PowerTop(a)lists.01.org
+>> >> https://lists.01.org/mailman/listinfo/powertop
+>> >>
+>>
 
-> > Hello everybody,
-> > =
-
-> > I've forked a powertop2-next (well, let it be our -next) from the curre=
-nt
-> > code and dig through the list from February 2013 to September 2013 and
-> > picked up all patches that haven't been merged. so we have better chanc=
-es
-> > not to lose them (we'll merge them with the upstream some day)
-> =
-
-> Thanks for doing this.  I'll poke through your tree and try to get the
-> patches merged ASAP.
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
-
-pulled all of your patches - we should be up to date now.
-
---===============8458272940296213105==--
+--===============4033048448353409424==--
 
