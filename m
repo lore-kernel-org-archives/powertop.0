@@ -1,56 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============7085212721876828057=="
+Content-Type: multipart/mixed; boundary="===============8626637592620702986=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] typo in Powertop 'managmenet' -> management
-Date: Tue, 26 Nov 2013 22:07:47 +0300
-Message-ID: <20131126190747.GB2329@swordfish.minsk.epam.com>
-In-Reply-To: 87r4a3ru95.fsf@hillenius.net
+Subject: Re: [Powertop] [PATCH POWERTOP V3] resolve the bug that powertop
+ doesn't show correct frequency stats
+Date: Mon, 07 Oct 2013 13:03:25 +0300
+Message-ID: <20131007100325.GB2460@swordfish.minsk.epam.com>
+In-Reply-To: 1381138004-17468-1-git-send-email-shaojie.sun@linaro.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7085212721876828057==
+--===============8626637592620702986==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (11/26/13 17:38), Gijs Hillenius wrote:
-> Hi all, =
-
+On (10/07/13 17:26), Shaojie Sun wrote:
+> From: Jon Medhurst <tixy(a)linaro.org>
 > =
 
-> This could be an interesting way to get users to join the
-> mailinglist. Or it is just a typo:
+> For cpu_frequency events, perf_power_bundle::handle_trace_point()
+> is always being called with the same cpunr. so the parameter of
+> cpunr is not equal to the cpu which cpu_frequency events happened.
+> Lucky the trace event themselves have a cpu_id field to say to which
+> CPU event it relates, we should use this cpu_id field.
 > =
 
+> Signed-off-by:  Jon Medhurst <tixy(a)linaro.org>
+> 		Shaojie Sun <shaojie.sun(a)linaro.com>
+> ---
+>  src/cpu/cpu.cpp |    9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 > =
 
-> Enable SATA link power Managmenet for host0
-> =
+> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+> index 7f3af69..e304bbe 100644
+> --- a/src/cpu/cpu.cpp
+> +++ b/src/cpu/cpu.cpp
+> @@ -781,10 +781,15 @@ void perf_power_bundle::handle_trace_point(void *tr=
+ace, int cpunr, uint64_t time
+>  =
 
-> that should be Managment, I'd think?
+>  	if (strcmp(event->name, "power_frequency") =3D=3D 0
+>  	|| strcmp(event->name, "cpu_frequency") =3D=3D 0){
+> -
+> +		ret =3D pevent_get_field_val(NULL, event, "cpu_id", &rec, &val, 0);
+> +		if (ret < 0) {
+> +			fprintf(stderr, _("power or cpu_frequency event returned no cpu?\n"));
+> +			exit(-1);
+> +		}
+> +		cpu =3D all_cpus[val];
+>  		ret =3D pevent_get_field_val(NULL, event, "state", &rec, &val, 0);
+>  		if (ret < 0) {
+> -			fprintf(stderr, _("power or cpu_frequecny event returned no state?\n"=
+));
+> +			fprintf(stderr, _("power or cpu_frequency event returned no state?\n"=
+));
+>  			exit(-1);
+>  		}
 
-I think that should be 'management'. the same way sysfs param
-named: /sys/class/scsi_host/%s/link_power_management_policy
+Hello,
+why not fixing it in src/perf/perf_bundle (perf_sample's perf_event_header),
+where we create data for handle_trace_point() ?
 
 	-ss
 
-> Rgrds
-> =
-
-> Gijs
-> =
-
 > -- =
 
-> BOFH excuse #73:
+> 1.7.9.5
 > =
 
-> Daemons did it
 > _______________________________________________
 > PowerTop mailing list
 > PowerTop(a)lists.01.org
 > https://lists.01.org/mailman/listinfo/powertop
 >=20
 
---===============7085212721876828057==--
+--===============8626637592620702986==--
 
