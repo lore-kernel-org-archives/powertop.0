@@ -1,147 +1,222 @@
-Content-Type: multipart/mixed; boundary="===============8376856167519753130=="
+Content-Type: multipart/mixed; boundary="===============3264344332252678648=="
 MIME-Version: 1.0
-From: Kristen Carlson Accardi <kristen at linux.intel.com>
-Subject: [Powertop] [PATCH] intel_cpus: add support for Silvermont/Baytrail-M
- CPU
-Date: Tue, 08 Oct 2013 16:51:08 -0700
-Message-ID: <1381276268-23515-1-git-send-email-kristen@linux.intel.com>
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] patch: tell user if the system is running out of FDs
+Date: Tue, 08 Oct 2013 16:21:37 +0300
+Message-ID: <20131008132137.GB2452@swordfish.minsk.epam.com>
+In-Reply-To: 988443702.3413079.1381237003703.JavaMail.root@redhat.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8376856167519753130==
+--===============3264344332252678648==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
----
- src/cpu/intel_cpus.cpp | 24 ++++++++++++++++++++++--
- src/cpu/intel_cpus.h   |  3 +++
- 2 files changed, 25 insertions(+), 2 deletions(-)
+On (10/08/13 08:56), Jaroslav Skarvada wrote:
+> Date: Tue, 8 Oct 2013 08:56:43 -0400 (EDT)
+> From: Jaroslav Skarvada <jskarvad(a)redhat.com>
+> To: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+> Cc: powertop(a)ml01.01.org
+> Subject: Re: [Powertop] patch: tell user if the system is running out of =
+FDs
+> X-Mailer: Zimbra 8.0.3_GA_5664 (ZimbraWebClient - FF24
+>  (Linux)/8.0.3_GA_5664)
+> =
 
-diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
-index 5b2e205..3348dba 100644
---- a/src/cpu/intel_cpus.cpp
-+++ b/src/cpu/intel_cpus.cpp
-@@ -54,6 +54,7 @@ static int intel_cpu_models[] =3D {
- 	0x3A,   /* IVB */
- 	0x3C,
- 	0x3D,	/* IVB Xeon */
-+	0x37,	/* BYT-M */
- 	0	/* last entry must be zero */
- };
- =
+> =
 
-@@ -96,7 +97,12 @@ nhm_core::nhm_core(int model)
- 			has_c2c7_res =3D 1;
- 	}
- =
+> =
 
--	has_c3_res =3D 1;
-+	/* BYT-M does not support C3/C4 */
-+	if (model =3D=3D 0x37) {
-+		has_c3_res =3D 0;
-+		has_c1_res =3D 1;
-+	} else
-+		has_c3_res =3D 1;
- }
- =
+> ----- Original Message -----
+> > On (10/08/13 08:08), Jaroslav Skarvada wrote:
+> > > > Hello,
+> > > > =
 
- void nhm_core::measurement_start(void)
-@@ -109,6 +115,8 @@ void nhm_core::measurement_start(void)
- =
+> > > > > I used Youquan's patch, but we have noticed that it can only over=
+come
+> > > > > soft
+> > > > > limits,
+> > > > > but not hard limits. E.g. on Fedora (and probably others) there i=
+s a
+> > > > > soft
+> > > > > limit
+> > > > > of 1024 and a hard limit of 4096, so if powertop opens at least 1=
+5 file
+> > > > > descriptors
+> > > > > per CPU, then this will fail on a system with >273 CPUs.
+> > > > =
 
- 	last_stamp =3D 0;
- =
+> > > > that's a pretty big system
+> > > > =
 
-+	if (this->has_c1_res)
-+		c1_before =3D get_msr(first_cpu, MSR_CORE_C1_RESIDENCY);
- 	if (this->has_c3_res)
- 		c3_before    =3D get_msr(first_cpu, MSR_CORE_C3_RESIDENCY);
- 	c6_before    =3D get_msr(first_cpu, MSR_CORE_C6_RESIDENCY);
-@@ -116,6 +124,8 @@ void nhm_core::measurement_start(void)
- 		c7_before    =3D get_msr(first_cpu, MSR_CORE_C7_RESIDENCY);
- 	tsc_before   =3D get_msr(first_cpu, MSR_TSC);
- =
+> > > > > In case you think we can also temporally increase the hard limit =
+(as we
+> > > > > already have
+> > > > > the privilege), the attached patch will do it. In case you think =
+the
+> > > > > hard
+> > > > > limits set by
+> > > > > the system administrator are untouchable (e.g. violation of system
+> > > > > resources hard limits
+> > > > > could result in a bad effects like explosion in a nuclear power p=
+lant
+> > > > > :),
+> > > > > the
+> > > > > previously sent patch that fixes the error message needs to be al=
+so
+> > > > > used
+> > > > =
 
-+	if (this->has_c1_res)
-+		insert_cstate("core c1", "C1 (cc1)", 0, c1_before, 1);
- 	if (this->has_c3_res)
- 		insert_cstate("core c3", "C3 (cc3)", 0, c3_before, 1);
- 	insert_cstate("core c6", "C6 (cc6)", 0, c6_before, 1);
-@@ -149,6 +159,8 @@ void nhm_core::measurement_end(void)
- 	uint64_t time_delta;
- 	double ratio;
- =
+> > > > hm, need to think about this for a moment. both your patches make s=
+ense.
+> > > > I'd probably go with `temporally increase the hard limit' solution,=
+ to
+> > > > make
+> > > > someones life easier. what do you, guys, think?
+> > > > =
 
-+	if (this->has_c1_res)
-+		c1_after =3D get_msr(first_cpu, MSR_CORE_C1_RESIDENCY);
- 	if (this->has_c3_res)
- 		c3_after    =3D get_msr(first_cpu, MSR_CORE_C3_RESIDENCY);
- 	c6_after    =3D get_msr(first_cpu, MSR_CORE_C6_RESIDENCY);
-@@ -156,6 +168,8 @@ void nhm_core::measurement_end(void)
- 		c7_after    =3D get_msr(first_cpu, MSR_CORE_C7_RESIDENCY);
- 	tsc_after   =3D get_msr(first_cpu, MSR_TSC);
- =
+> > > > =
 
-+	if (this->has_c1_res)
-+		finalize_cstate("core c1", 0, c1_after, 1);
- 	if (this->has_c3_res)
- 		finalize_cstate("core c3", 0, c3_after, 1);
- 	finalize_cstate("core c6", 0, c6_after, 1);
-@@ -241,12 +255,18 @@ nhm_package::nhm_package(int model)
- 		case 0x2D:	/* SNB Xeon */
- 		case 0x3A:      /* IVB */
- 		case 0x3C:
-+		case 0x37:
- 		case 0x3D:      /* IVB Xeon */
- 		case 0x45:
- 			has_c2c7_res =3D 1;
- 	}
- =
+> > > > 	-ss
+> > > > =
 
--	has_c3_res =3D 1;
-+	/* BYT-M doesn't have C3 */
-+	if (model =3D=3D 0x37)
-+		has_c3_res =3D 0;
-+	else
-+		has_c3_res =3D 1;
-+
- =
+> > > > > regards
+> > > > > =
 
- 	/* Haswell-ULT has C8/9/10*/
- 	if (model =3D=3D 0x45)
-diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
-index 4a51494..57afd8a 100644
---- a/src/cpu/intel_cpus.h
-+++ b/src/cpu/intel_cpus.h
-@@ -40,6 +40,7 @@
- #define MSR_PKG_C8_RESIDENCY		0x630
- #define MSR_PKG_C9_RESIDENCY		0x631
- #define MSR_PKG_C10_RESIDENCY		0x632
-+#define MSR_CORE_C1_RESIDENCY		0x660
- #define MSR_CORE_C3_RESIDENCY		0x3FC
- #define MSR_CORE_C6_RESIDENCY		0x3FD
- #define MSR_CORE_C7_RESIDENCY		0x3FE
-@@ -73,6 +74,7 @@ public:
- class nhm_core: public cpu_core
- {
- private:
-+	uint64_t	c1_before, c1_after;
- 	uint64_t	c3_before, c3_after;
- 	uint64_t	c6_before, c6_after;
- 	uint64_t	c7_before, c7_after;
-@@ -81,6 +83,7 @@ private:
- 	uint64_t	last_stamp;
- 	uint64_t	total_stamp;
- public:
-+	int		has_c1_res;
- 	int		has_c2c7_res;
- 	int		has_c3_res;
- 	nhm_core(int model);
--- =
+> > > > > Jaroslav
+> > > > =
 
-1.8.3.2
+> > > > > diff --git a/src/main.cpp b/src/main.cpp
+> > > > > index 0883424..e0e8a71 100644
+> > > > > --- a/src/main.cpp
+> > > > > +++ b/src/main.cpp
+> > > > > @@ -36,6 +36,8 @@
+> > > > >  #include <getopt.h>
+> > > > >  #include <unistd.h>
+> > > > >  #include <locale.h>
+> > > > > +#include <sys/resource.h>
+> > > > > +#include <linux/limits.h>
+> > > > >  =
 
+> > > > >  #include "cpu/cpu.h"
+> > > > >  #include "process/process.h"
+> > > > > @@ -283,11 +285,16 @@ static void powertop_init(void)
+> > > > >  	static char initialized =3D 0;
+> > > > >  	int ret;
+> > > > >  	struct statfs st_fs;
+> > > > > +	struct rlimit rlmt;
+> > > > >  =
 
---===============8376856167519753130==--
+> > > > >  	if (initialized)
+> > > > >  		return;
+> > > > >  =
+
+> > > > >  	checkroot();
+> > > > > +
+> > > > > +	rlmt.rlim_cur =3D rlmt.rlim_max =3D NR_OPEN;
+> > > =
+
+> > > This seems to be wrong. On my system NR_OPEN is 1024, but
+> > > /proc/sys/fs/nr_open gives me 1048576. It seems the linux kernel
+> > > hardcodes 1024 * 1024 as the default kernel limit. This default
+> > > limit can be raised to:
+> > > =
+
+> > > sysctl_nr_open_max =3D min((size_t)INT_MAX, ~(size_t)0/sizeof(void *)=
+) &
+> > >   -BITS_PER_LONG;
+> > > =
+
+> > > which is 2 Gi - 63 on my 64 bit system. I think we shouldn't
+> > > touch/increase this. It seems there is no header definition for these
+> > > limits.
+> > > =
+
+> > > I am proposing new patch, which reads the current kernel limit from t=
+he
+> > > /proc. I am not sure about the portability, but at least it shouldn't
+> > > break anything.
+> > > =
+
+> > > Finally I think, the first patch could be applied together with this =
+patch
+> > > (probably with the changed message) to notify user that he/she reached
+> > > the FDs limit, because there is still some limit. This could also
+> > > occur if some process would decrease the /proc/sys/fs/nr_open after
+> > > it is read by powertop and before the ulimit is set
+> > > =
+
+> > > regards
+> > > =
+
+> > > Jaroslav
+> > =
+
+> > > diff --git a/src/main.cpp b/src/main.cpp
+> > > index 0883424..16b1613 100644
+> > > --- a/src/main.cpp
+> > > +++ b/src/main.cpp
+> > > @@ -28,6 +28,7 @@
+> > >   *	Arjan van de Ven <arjan(a)linux.intel.com>
+> > >   */
+> > >  #include <iostream>
+> > > +#include <fstream>
+> > >  #include <stdlib.h>
+> > >  #include <stdio.h>
+> > >  #include <time.h>
+> > > @@ -36,6 +37,7 @@
+> > >  #include <getopt.h>
+> > >  #include <unistd.h>
+> > >  #include <locale.h>
+> > > +#include <sys/resource.h>
+> > >  =
+
+> > >  #include "cpu/cpu.h"
+> > >  #include "process/process.h"
+> > > @@ -60,6 +62,8 @@
+> > >  =
+
+> > >  #define DEBUGFS_MAGIC          0x64626720
+> > >  =
+
+> > > +#define NR_OPEN_DEF 1024 * 1024
+> > >  int debug_learning =3D 0;
+> > >  unsigned time_out =3D 20;
+> > >  int leave_powertop =3D 0;
+> > > @@ -278,16 +282,35 @@ static void checkroot() {
+> > >  =
+
+> > >  }
+> > >  =
+
+> > > +static int get_nr_open(void) {
+> > > +	int nr_open =3D NR_OPEN_DEF;
+> > > +	ifstream file;
+> > > +
+> > > +	file.open("/proc/sys/fs/nr_open", ios::in);
+> > > +	if (file) {
+> > > +		file >> nr_open;
+> > > +		if (!file)
+> > > +			nr_open =3D NR_OPEN_DEF;
+> > =
+
+> > =
+
+> > what if /proc/sys/fs/nr_open is less than 4096 or (NR_OPEN_DEF)?
+> > you probaly want max()?
+> =
+
+> I think you cannot set ulimit beyond /proc/sys/fs/nr_open. You
+> need to increase /proc/sys/fs/nr_open first, which is something
+> we should avoid
+
+fair enough. I'm gonna apply it through the -next tree (the
+patch requires some modification to apply).
+
+thanks.
+
+	-ss
+
+--===============3264344332252678648==--
 
