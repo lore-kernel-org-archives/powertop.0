@@ -1,33 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============0181829990399970440=="
+Content-Type: multipart/mixed; boundary="===============8458272940296213105=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] PowerTop 2.5 installation
-Date: Wed, 04 Dec 2013 08:07:29 -0800
-Message-ID: <529F5341.7030103@linux.intel.com>
-In-Reply-To: F9A26558D30ED241A8204F06F9947260257FE613@BGSMSX102.gar.corp.intel.com
+From: Kristen Carlson Accardi <kristen at linux.intel.com>
+Subject: Re: [Powertop] introduce powertop2 -next
+Date: Tue, 08 Oct 2013 14:58:15 -0700
+Message-ID: <20131008145815.0da005aa@bluebird.jf.intel.com>
+In-Reply-To: 20130923121318.4b24c0b2@bluebird.jf.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0181829990399970440==
+--===============8458272940296213105==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 12/3/2013 8:23 PM, Mukherjee, Adrip wrote:
-> Thanks Auke. Ok sure.
->
-> So now I tried to build the powertop in a Linux build machine following t=
-he steps in the readme file.
+On Mon, 23 Sep 2013 12:13:18 -0700
+Kristen Carlson Accardi <kristen(a)linux.intel.com> wrote:
 
-please run
+> On Tue, 17 Sep 2013 22:30:33 +0300
+> Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com> wrote:
+> =
 
-./configure
-make
+> > Hello everybody,
+> > =
 
-don't use Makefile.in, that's input to the configure script which will outp=
-ut a real "Makefile" from it
+> > I've forked a powertop2-next (well, let it be our -next) from the curre=
+nt
+> > code and dig through the list from February 2013 to September 2013 and
+> > picked up all patches that haven't been merged. so we have better chanc=
+es
+> > not to lose them (we'll merge them with the upstream some day)
+> =
 
+> Thanks for doing this.  I'll poke through your tree and try to get the
+> patches merged ASAP.
+> =
 
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
 
---===============0181829990399970440==--
+pulled all of your patches - we should be up to date now.
+
+--===============8458272940296213105==--
 
