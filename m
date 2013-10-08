@@ -1,100 +1,210 @@
-Content-Type: multipart/mixed; boundary="===============2103930296231774401=="
+Content-Type: multipart/mixed; boundary="===============4894149544677395079=="
 MIME-Version: 1.0
-From: Mukherjee, Adrip <adrip.mukherjee at intel.com>
-Subject: [Powertop] PowerTop Installation issue
-Date: Wed, 20 Nov 2013 11:33:28 +0000
-Message-ID: <F9A26558D30ED241A8204F06F9947260257FADBB@BGSMSX102.gar.corp.intel.com>
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] patch: tell user if the system is running out of FDs
+Date: Tue, 08 Oct 2013 15:49:05 +0300
+Message-ID: <20131008124905.GA2452@swordfish.minsk.epam.com>
+In-Reply-To: 32937649.3381028.1381234097785.JavaMail.root@redhat.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2103930296231774401==
+--===============4894149544677395079==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi ,
-       This is Adrip from Intel India PCCG group. Recently I was trying to =
-install powertop in my HSW PVT2 system having Android JellyBean internal ve=
-rsion . According to the installation steps listed here:
+On (10/08/13 08:08), Jaroslav Skarvada wrote:
+> > Hello,
+> > =
 
-To build and install PowerTOP type the following commands,
-        ./configure
-        ./make
-        ./make install
-Its failing to configure with a message : "permission denied" even though I=
- have rooted my terminal emulator. Can you please tell me what I need to fo=
-llow to run the powertop tool on Android in a Haswell SDS system.
+> > > I used Youquan's patch, but we have noticed that it can only overcome=
+ soft
+> > > limits,
+> > > but not hard limits. E.g. on Fedora (and probably others) there is a =
+soft
+> > > limit
+> > > of 1024 and a hard limit of 4096, so if powertop opens at least 15 fi=
+le
+> > > descriptors
+> > > per CPU, then this will fail on a system with >273 CPUs.
+> > =
 
-regards
-Adrip
+> > that's a pretty big system
+> > =
+
+> > > In case you think we can also temporally increase the hard limit (as =
+we
+> > > already have
+> > > the privilege), the attached patch will do it. In case you think the =
+hard
+> > > limits set by
+> > > the system administrator are untouchable (e.g. violation of system
+> > > resources hard limits
+> > > could result in a bad effects like explosion in a nuclear power plant=
+ :),
+> > > the
+> > > previously sent patch that fixes the error message needs to be also u=
+sed
+> > =
+
+> > hm, need to think about this for a moment. both your patches make sense.
+> > I'd probably go with `temporally increase the hard limit' solution, to =
+make
+> > someones life easier. what do you, guys, think?
+> > =
+
+> > =
+
+> > 	-ss
+> > =
+
+> > > regards
+> > > =
+
+> > > Jaroslav
+> > =
+
+> > > diff --git a/src/main.cpp b/src/main.cpp
+> > > index 0883424..e0e8a71 100644
+> > > --- a/src/main.cpp
+> > > +++ b/src/main.cpp
+> > > @@ -36,6 +36,8 @@
+> > >  #include <getopt.h>
+> > >  #include <unistd.h>
+> > >  #include <locale.h>
+> > > +#include <sys/resource.h>
+> > > +#include <linux/limits.h>
+> > >  =
+
+> > >  #include "cpu/cpu.h"
+> > >  #include "process/process.h"
+> > > @@ -283,11 +285,16 @@ static void powertop_init(void)
+> > >  	static char initialized =3D 0;
+> > >  	int ret;
+> > >  	struct statfs st_fs;
+> > > +	struct rlimit rlmt;
+> > >  =
+
+> > >  	if (initialized)
+> > >  		return;
+> > >  =
+
+> > >  	checkroot();
+> > > +
+> > > +	rlmt.rlim_cur =3D rlmt.rlim_max =3D NR_OPEN;
+> =
+
+> This seems to be wrong. On my system NR_OPEN is 1024, but
+> /proc/sys/fs/nr_open gives me 1048576. It seems the linux kernel
+> hardcodes 1024 * 1024 as the default kernel limit. This default
+> limit can be raised to:
+> =
+
+> sysctl_nr_open_max =3D min((size_t)INT_MAX, ~(size_t)0/sizeof(void *)) &
+>   -BITS_PER_LONG;
+> =
+
+> which is 2 Gi - 63 on my 64 bit system. I think we shouldn't
+> touch/increase this. It seems there is no header definition for these
+> limits.
+> =
+
+> I am proposing new patch, which reads the current kernel limit from the
+> /proc. I am not sure about the portability, but at least it shouldn't
+> break anything.
+> =
+
+> Finally I think, the first patch could be applied together with this patch
+> (probably with the changed message) to notify user that he/she reached
+> the FDs limit, because there is still some limit. This could also
+> occur if some process would decrease the /proc/sys/fs/nr_open after
+> it is read by powertop and before the ulimit is set
+> =
+
+> regards
+> =
+
+> Jaroslav
+
+> diff --git a/src/main.cpp b/src/main.cpp
+> index 0883424..16b1613 100644
+> --- a/src/main.cpp
+> +++ b/src/main.cpp
+> @@ -28,6 +28,7 @@
+>   *	Arjan van de Ven <arjan(a)linux.intel.com>
+>   */
+>  #include <iostream>
+> +#include <fstream>
+>  #include <stdlib.h>
+>  #include <stdio.h>
+>  #include <time.h>
+> @@ -36,6 +37,7 @@
+>  #include <getopt.h>
+>  #include <unistd.h>
+>  #include <locale.h>
+> +#include <sys/resource.h>
+>  =
+
+>  #include "cpu/cpu.h"
+>  #include "process/process.h"
+> @@ -60,6 +62,8 @@
+>  =
+
+>  #define DEBUGFS_MAGIC          0x64626720
+>  =
+
+> +#define NR_OPEN_DEF 1024 * 1024
+>  int debug_learning =3D 0;
+>  unsigned time_out =3D 20;
+>  int leave_powertop =3D 0;
+> @@ -278,16 +282,35 @@ static void checkroot() {
+>  =
+
+>  }
+>  =
+
+> +static int get_nr_open(void) {
+> +	int nr_open =3D NR_OPEN_DEF;
+> +	ifstream file;
+> +
+> +	file.open("/proc/sys/fs/nr_open", ios::in);
+> +	if (file) {
+> +		file >> nr_open;
+> +		if (!file)
+> +			nr_open =3D NR_OPEN_DEF;
 
 
---===============2103930296231774401==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+what if /proc/sys/fs/nr_open is less than 4096 or (NR_OPEN_DEF)?
+you probaly want max()?
 
-PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
-bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
-YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6ZHQ9InV1aWQ6QzJGNDEwMTAtNjVC
-My0xMWQxLUEyOUYtMDBBQTAwQzE0ODgyIiB4bWxuczptPSJodHRwOi8vc2NoZW1hcy5taWNyb3Nv
-ZnQuY29tL29mZmljZS8yMDA0LzEyL29tbWwiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy9UUi9S
-RUMtaHRtbDQwIj4KPGhlYWQ+CjxtZXRhIGh0dHAtZXF1aXY9IkNvbnRlbnQtVHlwZSIgY29udGVu
-dD0idGV4dC9odG1sOyBjaGFyc2V0PXVzLWFzY2lpIj4KPG1ldGEgbmFtZT0iR2VuZXJhdG9yIiBj
-b250ZW50PSJNaWNyb3NvZnQgV29yZCAxNCAoZmlsdGVyZWQgbWVkaXVtKSI+CjxzdHlsZT48IS0t
-Ci8qIEZvbnQgRGVmaW5pdGlvbnMgKi8KQGZvbnQtZmFjZQoJe2ZvbnQtZmFtaWx5OkNhbGlicmk7
-CglwYW5vc2UtMToyIDE1IDUgMiAyIDIgNCAzIDIgNDt9CkBmb250LWZhY2UKCXtmb250LWZhbWls
-eTpWaXZhbGRpOwoJcGFub3NlLTE6MyAyIDYgMiA1IDUgNiA5IDggNDt9CkBmb250LWZhY2UKCXtm
-b250LWZhbWlseTpDb25zb2xhczsKCXBhbm9zZS0xOjIgMTEgNiA5IDIgMiA0IDMgMiA0O30KLyog
-U3R5bGUgRGVmaW5pdGlvbnMgKi8KcC5Nc29Ob3JtYWwsIGxpLk1zb05vcm1hbCwgZGl2Lk1zb05v
-cm1hbAoJe21hcmdpbjowaW47CgltYXJnaW4tYm90dG9tOi4wMDAxcHQ7Cglmb250LXNpemU6MTEu
-MHB0OwoJZm9udC1mYW1pbHk6IkNhbGlicmkiLCJzYW5zLXNlcmlmIjt9CmE6bGluaywgc3Bhbi5N
-c29IeXBlcmxpbmsKCXttc28tc3R5bGUtcHJpb3JpdHk6OTk7Cgljb2xvcjpibHVlOwoJdGV4dC1k
-ZWNvcmF0aW9uOnVuZGVybGluZTt9CmE6dmlzaXRlZCwgc3Bhbi5Nc29IeXBlcmxpbmtGb2xsb3dl
-ZAoJe21zby1zdHlsZS1wcmlvcml0eTo5OTsKCWNvbG9yOnB1cnBsZTsKCXRleHQtZGVjb3JhdGlv
-bjp1bmRlcmxpbmU7fQpwCgl7bXNvLXN0eWxlLXByaW9yaXR5Ojk5OwoJbXNvLW1hcmdpbi10b3At
-YWx0OmF1dG87CgltYXJnaW4tcmlnaHQ6MGluOwoJbXNvLW1hcmdpbi1ib3R0b20tYWx0OmF1dG87
-CgltYXJnaW4tbGVmdDowaW47Cglmb250LXNpemU6MTIuMHB0OwoJZm9udC1mYW1pbHk6IlRpbWVz
-IE5ldyBSb21hbiIsInNlcmlmIjt9CnNwYW4uRW1haWxTdHlsZTE3Cgl7bXNvLXN0eWxlLXR5cGU6
-cGVyc29uYWwtY29tcG9zZTsKCWZvbnQtZmFtaWx5OiJDYWxpYnJpIiwic2Fucy1zZXJpZiI7Cglj
-b2xvcjp3aW5kb3d0ZXh0O30KLk1zb0NocERlZmF1bHQKCXttc28tc3R5bGUtdHlwZTpleHBvcnQt
-b25seTsKCWZvbnQtZmFtaWx5OiJDYWxpYnJpIiwic2Fucy1zZXJpZiI7fQouTXNvUGFwRGVmYXVs
-dAoJe21zby1zdHlsZS10eXBlOmV4cG9ydC1vbmx5OwoJbXNvLW1hcmdpbi10b3AtYWx0OmF1dG87
-Cgltc28tbWFyZ2luLWJvdHRvbS1hbHQ6YXV0bzt9CkBwYWdlIFdvcmRTZWN0aW9uMQoJe3NpemU6
-OC41aW4gMTEuMGluOwoJbWFyZ2luOjEuMGluIDEuMGluIDEuMGluIDEuMGluO30KZGl2LldvcmRT
-ZWN0aW9uMQoJe3BhZ2U6V29yZFNlY3Rpb24xO30KLS0+PC9zdHlsZT48IS0tW2lmIGd0ZSBtc28g
-OV0+PHhtbD4KPG86c2hhcGVkZWZhdWx0cyB2OmV4dD0iZWRpdCIgc3BpZG1heD0iMTAyNiIgLz4K
-PC94bWw+PCFbZW5kaWZdLS0+PCEtLVtpZiBndGUgbXNvIDldPjx4bWw+CjxvOnNoYXBlbGF5b3V0
-IHY6ZXh0PSJlZGl0Ij4KPG86aWRtYXAgdjpleHQ9ImVkaXQiIGRhdGE9IjEiIC8+CjwvbzpzaGFw
-ZWxheW91dD48L3htbD48IVtlbmRpZl0tLT4KPC9oZWFkPgo8Ym9keSBsYW5nPSJFTi1VUyIgbGlu
-az0iYmx1ZSIgdmxpbms9InB1cnBsZSI+CjxkaXYgY2xhc3M9IldvcmRTZWN0aW9uMSI+CjxwIGNs
-YXNzPSJNc29Ob3JtYWwiPkhpICw8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IFRoaXMgaXMgQWRyaXAgZnJvbSBJ
-bnRlbCBJbmRpYSBQQ0NHIGdyb3VwLiBSZWNlbnRseSBJIHdhcyB0cnlpbmcgdG8gaW5zdGFsbCBw
-b3dlcnRvcCBpbiBteSBIU1cgUFZUMiBzeXN0ZW0gaGF2aW5nIEFuZHJvaWQgSmVsbHlCZWFuIGlu
-dGVybmFsIHZlcnNpb24gLiBBY2NvcmRpbmcgdG8gdGhlIGluc3RhbGxhdGlvbiBzdGVwcyBsaXN0
-ZWQgaGVyZToKPG86cD48L286cD48L3A+CjxwIHN0eWxlPSJtYXJnaW46MGluO21hcmdpbi1ib3R0
-b206LjAwMDFwdCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMS41cHQ7Zm9udC1mYW1pbHk6Q29u
-c29sYXM7Y29sb3I6IzMzMzMzMyI+VG8gYnVpbGQgYW5kIGluc3RhbGwgUG93ZXJUT1AgdHlwZSB0
-aGUgZm9sbG93aW5nIGNvbW1hbmRzLAo8YnI+CiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOzwvc3Bhbj48c3BhbiBzdHlsZT0iZm9udC1zaXplOjExLjVwdDtm
-b250LWZhbWlseTpDb25zb2xhcztjb2xvcjpyZWQiPi4vY29uZmlndXJlCjwvc3Bhbj48c3BhbiBz
-dHlsZT0iZm9udC1zaXplOjExLjVwdDtmb250LWZhbWlseTpDb25zb2xhcztjb2xvcjojMzMzMzMz
-Ij48YnI+CiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOy4v
-bWFrZTxicj4KJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Li9tYWtlIGluc3RhbGw8bzpwPjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwi
-Pkl0cyBmYWlsaW5nIHRvIGNvbmZpZ3VyZSB3aXRoIGEgbWVzc2FnZSA6ICYjODIyMDtwZXJtaXNz
-aW9uIGRlbmllZCYjODIyMTsgZXZlbiB0aG91Z2ggSSBoYXZlIHJvb3RlZCBteSB0ZXJtaW5hbCBl
-bXVsYXRvci4gQ2FuIHlvdSBwbGVhc2UgdGVsbCBtZSB3aGF0IEkgbmVlZCB0byBmb2xsb3cgdG8g
-cnVuIHRoZSBwb3dlcnRvcCB0b29sIG9uIEFuZHJvaWQgaW4gYSBIYXN3ZWxsIFNEUyBzeXN0ZW0u
-PG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9w
-Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iZm9udC1zaXplOjEwLjBwdDtmb250
-LWZhbWlseTpWaXZhbGRpO2NvbG9yOiM0MDMxNTIiPnJlZ2FyZHM8bzpwPjwvbzpwPjwvc3Bhbj48
-L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTAuMHB0O2Zv
-bnQtZmFtaWx5OlZpdmFsZGk7Y29sb3I6IzQwMzE1MiI+QWRyaXA8bzpwPjwvbzpwPjwvc3Bhbj48
-L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8L2Rpdj4KPC9i
-b2R5Pgo8L2h0bWw+Cg==
+	-ss
 
---===============2103930296231774401==--
+> +		file.close();
+> +	}
+> +	return nr_open;
+> +}
+> +
+>  static void powertop_init(void)
+>  {
+>  	static char initialized =3D 0;
+>  	int ret;
+>  	struct statfs st_fs;
+> +	struct rlimit rlmt;
+>  =
+
+>  	if (initialized)
+>  		return;
+>  =
+
+>  	checkroot();
+> +
+> +	rlmt.rlim_cur =3D rlmt.rlim_max =3D get_nr_open();
+> +	setrlimit (RLIMIT_NOFILE, &rlmt);
+> +
+>  	ret =3D system("/sbin/modprobe cpufreq_stats > /dev/null 2>&1");
+>  	ret =3D system("/sbin/modprobe msr > /dev/null 2>&1");
+>  	statfs("/sys/kernel/debug", &st_fs);
+
+
+--===============4894149544677395079==--
 
