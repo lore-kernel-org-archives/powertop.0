@@ -1,97 +1,126 @@
-Content-Type: multipart/mixed; boundary="===============7095026057477926459=="
+Content-Type: multipart/mixed; boundary="===============7128387425237102065=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH v3 02/31] report: call powertop logo
-Date: Mon, 18 Nov 2013 12:26:53 -0800
-Message-ID: <1384806442-20294-3-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: 1384806442-20294-1-git-send-email-alexandra.yates@linux.intel.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH 2/2] tuning: print executed toggle script
+Date: Wed, 09 Oct 2013 17:33:11 +0300
+Message-ID: <20131009143311.GC2305@swordfish.minsk.epam.com>
+In-Reply-To: 1381326875.9101.52.camel@sara
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7095026057477926459==
+--===============7128387425237102065==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Implements add_logo in report generator
+On (10/09/13 15:54), Magnus Fromreide wrote:
+> On Wed, 2013-10-09 at 16:17 +0300, Sergey Senozhatsky wrote:
+> > report executed toggle_script back to user via ui_notify_user().
+> > =
 
-Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
----
- src/report/report-formatter.h |    5 +++++
- src/report/report-maker.cpp   |   21 +++++++++++++++++++++
- src/report/report-maker.h     |    5 +++++
- 3 files changed, 31 insertions(+)
+> > Example:
+> >  Execute: echo 'auto' > '/sys/bus/pci/devices/0000:00:1c.1/power/contro=
+l';
+> >  Execute: echo 'on' > '/sys/bus/pci/devices/0000:00:1c.1/power/control';
+> > =
 
-diff --git a/src/report/report-formatter.h b/src/report/report-formatter.h
-index d532f30..449fae7 100644
---- a/src/report/report-formatter.h
-+++ b/src/report/report-formatter.h
-@@ -60,6 +60,11 @@ public:
- =
+> > Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+> > =
 
- 	/* For quad-colouring CPU tables in HTML */
- 	virtual void set_cpu_number(int nr) {}
-+
-+	/* *** Report Style *** */
-+	virtual void add_logo() {}
-+	virtual void add_header() {}
-+	virtual void end_hheader() {}
- };
- =
+> > ---
+> >  src/tuning/tuning.cpp | 6 +++++-
+> >  1 file changed, 5 insertions(+), 1 deletion(-)
+> > =
 
- #endif /* _REPORT_FORMATTER_H_ */
-diff --git a/src/report/report-maker.cpp b/src/report/report-maker.cpp
-index 59e83d9..8eba618 100644
---- a/src/report/report-maker.cpp
-+++ b/src/report/report-maker.cpp
-@@ -329,3 +329,24 @@ report_maker::end_paragraph()
- 	paragraph_opened =3D false;
- 	formatter->end_paragraph();
- }
-+
-+
-+/* *** Report Style *** */
-+void
-+report_maker::add_logo()
-+{
-+	formatter->add_logo();
-+}
-+
-+void
-+report_maker::add_header()
-+{
-+	formatter->add_header();
-+}
-+
-+void
-+report_maker::end_hheader()
-+{
-+	formatter->end_hheader();
-+}
-+
-diff --git a/src/report/report-maker.h b/src/report/report-maker.h
-index 75e0d06..fab9589 100644
---- a/src/report/report-maker.h
-+++ b/src/report/report-maker.h
-@@ -192,6 +192,11 @@ public:
- =
+> > diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
+> > index ff3d715..5adcbfe 100644
+> > --- a/src/tuning/tuning.cpp
+> > +++ b/src/tuning/tuning.cpp
+> > @@ -141,11 +141,15 @@ void tuning_window::repaint(void)
+> >  void tuning_window::cursor_enter(void)
+> >  {
+> >  	class tunable *tun;
+> > -
+> > +	const char *toggle_script;
+> >  	tun =3D all_tunables[cursor_pos];
+> >  	if (!tun)
+> >  		return;
+> > +	/** device will change its state so need to store toggle script before
+> > +	 * we toggle()*/
+> > +	toggle_script =3D tun->toggle_script();
+> >  	tun->toggle();
+> > +	ui_notify_user("Execute: %s\n", toggle_script);
+> >  }
+> >  =
 
- 	void set_cpu_number(int nr);
- =
+> >  static bool tunables_sort(class tunable * i, class tunable * j)
+> =
 
-+	/* *** Report Style *** */
-+	void add_header();
-+	void end_hheader();
-+	void add_logo();
-+
- private:
- 	void setup_report_formatter();
- =
+> This only shows the toggle script when you run it, right?
+> =
 
--- =
+> What about the following:
+> =
 
-1.7.9.5
+> diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
+> index ff3d715..505274c 100644
+> --- a/src/tuning/tuning.cpp
+> +++ b/src/tuning/tuning.cpp
+> @@ -119,7 +119,11 @@ static void __tuning_update_display(int cursor_pos)
+>  			wattrset(win, A_REVERSE);
+>  			wprintw(win, ">> ");
+>  		}
+> -		wprintw(win, "%s  %s\n", _(res), _(desc));
+> +                if (all_tunables[i]->good_bad() !=3D TUNE_BAD)
+> +                        wprintw(win, "%s  %s\n", _(res), _(desc));
+> +                else
+> +                        wprintw(win, "%s  %s  %s\n", _(res), _(desc),
+> +                                all_tunables[i]->toggle_script());
+>  	}
+>  }
+>  =
+
+> which shows it in the list of bad tunables.
+> =
+
+> Maybe both are useful as my version have the disadvantage of not showing
+> anything after the script is executed.
+
+well, I thought about that and decided to go with "I did X" notification
+rather than "I will do X". the idea is that user request some action and
+we report back what we did.
+
+	-ss
+
+> /MF
+> =
+
+> (attached a copy of the patch for easier applying)
+
+> diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
+> index ff3d715..505274c 100644
+> --- a/src/tuning/tuning.cpp
+> +++ b/src/tuning/tuning.cpp
+> @@ -119,7 +119,11 @@ static void __tuning_update_display(int cursor_pos)
+>  			wattrset(win, A_REVERSE);
+>  			wprintw(win, ">> ");
+>  		}
+> -		wprintw(win, "%s  %s\n", _(res), _(desc));
+> +                if (all_tunables[i]->good_bad() !=3D TUNE_BAD)
+> +                        wprintw(win, "%s  %s\n", _(res), _(desc));
+> +                else
+> +                        wprintw(win, "%s  %s  %s\n", _(res), _(desc),
+> +                                all_tunables[i]->toggle_script());
+>  	}
+>  }
+>  =
 
 
---===============7095026057477926459==--
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+
+
+--===============7128387425237102065==--
 
