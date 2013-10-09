@@ -1,75 +1,140 @@
-Content-Type: multipart/mixed; boundary="===============6582306074380754088=="
+Content-Type: multipart/mixed; boundary="===============4216221394277952890=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH v2 06/31] report-html: summary list and navigation
-Date: Fri, 15 Nov 2013 16:28:53 -0800
-Message-ID: <1384561758-21516-7-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: 1384561758-21516-1-git-send-email-alexandra.yates@linux.intel.com
+From: Shaojie Sun <shaojie.sun at linaro.org>
+Subject: Re: [Powertop] [PATCH] perf_bundle: introduce fixup_sample_trace_cpu()
+Date: Wed, 09 Oct 2013 11:54:24 +0800
+Message-ID: <CANHzE=2MDsgFHew0-ga-aNSvEqvmAnvKgitiRZGPW2o07rLHmw@mail.gmail.com>
+In-Reply-To: 20131008145534.GC2452@swordfish.minsk.epam.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6582306074380754088==
+--===============4216221394277952890==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Generates the html tags to add navigation and summary including css
-attribute support.
+Hi Sergey
+    I tested the patch running in our system.
+    Next is the test result.
 
-Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
----
- src/report/report-formatter-html.cpp |   18 ++++++++++++++++++
- src/report/report-formatter-html.h   |    2 ++
- 2 files changed, 20 insertions(+)
+fixed [cpu_frequency] cpuid from 2 to 3
+fixed [cpu_frequency] cpuid from 2 to 4
+fixed [cpu_frequency] cpuid from 2 to 3
+fixed [cpu_frequency] cpuid from 2 to 4
+fixed [cpu_frequency] cpuid from 2 to 3
+fixed [cpu_frequency] cpuid from 2 to 4
+fixed [cpu_frequency] cpuid from 2 to 0
+fixed [cpu_frequency] cpuid from 2 to 1
+fixed [cpu_frequency] cpuid from 2 to 0
+fixed [cpu_frequency] cpuid from 2 to 1
+fixed [cpu_frequency] cpuid from 2 to 0
+fixed [cpu_frequency] cpuid from 2 to 1
+fixed [cpu_frequency] cpuid from 2 to 0
+fixed [cpu_frequency] cpuid from 2 to 1
+fixed [cpu_frequency] cpuid from 2 to 0
+fixed [cpu_frequency] cpuid from 2 to 1
+fixed [cpu_frequency] cpuid from 2 to 0
+fixed [cpu_frequency] cpuid from 2 to 1
+fixed [cpu_frequency] cpuid from 2 to 0
+fixed [cpu_frequency] cpuid from 2 to 1
+fixed [cpu_frequency] cpuid from 2 to 0
+fixed [cpu_frequency] cpuid from 2 to 1
+fixed [cpu_frequency] cpuid from 2 to 3
+fixed [cpu_frequency] cpuid from 2 to 4
+fixed [cpu_frequency] cpuid from 2 to 3
+fixed [cpu_frequency] cpuid from 2 to 4
+fixed [cpu_frequency] cpuid from 2 to 3
+fixed [cpu_frequency] cpuid from 2 to 4
+fixed [cpu_frequency] cpuid from 2 to 0
+fixed [cpu_frequency] cpuid from 2 to 1
+fixed [cpu_frequency] cpuid from 2 to 0
 
-diff --git a/src/report/report-formatter-html.cpp b/src/report/report-forma=
-tter-html.cpp
-index db21c8c..8038181 100644
---- a/src/report/report-formatter-html.cpp
-+++ b/src/report/report-formatter-html.cpp
-@@ -514,3 +514,21 @@ report_formatter_html::add_title(struct tag_attr *titl=
-e_att, const char *title)
- 	addf_exact("<h2 class=3D\"%s\"> %s </h2>\n", title_att->css_class, title);
- }
- =
+On Tue, Oct 8, 2013 at 10:55 PM, Sergey Senozhatsky
+<sergey.senozhatsky(a)gmail.com> wrote:
+> Could you please test this patch?
+>
+>
+> struct perf_sample's trace cpu is a raw_smp_processor_id()
+> (as requsted by PERF_SAMPLE_CPU) by the time of perf_event_output()
+> call, which may differ from original struct perf_event's cpu.
+> thus we need to fix sample->trace.cpu via fixup_sample_trace_cpu()
+> call.
+>
+> debugging output has demonstrated that some events (namely cpu_frequency)
+> were routed incorrectly (sample->trace.cpu !=3D pevent_get_field_val("cpu=
+_id")):
+> fix [cpu_frequency] cpu_nr from 1 to 0
+> fix [cpu_frequency] cpu_nr from 1 to 0
+> fix [cpu_frequency] cpu_nr from 1 to 2
+> fix [cpu_frequency] cpu_nr from 1 to 2
+> fix [cpu_frequency] cpu_nr from 1 to 3
+> fix [cpu_frequency] cpu_nr from 1 to 3
+> fix [cpu_frequency] cpu_nr from 1 to 0
+> fix [cpu_frequency] cpu_nr from 1 to 0
+> fix [cpu_frequency] cpu_nr from 1 to 2
+> fix [cpu_frequency] cpu_nr from 1 to 2
+> fix [cpu_frequency] cpu_nr from 1 to 0
+> fix [cpu_frequency] cpu_nr from 1 to 0
+> fix [cpu_frequency] cpu_nr from 1 to 0
+>
+> Thanks for reporting and tracking this down to (not in any particular
+> order): Shaojie Sun, Jon Medhurst, Sanjay Rawat, SunShaoJie.
+>
+> Cc: Shaojie Sun <shaojie.sun(a)linaro.org>
+> Cc: Jon Medhurst <jon.medhurst(a)linaro.org>
+> Cc: Sanjay Rawat <sanjay.rawat(a)linaro.org>
+> Cc: SunShaoJie <sunshaojie(a)huawei.com>
+> Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+>
+> ---
+>
+> diff --git a/src/perf/perf_bundle.cpp b/src/perf/perf_bundle.cpp
+> index 8d480e8..b0e982b 100644
+> --- a/src/perf/perf_bundle.cpp
+> +++ b/src/perf/perf_bundle.cpp
+> @@ -285,6 +285,31 @@ static bool event_sort_function (void *i, void *j)
+>         return (timestamp(I)<timestamp(J));
+>  }
+>
+> +/*
+> + * sample's PERF_SAMPLE_CPU cpu nr is a raw_smp_processor_id() by the
+> + * time of perf_event_output(), which may differ from struct perf_event
+> + * cpu, thus we need to fix sample->trace.cpu.
+> + */
+> +static void fixup_sample_trace_cpu(struct perf_sample *sample)
+> +{
+> +       struct event_format *event;
+> +       struct pevent_record rec;
+> +       unsigned long long cpu_nr;
+> +       int type;
+> +       int ret;
+> +
+> +       rec.data =3D &sample->data;
+> +       type =3D pevent_data_type(perf_event::pevent, &rec);
+> +       event =3D pevent_find_event(perf_event::pevent, type);
+> +       if (!event)
+> +               return;
+> +       /** don't touch trace if event does not contain cpu_id field*/
+> +       ret =3D pevent_get_field_val(NULL, event, "cpu_id", &rec, &cpu_nr=
+, 0);
+> +       if (ret < 0)
+> +               return;
+> +       sample->trace.cpu =3D cpu_nr;
+> +}
+> +
+>  void perf_bundle::process(void)
+>  {
+>         unsigned int i;
+> @@ -309,6 +334,7 @@ void perf_bundle::process(void)
+>                 if (sample->header.type !=3D PERF_RECORD_SAMPLE)
+>                         continue;
+>
+> +               fixup_sample_trace_cpu(sample);
+>                 handle_trace_point(&sample->data, sample->trace.cpu, samp=
+le->trace.time);
+>         }
+>  }
+>
 
-+void
-+report_formatter_html::add_navigation()
-+{
-+	add_exact("<br/><nav id=3D\"main_menu\"> </nav>\n");
-+}
-+
-+void
-+report_formatter_html::add_summary_list(std::string *list, int size)
-+{
-+	int i;
-+	add_exact("<div><br/> <ul>\n");
-+	for (i=3D0; i < size; i+=3D2){
-+		addf_exact("<li class=3D\"summary_list\"> <b> %s </b> %s </li>",
-+				list[i].c_str(), list[i+1].c_str());
-+	}
-+	add_exact("</ul> </div> <br />\n");
-+}
-+
-diff --git a/src/report/report-formatter-html.h b/src/report/report-formatt=
-er-html.h
-index 0f508d3..261e0dd 100644
---- a/src/report/report-formatter-html.h
-+++ b/src/report/report-formatter-html.h
-@@ -89,6 +89,8 @@ public:
- 	void add_div(struct tag_attr *div_attr);
- 	void end_div();
- 	void add_title(struct tag_attr *title_att, const char *title);
-+	void add_navigation();
-+	void add_summary_list(std::string *list, int size);
- =
-
- private:
- 	/* Document structure related functions */
--- =
-
-1.7.9.5
-
-
---===============6582306074380754088==--
+--===============4216221394277952890==--
 
