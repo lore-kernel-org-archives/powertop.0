@@ -1,47 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============4355447602385399598=="
+Content-Type: multipart/mixed; boundary="===============8294740383245036583=="
 MIME-Version: 1.0
-From: Kok, Auke-jan H <auke-jan.h.kok at intel.com>
-Subject: Re: [Powertop] PowerTop version 2.5 Installation issue
-Date: Tue, 03 Dec 2013 11:22:46 -0800
-Message-ID: <CABsxX9LJeLaCtbHbUGXAiVYzLiBR9L9c_hEUxvYfyOsemG2B2Q@mail.gmail.com>
-In-Reply-To: F9A26558D30ED241A8204F06F9947260257FD05F@BGSMSX102.gar.corp.intel.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] introduce powertop2 -next
+Date: Wed, 09 Oct 2013 12:03:29 +0300
+Message-ID: <20131009090329.GB2532@swordfish.minsk.epam.com>
+In-Reply-To: 20131008145815.0da005aa@bluebird.jf.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4355447602385399598==
+--===============8294740383245036583==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 29, 2013 at 8:12 AM, Mukherjee, Adrip
-<adrip.mukherjee(a)intel.com> wrote:
-> Hi,
+On (10/08/13 14:58), Kristen Carlson Accardi wrote:
+> > On Tue, 17 Sep 2013 22:30:33 +0300
+> > Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com> wrote:
+> > =
+
+> > > Hello everybody,
+> > > =
+
+> > > I've forked a powertop2-next (well, let it be our -next) from the cur=
+rent
+> > > code and dig through the list from February 2013 to September 2013 and
+> > > picked up all patches that haven't been merged. so we have better cha=
+nces
+> > > not to lose them (we'll merge them with the upstream some day)
+> > =
+
+> > Thanks for doing this.  I'll poke through your tree and try to get the
+> > patches merged ASAP.
+> > =
+
+> > _______________________________________________
+> > PowerTop mailing list
+> > PowerTop(a)lists.01.org
+> > https://lists.01.org/mailman/listinfo/powertop
+> =
+
+> pulled all of your patches - we should be up to date now.
 >
->            Can someone please suggest the full set of kernel config optio=
-ns
-> need to set before running powertop. The readme file suggests that the li=
-st
-> is incomplete.
 
-Adrip,
+good, thank you.
 
-Please don't start a new discussion by replying to another discussion
-- it's called "thread hijacking", and confuses mail readers and
-people. Just create a new thread please. Thanks.
+	-ss
 
-The list is incomplete as the options listed have various dependencies
-to other options that would be too long to list, so we're listed the
-options that should give you the functionality, but you'll have to
-modify the kernel configuration yourself to satisfy that these options
-are enabled.
-
-Listing every single kernel option would be impossible as it would be
-hundreds of config items, making it impossible to check. The short
-list here works a lot better.
-
-Cheers,
-
-Auke
-
---===============4355447602385399598==--
+--===============8294740383245036583==--
 
