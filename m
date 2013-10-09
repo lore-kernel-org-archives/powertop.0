@@ -1,133 +1,159 @@
-Content-Type: multipart/mixed; boundary="===============6483108321839961585=="
+Content-Type: multipart/mixed; boundary="===============8886396617935738760=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH v2 21/31] report: Redesign Device Activity csv &
- html report
-Date: Fri, 15 Nov 2013 16:29:08 -0800
-Message-ID: <1384561758-21516-22-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: 1384561758-21516-1-git-send-email-alexandra.yates@linux.intel.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH] intel_cpus: add support for
+ Silvermont/Baytrail-M CPU
+Date: Wed, 09 Oct 2013 12:21:38 +0300
+Message-ID: <20131009092138.GA2210@swordfish.datadirectnet.com>
+In-Reply-To: 1381276268-23515-1-git-send-email-kristen@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6483108321839961585==
+--===============8886396617935738760==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Enables new design for "Process Device Activity" table part of
-"Device info" section, while preserving translation macros.
+On (10/08/13 16:51), Kristen Carlson Accardi wrote:
+> ---
+>  src/cpu/intel_cpus.cpp | 24 ++++++++++++++++++++++--
+>  src/cpu/intel_cpus.h   |  3 +++
+>  2 files changed, 25 insertions(+), 2 deletions(-)
 
-Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
----
- src/devices/device.cpp |    1 -
- src/devlist.cpp        |   46 +++++++++++++++++++++++++++++++-------------=
---
- 2 files changed, 31 insertions(+), 16 deletions(-)
+merged to -next
 
-diff --git a/src/devices/device.cpp b/src/devices/device.cpp
-index 4120b9c..83ee02f 100644
---- a/src/devices/device.cpp
-+++ b/src/devices/device.cpp
-@@ -286,7 +286,6 @@ void show_report_devices(void)
- 	report.add_div(&div_attr);
- 	report.add_title(&title_attr, __("Device Power Report"));
- 	report.add_table(device_data, &std_table_css);
--	report.end_div();
- }
- =
+	-ss
 
- =
+> diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
+> index 5b2e205..3348dba 100644
+> --- a/src/cpu/intel_cpus.cpp
+> +++ b/src/cpu/intel_cpus.cpp
+> @@ -54,6 +54,7 @@ static int intel_cpu_models[] =3D {
+>  	0x3A,   /* IVB */
+>  	0x3C,
+>  	0x3D,	/* IVB Xeon */
+> +	0x37,	/* BYT-M */
+>  	0	/* last entry must be zero */
+>  };
+>  =
 
-diff --git a/src/devlist.cpp b/src/devlist.cpp
-index 633a568..ada3538 100644
---- a/src/devlist.cpp
-+++ b/src/devlist.cpp
-@@ -45,6 +45,7 @@ using namespace std;
- #include "lib.h"
- #include "report/report.h"
- #include "report/report-maker.h"
-+#include "report/report-data-html.h"
- =
+> @@ -96,7 +97,12 @@ nhm_core::nhm_core(int model)
+>  			has_c2c7_res =3D 1;
+>  	}
+>  =
 
- #include "process/process.h"
- #include "devices/device.h"
-@@ -284,9 +285,9 @@ void report_show_open_devices(void)
- 	vector<struct devuser *> *target;
- 	unsigned int i;
- 	char prev[128], proc[128];
-+	int idx, cols, rows;
- =
+> -	has_c3_res =3D 1;
+> +	/* BYT-M does not support C3/C4 */
+> +	if (model =3D=3D 0x37) {
+> +		has_c3_res =3D 0;
+> +		has_c1_res =3D 1;
+> +	} else
+> +		has_c3_res =3D 1;
+>  }
+>  =
 
- 	prev[0] =3D 0;
--
- 	if (phase =3D=3D 1)
- 		target =3D &one;
- 	else
-@@ -295,27 +296,42 @@ void report_show_open_devices(void)
- 	if (target->size() =3D=3D 0)
- 		return;
- =
+>  void nhm_core::measurement_start(void)
+> @@ -109,6 +115,8 @@ void nhm_core::measurement_start(void)
+>  =
 
--	sort(target->begin(), target->end(), devlist_sort);
-+	/* div attr css_class and css_id */
-+	tag_attr div_attr;
-+	init_div(&div_attr, "", "device");
-+
-+	/* Set Table attributes, rows, and cols */
-+	table_attributes std_table_css;
-+	cols =3D 2;
-+	idx =3D cols;
-+	rows=3D target->size() + 1;
-+	init_std_table_attr(&std_table_css, rows, cols);
-+
-+	/* Set Title attributes */
-+	tag_attr title_attr;
-+	init_title_attr(&title_attr);
- =
+>  	last_stamp =3D 0;
+>  =
 
--	report.add_header("Process device activity");
--	report.begin_table(TABLE_WIDE);
--	report.begin_row();
--	report.begin_cell(CELL_DEVACTIVITY_PROCESS);
--	report.add("Process");
--	report.begin_cell(CELL_DEVACTIVITY_DEVICE);
--	report.add("Device");
-+	/* Set array of data in row Major order */
-+	string process_data[cols * rows];
-+
-+	sort(target->begin(), target->end(), devlist_sort);
-+	process_data[0]=3D__("Process");
-+	process_data[1]=3D__("Device");
- =
+> +	if (this->has_c1_res)
+> +		c1_before =3D get_msr(first_cpu, MSR_CORE_C1_RESIDENCY);
+>  	if (this->has_c3_res)
+>  		c3_before    =3D get_msr(first_cpu, MSR_CORE_C3_RESIDENCY);
+>  	c6_before    =3D get_msr(first_cpu, MSR_CORE_C6_RESIDENCY);
+> @@ -116,6 +124,8 @@ void nhm_core::measurement_start(void)
+>  		c7_before    =3D get_msr(first_cpu, MSR_CORE_C7_RESIDENCY);
+>  	tsc_before   =3D get_msr(first_cpu, MSR_TSC);
+>  =
 
- 	for (i =3D 0; i < target->size(); i++) {
- 		proc[0] =3D 0;
--
- 		if (strcmp(prev, (*target)[i]->comm) !=3D 0)
- 			sprintf(proc, "%s", (*target)[i]->comm);
- =
+> +	if (this->has_c1_res)
+> +		insert_cstate("core c1", "C1 (cc1)", 0, c1_before, 1);
+>  	if (this->has_c3_res)
+>  		insert_cstate("core c3", "C3 (cc3)", 0, c3_before, 1);
+>  	insert_cstate("core c6", "C6 (cc6)", 0, c6_before, 1);
+> @@ -149,6 +159,8 @@ void nhm_core::measurement_end(void)
+>  	uint64_t time_delta;
+>  	double ratio;
+>  =
 
--		report.begin_row(ROW_DEVPOWER);
--		report.begin_cell();
--		report.add(proc);
--		report.begin_cell();
--		report.add((*target)[i]->device);
-+		process_data[idx]=3Dstring(proc);
-+		idx+=3D1;
-+		process_data[idx]=3Dstring((*target)[i]->device);
-+		idx+=3D1;
- 		sprintf(prev, "%s", (*target)[i]->comm);
- 	}
-+
-+	/* Report Output */
-+	report.add_title(&title_attr, __("Process Device Activity"));
-+	report.add_table(process_data, &std_table_css);
-+	report.end_div();
- }
--- =
+> +	if (this->has_c1_res)
+> +		c1_after =3D get_msr(first_cpu, MSR_CORE_C1_RESIDENCY);
+>  	if (this->has_c3_res)
+>  		c3_after    =3D get_msr(first_cpu, MSR_CORE_C3_RESIDENCY);
+>  	c6_after    =3D get_msr(first_cpu, MSR_CORE_C6_RESIDENCY);
+> @@ -156,6 +168,8 @@ void nhm_core::measurement_end(void)
+>  		c7_after    =3D get_msr(first_cpu, MSR_CORE_C7_RESIDENCY);
+>  	tsc_after   =3D get_msr(first_cpu, MSR_TSC);
+>  =
 
-1.7.9.5
+> +	if (this->has_c1_res)
+> +		finalize_cstate("core c1", 0, c1_after, 1);
+>  	if (this->has_c3_res)
+>  		finalize_cstate("core c3", 0, c3_after, 1);
+>  	finalize_cstate("core c6", 0, c6_after, 1);
+> @@ -241,12 +255,18 @@ nhm_package::nhm_package(int model)
+>  		case 0x2D:	/* SNB Xeon */
+>  		case 0x3A:      /* IVB */
+>  		case 0x3C:
+> +		case 0x37:
+>  		case 0x3D:      /* IVB Xeon */
+>  		case 0x45:
+>  			has_c2c7_res =3D 1;
+>  	}
+>  =
 
+> -	has_c3_res =3D 1;
+> +	/* BYT-M doesn't have C3 */
+> +	if (model =3D=3D 0x37)
+> +		has_c3_res =3D 0;
+> +	else
+> +		has_c3_res =3D 1;
+> +
+>  =
 
---===============6483108321839961585==--
+>  	/* Haswell-ULT has C8/9/10*/
+>  	if (model =3D=3D 0x45)
+> diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
+> index 4a51494..57afd8a 100644
+> --- a/src/cpu/intel_cpus.h
+> +++ b/src/cpu/intel_cpus.h
+> @@ -40,6 +40,7 @@
+>  #define MSR_PKG_C8_RESIDENCY		0x630
+>  #define MSR_PKG_C9_RESIDENCY		0x631
+>  #define MSR_PKG_C10_RESIDENCY		0x632
+> +#define MSR_CORE_C1_RESIDENCY		0x660
+>  #define MSR_CORE_C3_RESIDENCY		0x3FC
+>  #define MSR_CORE_C6_RESIDENCY		0x3FD
+>  #define MSR_CORE_C7_RESIDENCY		0x3FE
+> @@ -73,6 +74,7 @@ public:
+>  class nhm_core: public cpu_core
+>  {
+>  private:
+> +	uint64_t	c1_before, c1_after;
+>  	uint64_t	c3_before, c3_after;
+>  	uint64_t	c6_before, c6_after;
+>  	uint64_t	c7_before, c7_after;
+> @@ -81,6 +83,7 @@ private:
+>  	uint64_t	last_stamp;
+>  	uint64_t	total_stamp;
+>  public:
+> +	int		has_c1_res;
+>  	int		has_c2c7_res;
+>  	int		has_c3_res;
+>  	nhm_core(int model);
+> -- =
+
+> 1.8.3.2
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>=20
+
+--===============8886396617935738760==--
 
