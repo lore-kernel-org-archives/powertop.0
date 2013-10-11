@@ -1,32 +1,105 @@
-Content-Type: multipart/mixed; boundary="===============3285213081387456721=="
+Content-Type: multipart/mixed; boundary="===============4846770971786850367=="
 MIME-Version: 1.0
-From: Kristen Carlson Accardi <kristen at linux.intel.com>
-Subject: Re: [Powertop] introduce powertop2 -next
-Date: Mon, 23 Sep 2013 12:13:18 -0700
-Message-ID: <20130923121318.4b24c0b2@bluebird.jf.intel.com>
-In-Reply-To: 20130917193033.GC2289@swordfish
+From: Maksim Melnikau <maxposedon at gmail.com>
+Subject: Re: [Powertop] [BUG] powertop shows estimates only for 1st battery
+ from 2
+Date: Fri, 11 Oct 2013 11:16:34 +0300
+Message-ID: <CAGbmdnUvBORJYyg=0EspRSAVqqcpgbcX1ZL4FxfFJioEh8p8SQ@mail.gmail.com>
+In-Reply-To: CAGbmdnXgHmeKcVxJ0gvNtmixc8E8=Ah9JDeqb-0fwYRm+w187g@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3285213081387456721==
+--===============4846770971786850367==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 17 Sep 2013 22:30:33 +0300
-Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com> wrote:
+When first battery discharged, kernel reports following info
 
-> Hello everybody,
-> =
+% cat /sys/class/power_supply/BAT0/uevent
+POWER_SUPPLY_NAME=3DBAT0
+POWER_SUPPLY_STATUS=3DDischarging
+POWER_SUPPLY_PRESENT=3D1
+POWER_SUPPLY_TECHNOLOGY=3DLi-poly
+POWER_SUPPLY_CYCLE_COUNT=3D0
+POWER_SUPPLY_VOLTAGE_MIN_DESIGN=3D11100000
+POWER_SUPPLY_VOLTAGE_NOW=3D12401000
+POWER_SUPPLY_POWER_NOW=3D7800000
+POWER_SUPPLY_ENERGY_FULL_DESIGN=3D42010000
+POWER_SUPPLY_ENERGY_FULL=3D42010000
+POWER_SUPPLY_ENERGY_NOW=3D41810000
+POWER_SUPPLY_CAPACITY=3D99
+POWER_SUPPLY_MODEL_NAME=3D45N1103
+POWER_SUPPLY_MANUFACTURER=3DSMP
+POWER_SUPPLY_SERIAL_NUMBER=3D 3507
 
-> I've forked a powertop2-next (well, let it be our -next) from the current
-> code and dig through the list from February 2013 to September 2013 and
-> picked up all patches that haven't been merged. so we have better chances
-> not to lose them (we'll merge them with the upstream some day)
+% cat /sys/class/power_supply/BAT1/uevent
+POWER_SUPPLY_NAME=3DBAT1
+POWER_SUPPLY_STATUS=3DUnknown
+POWER_SUPPLY_PRESENT=3D1
+POWER_SUPPLY_TECHNOLOGY=3DLi-poly
+POWER_SUPPLY_CYCLE_COUNT=3D0
+POWER_SUPPLY_VOLTAGE_MIN_DESIGN=3D14800000
+POWER_SUPPLY_VOLTAGE_NOW=3D13902000
+POWER_SUPPLY_POWER_NOW=3D0
+POWER_SUPPLY_ENERGY_FULL_DESIGN=3D28050000
+POWER_SUPPLY_ENERGY_FULL=3D26370000
+POWER_SUPPLY_ENERGY_NOW=3D930000
+POWER_SUPPLY_CAPACITY=3D3
+POWER_SUPPLY_MODEL_NAME=3D45N1101
+POWER_SUPPLY_MANUFACTURER=3DSMP
+POWER_SUPPLY_SERIAL_NUMBER=3D 1840
 
-Thanks for doing this.  I'll poke through your tree and try to get the
-patches merged ASAP.
+On Fri, Oct 11, 2013 at 9:19 AM, Maksim Melnikau <maxposedon(a)gmail.com> w=
+rote:
+> Hello!
+>
+> I have 2 batteries in my thinkpad helix laptop, and it looks like powertop
+> shows "the estimated remaining time" just for first battery, what is a bit
+> confusing. May be it somehow connected to some hardware features of
+> batteries switching.
+>
+> # powertop, Overview page
+> The battery reports a discharge rate of 7.67 W
+> The estimated remaining time is 2 hours, 17 minutes
+>
+> # powertop -V
+> PowerTOP versionv2.4, compiled on Jul 29 2013
+>
+> # cat /sys/class/power_supply/BAT0/uevent
+> POWER_SUPPLY_NAME=3DBAT0
+> POWER_SUPPLY_STATUS=3DUnknown
+> POWER_SUPPLY_PRESENT=3D1
+> POWER_SUPPLY_TECHNOLOGY=3DLi-poly
+> POWER_SUPPLY_CYCLE_COUNT=3D0
+> POWER_SUPPLY_VOLTAGE_MIN_DESIGN=3D11100000
+> POWER_SUPPLY_VOLTAGE_NOW=3D12503000
+> POWER_SUPPLY_POWER_NOW=3D0
+> POWER_SUPPLY_ENERGY_FULL_DESIGN=3D42010000
+> POWER_SUPPLY_ENERGY_FULL=3D42010000
+> POWER_SUPPLY_ENERGY_NOW=3D41940000
+> POWER_SUPPLY_CAPACITY=3D99
+> POWER_SUPPLY_MODEL_NAME=3D45N1103
+> POWER_SUPPLY_MANUFACTURER=3DSMP
+> POWER_SUPPLY_SERIAL_NUMBER=3D 3507
+>
+> # cat /sys/class/power_supply/BAT1/uevent
+> POWER_SUPPLY_NAME=3DBAT1
+> POWER_SUPPLY_STATUS=3DDischarging
+> POWER_SUPPLY_PRESENT=3D1
+> POWER_SUPPLY_TECHNOLOGY=3DLi-poly
+> POWER_SUPPLY_CYCLE_COUNT=3D0
+> POWER_SUPPLY_VOLTAGE_MIN_DESIGN=3D14800000
+> POWER_SUPPLY_VOLTAGE_NOW=3D15178000
+> POWER_SUPPLY_POWER_NOW=3D8165000
+> POWER_SUPPLY_ENERGY_FULL_DESIGN=3D28050000
+> POWER_SUPPLY_ENERGY_FULL=3D26370000
+> POWER_SUPPLY_ENERGY_NOW=3D16750000
+> POWER_SUPPLY_CAPACITY=3D63
+> POWER_SUPPLY_MODEL_NAME=3D45N1101
+> POWER_SUPPLY_MANUFACTURER=3DSMP
+> POWER_SUPPLY_SERIAL_NUMBER=3D 1840
+>
 
-
---===============3285213081387456721==--
+--===============4846770971786850367==--
 
