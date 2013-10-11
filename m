@@ -1,39 +1,25 @@
-Content-Type: multipart/mixed; boundary="===============1283014239122090010=="
+Content-Type: multipart/mixed; boundary="===============8745081390153787019=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] How does powertop deal with multiple executions
-Date: Mon, 28 Oct 2013 19:20:30 -0700
-Message-ID: <526F1B6E.4080000@linux.intel.com>
-In-Reply-To: 526EF543.3000503@gmail.com
+From: Maksim Melnikau <maxposedon at gmail.com>
+Subject: Re: [Powertop] [BUG] powertop shows estimates only for 1st battery
+ from 2
+Date: Fri, 11 Oct 2013 11:22:07 +0300
+Message-ID: <CAGbmdnUmtnXqpw6JaZpkJEf_TZ_OrVdHZ=PL4sLXpphqczvL3A@mail.gmail.com>
+In-Reply-To: CAGbmdnXgHmeKcVxJ0gvNtmixc8E8=Ah9JDeqb-0fwYRm+w187g@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1283014239122090010==
+--===============8745081390153787019==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 10/28/2013 4:37 PM, Jes=C3=BAs D=C3=ADaz Vico wrote:
-> Hello,
->
-> I'm trying to estimate the power consumption (besides some other properti=
-es) of a custom program. During my tests, I execute my program several time=
-s (it is not a
-> background process) with powertop running. My doubt is: how does powertop=
- deal with these multiple executions?
->
-> I'd guess that it averages over the number of executions, because I'm obt=
-aining very similar power consumption measurements for both 500 and 5000 ex=
-ecutions of my program
-> (335 mW and 364 mW, respectively). Still, there is the possibility that p=
-owertop only keeps the estimation corresponding to the last execution...
->
-> Thanks.
+# powertop, Overview page, when first battery discharged
+The battery reports a discharge rate of 7.54 W
+The estimated remaining time is 5 hours, 28 minutes
 
-by default, powertop will group programs with the same name into one bucket=
- for display purposes.
+So, from the beginning I'm expecting to see not 2.5h estimate, and
+later 5.5h. But smth like 8h from the beginning.
 
-
-
---===============1283014239122090010==--
+--===============8745081390153787019==--
 
