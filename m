@@ -1,205 +1,106 @@
-Content-Type: multipart/mixed; boundary="===============2811062037160080411=="
+Content-Type: multipart/mixed; boundary="===============3387540322694001468=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: [Powertop] [PATCH 05/10] power_meter: introduce discharging member
- measurement: report total global_time_left()
-Date: Mon, 14 Oct 2013 11:40:52 +0300
-Message-ID: <1381740057-12499-6-git-send-email-sergey.senozhatsky@gmail.com>
-In-Reply-To: 1381740057-12499-1-git-send-email-sergey.senozhatsky@gmail.com
+From: Maksim Melnikau <maxposedon at gmail.com>
+Subject: [Powertop] [BUG] powertop shows estimates only for 1st battery from 2
+Date: Fri, 11 Oct 2013 09:19:16 +0300
+Message-ID: <CAGbmdnXgHmeKcVxJ0gvNtmixc8E8=Ah9JDeqb-0fwYRm+w187g@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2811062037160080411==
+--===============3387540322694001468==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-report total capacity and discahrge rate if at least one power_meter
-reports that is's discharging. previously we reported only discharging
-power_meters, thus user was not aware of total time left in case of
-N batteries. this is the reason why power_meter discharging member
-(with getter and setter one-liners were introduced) -- we need
-capacity and rate for every power_meter, regardless the fact whether
-its /sys/class/power_supply/*/status reports "Discharging" or not.
-report total "The battery discharge rate" and "The estimated remaining
-time" back to user when at least one power_meter is discharging.
+Hello!
 
-Reported-and-tested-by: Maksim Melnikau <maxposedon(a)gmail.com>
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
----
- src/measurement/measurement.cpp | 32 ++++++++++++++------------------
- src/measurement/measurement.h   | 24 +++++++++++++++++-------
- src/measurement/sysfs.cpp       |  7 ++++---
- 3 files changed, 35 insertions(+), 28 deletions(-)
+I have 2 batteries in my thinkpad helix laptop, and it looks like powertop
+shows "the estimated remaining time" just for first battery, what is a bit
+confusing. May be it somehow connected to some hardware features of
+batteries switching.
 
-diff --git a/src/measurement/measurement.cpp b/src/measurement/measurement.=
-cpp
-index 0b68940..8b63eb3 100644
---- a/src/measurement/measurement.cpp
-+++ b/src/measurement/measurement.cpp
-@@ -54,23 +54,6 @@ double power_meter::joules_consumed(void)
- 	return 0.0;
- }
- =
+# powertop, Overview page
+The battery reports a discharge rate of 7.67 W
+The estimated remaining time is 2 hours, 17 minutes
 
--double power_meter::time_left(void)
--{
--	double cap, rate;
--
--	cap =3D dev_capacity();
--	rate =3D joules_consumed();
--
--	if (cap < 0.001)
--		return 0.0;
--
--	/* return 0.0 instead of INF+ */
--	if (rate < 0.001)
--		return 0.0;
--
--	return cap / rate;
--}
--
- vector<class power_meter *> power_meters;
- =
+# powertop -V
+PowerTOP versionv2.4, compiled on Jul 29 2013
 
- void start_power_measurement(void)
-@@ -88,10 +71,17 @@ void end_power_measurement(void)
- =
+# cat /sys/class/power_supply/BAT0/uevent
+POWER_SUPPLY_NAME=3DBAT0
+POWER_SUPPLY_STATUS=3DUnknown
+POWER_SUPPLY_PRESENT=3D1
+POWER_SUPPLY_TECHNOLOGY=3DLi-poly
+POWER_SUPPLY_CYCLE_COUNT=3D0
+POWER_SUPPLY_VOLTAGE_MIN_DESIGN=3D11100000
+POWER_SUPPLY_VOLTAGE_NOW=3D12503000
+POWER_SUPPLY_POWER_NOW=3D0
+POWER_SUPPLY_ENERGY_FULL_DESIGN=3D42010000
+POWER_SUPPLY_ENERGY_FULL=3D42010000
+POWER_SUPPLY_ENERGY_NOW=3D41940000
+POWER_SUPPLY_CAPACITY=3D99
+POWER_SUPPLY_MODEL_NAME=3D45N1103
+POWER_SUPPLY_MANUFACTURER=3DSMP
+POWER_SUPPLY_SERIAL_NUMBER=3D 3507
 
- double global_joules_consumed(void)
- {
-+	bool global_discharging =3D false;
- 	double total =3D 0.0;
- 	unsigned int i;
--	for (i =3D 0; i < power_meters.size(); i++)
-+
-+	for (i =3D 0; i < power_meters.size(); i++) {
-+		global_discharging |=3D power_meters[i]->is_discharging();
- 		total +=3D power_meters[i]->joules_consumed();
-+	}
-+	/* report global time left if at least one battery is discharging */
-+	if (!global_discharging)
-+		return 0.0;
- =
+# cat /sys/class/power_supply/BAT1/uevent
+POWER_SUPPLY_NAME=3DBAT1
+POWER_SUPPLY_STATUS=3DDischarging
+POWER_SUPPLY_PRESENT=3D1
+POWER_SUPPLY_TECHNOLOGY=3DLi-poly
+POWER_SUPPLY_CYCLE_COUNT=3D0
+POWER_SUPPLY_VOLTAGE_MIN_DESIGN=3D14800000
+POWER_SUPPLY_VOLTAGE_NOW=3D15178000
+POWER_SUPPLY_POWER_NOW=3D8165000
+POWER_SUPPLY_ENERGY_FULL_DESIGN=3D28050000
+POWER_SUPPLY_ENERGY_FULL=3D26370000
+POWER_SUPPLY_ENERGY_NOW=3D16750000
+POWER_SUPPLY_CAPACITY=3D63
+POWER_SUPPLY_MODEL_NAME=3D45N1101
+POWER_SUPPLY_MANUFACTURER=3DSMP
+POWER_SUPPLY_SERIAL_NUMBER=3D 1840
 
- 	all_results.power =3D total;
- 	if (total < min_power && total > 0.01)
-@@ -101,13 +91,19 @@ double global_joules_consumed(void)
- =
+--===============3387540322694001468==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
- double global_time_left(void)
- {
-+	bool global_discharging =3D false;
- 	double total_capacity =3D 0.0;
- 	double total_rate =3D 0.0;
- 	unsigned int i;
- 	for (i =3D 0; i < power_meters.size(); i++) {
-+		global_discharging |=3D power_meters[i]->is_discharging();
- 		total_capacity +=3D power_meters[i]->dev_capacity();
- 		total_rate +=3D power_meters[i]->joules_consumed();
- 	}
-+	/* report global time left if at least one battery is discharging */
-+	if (!global_discharging)
-+		return 0.0;
-+
- 	/* return 0.0 instead of INF+ */
- 	if (total_rate < 0.001)
- 		return 0.0;
-diff --git a/src/measurement/measurement.h b/src/measurement/measurement.h
-index 5bcd8e2..83ffc34 100644
---- a/src/measurement/measurement.h
-+++ b/src/measurement/measurement.h
-@@ -30,18 +30,29 @@
- using namespace std;
- =
+PGRpdiBkaXI9Imx0ciI+PGRpdj5IZWxsbyE8L2Rpdj48ZGl2Pjxicj48L2Rpdj5JIGhhdmUgMiBi
+YXR0ZXJpZXMgaW4gbXkgdGhpbmtwYWQgaGVsaXggbGFwdG9wLCBhbmQgaXQgbG9va3MgbGlrZSBw
+b3dlcnRvcCBzaG93cyAmcXVvdDt0aGUgZXN0aW1hdGVkIHJlbWFpbmluZyB0aW1lJnF1b3Q7IGp1
+c3QgZm9yIGZpcnN0IGJhdHRlcnksIHdoYXQgaXMgYSBiaXQgY29uZnVzaW5nLiBNYXkgYmUgaXQg
+c29tZWhvdyBjb25uZWN0ZWQgdG8gc29tZSBoYXJkd2FyZSBmZWF0dXJlcyBvZiBiYXR0ZXJpZXMg
+c3dpdGNoaW5nLjxkaXY+Cjxicj48L2Rpdj48ZGl2PiMgcG93ZXJ0b3AsIE92ZXJ2aWV3IHBhZ2U8
+L2Rpdj48ZGl2PjxkaXY+VGhlIGJhdHRlcnkgcmVwb3J0cyBhIGRpc2NoYXJnZSByYXRlIG9mIDcu
+NjcgVzwvZGl2PjxkaXY+VGhlIGVzdGltYXRlZCByZW1haW5pbmcgdGltZSBpcyAyIGhvdXJzLCAx
+NyBtaW51dGVzPC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj4jIHBvd2VydG9wIC1WPC9kaXY+PGRp
+dj5Qb3dlclRPUCB2ZXJzaW9udjIuNCwgY29tcGlsZWQgb24gSnVsIDI5IDIwMTM8YnI+CjwvZGl2
+PjwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+PGRpdj4jIGNhdCAvc3lzL2NsYXNzL3Bvd2VyX3N1
+cHBseS9CQVQwL3VldmVudDwvZGl2PjxkaXY+UE9XRVJfU1VQUExZX05BTUU9QkFUMDwvZGl2Pjxk
+aXY+UE9XRVJfU1VQUExZX1NUQVRVUz1Vbmtub3duPC9kaXY+PGRpdj5QT1dFUl9TVVBQTFlfUFJF
+U0VOVD0xPC9kaXY+PGRpdj5QT1dFUl9TVVBQTFlfVEVDSE5PTE9HWT1MaS1wb2x5PC9kaXY+Cjxk
+aXY+UE9XRVJfU1VQUExZX0NZQ0xFX0NPVU5UPTA8L2Rpdj48ZGl2PlBPV0VSX1NVUFBMWV9WT0xU
+QUdFX01JTl9ERVNJR049MTExMDAwMDA8L2Rpdj48ZGl2PlBPV0VSX1NVUFBMWV9WT0xUQUdFX05P
+Vz0xMjUwMzAwMDwvZGl2PjxkaXY+UE9XRVJfU1VQUExZX1BPV0VSX05PVz0wPC9kaXY+PGRpdj5Q
+T1dFUl9TVVBQTFlfRU5FUkdZX0ZVTExfREVTSUdOPTQyMDEwMDAwPC9kaXY+PGRpdj4KUE9XRVJf
+U1VQUExZX0VORVJHWV9GVUxMPTQyMDEwMDAwPC9kaXY+PGRpdj5QT1dFUl9TVVBQTFlfRU5FUkdZ
+X05PVz00MTk0MDAwMDwvZGl2PjxkaXY+UE9XRVJfU1VQUExZX0NBUEFDSVRZPTk5PC9kaXY+PGRp
+dj5QT1dFUl9TVVBQTFlfTU9ERUxfTkFNRT00NU4xMTAzPC9kaXY+PGRpdj5QT1dFUl9TVVBQTFlf
+TUFOVUZBQ1RVUkVSPVNNUDwvZGl2PjxkaXY+UE9XRVJfU1VQUExZX1NFUklBTF9OVU1CRVI9IDM1
+MDc8L2Rpdj4KPGRpdj48YnI+PC9kaXY+PGRpdj4jIGNhdCAvc3lzL2NsYXNzL3Bvd2VyX3N1cHBs
+eS9CQVQxL3VldmVudDwvZGl2PjxkaXY+UE9XRVJfU1VQUExZX05BTUU9QkFUMTwvZGl2PjxkaXY+
+UE9XRVJfU1VQUExZX1NUQVRVUz1EaXNjaGFyZ2luZzwvZGl2PjxkaXY+UE9XRVJfU1VQUExZX1BS
+RVNFTlQ9MTwvZGl2PjxkaXY+UE9XRVJfU1VQUExZX1RFQ0hOT0xPR1k9TGktcG9seTwvZGl2Pjxk
+aXY+ClBPV0VSX1NVUFBMWV9DWUNMRV9DT1VOVD0wPC9kaXY+PGRpdj5QT1dFUl9TVVBQTFlfVk9M
+VEFHRV9NSU5fREVTSUdOPTE0ODAwMDAwPC9kaXY+PGRpdj5QT1dFUl9TVVBQTFlfVk9MVEFHRV9O
+T1c9MTUxNzgwMDA8L2Rpdj48ZGl2PlBPV0VSX1NVUFBMWV9QT1dFUl9OT1c9ODE2NTAwMDwvZGl2
+PjxkaXY+UE9XRVJfU1VQUExZX0VORVJHWV9GVUxMX0RFU0lHTj0yODA1MDAwMDwvZGl2PjxkaXY+
+ClBPV0VSX1NVUFBMWV9FTkVSR1lfRlVMTD0yNjM3MDAwMDwvZGl2PjxkaXY+UE9XRVJfU1VQUExZ
+X0VORVJHWV9OT1c9MTY3NTAwMDA8L2Rpdj48ZGl2PlBPV0VSX1NVUFBMWV9DQVBBQ0lUWT02Mzwv
+ZGl2PjxkaXY+UE9XRVJfU1VQUExZX01PREVMX05BTUU9NDVOMTEwMTwvZGl2PjxkaXY+UE9XRVJf
+U1VQUExZX01BTlVGQUNUVVJFUj1TTVA8L2Rpdj48ZGl2PlBPV0VSX1NVUFBMWV9TRVJJQUxfTlVN
+QkVSPSAxODQwPC9kaXY+CjwvZGl2PjxkaXY+PGJyPjwvZGl2PjwvZGl2Pgo=
 
- class power_meter {
-+	bool discharging;
- public:
-+	virtual ~power_meter() {};
-+
- 	virtual void start_measurement(void);
- 	virtual void end_measurement(void);
--
- 	virtual double joules_consumed(void);
--	virtual double dev_capacity(void) { return 0.0;};  /* in Joules */
- =
-
--	virtual double time_left(void);
-+	virtual double dev_capacity(void)
-+	{
-+		return 0.0; /* in Joules */
-+	}
- =
-
--	virtual ~power_meter() {};
--};
-+	virtual void set_discharging(bool d)
-+	{
-+		discharging =3D d;
-+	}
- =
-
-+	virtual bool is_discharging()
-+	{
-+		return discharging;
-+	}
-+};
- =
-
- extern vector<class power_meter *> power_meters;
- =
-
-@@ -53,7 +64,6 @@ extern double global_time_left(void);
- extern void detect_power_meters(void);
- extern void extech_power_meter(const char *devnode);
- =
-
--
- extern double min_power;
- =
-
--#endif
-\ No newline at end of file
-+#endif
-diff --git a/src/measurement/sysfs.cpp b/src/measurement/sysfs.cpp
-index 66cb1cd..ed42ed4 100644
---- a/src/measurement/sysfs.cpp
-+++ b/src/measurement/sysfs.cpp
-@@ -126,11 +126,13 @@ void sysfs_power_meter::measure()
- =
-
- 	rate =3D 0.0;
- 	capacity =3D 0.0;
-+	this->set_discharging(false);
- =
-
- 	if (!is_present())
- 		return;
--	if (read_sysfs_string("/sys/class/power_supply/%s/status", name) !=3D "Di=
-scharging")
--		return;
-+	/** do not jump over. we may have discharging battery */
-+	if (read_sysfs_string("/sys/class/power_supply/%s/status", name) =3D=3D "=
-Discharging")
-+		this->set_discharging(true);
- =
-
- 	got_rate =3D set_rate_from_power();
- 	got_capacity =3D set_capacity_from_energy();
-@@ -146,7 +148,6 @@ void sysfs_power_meter::measure()
- 	}
- }
- =
-
--
- void sysfs_power_meter::end_measurement(void)
- {
- 	measure();
--- =
-
-1.8.4.679.g0a1a803
-
-
---===============2811062037160080411==--
+--===============3387540322694001468==--
 
