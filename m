@@ -1,104 +1,185 @@
-Content-Type: multipart/mixed; boundary="===============4618907583311795278=="
+Content-Type: multipart/mixed; boundary="===============2709721769963417545=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Fix for some 'requesting unregistered parameter'
-Date: Tue, 29 Oct 2013 14:27:02 +0300
-Message-ID: <20131029112701.GA2180@swordfish.minsk.epam.com>
-In-Reply-To: 435649119.17204207.1383038286562.JavaMail.root@redhat.com
+Subject: Re: [Powertop] [BUG] powertop shows estimates only for 1st battery
+ from 2
+Date: Fri, 11 Oct 2013 11:43:14 +0300
+Message-ID: <20131011084314.GB2781@swordfish.minsk.epam.com>
+In-Reply-To: CAGbmdnUmtnXqpw6JaZpkJEf_TZ_OrVdHZ=PL4sLXpphqczvL3A@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4618907583311795278==
+--===============2709721769963417545==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/29/13 05:18), Jaroslav Skarvada wrote:
-> Hi,
+On (10/11/13 11:22), Maksim Melnikau wrote:
+> # powertop, Overview page, when first battery discharged
+> The battery reports a discharge rate of 7.54 W
+> The estimated remaining time is 5 hours, 28 minutes
 > =
 
-> the attached patch may fix 'requesting unregistered parameter' for cases
-> if e.g NIC was added after calibration
-> =
+> So, from the beginning I'm expecting to see not 2.5h estimate, and
+> later 5.5h. But smth like 8h from the beginning.
+
+could you please try the following patch.
+
+/* just for testing. w/o commit message and credits at the momemnt. */
+
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+
+---
+
+ src/measurement/measurement.cpp | 23 ++++++-----------------
+ src/measurement/measurement.h   | 24 +++++++++++++++++-------
+ src/measurement/sysfs.cpp       |  7 ++++---
+ 3 files changed, 27 insertions(+), 27 deletions(-)
+
+diff --git a/src/measurement/measurement.cpp b/src/measurement/measurement.=
+cpp
+index 0b68940..8aea3a8 100644
+--- a/src/measurement/measurement.cpp
++++ b/src/measurement/measurement.cpp
+@@ -54,23 +54,6 @@ double power_meter::joules_consumed(void)
+ 	return 0.0;
+ }
+ =
+
+-double power_meter::time_left(void)
+-{
+-	double cap, rate;
+-
+-	cap =3D dev_capacity();
+-	rate =3D joules_consumed();
+-
+-	if (cap < 0.001)
+-		return 0.0;
+-
+-	/* return 0.0 instead of INF+ */
+-	if (rate < 0.001)
+-		return 0.0;
+-
+-	return cap / rate;
+-}
+-
+ vector<class power_meter *> power_meters;
+ =
+
+ void start_power_measurement(void)
+@@ -101,13 +84,19 @@ double global_joules_consumed(void)
+ =
+
+ double global_time_left(void)
+ {
++	bool global_discharging =3D false;
+ 	double total_capacity =3D 0.0;
+ 	double total_rate =3D 0.0;
+ 	unsigned int i;
+ 	for (i =3D 0; i < power_meters.size(); i++) {
++		global_discharging |=3D power_meters[i]->is_discharging();
+ 		total_capacity +=3D power_meters[i]->dev_capacity();
+ 		total_rate +=3D power_meters[i]->joules_consumed();
+ 	}
++	/* report global time left if at least one battery is discharging */
++	if (!global_discharging)
++		return 0.0;
++
+ 	/* return 0.0 instead of INF+ */
+ 	if (total_rate < 0.001)
+ 		return 0.0;
+diff --git a/src/measurement/measurement.h b/src/measurement/measurement.h
+index 5bcd8e2..83ffc34 100644
+--- a/src/measurement/measurement.h
++++ b/src/measurement/measurement.h
+@@ -30,18 +30,29 @@
+ using namespace std;
+ =
+
+ class power_meter {
++	bool discharging;
+ public:
++	virtual ~power_meter() {};
++
+ 	virtual void start_measurement(void);
+ 	virtual void end_measurement(void);
+-
+ 	virtual double joules_consumed(void);
+-	virtual double dev_capacity(void) { return 0.0;};  /* in Joules */
+ =
+
+-	virtual double time_left(void);
++	virtual double dev_capacity(void)
++	{
++		return 0.0; /* in Joules */
++	}
+ =
+
+-	virtual ~power_meter() {};
+-};
++	virtual void set_discharging(bool d)
++	{
++		discharging =3D d;
++	}
+ =
+
++	virtual bool is_discharging()
++	{
++		return discharging;
++	}
++};
+ =
+
+ extern vector<class power_meter *> power_meters;
+ =
+
+@@ -53,7 +64,6 @@ extern double global_time_left(void);
+ extern void detect_power_meters(void);
+ extern void extech_power_meter(const char *devnode);
+ =
+
+-
+ extern double min_power;
+ =
+
+-#endif
+\ No newline at end of file
++#endif
+diff --git a/src/measurement/sysfs.cpp b/src/measurement/sysfs.cpp
+index 66cb1cd..ed42ed4 100644
+--- a/src/measurement/sysfs.cpp
++++ b/src/measurement/sysfs.cpp
+@@ -126,11 +126,13 @@ void sysfs_power_meter::measure()
+ =
+
+ 	rate =3D 0.0;
+ 	capacity =3D 0.0;
++	this->set_discharging(false);
+ =
+
+ 	if (!is_present())
+ 		return;
+-	if (read_sysfs_string("/sys/class/power_supply/%s/status", name) !=3D "Di=
+scharging")
+-		return;
++	/** do not jump over. we may have discharging battery */
++	if (read_sysfs_string("/sys/class/power_supply/%s/status", name) =3D=3D "=
+Discharging")
++		this->set_discharging(true);
+ =
+
+ 	got_rate =3D set_rate_from_power();
+ 	got_capacity =3D set_capacity_from_energy();
+@@ -146,7 +148,6 @@ void sysfs_power_meter::measure()
+ 	}
+ }
+ =
+
+-
+ void sysfs_power_meter::end_measurement(void)
+ {
+ 	measure();
 
 
-added to -next. thanks.
-
-	-ss
-
-> regards
-> =
-
-> Jaroslav
-
-> From d1daec6fd9c1d6534d81df1c3c73de9d714b7196 Mon Sep 17 00:00:00 2001
-> From: =3D?UTF-8?q?Jaroslav=3D20=3DC5=3DA0karvada?=3D <jskarvad(a)redhat.c=
-om>
-> Date: Tue, 29 Oct 2013 10:12:12 +0100
-> Subject: [PATCH] network: fixed 'requesting unregistered parameter' if NI=
-C is
->  added
-> MIME-Version: 1.0
-> Content-Type: text/plain; charset=3DUTF-8
-> Content-Transfer-Encoding: 8bit
-> =
-
-> Signed-off-by: Jaroslav ??karvada <jskarvad(a)redhat.com>
-> ---
->  src/devices/network.cpp | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
-> =
-
-> diff --git a/src/devices/network.cpp b/src/devices/network.cpp
-> index d0827ef..002600b 100644
-> --- a/src/devices/network.cpp
-> +++ b/src/devices/network.cpp
-> @@ -345,11 +345,32 @@ const char * network::device_name(void)
->  =
-
->  static void netdev_callback(const char *d_name)
->  {
-> +	char devname[128];
-> +
->  	std::string f_name("/sys/class/net/");
->  	if (strcmp(d_name, "lo") =3D=3D 0)
->  		return;
->  =
-
->  	f_name.append(d_name);
-> +
-> +	sprintf(devname, "%s-up", d_name);
-> +	register_parameter(devname);
-> +
-> +	sprintf(devname, "%s-powerunsave", d_name);
-> +	register_parameter(devname);
-> +
-> +	sprintf(devname, "%s-link-100", d_name);
-> +	register_parameter(devname);
-> +
-> +	sprintf(devname, "%s-link-1000", d_name);
-> +	register_parameter(devname);
-> +
-> +	sprintf(devname, "%s-link-high", d_name);
-> +	register_parameter(devname);
-> +
-> +	sprintf(devname, "%s-packets", d_name);
-> +	register_parameter(devname);
-> +
->  	network *bl =3D new(std::nothrow) class network(d_name, f_name.c_str());
->  	if (bl) {
->  		all_devices.push_back(bl);
-> -- =
-
-> 1.8.3.1
-> =
-
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
-
-
---===============4618907583311795278==--
+--===============2709721769963417545==--
 
