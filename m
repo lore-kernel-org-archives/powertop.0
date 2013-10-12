@@ -1,33 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============6222120690411877926=="
+Content-Type: multipart/mixed; boundary="===============2476599703589421680=="
 MIME-Version: 1.0
-From: Kristen Carlson Accardi <kristen at linux.intel.com>
-Subject: Re: [Powertop] [PATCH 00/10] pull request
-Date: Mon, 14 Oct 2013 13:42:25 -0700
-Message-ID: <20131014134225.340469eb@bluebird.jf.intel.com>
-In-Reply-To: 1381740057-12499-1-git-send-email-sergey.senozhatsky@gmail.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [BUG] powertop shows estimates only for 1st battery
+ from 2
+Date: Sat, 12 Oct 2013 20:53:12 +0300
+Message-ID: <20131012175312.GC2248@swordfish.minsk.epam.com>
+In-Reply-To: CAGbmdnVwzFMNWQZ6sUHJ494XVW0OybiT99DEMVxymsaW=uT54A@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6222120690411877926==
+--===============2476599703589421680==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 14 Oct 2013 11:40:47 +0300
-Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com> wrote:
-
-> Hello,
+On (10/12/13 18:06), Maksim Melnikau wrote:
+> > v2: after some thinking, better to fix parameters.
+> I'm don't think that values below is correct now
 > =
 
-> the following patch set contains a number of fixes and updates.
-> added to -next tree.
-> =
+> # powertop, Device stats page
+> The battery reports a discharge rate of 12.9 W
+> System baseline power is estimated at 16.5 W
 
-> I think this is the last pull request before 2.5 release.
+could you please post:
 
-Applied, thanks.
+ls /sys/class/backlight/
 
-Kristen
+cat /sys/class/backlight/*/device/enabled
+cat /sys/class/backlight/*/type
 
---===============6222120690411877926==--
+	-ss
+
+> Power est.    Usage     Device name
+>   12.2 W     86.2%        Display backlight
+>   3.17 W     44.0%        Display backlight
+>   639 mW      9.4%        CPU core
+>   475 mW      9.4%        CPU misc
+>=20
+
+--===============2476599703589421680==--
 
