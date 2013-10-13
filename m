@@ -1,62 +1,64 @@
-Content-Type: multipart/mixed; boundary="===============1659169658021830187=="
+Content-Type: multipart/mixed; boundary="===============8479692026481911610=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH v3 22/31] report: cleanup csv title and unused vars
-Date: Mon, 18 Nov 2013 12:27:13 -0800
-Message-ID: <1384806442-20294-23-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: 1384806442-20294-1-git-send-email-alexandra.yates@linux.intel.com
+From: Marc MERLIN <marc_powertop at merlins.org>
+Subject: Re: [Powertop] USB devices get wrong power use values
+Date: Sun, 13 Oct 2013 15:10:48 -0700
+Message-ID: <20131013221048.GI30504@merlins.org>
+In-Reply-To: 525AEAF9.5080709@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1659169658021830187==
+--===============8479692026481911610==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Removed old csv headder to avoid redundancy. Removed unused variables
-from report.cpp str2 and str3.
+On Sun, Oct 13, 2013 at 11:48:25AM -0700, Arjan van de Ven wrote:
+> On 10/13/2013 9:22 AM, Marc MERLIN wrote:
+> =
 
-Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
----
- src/report/report-formatter-csv.cpp |    2 +-
- src/report/report.cpp               |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+> >>having a USB device active also generally makes the CPU/etc use much mo=
+re power,
+> >>which Powertop "charges" to the USB device in question.
+> >>
+> >>8 Watts sounds entirely reasonable for that to me...
+> >
+> >Aah, if the CPU gets involved, then yes, it's a bit more possible.
+> >So, a simple USB keyboard that's unused can keep one core awake and burn=
+ 8
+> >watts if something else goes wrong in the kernel to cause that?
+> =
 
-diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-format=
-ter-csv.cpp
-index facdd4d..0ab1091 100644
---- a/src/report/report-formatter-csv.cpp
-+++ b/src/report/report-formatter-csv.cpp
-@@ -57,7 +57,7 @@ report_formatter_csv::finish_report()
- void
- report_formatter_csv::add_doc_header()
- {
--	add_header(report_csv_header, 1);
-+	/*add_header(report_csv_header, 1);*/
- }
- =
+> a bad USB keyboard can keep the processor out of deep package C states..
+> not a lot the software can do about that...
+> but yet it can be THAT much power delta.
+> =
 
- /* ***********************************************************************=
-* */
-diff --git a/src/report/report.cpp b/src/report/report.cpp
-index 3b46f58..56232a6 100644
---- a/src/report/report.cpp
-+++ b/src/report/report.cpp
-@@ -100,7 +100,7 @@ static string read_os_release(const string &filename)
- =
+> (we've seen for example on some servers that a cheap keyboard makes > 15 =
+Watts difference, but measured
+> at the wall socket, so after the power supply/etc)
 
- static void system_info(void)
- {
--	string str, str2, str3;
-+	string str;
- =
+So note that it's actually a very small USB widget that behaves as a
+keyboard (it's an OTP token).
+I've only had that OTP token show as 7W once, and it was suspicious that
+it was at the exact same time as my built in camera.
 
- 	/* div attr css_class and css_id */
- 	tag_attr div_attr;
+So from what you're staying, you're pretty sure that the measuring code
+was correct and that somehow the USB system was wedged or that power
+management suspend failed in a way that both devices were taking 14W
+together, more than what the entire laptop uses when on batteries with
+CPUs mostly asleep?
+
+Marc
 -- =
 
-1.7.9.5
+"A mouse is a device used to point at the xterm you want to type in" - A.S.=
+R.
+Microsoft is to operating systems ....
+                                      .... what McDonalds is to gourmet coo=
+king
+Home page: http://marc.merlins.org/                         | PGP 1024R/763=
+BE901
 
-
---===============1659169658021830187==--
+--===============8479692026481911610==--
 
