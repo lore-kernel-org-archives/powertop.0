@@ -1,97 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============4355684284060045602=="
+Content-Type: multipart/mixed; boundary="===============5634263278858920268=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH 11/29] report-csv: modular table
-Date: Wed, 30 Oct 2013 14:21:02 -0700
-Message-ID: <1383168080-18233-12-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: 1383168080-18233-1-git-send-email-alexandra.yates@linux.intel.com
+From: Marc MERLIN <marc_powertop at merlins.org>
+Subject: Re: [Powertop] USB devices get wrong power use values
+Date: Sun, 13 Oct 2013 09:22:12 -0700
+Message-ID: <20131013162212.GH30504@merlins.org>
+In-Reply-To: 525ABD5F.6030001@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4355684284060045602==
+--===============5634263278858920268==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Generates a modular table to the csv report using the table_size and a
-set of data stored in a single dimensional array stored in row major
-order.
+On Sun, Oct 13, 2013 at 08:33:51AM -0700, Arjan van de Ven wrote:
+> On 9/22/2013 4:54 PM, Marc MERLIN wrote:
+> >So, I asked on the linux-usb list, and one thing I quickly found out is =
+that the
+> >Watt value given by powertop 2.4 is way off for USB devices:
+> =
 
-Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
----
- src/report/report-formatter-csv.cpp |   28 ++++++++++++++++++++++++++++
- src/report/report-formatter-csv.h   |    2 ++
- 2 files changed, 30 insertions(+)
+> what makes you think the value is off?
+> =
 
-diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-format=
-ter-csv.cpp
-index 2981940..b9336ad 100644
---- a/src/report/report-formatter-csv.cpp
-+++ b/src/report/report-formatter-csv.cpp
-@@ -33,6 +33,7 @@
- #include <stdarg.h>
- =
+> >>Power est.  Events/s    Category       Description
+> >>   8.18 W    100.0%      Device         USB device: Yubico Yubikey II (=
+Yubico)
+> >>   8.13 W    100.0%      Device         USB device: Integrated Camera (=
+Chicony Electronics Co., Ltd.)
+> =
 
- #include "report-formatter-csv.h"
-+#include "report-data-html.h"
- =
+> having a USB device active also generally makes the CPU/etc use much more=
+ power,
+> which Powertop "charges" to the USB device in question.
+> =
 
- static const char report_csv_header[] =3D "PowerTOP Report";
- =
+> 8 Watts sounds entirely reasonable for that to me...
 
-@@ -279,3 +280,30 @@ report_formatter_csv::add_summary_list(string *list, i=
-nt size)
- 	add_exact("\n");
- }
- =
+Aah, if the CPU gets involved, then yes, it's a bit more possible.
+So, a simple USB keyboard that's unused can keep one core awake and burn 8
+watts if something else goes wrong in the kernel to cause that?
 
-+void
-+report_formatter_csv::add_table(string *system_data, struct table_size *si=
-ze,
-+		struct table_attributes* tb_attr)
-+{
-+	int i, j;
-+	int offset=3D0;
-+	string tmp_str=3D"";
-+	int empty_row=3D0;
-+	add_exact("\n");
-+	for (i=3D0; i < size->rows; i++){
-+		for (j=3D0; j < size->cols; j++){
-+			offset =3D i * (size->cols) + j;
-+			tmp_str=3Dsystem_data[offset];
-+
-+			if(tmp_str =3D=3D "&nbsp;")
-+				empty_row+=3D1;
-+			else{
-+				addf_exact("%s", system_data[offset].c_str());
-+				if(j < (size->cols - 1))
-+					add_exact(",");
-+			}
-+		}
-+		if(empty_row < size->cols)
-+		add_exact("\n");
-+		empty_row=3D0;
-+	}
-+}
-diff --git a/src/report/report-formatter-csv.h b/src/report/report-formatte=
-r-csv.h
-index daf723e..994b765 100644
---- a/src/report/report-formatter-csv.h
-+++ b/src/report/report-formatter-csv.h
-@@ -82,6 +82,8 @@ public:
- 	void add_title(struct tag_attr *title_att, const char *title);
- 	void add_navigation();
- 	void add_summary_list(string *list, int size);
-+	void add_table(string *system_data, struct table_size *size,
-+			struct table_attributes *tb_attr);
- =
-
- private:
- 	void add_doc_header();
+Thanks,
+Marc
 -- =
 
-1.7.9.5
+"A mouse is a device used to point at the xterm you want to type in" - A.S.=
+R.
+Microsoft is to operating systems ....
+                                      .... what McDonalds is to gourmet coo=
+king
+Home page: http://marc.merlins.org/                         | PGP 1024R/763=
+BE901
 
-
---===============4355684284060045602==--
+--===============5634263278858920268==--
 
