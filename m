@@ -1,256 +1,67 @@
-Content-Type: multipart/mixed; boundary="===============9155974870264631512=="
+Content-Type: multipart/mixed; boundary="===============7974696997217273847=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH 18/29] report: CPU Frequency html & csv
-Date: Wed, 30 Oct 2013 14:21:09 -0700
-Message-ID: <1383168080-18233-19-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: 1383168080-18233-1-git-send-email-alexandra.yates@linux.intel.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: [Powertop] [PATCH 00/10] pull request
+Date: Mon, 14 Oct 2013 11:40:47 +0300
+Message-ID: <1381740057-12499-1-git-send-email-sergey.senozhatsky@gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============9155974870264631512==
+--===============7974696997217273847==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Enables html and csv report new stlyes for "CPU Frequency" section.
+Hello,
 
-Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
----
- src/cpu/cpu.cpp |  139 ++++++++++++++++++++++++++++++++++++++++-----------=
+the following patch set contains a number of fixes and updates.
+added to -next tree.
+
+I think this is the last pull request before 2.5 release.
+
+
+David Rosca (1):
+  Fixed cpu_core::has_c1_res initialization
+
+Jaroslav Skarvada (2):
+  tell user if the system is running out of FDs
+  set open files rlimit to /proc/sys/fs/nr_open
+
+Sergey Senozhatsky (7):
+  lib: introduce ui_notify_user()
+  tuning: print executed toggle script
+  power_meter: introduce discharging member     measurement: report
+    total global_time_left()
+  power_supply: delete unused power_supply class
+  parameters: report correct "base power" parameter
+  backlight: use process_directory() helper
+  backlight: decrease backlight() .ctor mem usage
+
+ Android.mk                       |   2 +-
+ src/Makefile.am                  |   4 +-
+ src/cpu/intel_cpus.cpp           |   4 +-
+ src/devices/backlight.cpp        |  46 ++++------
+ src/devices/backlight.h          |   4 +-
+ src/lib.cpp                      |  20 +++++
+ src/lib.h                        |   2 +
+ src/main.cpp                     |  20 ++++-
+ src/measurement/measurement.cpp  |  62 +++----------
+ src/measurement/measurement.h    |  24 +++--
+ src/measurement/power_supply.cpp | 190 -----------------------------------=
 ----
- 1 file changed, 101 insertions(+), 38 deletions(-)
+ src/measurement/power_supply.h   |  46 ----------
+ src/measurement/sysfs.cpp        |   7 +-
+ src/parameters/parameters.cpp    |  10 +--
+ src/perf/perf.cpp                |  13 ++-
+ src/tuning/tuning.cpp            |   6 +-
+ 16 files changed, 117 insertions(+), 343 deletions(-)
+ delete mode 100644 src/measurement/power_supply.cpp
+ delete mode 100644 src/measurement/power_supply.h
 
-diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-index ac89ec7..acb5a25 100644
---- a/src/cpu/cpu.cpp
-+++ b/src/cpu/cpu.cpp
-@@ -612,29 +612,81 @@ void report_display_cpu_cstates(void)
- =
-
- void report_display_cpu_pstates(void)
- {
--	char buffer[512], buffer2[512];
-+	char buffer[512], buffer2[512], tmp_num[50];
- 	unsigned int package, core, cpu;
- 	int line;
- 	class abstract_cpu *_package, * _core, * _cpu;
- 	unsigned int i, pstates_num;
- =
-
--	for (i =3D 0, pstates_num =3D 0; i < all_cpus.size(); i++)
-+	/* div attr css_class and css_id */
-+	tag_attr div_attr;
-+	init_div(&div_attr, "clear_block", "cpufreq");
-+
-+	/* Set Table attributes, rows, and cols */
-+	table_attributes std_table_css;
-+	table_size pkg_tbl_size;
-+	table_size core_tbl_size;
-+	table_size cpu_tbl_size;
-+
-+
-+	/* Set Title attributes */
-+	tag_attr title_attr;
-+	init_title_attr(&title_attr);
-+
-+	/* Report add section */
-+        report.add_div(&div_attr);
-+        report.add_title(&title_attr, "Processor Frequency Report");
-+
-+        /* Set array of data in row Major order */
-+	int idx1, idx2, idx3, num_cpus=3D0;
-+        string tmp_str;
-+
-+	for (i =3D 0, pstates_num =3D 0; i < all_cpus.size(); i++) {
- 		if (all_cpus[i])
- 			pstates_num =3D std::max<unsigned int>(pstates_num,
--								all_cpus[i]->pstates.size());
--
--	report.begin_section(SECTION_CPUFREQ);
--	report.add_header("Processor Frequency Report");
-+				all_cpus[i]->pstates.size());
-+	}
- =
-
- 	for (package =3D 0; package < system_level.children.size(); package++) {
- 		bool first_core =3D true;
-+		idx1=3D0;
-+		idx2=3D0;
-+		idx3=3D0;
- =
-
- 		_package =3D system_level.children[package];
- 		if (!_package)
- 			continue;
- =
-
--		report.begin_table(TABLE_WIDE);
-+		/*  Tables for PKG, CORE, CPU */
-+		pkg_tbl_size.cols=3D2;
-+		pkg_tbl_size.rows=3Dpstates_num+2;
-+		string pkg_data[pkg_tbl_size.cols * pkg_tbl_size.rows];
-+
-+		core_tbl_size.cols=3D2;
-+		core_tbl_size.rows=3D((pstates_num+2) *_package->children.size());
-+		string core_data[core_tbl_size.cols * core_tbl_size.rows];
-+
-+		/* PKG */
-+		num_cpus=3D0;
-+		for (core =3D 0; core < _package->children.size(); core++) {
-+			_core =3D _package->children[core];
-+			if (!_core)
-+				continue;
-+			for (cpu =3D 0; cpu < _core->children.size(); cpu++) {
-+				if (!_cpu)
-+				continue;
-+				_cpu =3D _core->children[cpu];
-+				num_cpus+=3D1;
-+			}
-+		}
-+		cpu_tbl_size.cols=3D num_cpus+1;
-+		cpu_tbl_size.rows=3D (pstates_num+2)* _package->children.size();
-+		string cpu_data[cpu_tbl_size.cols * cpu_tbl_size.rows];
-+
-+		/* Core */
- 		for (core =3D 0; core < _package->children.size(); core++) {
-+			cpu_data[idx3]=3D"&nbsp;";
-+			idx3+=3D1;
- 			_core =3D _package->children[core];
- 			if (!_core)
- 				continue;
-@@ -646,75 +698,86 @@ void report_display_cpu_pstates(void)
- 				bool first_cpu =3D true;
- =
-
- 				if (!_package->has_pstate_level(line))
--					continue;
--
--				report.begin_row();
-+				continue;
- =
-
- 				buffer[0] =3D 0;
- 				buffer2[0] =3D 0;
- 				if (first_core) {
- 					if (line =3D=3D LEVEL_HEADER) {
--						report.begin_cell(CELL_FIRST_PACKAGE_HEADER);
--						report.addf(__("Package %i"), _package->get_number());
-+						pkg_data[idx1]=3D"Package";
-+						idx1+=3D1;
-+						sprintf(tmp_num,"%d",  _package->get_number());
-+						pkg_data[idx1]=3D string(tmp_num);
-+						idx1+=3D1;
- 					} else {
--						report.begin_cell(CELL_STATE_NAME);
--						report.add(_package->fill_pstate_name(line, buffer));
--						report.begin_cell(CELL_PACKAGE_STATE_VALUE);
--						report.add(_package->fill_pstate_line(line, buffer2));
-+						tmp_str=3Dstring(_package->fill_pstate_name(line, buffer));
-+						pkg_data[idx1]=3D(tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
-+						idx1+=3D1;
-+						tmp_str=3Dstring(_package->fill_pstate_line(line, buffer2));
-+						pkg_data[idx1]=3D(tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
-+						idx1+=3D1;
- 					}
--				} else {
--					report.begin_cell(CELL_EMPTY_PACKAGE_STATE);
--					report.add_empty_cell();
- 				}
- =
-
--				report.begin_cell(CELL_SEPARATOR);
--				report.add_empty_cell();
- =
-
- 				if (!_core->can_collapse()) {
- 					buffer[0] =3D 0;
- 					buffer2[0] =3D 0;
- 					if (line =3D=3D LEVEL_HEADER) {
--						report.begin_cell(CELL_CORE_HEADER);
--						report.addf(__("Core %i"), _core->get_number());
-+						core_data[idx2]=3D"";
-+						idx2+=3D1;
-+						sprintf(tmp_num,"Core %d",_core->get_number());
-+						core_data[idx2]=3Dstring(tmp_num);
-+						idx2+=3D1;
- 					} else {
--						report.begin_cell(CELL_STATE_NAME);
--						report.add(_core->fill_pstate_name(line, buffer));
--						report.begin_cell(CELL_PACKAGE_STATE_VALUE);
--						report.add(_core->fill_pstate_line(line, buffer2));
-+						tmp_str=3Dstring(_core->fill_pstate_name(line, buffer));
-+						core_data[idx2]=3D (tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
-+						idx2+=3D1;
-+						tmp_str=3Dstring(_core->fill_pstate_line(line, buffer2));
-+						core_data[idx2]=3D (tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
-+						idx2+=3D1;
- 					}
- 				}
- =
-
--				report.begin_cell(CELL_SEPARATOR);
--				report.add_empty_cell();
--
-+				/* CPU */
- 				for (cpu =3D 0; cpu < _core->children.size(); cpu++) {
- 					buffer[0] =3D 0;
- 					_cpu =3D _core->children[cpu];
- 					if (!_cpu)
- 						continue;
- =
-
--					report.set_cpu_number(cpu);
- 					if (line =3D=3D LEVEL_HEADER) {
--						report.begin_cell(CELL_CPU_PSTATE_HEADER);
--						report.addf(__("CPU %i"), _cpu->get_number());
-+						sprintf(tmp_num,"CPU %d",_cpu->get_number());
-+						cpu_data[idx3] =3D string(tmp_num);
-+						idx3+=3D1;
- 						continue;
- 					}
- =
-
- 					if (first_cpu) {
--						report.begin_cell(CELL_STATE_NAME);
--						report.add(_cpu->fill_pstate_name(line, buffer));
-+						tmp_str=3Dstring(_cpu->fill_pstate_name(line, buffer));
-+						cpu_data[idx3]=3D(tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
-+						idx3+=3D1;
- 						first_cpu =3D false;
- 					}
- =
-
- 					buffer[0] =3D 0;
--					report.begin_cell(CELL_CPU_STATE_VALUE);
--					report.add(_cpu->fill_pstate_line(line, buffer));
-+					tmp_str=3Dstring(_cpu->fill_pstate_line(line, buffer));
-+					cpu_data[idx3]=3D(tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
-+					idx3+=3D1;
- 				}
- 			}
--
- 			first_core =3D false;
- 		}
-+		init_pkg_table_attr(&std_table_css, pkg_tbl_size.rows, pkg_tbl_size.cols=
-);
-+		report.add_table(pkg_data, &std_table_css);
-+		init_core_table_attr(&std_table_css, (pstates_num+2),
-+				core_tbl_size.rows, core_tbl_size.cols);
-+		report.add_table(core_data, &std_table_css);
-+		init_cpu_table_attr(&std_table_css, (pstates_num+2),
-+				cpu_tbl_size.rows, cpu_tbl_size.cols);
-+		report.add_table(cpu_data, &std_table_css);
- 	}
-+	report.end_div();
- }
- =
-
- void impl_w_display_cpu_states(int state)
 -- =
 
-1.7.9.5
+1.8.4.679.g0a1a803
 
 
---===============9155974870264631512==--
+--===============7974696997217273847==--
 
