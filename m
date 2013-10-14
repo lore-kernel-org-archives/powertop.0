@@ -1,101 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============0125192842810301867=="
+Content-Type: multipart/mixed; boundary="===============6917084735671941546=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH v2 07/31] report-maker: navigation & summary
-Date: Fri, 15 Nov 2013 16:28:54 -0800
-Message-ID: <1384561758-21516-8-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: 1384561758-21516-1-git-send-email-alexandra.yates@linux.intel.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: [Powertop] [PATCH 09/10] backlight: decrease backlight() .ctor mem
+ usage
+Date: Mon, 14 Oct 2013 11:40:56 +0300
+Message-ID: <1381740057-12499-10-git-send-email-sergey.senozhatsky@gmail.com>
+In-Reply-To: 1381740057-12499-1-git-send-email-sergey.senozhatsky@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0125192842810301867==
+--===============6917084735671941546==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Implements methods to generate navigation and summary from the report
-object.
-
-Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
 ---
- src/report/report-formatter.h |    3 +++
- src/report/report-maker.cpp   |   12 ++++++++++++
- src/report/report-maker.h     |    4 +++-
- 3 files changed, 18 insertions(+), 1 deletion(-)
+ src/devices/backlight.cpp | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/src/report/report-formatter.h b/src/report/report-formatter.h
-index 78382d8..5e5b8d7 100644
---- a/src/report/report-formatter.h
-+++ b/src/report/report-formatter.h
-@@ -27,6 +27,7 @@
- #define _REPORT_FORMATTER_H_
+diff --git a/src/devices/backlight.cpp b/src/devices/backlight.cpp
+index ebdebc8..73bdac9 100644
+--- a/src/devices/backlight.cpp
++++ b/src/devices/backlight.cpp
+@@ -41,15 +41,13 @@ using namespace std;
  =
 
- #include "report-maker.h"
-+using namespace std;
- =
-
- class report_formatter
+ backlight::backlight(const char *_name, const char *path): device()
  {
-@@ -68,6 +69,8 @@ public:
- 	virtual void add_div(struct tag_attr *div_attr) {}
- 	virtual void end_div() {}
- 	virtual void add_title(struct tag_attr *att_title, const char *title) {}
-+	virtual void add_navigation() {}
-+	virtual void add_summary_list(string *list, int size) {}
- };
- =
-
- #endif /* _REPORT_FORMATTER_H_ */
-diff --git a/src/report/report-maker.cpp b/src/report/report-maker.cpp
-index ff87f1e..ccfbec4 100644
---- a/src/report/report-maker.cpp
-+++ b/src/report/report-maker.cpp
-@@ -368,3 +368,15 @@ report_maker::end_div()
- 	formatter->end_div();
+-	char devname[128];
+ 	min_level =3D 0;
+ 	max_level =3D 0;
+ 	start_level =3D 0;
+ 	end_level =3D 0;
+ 	strncpy(sysfs_path, path, sizeof(sysfs_path));
+ 	register_sysfs_path(sysfs_path);
+-	sprintf(devname, "backlight:%s", _name);
+-	strncpy(name, devname, sizeof(name));
++	snprintf(name, sizeof(name) - 1, "backlight:%s", _name);
+ 	r_index =3D get_result_index(name);
+ 	r_index_power =3D 0;
  }
- =
-
-+void
-+report_maker::add_navigation()
-+{
-+	formatter->add_navigation();
-+}
-+
-+void
-+report_maker::add_summary_list(string *list, int size)
-+{
-+	formatter->add_summary_list(list, size);
-+}
-+
-diff --git a/src/report/report-maker.h b/src/report/report-maker.h
-index 0c17635..6e5f4d1 100644
---- a/src/report/report-maker.h
-+++ b/src/report/report-maker.h
-@@ -73,7 +73,7 @@
- #include <stdarg.h>
- =
-
- #include <string>
--
-+using namespace std;
- /* Conditional gettext. We need original strings for CSV. */
- #define __(STRING) \
- 	((report.get_type() =3D=3D REPORT_CSV) ? (STRING) : gettext(STRING))
-@@ -199,6 +199,8 @@ public:
- 	void add_div(struct tag_attr *div_attr);
- 	void end_div();
- 	void add_title(struct tag_attr *att_title, const char *title);
-+	void add_navigation();
-+	void add_summary_list(string *list, int size);
- =
-
- private:
- 	void setup_report_formatter();
 -- =
 
-1.7.9.5
+1.8.4.679.g0a1a803
 
 
---===============0125192842810301867==--
+--===============6917084735671941546==--
 
