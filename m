@@ -1,50 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============3021204145565203480=="
+Content-Type: multipart/mixed; boundary="===============6222120690411877926=="
 MIME-Version: 1.0
-From: Sanjay Singh Rawat <sanjay.rawat at linaro.org>
-Subject: [Powertop] [PATCH] update source file for android
-Date: Mon, 21 Oct 2013 17:17:46 +0530
-Message-ID: <1382356066-21359-1-git-send-email-sanjay.rawat@linaro.org>
+From: Kristen Carlson Accardi <kristen at linux.intel.com>
+Subject: Re: [Powertop] [PATCH 00/10] pull request
+Date: Mon, 14 Oct 2013 13:42:25 -0700
+Message-ID: <20131014134225.340469eb@bluebird.jf.intel.com>
+In-Reply-To: 1381740057-12499-1-git-send-email-sergey.senozhatsky@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3021204145565203480==
+--===============6222120690411877926==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-- these files are missing in the android makefile
+On Mon, 14 Oct 2013 11:40:47 +0300
+Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com> wrote:
 
-Signed-off-by: Sanjay Singh Rawat <sanjay.rawat(a)linaro.org>
----
- Android.mk |    4 ++++
- 1 file changed, 4 insertions(+)
+> Hello,
+> =
 
-diff --git a/Android.mk b/Android.mk
-index ec47c4b..cf13fe8 100644
---- a/Android.mk
-+++ b/Android.mk
-@@ -31,6 +31,9 @@ LOCAL_SRC_FILES +=3D \
- 	src/cpu/cpu_core.cpp \
- 	src/cpu/cpu_package.cpp \
- 	src/cpu/abstract_cpu.cpp \
-+	src/cpu/cpu_rapl_device.cpp \
-+	src/cpu/dram_rapl_device.cpp \
-+	src/cpu/rapl/rapl_interface.cpp \
- 	src/measurement/measurement.cpp \
- 	src/measurement/acpi.cpp \
- 	src/measurement/extech.cpp \
-@@ -62,6 +65,7 @@ LOCAL_SRC_FILES +=3D \
- 	src/devices/backlight.cpp \
- 	src/devices/network.cpp \
- 	src/devices/device.cpp \
-+	src/devices/gpu_rapl_device.cpp \
- 	src/devlist.cpp \
- 	src/calibrate/calibrate.cpp \
- 	src/lib.cpp \
--- =
+> the following patch set contains a number of fixes and updates.
+> added to -next tree.
+> =
 
-1.7.9.5
+> I think this is the last pull request before 2.5 release.
 
+Applied, thanks.
 
---===============3021204145565203480==--
+Kristen
+
+--===============6222120690411877926==--
 
