@@ -1,127 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============8241161399380333563=="
+Content-Type: multipart/mixed; boundary="===============0448405662829064241=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [BUG] powertop shows estimates only for 1st battery
- from 2
-Date: Fri, 11 Oct 2013 11:30:44 +0300
-Message-ID: <20131011083044.GA2781@swordfish.minsk.epam.com>
-In-Reply-To: CAGbmdnUvBORJYyg=0EspRSAVqqcpgbcX1ZL4FxfFJioEh8p8SQ@mail.gmail.com
+From: Kok, Auke-jan H <auke-jan.h.kok at intel.com>
+Subject: Re: [Powertop] (no subject)
+Date: Tue, 15 Oct 2013 10:01:07 -0700
+Message-ID: <CABsxX9+70UP49P5sNNZQfTmyDmW0CnraLxKhFy_==F0SWPZc9w@mail.gmail.com>
+In-Reply-To: CADy9ZNCnbhd2PBg0H8UPhpCSjVHRT0-PuRn31nvJ15WeUAcrpQ@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8241161399380333563==
+--===============0448405662829064241==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/11/13 11:16), Maksim Melnikau wrote:
-> Date: Fri, 11 Oct 2013 11:16:34 +0300
-> From: Maksim Melnikau <maxposedon(a)gmail.com>
-> To: powertop(a)lists.01.org
-> Subject: Re: [Powertop] [BUG] powertop shows estimates only for 1st batte=
-ry
->  from 2
-> =
+On Tue, Oct 15, 2013 at 8:05 AM, Bill Vyzas <vizasb(a)gmail.com> wrote:
+> Hello people,
+>
+> My name is Bill and I am third year computer science student. I am looking
+> for a project to work on my final year project and I would be interested =
+to
+> work on power management on linux platforms.
+>
+> One idea I have about my final year project is to develop a GUI that will
+> make powertop more user friendly and maybe add some more functionality to
+> the source.
+>
+> Any advices and ideas are more than appreciated.
 
-> When first battery discharged, kernel reports following info
+Please have a look at the TODO file in the code, which lists obvious
+tasks that haven't been done yet:
 
-thank you. I'll take a look.
+https://github.com/fenrus75/powertop/blob/master/TODO
 
-	-ss
+Cheers,
 
-> % cat /sys/class/power_supply/BAT0/uevent
-> POWER_SUPPLY_NAME=3DBAT0
-> POWER_SUPPLY_STATUS=3DDischarging
-> POWER_SUPPLY_PRESENT=3D1
-> POWER_SUPPLY_TECHNOLOGY=3DLi-poly
-> POWER_SUPPLY_CYCLE_COUNT=3D0
-> POWER_SUPPLY_VOLTAGE_MIN_DESIGN=3D11100000
-> POWER_SUPPLY_VOLTAGE_NOW=3D12401000
-> POWER_SUPPLY_POWER_NOW=3D7800000
-> POWER_SUPPLY_ENERGY_FULL_DESIGN=3D42010000
-> POWER_SUPPLY_ENERGY_FULL=3D42010000
-> POWER_SUPPLY_ENERGY_NOW=3D41810000
-> POWER_SUPPLY_CAPACITY=3D99
-> POWER_SUPPLY_MODEL_NAME=3D45N1103
-> POWER_SUPPLY_MANUFACTURER=3DSMP
-> POWER_SUPPLY_SERIAL_NUMBER=3D 3507
-> =
+Auke
 
-> % cat /sys/class/power_supply/BAT1/uevent
-> POWER_SUPPLY_NAME=3DBAT1
-> POWER_SUPPLY_STATUS=3DUnknown
-> POWER_SUPPLY_PRESENT=3D1
-> POWER_SUPPLY_TECHNOLOGY=3DLi-poly
-> POWER_SUPPLY_CYCLE_COUNT=3D0
-> POWER_SUPPLY_VOLTAGE_MIN_DESIGN=3D14800000
-> POWER_SUPPLY_VOLTAGE_NOW=3D13902000
-> POWER_SUPPLY_POWER_NOW=3D0
-> POWER_SUPPLY_ENERGY_FULL_DESIGN=3D28050000
-> POWER_SUPPLY_ENERGY_FULL=3D26370000
-> POWER_SUPPLY_ENERGY_NOW=3D930000
-> POWER_SUPPLY_CAPACITY=3D3
-> POWER_SUPPLY_MODEL_NAME=3D45N1101
-> POWER_SUPPLY_MANUFACTURER=3DSMP
-> POWER_SUPPLY_SERIAL_NUMBER=3D 1840
-> =
-
-> On Fri, Oct 11, 2013 at 9:19 AM, Maksim Melnikau <maxposedon(a)gmail.com>=
- wrote:
-> > Hello!
-> >
-> > I have 2 batteries in my thinkpad helix laptop, and it looks like power=
-top
-> > shows "the estimated remaining time" just for first battery, what is a =
-bit
-> > confusing. May be it somehow connected to some hardware features of
-> > batteries switching.
-> >
-> > # powertop, Overview page
-> > The battery reports a discharge rate of 7.67 W
-> > The estimated remaining time is 2 hours, 17 minutes
-> >
-> > # powertop -V
-> > PowerTOP versionv2.4, compiled on Jul 29 2013
-> >
-> > # cat /sys/class/power_supply/BAT0/uevent
-> > POWER_SUPPLY_NAME=3DBAT0
-> > POWER_SUPPLY_STATUS=3DUnknown
-> > POWER_SUPPLY_PRESENT=3D1
-> > POWER_SUPPLY_TECHNOLOGY=3DLi-poly
-> > POWER_SUPPLY_CYCLE_COUNT=3D0
-> > POWER_SUPPLY_VOLTAGE_MIN_DESIGN=3D11100000
-> > POWER_SUPPLY_VOLTAGE_NOW=3D12503000
-> > POWER_SUPPLY_POWER_NOW=3D0
-> > POWER_SUPPLY_ENERGY_FULL_DESIGN=3D42010000
-> > POWER_SUPPLY_ENERGY_FULL=3D42010000
-> > POWER_SUPPLY_ENERGY_NOW=3D41940000
-> > POWER_SUPPLY_CAPACITY=3D99
-> > POWER_SUPPLY_MODEL_NAME=3D45N1103
-> > POWER_SUPPLY_MANUFACTURER=3DSMP
-> > POWER_SUPPLY_SERIAL_NUMBER=3D 3507
-> >
-> > # cat /sys/class/power_supply/BAT1/uevent
-> > POWER_SUPPLY_NAME=3DBAT1
-> > POWER_SUPPLY_STATUS=3DDischarging
-> > POWER_SUPPLY_PRESENT=3D1
-> > POWER_SUPPLY_TECHNOLOGY=3DLi-poly
-> > POWER_SUPPLY_CYCLE_COUNT=3D0
-> > POWER_SUPPLY_VOLTAGE_MIN_DESIGN=3D14800000
-> > POWER_SUPPLY_VOLTAGE_NOW=3D15178000
-> > POWER_SUPPLY_POWER_NOW=3D8165000
-> > POWER_SUPPLY_ENERGY_FULL_DESIGN=3D28050000
-> > POWER_SUPPLY_ENERGY_FULL=3D26370000
-> > POWER_SUPPLY_ENERGY_NOW=3D16750000
-> > POWER_SUPPLY_CAPACITY=3D63
-> > POWER_SUPPLY_MODEL_NAME=3D45N1101
-> > POWER_SUPPLY_MANUFACTURER=3DSMP
-> > POWER_SUPPLY_SERIAL_NUMBER=3D 1840
-> >
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============8241161399380333563==--
+--===============0448405662829064241==--
 
