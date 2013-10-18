@@ -1,341 +1,228 @@
-Content-Type: multipart/mixed; boundary="===============4745607594565308682=="
+Content-Type: multipart/mixed; boundary="===============3553752691138025159=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH 29/29] tunables: removed on-demand cpu frequency
- governor
-Date: Wed, 30 Oct 2013 14:21:20 -0700
-Message-ID: <1383168080-18233-30-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: 1383168080-18233-1-git-send-email-alexandra.yates@linux.intel.com
+From: Marc MERLIN <marc_powertop at merlins.org>
+Subject: Re: [Powertop] USB devices get wrong power use values
+Date: Thu, 17 Oct 2013 17:01:54 -0700
+Message-ID: <20131018000154.GA5362@merlins.org>
+In-Reply-To: 20131013162212.GH30504@merlins.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4745607594565308682==
+--===============3553752691138025159==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Remove sugestion to use the on-demand cpu frequency governor from
-powertop tunables as that is not longer a good sugestion since the
-pstate driver is the Intel recomended replacement.
+On Sun, Oct 13, 2013 at 09:22:12AM -0700, Marc MERLIN wrote:
+> On Sun, Oct 13, 2013 at 08:33:51AM -0700, Arjan van de Ven wrote:
+> > On 9/22/2013 4:54 PM, Marc MERLIN wrote:
+> > >So, I asked on the linux-usb list, and one thing I quickly found out i=
+s that the
+> > >Watt value given by powertop 2.4 is way off for USB devices:
+> > =
 
-Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
----
- src/tuning/cpufreq.cpp |  213 --------------------------------------------=
-----
- src/tuning/cpufreq.h   |   50 ------------
- src/tuning/tuning.cpp  |    1 -
- 3 files changed, 264 deletions(-)
- delete mode 100644 src/tuning/cpufreq.cpp
- delete mode 100644 src/tuning/cpufreq.h
+> > what makes you think the value is off?
+> > =
 
-diff --git a/src/tuning/cpufreq.cpp b/src/tuning/cpufreq.cpp
-deleted file mode 100644
-index e870559..0000000
---- a/src/tuning/cpufreq.cpp
-+++ /dev/null
-@@ -1,213 +0,0 @@
--/*
-- * Copyright 2010, Intel Corporation
-- *
-- * This file is part of PowerTOP
-- *
-- * This program file is free software; you can redistribute it and/or modi=
-fy it
-- * under the terms of the GNU General Public License as published by the
-- * Free Software Foundation; version 2 of the License.
-- *
-- * This program is distributed in the hope that it will be useful, but WIT=
-HOUT
-- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-- * for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with this program in a file named COPYING; if not, write to the
-- * Free Software Foundation, Inc,
-- * 51 Franklin Street, Fifth Floor,
-- * Boston, MA 02110-1301 USA
-- * or just google for it.
-- *
-- * Authors:
-- *	Arjan van de Ven <arjan(a)linux.intel.com>
-- */
--
--#include "tuning.h"
--#include "tunable.h"
--#include <unistd.h>
--#include <stdio.h>
--#include <stdlib.h>
--#include <string.h>
--#include <utility>
--#include <iostream>
--#include <fstream>
--#include <unistd.h>
--#include <dirent.h>
--#include <errno.h>
--#include <sys/stat.h>
--#include <ctype.h>
--
--#include "../lib.h"
--#include "cpufreq.h"
--
--cpufreq_tunable::cpufreq_tunable(void) : tunable("", 0.3, _("Good"), _("Ba=
-d"), _("Unknown"))
--{
--	string str;
--	sprintf(desc, _("Using 'ondemand' cpufreq governor"));
--
--	str =3D read_sysfs_string("/sys/devices/system/cpu/cpu0/cpufreq/scaling_g=
-overnor");
--	strcpy(original, str.c_str());
--	if (strlen(original) < 1)
--		strcpy(original, "ondemand");
--}
--
--
--int cpufreq_tunable::good_bad(void)
--{
--	DIR *dir;
--	struct dirent *dirent;
--	FILE *file;
--	char filename[PATH_MAX];
--	char line[1024];
--
--	char gov[1024];
--	int ret =3D TUNE_GOOD;
--
--
--	gov[0] =3D 0;
--
--
--	dir =3D opendir("/sys/devices/system/cpu");
--	if (!dir)
--		return ret;
--
--	while ((dirent =3D readdir(dir))) {
--		if (strncmp(dirent->d_name, "cpu", 3) !=3D 0 || !isdigit(dirent->d_name[=
-3]))
--			continue;
--		sprintf(filename, "/sys/devices/system/cpu/%s/cpufreq/scaling_governor",=
- dirent->d_name);
--		file =3D fopen(filename, "r");
--		if (!file)
--			continue;
--		memset(line, 0, 1024);
--		if (fgets(line, 1023,file)=3D=3DNULL) {
--			fclose(file);
--			continue;
--		}
--		if (strlen(gov)=3D=3D0)
--			strcpy(gov, line);
--		else
--			/* if the governors are inconsistent, warn */
--			if (strcmp(gov, line))
--				ret =3D TUNE_BAD;
--		fclose(file);
--	}
--
--	closedir(dir);
--
--	/* if the governor is set to userspace, also warn */
--	if (strstr(gov, "userspace"))
--		ret =3D TUNE_BAD;
--
--	/* if the governor is set to performance, also warn */
--	/* FIXME: check if this is fair on all cpus */
--	if (strstr(gov, "performance"))
--		ret =3D TUNE_BAD;
--
--	return ret;
--}
--
--void cpufreq_tunable::toggle(void)
--{
--	DIR *dir;
--	struct dirent *dirent;
--	FILE *file;
--	char filename[PATH_MAX];
--	int good;
--	good =3D good_bad();
--
--	system("/sbin/modprobe cpufreq_ondemand > /dev/null 2>&1");
--
--	if (good =3D=3D TUNE_GOOD) {
--		dir =3D opendir("/sys/devices/system/cpu");
--		if (!dir)
--			return;
--
--		while ((dirent =3D readdir(dir))) {
--			if (strncmp(dirent->d_name, "cpu", 3) !=3D 0 || !isdigit(dirent->d_name=
-[3]))
--				continue;
--			sprintf(filename, "/sys/devices/system/cpu/%s/cpufreq/scaling_governor"=
-, dirent->d_name);
--			file =3D fopen(filename, "w");
--			if (!file)
--				continue;
--			fprintf(file, "%s\n", original);
--			fclose(file);
--		}
--
--		closedir(dir);
--		return;
--	}
--	dir =3D opendir("/sys/devices/system/cpu");
--	if (!dir)
--		return;
--
--	while ((dirent =3D readdir(dir))) {
--		if (strncmp(dirent->d_name, "cpu", 3) !=3D 0 || !isdigit(dirent->d_name[=
-3]))
--			continue;
--		sprintf(filename, "/sys/devices/system/cpu/%s/cpufreq/scaling_governor",=
- dirent->d_name);
--		file =3D fopen(filename, "w");
--		if (!file)
--			continue;
--		fprintf(file, "ondemand\n");
--		fclose(file);
--	}
--
--	closedir(dir);
--}
--
--const char *cpufreq_tunable::toggle_script(void) {
--	DIR *dir;
--	struct dirent *dirent;
--	char filename[PATH_MAX];
--	char tmp[4096];
--	struct stat statbuf;
--	int good;
--	good =3D good_bad();
--
--	strcpy(toggle_good, "/sbin/modprobe cpufreq_ondemand > /dev/null 2>&1\n");
--
--	if (good =3D=3D TUNE_GOOD) {
--		dir =3D opendir("/sys/devices/system/cpu");
--		if (!dir)
--			return NULL;
--
--		while ((dirent =3D readdir(dir))) {
--			if (strncmp(dirent->d_name, "cpu", 3) !=3D 0 || !isdigit(dirent->d_name=
-[3]))
--				continue;
--			sprintf(filename, "/sys/devices/system/cpu/%s/cpufreq/scaling_governor"=
-, dirent->d_name);
--			if (stat(filename, &statbuf) =3D=3D -1)
--				continue;
--			sprintf(tmp, "echo '%s' > '%s';\n", original, filename);
--			strcat(toggle_good, tmp);
--		}
--
--		closedir(dir);
--		return toggle_good;
--	}
--
--	dir =3D opendir("/sys/devices/system/cpu");
--	if (!dir)
--		return NULL;
--
--	while ((dirent =3D readdir(dir))) {
--		if (strncmp(dirent->d_name, "cpu", 3) !=3D 0 || !isdigit(dirent->d_name[=
-3]))
--			continue;
--		sprintf(filename, "/sys/devices/system/cpu/%s/cpufreq/scaling_governor",=
- dirent->d_name);
--		if (stat(filename, &statbuf) =3D=3D -1)
--			continue;
--		sprintf(tmp, "echo 'ondemand' > '%s';\n", filename);
--		strcat(toggle_good, tmp);
--	}
--
--	closedir(dir);
--	return toggle_good;
--}
--
--
--void add_cpufreq_tunable(void)
--{
--	class cpufreq_tunable *cf;
--
--	cf =3D new class cpufreq_tunable();
--	all_tunables.push_back(cf);
--}
-diff --git a/src/tuning/cpufreq.h b/src/tuning/cpufreq.h
-deleted file mode 100644
-index 983f813..0000000
---- a/src/tuning/cpufreq.h
-+++ /dev/null
-@@ -1,50 +0,0 @@
--/*
-- * Copyright 2010, Intel Corporation
-- *
-- * This file is part of PowerTOP
-- *
-- * This program file is free software; you can redistribute it and/or modi=
-fy it
-- * under the terms of the GNU General Public License as published by the
-- * Free Software Foundation; version 2 of the License.
-- *
-- * This program is distributed in the hope that it will be useful, but WIT=
-HOUT
-- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-- * for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with this program in a file named COPYING; if not, write to the
-- * Free Software Foundation, Inc,
-- * 51 Franklin Street, Fifth Floor,
-- * Boston, MA 02110-1301 USA
-- * or just google for it.
-- *
-- * Authors:
-- *	Arjan van de Ven <arjan(a)linux.intel.com>
-- */
--#ifndef _INCLUDE_GUARD_CPUFREQ_TUNE_H
--#define _INCLUDE_GUARD_CPUFREQ_TUNE_H
--
--#include <vector>
--
--#include "tunable.h"
--
--using namespace std;
--
--class cpufreq_tunable : public tunable {
--	char original[4096];
--public:
--	cpufreq_tunable(void);
--
--	virtual int good_bad(void);
--
--	virtual void toggle(void);
--
--	virtual const char *toggle_script(void);
--
--};
--
--extern void add_cpufreq_tunable(void);
--
--
--#endif
-diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
-index 0f5bf25..7f6d3ec 100644
---- a/src/tuning/tuning.cpp
-+++ b/src/tuning/tuning.cpp
-@@ -67,7 +67,6 @@ static void init_tuning(void)
- 	add_ethernet_tunable();
- 	add_bt_tunable();
- 	add_wifi_tunables();
--	add_cpufreq_tunable();
- =
+> > >>Power est.  Events/s    Category       Description
+> > >>   8.18 W    100.0%      Device         USB device: Yubico Yubikey II=
+ (Yubico)
+> > >>   8.13 W    100.0%      Device         USB device: Integrated Camera=
+ (Chicony Electronics Co., Ltd.)
+> > =
 
- 	sort_tunables();
- }
+> > having a USB device active also generally makes the CPU/etc use much mo=
+re power,
+> > which Powertop "charges" to the USB device in question.
+> > =
+
+> > 8 Watts sounds entirely reasonable for that to me...
+> =
+
+> Aah, if the CPU gets involved, then yes, it's a bit more possible.
+> So, a simple USB keyboard that's unused can keep one core awake and burn 8
+> watts if something else goes wrong in the kernel to cause that?
+
+So, I just upgraded to 3.11.5, and see things like this below. Can alsa sou=
+nd
+really take 10W when I'm batteries?
+Let me put it another way, it just cannot be correct. Full power use is 15W=
+ and
+if you removed 10W for audio (I'm sure that's wrong) and 3W for wifi (that =
+may be correct)
+it means my quad core laptop is running at 2W with the screen on?
+Not possible at all.
+
+So there has to be a bug in powertop 2.4 USB device power calculation.
+
+For what it's worth, I got the data below right after running
+powertop --calibrate and letting it go through a full cycle.
+
+----------------------------------------------------------------------------
+The battery reports a discharge rate of 15.1 W
+The estimated remaining time is 4 hours, 53 minutes
+
+Summary: 572.4 wakeups/second,  18.3 GPU ops/seconds, 0.0 VFS ops/sec and 8=
+.3% CPU use
+
+Power est.              Usage       Events/s    Category       Description
+  10.5 W    100.0%                      Device         Audio codec alsa:hwC=
+0D0: thinkpad (Realtek)
+  3.10 W      7.0 pkts/s                Device         Network interface: w=
+lan0 (iwlwifi)
+  772 mW     25.1 ms/s     208.4        Process        /usr/bin/enlightenme=
+nt
+ 13.4 mW      1.2 ms/s       8.5        Process        xfce4-terminal -T wi=
+ndow10 --role=3Dwindow10 --tab
+(...)
+----------------------------------------------------------------------------
+
+Calibrate results if that helps:
+gandalfthegreat:~# powertop --calibrate
+Loaded 750 prior measurements
+RAPL device for cpu 0
+RAPL device for cpu 0
+RAPL device for cpu 0
+Starting PowerTOP power estimate calibration =
+
+Calibrating idle
+Calibrating: disk usage =
+
+Calibrating backlight
+.... device /sys/class/backlight/intel_backlight/brightness =
+
+.... device /sys/class/backlight/acpi_video0/brightness =
+
+Calibrating idle
+Calibrating: CPU usage on 1 threads
+Calibrating: CPU usage on 4 threads
+Calibrating: CPU wakeup power consumption
+Calibrating: CPU wakeup power consumption
+Calibrating: CPU wakeup power consumption
+Calibrating USB devices
+.... device /sys/bus/usb/devices/3-1/power/control =
+
+.... device /sys/bus/usb/devices/4-1/power/control =
+
+.... device /sys/bus/usb/devices/usb1/power/control =
+
+.... device /sys/bus/usb/devices/usb2/power/control =
+
+.... device /sys/bus/usb/devices/usb3/power/control =
+
+.... device /sys/bus/usb/devices/usb4/power/control =
+
+.... device /sys/bus/usb/devices/3-1.2/power/control =
+
+.... device /sys/bus/usb/devices/3-1.6/power/control =
+
+Calibrating radio devices
+.... device /sys/class/rfkill/rfkill0/soft =
+
+.... device /sys/class/rfkill/rfkill1/soft =
+
+.... device /sys/class/rfkill/rfkill0/soft =
+
+.... device /sys/class/rfkill/rfkill1/soft =
+
+Finishing PowerTOP power estimate calibration =
+
+Parameters after calibration:
+
+
+Parameter state =
+
+----------------------------------
+Value		Name
+ 2.23		alsa-codec-power (2)
+ 0.37		backlight (3)
+ 3.51		backlight-boost-100 (4)
+ 2.52		backlight-boost-40 (5)
+ 6.65		backlight-boost-80 (6)
+ 0.00		backlight-power (7)
+ 0.21		base power (8)
+ 0.00		cpu-consumption (9)
+ 0.00		cpu-wakeups (10)
+ 0.00		disk-operations (11)
+ 0.00		disk-operations-hard (12)
+ 0.00		eth0-link-100 (13)
+10.93		eth0-link-1000 (14)
+ 0.00		eth0-link-high (15)
+ 0.00		eth0-packets (16)
+ 0.00		eth0-powerunsave (17)
+ 0.00		eth0-up (18)
+ 0.20		gpu-operations (19)
+ 0.00		radio:hci0 (20)
+ 0.00		radio:phy0 (21)
+ 0.31		radio:tpacpi_bluetooth_sw (22)
+ 0.00		runtime-0000:00:00.0 (23)
+ 0.00		runtime-0000:00:02.0 (24)
+ 0.00		runtime-0000:00:14.0 (25)
+ 0.00		runtime-0000:00:16.0 (26)
+ 0.00		runtime-0000:00:16.3 (27)
+ 0.00		runtime-0000:00:19.0 (28)
+ 0.00		runtime-0000:00:1a.0 (29)
+ 0.00		runtime-0000:00:1b.0 (30)
+ 0.00		runtime-0000:00:1c.0 (31)
+ 0.00		runtime-0000:00:1c.1 (32)
+ 0.00		runtime-0000:00:1c.2 (33)
+ 0.00		runtime-0000:00:1d.0 (34)
+ 0.00		runtime-0000:00:1f.0 (35)
+ 0.00		runtime-0000:00:1f.2 (36)
+ 0.00		runtime-0000:00:1f.3 (37)
+ 0.00		runtime-0000:02:00.0 (38)
+ 0.00		runtime-0000:03:00.0 (39)
+ 0.00		thinkpad-fan (40)
+ 0.00		thinkpad-fan-cub (41)
+ 0.00		thinkpad-fan-sqr (42)
+ 0.00		thinkpad-light (43)
+ 0.00		usb-device-0403-6001 (44)
+ 0.00		usb-device-04e8-6860 (45)
+ 0.00		usb-device-04e8-6864 (46)
+ 2.58		usb-device-04f2-b2ea (47)
+ 0.00		usb-device-058f-6387 (48)
+ 0.00		usb-device-091e-0003 (49)
+ 1.34		usb-device-0a5c-21e6 (50)
+ 9.82		usb-device-1050-0010 (51)
+ 0.00		usb-device-18d1-4ee2 (52)
+ 0.00		usb-device-18d1-4ee4 (53)
+ 0.00		usb-device-1d6b-0002 (54)
+ 0.00		usb-device-1d6b-0003 (55)
+ 0.00		usb-device-8087-0024 (56)
+ 0.00		usb0-link-100 (57)
+ 0.00		usb0-link-1000 (58)
+ 0.00		usb0-link-high (59)
+ 0.00		usb0-packets (60)
+ 0.00		usb0-powerunsave (61)
+ 0.00		usb0-up (62)
+ 0.00		vboxnet0-link-100 (63)
+ 0.00		vboxnet0-link-1000 (64)
+ 0.00		vboxnet0-link-high (65)
+ 0.00		vboxnet0-packets (66)
+ 0.00		vboxnet0-powerunsave (67)
+ 0.00		vboxnet0-up (68)
+ 0.00		wlan0-link-100 (69)
+ 0.00		wlan0-link-1000 (70)
+ 0.00		wlan0-link-high (71)
+ 0.00		wlan0-packets (72)
+ 1.64		wlan0-powerunsave (73)
+ 0.00		wlan0-up (74)
+ 0.00		xwakes (75)
+
+Score:    2.6  (104691.5)
+Guess:   13.2
+Actual:  13.6
+----------------------------------
+
+
 -- =
 
-1.7.9.5
+"A mouse is a device used to point at the xterm you want to type in" - A.S.=
+R.
+Microsoft is to operating systems ....
+                                      .... what McDonalds is to gourmet coo=
+king
+Home page: http://marc.merlins.org/ =20
 
-
---===============4745607594565308682==--
+--===============3553752691138025159==--
 
