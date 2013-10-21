@@ -1,49 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============0193583013089838624=="
+Content-Type: multipart/mixed; boundary="===============3021204145565203480=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [Announce] v2.5-rc1
-Date: Tue, 22 Oct 2013 11:16:09 +0300
-Message-ID: <20131022081608.GA2286@swordfish>
-In-Reply-To: 526215F6.50106@fifthhorseman.net
+From: Sanjay Singh Rawat <sanjay.rawat at linaro.org>
+Subject: [Powertop] [PATCH] update source file for android
+Date: Mon, 21 Oct 2013 17:17:46 +0530
+Message-ID: <1382356066-21359-1-git-send-email-sanjay.rawat@linaro.org>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0193583013089838624==
+--===============3021204145565203480==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/19/13 01:17), Daniel Kahn Gillmor wrote:
-> On 10/18/2013 06:33 PM, Yates, Alexandra wrote:
-> > Tested PowerTop different platforms including Linux and Windows.  The f=
-ollowing patch breaks IE compatibility. =
+- these files are missing in the android makefile
 
-> > =
+Signed-off-by: Sanjay Singh Rawat <sanjay.rawat(a)linaro.org>
+---
+ Android.mk |    4 ++++
+ 1 file changed, 4 insertions(+)
 
-> > https://lists.01.org/pipermail/powertop/2013-September/000925.html =
+diff --git a/Android.mk b/Android.mk
+index ec47c4b..cf13fe8 100644
+--- a/Android.mk
++++ b/Android.mk
+@@ -31,6 +31,9 @@ LOCAL_SRC_FILES +=3D \
+ 	src/cpu/cpu_core.cpp \
+ 	src/cpu/cpu_package.cpp \
+ 	src/cpu/abstract_cpu.cpp \
++	src/cpu/cpu_rapl_device.cpp \
++	src/cpu/dram_rapl_device.cpp \
++	src/cpu/rapl/rapl_interface.cpp \
+ 	src/measurement/measurement.cpp \
+ 	src/measurement/acpi.cpp \
+ 	src/measurement/extech.cpp \
+@@ -62,6 +65,7 @@ LOCAL_SRC_FILES +=3D \
+ 	src/devices/backlight.cpp \
+ 	src/devices/network.cpp \
+ 	src/devices/device.cpp \
++	src/devices/gpu_rapl_device.cpp \
+ 	src/devlist.cpp \
+ 	src/calibrate/calibrate.cpp \
+ 	src/lib.cpp \
+-- =
 
-> =
-
-> Can you describe how IE breaks?  what specifically fails?  is there an
-> explicit javascript error or a backtrace or debug log or something?  Is
-> data lost or hidden?
-> =
-
-> sorry, but i don't have IE to test with, or a windows platform to run it
-> on if i did.
-> =
+1.7.9.5
 
 
-ok, classList is not supported by IE10 and older.
-
-so this generates NULL object access:
-
-    var el =3D document.getElementById(idx);
-    if (el)
-      el.classList.add(c);
-
-
-	-ss
-
---===============0193583013089838624==--
+--===============3021204145565203480==--
 
