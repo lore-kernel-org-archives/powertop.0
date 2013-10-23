@@ -1,182 +1,92 @@
-Content-Type: multipart/mixed; boundary="===============7621666575207863559=="
+Content-Type: multipart/mixed; boundary="===============8186252102626714819=="
 MIME-Version: 1.0
-From: Prigent, Christophe <christophe.prigent at intel.com>
-Subject: Re: [Powertop] PowerTop Installation issue
-Date: Wed, 20 Nov 2013 14:15:26 +0000
-Message-ID: <AC81B6AA7676DD448250A85A459C1F412F0CB049@IRSMSX101.ger.corp.intel.com>
-In-Reply-To: F9A26558D30ED241A8204F06F9947260257FADBB@BGSMSX102.gar.corp.intel.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] [Announce] v2.5-rc1
+Date: Wed, 23 Oct 2013 11:32:12 -0700
+Message-ID: <54661.10.24.1.152.1382553132.squirrel@linux.intel.com>
+In-Reply-To: 20131023180039.GC2474@swordfish.minsk.epam.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7621666575207863559==
+--===============8186252102626714819==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Adrip,
 
-I never tried on Android but I think you need to install the NDK, and use t=
-he NDK to build PowerTop.
+> On (10/23/13 09:12), Alexandra Yates wrote:
+>> >>
+>> >> This change enables the menu links and mouse over, but the font and
+>> the
+>> >> button background are all black, I don't think the css are working
+>> here.
+>> >> I will send you the image to your email that way you get to see it.
+>> >>
+>> >
+>> > thanks. well, that's weird. I found rdesktop-ed win box around and
+>> tested
+>> > generated report on IE (don't know the version - 8 or 9). what IE
+>> version
+>> > is on the picture?
+>> >
+>>
+>> You are welcome, what version of IE are you running?
+>>
+>
+> ok. this is really the last one :)
+>
+> I think I found the issue -- textContent support in IE.
+>
+>
+> ---
+>  src/powertop.css | 19 ++++++++++++++-----
+>  1 file changed, 14 insertions(+), 5 deletions(-)
+>
+> diff --git a/src/powertop.css b/src/powertop.css
+> index 6d43e07..ce7dbb2 100644
+> --- a/src/powertop.css
+> +++ b/src/powertop.css
+> @@ -17,20 +17,29 @@ var powertop =3D {
+>   },
+>   cadd: function(idx, c){
+>     var el =3D document.getElementById(idx);
+> -   if (el)
+> -     el.classList.add(c);
+> -
+> +   if (el) {
+> +      var cn =3D el.className;
+> +      if (cn.indexOf(c) !=3D -1)
+> +         return;
+> +      cn +=3D ' ' + c;
+> +      el.className =3D cn;
+> +   }
+>   },
+>   crm: function(id, c){
+>     var el =3D document.getElementById(id);
+> -   if (el)
+> -     el.classList.remove(c);
+> +   if (el) {
+> +      var cn =3D el.className
+> +      while (cn.indexOf(' ' + c) !=3D -1)
+> +         cn =3D cn.replace(' ' + c,'');
+> +      el.className =3D cn;
+> +   }
+>   },
+>   newbutton: function(id, txt) {
+>    var x =3D document.createElement('div');
+>    x.id =3D id + '_button';
+>    x.className =3D 'nav_button';
+>    x.textContent =3D txt;
+> +  x.innerText =3D txt;
+>    x.onclick =3D function() { powertop.toggle(id); };
+>    return x;
+>   },
+>
+>
+YES! that fixes the menu! It works in IE, FF, Chrome :)
 
-It is well documented here: http://developer.android.com/tools/sdk/ndk/inde=
-x.html
+Thank you,
+Alexandra.
 
-Here are simplified steps to give you an idea:
-Place sources + "Android.mk" in your .../project/jni folder
-Build the native code by running $NDK/ndk-build "APP_ABI :=3D x86" script f=
-rom your project directory (APP_ABI :=3D x86 is used for Intel Architecture=
-).
-Then you can build the Android apk, for example, using Eclipse.
-
-Christophe.
-
-From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of Mukher=
-jee, Adrip
-Sent: Wednesday, November 20, 2013 12:33 PM
-To: powertop(a)lists.01.org
-Subject: [Powertop] PowerTop Installation issue
-
-Hi ,
-       This is Adrip from Intel India PCCG group. Recently I was trying to =
-install powertop in my HSW PVT2 system having Android JellyBean internal ve=
-rsion . According to the installation steps listed here:
-
-To build and install PowerTOP type the following commands,
-        ./configure
-        ./make
-        ./make install
-Its failing to configure with a message : "permission denied" even though I=
- have rooted my terminal emulator. Can you please tell me what I need to fo=
-llow to run the powertop tool on Android in a Haswell SDS system.
-
-regards
-Adrip
-
----------------------------------------------------------------------
-Intel Corporation SAS (French simplified joint stock company)
-Registered headquarters: "Les Montalets"- 2, rue de Paris, =
-
-92196 Meudon Cedex, France
-Registration Number:  302 456 199 R.C.S. NANTERRE
-Capital: 4,572,000 Euros
-
-This e-mail and any attachments may contain confidential material for
-the sole use of the intended recipient(s). Any review or distribution
-by others is strictly prohibited. If you are not the intended
-recipient, please contact the sender and delete all copies.
-
---===============7621666575207863559==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
-
-PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
-bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
-YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
-cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
-VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
-bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
-ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTUgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
-PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseToiQ2Ft
-YnJpYSBNYXRoIjsKCXBhbm9zZS0xOjIgNCA1IDMgNSA0IDYgMyAyIDQ7fQpAZm9udC1mYWNlCgl7
-Zm9udC1mYW1pbHk6Q2FsaWJyaTsKCXBhbm9zZS0xOjIgMTUgNSAyIDIgMiA0IDMgMiA0O30KQGZv
-bnQtZmFjZQoJe2ZvbnQtZmFtaWx5OkNvbnNvbGFzOwoJcGFub3NlLTE6MiAxMSA2IDkgMiAyIDQg
-MyAyIDQ7fQpAZm9udC1mYWNlCgl7Zm9udC1mYW1pbHk6Vml2YWxkaTsKCXBhbm9zZS0xOjMgMiA2
-IDIgNSA1IDYgOSA4IDQ7fQovKiBTdHlsZSBEZWZpbml0aW9ucyAqLwpwLk1zb05vcm1hbCwgbGku
-TXNvTm9ybWFsLCBkaXYuTXNvTm9ybWFsCgl7bWFyZ2luOjBpbjsKCW1hcmdpbi1ib3R0b206LjAw
-MDFwdDsKCWZvbnQtc2l6ZToxMS4wcHQ7Cglmb250LWZhbWlseToiQ2FsaWJyaSIsInNhbnMtc2Vy
-aWYiO30KYTpsaW5rLCBzcGFuLk1zb0h5cGVybGluawoJe21zby1zdHlsZS1wcmlvcml0eTo5OTsK
-CWNvbG9yOmJsdWU7Cgl0ZXh0LWRlY29yYXRpb246dW5kZXJsaW5lO30KYTp2aXNpdGVkLCBzcGFu
-Lk1zb0h5cGVybGlua0ZvbGxvd2VkCgl7bXNvLXN0eWxlLXByaW9yaXR5Ojk5OwoJY29sb3I6cHVy
-cGxlOwoJdGV4dC1kZWNvcmF0aW9uOnVuZGVybGluZTt9CnAKCXttc28tc3R5bGUtcHJpb3JpdHk6
-OTk7Cgltc28tbWFyZ2luLXRvcC1hbHQ6YXV0bzsKCW1hcmdpbi1yaWdodDowaW47Cgltc28tbWFy
-Z2luLWJvdHRvbS1hbHQ6YXV0bzsKCW1hcmdpbi1sZWZ0OjBpbjsKCWZvbnQtc2l6ZToxMi4wcHQ7
-Cglmb250LWZhbWlseToiVGltZXMgTmV3IFJvbWFuIiwic2VyaWYiO30Kc3Bhbi5FbWFpbFN0eWxl
-MTgKCXttc28tc3R5bGUtdHlwZTpwZXJzb25hbDsKCWZvbnQtZmFtaWx5OiJDYWxpYnJpIiwic2Fu
-cy1zZXJpZiI7Cgljb2xvcjp3aW5kb3d0ZXh0O30Kc3Bhbi5FbWFpbFN0eWxlMTkKCXttc28tc3R5
-bGUtdHlwZTpwZXJzb25hbC1yZXBseTsKCWZvbnQtZmFtaWx5OiJDYWxpYnJpIiwic2Fucy1zZXJp
-ZiI7Cgljb2xvcjojMUY0OTdEO30KLk1zb0NocERlZmF1bHQKCXttc28tc3R5bGUtdHlwZTpleHBv
-cnQtb25seTsKCWZvbnQtc2l6ZToxMC4wcHQ7fQpAcGFnZSBXb3JkU2VjdGlvbjEKCXtzaXplOjgu
-NWluIDExLjBpbjsKCW1hcmdpbjoxLjBpbiAxLjBpbiAxLjBpbiAxLjBpbjt9CmRpdi5Xb3JkU2Vj
-dGlvbjEKCXtwYWdlOldvcmRTZWN0aW9uMTt9Ci0tPjwvc3R5bGU+PCEtLVtpZiBndGUgbXNvIDld
-Pjx4bWw+CjxvOnNoYXBlZGVmYXVsdHMgdjpleHQ9ImVkaXQiIHNwaWRtYXg9IjEwMjYiIC8+Cjwv
-eG1sPjwhW2VuZGlmXS0tPjwhLS1baWYgZ3RlIG1zbyA5XT48eG1sPgo8bzpzaGFwZWxheW91dCB2
-OmV4dD0iZWRpdCI+CjxvOmlkbWFwIHY6ZXh0PSJlZGl0IiBkYXRhPSIxIiAvPgo8L286c2hhcGVs
-YXlvdXQ+PC94bWw+PCFbZW5kaWZdLS0+CjwvaGVhZD4KPGJvZHkgbGFuZz0iRU4tVVMiIGxpbms9
-ImJsdWUiIHZsaW5rPSJwdXJwbGUiPgo8ZGl2IGNsYXNzPSJXb3JkU2VjdGlvbjEiPgo8cCBjbGFz
-cz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iY29sb3I6IzFGNDk3RCI+SGkgQWRyaXAsPG86cD48
-L286cD48L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iY29sb3I6
-IzFGNDk3RCI+PG86cD4mbmJzcDs8L286cD48L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFs
-Ij48c3BhbiBzdHlsZT0iY29sb3I6IzFGNDk3RCI+SSBuZXZlciB0cmllZCBvbiBBbmRyb2lkIGJ1
-dCBJIHRoaW5rIHlvdSBuZWVkIHRvIGluc3RhbGwgdGhlIE5ESywgYW5kIHVzZSB0aGUgTkRLIHRv
-IGJ1aWxkIFBvd2VyVG9wLjxvOnA+PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1h
-bCI+PHNwYW4gc3R5bGU9ImNvbG9yOiMxRjQ5N0QiPjxvOnA+Jm5ic3A7PC9vOnA+PC9zcGFuPjwv
-cD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImNvbG9yOiMxRjQ5N0QiPkl0IGlz
-IHdlbGwgZG9jdW1lbnRlZCBoZXJlOiA8YSBocmVmPSJodHRwOi8vZGV2ZWxvcGVyLmFuZHJvaWQu
-Y29tL3Rvb2xzL3Nkay9uZGsvaW5kZXguaHRtbCI+Cmh0dHA6Ly9kZXZlbG9wZXIuYW5kcm9pZC5j
-b20vdG9vbHMvc2RrL25kay9pbmRleC5odG1sPC9hPjxvOnA+PC9vOnA+PC9zcGFuPjwvcD4KPHAg
-Y2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImNvbG9yOiMxRjQ5N0QiPjxvOnA+Jm5ic3A7
-PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImNvbG9y
-OiMxRjQ5N0QiPkhlcmUgYXJlIHNpbXBsaWZpZWQgc3RlcHMgdG8gZ2l2ZSB5b3UgYW4gaWRlYTo8
-bzpwPjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJj
-b2xvcjojMUY0OTdEIj5QbGFjZSBzb3VyY2VzICYjNDM7ICYjODIyMDtBbmRyb2lkLm1rJiM4MjIx
-OyBpbiB5b3VyICYjODIzMDsvcHJvamVjdC9qbmkgZm9sZGVyPG86cD48L286cD48L3NwYW4+PC9w
-Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iY29sb3I6IzFGNDk3RCI+QnVpbGQg
-dGhlIG5hdGl2ZSBjb2RlIGJ5IHJ1bm5pbmcgJE5ESy9uZGstYnVpbGQgJnF1b3Q7QVBQX0FCSSA6
-PSB4ODYmcXVvdDsgc2NyaXB0IGZyb20geW91ciBwcm9qZWN0IGRpcmVjdG9yeSAoQVBQX0FCSSA6
-PSB4ODYgaXMgdXNlZCBmb3IgSW50ZWwgQXJjaGl0ZWN0dXJlKS48bzpwPjwvbzpwPjwvc3Bhbj48
-L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJjb2xvcjojMUY0OTdEIj5UaGVu
-IHlvdSBjYW4gYnVpbGQgdGhlIEFuZHJvaWQgYXBrLCBmb3IgZXhhbXBsZSwgdXNpbmcgRWNsaXBz
-ZS48bzpwPjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxl
-PSJjb2xvcjojMUY0OTdEIj48bzpwPiZuYnNwOzwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJN
-c29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJjb2xvcjojMUY0OTdEIj5DaHJpc3RvcGhlLjxvOnA+PC9v
-OnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImNvbG9yOiMx
-RjQ5N0QiPjxvOnA+Jm5ic3A7PC9vOnA+PC9zcGFuPjwvcD4KPGRpdj4KPGRpdiBzdHlsZT0iYm9y
-ZGVyOm5vbmU7Ym9yZGVyLXRvcDpzb2xpZCAjRTFFMUUxIDEuMHB0O3BhZGRpbmc6My4wcHQgMGlu
-IDBpbiAwaW4iPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48Yj5Gcm9tOjwvYj4gUG93ZXJUb3AgW21h
-aWx0bzpwb3dlcnRvcC1ib3VuY2VzQGxpc3RzLjAxLm9yZ10KPGI+T24gQmVoYWxmIE9mIDwvYj5N
-dWtoZXJqZWUsIEFkcmlwPGJyPgo8Yj5TZW50OjwvYj4gV2VkbmVzZGF5LCBOb3ZlbWJlciAyMCwg
-MjAxMyAxMjozMyBQTTxicj4KPGI+VG86PC9iPiBwb3dlcnRvcEBsaXN0cy4wMS5vcmc8YnI+Cjxi
-PlN1YmplY3Q6PC9iPiBbUG93ZXJ0b3BdIFBvd2VyVG9wIEluc3RhbGxhdGlvbiBpc3N1ZTxvOnA+
-PC9vOnA+PC9wPgo8L2Rpdj4KPC9kaXY+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7
-PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5IaSAsPG86cD48L286cD48L3A+CjxwIGNs
-YXNzPSJNc29Ob3JtYWwiPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBUaGlz
-IGlzIEFkcmlwIGZyb20gSW50ZWwgSW5kaWEgUENDRyBncm91cC4gUmVjZW50bHkgSSB3YXMgdHJ5
-aW5nIHRvIGluc3RhbGwgcG93ZXJ0b3AgaW4gbXkgSFNXIFBWVDIgc3lzdGVtIGhhdmluZyBBbmRy
-b2lkIEplbGx5QmVhbiBpbnRlcm5hbCB2ZXJzaW9uIC4gQWNjb3JkaW5nIHRvIHRoZSBpbnN0YWxs
-YXRpb24gc3RlcHMgbGlzdGVkIGhlcmU6CjxvOnA+PC9vOnA+PC9wPgo8cCBzdHlsZT0ibWFyZ2lu
-OjBpbjttYXJnaW4tYm90dG9tOi4wMDAxcHQiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTEuNXB0
-O2ZvbnQtZmFtaWx5OkNvbnNvbGFzO2NvbG9yOiMzMzMzMzMiPlRvIGJ1aWxkIGFuZCBpbnN0YWxs
-IFBvd2VyVE9QIHR5cGUgdGhlIGZvbGxvd2luZyBjb21tYW5kcywKPGJyPgombmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDs8L3NwYW4+PHNwYW4gc3R5bGU9ImZv
-bnQtc2l6ZToxMS41cHQ7Zm9udC1mYW1pbHk6Q29uc29sYXM7Y29sb3I6cmVkIj4uL2NvbmZpZ3Vy
-ZQo8L3NwYW4+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMS41cHQ7Zm9udC1mYW1pbHk6Q29uc29s
-YXM7Y29sb3I6IzMzMzMzMyI+PGJyPgombmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsuL21ha2U8YnI+CiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOy4vbWFrZSBpbnN0YWxsPG86cD48L286cD48L3NwYW4+PC9wPgo8cCBj
-bGFzcz0iTXNvTm9ybWFsIj5JdHMgZmFpbGluZyB0byBjb25maWd1cmUgd2l0aCBhIG1lc3NhZ2Ug
-OiAmIzgyMjA7cGVybWlzc2lvbiBkZW5pZWQmIzgyMjE7IGV2ZW4gdGhvdWdoIEkgaGF2ZSByb290
-ZWQgbXkgdGVybWluYWwgZW11bGF0b3IuIENhbiB5b3UgcGxlYXNlIHRlbGwgbWUgd2hhdCBJIG5l
-ZWQgdG8gZm9sbG93IHRvIHJ1biB0aGUgcG93ZXJ0b3AgdG9vbCBvbiBBbmRyb2lkIGluIGEgSGFz
-d2VsbCBTRFMgc3lzdGVtLjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpw
-PiZuYnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImZvbnQt
-c2l6ZToxMC4wcHQ7Zm9udC1mYW1pbHk6Vml2YWxkaTtjb2xvcjojNDAzMTUyIj5yZWdhcmRzPG86
-cD48L286cD48L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iZm9u
-dC1zaXplOjEwLjBwdDtmb250LWZhbWlseTpWaXZhbGRpO2NvbG9yOiM0MDMxNTIiPkFkcmlwPG86
-cD48L286cD48L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpw
-PjwvcD4KPC9kaXY+CjxwPi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLTxicj4KSW50ZWwgQ29ycG9yYXRpb24gU0FTIChG
-cmVuY2ggc2ltcGxpZmllZCBqb2ludCBzdG9jayBjb21wYW55KTxicj4KUmVnaXN0ZXJlZCBoZWFk
-cXVhcnRlcnM6ICJMZXMgTW9udGFsZXRzIi0gMiwgcnVlIGRlIFBhcmlzLCA8YnI+CjkyMTk2IE1l
-dWRvbiBDZWRleCwgRnJhbmNlPGJyPgpSZWdpc3RyYXRpb24gTnVtYmVyOiZuYnNwOyAzMDIgNDU2
-IDE5OSBSLkMuUy4gTkFOVEVSUkU8YnI+CkNhcGl0YWw6IDQsNTcyLDAwMCBFdXJvczwvcD4KCjxw
-PlRoaXMgZS1tYWlsIGFuZCBhbnkgYXR0YWNobWVudHMgbWF5IGNvbnRhaW4gY29uZmlkZW50aWFs
-IG1hdGVyaWFsIGZvcjxicj4KdGhlIHNvbGUgdXNlIG9mIHRoZSBpbnRlbmRlZCByZWNpcGllbnQo
-cykuIEFueSByZXZpZXcgb3IgZGlzdHJpYnV0aW9uPGJyPgpieSBvdGhlcnMgaXMgc3RyaWN0bHkg
-cHJvaGliaXRlZC4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkPGJyPgpyZWNpcGllbnQsIHBs
-ZWFzZSBjb250YWN0IHRoZSBzZW5kZXIgYW5kIGRlbGV0ZSBhbGwgY29waWVzLjwvcD48L2JvZHk+
-CjwvaHRtbD4K
-
---===============7621666575207863559==--
+--===============8186252102626714819==--
 
