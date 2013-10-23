@@ -1,71 +1,86 @@
-Content-Type: multipart/mixed; boundary="===============1182322964003670563=="
+Content-Type: multipart/mixed; boundary="===============0411241199296907973=="
 MIME-Version: 1.0
-From: Sanjay Singh Rawat <sanjay.rawat at linaro.org>
-Subject: [Powertop] [PATCH] resolve error for overloaded function call
-Date: Mon, 21 Oct 2013 17:19:01 +0530
-Message-ID: <1382356141-21415-1-git-send-email-sanjay.rawat@linaro.org>
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [Announce] v2.5-rc1
+Date: Wed, 23 Oct 2013 21:00:39 +0300
+Message-ID: <20131023180039.GC2474@swordfish.minsk.epam.com>
+In-Reply-To: 63704.10.24.1.152.1382544759.squirrel@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1182322964003670563==
+--===============0411241199296907973==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-- for android receiving compilation error
-rapl_interface.cpp:195:40: error: call of overloaded 'pow(int, uint64_t)' i=
-s ambiguous
+On (10/23/13 09:12), Alexandra Yates wrote:
+> >>
+> >> This change enables the menu links and mouse over, but the font and the
+> >> button background are all black, I don't think the css are working her=
+e.
+> >> I will send you the image to your email that way you get to see it.
+> >>
+> >
+> > thanks. well, that's weird. I found rdesktop-ed win box around and test=
+ed
+> > generated report on IE (don't know the version - 8 or 9). what IE versi=
+on
+> > is on the picture?
+> >
+> =
 
-include/math.h:222:8: note: double pow(double, double).
-stlport/stlport/stl/_cmath.h:453:24: note: float pow(float, float)
+> You are welcome, what version of IE are you running?
+>
 
-Signed-off-by: Sanjay Singh Rawat <sanjay.rawat(a)linaro.org>
+ok. this is really the last one :)
+
+I think I found the issue -- textContent support in IE.
+
+
 ---
- src/cpu/rapl/rapl_interface.cpp |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ src/powertop.css | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/src/cpu/rapl/rapl_interface.cpp b/src/cpu/rapl/rapl_interface.=
-cpp
-index 8f236eb..6dd7b26 100644
---- a/src/cpu/rapl/rapl_interface.cpp
-+++ b/src/cpu/rapl/rapl_interface.cpp
-@@ -192,7 +192,7 @@ double c_rapl_interface::get_power_unit()
- 		return ret;
- 	}
- =
-
--	return (double) 1/pow(2, value & 0xf);
-+	return (double) 1/pow((double)2, (double)(value & 0xf));
- }
- =
-
- double c_rapl_interface::get_energy_status_unit()
-@@ -206,7 +206,7 @@ double c_rapl_interface::get_energy_status_unit()
- 		return ret;
- 	}
- =
-
--	return (double)1/ pow(2, (value & 0x1f00) >> 8);
-+	return (double)1/ pow((double)2, (double)((value & 0x1f00) >> 8));
- }
- =
-
- double c_rapl_interface::get_time_unit()
-@@ -220,7 +220,7 @@ double c_rapl_interface::get_time_unit()
- 		return ret;
- 	}
- =
-
--	return (double)1 / pow(2, (value & 0xf0000) >> 16);
-+	return (double)1 / pow((double)2, (double)((value & 0xf0000) >> 16));
- }
- =
-
- int c_rapl_interface::get_pkg_energy_status(double *status)
--- =
-
-1.7.9.5
+diff --git a/src/powertop.css b/src/powertop.css
+index 6d43e07..ce7dbb2 100644
+--- a/src/powertop.css
++++ b/src/powertop.css
+@@ -17,20 +17,29 @@ var powertop =3D {
+  },
+  cadd: function(idx, c){
+    var el =3D document.getElementById(idx);
+-   if (el)
+-     el.classList.add(c);
+-
++   if (el) {
++      var cn =3D el.className;
++      if (cn.indexOf(c) !=3D -1)
++         return;
++      cn +=3D ' ' + c;
++      el.className =3D cn;
++   }
+  },
+  crm: function(id, c){
+    var el =3D document.getElementById(id);
+-   if (el)
+-     el.classList.remove(c);
++   if (el) {
++      var cn =3D el.className
++      while (cn.indexOf(' ' + c) !=3D -1)
++         cn =3D cn.replace(' ' + c,'');
++      el.className =3D cn;
++   }
+  },
+  newbutton: function(id, txt) {
+   var x =3D document.createElement('div');
+   x.id =3D id + '_button';
+   x.className =3D 'nav_button';
+   x.textContent =3D txt;
++  x.innerText =3D txt;
+   x.onclick =3D function() { powertop.toggle(id); };
+   return x;
+  },
 
 
---===============1182322964003670563==--
+--===============0411241199296907973==--
 
