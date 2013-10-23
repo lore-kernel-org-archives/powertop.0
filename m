@@ -1,83 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============1482107194208525812=="
+Content-Type: multipart/mixed; boundary="===============4799893996506766178=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: [Powertop] [PATCH 2/2] tuningsysfs: use lib process_directory() helper
-Date: Tue, 26 Nov 2013 22:27:10 +0300
-Message-ID: <1385494030-22556-3-git-send-email-sergey.senozhatsky@gmail.com>
-In-Reply-To: 1385494030-22556-1-git-send-email-sergey.senozhatsky@gmail.com
+Subject: Re: [Powertop] [Announce] v2.5-rc1
+Date: Wed, 23 Oct 2013 19:58:06 +0300
+Message-ID: <20131023165805.GB2474@swordfish.minsk.epam.com>
+In-Reply-To: 63704.10.24.1.152.1382544759.squirrel@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1482107194208525812==
+--===============4799893996506766178==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-use process_directory() helper while processing sata tunables.
+On (10/23/13 09:12), Alexandra Yates wrote:
+> >> This change enables the menu links and mouse over, but the font and the
+> >> button background are all black, I don't think the css are working her=
+e.
+> >> I will send you the image to your email that way you get to see it.
+> >>
+> >
+> > thanks. well, that's weird. I found rdesktop-ed win box around and test=
+ed
+> > generated report on IE (don't know the version - 8 or 9). what IE versi=
+on
+> > is on the picture?
+> >
+> >
+> =
 
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+> You are welcome, what version of IE are you running?
+>
+
+ok, last chance. [not tested on IE 8]
+
+could you please try this one?
+
+
 ---
- src/tuning/tuningsysfs.cpp | 33 ++++++++-------------------------
- 1 file changed, 8 insertions(+), 25 deletions(-)
+ src/powertop.css | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-diff --git a/src/tuning/tuningsysfs.cpp b/src/tuning/tuningsysfs.cpp
-index f70dc23..0859a0c 100644
---- a/src/tuning/tuningsysfs.cpp
-+++ b/src/tuning/tuningsysfs.cpp
-@@ -113,34 +113,17 @@ void add_sysfs_tunable(const char *str, const char *_=
-sysfs_path, const char *_ta
- 	all_tunables.push_back(tunable);
- }
- =
-
--void add_sata_tunables(void)
-+static void add_sata_tunables_callback(const char *d_name)
- {
--	struct dirent *entry;
--	DIR *dir;
- 	char filename[4096];
- 	char msg[4096];
- =
-
--	dir =3D opendir("/sys/class/scsi_host");
+diff --git a/src/powertop.css b/src/powertop.css
+index 6d43e07..64f8de2 100644
+--- a/src/powertop.css
++++ b/src/powertop.css
+@@ -17,14 +17,22 @@ var powertop =3D {
+  },
+  cadd: function(idx, c){
+    var el =3D document.getElementById(idx);
+-   if (el)
+-     el.classList.add(c);
 -
--	if (!dir)
--		return;
--
--        while (1) {
--		entry =3D readdir(dir);
--
--		if (!entry)
--			break;
--
--		if (entry->d_name[0] =3D=3D '.')
--			continue;
--
--		sprintf(filename, "/sys/class/scsi_host/%s/link_power_management_policy"=
-, entry->d_name);
--
--	        sprintf(msg, _("Enable SATA link power management for %s"),entry-=
->d_name);
--
--		add_sysfs_tunable(msg, filename,"min_power");
--
--        }
-+	sprintf(filename, "/sys/class/scsi_host/%s/link_power_management_policy",=
- d_name);
-+	sprintf(msg, _("Enable SATA link power management for %s"), d_name);
-+	add_sysfs_tunable(msg, filename,"min_power");
-+}
- =
-
--        closedir(dir);
-+void add_sata_tunables(void)
-+{
-+	process_directory("/sys/class/scsi_host", add_sata_tunables_callback);
- }
--- =
-
-1.8.5.rc3.362.gdf10213.dirty
++   if (el) {
++      var cn =3D el.className;
++      if (cn.indexOf(c) !=3D -1)
++         return;
++      cn +=3D ' ' + c;
++      el.className =3D cn;
++   }
+  },
+  crm: function(id, c){
+    var el =3D document.getElementById(id);
+-   if (el)
+-     el.classList.remove(c);
++   if (el) {
++      var cn =3D el.className
++      while (cn.indexOf(' ' + c) !=3D -1)
++         cn =3D cn.replace(' ' + c,'');
++      el.className =3D cn;
++   }
+  },
+  newbutton: function(id, txt) {
+   var x =3D document.createElement('div');
 
 
---===============1482107194208525812==--
+--===============4799893996506766178==--
 
