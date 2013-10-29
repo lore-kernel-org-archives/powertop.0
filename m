@@ -1,50 +1,104 @@
-Content-Type: multipart/mixed; boundary="===============6917084735671941546=="
+Content-Type: multipart/mixed; boundary="===============4618907583311795278=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: [Powertop] [PATCH 09/10] backlight: decrease backlight() .ctor mem
- usage
-Date: Mon, 14 Oct 2013 11:40:56 +0300
-Message-ID: <1381740057-12499-10-git-send-email-sergey.senozhatsky@gmail.com>
-In-Reply-To: 1381740057-12499-1-git-send-email-sergey.senozhatsky@gmail.com
+Subject: Re: [Powertop] Fix for some 'requesting unregistered parameter'
+Date: Tue, 29 Oct 2013 14:27:02 +0300
+Message-ID: <20131029112701.GA2180@swordfish.minsk.epam.com>
+In-Reply-To: 435649119.17204207.1383038286562.JavaMail.root@redhat.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6917084735671941546==
+--===============4618907583311795278==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
----
- src/devices/backlight.cpp | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+On (10/29/13 05:18), Jaroslav Skarvada wrote:
+> Hi,
+> =
 
-diff --git a/src/devices/backlight.cpp b/src/devices/backlight.cpp
-index ebdebc8..73bdac9 100644
---- a/src/devices/backlight.cpp
-+++ b/src/devices/backlight.cpp
-@@ -41,15 +41,13 @@ using namespace std;
- =
-
- backlight::backlight(const char *_name, const char *path): device()
- {
--	char devname[128];
- 	min_level =3D 0;
- 	max_level =3D 0;
- 	start_level =3D 0;
- 	end_level =3D 0;
- 	strncpy(sysfs_path, path, sizeof(sysfs_path));
- 	register_sysfs_path(sysfs_path);
--	sprintf(devname, "backlight:%s", _name);
--	strncpy(name, devname, sizeof(name));
-+	snprintf(name, sizeof(name) - 1, "backlight:%s", _name);
- 	r_index =3D get_result_index(name);
- 	r_index_power =3D 0;
- }
--- =
-
-1.8.4.679.g0a1a803
+> the attached patch may fix 'requesting unregistered parameter' for cases
+> if e.g NIC was added after calibration
+> =
 
 
---===============6917084735671941546==--
+added to -next. thanks.
+
+	-ss
+
+> regards
+> =
+
+> Jaroslav
+
+> From d1daec6fd9c1d6534d81df1c3c73de9d714b7196 Mon Sep 17 00:00:00 2001
+> From: =3D?UTF-8?q?Jaroslav=3D20=3DC5=3DA0karvada?=3D <jskarvad(a)redhat.c=
+om>
+> Date: Tue, 29 Oct 2013 10:12:12 +0100
+> Subject: [PATCH] network: fixed 'requesting unregistered parameter' if NI=
+C is
+>  added
+> MIME-Version: 1.0
+> Content-Type: text/plain; charset=3DUTF-8
+> Content-Transfer-Encoding: 8bit
+> =
+
+> Signed-off-by: Jaroslav ??karvada <jskarvad(a)redhat.com>
+> ---
+>  src/devices/network.cpp | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+> =
+
+> diff --git a/src/devices/network.cpp b/src/devices/network.cpp
+> index d0827ef..002600b 100644
+> --- a/src/devices/network.cpp
+> +++ b/src/devices/network.cpp
+> @@ -345,11 +345,32 @@ const char * network::device_name(void)
+>  =
+
+>  static void netdev_callback(const char *d_name)
+>  {
+> +	char devname[128];
+> +
+>  	std::string f_name("/sys/class/net/");
+>  	if (strcmp(d_name, "lo") =3D=3D 0)
+>  		return;
+>  =
+
+>  	f_name.append(d_name);
+> +
+> +	sprintf(devname, "%s-up", d_name);
+> +	register_parameter(devname);
+> +
+> +	sprintf(devname, "%s-powerunsave", d_name);
+> +	register_parameter(devname);
+> +
+> +	sprintf(devname, "%s-link-100", d_name);
+> +	register_parameter(devname);
+> +
+> +	sprintf(devname, "%s-link-1000", d_name);
+> +	register_parameter(devname);
+> +
+> +	sprintf(devname, "%s-link-high", d_name);
+> +	register_parameter(devname);
+> +
+> +	sprintf(devname, "%s-packets", d_name);
+> +	register_parameter(devname);
+> +
+>  	network *bl =3D new(std::nothrow) class network(d_name, f_name.c_str());
+>  	if (bl) {
+>  		all_devices.push_back(bl);
+> -- =
+
+> 1.8.3.1
+> =
+
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+
+
+--===============4618907583311795278==--
 
