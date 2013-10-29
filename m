@@ -1,83 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============2146609242430178519=="
+Content-Type: multipart/mixed; boundary="===============7481473071635364192=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH v3 26/31] report: design batery discharge/system
- baseline
-Date: Mon, 18 Nov 2013 12:27:17 -0800
-Message-ID: <1384806442-20294-27-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: 1384806442-20294-1-git-send-email-alexandra.yates@linux.intel.com
+From: =?utf-8?q?Jes=C3=BAs_D_=3Cjesus=2Ediaz=2Evico_at_gmail=2Ecom=3E?=
+Subject: Re: [Powertop] How does powertop deal with multiple executions
+Date: Tue, 29 Oct 2013 16:39:38 +0100
+Message-ID: <CAA3v609vVCum=Q0kFjeix8XTPMQWGsHEK-RrcAaZTBadRQKqEA@mail.gmail.com>
+In-Reply-To: 526FD4C9.2020000@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2146609242430178519==
+--===============7481473071635364192==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Redesigns the header section on Device Power Report to include the
-battery discharge report and system baseline power, while preserving the
-translation macros.
+Facepalm... Thanks!
+El 29/10/2013 16:35, "Arjan van de Ven" <arjan(a)linux.intel.com> escribi=
+=C3=B3:
 
-Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
----
- src/devices/device.cpp |   24 +++++++++++++++++++++++-
- 1 file changed, 23 insertions(+), 1 deletion(-)
+> On 10/29/2013 12:23 AM, Jes=C3=BAs D wrote:
+>
+>> Thank you, Arjan.
+>>
+>> But my question is how does powertop group programs with the same name.
+>>
+>> Unless I'm doing something wrong, I doubt that it is just adding the
+>> power consumption of all the independent executions. I say this because
+>> powertop estimates a
+>> consumption of 335 mW for 500 executions, and a consumption of 364 mW for
+>> 5000. I am configuring the monitorization time with the --time parameter
+>> (with a value long enough
+>> to cover all the 500 or 5000 executions).
+>>
+>> Is it calculating an average then?
+>>
+>>
+>
+> remember Watts are a "Joules per second" measure!
+>
+>
 
-diff --git a/src/devices/device.cpp b/src/devices/device.cpp
-index a916bf6..da595a8 100644
---- a/src/devices/device.cpp
-+++ b/src/devices/device.cpp
-@@ -219,6 +219,7 @@ void show_report_devices(void)
- {
- 	unsigned int i;
- 	int show_power, cols, rows, idx;
-+	double pw;
- =
+--===============7481473071635364192==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
- 	show_power =3D global_power_valid();
- 	sort(all_devices.begin(), all_devices.end(), power_device_sort);
-@@ -241,6 +242,28 @@ void show_report_devices(void)
-         tag_attr title_attr;
-         init_title_attr(&title_attr);
- =
+PHA+RmFjZXBhbG0uLi4gVGhhbmtzITwvcD4KPGRpdiBjbGFzcz0iZ21haWxfcXVvdGUiPkVsIDI5
+LzEwLzIwMTMgMTY6MzUsICZxdW90O0FyamFuIHZhbiBkZSBWZW4mcXVvdDsgJmx0OzxhIGhyZWY9
+Im1haWx0bzphcmphbkBsaW51eC5pbnRlbC5jb20iPmFyamFuQGxpbnV4LmludGVsLmNvbTwvYT4m
+Z3Q7IGVzY3JpYmnzOjxiciB0eXBlPSJhdHRyaWJ1dGlvbiI+PGJsb2NrcXVvdGUgY2xhc3M9Imdt
+YWlsX3F1b3RlIiBzdHlsZT0ibWFyZ2luOjAgMCAwIC44ZXg7Ym9yZGVyLWxlZnQ6MXB4ICNjY2Mg
+c29saWQ7cGFkZGluZy1sZWZ0OjFleCI+Ck9uIDEwLzI5LzIwMTMgMTI6MjMgQU0sIEplc/pzIEQg
+d3JvdGU6PGJyPgo8YmxvY2txdW90ZSBjbGFzcz0iZ21haWxfcXVvdGUiIHN0eWxlPSJtYXJnaW46
+MCAwIDAgLjhleDtib3JkZXItbGVmdDoxcHggI2NjYyBzb2xpZDtwYWRkaW5nLWxlZnQ6MWV4Ij4K
+VGhhbmsgeW91LCBBcmphbi48YnI+Cjxicj4KQnV0IG15IHF1ZXN0aW9uIGlzIGhvdyBkb2VzIHBv
+d2VydG9wIGdyb3VwIHByb2dyYW1zIHdpdGggdGhlIHNhbWUgbmFtZS48YnI+Cjxicj4KVW5sZXNz
+IEkmIzM5O20gZG9pbmcgc29tZXRoaW5nIHdyb25nLCBJIGRvdWJ0IHRoYXQgaXQgaXMganVzdCBh
+ZGRpbmcgdGhlIHBvd2VyIGNvbnN1bXB0aW9uIG9mIGFsbCB0aGUgaW5kZXBlbmRlbnQgZXhlY3V0
+aW9ucy4gSSBzYXkgdGhpcyBiZWNhdXNlIHBvd2VydG9wIGVzdGltYXRlcyBhPGJyPgpjb25zdW1w
+dGlvbiBvZiAzMzUgbVcgZm9yIDUwMCBleGVjdXRpb25zLCBhbmQgYSBjb25zdW1wdGlvbiBvZiAz
+NjQgbVcgZm9yIDUwMDAuIEkgYW0gY29uZmlndXJpbmcgdGhlIG1vbml0b3JpemF0aW9uIHRpbWUg
+d2l0aCB0aGUgLS10aW1lIHBhcmFtZXRlciAod2l0aCBhIHZhbHVlIGxvbmcgZW5vdWdoPGJyPgp0
+byBjb3ZlciBhbGwgdGhlIDUwMCBvciA1MDAwIGV4ZWN1dGlvbnMpLjxicj4KPGJyPgpJcyBpdCBj
+YWxjdWxhdGluZyBhbiBhdmVyYWdlIHRoZW4/PGJyPgo8YnI+CjwvYmxvY2txdW90ZT4KPGJyPgo8
+YnI+CnJlbWVtYmVyIFdhdHRzIGFyZSBhICZxdW90O0pvdWxlcyBwZXIgc2Vjb25kJnF1b3Q7IG1l
+YXN1cmUhPGJyPgo8YnI+CjwvYmxvY2txdW90ZT48L2Rpdj4K
 
-+	/* Add section */
-+	report.add_div(&div_attr);
-+
-+	/* Device Summary */
-+	int summary_size=3D2;
-+        string summary[summary_size];
-+	pw =3D global_joules_consumed();
-+	char buf[32];
-+	if (pw > 0.0001) {
-+		summary[0]=3D __("The battery reports a discharge rate of: ");
-+		summary[1]=3Dstring(fmt_prefix(pw, buf));
-+		summary[1].append(" W");
-+		report.add_summary_list(summary, summary_size);
-+	}
-+
-+	if (show_power) {
-+		summary[0]=3D__("The system baseline power is estimated at: ");
-+		summary[1]=3Dstring(fmt_prefix(get_parameter_value("base power"), buf));
-+		summary[1].append(" W");
-+		report.add_summary_list(summary, summary_size);
-+	}
-+
-         /* Set array of data in row Major order */
- 	string device_data[cols * rows];
- 	device_data[0]=3D __("Usage");
-@@ -283,7 +306,6 @@ void show_report_devices(void)
- 		}
- 	}
- 	/* Report Output */
--	report.add_div(&div_attr);
- 	report.add_title(&title_attr, __("Device Power Report"));
- 	report.add_table(device_data, &std_table_css);
- }
--- =
-
-1.7.9.5
-
-
---===============2146609242430178519==--
+--===============7481473071635364192==--
 
