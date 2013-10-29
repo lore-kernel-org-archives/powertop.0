@@ -1,39 +1,61 @@
-Content-Type: multipart/mixed; boundary="===============5220855556631104254=="
+Content-Type: multipart/mixed; boundary="===============2288559116949547498=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [Announce] v2.5-rc1
-Date: Wed, 23 Oct 2013 19:31:58 +0300
-Message-ID: <20131023163158.GA2474@swordfish.minsk.epam.com>
-In-Reply-To: 63704.10.24.1.152.1382544759.squirrel@linux.intel.com
+From: Jaroslav Skarvada <jskarvad at redhat.com>
+Subject: [Powertop] Fix for some 'requesting unregistered parameter'
+Date: Tue, 29 Oct 2013 05:18:06 -0400
+Message-ID: <435649119.17204207.1383038286562.JavaMail.root@redhat.com>
+In-Reply-To: 277223620.17203495.1383038201970.JavaMail.root@redhat.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5220855556631104254==
+--===============2288559116949547498==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/23/13 09:12), Alexandra Yates wrote:
-> > thanks. well, that's weird. I found rdesktop-ed win box around and test=
-ed
-> > generated report on IE (don't know the version - 8 or 9). what IE versi=
-on
-> > is on the picture?
-> >
-> =
+Hi,
 
-> You are welcome, what version of IE are you running?
-> =
+the attached patch may fix 'requesting unregistered parameter' for cases
+if e.g NIC was added after calibration
 
+regards
 
-v9. report renders just fine. looks like IE v8 specific problem and
-[if so] I'd probably consider reverting the commit -- too much pain.
+Jaroslav
 
+--===============2288559116949547498==
+Content-Type: text/x-patch
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="0001-network-fixed-requesting-unregistered-parameter-if-N.patch"
 
-do you have any chance to check with different IE versions?
+RnJvbSBkMWRhZWM2ZmQ5YzFkNjUzNGQ4MWRmMWMzYzczZGU5ZDcxNGI3MTk2IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiA9P1VURi04P3E/SmFyb3NsYXY9MjA9QzU9QTBrYXJ2YWRhPz0g
+PGpza2FydmFkQHJlZGhhdC5jb20+CkRhdGU6IFR1ZSwgMjkgT2N0IDIwMTMgMTA6MTI6MTIgKzAx
+MDAKU3ViamVjdDogW1BBVENIXSBuZXR3b3JrOiBmaXhlZCAncmVxdWVzdGluZyB1bnJlZ2lzdGVy
+ZWQgcGFyYW1ldGVyJyBpZiBOSUMgaXMKIGFkZGVkCk1JTUUtVmVyc2lvbjogMS4wCkNvbnRlbnQt
+VHlwZTogdGV4dC9wbGFpbjsgY2hhcnNldD1VVEYtOApDb250ZW50LVRyYW5zZmVyLUVuY29kaW5n
+OiA4Yml0CgpTaWduZWQtb2ZmLWJ5OiBKYXJvc2xhdiDFoGthcnZhZGEgPGpza2FydmFkQHJlZGhh
+dC5jb20+Ci0tLQogc3JjL2RldmljZXMvbmV0d29yay5jcHAgfCAyMSArKysrKysrKysrKysrKysr
+KysrKysKIDEgZmlsZSBjaGFuZ2VkLCAyMSBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvc3Jj
+L2RldmljZXMvbmV0d29yay5jcHAgYi9zcmMvZGV2aWNlcy9uZXR3b3JrLmNwcAppbmRleCBkMDgy
+N2VmLi4wMDI2MDBiIDEwMDY0NAotLS0gYS9zcmMvZGV2aWNlcy9uZXR3b3JrLmNwcAorKysgYi9z
+cmMvZGV2aWNlcy9uZXR3b3JrLmNwcApAQCAtMzQ1LDExICszNDUsMzIgQEAgY29uc3QgY2hhciAq
+IG5ldHdvcms6OmRldmljZV9uYW1lKHZvaWQpCiAKIHN0YXRpYyB2b2lkIG5ldGRldl9jYWxsYmFj
+ayhjb25zdCBjaGFyICpkX25hbWUpCiB7CisJY2hhciBkZXZuYW1lWzEyOF07CisKIAlzdGQ6OnN0
+cmluZyBmX25hbWUoIi9zeXMvY2xhc3MvbmV0LyIpOwogCWlmIChzdHJjbXAoZF9uYW1lLCAibG8i
+KSA9PSAwKQogCQlyZXR1cm47CiAKIAlmX25hbWUuYXBwZW5kKGRfbmFtZSk7CisKKwlzcHJpbnRm
+KGRldm5hbWUsICIlcy11cCIsIGRfbmFtZSk7CisJcmVnaXN0ZXJfcGFyYW1ldGVyKGRldm5hbWUp
+OworCisJc3ByaW50ZihkZXZuYW1lLCAiJXMtcG93ZXJ1bnNhdmUiLCBkX25hbWUpOworCXJlZ2lz
+dGVyX3BhcmFtZXRlcihkZXZuYW1lKTsKKworCXNwcmludGYoZGV2bmFtZSwgIiVzLWxpbmstMTAw
+IiwgZF9uYW1lKTsKKwlyZWdpc3Rlcl9wYXJhbWV0ZXIoZGV2bmFtZSk7CisKKwlzcHJpbnRmKGRl
+dm5hbWUsICIlcy1saW5rLTEwMDAiLCBkX25hbWUpOworCXJlZ2lzdGVyX3BhcmFtZXRlcihkZXZu
+YW1lKTsKKworCXNwcmludGYoZGV2bmFtZSwgIiVzLWxpbmstaGlnaCIsIGRfbmFtZSk7CisJcmVn
+aXN0ZXJfcGFyYW1ldGVyKGRldm5hbWUpOworCisJc3ByaW50ZihkZXZuYW1lLCAiJXMtcGFja2V0
+cyIsIGRfbmFtZSk7CisJcmVnaXN0ZXJfcGFyYW1ldGVyKGRldm5hbWUpOworCiAJbmV0d29yayAq
+YmwgPSBuZXcoc3RkOjpub3Rocm93KSBjbGFzcyBuZXR3b3JrKGRfbmFtZSwgZl9uYW1lLmNfc3Ry
+KCkpOwogCWlmIChibCkgewogCQlhbGxfZGV2aWNlcy5wdXNoX2JhY2soYmwpOwotLSAKMS44LjMu
+MQoK
 
-	-ss
-
-
---===============5220855556631104254==--
+--===============2288559116949547498==--
 
