@@ -1,185 +1,107 @@
-Content-Type: multipart/mixed; boundary="===============2709721769963417545=="
+Content-Type: multipart/mixed; boundary="===============3131824773627761780=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [BUG] powertop shows estimates only for 1st battery
- from 2
-Date: Fri, 11 Oct 2013 11:43:14 +0300
-Message-ID: <20131011084314.GB2781@swordfish.minsk.epam.com>
-In-Reply-To: CAGbmdnUmtnXqpw6JaZpkJEf_TZ_OrVdHZ=PL4sLXpphqczvL3A@mail.gmail.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH 05/29] report-csv: title, div, logo, header
+Date: Wed, 30 Oct 2013 14:20:56 -0700
+Message-ID: <1383168080-18233-6-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1383168080-18233-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2709721769963417545==
+--===============3131824773627761780==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/11/13 11:22), Maksim Melnikau wrote:
-> # powertop, Overview page, when first battery discharged
-> The battery reports a discharge rate of 7.54 W
-> The estimated remaining time is 5 hours, 28 minutes
-> =
+Implements csv report functionality to add title, division, header,
+and logo.
 
-> So, from the beginning I'm expecting to see not 2.5h estimate, and
-> later 5.5h. But smth like 8h from the beginning.
-
-could you please try the following patch.
-
-/* just for testing. w/o commit message and credits at the momemnt. */
-
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
-
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
 ---
+ src/report/report-formatter-csv.cpp |   39 +++++++++++++++++++++++++++++++=
+++++
+ src/report/report-formatter-csv.h   |    8 +++++++
+ 2 files changed, 47 insertions(+)
 
- src/measurement/measurement.cpp | 23 ++++++-----------------
- src/measurement/measurement.h   | 24 +++++++++++++++++-------
- src/measurement/sysfs.cpp       |  7 ++++---
- 3 files changed, 27 insertions(+), 27 deletions(-)
-
-diff --git a/src/measurement/measurement.cpp b/src/measurement/measurement.=
-cpp
-index 0b68940..8aea3a8 100644
---- a/src/measurement/measurement.cpp
-+++ b/src/measurement/measurement.cpp
-@@ -54,23 +54,6 @@ double power_meter::joules_consumed(void)
- 	return 0.0;
- }
- =
-
--double power_meter::time_left(void)
--{
--	double cap, rate;
--
--	cap =3D dev_capacity();
--	rate =3D joules_consumed();
--
--	if (cap < 0.001)
--		return 0.0;
--
--	/* return 0.0 instead of INF+ */
--	if (rate < 0.001)
--		return 0.0;
--
--	return cap / rate;
--}
--
- vector<class power_meter *> power_meters;
- =
-
- void start_power_measurement(void)
-@@ -101,13 +84,19 @@ double global_joules_consumed(void)
- =
-
- double global_time_left(void)
+diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-format=
+ter-csv.cpp
+index cd70d91..bd9dfd3 100644
+--- a/src/report/report-formatter-csv.cpp
++++ b/src/report/report-formatter-csv.cpp
+@@ -222,3 +222,42 @@ report_formatter_csv::set_cpu_number(int nr UNUSED)
  {
-+	bool global_discharging =3D false;
- 	double total_capacity =3D 0.0;
- 	double total_rate =3D 0.0;
- 	unsigned int i;
- 	for (i =3D 0; i < power_meters.size(); i++) {
-+		global_discharging |=3D power_meters[i]->is_discharging();
- 		total_capacity +=3D power_meters[i]->dev_capacity();
- 		total_rate +=3D power_meters[i]->joules_consumed();
- 	}
-+	/* report global time left if at least one battery is discharging */
-+	if (!global_discharging)
-+		return 0.0;
-+
- 	/* return 0.0 instead of INF+ */
- 	if (total_rate < 0.001)
- 		return 0.0;
-diff --git a/src/measurement/measurement.h b/src/measurement/measurement.h
-index 5bcd8e2..83ffc34 100644
---- a/src/measurement/measurement.h
-+++ b/src/measurement/measurement.h
-@@ -30,18 +30,29 @@
- using namespace std;
- =
-
- class power_meter {
-+	bool discharging;
- public:
-+	virtual ~power_meter() {};
-+
- 	virtual void start_measurement(void);
- 	virtual void end_measurement(void);
--
- 	virtual double joules_consumed(void);
--	virtual double dev_capacity(void) { return 0.0;};  /* in Joules */
- =
-
--	virtual double time_left(void);
-+	virtual double dev_capacity(void)
-+	{
-+		return 0.0; /* in Joules */
-+	}
- =
-
--	virtual ~power_meter() {};
--};
-+	virtual void set_discharging(bool d)
-+	{
-+		discharging =3D d;
-+	}
- =
-
-+	virtual bool is_discharging()
-+	{
-+		return discharging;
-+	}
-+};
- =
-
- extern vector<class power_meter *> power_meters;
- =
-
-@@ -53,7 +64,6 @@ extern double global_time_left(void);
- extern void detect_power_meters(void);
- extern void extech_power_meter(const char *devnode);
- =
-
--
- extern double min_power;
- =
-
--#endif
-\ No newline at end of file
-+#endif
-diff --git a/src/measurement/sysfs.cpp b/src/measurement/sysfs.cpp
-index 66cb1cd..ed42ed4 100644
---- a/src/measurement/sysfs.cpp
-+++ b/src/measurement/sysfs.cpp
-@@ -126,11 +126,13 @@ void sysfs_power_meter::measure()
- =
-
- 	rate =3D 0.0;
- 	capacity =3D 0.0;
-+	this->set_discharging(false);
- =
-
- 	if (!is_present())
- 		return;
--	if (read_sysfs_string("/sys/class/power_supply/%s/status", name) !=3D "Di=
-scharging")
--		return;
-+	/** do not jump over. we may have discharging battery */
-+	if (read_sysfs_string("/sys/class/power_supply/%s/status", name) =3D=3D "=
-Discharging")
-+		this->set_discharging(true);
- =
-
- 	got_rate =3D set_rate_from_power();
- 	got_capacity =3D set_capacity_from_energy();
-@@ -146,7 +148,6 @@ void sysfs_power_meter::measure()
- 	}
+ 	/* Do nothing */
  }
++
++/* Report Style */
++void
++report_formatter_csv::add_header()
++{
++	add_exact("\n=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D\n");
++}
++
++void
++report_formatter_csv::end_hheader()
++{
++	/* Do nothing */
++}
++
++void
++report_formatter_csv::add_logo()
++{
++	add_exact("\t\t\tP o w e r T o p\n");
++}
++
++
++void
++report_formatter_csv::add_div(struct tag_attr * div_attr)
++{
++	add_exact("\n");
++}
++
++void
++report_formatter_csv::end_div()
++{
++	/*Do nothing*/
++}
++
++void
++report_formatter_csv::add_title(struct tag_attr *title_att, const char *ti=
+tle)
++{
++	add_exact("______________________________________________________________=
+______\n");
++	addf_exact(" *  *  *   %s   *  *  *\n", title);
++}
+diff --git a/src/report/report-formatter-csv.h b/src/report/report-formatte=
+r-csv.h
+index 8dd2976..2c1c0fd 100644
+--- a/src/report/report-formatter-csv.h
++++ b/src/report/report-formatter-csv.h
+@@ -71,6 +71,14 @@ public:
  =
 
--
- void sysfs_power_meter::end_measurement(void)
- {
- 	measure();
+ 	void set_cpu_number(int nr);
+ =
+
++	/* Report Style */
++	void add_logo();
++	void add_header();
++	void end_hheader();
++	void add_div(struct tag_attr *div_attr);
++	void end_div();
++	void add_title(struct tag_attr *title_att, const char *title);
++
+ private:
+ 	void add_doc_header();
+ =
+
+-- =
+
+1.7.9.5
 
 
---===============2709721769963417545==--
+--===============3131824773627761780==--
 
