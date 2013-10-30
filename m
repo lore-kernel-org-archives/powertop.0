@@ -1,203 +1,123 @@
-Content-Type: multipart/mixed; boundary="===============5477042797358300814=="
+Content-Type: multipart/mixed; boundary="===============4766992016408869607=="
 MIME-Version: 1.0
 From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH 09/29] report-html: Table generation
-Date: Wed, 30 Oct 2013 14:21:00 -0700
-Message-ID: <1383168080-18233-10-git-send-email-alexandra.yates@linux.intel.com>
+Subject: [Powertop] [PATCH 03/29] html-report: add title and div tags
+Date: Wed, 30 Oct 2013 14:20:54 -0700
+Message-ID: <1383168080-18233-4-git-send-email-alexandra.yates@linux.intel.com>
 In-Reply-To: 1383168080-18233-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5477042797358300814==
+--===============4766992016408869607==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Generates modular html tables using table_size, css_attributes,
-and a set of data. The data is stored in a single dimesional array,
-using row major order.
+Implements add_title and add_div methods that pass css attributes for
+modular styling.
 
 Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
 ---
- src/report/report-data-html.h        |   18 +++++++++++
- src/report/report-formatter-html.cpp |   59 ++++++++++++++++++++++++++++++=
-+---
- src/report/report-formatter-html.h   |    9 ++++--
- 3 files changed, 79 insertions(+), 7 deletions(-)
+ src/report/report-data-html.h        |    4 ++++
+ src/report/report-formatter-html.cpp |   33 ++++++++++++++++++++++++++++++=
++++
+ src/report/report-formatter-html.h   |    5 ++++-
+ 3 files changed, 41 insertions(+), 1 deletion(-)
+ create mode 100644 src/report/report-data-html.h
 
 diff --git a/src/report/report-data-html.h b/src/report/report-data-html.h
-index 70ccbdb..282d8b5 100644
---- a/src/report/report-data-html.h
+new file mode 100644
+index 0000000..70ccbdb
+--- /dev/null
 +++ b/src/report/report-data-html.h
-@@ -2,3 +2,21 @@ struct tag_attr {
- 	const char *css_class;
- 	const char *css_id;
- };
-+/* T:Top, L:Left, TL:Top-Left, TLC: Top-Left-Center */
-+enum position { T, L, TL, TC, TLC };
-+
-+struct table_attributes {
-+	const char *table_class;
-+	const char *td_class;
-+	const char *tr_class;
-+	const char *th_class;
-+	position pos_table_title;
-+	int title_mod;
+@@ -0,0 +1,4 @@
++struct tag_attr {
++	const char *css_class;
++	const char *css_id;
 +};
-+
-+
-+struct table_size {
-+	int rows;
-+	int cols;
-+};
-+
 diff --git a/src/report/report-formatter-html.cpp b/src/report/report-forma=
 tter-html.cpp
-index 8038181..5920d9c 100644
+index 79a0c35..db21c8c 100644
 --- a/src/report/report-formatter-html.cpp
 +++ b/src/report/report-formatter-html.cpp
-@@ -420,10 +420,10 @@ report_formatter_html::end_paragraph()
- =
-
- /* ***********************************************************************=
-* */
- =
-
--std::string
-+string
- report_formatter_html::escape_string(const char *str)
- {
--	std::string res;
-+	string res;
- =
-
- 	assert(str);
- =
-
-@@ -486,8 +486,8 @@ report_formatter_html::end_hheader()
- void
- report_formatter_html::add_div(struct tag_attr * div_attr)
- {
--	std::string empty=3D"";
--	std::string tmp_str;
-+	string empty=3D"";
-+	string tmp_str;
- =
-
- 	if (div_attr->css_class =3D=3D empty && div_attr->css_id =3D=3D empty)
- 	add_exact("<div>\n");
-@@ -521,7 +521,7 @@ report_formatter_html::add_navigation()
+@@ -464,6 +464,8 @@ report_formatter_html::set_cpu_number(int nr)
+ 	cpu_nr =3D nr;
  }
  =
 
++
++/* Report Style */
  void
--report_formatter_html::add_summary_list(std::string *list, int size)
-+report_formatter_html::add_summary_list(string *list, int size)
+ report_formatter_html::add_logo()
  {
- 	int i;
- 	add_exact("<div><br/> <ul>\n");
-@@ -532,3 +532,52 @@ report_formatter_html::add_summary_list(std::string *l=
-ist, int size)
- 	add_exact("</ul> </div> <br />\n");
+@@ -481,3 +483,34 @@ report_formatter_html::end_hheader()
+ {
+ 	add_exact("</header>\n\n");
  }
- =
-
++void
++report_formatter_html::add_div(struct tag_attr * div_attr)
++{
++	std::string empty=3D"";
++	std::string tmp_str;
++
++	if (div_attr->css_class =3D=3D empty && div_attr->css_id =3D=3D empty)
++	add_exact("<div>\n");
++
++	else if (div_attr->css_class =3D=3D empty && div_attr->css_id !=3D empty)
++	addf_exact("<div id=3D\"%s\">\n", div_attr->css_id);
++
++	else if (div_attr->css_class !=3D empty && div_attr->css_id =3D=3D empty)
++	addf_exact("<div class=3D\"%s\">\n", div_attr->css_class);
++
++	else if (div_attr->css_class !=3D empty && div_attr->css_id !=3D empty)
++	addf_exact("<div class=3D\"%s\" id=3D\"%s\">\n", div_attr->css_class, div=
+_attr->css_id);
++}
 +
 +void
-+report_formatter_html::add_table(string *system_data, struct table_size *s=
-ize, struct table_attributes* tb_attr)
++report_formatter_html::end_div()
 +{
-+	int i, j;
-+	int offset=3D0;
-+	string  empty=3D"";
++	add_exact("</div>\n");
++}
 +
-+	if (tb_attr->table_class =3D=3D empty)
-+		add_exact("<table>\n");
-+	else
-+		addf_exact("<table class=3D\"%s\">\n", tb_attr->table_class);
-+
-+	for (i=3D0; i < size->rows; i++){
-+		if (tb_attr->tr_class =3D=3D empty)
-+			add_exact("<tr> ");
-+		else
-+			addf_exact("<tr class=3D\"%s\"> ", tb_attr->tr_class);
-+
-+		for (j=3D0; j < size->cols; j++){
-+			offset =3D i * (size->cols) + j;
-+
-+			if (tb_attr->pos_table_title =3D=3D T &&  i=3D=3D0)
-+				addf_exact("<th class=3D\"%s\"> %s </th> ",
-+				tb_attr->th_class,system_data[offset].c_str());
-+			else if (tb_attr->pos_table_title =3D=3D L &&  j=3D=3D0)
-+				addf_exact("<th class=3D\"%s\"> %s </th> ",
-+				tb_attr->th_class, system_data[offset].c_str());
-+			else if (tb_attr->pos_table_title =3D=3D TL && ( i=3D=3D0 || j=3D=3D0 ))
-+				addf_exact("<th class=3D\"%s\"> %s </th> ",
-+				tb_attr->th_class, system_data[offset].c_str());
-+			else if (tb_attr->pos_table_title =3D=3D TC && ((i % tb_attr->title_mod=
- ) =3D=3D 0))
-+				addf_exact("<th class=3D\"%s\"> %s </th> ", tb_attr->th_class,
-+					system_data[offset].c_str());
-+			else if (tb_attr->pos_table_title =3D=3D TLC && ((i % tb_attr->title_mo=
-d) =3D=3D 0 || j=3D=3D0))
-+				addf_exact("<th class=3D\"%s\"> %s </th> ", tb_attr->th_class,
-+				system_data[offset].c_str());
-+			else
-+				if ( tb_attr->td_class =3D=3D empty)
-+					addf_exact("<td > %s </td> ", system_data[offset].c_str());
-+				else
-+					addf_exact("<td class=3D\"%s\"> %s </td> ", tb_attr->td_class,
-+						system_data[offset].c_str());
-+		}
-+		add_exact("</tr>\n");
-+	}
-+	add_exact("</table>\n");
++void
++report_formatter_html::add_title(struct tag_attr *title_att, const char *t=
+itle)
++{
++	addf_exact("<h2 class=3D\"%s\"> %s </h2>\n", title_att->css_class, title);
 +}
 +
 diff --git a/src/report/report-formatter-html.h b/src/report/report-formatt=
 er-html.h
-index 261e0dd..d625ced 100644
+index 1ade760..0f508d3 100644
 --- a/src/report/report-formatter-html.h
 +++ b/src/report/report-formatter-html.h
-@@ -30,6 +30,9 @@
+@@ -29,7 +29,7 @@
+ #include <string>
  =
 
  #include "report-formatter-base.h"
- #include "report-data-html.h"
-+
-+using namespace std;
-+
+-
++#include "report-data-html.h"
  /* Whether to replace " and ' in HTML by &quot; and &apos; respectively */
  /*#define REPORT_HTML_ESCAPE_QUOTES*/
  =
 
-@@ -90,7 +93,9 @@ public:
- 	void end_div();
- 	void add_title(struct tag_attr *title_att, const char *title);
- 	void add_navigation();
--	void add_summary_list(std::string *list, int size);
-+	void add_summary_list(string *list, int size);
-+	void add_table(string *system_data, struct table_size *size,
-+			struct table_attributes *tb_attr);
+@@ -86,6 +86,9 @@ public:
+ 	void add_logo();
+ 	void add_header();
+ 	void end_hheader();
++	void add_div(struct tag_attr *div_attr);
++	void end_div();
++	void add_title(struct tag_attr *title_att, const char *title);
  =
 
  private:
  	/* Document structure related functions */
-@@ -113,7 +118,7 @@ private:
- 	void add_doc_header();
- 	void add_doc_footer();
- =
-
--	std::string escape_string(const char *str);
-+	string escape_string(const char *str);
- =
-
- 	html_section sections[SECTION_MAX];
- 	html_table tables[TABLE_MAX];
 -- =
 
 1.7.9.5
 
 
---===============5477042797358300814==--
+--===============4766992016408869607==--
 
