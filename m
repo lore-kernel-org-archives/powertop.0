@@ -1,159 +1,203 @@
-Content-Type: multipart/mixed; boundary="===============8886396617935738760=="
+Content-Type: multipart/mixed; boundary="===============5477042797358300814=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] intel_cpus: add support for
- Silvermont/Baytrail-M CPU
-Date: Wed, 09 Oct 2013 12:21:38 +0300
-Message-ID: <20131009092138.GA2210@swordfish.datadirectnet.com>
-In-Reply-To: 1381276268-23515-1-git-send-email-kristen@linux.intel.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH 09/29] report-html: Table generation
+Date: Wed, 30 Oct 2013 14:21:00 -0700
+Message-ID: <1383168080-18233-10-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1383168080-18233-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8886396617935738760==
+--===============5477042797358300814==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/08/13 16:51), Kristen Carlson Accardi wrote:
-> ---
->  src/cpu/intel_cpus.cpp | 24 ++++++++++++++++++++++--
->  src/cpu/intel_cpus.h   |  3 +++
->  2 files changed, 25 insertions(+), 2 deletions(-)
+Generates modular html tables using table_size, css_attributes,
+and a set of data. The data is stored in a single dimesional array,
+using row major order.
 
-merged to -next
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+---
+ src/report/report-data-html.h        |   18 +++++++++++
+ src/report/report-formatter-html.cpp |   59 ++++++++++++++++++++++++++++++=
++---
+ src/report/report-formatter-html.h   |    9 ++++--
+ 3 files changed, 79 insertions(+), 7 deletions(-)
 
-	-ss
+diff --git a/src/report/report-data-html.h b/src/report/report-data-html.h
+index 70ccbdb..282d8b5 100644
+--- a/src/report/report-data-html.h
++++ b/src/report/report-data-html.h
+@@ -2,3 +2,21 @@ struct tag_attr {
+ 	const char *css_class;
+ 	const char *css_id;
+ };
++/* T:Top, L:Left, TL:Top-Left, TLC: Top-Left-Center */
++enum position { T, L, TL, TC, TLC };
++
++struct table_attributes {
++	const char *table_class;
++	const char *td_class;
++	const char *tr_class;
++	const char *th_class;
++	position pos_table_title;
++	int title_mod;
++};
++
++
++struct table_size {
++	int rows;
++	int cols;
++};
++
+diff --git a/src/report/report-formatter-html.cpp b/src/report/report-forma=
+tter-html.cpp
+index 8038181..5920d9c 100644
+--- a/src/report/report-formatter-html.cpp
++++ b/src/report/report-formatter-html.cpp
+@@ -420,10 +420,10 @@ report_formatter_html::end_paragraph()
+ =
 
-> diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
-> index 5b2e205..3348dba 100644
-> --- a/src/cpu/intel_cpus.cpp
-> +++ b/src/cpu/intel_cpus.cpp
-> @@ -54,6 +54,7 @@ static int intel_cpu_models[] =3D {
->  	0x3A,   /* IVB */
->  	0x3C,
->  	0x3D,	/* IVB Xeon */
-> +	0x37,	/* BYT-M */
->  	0	/* last entry must be zero */
->  };
->  =
+ /* ***********************************************************************=
+* */
+ =
 
-> @@ -96,7 +97,12 @@ nhm_core::nhm_core(int model)
->  			has_c2c7_res =3D 1;
->  	}
->  =
+-std::string
++string
+ report_formatter_html::escape_string(const char *str)
+ {
+-	std::string res;
++	string res;
+ =
 
-> -	has_c3_res =3D 1;
-> +	/* BYT-M does not support C3/C4 */
-> +	if (model =3D=3D 0x37) {
-> +		has_c3_res =3D 0;
-> +		has_c1_res =3D 1;
-> +	} else
-> +		has_c3_res =3D 1;
->  }
->  =
+ 	assert(str);
+ =
 
->  void nhm_core::measurement_start(void)
-> @@ -109,6 +115,8 @@ void nhm_core::measurement_start(void)
->  =
+@@ -486,8 +486,8 @@ report_formatter_html::end_hheader()
+ void
+ report_formatter_html::add_div(struct tag_attr * div_attr)
+ {
+-	std::string empty=3D"";
+-	std::string tmp_str;
++	string empty=3D"";
++	string tmp_str;
+ =
 
->  	last_stamp =3D 0;
->  =
+ 	if (div_attr->css_class =3D=3D empty && div_attr->css_id =3D=3D empty)
+ 	add_exact("<div>\n");
+@@ -521,7 +521,7 @@ report_formatter_html::add_navigation()
+ }
+ =
 
-> +	if (this->has_c1_res)
-> +		c1_before =3D get_msr(first_cpu, MSR_CORE_C1_RESIDENCY);
->  	if (this->has_c3_res)
->  		c3_before    =3D get_msr(first_cpu, MSR_CORE_C3_RESIDENCY);
->  	c6_before    =3D get_msr(first_cpu, MSR_CORE_C6_RESIDENCY);
-> @@ -116,6 +124,8 @@ void nhm_core::measurement_start(void)
->  		c7_before    =3D get_msr(first_cpu, MSR_CORE_C7_RESIDENCY);
->  	tsc_before   =3D get_msr(first_cpu, MSR_TSC);
->  =
+ void
+-report_formatter_html::add_summary_list(std::string *list, int size)
++report_formatter_html::add_summary_list(string *list, int size)
+ {
+ 	int i;
+ 	add_exact("<div><br/> <ul>\n");
+@@ -532,3 +532,52 @@ report_formatter_html::add_summary_list(std::string *l=
+ist, int size)
+ 	add_exact("</ul> </div> <br />\n");
+ }
+ =
 
-> +	if (this->has_c1_res)
-> +		insert_cstate("core c1", "C1 (cc1)", 0, c1_before, 1);
->  	if (this->has_c3_res)
->  		insert_cstate("core c3", "C3 (cc3)", 0, c3_before, 1);
->  	insert_cstate("core c6", "C6 (cc6)", 0, c6_before, 1);
-> @@ -149,6 +159,8 @@ void nhm_core::measurement_end(void)
->  	uint64_t time_delta;
->  	double ratio;
->  =
++
++void
++report_formatter_html::add_table(string *system_data, struct table_size *s=
+ize, struct table_attributes* tb_attr)
++{
++	int i, j;
++	int offset=3D0;
++	string  empty=3D"";
++
++	if (tb_attr->table_class =3D=3D empty)
++		add_exact("<table>\n");
++	else
++		addf_exact("<table class=3D\"%s\">\n", tb_attr->table_class);
++
++	for (i=3D0; i < size->rows; i++){
++		if (tb_attr->tr_class =3D=3D empty)
++			add_exact("<tr> ");
++		else
++			addf_exact("<tr class=3D\"%s\"> ", tb_attr->tr_class);
++
++		for (j=3D0; j < size->cols; j++){
++			offset =3D i * (size->cols) + j;
++
++			if (tb_attr->pos_table_title =3D=3D T &&  i=3D=3D0)
++				addf_exact("<th class=3D\"%s\"> %s </th> ",
++				tb_attr->th_class,system_data[offset].c_str());
++			else if (tb_attr->pos_table_title =3D=3D L &&  j=3D=3D0)
++				addf_exact("<th class=3D\"%s\"> %s </th> ",
++				tb_attr->th_class, system_data[offset].c_str());
++			else if (tb_attr->pos_table_title =3D=3D TL && ( i=3D=3D0 || j=3D=3D0 ))
++				addf_exact("<th class=3D\"%s\"> %s </th> ",
++				tb_attr->th_class, system_data[offset].c_str());
++			else if (tb_attr->pos_table_title =3D=3D TC && ((i % tb_attr->title_mod=
+ ) =3D=3D 0))
++				addf_exact("<th class=3D\"%s\"> %s </th> ", tb_attr->th_class,
++					system_data[offset].c_str());
++			else if (tb_attr->pos_table_title =3D=3D TLC && ((i % tb_attr->title_mo=
+d) =3D=3D 0 || j=3D=3D0))
++				addf_exact("<th class=3D\"%s\"> %s </th> ", tb_attr->th_class,
++				system_data[offset].c_str());
++			else
++				if ( tb_attr->td_class =3D=3D empty)
++					addf_exact("<td > %s </td> ", system_data[offset].c_str());
++				else
++					addf_exact("<td class=3D\"%s\"> %s </td> ", tb_attr->td_class,
++						system_data[offset].c_str());
++		}
++		add_exact("</tr>\n");
++	}
++	add_exact("</table>\n");
++}
++
+diff --git a/src/report/report-formatter-html.h b/src/report/report-formatt=
+er-html.h
+index 261e0dd..d625ced 100644
+--- a/src/report/report-formatter-html.h
++++ b/src/report/report-formatter-html.h
+@@ -30,6 +30,9 @@
+ =
 
-> +	if (this->has_c1_res)
-> +		c1_after =3D get_msr(first_cpu, MSR_CORE_C1_RESIDENCY);
->  	if (this->has_c3_res)
->  		c3_after    =3D get_msr(first_cpu, MSR_CORE_C3_RESIDENCY);
->  	c6_after    =3D get_msr(first_cpu, MSR_CORE_C6_RESIDENCY);
-> @@ -156,6 +168,8 @@ void nhm_core::measurement_end(void)
->  		c7_after    =3D get_msr(first_cpu, MSR_CORE_C7_RESIDENCY);
->  	tsc_after   =3D get_msr(first_cpu, MSR_TSC);
->  =
+ #include "report-formatter-base.h"
+ #include "report-data-html.h"
++
++using namespace std;
++
+ /* Whether to replace " and ' in HTML by &quot; and &apos; respectively */
+ /*#define REPORT_HTML_ESCAPE_QUOTES*/
+ =
 
-> +	if (this->has_c1_res)
-> +		finalize_cstate("core c1", 0, c1_after, 1);
->  	if (this->has_c3_res)
->  		finalize_cstate("core c3", 0, c3_after, 1);
->  	finalize_cstate("core c6", 0, c6_after, 1);
-> @@ -241,12 +255,18 @@ nhm_package::nhm_package(int model)
->  		case 0x2D:	/* SNB Xeon */
->  		case 0x3A:      /* IVB */
->  		case 0x3C:
-> +		case 0x37:
->  		case 0x3D:      /* IVB Xeon */
->  		case 0x45:
->  			has_c2c7_res =3D 1;
->  	}
->  =
+@@ -90,7 +93,9 @@ public:
+ 	void end_div();
+ 	void add_title(struct tag_attr *title_att, const char *title);
+ 	void add_navigation();
+-	void add_summary_list(std::string *list, int size);
++	void add_summary_list(string *list, int size);
++	void add_table(string *system_data, struct table_size *size,
++			struct table_attributes *tb_attr);
+ =
 
-> -	has_c3_res =3D 1;
-> +	/* BYT-M doesn't have C3 */
-> +	if (model =3D=3D 0x37)
-> +		has_c3_res =3D 0;
-> +	else
-> +		has_c3_res =3D 1;
-> +
->  =
+ private:
+ 	/* Document structure related functions */
+@@ -113,7 +118,7 @@ private:
+ 	void add_doc_header();
+ 	void add_doc_footer();
+ =
 
->  	/* Haswell-ULT has C8/9/10*/
->  	if (model =3D=3D 0x45)
-> diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
-> index 4a51494..57afd8a 100644
-> --- a/src/cpu/intel_cpus.h
-> +++ b/src/cpu/intel_cpus.h
-> @@ -40,6 +40,7 @@
->  #define MSR_PKG_C8_RESIDENCY		0x630
->  #define MSR_PKG_C9_RESIDENCY		0x631
->  #define MSR_PKG_C10_RESIDENCY		0x632
-> +#define MSR_CORE_C1_RESIDENCY		0x660
->  #define MSR_CORE_C3_RESIDENCY		0x3FC
->  #define MSR_CORE_C6_RESIDENCY		0x3FD
->  #define MSR_CORE_C7_RESIDENCY		0x3FE
-> @@ -73,6 +74,7 @@ public:
->  class nhm_core: public cpu_core
->  {
->  private:
-> +	uint64_t	c1_before, c1_after;
->  	uint64_t	c3_before, c3_after;
->  	uint64_t	c6_before, c6_after;
->  	uint64_t	c7_before, c7_after;
-> @@ -81,6 +83,7 @@ private:
->  	uint64_t	last_stamp;
->  	uint64_t	total_stamp;
->  public:
-> +	int		has_c1_res;
->  	int		has_c2c7_res;
->  	int		has_c3_res;
->  	nhm_core(int model);
-> -- =
+-	std::string escape_string(const char *str);
++	string escape_string(const char *str);
+ =
 
-> 1.8.3.2
-> =
+ 	html_section sections[SECTION_MAX];
+ 	html_table tables[TABLE_MAX];
+-- =
 
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
+1.7.9.5
 
---===============8886396617935738760==--
+
+--===============5477042797358300814==--
 
