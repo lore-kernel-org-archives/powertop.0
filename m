@@ -1,137 +1,117 @@
-Content-Type: multipart/mixed; boundary="===============8961839137969769748=="
+Content-Type: multipart/mixed; boundary="===============3141477656173030721=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] patch: tell user if the system is running out of FDs
-Date: Mon, 07 Oct 2013 17:05:08 +0300
-Message-ID: <20131007140508.GA2271@swordfish.minsk.epam.com>
-In-Reply-To: 23016151.2470223.1381151558300.JavaMail.root@redhat.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH 21/29] report: Redesign Device Activity css & html
+Date: Wed, 30 Oct 2013 14:21:12 -0700
+Message-ID: <1383168080-18233-22-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1383168080-18233-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8961839137969769748==
+--===============3141477656173030721==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/07/13 09:12), Jaroslav Skarvada wrote:
-> ----- Original Message -----
-> > On (09/19/13 11:23), Jaroslav Skarvada wrote:
-> > > Hi,
-> > > =
+Enables new design for Process Device Activity table part of "Device
+info" section. These changes are for csv and html reports.
 
-> > > complex servers can run out of FDs easily (due to perf).
-> > > In such case tell user that more FDs are needed instead
-> > > of the generic message (that kernel doesn't support
-> > > the perf)
-> > =
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+---
+ src/devlist.cpp |   47 ++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 32 insertions(+), 15 deletions(-)
 
-> > Hello Jaroslav,
-> > Thank you for your patch.
-> > =
+diff --git a/src/devlist.cpp b/src/devlist.cpp
+index 633a568..09d256b 100644
+--- a/src/devlist.cpp
++++ b/src/devlist.cpp
+@@ -45,6 +45,7 @@ using namespace std;
+ #include "lib.h"
+ #include "report/report.h"
+ #include "report/report-maker.h"
++#include "report/report-data-html.h"
+ =
 
-> > Youquan Song proposed to change RLIMIT_NOFILE in "[PATCH] Fix running
-> > failure when > 69 CPUs for open file limitation" some time ago
-> > (v1 of the patch
-> > https://lists.01.org/pipermail/powertop/2013-May/000850.html)
-> > =
+ #include "process/process.h"
+ #include "devices/device.h"
+@@ -284,9 +285,9 @@ void report_show_open_devices(void)
+ 	vector<struct devuser *> *target;
+ 	unsigned int i;
+ 	char prev[128], proc[128];
++	int idx, cols, rows;
+ =
 
-> > after some thinking I've merged Youquan's patch to powertop2-next tree
-> > https://github.com/sergey-senozhatsky/powertop2-next/commit/4cbb9576058=
-18dc7e4b7932dafac0aad5ed0b87a
-> > =
+ 	prev[0] =3D 0;
+-
+ 	if (phase =3D=3D 1)
+ 		target =3D &one;
+ 	else
+@@ -295,27 +296,43 @@ void report_show_open_devices(void)
+ 	if (target->size() =3D=3D 0)
+ 		return;
+ =
 
-> > (not upstreamed yet).
-> > =
+-	sort(target->begin(), target->end(), devlist_sort);
++	/* div attr css_class and css_id */
++	tag_attr div_attr;
++	init_div(&div_attr, "", "device");
++
++	/* Set Table attributes, rows, and cols */
++	table_attributes std_table_css;
++	cols =3D 2;
++	idx =3D cols;
++	rows=3D target->size() + 1;
++	init_std_table_attr(&std_table_css, rows, cols);
++
++	/* Set Title attributes */
++	tag_attr title_attr;
++	init_title_attr(&title_attr);
+ =
 
-> > while I don't really want to unlimit fds, at the same time from the use=
-r's
-> > point of view it'd better to handle it `transparently'. I think most li=
-kely
-> > user
-> > will react with `ulimit -n unlimited' to any powertop rlimited fds mess=
-age,
-> > since
-> > he/she really does not control (+does not care about) the number of ope=
-ned
-> > fds.
-> > =
+-	report.add_header("Process device activity");
+-	report.begin_table(TABLE_WIDE);
+-	report.begin_row();
+-	report.begin_cell(CELL_DEVACTIVITY_PROCESS);
+-	report.add("Process");
+-	report.begin_cell(CELL_DEVACTIVITY_DEVICE);
+-	report.add("Device");
++	/* Set array of data in row Major order */
++	string process_data[cols * rows];
++
++	sort(target->begin(), target->end(), devlist_sort);
++	process_data[0]=3D"Process";
++	process_data[1]=3D"Device";
+ =
 
-> > thanks,
-> > 	-ss
-> > =
+ 	for (i =3D 0; i < target->size(); i++) {
+ 		proc[0] =3D 0;
+-
+ 		if (strcmp(prev, (*target)[i]->comm) !=3D 0)
+ 			sprintf(proc, "%s", (*target)[i]->comm);
+ =
 
-> =
+-		report.begin_row(ROW_DEVPOWER);
+-		report.begin_cell();
+-		report.add(proc);
+-		report.begin_cell();
+-		report.add((*target)[i]->device);
++		process_data[idx]=3Dstring(proc);
++		idx+=3D1;
++		process_data[idx]=3Dstring((*target)[i]->device);
++		idx+=3D1;
+ 		sprintf(prev, "%s", (*target)[i]->comm);
+ 	}
++
++	/* Report Output */
++	report.add_div(&div_attr);
++	report.add_title(&title_attr, "Process Device Activity");
++	report.add_table(process_data, &std_table_css);
++	report.end_div();
+ }
+-- =
 
-> Hi,
-
-Hello,
-
-> I used Youquan's patch, but we have noticed that it can only overcome sof=
-t limits,
-> but not hard limits. E.g. on Fedora (and probably others) there is a soft=
- limit
-> of 1024 and a hard limit of 4096, so if powertop opens at least 15 file d=
-escriptors
-> per CPU, then this will fail on a system with >273 CPUs.
-
-that's a pretty big system
-
-> In case you think we can also temporally increase the hard limit (as we a=
-lready have
-> the privilege), the attached patch will do it. In case you think the hard=
- limits set by
-> the system administrator are untouchable (e.g. violation of system resour=
-ces hard limits
-> could result in a bad effects like explosion in a nuclear power plant :),=
- the
-> previously sent patch that fixes the error message needs to be also used
-
-hm, need to think about this for a moment. both your patches make sense.
-I'd probably go with `temporally increase the hard limit' solution, to make
-someones life easier. what do you, guys, think?
-
-
-	-ss
-
-> regards
-> =
-
-> Jaroslav
-
-> diff --git a/src/main.cpp b/src/main.cpp
-> index 0883424..e0e8a71 100644
-> --- a/src/main.cpp
-> +++ b/src/main.cpp
-> @@ -36,6 +36,8 @@
->  #include <getopt.h>
->  #include <unistd.h>
->  #include <locale.h>
-> +#include <sys/resource.h>
-> +#include <linux/limits.h>
->  =
-
->  #include "cpu/cpu.h"
->  #include "process/process.h"
-> @@ -283,11 +285,16 @@ static void powertop_init(void)
->  	static char initialized =3D 0;
->  	int ret;
->  	struct statfs st_fs;
-> +	struct rlimit rlmt;
->  =
-
->  	if (initialized)
->  		return;
->  =
-
->  	checkroot();
-> +
-> +	rlmt.rlim_cur =3D rlmt.rlim_max =3D NR_OPEN;
-> +	setrlimit (RLIMIT_NOFILE, &rlmt);
-> +
->  	ret =3D system("/sbin/modprobe cpufreq_stats > /dev/null 2>&1");
->  	ret =3D system("/sbin/modprobe msr > /dev/null 2>&1");
->  	statfs("/sys/kernel/debug", &st_fs);
+1.7.9.5
 
 
---===============8961839137969769748==--
+--===============3141477656173030721==--
 
