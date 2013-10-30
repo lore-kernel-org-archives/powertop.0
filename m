@@ -1,50 +1,341 @@
-Content-Type: multipart/mixed; boundary="===============3629365469055001636=="
+Content-Type: multipart/mixed; boundary="===============4745607594565308682=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: [Powertop] [PATCH 1/2] tuningsysfs: fix msg typo
-Date: Tue, 26 Nov 2013 22:27:09 +0300
-Message-ID: <1385494030-22556-2-git-send-email-sergey.senozhatsky@gmail.com>
-In-Reply-To: 1385494030-22556-1-git-send-email-sergey.senozhatsky@gmail.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH 29/29] tunables: removed on-demand cpu frequency
+ governor
+Date: Wed, 30 Oct 2013 14:21:20 -0700
+Message-ID: <1383168080-18233-30-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1383168080-18233-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3629365469055001636==
+--===============4745607594565308682==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-fix 'Managmenet' typo.
+Remove sugestion to use the on-demand cpu frequency governor from
+powertop tunables as that is not longer a good sugestion since the
+pstate driver is the Intel recomended replacement.
 
-Reported-by: Gijs Hillenius <gijs(a)hillenius.net>
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
 ---
- src/tuning/tuningsysfs.cpp | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/tuning/cpufreq.cpp |  213 --------------------------------------------=
+----
+ src/tuning/cpufreq.h   |   50 ------------
+ src/tuning/tuning.cpp  |    1 -
+ 3 files changed, 264 deletions(-)
+ delete mode 100644 src/tuning/cpufreq.cpp
+ delete mode 100644 src/tuning/cpufreq.h
 
-diff --git a/src/tuning/tuningsysfs.cpp b/src/tuning/tuningsysfs.cpp
-index ec1ca6b..f70dc23 100644
---- a/src/tuning/tuningsysfs.cpp
-+++ b/src/tuning/tuningsysfs.cpp
-@@ -136,7 +136,7 @@ void add_sata_tunables(void)
+diff --git a/src/tuning/cpufreq.cpp b/src/tuning/cpufreq.cpp
+deleted file mode 100644
+index e870559..0000000
+--- a/src/tuning/cpufreq.cpp
++++ /dev/null
+@@ -1,213 +0,0 @@
+-/*
+- * Copyright 2010, Intel Corporation
+- *
+- * This file is part of PowerTOP
+- *
+- * This program file is free software; you can redistribute it and/or modi=
+fy it
+- * under the terms of the GNU General Public License as published by the
+- * Free Software Foundation; version 2 of the License.
+- *
+- * This program is distributed in the hope that it will be useful, but WIT=
+HOUT
+- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+- * for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program in a file named COPYING; if not, write to the
+- * Free Software Foundation, Inc,
+- * 51 Franklin Street, Fifth Floor,
+- * Boston, MA 02110-1301 USA
+- * or just google for it.
+- *
+- * Authors:
+- *	Arjan van de Ven <arjan(a)linux.intel.com>
+- */
+-
+-#include "tuning.h"
+-#include "tunable.h"
+-#include <unistd.h>
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <string.h>
+-#include <utility>
+-#include <iostream>
+-#include <fstream>
+-#include <unistd.h>
+-#include <dirent.h>
+-#include <errno.h>
+-#include <sys/stat.h>
+-#include <ctype.h>
+-
+-#include "../lib.h"
+-#include "cpufreq.h"
+-
+-cpufreq_tunable::cpufreq_tunable(void) : tunable("", 0.3, _("Good"), _("Ba=
+d"), _("Unknown"))
+-{
+-	string str;
+-	sprintf(desc, _("Using 'ondemand' cpufreq governor"));
+-
+-	str =3D read_sysfs_string("/sys/devices/system/cpu/cpu0/cpufreq/scaling_g=
+overnor");
+-	strcpy(original, str.c_str());
+-	if (strlen(original) < 1)
+-		strcpy(original, "ondemand");
+-}
+-
+-
+-int cpufreq_tunable::good_bad(void)
+-{
+-	DIR *dir;
+-	struct dirent *dirent;
+-	FILE *file;
+-	char filename[PATH_MAX];
+-	char line[1024];
+-
+-	char gov[1024];
+-	int ret =3D TUNE_GOOD;
+-
+-
+-	gov[0] =3D 0;
+-
+-
+-	dir =3D opendir("/sys/devices/system/cpu");
+-	if (!dir)
+-		return ret;
+-
+-	while ((dirent =3D readdir(dir))) {
+-		if (strncmp(dirent->d_name, "cpu", 3) !=3D 0 || !isdigit(dirent->d_name[=
+3]))
+-			continue;
+-		sprintf(filename, "/sys/devices/system/cpu/%s/cpufreq/scaling_governor",=
+ dirent->d_name);
+-		file =3D fopen(filename, "r");
+-		if (!file)
+-			continue;
+-		memset(line, 0, 1024);
+-		if (fgets(line, 1023,file)=3D=3DNULL) {
+-			fclose(file);
+-			continue;
+-		}
+-		if (strlen(gov)=3D=3D0)
+-			strcpy(gov, line);
+-		else
+-			/* if the governors are inconsistent, warn */
+-			if (strcmp(gov, line))
+-				ret =3D TUNE_BAD;
+-		fclose(file);
+-	}
+-
+-	closedir(dir);
+-
+-	/* if the governor is set to userspace, also warn */
+-	if (strstr(gov, "userspace"))
+-		ret =3D TUNE_BAD;
+-
+-	/* if the governor is set to performance, also warn */
+-	/* FIXME: check if this is fair on all cpus */
+-	if (strstr(gov, "performance"))
+-		ret =3D TUNE_BAD;
+-
+-	return ret;
+-}
+-
+-void cpufreq_tunable::toggle(void)
+-{
+-	DIR *dir;
+-	struct dirent *dirent;
+-	FILE *file;
+-	char filename[PATH_MAX];
+-	int good;
+-	good =3D good_bad();
+-
+-	system("/sbin/modprobe cpufreq_ondemand > /dev/null 2>&1");
+-
+-	if (good =3D=3D TUNE_GOOD) {
+-		dir =3D opendir("/sys/devices/system/cpu");
+-		if (!dir)
+-			return;
+-
+-		while ((dirent =3D readdir(dir))) {
+-			if (strncmp(dirent->d_name, "cpu", 3) !=3D 0 || !isdigit(dirent->d_name=
+[3]))
+-				continue;
+-			sprintf(filename, "/sys/devices/system/cpu/%s/cpufreq/scaling_governor"=
+, dirent->d_name);
+-			file =3D fopen(filename, "w");
+-			if (!file)
+-				continue;
+-			fprintf(file, "%s\n", original);
+-			fclose(file);
+-		}
+-
+-		closedir(dir);
+-		return;
+-	}
+-	dir =3D opendir("/sys/devices/system/cpu");
+-	if (!dir)
+-		return;
+-
+-	while ((dirent =3D readdir(dir))) {
+-		if (strncmp(dirent->d_name, "cpu", 3) !=3D 0 || !isdigit(dirent->d_name[=
+3]))
+-			continue;
+-		sprintf(filename, "/sys/devices/system/cpu/%s/cpufreq/scaling_governor",=
+ dirent->d_name);
+-		file =3D fopen(filename, "w");
+-		if (!file)
+-			continue;
+-		fprintf(file, "ondemand\n");
+-		fclose(file);
+-	}
+-
+-	closedir(dir);
+-}
+-
+-const char *cpufreq_tunable::toggle_script(void) {
+-	DIR *dir;
+-	struct dirent *dirent;
+-	char filename[PATH_MAX];
+-	char tmp[4096];
+-	struct stat statbuf;
+-	int good;
+-	good =3D good_bad();
+-
+-	strcpy(toggle_good, "/sbin/modprobe cpufreq_ondemand > /dev/null 2>&1\n");
+-
+-	if (good =3D=3D TUNE_GOOD) {
+-		dir =3D opendir("/sys/devices/system/cpu");
+-		if (!dir)
+-			return NULL;
+-
+-		while ((dirent =3D readdir(dir))) {
+-			if (strncmp(dirent->d_name, "cpu", 3) !=3D 0 || !isdigit(dirent->d_name=
+[3]))
+-				continue;
+-			sprintf(filename, "/sys/devices/system/cpu/%s/cpufreq/scaling_governor"=
+, dirent->d_name);
+-			if (stat(filename, &statbuf) =3D=3D -1)
+-				continue;
+-			sprintf(tmp, "echo '%s' > '%s';\n", original, filename);
+-			strcat(toggle_good, tmp);
+-		}
+-
+-		closedir(dir);
+-		return toggle_good;
+-	}
+-
+-	dir =3D opendir("/sys/devices/system/cpu");
+-	if (!dir)
+-		return NULL;
+-
+-	while ((dirent =3D readdir(dir))) {
+-		if (strncmp(dirent->d_name, "cpu", 3) !=3D 0 || !isdigit(dirent->d_name[=
+3]))
+-			continue;
+-		sprintf(filename, "/sys/devices/system/cpu/%s/cpufreq/scaling_governor",=
+ dirent->d_name);
+-		if (stat(filename, &statbuf) =3D=3D -1)
+-			continue;
+-		sprintf(tmp, "echo 'ondemand' > '%s';\n", filename);
+-		strcat(toggle_good, tmp);
+-	}
+-
+-	closedir(dir);
+-	return toggle_good;
+-}
+-
+-
+-void add_cpufreq_tunable(void)
+-{
+-	class cpufreq_tunable *cf;
+-
+-	cf =3D new class cpufreq_tunable();
+-	all_tunables.push_back(cf);
+-}
+diff --git a/src/tuning/cpufreq.h b/src/tuning/cpufreq.h
+deleted file mode 100644
+index 983f813..0000000
+--- a/src/tuning/cpufreq.h
++++ /dev/null
+@@ -1,50 +0,0 @@
+-/*
+- * Copyright 2010, Intel Corporation
+- *
+- * This file is part of PowerTOP
+- *
+- * This program file is free software; you can redistribute it and/or modi=
+fy it
+- * under the terms of the GNU General Public License as published by the
+- * Free Software Foundation; version 2 of the License.
+- *
+- * This program is distributed in the hope that it will be useful, but WIT=
+HOUT
+- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+- * for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program in a file named COPYING; if not, write to the
+- * Free Software Foundation, Inc,
+- * 51 Franklin Street, Fifth Floor,
+- * Boston, MA 02110-1301 USA
+- * or just google for it.
+- *
+- * Authors:
+- *	Arjan van de Ven <arjan(a)linux.intel.com>
+- */
+-#ifndef _INCLUDE_GUARD_CPUFREQ_TUNE_H
+-#define _INCLUDE_GUARD_CPUFREQ_TUNE_H
+-
+-#include <vector>
+-
+-#include "tunable.h"
+-
+-using namespace std;
+-
+-class cpufreq_tunable : public tunable {
+-	char original[4096];
+-public:
+-	cpufreq_tunable(void);
+-
+-	virtual int good_bad(void);
+-
+-	virtual void toggle(void);
+-
+-	virtual const char *toggle_script(void);
+-
+-};
+-
+-extern void add_cpufreq_tunable(void);
+-
+-
+-#endif
+diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
+index 0f5bf25..7f6d3ec 100644
+--- a/src/tuning/tuning.cpp
++++ b/src/tuning/tuning.cpp
+@@ -67,7 +67,6 @@ static void init_tuning(void)
+ 	add_ethernet_tunable();
+ 	add_bt_tunable();
+ 	add_wifi_tunables();
+-	add_cpufreq_tunable();
  =
 
- 		sprintf(filename, "/sys/class/scsi_host/%s/link_power_management_policy"=
-, entry->d_name);
- =
-
--	        sprintf(msg, _("Enable SATA link power Managmenet for %s"),entry-=
->d_name);
-+	        sprintf(msg, _("Enable SATA link power management for %s"),entry-=
->d_name);
- =
-
- 		add_sysfs_tunable(msg, filename,"min_power");
- =
-
+ 	sort_tunables();
+ }
 -- =
 
-1.8.5.rc3.362.gdf10213.dirty
+1.7.9.5
 
 
---===============3629365469055001636==--
+--===============4745607594565308682==--
 
