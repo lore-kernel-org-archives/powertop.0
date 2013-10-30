@@ -1,81 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============2813277884846284818=="
+Content-Type: multipart/mixed; boundary="===============0664281185559469141=="
 MIME-Version: 1.0
 From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH 04/29] report: report maker add title and div
-Date: Wed, 30 Oct 2013 14:20:55 -0700
-Message-ID: <1383168080-18233-5-git-send-email-alexandra.yates@linux.intel.com>
+Subject: [Powertop] [PATCH 10/29] report-maker: modular table generation
+Date: Wed, 30 Oct 2013 14:21:01 -0700
+Message-ID: <1383168080-18233-11-git-send-email-alexandra.yates@linux.intel.com>
 In-Reply-To: 1383168080-18233-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2813277884846284818==
+--===============0664281185559469141==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Calls to add a title and add a division from report maker using report
-object to the generated report.
+Generates a modular table when using the report maker object.
+It passess table_size, css_attributes, and data.  The data is stored in
+a single dimensional array using row major order.
 
 Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
 ---
  src/report/report-formatter.h |    3 +++
- src/report/report-maker.cpp   |   18 ++++++++++++++++++
- src/report/report-maker.h     |    3 +++
- 3 files changed, 24 insertions(+)
+ src/report/report-maker.cpp   |    7 +++++++
+ src/report/report-maker.h     |    2 ++
+ 3 files changed, 12 insertions(+)
 
 diff --git a/src/report/report-formatter.h b/src/report/report-formatter.h
-index 449fae7..78382d8 100644
+index 5e5b8d7..4fe2c42 100644
 --- a/src/report/report-formatter.h
 +++ b/src/report/report-formatter.h
-@@ -65,6 +65,9 @@ public:
- 	virtual void add_logo() {}
- 	virtual void add_header() {}
- 	virtual void end_hheader() {}
-+	virtual void add_div(struct tag_attr *div_attr) {}
-+	virtual void end_div() {}
-+	virtual void add_title(struct tag_attr *att_title, const char *title) {}
+@@ -71,6 +71,9 @@ public:
+ 	virtual void add_title(struct tag_attr *att_title, const char *title) {}
+ 	virtual void add_navigation() {}
+ 	virtual void add_summary_list(string *list, int size) {}
++	virtual void add_table(string *system_data,
++			struct table_size *size,
++			struct table_attributes *tb_attr)     {}
  };
  =
 
  #endif /* _REPORT_FORMATTER_H_ */
 diff --git a/src/report/report-maker.cpp b/src/report/report-maker.cpp
-index 8eba618..ff87f1e 100644
+index ccfbec4..031b692 100644
 --- a/src/report/report-maker.cpp
 +++ b/src/report/report-maker.cpp
-@@ -350,3 +350,21 @@ report_maker::end_hheader()
- 	formatter->end_hheader();
+@@ -380,3 +380,10 @@ report_maker::add_summary_list(string *list, int size)
+ 	formatter->add_summary_list(list, size);
  }
  =
 
 +void
-+report_maker::add_title(struct tag_attr *att_title, const char *title)
++report_maker::add_table(string *system_data, struct table_size *size,
++		struct table_attributes *tb_attr)
 +{
-+	formatter->add_title(att_title, title);
-+}
-+
-+void
-+report_maker::add_div(struct tag_attr * div_attr)
-+{
-+	formatter->add_div(div_attr);
-+}
-+
-+void
-+report_maker::end_div()
-+{
-+	formatter->end_div();
++	formatter->add_table(system_data, size, tb_attr);
 +}
 +
 diff --git a/src/report/report-maker.h b/src/report/report-maker.h
-index fab9589..0c17635 100644
+index 6e5f4d1..e75c99a 100644
 --- a/src/report/report-maker.h
 +++ b/src/report/report-maker.h
-@@ -196,6 +196,9 @@ public:
- 	void add_header();
- 	void end_hheader();
- 	void add_logo();
-+	void add_div(struct tag_attr *div_attr);
-+	void end_div();
-+	void add_title(struct tag_attr *att_title, const char *title);
+@@ -201,6 +201,8 @@ public:
+ 	void add_title(struct tag_attr *att_title, const char *title);
+ 	void add_navigation();
+ 	void add_summary_list(string *list, int size);
++	void add_table(string *system_data, struct table_size *size,
++			struct table_attributes *tb_attr);
  =
 
  private:
@@ -85,5 +74,5 @@ index fab9589..0c17635 100644
 1.7.9.5
 
 
---===============2813277884846284818==--
+--===============0664281185559469141==--
 
