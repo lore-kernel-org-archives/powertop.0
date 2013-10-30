@@ -1,36 +1,75 @@
-Content-Type: multipart/mixed; boundary="===============6501359955559631395=="
+Content-Type: multipart/mixed; boundary="===============4119418862674229225=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] USB devices get wrong power use values
-Date: Sun, 13 Oct 2013 15:38:21 -0700
-Message-ID: <525B20DD.6070902@linux.intel.com>
-In-Reply-To: 20131013221048.GI30504@merlins.org
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH 06/29] report-html: summary list and navigation
+Date: Wed, 30 Oct 2013 14:20:57 -0700
+Message-ID: <1383168080-18233-7-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1383168080-18233-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6501359955559631395==
+--===============4119418862674229225==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
->
-> So note that it's actually a very small USB widget that behaves as a
-> keyboard (it's an OTP token).
-> I've only had that OTP token show as 7W once, and it was suspicious that
-> it was at the exact same time as my built in camera.
->
-> So from what you're staying, you're pretty sure that the measuring code
-> was correct and that somehow the USB system was wedged or that power
-> management suspend failed in a way that both devices were taking 14W
-> together, more than what the entire laptop uses when on batteries with
-> CPUs mostly asleep?
+Generates the html tags to add navigation and summary including css
+attribute support.
 
-well powertop cannot measure, only model these things
-if you go WAAAY outside the current model (by adding devices never seen bef=
-ore)
-the accuracy will go up over time, but initially might be off by a bit.
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+---
+ src/report/report-formatter-html.cpp |   18 ++++++++++++++++++
+ src/report/report-formatter-html.h   |    2 ++
+ 2 files changed, 20 insertions(+)
+
+diff --git a/src/report/report-formatter-html.cpp b/src/report/report-forma=
+tter-html.cpp
+index db21c8c..8038181 100644
+--- a/src/report/report-formatter-html.cpp
++++ b/src/report/report-formatter-html.cpp
+@@ -514,3 +514,21 @@ report_formatter_html::add_title(struct tag_attr *titl=
+e_att, const char *title)
+ 	addf_exact("<h2 class=3D\"%s\"> %s </h2>\n", title_att->css_class, title);
+ }
+ =
+
++void
++report_formatter_html::add_navigation()
++{
++	add_exact("<br/><nav id=3D\"main_menu\"> </nav>\n");
++}
++
++void
++report_formatter_html::add_summary_list(std::string *list, int size)
++{
++	int i;
++	add_exact("<div><br/> <ul>\n");
++	for (i=3D0; i < size; i+=3D2){
++		addf_exact("<li class=3D\"summary_list\"> <b> %s </b> %s </li>",
++				list[i].c_str(), list[i+1].c_str());
++	}
++	add_exact("</ul> </div> <br />\n");
++}
++
+diff --git a/src/report/report-formatter-html.h b/src/report/report-formatt=
+er-html.h
+index 0f508d3..261e0dd 100644
+--- a/src/report/report-formatter-html.h
++++ b/src/report/report-formatter-html.h
+@@ -89,6 +89,8 @@ public:
+ 	void add_div(struct tag_attr *div_attr);
+ 	void end_div();
+ 	void add_title(struct tag_attr *title_att, const char *title);
++	void add_navigation();
++	void add_summary_list(std::string *list, int size);
+ =
+
+ private:
+ 	/* Document structure related functions */
+-- =
+
+1.7.9.5
 
 
-
---===============6501359955559631395==--
+--===============4119418862674229225==--
 
