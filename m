@@ -1,130 +1,92 @@
-Content-Type: multipart/mixed; boundary="===============4034784768716263745=="
+Content-Type: multipart/mixed; boundary="===============8939561906310123849=="
 MIME-Version: 1.0
 From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH v2 25/31] report: fixed empty SW settings in need
- of tunning
-Date: Fri, 15 Nov 2013 16:29:12 -0800
-Message-ID: <1384561758-21516-26-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: 1384561758-21516-1-git-send-email-alexandra.yates@linux.intel.com
+Subject: [Powertop] [PATCH 00/29]Report Redesign
+Date: Wed, 30 Oct 2013 14:20:51 -0700
+Message-ID: <1383168080-18233-1-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: Report Redesign
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4034784768716263745==
+--===============8939561906310123849==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-After tunning the sistem the Software Setings in Need of Tunning table
-appreared empty. Added a conditional statement to print the table only
-when there are software settings  in need of tunning.
+This patches are to be applied post release 2.5. =
 
-Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
----
- src/tuning/tuning.cpp |   65 ++++++++++++++++++++++++++-------------------=
+
+This set of patches include the redesign changes for HTML
+and CSV reports.  Additionally, includes removing the suggestion
+to use on demand cpu frequency governor.  This feature was removed because =
+the
+Intel P-States driver is the Intel recommended method for CPU frequency. =
+
+
+Alexandra Yates (29):
+  report-formater-html: add logo
+  report: call powertop logo
+  html-report: add title and div tags
+  report: report maker add title and div
+  report-csv: title, div, logo, header
+  report-html: summary list and navigation
+  report-maker: navigation & summary
+  report-csv: Added navigation & summary list
+  report-html: Table generation
+  report-maker: modular table generation
+  report-csv: modular table
+  report: Logo and system Information
+  report-html-css: html 5 and css for new design
+  report-summary: enable html and csv new styles
+  report: redesign html menu
+  report: Cpu Idle section redesigned html & csv
+  report: Fixed html summary & menu colapse styles
+  report: CPU Frequency html & csv
+  report: redesign System Information csv and html
+  report: redesign Device Power Report css & html
+  report: Redesign Device Activity css & html
+  report: cleanup csv title and unused vars
+  report: report tuning with new desig html csv
+  report-html: fixed not hidding sections errors
+  report: fixed empty SW settings in need of tunning
+  report: design batery discharge/system baseline
+  report: conditional runs ncurses & cpu html report
+  report: logo size & menu compatibility
+  tunables: removed on-demand cpu frequency governor
+
+ PowerTop.png                         |  Bin 0 -> 6975 bytes
+ src/Makefile.am                      |    1 +
+ src/cpu/cpu.cpp                      |  327 ++++++++++++++++++++++++------=
 ----
- 1 file changed, 35 insertions(+), 30 deletions(-)
+ src/devices/device.cpp               |   81 +++++----
+ src/devlist.cpp                      |   44 +++--
+ src/main.cpp                         |    7 +-
+ src/powertop.css                     |  287 +++++++++++++----------------
+ src/process/do_process.cpp           |  233 ++++++++++++++----------
+ src/report/report-data-html.cpp      |  118 ++++++++++++
+ src/report/report-data-html.h        |   69 +++++++
+ src/report/report-formatter-csv.cpp  |   92 +++++++++-
+ src/report/report-formatter-csv.h    |   15 +-
+ src/report/report-formatter-html.cpp |  123 ++++++++++++-
+ src/report/report-formatter-html.h   |   16 +-
+ src/report/report-formatter.h        |   13 ++
+ src/report/report-maker.cpp          |   57 ++++++
+ src/report/report-maker.h            |   13 +-
+ src/report/report.cpp                |   83 +++++----
+ src/tuning/cpufreq.cpp               |  213 ----------------------
+ src/tuning/cpufreq.h                 |   50 ------
+ src/tuning/tuning.cpp                |  130 ++++++++------
+ 21 files changed, 1213 insertions(+), 759 deletions(-)
+ create mode 100644 PowerTop.png
+ create mode 100644 src/report/report-data-html.cpp
+ create mode 100644 src/report/report-data-html.h
+ delete mode 100644 src/tuning/cpufreq.cpp
+ delete mode 100644 src/tuning/cpufreq.h
 
-diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
-index ac479a2..67d604f 100644
---- a/src/tuning/tuning.cpp
-+++ b/src/tuning/tuning.cpp
-@@ -209,39 +209,49 @@ void report_show_tunables(void)
-         tag_attr div_attr;
-         init_div(&div_attr, "clear_block", "tuning");
- =
-
-+	/* Set Title attributes */
-+       	tag_attr title_attr;
-+        init_title_attr(&title_attr);
-+
- 	/* Set Table attributes, rows, and cols */
- 	table_attributes tune_table_css;
- 	cols=3D2;
- 	idx =3D cols;
--	rows=3D all_tunables.size() + 1;
--	init_tune_table_attr(&tune_table_css, rows, cols);
--
--	/* Set Title attributes */
--        tag_attr title_attr;
--        init_title_attr(&title_attr);
--
--	/* Set array of data in row Major order */
--	string tunable_data[cols * rows];
--
--	tunable_data[0]=3D__("Description");
--	tunable_data[1]=3D__("Script");
--
- =
-
- 	for (i =3D 0; i < all_tunables.size(); i++) {
--		int gb;
--		gb =3D all_tunables[i]->good_bad();
--		if (gb !=3D TUNE_BAD)
--			continue;
--		tunable_data[idx]=3Dstring(all_tunables[i]->description());
--		idx+=3D1;
--		tunable_data[idx]=3Dstring(all_tunables[i]->toggle_script());
--		idx+=3D1;
-+		int tgb;
-+		tgb =3D all_tunables[i]->good_bad();
-+		if (tgb =3D=3D TUNE_BAD)
-+			rows+=3D1;
- 	}
--
--	/* Report Output */
-+	/* add section */
- 	report.add_div(&div_attr);
--	report.add_title(&title_attr,__("Software Settings in Need of Tuning"));
--	report.add_table(tunable_data, &tune_table_css);
-+
-+	if (rows > 0){
-+		rows=3D rows + 1;
-+		init_tune_table_attr(&tune_table_css, rows, cols);
-+
-+		/* Set array of data in row Major order */
-+		string tunable_data[cols * rows];
-+
-+		tunable_data[0]=3D__("Description");
-+		tunable_data[1]=3D__("Script");
-+
-+		for (i =3D 0; i < all_tunables.size(); i++) {
-+			int gb;
-+			gb =3D all_tunables[i]->good_bad();
-+			if (gb !=3D TUNE_BAD)
-+				continue;
-+			tunable_data[idx]=3Dstring(all_tunables[i]->description());
-+			idx+=3D1;
-+			tunable_data[idx]=3Dstring(all_tunables[i]->toggle_script());
-+			idx+=3D1;
-+		}
-+
-+		/* Report Output */
-+		report.add_title(&title_attr,__("Software Settings in Need of Tuning"));
-+		report.add_table(tunable_data, &tune_table_css);
-+	}
- =
-
- 	/* Second Table */
- 	/* Set Table attributes, rows, and cols */
-@@ -257,12 +267,7 @@ void report_show_tunables(void)
- 		untunable_data[i+1]=3D string(all_untunables[i]->description());
- =
-
- 	/* Report Output */
--<<<<<<< HEAD
--	report.add_div(&div_attr);
- 	report.add_title(&title_attr,__("Untunable Software Issues"));
--=3D=3D=3D=3D=3D=3D=3D
--	report.add_title(&title_attr,"Untunable Software Issues");
-->>>>>>> 4d9b82e... report-html: fixed not hidding sections errors
- 	report.add_table(untunable_data, &tune_table_css);
- =
-
- 	/* Third Table */
 -- =
 
 1.7.9.5
 
 
---===============4034784768716263745==--
+--===============8939561906310123849==--
 
