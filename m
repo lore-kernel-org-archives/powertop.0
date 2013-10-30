@@ -1,105 +1,238 @@
-Content-Type: multipart/mixed; boundary="===============3151050391205672421=="
+Content-Type: multipart/mixed; boundary="===============5122275946141518517=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] USB devices get wrong power use values
-Date: Sat, 12 Oct 2013 14:16:28 +0300
-Message-ID: <20131012111628.GA2238@swordfish.minsk.epam.com>
-In-Reply-To: 20130922235400.GE1886@merlins.org
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH 24/29] report-html: fixed not hidding sections
+ errors
+Date: Wed, 30 Oct 2013 14:21:15 -0700
+Message-ID: <1383168080-18233-25-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1383168080-18233-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3151050391205672421==
+--===============5122275946141518517==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (09/22/13 16:54), Marc MERLIN wrote:
-> So, I asked on the linux-usb list, and one thing I quickly found out is t=
-hat the
-> Watt value given by powertop 2.4 is way off for USB devices:
-> =
+Removed multiple division when displaying more than one table on a
+section as it was the case of Device Info and Tuning sections. Now all
+sections display accordingly to the selected menu button.
 
-> Alan Stern wrote the following:
-> =
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+---
+ src/devices/device.cpp          |    5 ++---
+ src/devlist.cpp                 |    5 +----
+ src/powertop.css                |   19 +++++++++----------
+ src/report/report-data-html.cpp |   11 +++++++++++
+ src/report/report-data-html.h   |    4 ++++
+ src/tuning/tuning.cpp           |    6 +-----
+ 6 files changed, 28 insertions(+), 22 deletions(-)
 
-> Do you have a bug on powertop 2.4 mis-calculating USB power use, both whe=
-n =
+diff --git a/src/devices/device.cpp b/src/devices/device.cpp
+index 1d9b1d4..1913604 100644
+--- a/src/devices/device.cpp
++++ b/src/devices/device.cpp
+@@ -225,7 +225,7 @@ void show_report_devices(void)
+ =
 
-> power is plugged in and when it's not?
+ 	/* div attr css_class and css_id */
+         tag_attr div_attr;
+-        init_div(&div_attr, "", "device");
++        init_div(&div_attr, "", "devinfo");
+ =
 
-powertop uses
+         /* Set Table attributes, rows, and cols */
+         table_attributes std_table_css;
+@@ -235,7 +235,7 @@ void show_report_devices(void)
+ =
 
-	/sys/bus/usb/devices/%s/power/active_duration
-and
-	/sys/bus/usb/devices/%s/power/connected_duration
+ 	idx =3D cols;
+  	rows=3D all_devices.size() + 1;
+-        init_std_table_attr(&std_table_css, rows, cols);
++        init_std_side_table_attr(&std_table_css, rows, cols);
+ =
 
-	-ss
+         /* Set Title attributes */
+         tag_attr title_attr;
+@@ -286,7 +286,6 @@ void show_report_devices(void)
+ 	report.add_div(&div_attr);
+ 	report.add_title(&title_attr,"Device Power Report");
+ 	report.add_table(device_data, &std_table_css);
+-	report.end_div();
+ }
+ =
 
-> Thanks,
-> Marc
-> =
+ =
 
-> On Sun, Sep 22, 2013 at 12:38:56PM -0400, Alan Stern wrote:
-> > > > gandalfthegreat:/sys/bus/usb/devices/3-1.6/power# grep . *
-> > > > active_duration:61227648
-> > > > async:enabled
-> > > > autosuspend:2
-> > > > autosuspend_delay_ms:2000
-> > > > connected_duration:66830880
-> > > > control:auto
-> > > > level:auto
-> > > > persist:1
-> > > > runtime_active_kids:0
-> > > > runtime_active_time:18870052
-> > > > runtime_enabled:enabled
-> > > > runtime_status:active
-> > > > runtime_suspended_time:5324088
-> > > > runtime_usage:0
-> > >
-> > > This all looks correct.
-> >
-> > Since then, I've confirmed that I don't have the problem some time after
-> > reboot. It may be that the device doesn't seem to sleep well after I've=
- used
-> > it once.
-> >
-> > What's interesting, is that I see this when power is plugged in:
-> >
-> > Power est.  Events/s    Category       Description
-> >   8.18 W    100.0%      Device         USB device: Yubico Yubikey II (Y=
-ubico)
-> >   8.13 W    100.0%      Device         USB device: Integrated Camera (C=
-hicony Electronics Co., Ltd.)
-> >
-> > Once I go to batteries, I see this:
-> > Summary: 760.1 wakeups/second,  718.9 GPU ops/seconds, 0.0 VFS ops/sec =
-and 6.9% CPU use
-> >
-> > Power est.              Usage       Events/s    Category       Descript=
-ion
-> >   8.32 W    100.0%                      Device         USB device: Yubi=
-co Yubikey II (Yubico)
-> >   2.52 W     73.3%                      Device         Display backlight
-> >
-> > Somehow I know that my Yubikey isn't using 8W, so powertop numbers need=
- to
-> > be taken with a grain of salt.
-> =
+diff --git a/src/devlist.cpp b/src/devlist.cpp
+index 09d256b..cd23969 100644
+--- a/src/devlist.cpp
++++ b/src/devlist.cpp
+@@ -296,9 +296,6 @@ void report_show_open_devices(void)
+ 	if (target->size() =3D=3D 0)
+ 		return;
+ =
 
-> I don't know where powertop gets its numbers from.  Perhaps it uses the
-> value reported by the device (bMaxPower).  That value is only a
-> maximum; it doesn't change to reflect the actual usage.
-> =
+-	/* div attr css_class and css_id */
+-	tag_attr div_attr;
+-	init_div(&div_attr, "", "device");
+ =
 
-> -- =
+ 	/* Set Table attributes, rows, and cols */
+ 	table_attributes std_table_css;
+@@ -331,7 +328,7 @@ void report_show_open_devices(void)
+ 	}
+ =
 
-> "A mouse is a device used to point at the xterm you want to type in" - A.=
-S.R.
-> Microsoft is to operating systems ....
->                                       .... what McDonalds is to gourmet c=
-ooking
-> Home page: http://marc.merlins.org/
->=20
+ 	/* Report Output */
+-	report.add_div(&div_attr);
++	/* No div attribute here inherits from device power report */
+ 	report.add_title(&title_attr, "Process Device Activity");
+ 	report.add_table(process_data, &std_table_css);
+ 	report.end_div();
+diff --git a/src/powertop.css b/src/powertop.css
+index 97c15cc..0c0f75b 100644
+--- a/src/powertop.css
++++ b/src/powertop.css
+@@ -12,7 +12,7 @@ var powertop =3D {
+   cpuidle: 'CPU Idle',
+   cpufreq: 'CPU Frequency',
+   software: 'Software Info',
+-  device: 'Device Info',
++  devinfo: 'Device Info',
+   tuning: 'Tuning'
+  },
+  cadd: function(idx, c){
+@@ -76,6 +76,13 @@ var powertop =3D {
+ 	padding:0px;
+ }
+ =
 
---===============3151050391205672421==--
++body {
++	background-color: #eee; /* Background color */
++	color: #222;            /* Font color */
++	font-family: Helvetica;
++	font-size: 14px;
++}
++
+ #main_container{
+ 	width: 960px;
+ 	margin: 2px auto;
+@@ -198,15 +205,7 @@ li.summary_list
+ =
+
+ =
+
+ =
+
+-/*menu css*/
+-
+-body {
+-	background-color: #eee; /* Background color */
+-	color: #222;            /* Font color */
+-	font-family: Helvetica;
+-	font-size: 14px;
+-}
+-
++/* main menu css*/
+ #main_menu {
+ 	display: inline-block;
+ 	font-weight: bold;
+diff --git a/src/report/report-data-html.cpp b/src/report/report-data-html.=
+cpp
+index 72d2e52..78354c3 100644
+--- a/src/report/report-data-html.cpp
++++ b/src/report/report-data-html.cpp
+@@ -34,6 +34,17 @@ void init_std_table_attr(struct table_attributes *table_=
+css, int rows, int cols)
+ 	table_css->rows=3Drows;
+ 	table_css->cols=3Dcols;
+ }
++void init_std_side_table_attr(struct table_attributes *table_css, int rows=
+, int cols){
++	table_css->table_class=3D"emphasis2 side_by_side_left";
++	table_css->tr_class=3D"emph1";
++	table_css->th_class=3D"emph_title";
++	table_css->td_class=3D"";
++	table_css->pos_table_title=3DT;
++	table_css->title_mod=3D0;
++	table_css->rows=3Drows;
++	table_css->cols=3Dcols;
++}
++
+ =
+
+ void init_pkg_table_attr(struct table_attributes *table_css, int rows, int=
+ cols){
+ 	table_css->table_class=3D"emphasis2 side_by_side_left";
+diff --git a/src/report/report-data-html.h b/src/report/report-data-html.h
+index 7e517eb..f16977e 100644
+--- a/src/report/report-data-html.h
++++ b/src/report/report-data-html.h
+@@ -44,6 +44,10 @@ void
+ init_std_table_attr(struct table_attributes *table_css, int rows, int cols=
+);
+ =
+
+ void
++init_std_side_table_attr(struct table_attributes *table_css, int rows,
++		int cols);
++
++void
+ init_pkg_table_attr(struct table_attributes *table_css, int rows, int cols=
+);
+ =
+
+ void
+diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
+index e251f56..4b2588d 100644
+--- a/src/tuning/tuning.cpp
++++ b/src/tuning/tuning.cpp
+@@ -207,7 +207,7 @@ void report_show_tunables(void)
+ =
+
+ 	 /* div attr css_class and css_id */
+         tag_attr div_attr;
+-        init_div(&div_attr, "", "tuning");
++        init_div(&div_attr, "clear_block", "tuning");
+ =
+
+ 	/* Set Table attributes, rows, and cols */
+ 	table_attributes tune_table_css;
+@@ -242,7 +242,6 @@ void report_show_tunables(void)
+ 	report.add_div(&div_attr);
+ 	report.add_title(&title_attr,"Software Settings in Need of Tuning");
+ 	report.add_table(tunable_data, &tune_table_css);
+-	report.end_div();
+ =
+
+ 	/* Second Table */
+ 	/* Set Table attributes, rows, and cols */
+@@ -258,10 +257,8 @@ void report_show_tunables(void)
+ 		untunable_data[i+1]=3D string(all_untunables[i]->description());
+ =
+
+ 	/* Report Output */
+-	report.add_div(&div_attr);
+ 	report.add_title(&title_attr,"Untunable Software Issues");
+ 	report.add_table(untunable_data, &tune_table_css);
+-	report.end_div();
+ =
+
+ 	/* Third Table */
+ 	/* Set Table attributes, rows, and cols */
+@@ -283,7 +280,6 @@ void report_show_tunables(void)
+ 		idx+=3D1;
+         }
+ 	/* Report Output */
+-	report.add_div(&div_attr);
+ 	report.add_title(&title_attr,"Optimal Tuned Software Settings");
+         report.add_table(tuned_data, &tune_table_css);
+         report.end_div();
+-- =
+
+1.7.9.5
+
+
+--===============5122275946141518517==--
 
