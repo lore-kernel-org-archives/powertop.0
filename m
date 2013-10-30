@@ -1,124 +1,89 @@
-Content-Type: multipart/mixed; boundary="===============4940981571676996302=="
+Content-Type: multipart/mixed; boundary="===============2813277884846284818=="
 MIME-Version: 1.0
 From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH v3 03/31] html-report: add title and div tags
-Date: Mon, 18 Nov 2013 12:26:54 -0800
-Message-ID: <1384806442-20294-4-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: 1384806442-20294-1-git-send-email-alexandra.yates@linux.intel.com
+Subject: [Powertop] [PATCH 04/29] report: report maker add title and div
+Date: Wed, 30 Oct 2013 14:20:55 -0700
+Message-ID: <1383168080-18233-5-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1383168080-18233-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4940981571676996302==
+--===============2813277884846284818==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Implements add_title and add_div methods that pass css attributes for
-modular styling.
+Calls to add a title and add a division from report maker using report
+object to the generated report.
 
 Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
 ---
- src/report/report-data-html.h        |    4 ++++
- src/report/report-formatter-html.cpp |   35 ++++++++++++++++++++++++++++++=
-++++
- src/report/report-formatter-html.h   |    5 ++++-
- 3 files changed, 43 insertions(+), 1 deletion(-)
- create mode 100644 src/report/report-data-html.h
+ src/report/report-formatter.h |    3 +++
+ src/report/report-maker.cpp   |   18 ++++++++++++++++++
+ src/report/report-maker.h     |    3 +++
+ 3 files changed, 24 insertions(+)
 
-diff --git a/src/report/report-data-html.h b/src/report/report-data-html.h
-new file mode 100644
-index 0000000..70ccbdb
---- /dev/null
-+++ b/src/report/report-data-html.h
-@@ -0,0 +1,4 @@
-+struct tag_attr {
-+	const char *css_class;
-+	const char *css_id;
-+};
-diff --git a/src/report/report-formatter-html.cpp b/src/report/report-forma=
-tter-html.cpp
-index 79a0c35..2e59725 100644
---- a/src/report/report-formatter-html.cpp
-+++ b/src/report/report-formatter-html.cpp
-@@ -464,6 +464,8 @@ report_formatter_html::set_cpu_number(int nr)
- 	cpu_nr =3D nr;
+diff --git a/src/report/report-formatter.h b/src/report/report-formatter.h
+index 449fae7..78382d8 100644
+--- a/src/report/report-formatter.h
++++ b/src/report/report-formatter.h
+@@ -65,6 +65,9 @@ public:
+ 	virtual void add_logo() {}
+ 	virtual void add_header() {}
+ 	virtual void end_hheader() {}
++	virtual void add_div(struct tag_attr *div_attr) {}
++	virtual void end_div() {}
++	virtual void add_title(struct tag_attr *att_title, const char *title) {}
+ };
+ =
+
+ #endif /* _REPORT_FORMATTER_H_ */
+diff --git a/src/report/report-maker.cpp b/src/report/report-maker.cpp
+index 8eba618..ff87f1e 100644
+--- a/src/report/report-maker.cpp
++++ b/src/report/report-maker.cpp
+@@ -350,3 +350,21 @@ report_maker::end_hheader()
+ 	formatter->end_hheader();
  }
  =
 
-+
-+/* Report Style */
- void
- report_formatter_html::add_logo()
- {
-@@ -481,3 +483,36 @@ report_formatter_html::end_hheader()
- {
- 	add_exact("</header>\n\n");
- }
-+
 +void
-+report_formatter_html::add_div(struct tag_attr * div_attr)
++report_maker::add_title(struct tag_attr *att_title, const char *title)
 +{
-+	std::string empty=3D"";
-+	std::string tmp_str;
-+
-+	if (div_attr->css_class =3D=3D empty && div_attr->css_id =3D=3D empty)
-+		add_exact("<div>\n");
-+
-+	else if (div_attr->css_class =3D=3D empty && div_attr->css_id !=3D empty)
-+		addf_exact("<div id=3D\"%s\">\n", div_attr->css_id);
-+
-+	else if (div_attr->css_class !=3D empty && div_attr->css_id =3D=3D empty)
-+		addf_exact("<div class=3D\"%s\">\n", div_attr->css_class);
-+
-+	else if (div_attr->css_class !=3D empty && div_attr->css_id !=3D empty)
-+		addf_exact("<div class=3D\"%s\" id=3D\"%s\">\n",
-+				div_attr->css_class, div_attr->css_id);
++	formatter->add_title(att_title, title);
 +}
 +
 +void
-+report_formatter_html::end_div()
++report_maker::add_div(struct tag_attr * div_attr)
 +{
-+	add_exact("</div>\n");
++	formatter->add_div(div_attr);
 +}
 +
 +void
-+report_formatter_html::add_title(struct tag_attr *title_att, const char *t=
-itle)
++report_maker::end_div()
 +{
-+	addf_exact("<h2 class=3D\"%s\"> %s </h2>\n", title_att->css_class, title);
++	formatter->end_div();
 +}
 +
-diff --git a/src/report/report-formatter-html.h b/src/report/report-formatt=
-er-html.h
-index 1ade760..0f508d3 100644
---- a/src/report/report-formatter-html.h
-+++ b/src/report/report-formatter-html.h
-@@ -29,7 +29,7 @@
- #include <string>
- =
-
- #include "report-formatter-base.h"
--
-+#include "report-data-html.h"
- /* Whether to replace " and ' in HTML by &quot; and &apos; respectively */
- /*#define REPORT_HTML_ESCAPE_QUOTES*/
- =
-
-@@ -86,6 +86,9 @@ public:
- 	void add_logo();
+diff --git a/src/report/report-maker.h b/src/report/report-maker.h
+index fab9589..0c17635 100644
+--- a/src/report/report-maker.h
++++ b/src/report/report-maker.h
+@@ -196,6 +196,9 @@ public:
  	void add_header();
  	void end_hheader();
+ 	void add_logo();
 +	void add_div(struct tag_attr *div_attr);
 +	void end_div();
-+	void add_title(struct tag_attr *title_att, const char *title);
++	void add_title(struct tag_attr *att_title, const char *title);
  =
 
  private:
- 	/* Document structure related functions */
+ 	void setup_report_formatter();
 -- =
 
 1.7.9.5
 
 
---===============4940981571676996302==--
+--===============2813277884846284818==--
 
