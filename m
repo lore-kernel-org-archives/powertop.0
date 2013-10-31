@@ -1,46 +1,99 @@
-Content-Type: multipart/mixed; boundary="===============5381191077804438572=="
+Content-Type: multipart/mixed; boundary="===============2608288326910757892=="
 MIME-Version: 1.0
-From: Marc MERLIN <marc_powertop at merlins.org>
-Subject: [Powertop] Has anyone seen power bugs from kill -STOP process before
- and after S3 sleep?
-Date: Sat, 23 Nov 2013 16:53:06 -0800
-Message-ID: <20131124005306.GC11389@merlins.org>
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: Re: [Powertop] [PATCH 19/29] report: redesign System Information
+ csv	and html
+Date: Thu, 31 Oct 2013 11:35:20 +0400
+Message-ID: <52720838.7080106@samsung.com>
+In-Reply-To: 1383168080-18233-20-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5381191077804438572==
+--===============2608288326910757892==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-I'm still trying to figure out why my laptop can idle at 12-13W or 20W
-with no differences in processes, and why powertop (even latest, 1.25)
-can provide very incorrect power values.
+Hi Alexandra,
 
-One thing I do that likely few people do:
-killall -STOP chrome chromium firefox-bin xmms mplayer pidgin procmeter3 pl=
-ugin-container
+Alexandra Yates wrote:
+> Enabled "System Information" section for csv and html report design.
+>
+> Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+> ---
+>   src/process/do_process.cpp      |  113 ++++++++++++++++++++++----------=
+-------
+>   src/report/report-data-html.cpp |   11 +++-
+>   src/report/report-data-html.h   |    2 +
+>   3 files changed, 77 insertions(+), 49 deletions(-)
+>
+> diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
+> index 6708f12..c50fdd3 100644
+> --- a/src/process/do_process.cpp
+> +++ b/src/process/do_process.cpp
+> @@ -889,42 +889,48 @@ void report_process_update_display(void)
+...
+>   =
 
-That seems to work with power of course, but I think it later causes
-problem when I go to sleep (shut the lid) and come back later.
+> -	report.begin_section(SECTION_SOFTWARE);
+> -	report.add_header(__("Overview of Software Power Consumers"));
+> -	report.begin_table(TABLE_WIDE);
+> -	report.begin_row();
+> -	if (show_power) {
+> -		report.begin_cell(CELL_SOFTWARE_HEADER);
+> -		report.add(__("Power est."));
+> -	}
+> +	/* Set Table attributes, rows, and cols */
+> +	cols=3D7;
+> +	if (show_power)
+> +		cols=3D8;
+>   =
 
-Have others seen issues with this?
-It's happened for me for over a year, all the way to kernel 3.11
+> -	report.begin_cell(CELL_SOFTWARE_HEADER);
+> -	report.add(__("Usage"));
+> -	report.begin_cell(CELL_SOFTWARE_HEADER);
+> -	report.add(__("Wakeups/s"));
+> -	report.begin_cell(CELL_SOFTWARE_HEADER);
+> -	report.add(__("GPU ops/s"));
+> -	report.begin_cell(CELL_SOFTWARE_HEADER);
+> -	report.add(__("Disk IO/s"));
+> -	report.begin_cell(CELL_SOFTWARE_HEADER);
+> -	report.add(__("GFX Wakeups/s"));
+> -	report.begin_cell(CELL_SOFTWARE_PROCESS);
+> -	report.add(__("Category"));
+> -	report.begin_cell(CELL_SOFTWARE_DESCRIPTION);
+> -	report.add(__("Description"));
+...
+> +	/* Set array of data in row Major order */
+> +	string  software_data[cols * rows];
+> +	software_data[0]=3D"Usage";
+> +	software_data[1]=3D"Wakeups/s";
+> +	software_data[2]=3D"GPU ops/s";
+> +	software_data[3]=3D"Disk IO/s";
+> +	software_data[4]=3D"GFX Wakeups/s";
+> +	software_data[5]=3D"Category";
+> +	software_data[6]=3D"Description";
+> +
+> +	if (show_power)
+> +		software_data[7]=3D"PW Estimate";
+>
+Didn't you miss the __(...) macro here? This macro is used for localizing
+strings to produce reports on another languages too.
 
-Could it also be generating the weird powertop behaviour I get and no
-one else does?
+Thank you.
 
-Thanks,
-Marc
 -- =
 
-"A mouse is a device used to point at the xterm you want to type in" - A.S.=
-R.
-Microsoft is to operating systems ....
-                                      .... what McDonalds is to gourmet coo=
-king
-Home page: http://marc.merlins.org/                         | PGP 1024R/763=
-BE901
+Best regards,
+Igor Zhbanov,
+Expert Software Engineer,
+phone: +7 (495) 797 25 00 ext 3981
+e-mail: i.zhbanov(a)samsung.com
 
---===============5381191077804438572==--
+Mobile group, Moscow R&D center, Samsung Electronics
+12 Dvintsev street, building 1
+127018, Moscow, Russian Federation
+
+
+--===============2608288326910757892==--
 
