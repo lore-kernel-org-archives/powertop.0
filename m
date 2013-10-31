@@ -1,761 +1,510 @@
-Content-Type: multipart/mixed; boundary="===============6541191237722092136=="
+Content-Type: multipart/mixed; boundary="===============1335493132245027151=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH POWERTOP V3] resolve the bug that powertop
- doesn't show correct frequency stats
-Date: Tue, 08 Oct 2013 11:54:00 +0300
-Message-ID: <20131008085359.GA2495@swordfish.minsk.epam.com>
-In-Reply-To: CANHzE=2g6K4tzBEXOC5cuw98erR44RF_4ZQnzQacuqv6W9Ktkw@mail.gmail.com
+From: Zhang, Xiaofeng <xiaofeng.zhang at intel.com>
+Subject: [Powertop] powertop doesnt show watts
+Date: Thu, 31 Oct 2013 06:34:31 +0000
+Message-ID: <0A69F75AE33F46479629A1B92848A62C04B0501E@SHSMSX104.ccr.corp.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6541191237722092136==
+--===============1335493132245027151==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Hi =
 
-On (10/08/13 16:45), Shaojie Sun wrote:
-> Hi Sergey
+
+>From this mail thread, I see a result format like this:
+Power est.  Events/s    Category       Description
+8.18 W    100.0%      Device         USB device: Yubico Yubikey II (Yubico)
+8.13 W    100.0%      Device         USB device: Integrated Camera (Chicony
+
+However, when I use powertop on my Ubuntu laptop, I can't get the first col=
+umn (8.18W, etc.). I use the commond "powertop --calibrate ", while my lapt=
+op in discharging mode.
+I can't find the solution in README or website, could you help?
+
+
+
+Best Regards =E2=98=BA
+Xiaofeng Zhang
+
+-----Original Message-----
+From: powertop-bounces(a)lists.01.org [mailto:powertop-bounces(a)lists.01.o=
+rg] On Behalf Of powertop-request(a)lists.01.org
+Sent: Saturday, October 19, 2013 3:00 AM
+To: powertop(a)lists.01.org
+Subject: PowerTop Digest, Vol 18, Issue 19
+
+Send PowerTop mailing list submissions to
+	powertop(a)lists.01.org
+
+To subscribe or unsubscribe via the World Wide Web, visit
+	https://lists.01.org/mailman/listinfo/powertop
+or, via email, send a message with subject or body 'help' to
+	powertop-request(a)lists.01.org
+
+You can reach the person managing the list at
+	powertop-owner(a)lists.01.org
+
+When replying, please edit your Subject line so it is more specific than "R=
+e: Contents of PowerTop digest..."
+
+
+Today's Topics:
+
+   1. [PATCH -next] intel cpus: add proper C-states init
+      (Sergey Senozhatsky)
+   2. Re: USB devices get wrong power use values (Marc MERLIN)
+   3. Re: USB devices get wrong power use values (Marc MERLIN)
+   4. Re: [PATCH -next] intel cpus: add proper C-states init
+      (Kristen Carlson Accardi)
+   5. [Announce] v2.5-rc1 (Kristen Carlson Accardi)
+
+
+----------------------------------------------------------------------
+
+Message: 1
+Date: Thu, 17 Oct 2013 23:37:51 +0300
+From: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+To: powertop(a)lists.01.org
+Subject: [Powertop] [PATCH -next] intel cpus: add proper C-states init
+Message-ID: <20131017203751.GA2280(a)swordfish>
+Content-Type: text/plain; charset=3Dus-ascii
+
+add missing has_c2c7_res init to nhm_core() .ctor and has_c8c9c10_res/has_c=
+2c7_res init to nhm_package() .ctor.
+
+uninitialised has_c2c7_res/has_c8c9c10_res/has_c2c7_res
+may be used in core/package measurement_start()/measurement_end().
+
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+
+---
+
+src/cpu/intel_cpus.cpp | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp index 194dc75.=
+.ad80337 100644
+--- a/src/cpu/intel_cpus.cpp
++++ b/src/cpu/intel_cpus.cpp
+@@ -87,6 +87,8 @@ static uint64_t get_msr(int cpu, uint64_t offset)
+ =
+
+ nhm_core::nhm_core(int model)
+ {
++	has_c2c7_res =3D 0;
++
+ 	switch(model) {
+ 		case 0x2A:	/* SNB */
+ 		case 0x2D:	/* SNB Xeon */
+@@ -252,6 +254,9 @@ char * nhm_core::fill_pstate_line(int line_nr, char *bu=
+ffer)
+ =
+
+ nhm_package::nhm_package(int model)
+ {
++	has_c8c9c10_res =3D 0;
++	has_c2c7_res =3D 0;
++
+ 	switch(model) {
+ 		case 0x2A:	/* SNB */
+ 		case 0x2D:	/* SNB Xeon */
+@@ -269,7 +274,6 @@ nhm_package::nhm_package(int model)
+ 	else
+ 		has_c3_res =3D 1;
+ =
+
+-
+ 	/* Haswell-ULT has C8/9/10*/
+ 	if (model =3D=3D 0x45)
+ 		has_c8c9c10_res =3D 1;
+
+
+
+------------------------------
+
+Message: 2
+Date: Thu, 17 Oct 2013 17:01:54 -0700
+From: Marc MERLIN <marc_powertop(a)merlins.org>
+To: Arjan van de Ven <arjan(a)linux.intel.com>
+Cc: powertop(a)ml01.01.org
+Subject: Re: [Powertop] USB devices get wrong power use values
+Message-ID: <20131018000154.GA5362(a)merlins.org>
+Content-Type: text/plain; charset=3Dus-ascii
+
+On Sun, Oct 13, 2013 at 09:22:12AM -0700, Marc MERLIN wrote:
+> On Sun, Oct 13, 2013 at 08:33:51AM -0700, Arjan van de Ven wrote:
+> > On 9/22/2013 4:54 PM, Marc MERLIN wrote:
+> > >So, I asked on the linux-usb list, and one thing I quickly found =
+
+> > >out is that the Watt value given by powertop 2.4 is way off for USB de=
+vices:
+> > =
+
+> > what makes you think the value is off?
+> > =
+
+> > >>Power est.  Events/s    Category       Description
+> > >>   8.18 W    100.0%      Device         USB device: Yubico Yubikey II=
+ (Yubico)
+> > >>   8.13 W    100.0%      Device         USB device: Integrated Camera=
+ (Chicony Electronics Co., Ltd.)
+> > =
+
+> > having a USB device active also generally makes the CPU/etc use much =
+
+> > more power, which Powertop "charges" to the USB device in question.
+> > =
+
+> > 8 Watts sounds entirely reasonable for that to me...
 > =
 
-> I tested in powertop tool and find that there is no cpu_id filed in
-> some perf events. such as sched_switch, hrtimer_expire_exit and so on.
-> so we can't modify this change in src/perf/perf_bundle (perf_sample's
-> perf_event_header).
+> Aah, if the CPU gets involved, then yes, it's a bit more possible.
+> So, a simple USB keyboard that's unused can keep one core awake and =
+
+> burn 8 watts if something else goes wrong in the kernel to cause that?
+
+So, I just upgraded to 3.11.5, and see things like this below. Can alsa sou=
+nd really take 10W when I'm batteries?
+Let me put it another way, it just cannot be correct. Full power use is 15W=
+ and if you removed 10W for audio (I'm sure that's wrong) and 3W for wifi (=
+that may be correct) it means my quad core laptop is running at 2W with the=
+ screen on?
+Not possible at all.
+
+So there has to be a bug in powertop 2.4 USB device power calculation.
+
+For what it's worth, I got the data below right after running powertop --ca=
+librate and letting it go through a full cycle.
+
+----------------------------------------------------------------------------
+The battery reports a discharge rate of 15.1 W The estimated remaining time=
+ is 4 hours, 53 minutes
+
+Summary: 572.4 wakeups/second,  18.3 GPU ops/seconds, 0.0 VFS ops/sec and 8=
+.3% CPU use
+
+Power est.              Usage       Events/s    Category       Description
+  10.5 W    100.0%                      Device         Audio codec alsa:hwC=
+0D0: thinkpad (Realtek)
+  3.10 W      7.0 pkts/s                Device         Network interface: w=
+lan0 (iwlwifi)
+  772 mW     25.1 ms/s     208.4        Process        /usr/bin/enlightenme=
+nt
+ 13.4 mW      1.2 ms/s       8.5        Process        xfce4-terminal -T wi=
+ndow10 --role=3Dwindow10 --tab
+(...)
+----------------------------------------------------------------------------
+
+Calibrate results if that helps:
+gandalfthegreat:~# powertop --calibrate
+Loaded 750 prior measurements
+RAPL device for cpu 0
+RAPL device for cpu 0
+RAPL device for cpu 0
+Starting PowerTOP power estimate calibration Calibrating idle
+Calibrating: disk usage
+Calibrating backlight
+.... device /sys/class/backlight/intel_backlight/brightness
+.... device /sys/class/backlight/acpi_video0/brightness
+Calibrating idle
+Calibrating: CPU usage on 1 threads
+Calibrating: CPU usage on 4 threads
+Calibrating: CPU wakeup power consumption
+Calibrating: CPU wakeup power consumption
+Calibrating: CPU wakeup power consumption Calibrating USB devices .... devi=
+ce /sys/bus/usb/devices/3-1/power/control
+.... device /sys/bus/usb/devices/4-1/power/control
+.... device /sys/bus/usb/devices/usb1/power/control
+.... device /sys/bus/usb/devices/usb2/power/control
+.... device /sys/bus/usb/devices/usb3/power/control
+.... device /sys/bus/usb/devices/usb4/power/control
+.... device /sys/bus/usb/devices/3-1.2/power/control
+.... device /sys/bus/usb/devices/3-1.6/power/control
+Calibrating radio devices
+.... device /sys/class/rfkill/rfkill0/soft .... device /sys/class/rfkill/rf=
+kill1/soft .... device /sys/class/rfkill/rfkill0/soft .... device /sys/clas=
+s/rfkill/rfkill1/soft Finishing PowerTOP power estimate calibration Paramet=
+ers after calibration:
+
+
+Parameter state
+----------------------------------
+Value		Name
+ 2.23		alsa-codec-power (2)
+ 0.37		backlight (3)
+ 3.51		backlight-boost-100 (4)
+ 2.52		backlight-boost-40 (5)
+ 6.65		backlight-boost-80 (6)
+ 0.00		backlight-power (7)
+ 0.21		base power (8)
+ 0.00		cpu-consumption (9)
+ 0.00		cpu-wakeups (10)
+ 0.00		disk-operations (11)
+ 0.00		disk-operations-hard (12)
+ 0.00		eth0-link-100 (13)
+10.93		eth0-link-1000 (14)
+ 0.00		eth0-link-high (15)
+ 0.00		eth0-packets (16)
+ 0.00		eth0-powerunsave (17)
+ 0.00		eth0-up (18)
+ 0.20		gpu-operations (19)
+ 0.00		radio:hci0 (20)
+ 0.00		radio:phy0 (21)
+ 0.31		radio:tpacpi_bluetooth_sw (22)
+ 0.00		runtime-0000:00:00.0 (23)
+ 0.00		runtime-0000:00:02.0 (24)
+ 0.00		runtime-0000:00:14.0 (25)
+ 0.00		runtime-0000:00:16.0 (26)
+ 0.00		runtime-0000:00:16.3 (27)
+ 0.00		runtime-0000:00:19.0 (28)
+ 0.00		runtime-0000:00:1a.0 (29)
+ 0.00		runtime-0000:00:1b.0 (30)
+ 0.00		runtime-0000:00:1c.0 (31)
+ 0.00		runtime-0000:00:1c.1 (32)
+ 0.00		runtime-0000:00:1c.2 (33)
+ 0.00		runtime-0000:00:1d.0 (34)
+ 0.00		runtime-0000:00:1f.0 (35)
+ 0.00		runtime-0000:00:1f.2 (36)
+ 0.00		runtime-0000:00:1f.3 (37)
+ 0.00		runtime-0000:02:00.0 (38)
+ 0.00		runtime-0000:03:00.0 (39)
+ 0.00		thinkpad-fan (40)
+ 0.00		thinkpad-fan-cub (41)
+ 0.00		thinkpad-fan-sqr (42)
+ 0.00		thinkpad-light (43)
+ 0.00		usb-device-0403-6001 (44)
+ 0.00		usb-device-04e8-6860 (45)
+ 0.00		usb-device-04e8-6864 (46)
+ 2.58		usb-device-04f2-b2ea (47)
+ 0.00		usb-device-058f-6387 (48)
+ 0.00		usb-device-091e-0003 (49)
+ 1.34		usb-device-0a5c-21e6 (50)
+ 9.82		usb-device-1050-0010 (51)
+ 0.00		usb-device-18d1-4ee2 (52)
+ 0.00		usb-device-18d1-4ee4 (53)
+ 0.00		usb-device-1d6b-0002 (54)
+ 0.00		usb-device-1d6b-0003 (55)
+ 0.00		usb-device-8087-0024 (56)
+ 0.00		usb0-link-100 (57)
+ 0.00		usb0-link-1000 (58)
+ 0.00		usb0-link-high (59)
+ 0.00		usb0-packets (60)
+ 0.00		usb0-powerunsave (61)
+ 0.00		usb0-up (62)
+ 0.00		vboxnet0-link-100 (63)
+ 0.00		vboxnet0-link-1000 (64)
+ 0.00		vboxnet0-link-high (65)
+ 0.00		vboxnet0-packets (66)
+ 0.00		vboxnet0-powerunsave (67)
+ 0.00		vboxnet0-up (68)
+ 0.00		wlan0-link-100 (69)
+ 0.00		wlan0-link-1000 (70)
+ 0.00		wlan0-link-high (71)
+ 0.00		wlan0-packets (72)
+ 1.64		wlan0-powerunsave (73)
+ 0.00		wlan0-up (74)
+ 0.00		xwakes (75)
+
+Score:    2.6  (104691.5)
+Guess:   13.2
+Actual:  13.6
+----------------------------------
+
+
+--
+"A mouse is a device used to point at the xterm you want to type in" - A.S.=
+R.
+Microsoft is to operating systems ....
+                                      .... what McDonalds is to gourmet coo=
+king Home page: http://marc.merlins.org/  =
+
+
+
+------------------------------
+
+Message: 3
+Date: Thu, 17 Oct 2013 17:24:41 -0700
+From: Marc MERLIN <marc_powertop(a)merlins.org>
+To: Arjan van de Ven <arjan(a)linux.intel.com>
+Cc: powertop(a)ml01.01.org
+Subject: Re: [Powertop] USB devices get wrong power use values
+Message-ID: <20131018002441.GB5362(a)merlins.org>
+Content-Type: text/plain; charset=3Dus-ascii
+
+On Thu, Oct 17, 2013 at 05:01:54PM -0700, Marc MERLIN wrote:
+> On Sun, Oct 13, 2013 at 09:22:12AM -0700, Marc MERLIN wrote:
+> > On Sun, Oct 13, 2013 at 08:33:51AM -0700, Arjan van de Ven wrote:
+> > > On 9/22/2013 4:54 PM, Marc MERLIN wrote:
+> > > >So, I asked on the linux-usb list, and one thing I quickly found out=
+ is that the
+> > > >Watt value given by powertop 2.4 is way off for USB devices:
+> > > =
+
+> > > what makes you think the value is off?
+> > > =
+
+> > > >>Power est.  Events/s    Category       Description
+> > > >>   8.18 W    100.0%      Device         USB device: Yubico Yubikey =
+II (Yubico)
+> > > >>   8.13 W    100.0%      Device         USB device: Integrated Came=
+ra (Chicony Electronics Co., Ltd.)
+> > > =
+
+> > > having a USB device active also generally makes the CPU/etc use much =
+more power,
+> > > which Powertop "charges" to the USB device in question.
+> > > =
+
+> > > 8 Watts sounds entirely reasonable for that to me...
+> > =
+
+> > Aah, if the CPU gets involved, then yes, it's a bit more possible.
+> > So, a simple USB keyboard that's unused can keep one core awake and bur=
+n 8
+> > watts if something else goes wrong in the kernel to cause that?
 > =
 
-> And we didn't find any bugs on other perf events. So we only modified
-> it in src/cpu/cpu.cpp.
+> So, I just upgraded to 3.11.5, and see things like this below. Can alsa s=
+ound
+> really take 10W when I'm batteries?
+> Let me put it another way, it just cannot be correct. Full power use is 1=
+5W and
+> if you removed 10W for audio (I'm sure that's wrong) and 3W for wifi (tha=
+t may be correct)
+> it means my quad core laptop is running at 2W with the screen on?
+> Not possible at all.
+
+> So there has to be a bug in powertop 2.4 USB device power calculation.
 > =
 
+> For what it's worth, I got the data below right after running
+> powertop --calibrate and letting it go through a full cycle.
+> =
 
-thanks. I'll try to find some time today (or tomorrow) to take a look
-on it.
+> -------------------------------------------------------------------------=
+---
+> The battery reports a discharge rate of 15.1 W
+> The estimated remaining time is 4 hours, 53 minutes
+> =
 
-	-ss
+> Summary: 572.4 wakeups/second,  18.3 GPU ops/seconds, 0.0 VFS ops/sec and=
+ 8.3% CPU use
+> =
 
-> On Tue, Oct 8, 2013 at 4:17 PM, Jon Medhurst (Tixy) <tixy(a)linaro.org> w=
-rote:
-> > On Mon, 2013-10-07 at 22:54 +0800, Shaojie Sun wrote:
-> >> add jon.medhurst(a)linaro.org
-> >>
-> >> On Mon, Oct 7, 2013 at 7:40 PM, Sergey Senozhatsky
-> >> <sergey.senozhatsky(a)gmail.com> wrote:
-> >> > On (10/07/13 19:31), Shaojie Sun wrote:
-> >> >> Date: Mon, 7 Oct 2013 19:31:54 +0800
-> >> >> From: Shaojie Sun <shaojie.sun(a)linaro.org>
-> >> >> To: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
-> >> >> Cc: Sanjay Rawat <sanjay.rawat(a)linaro.org>, Jon Medhurst <tixy(a)=
-linaro.org>,
-> >> >>  SunShaoJie <sunshaojie(a)huawei.com>, "Private-PMWG(a)Linaro"
-> >> >>  <private-pmwg(a)linaro.org>
-> >> >> Subject: Re: [Powertop] [PATCH POWERTOP V3] resolve the bug that po=
-wertop
-> >> >>  doesn't show correct frequency stats
-> >> >>
-> >> >> Goog question.
-> >> >> Could Tixy answer it?
-> >> >
-> >> > /** Removed Private-PMWG (no permissions), Cc'd powertop list. */
-> >> >
-> >> >
-> >> >
-> >> > the thing is that we tend to trust passed cpunr in many handle_trace=
-_point()-s.
-> >> > so it would be better to fix all sample->trace.cpu users, because the
-> >> > problme may be a bit bigger than that (e.g. src/process/do_process.c=
-pp
-> >> > perf_process_bundle::handle_trace_point()).
-> >
-> > That's what I thought too and said so when I commented on the Linaro's
-> > bug tracking system [1]. I was hoping that someone more familiar with
-> > powertop would investigate further as I had never looked at powertop or
-> > any perf related code before.
-> >
-> > [1] https://bugs.launchpad.net/linaro-android/+bug/1042755/comments/14
-> >
-> > --
-> > Tixy
-> >
-> >> >
-> >> >         -ss
-> >> >
-> >> >> On Mon, Oct 7, 2013 at 6:03 PM, Sergey Senozhatsky
-> >> >> <sergey.senozhatsky(a)gmail.com> wrote:
-> >> >> > On (10/07/13 17:26), Shaojie Sun wrote:
-> >> >> >> From: Jon Medhurst <tixy(a)linaro.org>
-> >> >> >>
-> >> >> >> For cpu_frequency events, perf_power_bundle::handle_trace_point()
-> >> >> >> is always being called with the same cpunr. so the parameter of
-> >> >> >> cpunr is not equal to the cpu which cpu_frequency events happene=
-d.
-> >> >> >> Lucky the trace event themselves have a cpu_id field to say to w=
-hich
-> >> >> >> CPU event it relates, we should use this cpu_id field.
-> >> >> >>
-> >> >> >> Signed-off-by:  Jon Medhurst <tixy(a)linaro.org>
-> >> >> >>               Shaojie Sun <shaojie.sun(a)linaro.com>
-> >> >> >> ---
-> >> >> >>  src/cpu/cpu.cpp |    9 +++++++--
-> >> >> >>  1 file changed, 7 insertions(+), 2 deletions(-)
-> >> >> >>
-> >> >> >> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-> >> >> >> index 7f3af69..e304bbe 100644
-> >> >> >> --- a/src/cpu/cpu.cpp
-> >> >> >> +++ b/src/cpu/cpu.cpp
-> >> >> >> @@ -781,10 +781,15 @@ void perf_power_bundle::handle_trace_point=
-(void *trace, int cpunr, uint64_t time
-> >> >> >>
-> >> >> >>       if (strcmp(event->name, "power_frequency") =3D=3D 0
-> >> >> >>       || strcmp(event->name, "cpu_frequency") =3D=3D 0){
-> >> >> >> -
-> >> >> >> +             ret =3D pevent_get_field_val(NULL, event, "cpu_id"=
-, &rec, &val, 0);
-> >> >> >> +             if (ret < 0) {
-> >> >> >> +                     fprintf(stderr, _("power or cpu_frequency =
-event returned no cpu?\n"));
-> >> >> >> +                     exit(-1);
-> >> >> >> +             }
-> >> >> >> +             cpu =3D all_cpus[val];
-> >> >> >>               ret =3D pevent_get_field_val(NULL, event, "state",=
- &rec, &val, 0);
-> >> >> >>               if (ret < 0) {
-> >> >> >> -                     fprintf(stderr, _("power or cpu_frequecny =
-event returned no state?\n"));
-> >> >> >> +                     fprintf(stderr, _("power or cpu_frequency =
-event returned no state?\n"));
-> >> >> >>                       exit(-1);
-> >> >> >>               }
-> >> >> >
-> >> >> > Hello,
-> >> >> > why not fixing it in src/perf/perf_bundle (perf_sample's perf_eve=
-nt_header),
-> >> >> > where we create data for handle_trace_point() ?
-> >> >> >
-> >> >> >         -ss
-> >> >> >
-> >> >> >> --
-> >> >> >> 1.7.9.5
-> >> >> >>
-> >> >> >> _______________________________________________
-> >> >> >> PowerTop mailing list
-> >> >> >> PowerTop(a)lists.01.org
-> >> >> >> https://lists.01.org/mailman/listinfo/powertop
-> >> >> >>
-> >> >>
-> >
-> >
+> Power est.              Usage       Events/s    Category       Description
+>   10.5 W    100.0%                      Device         Audio codec alsa:h=
+wC0D0: thinkpad (Realtek)
+>   3.10 W      7.0 pkts/s                Device         Network interface:=
+ wlan0 (iwlwifi)
+>   772 mW     25.1 ms/s     208.4        Process        /usr/bin/enlighten=
+ment
+>  13.4 mW      1.2 ms/s       8.5        Process        xfce4-terminal -T =
+window10 --role=3Dwindow10 --tab
+> (...)
+> -------------------------------------------------------------------------=
+---
 
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 175798456, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 27164, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 1, cpu 6, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 27164, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu 6, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 13, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 1, cpu 13, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 8, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 27164, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 0, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu 17, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 1, cpu 13, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 27164, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu 0, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 13, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 1, cpu 13, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 27164, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 6, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu 17, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 1, cpu 13, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 27164, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu 17, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 1, cpu 13, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 8, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu 0, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 27164, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is softirq_entry.
-> perf cpnnr 3, cpu 6, event name softirq_entry.
-> perf find a event not support cpu_id, event name is softirq_entry.
-> perf cpnnr 2, cpu 1, event name softirq_entry.
-> perf find a event not support cpu_id, event name is softirq_entry.
-> perf cpnnr 0, cpu 1, event name softirq_entry.
-> perf find a event not support cpu_id, event name is softirq_entry.
-> perf find a event not support cpu_id, event name is softirq_exit.
-> perf cpnnr 0, cpu 1, event name softirq_exit.
-> perf find a event not support cpu_id, event name is softirq_entry.
-> perf cpnnr 3, cpu 1, event name softirq_entry.
-> perf find a event not support cpu_id, event name is softirq_entry.
-> perf cpnnr 2, cpu 9, event name softirq_entry.
-> perf find a event not support cpu_id, event name is softirq_entry.
-> perf cpnnr 1, cpu 9, event name softirq_entry.
-> perf find a event not support cpu_id, event name is softirq_entry.
-> perf cpnnr 0, cpu 9, event name softirq_entry.
-> perf find a event not support cpu_id, event name is softirq_exit.
-> perf cpnnr 0, cpu 9, event name softirq_exit.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 1, cpu 9, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu 27164, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 13, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 6, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 1, cpu 6, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu 27164, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 13, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 6, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 1, cpu 6, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu 27164, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 13, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 6, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 1, cpu 6, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu 27164, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 6, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 1, cpu 6, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 8, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu 6, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 27164, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 1, cpu 8, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 8, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 27164, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu 0, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 13, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 1, cpu 17, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 8, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 27164, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu 0, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 13, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 1, cpu 17, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 8, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu 27164, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 13, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 1, cpu 8, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 8, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 27164, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu 0, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 13, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 1, cpu 17, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 8, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 27164, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu 0, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 13, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 1, cpu 6, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 8, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu 27164, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 0, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 1, cpu 6, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 8, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu 27164, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 0, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 8, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu -1, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 13, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 27164, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu -1, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 8, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu -1, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 27164, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu -1, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu -1, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 8, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu -1, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu 27164, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu -1, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 0, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 0, cpu 8, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 3, cpu -1, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 17, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 0, cpu 27164, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu -1, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu 0, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu -1, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 1, cpu 6, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu 8, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 3, cpu 13, event name sched_switch.
-> perf find a event not support cpu_id, event name is hrtimer_expire_entry.
-> perf cpnnr 0, cpu 1, event name hrtimer_expire_entry.
-> perf find a event not support cpu_id, event name is hrtimer_expire_entry.
-> perf cpnnr 2, cpu 773908736, event name hrtimer_expire_entry.
-> perf find a event not support cpu_id, event name is hrtimer_expire_entry.
-> perf cpnnr 3, cpu 774957312, event name hrtimer_expire_entry.
-> perf find a event not support cpu_id, event name is hrtimer_expire_entry.
-> perf cpnnr 1, cpu 775481600, event name hrtimer_expire_entry.
-> perf find a event not support cpu_id, event name is hrtimer_expire_exit.
-> perf cpnnr 3, cpu 774433024, event name hrtimer_expire_exit.
-> perf find a event not support cpu_id, event name is hrtimer_expire_exit.
-> perf cpnnr 2, cpu 775481600, event name hrtimer_expire_exit.
-> perf find a event not support cpu_id, event name is hrtimer_expire_exit.
-> perf cpnnr 0, cpu 774957312, event name hrtimer_expire_exit.
-> perf find a event not support cpu_id, event name is hrtimer_expire_exit.
-> perf cpnnr 1, cpu 773908736, event name hrtimer_expire_exit.
-> perf find a event not support cpu_id, event name is softirq_entry.
-> perf cpnnr 0, cpu 774433024, event name softirq_entry.
-> perf find a event not support cpu_id, event name is softirq_entry.
-> perf cpnnr 2, cpu 1, event name softirq_entry.
-> perf find a event not support cpu_id, event name is softirq_entry.
-> perf cpnnr 3, cpu 1, event name softirq_entry.
-> perf find a event not support cpu_id, event name is softirq_entry.
-> perf find a event not support cpu_id, event name is softirq_exit.
-> perf cpnnr 0, cpu 1, event name softirq_exit.
-> perf find a event not support cpu_id, event name is softirq_exit.
-> perf find a event not support cpu_id, event name is softirq_exit.
-> perf cpnnr 2, cpu 1, event name softirq_exit.
-> perf find a event not support cpu_id, event name is softirq_exit.
-> perf cpnnr 3, cpu 1, event name softirq_exit.
-> perf find a event not support cpu_id, event name is softirq_entry.
-> perf find a event not support cpu_id, event name is softirq_entry.
-> perf cpnnr 2, cpu 9, event name softirq_entry.
-> perf find a event not support cpu_id, event name is softirq_entry.
-> perf cpnnr 0, cpu 9, event name softirq_entry.
-> perf find a event not support cpu_id, event name is softirq_entry.
-> perf cpnnr 3, cpu 9, event name softirq_entry.
-> perf find a event not support cpu_id, event name is softirq_exit.
-> perf cpnnr 2, cpu 9, event name softirq_exit.
-> perf find a event not support cpu_id, event name is softirq_exit.
-> perf cpnnr 0, cpu 9, event name softirq_exit.
-> perf find a event not support cpu_id, event name is softirq_exit.
-> perf cpnnr 1, cpu 9, event name softirq_exit.
-> perf find a event not support cpu_id, event name is softirq_exit.
-> perf cpnnr 3, cpu 9, event name softirq_exit.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf find a event not support cpu_id, event name is hrtimer_expire_entry.
-> perf find a event not support cpu_id, event name is sched_wakeup.
-> perf cpnnr 2, cpu -1898111448, event name sched_wakeup.
-> perf find a event not support cpu_id, event name is hrtimer_expire_exit.
-> perf cpnnr 2, cpu 17533, event name hrtimer_expire_exit.
-> perf find a event not support cpu_id, event name is sched_switch.
-> perf cpnnr 2, cpu -1, event name sched_switch.
-> perf find a event not support cpu_id, event name is sched_wakeup.
+Just after I wrote this, I'm now seeing my yubikey back to 10W when it was
+alsa holding the slot earlier.
+ =
+
+> -------------------------------------------------------------------------=
+---
+The battery reports a discharge rate of 21.3 W
+The estimated remaining time is 3 hours, 0 minutes
+
+Summary: 2685.1 wakeups/second,  149.8 GPU ops/seconds, 0.0 VFS ops/sec and=
+ 31.2% CPU use
+
+Power est.              Usage       Events/s    Category       Description
+  10.4 W    100.0%                      Device         USB device: Yubico Y=
+ubikey II (Yubico)
+  5.50 W     13.0%                      Device         Display backlight
+  1.51 W     17.4 pkts/s                Device         Network interface: w=
+lan0 (iwlwifi)
+  566 mW     85.8 ms/s     1520.4       Process        /usr/bin/enlightenme=
+nt
+  109 mW    100.0%                      Device         Audio codec alsa:hwC=
+0D0: thinkpad (Realtek)
+ 43.2 mW      5.2 ms/s      72.9        Process        xfce4-terminal -T wi=
+ndow5 --role=3Dwindow5
+ 25.9 mW      0.8 ms/s      14.8        Process        xfce4-terminal -T wi=
+ndow9 --role=3Dwindow9 --tab
+> -------------------------------------------------------------------------=
+---
+
+I hope this is useful.
+
+Marc
+-- =
+
+"A mouse is a device used to point at the xterm you want to type in" - A.S.=
+R.
+Microsoft is to operating systems ....
+                                      .... what McDonalds is to gourmet coo=
+king
+Home page: http://marc.merlins.org/  =
 
 
---===============6541191237722092136==--
+
+------------------------------
+
+Message: 4
+Date: Fri, 18 Oct 2013 11:07:25 -0700
+From: Kristen Carlson Accardi <kristen(a)linux.intel.com>
+To: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+Cc: powertop(a)lists.01.org
+Subject: Re: [Powertop] [PATCH -next] intel cpus: add proper C-states
+	init
+Message-ID: <20131018110725.7a2b1459(a)bluebird.jf.intel.com>
+Content-Type: text/plain; charset=3DUS-ASCII
+
+On Thu, 17 Oct 2013 23:37:51 +0300
+Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com> wrote:
+
+> add missing has_c2c7_res init to nhm_core() .ctor and
+> has_c8c9c10_res/has_c2c7_res init to nhm_package() .ctor.
+> =
+
+> uninitialised has_c2c7_res/has_c8c9c10_res/has_c2c7_res
+> may be used in core/package measurement_start()/measurement_end().
+> =
+
+> Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+
+Applied, thanks.
+
+
+------------------------------
+
+Message: 5
+Date: Fri, 18 Oct 2013 11:09:26 -0700
+From: Kristen Carlson Accardi <kristen(a)linux.intel.com>
+To: powertop(a)lists.01.org
+Subject: [Powertop] [Announce] v2.5-rc1
+Message-ID: <20131018110926.2deb6450(a)bluebird.jf.intel.com>
+Content-Type: text/plain; charset=3DUS-ASCII
+
+Please test.
+
+Thanks,
+Kristen
+
+
+------------------------------
+
+_______________________________________________
+PowerTop mailing list
+PowerTop(a)lists.01.org
+https://lists.01.org/mailman/listinfo/powertop
+
+
+End of PowerTop Digest, Vol 18, Issue 19
+****************************************
+
+--===============1335493132245027151==--
 
