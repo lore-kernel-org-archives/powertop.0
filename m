@@ -1,55 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============3508278191207045989=="
+Content-Type: multipart/mixed; boundary="===============2989128169230041749=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: [Powertop] [PATCH 04/10] tuning: print executed toggle script
-Date: Mon, 14 Oct 2013 11:40:51 +0300
-Message-ID: <1381740057-12499-5-git-send-email-sergey.senozhatsky@gmail.com>
-In-Reply-To: 1381740057-12499-1-git-send-email-sergey.senozhatsky@gmail.com
+From: Kristen Carlson Accardi <kristen at linux.intel.com>
+Subject: Re: [Powertop] v2.5-rc1 testing: accounting still very wrong
+Date: Mon, 04 Nov 2013 10:31:05 -0800
+Message-ID: <20131104103105.5bb4711b@bluebird.jf.intel.com>
+In-Reply-To: 20131102195015.GJ5519@merlins.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3508278191207045989==
+--===============2989128169230041749==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-report executed toggle_script back to user via ui_notify_user().
+On Sat, 2 Nov 2013 12:50:15 -0700
+Marc MERLIN <marc_powertop(a)merlins.org> wrote:
 
-Example:
- >> 'auto' > '/sys/bus/pci/devices/0000:00:1c.1/power/control';
- >> echo 'on' > '/sys/bus/pci/devices/0000:00:1c.1/power/control';
+> On Sat, Nov 02, 2013 at 06:48:02AM -0700, Marc MERLIN wrote:
+> > On Fri, Oct 18, 2013 at 11:09:26AM -0700, Kristen Carlson Accardi wrote:
+> > > Please test.
+> > =
 
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
----
- src/tuning/tuning.cpp | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+> > Still the same power counting bugs than previous versions.
+> > After a few minutes, on battery, it went from 12W to 20W because of an
+> > rsync in the background, and when that rsync was finished (sigstop), I =
+got this.
+> > =
 
-diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
-index ff3d715..3d13cc3 100644
---- a/src/tuning/tuning.cpp
-+++ b/src/tuning/tuning.cpp
-@@ -141,11 +141,15 @@ void tuning_window::repaint(void)
- void tuning_window::cursor_enter(void)
- {
- 	class tunable *tun;
--
-+	const char *toggle_script;
- 	tun =3D all_tunables[cursor_pos];
- 	if (!tun)
- 		return;
-+	/** device will change its state so need to store toggle script before
-+	 * we toggle()*/
-+	toggle_script =3D tun->toggle_script();
- 	tun->toggle();
-+	ui_notify_user(">> %s\n", toggle_script);
- }
- =
+> > Somehow I very much doubt that e17 was using 1550W.
+> > =
 
- static bool tunables_sort(class tunable * i, class tunable * j)
--- =
+> > Clearly there is at least an assert missing that should ensure that the=
+ list
+> > of power estimated values clearly exceeds the total power.
+> > =
 
-1.8.4.679.g0a1a803
+> > Even if I stop enligthenment, which seems to be most of the wakeups, bad
+> > accounting is all wrong in many ways, see below:
+
+Thanks for the detailed report.  I think we aren't going to be able to
+address this for the 2.5 release, but I will put it on my list of
+things to do to see if we can duplicate this issue on another machine
+and start figuring out what is going on.  We'll try to put a test case
+for something like this together for the 2.6 release just to confirm
+that we are within the realm of possibilities for estimation.
 
 
---===============3508278191207045989==--
+--===============2989128169230041749==--
 
