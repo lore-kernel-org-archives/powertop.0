@@ -1,53 +1,62 @@
-Content-Type: multipart/mixed; boundary="===============5611040058374607487=="
+Content-Type: multipart/mixed; boundary="===============6805907275838867318=="
 MIME-Version: 1.0
 From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH v3 27/31] report: conditional runs ncurses & cpu
- html report
-Date: Mon, 18 Nov 2013 12:27:18 -0800
-Message-ID: <1384806442-20294-28-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: 1384806442-20294-1-git-send-email-alexandra.yates@linux.intel.com
+Subject: [Powertop] [PATCH v2 22/31] report: cleanup csv title and unused vars
+Date: Fri, 15 Nov 2013 16:29:09 -0800
+Message-ID: <1384561758-21516-23-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1384561758-21516-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5611040058374607487==
+--===============6805907275838867318==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Adds a conditional to fix n-curses from breaking when calling
-one_measurment from main. Now will execute report_display_cpu_cstates
-and report_display_cpu_pstates only when a csv or an HTML report are
-generated.
+Removed old csv headder to avoid redundancy. Removed unused variables
+from report.cpp str2 and str3.
 
 Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
 ---
- src/main.cpp |    7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ src/report/report-formatter-csv.cpp |    2 +-
+ src/report/report.cpp               |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/main.cpp b/src/main.cpp
-index 4e34ee6..c57aa57 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -216,10 +216,11 @@ void one_measurement(int seconds, char *workload)
- 	report_summary();
- 	w_display_cpu_cstates();
- 	w_display_cpu_pstates();
--	report_display_cpu_cstates();
--	report_display_cpu_pstates();
-+	if (reporttype !=3D REPORT_OFF) {
-+		report_display_cpu_cstates();
-+		report_display_cpu_pstates();
-+	}
- 	report_process_update_display();
--
- 	tuning_update_display();
+diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-format=
+ter-csv.cpp
+index facdd4d..0ab1091 100644
+--- a/src/report/report-formatter-csv.cpp
++++ b/src/report/report-formatter-csv.cpp
+@@ -57,7 +57,7 @@ report_formatter_csv::finish_report()
+ void
+ report_formatter_csv::add_doc_header()
+ {
+-	add_header(report_csv_header, 1);
++	/*add_header(report_csv_header, 1);*/
+ }
  =
 
- 	end_process_data();
+ /* ***********************************************************************=
+* */
+diff --git a/src/report/report.cpp b/src/report/report.cpp
+index 3b46f58..56232a6 100644
+--- a/src/report/report.cpp
++++ b/src/report/report.cpp
+@@ -100,7 +100,7 @@ static string read_os_release(const string &filename)
+ =
+
+ static void system_info(void)
+ {
+-	string str, str2, str3;
++	string str;
+ =
+
+ 	/* div attr css_class and css_id */
+ 	tag_attr div_attr;
 -- =
 
 1.7.9.5
 
 
---===============5611040058374607487==--
+--===============6805907275838867318==--
 
