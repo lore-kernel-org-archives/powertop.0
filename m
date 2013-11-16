@@ -1,101 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============4959807328568018217=="
+Content-Type: multipart/mixed; boundary="===============5998381926341519481=="
 MIME-Version: 1.0
 From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH v2 05/31] report-csv: title, div, logo, header
-Date: Fri, 15 Nov 2013 16:28:52 -0800
-Message-ID: <1384561758-21516-6-git-send-email-alexandra.yates@linux.intel.com>
+Subject: [Powertop] [PATCH v2 17/31] report: Fixed html summary & menu colapse
+ styles
+Date: Fri, 15 Nov 2013 16:29:04 -0800
+Message-ID: <1384561758-21516-18-git-send-email-alexandra.yates@linux.intel.com>
 In-Reply-To: 1384561758-21516-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4959807328568018217==
+--===============5998381926341519481==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Implements csv report functionality to add title, division, header,
-and logo.
+Fixed summary to only show in the summary section. Also fixed page to
+avoid the menu to wrap around with the logo/system info section.
 
 Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
 ---
- src/report/report-formatter-csv.cpp |   39 +++++++++++++++++++++++++++++++=
-++++
- src/report/report-formatter-csv.h   |    8 +++++++
- 2 files changed, 47 insertions(+)
+ src/powertop.css                     |    2 +-
+ src/process/do_process.cpp           |    2 +-
+ src/report/report-formatter-html.cpp |    1 +
+ 3 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-format=
-ter-csv.cpp
-index cd70d91..bd9dfd3 100644
---- a/src/report/report-formatter-csv.cpp
-+++ b/src/report/report-formatter-csv.cpp
-@@ -222,3 +222,42 @@ report_formatter_csv::set_cpu_number(int nr UNUSED)
- {
- 	/* Do nothing */
- }
-+
-+/* Report Style */
-+void
-+report_formatter_csv::add_header()
-+{
-+	add_exact("\n=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D\n");
-+}
-+
-+void
-+report_formatter_csv::end_hheader()
-+{
-+	/* Do nothing */
-+}
-+
-+void
-+report_formatter_csv::add_logo()
-+{
-+	add_exact("\t\t\tP o w e r T o p\n");
-+}
-+
-+
-+void
-+report_formatter_csv::add_div(struct tag_attr * div_attr)
-+{
-+	add_exact("\n");
-+}
-+
-+void
-+report_formatter_csv::end_div()
-+{
-+	/*Do nothing*/
-+}
-+
-+void
-+report_formatter_csv::add_title(struct tag_attr *title_att, const char *ti=
-tle)
-+{
-+	add_exact("______________________________________________________________=
-______\n");
-+	addf_exact(" *  *  *   %s   *  *  *\n", title);
-+}
-diff --git a/src/report/report-formatter-csv.h b/src/report/report-formatte=
-r-csv.h
-index 8dd2976..2c1c0fd 100644
---- a/src/report/report-formatter-csv.h
-+++ b/src/report/report-formatter-csv.h
-@@ -71,6 +71,14 @@ public:
+diff --git a/src/powertop.css b/src/powertop.css
+index d724ead..38daa1f 100644
+--- a/src/powertop.css
++++ b/src/powertop.css
+@@ -262,4 +262,4 @@ div.hide {
+ </head>
  =
 
- 	void set_cpu_number(int nr);
+ <body onload=3D'powertop.onload();'>
+-
++<div id=3D\"main_container\">
+diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
+index df7d646..c676978 100644
+--- a/src/process/do_process.cpp
++++ b/src/process/do_process.cpp
+@@ -1010,7 +1010,7 @@ void report_summary(void)
  =
 
-+	/* Report Style */
-+	void add_logo();
-+	void add_header();
-+	void end_hheader();
-+	void add_div(struct tag_attr *div_attr);
-+	void end_div();
-+	void add_title(struct tag_attr *title_att, const char *title);
-+
- private:
- 	void add_doc_header();
+ 	/* div attr css_class and css_id */
+ 	tag_attr div_attr;
+-	init_div(&div_attr, "summary", "");
++	init_div(&div_attr, "", "summary");
+ =
+
+ =
+
+ 	/* Set table attributes, rows, and cols */
+diff --git a/src/report/report-formatter-html.cpp b/src/report/report-forma=
+tter-html.cpp
+index fa758ec..210a354 100644
+--- a/src/report/report-formatter-html.cpp
++++ b/src/report/report-formatter-html.cpp
+@@ -52,6 +52,7 @@ static const char report_html_alternative_head[] =3D
+ /* ***********************************************************************=
+* */
+ =
+
+ static const char report_html_footer[] =3D
++	"</div>\n"
+ 	"</body>\n"
+ 	"</html>\n";
  =
 
 -- =
@@ -103,5 +72,5 @@ index 8dd2976..2c1c0fd 100644
 1.7.9.5
 
 
---===============4959807328568018217==--
+--===============5998381926341519481==--
 
