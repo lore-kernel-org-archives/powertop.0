@@ -1,149 +1,117 @@
-Content-Type: multipart/mixed; boundary="===============0556242495405731765=="
+Content-Type: multipart/mixed; boundary="===============4486642106724827184=="
 MIME-Version: 1.0
 From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH 20/29] report: redesign Device Power Report css &
- html
-Date: Wed, 30 Oct 2013 14:21:11 -0700
-Message-ID: <1383168080-18233-21-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: 1383168080-18233-1-git-send-email-alexandra.yates@linux.intel.com
+Subject: [Powertop] [PATCH v2 08/31] report-csv: Added navigation & summary
+ list
+Date: Fri, 15 Nov 2013 16:28:55 -0800
+Message-ID: <1384561758-21516-9-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1384561758-21516-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0556242495405731765==
+--===============4486642106724827184==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Redesign Device Power Report table part of "Device Info" section.
+Implements csv report functionality to add navigation and summary on the
+csv report.
 
 Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
 ---
- src/devices/device.cpp |   72 +++++++++++++++++++++++---------------------=
-----
- 1 file changed, 35 insertions(+), 37 deletions(-)
+ src/report/report-formatter-csv.cpp |   22 ++++++++++++++++++++--
+ src/report/report-formatter-csv.h   |    6 +++++-
+ 2 files changed, 25 insertions(+), 3 deletions(-)
 
-diff --git a/src/devices/device.cpp b/src/devices/device.cpp
-index 00ec5e6..1d9b1d4 100644
---- a/src/devices/device.cpp
-+++ b/src/devices/device.cpp
-@@ -49,6 +49,7 @@ using namespace std;
- #include "../lib.h"
- #include "../report/report.h"
- #include "../report/report-maker.h"
-+#include "../report/report-data-html.h"
- #include "../measurement/measurement.h"
- #include "../devlist.h"
- #include <unistd.h>
-@@ -217,43 +218,35 @@ void report_devices(void)
- void show_report_devices(void)
+diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-format=
+ter-csv.cpp
+index bd9dfd3..2981940 100644
+--- a/src/report/report-formatter-csv.cpp
++++ b/src/report/report-formatter-csv.cpp
+@@ -189,10 +189,10 @@ report_formatter_csv::end_paragraph()
+ =
+
+ /* ***********************************************************************=
+* */
+ =
+
+-std::string
++string
+ report_formatter_csv::escape_string(const char *str)
  {
- 	unsigned int i;
--	int show_power;
--	double pw;
-+	int show_power, cols, rows, idx;
+-	std::string res;
++	string res;
  =
 
- 	show_power =3D global_power_valid();
- 	sort(all_devices.begin(), all_devices.end(), power_device_sort);
+ 	assert(str);
  =
 
--	report.begin_section(SECTION_DEVPOWER);
--	report.add_header("Device Power Report");
-+	/* div attr css_class and css_id */
-+        tag_attr div_attr;
-+        init_div(&div_attr, "", "device");
- =
-
--	pw =3D global_joules_consumed();
--	if (pw > 0.0001) {
--		char buf[32];
-+        /* Set Table attributes, rows, and cols */
-+        table_attributes std_table_css;
-+	cols=3D2;
-+        if (show_power)
-+                cols=3D3;
- =
-
--		report.begin_paragraph();
--		report.addf("The battery reports a discharge rate of %sW",
--			    fmt_prefix(pw, buf));
--	}
-+	idx =3D cols;
-+ 	rows=3D all_devices.size() + 1;
-+        init_std_table_attr(&std_table_css, rows, cols);
- =
-
--	if (show_power) {
--		char buf[32];
-+        /* Set Title attributes */
-+        tag_attr title_attr;
-+        init_title_attr(&title_attr);
- =
-
--		report.begin_paragraph();
--		report.addf("System baseline power is estimated at %sW",
--			    fmt_prefix(get_parameter_value("base power"), buf));
--	}
--
--	report.begin_table(TABLE_WIDE);
--	report.begin_row();
--	if (show_power) {
--		report.begin_cell(CELL_DEVPOWER_HEADER);
--		report.add("Power est.");
--	}
--
--	report.begin_cell(CELL_DEVPOWER_HEADER);
--	report.add("Usage");
--	report.begin_cell(CELL_DEVPOWER_DEV_NAME);
--	report.add("Device name");
-+        /* Set array of data in row Major order */
-+	string device_data[cols * rows];
-+	device_data[0]=3D "Usage";
-+	device_data[1]=3D "Device Name";
-+	if (show_power)
-+		device_data[2]=3D "PW Estimate";
- =
-
- 	for (i =3D 0; i < all_devices.size(); i++) {
- 		double P;
-@@ -278,17 +271,22 @@ void show_report_devices(void)
- 		if (!show_power || !all_devices[i]->power_valid())
- 			strcpy(power, "           ");
- =
-
--		report.begin_row(ROW_DEVPOWER);
-+		device_data[idx]=3D string(util);
-+		idx+=3D1;
-+
-+		device_data[idx]=3D string(all_devices[i]->human_name());
-+		idx+=3D1;
-+
- 		if (show_power) {
--			report.begin_cell(CELL_DEVPOWER_POWER);
--			report.add(power);
-+			device_data[idx]=3D string(power);
-+			idx+=3D1;
- 		}
--
--		report.begin_cell(CELL_DEVPOWER_UTIL);
--		report.add(util);
--		report.begin_cell();
--		report.add(all_devices[i]->human_name());
- 	}
-+	/* Report Output */
-+	report.add_div(&div_attr);
-+	report.add_title(&title_attr,"Device Power Report");
-+	report.add_table(device_data, &std_table_css);
-+	report.end_div();
+@@ -261,3 +261,21 @@ report_formatter_csv::add_title(struct tag_attr *title=
+_att, const char *title)
+ 	add_exact("______________________________________________________________=
+______\n");
+ 	addf_exact(" *  *  *   %s   *  *  *\n", title);
  }
++
++void
++report_formatter_csv::add_navigation()
++{
++	/* No nav in csv - thinking on table of contents */
++}
++
++void
++report_formatter_csv::add_summary_list(string *list, int size)
++{
++	int i;
++	add_exact("\n");
++	for (i=3D0; i < size; i+=3D2){
++		addf_exact("%s %s,", list[i].c_str(), list[i+1].c_str());
++	}
++	add_exact("\n");
++}
++
+diff --git a/src/report/report-formatter-csv.h b/src/report/report-formatte=
+r-csv.h
+index 2c1c0fd..daf723e 100644
+--- a/src/report/report-formatter-csv.h
++++ b/src/report/report-formatter-csv.h
+@@ -42,6 +42,8 @@
+ /* Whether to escape with quotes empty cell values with spaces */
+ /*#define REPORT_CSV_SPACE_NEED_QUOTES*/
  =
 
++using namespace std;
++
+ /* ***********************************************************************=
+* */
  =
 
+ class report_formatter_csv: public report_formatter_string_base
+@@ -78,13 +80,15 @@ public:
+ 	void add_div(struct tag_attr *div_attr);
+ 	void end_div();
+ 	void add_title(struct tag_attr *title_att, const char *title);
++	void add_navigation();
++	void add_summary_list(string *list, int size);
+ =
+
+ private:
+ 	void add_doc_header();
+ =
+
+ 	void add_quotes();
+ =
+
+-	std::string escape_string(const char *str);
++	string escape_string(const char *str);
+ =
+
+ 	bool csv_need_quotes;
+ 	size_t table_cell_number, text_start;
 -- =
 
 1.7.9.5
 
 
---===============0556242495405731765==--
+--===============4486642106724827184==--
 
