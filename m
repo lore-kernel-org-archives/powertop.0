@@ -1,89 +1,107 @@
-Content-Type: multipart/mixed; boundary="===============7910444006784645114=="
+Content-Type: multipart/mixed; boundary="===============4959807328568018217=="
 MIME-Version: 1.0
 From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH v2 04/31] report: report maker add title and div
-Date: Fri, 15 Nov 2013 16:28:51 -0800
-Message-ID: <1384561758-21516-5-git-send-email-alexandra.yates@linux.intel.com>
+Subject: [Powertop] [PATCH v2 05/31] report-csv: title, div, logo, header
+Date: Fri, 15 Nov 2013 16:28:52 -0800
+Message-ID: <1384561758-21516-6-git-send-email-alexandra.yates@linux.intel.com>
 In-Reply-To: 1384561758-21516-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7910444006784645114==
+--===============4959807328568018217==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Calls to add a title and add a division from report maker using report
-object to the generated report.
+Implements csv report functionality to add title, division, header,
+and logo.
 
 Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
 ---
- src/report/report-formatter.h |    3 +++
- src/report/report-maker.cpp   |   18 ++++++++++++++++++
- src/report/report-maker.h     |    3 +++
- 3 files changed, 24 insertions(+)
+ src/report/report-formatter-csv.cpp |   39 +++++++++++++++++++++++++++++++=
+++++
+ src/report/report-formatter-csv.h   |    8 +++++++
+ 2 files changed, 47 insertions(+)
 
-diff --git a/src/report/report-formatter.h b/src/report/report-formatter.h
-index 449fae7..78382d8 100644
---- a/src/report/report-formatter.h
-+++ b/src/report/report-formatter.h
-@@ -65,6 +65,9 @@ public:
- 	virtual void add_logo() {}
- 	virtual void add_header() {}
- 	virtual void end_hheader() {}
-+	virtual void add_div(struct tag_attr *div_attr) {}
-+	virtual void end_div() {}
-+	virtual void add_title(struct tag_attr *att_title, const char *title) {}
- };
- =
-
- #endif /* _REPORT_FORMATTER_H_ */
-diff --git a/src/report/report-maker.cpp b/src/report/report-maker.cpp
-index 8eba618..ff87f1e 100644
---- a/src/report/report-maker.cpp
-+++ b/src/report/report-maker.cpp
-@@ -350,3 +350,21 @@ report_maker::end_hheader()
- 	formatter->end_hheader();
+diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-format=
+ter-csv.cpp
+index cd70d91..bd9dfd3 100644
+--- a/src/report/report-formatter-csv.cpp
++++ b/src/report/report-formatter-csv.cpp
+@@ -222,3 +222,42 @@ report_formatter_csv::set_cpu_number(int nr UNUSED)
+ {
+ 	/* Do nothing */
  }
++
++/* Report Style */
++void
++report_formatter_csv::add_header()
++{
++	add_exact("\n=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D\n");
++}
++
++void
++report_formatter_csv::end_hheader()
++{
++	/* Do nothing */
++}
++
++void
++report_formatter_csv::add_logo()
++{
++	add_exact("\t\t\tP o w e r T o p\n");
++}
++
++
++void
++report_formatter_csv::add_div(struct tag_attr * div_attr)
++{
++	add_exact("\n");
++}
++
++void
++report_formatter_csv::end_div()
++{
++	/*Do nothing*/
++}
++
++void
++report_formatter_csv::add_title(struct tag_attr *title_att, const char *ti=
+tle)
++{
++	add_exact("______________________________________________________________=
+______\n");
++	addf_exact(" *  *  *   %s   *  *  *\n", title);
++}
+diff --git a/src/report/report-formatter-csv.h b/src/report/report-formatte=
+r-csv.h
+index 8dd2976..2c1c0fd 100644
+--- a/src/report/report-formatter-csv.h
++++ b/src/report/report-formatter-csv.h
+@@ -71,6 +71,14 @@ public:
  =
 
-+void
-+report_maker::add_title(struct tag_attr *att_title, const char *title)
-+{
-+	formatter->add_title(att_title, title);
-+}
-+
-+void
-+report_maker::add_div(struct tag_attr * div_attr)
-+{
-+	formatter->add_div(div_attr);
-+}
-+
-+void
-+report_maker::end_div()
-+{
-+	formatter->end_div();
-+}
-+
-diff --git a/src/report/report-maker.h b/src/report/report-maker.h
-index fab9589..0c17635 100644
---- a/src/report/report-maker.h
-+++ b/src/report/report-maker.h
-@@ -196,6 +196,9 @@ public:
- 	void add_header();
- 	void end_hheader();
- 	void add_logo();
+ 	void set_cpu_number(int nr);
+ =
+
++	/* Report Style */
++	void add_logo();
++	void add_header();
++	void end_hheader();
 +	void add_div(struct tag_attr *div_attr);
 +	void end_div();
-+	void add_title(struct tag_attr *att_title, const char *title);
++	void add_title(struct tag_attr *title_att, const char *title);
++
+ private:
+ 	void add_doc_header();
  =
 
- private:
- 	void setup_report_formatter();
 -- =
 
 1.7.9.5
 
 
---===============7910444006784645114==--
+--===============4959807328568018217==--
 
