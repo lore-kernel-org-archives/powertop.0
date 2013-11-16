@@ -1,68 +1,101 @@
-Content-Type: multipart/mixed; boundary="===============0473041903888114840=="
+Content-Type: multipart/mixed; boundary="===============0125192842810301867=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [Announce] v2.5-rc1
-Date: Tue, 22 Oct 2013 11:56:32 +0300
-Message-ID: <20131022085631.GB2286@swordfish>
-In-Reply-To: 5B3EBE90AD716C428A6F03AC478C54067FB7D737@ORSMSX105.amr.corp.intel.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH v2 07/31] report-maker: navigation & summary
+Date: Fri, 15 Nov 2013 16:28:54 -0800
+Message-ID: <1384561758-21516-8-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1384561758-21516-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0473041903888114840==
+--===============0125192842810301867==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/21/13 17:21), Yates, Alexandra wrote:
-> IE 8.0 up to 10 doesn't display the menu bar nor any of the links.  =
+Implements methods to generate navigation and summary from the report
+object.
 
-
-please test the following patch.
-
-------8<-----8<--------
-
-IE up to v10 does not support object classList. workaround
-by manual className manipulation.
-
-Reported-by: Alexandra Yates <alexandra.yates(a)intel.com>
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
-
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
 ---
+ src/report/report-formatter.h |    3 +++
+ src/report/report-maker.cpp   |   12 ++++++++++++
+ src/report/report-maker.h     |    4 +++-
+ 3 files changed, 18 insertions(+), 1 deletion(-)
 
- src/powertop.css | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+diff --git a/src/report/report-formatter.h b/src/report/report-formatter.h
+index 78382d8..5e5b8d7 100644
+--- a/src/report/report-formatter.h
++++ b/src/report/report-formatter.h
+@@ -27,6 +27,7 @@
+ #define _REPORT_FORMATTER_H_
+ =
 
-diff --git a/src/powertop.css b/src/powertop.css
-index 6d43e07..c58d757 100644
---- a/src/powertop.css
-+++ b/src/powertop.css
-@@ -17,14 +17,20 @@ var powertop =3D {
-  },
-  cadd: function(idx, c){
-    var el =3D document.getElementById(idx);
--   if (el)
--     el.classList.add(c);
+ #include "report-maker.h"
++using namespace std;
+ =
+
+ class report_formatter
+ {
+@@ -68,6 +69,8 @@ public:
+ 	virtual void add_div(struct tag_attr *div_attr) {}
+ 	virtual void end_div() {}
+ 	virtual void add_title(struct tag_attr *att_title, const char *title) {}
++	virtual void add_navigation() {}
++	virtual void add_summary_list(string *list, int size) {}
+ };
+ =
+
+ #endif /* _REPORT_FORMATTER_H_ */
+diff --git a/src/report/report-maker.cpp b/src/report/report-maker.cpp
+index ff87f1e..ccfbec4 100644
+--- a/src/report/report-maker.cpp
++++ b/src/report/report-maker.cpp
+@@ -368,3 +368,15 @@ report_maker::end_div()
+ 	formatter->end_div();
+ }
+ =
+
++void
++report_maker::add_navigation()
++{
++	formatter->add_navigation();
++}
++
++void
++report_maker::add_summary_list(string *list, int size)
++{
++	formatter->add_summary_list(list, size);
++}
++
+diff --git a/src/report/report-maker.h b/src/report/report-maker.h
+index 0c17635..6e5f4d1 100644
+--- a/src/report/report-maker.h
++++ b/src/report/report-maker.h
+@@ -73,7 +73,7 @@
+ #include <stdarg.h>
+ =
+
+ #include <string>
 -
-+   if (el) {
-+      var cn =3D el.className;
-+      cn +=3D ' ' + c;
-+      el.className =3D cn;
-+   }
-  },
-  crm: function(id, c){
-    var el =3D document.getElementById(id);
--   if (el)
--     el.classList.remove(c);
-+   if (el) {
-+      var cn =3D el.className
-+      while (cn.indexOf(' ' + c) !=3D -1)
-+         cn =3D cn.replace(' ' + c,'');
-+      el.className =3D cn;
-+   }
-  },
-  newbutton: function(id, txt) {
-   var x =3D document.createElement('div');
++using namespace std;
+ /* Conditional gettext. We need original strings for CSV. */
+ #define __(STRING) \
+ 	((report.get_type() =3D=3D REPORT_CSV) ? (STRING) : gettext(STRING))
+@@ -199,6 +199,8 @@ public:
+ 	void add_div(struct tag_attr *div_attr);
+ 	void end_div();
+ 	void add_title(struct tag_attr *att_title, const char *title);
++	void add_navigation();
++	void add_summary_list(string *list, int size);
+ =
+
+ private:
+ 	void setup_report_formatter();
+-- =
+
+1.7.9.5
 
 
---===============0473041903888114840==--
+--===============0125192842810301867==--
 
