@@ -1,32 +1,78 @@
-Content-Type: multipart/mixed; boundary="===============5888397763421893981=="
+Content-Type: multipart/mixed; boundary="===============4545973957691012233=="
 MIME-Version: 1.0
-From: Maksim Melnikau <maxposedon at gmail.com>
-Subject: Re: [Powertop] [BUG] powertop shows estimates only for 1st battery
- from 2
-Date: Sun, 13 Oct 2013 11:10:19 +0300
-Message-ID: <CAGbmdnXRo_wG1myJC27DJDPD4000SSAtfoewu2vQY+s0YMjzsQ@mail.gmail.com>
-In-Reply-To: 20131012175312.GC2248@swordfish.minsk.epam.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH v2 10/31] report-maker: modular table generation
+Date: Fri, 15 Nov 2013 16:28:57 -0800
+Message-ID: <1384561758-21516-11-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1384561758-21516-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5888397763421893981==
+--===============4545973957691012233==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Oct 12, 2013 at 8:53 PM, Sergey Senozhatsky
-<sergey.senozhatsky(a)gmail.com> wrote:
-> could you please post:
-# ls /sys/class/backlight
-acpi_video0  intel_backlight
-# cat /sys/class/backlight/acpi_video0/device/enable
-1
-# cat /sys/class/backlight/acpi_video0/type
-firmware
-# cat /sys/class/backlight/intel_backlight/device/enabled
-enabled
-# cat /sys/class/backlight/intel_backlight/type
-raw
+Generates a modular table when using the report maker object.
+It passess table_size, css_attributes, and data.  The data is stored in
+a single dimensional array using row major order.
 
---===============5888397763421893981==--
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+---
+ src/report/report-formatter.h |    3 +++
+ src/report/report-maker.cpp   |    7 +++++++
+ src/report/report-maker.h     |    2 ++
+ 3 files changed, 12 insertions(+)
+
+diff --git a/src/report/report-formatter.h b/src/report/report-formatter.h
+index 5e5b8d7..4fe2c42 100644
+--- a/src/report/report-formatter.h
++++ b/src/report/report-formatter.h
+@@ -71,6 +71,9 @@ public:
+ 	virtual void add_title(struct tag_attr *att_title, const char *title) {}
+ 	virtual void add_navigation() {}
+ 	virtual void add_summary_list(string *list, int size) {}
++	virtual void add_table(string *system_data,
++			struct table_size *size,
++			struct table_attributes *tb_attr)     {}
+ };
+ =
+
+ #endif /* _REPORT_FORMATTER_H_ */
+diff --git a/src/report/report-maker.cpp b/src/report/report-maker.cpp
+index ccfbec4..031b692 100644
+--- a/src/report/report-maker.cpp
++++ b/src/report/report-maker.cpp
+@@ -380,3 +380,10 @@ report_maker::add_summary_list(string *list, int size)
+ 	formatter->add_summary_list(list, size);
+ }
+ =
+
++void
++report_maker::add_table(string *system_data, struct table_size *size,
++		struct table_attributes *tb_attr)
++{
++	formatter->add_table(system_data, size, tb_attr);
++}
++
+diff --git a/src/report/report-maker.h b/src/report/report-maker.h
+index 6e5f4d1..e75c99a 100644
+--- a/src/report/report-maker.h
++++ b/src/report/report-maker.h
+@@ -201,6 +201,8 @@ public:
+ 	void add_title(struct tag_attr *att_title, const char *title);
+ 	void add_navigation();
+ 	void add_summary_list(string *list, int size);
++	void add_table(string *system_data, struct table_size *size,
++			struct table_attributes *tb_attr);
+ =
+
+ private:
+ 	void setup_report_formatter();
+-- =
+
+1.7.9.5
+
+
+--===============4545973957691012233==--
 
