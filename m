@@ -1,61 +1,130 @@
-Content-Type: multipart/mixed; boundary="===============2288559116949547498=="
+Content-Type: multipart/mixed; boundary="===============4034784768716263745=="
 MIME-Version: 1.0
-From: Jaroslav Skarvada <jskarvad at redhat.com>
-Subject: [Powertop] Fix for some 'requesting unregistered parameter'
-Date: Tue, 29 Oct 2013 05:18:06 -0400
-Message-ID: <435649119.17204207.1383038286562.JavaMail.root@redhat.com>
-In-Reply-To: 277223620.17203495.1383038201970.JavaMail.root@redhat.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH v2 25/31] report: fixed empty SW settings in need
+ of tunning
+Date: Fri, 15 Nov 2013 16:29:12 -0800
+Message-ID: <1384561758-21516-26-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1384561758-21516-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2288559116949547498==
+--===============4034784768716263745==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+After tunning the sistem the Software Setings in Need of Tunning table
+appreared empty. Added a conditional statement to print the table only
+when there are software settings  in need of tunning.
 
-the attached patch may fix 'requesting unregistered parameter' for cases
-if e.g NIC was added after calibration
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+---
+ src/tuning/tuning.cpp |   65 ++++++++++++++++++++++++++-------------------=
+----
+ 1 file changed, 35 insertions(+), 30 deletions(-)
 
-regards
+diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
+index ac479a2..67d604f 100644
+--- a/src/tuning/tuning.cpp
++++ b/src/tuning/tuning.cpp
+@@ -209,39 +209,49 @@ void report_show_tunables(void)
+         tag_attr div_attr;
+         init_div(&div_attr, "clear_block", "tuning");
+ =
 
-Jaroslav
++	/* Set Title attributes */
++       	tag_attr title_attr;
++        init_title_attr(&title_attr);
++
+ 	/* Set Table attributes, rows, and cols */
+ 	table_attributes tune_table_css;
+ 	cols=3D2;
+ 	idx =3D cols;
+-	rows=3D all_tunables.size() + 1;
+-	init_tune_table_attr(&tune_table_css, rows, cols);
+-
+-	/* Set Title attributes */
+-        tag_attr title_attr;
+-        init_title_attr(&title_attr);
+-
+-	/* Set array of data in row Major order */
+-	string tunable_data[cols * rows];
+-
+-	tunable_data[0]=3D__("Description");
+-	tunable_data[1]=3D__("Script");
+-
+ =
 
---===============2288559116949547498==
-Content-Type: text/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="0001-network-fixed-requesting-unregistered-parameter-if-N.patch"
+ 	for (i =3D 0; i < all_tunables.size(); i++) {
+-		int gb;
+-		gb =3D all_tunables[i]->good_bad();
+-		if (gb !=3D TUNE_BAD)
+-			continue;
+-		tunable_data[idx]=3Dstring(all_tunables[i]->description());
+-		idx+=3D1;
+-		tunable_data[idx]=3Dstring(all_tunables[i]->toggle_script());
+-		idx+=3D1;
++		int tgb;
++		tgb =3D all_tunables[i]->good_bad();
++		if (tgb =3D=3D TUNE_BAD)
++			rows+=3D1;
+ 	}
+-
+-	/* Report Output */
++	/* add section */
+ 	report.add_div(&div_attr);
+-	report.add_title(&title_attr,__("Software Settings in Need of Tuning"));
+-	report.add_table(tunable_data, &tune_table_css);
++
++	if (rows > 0){
++		rows=3D rows + 1;
++		init_tune_table_attr(&tune_table_css, rows, cols);
++
++		/* Set array of data in row Major order */
++		string tunable_data[cols * rows];
++
++		tunable_data[0]=3D__("Description");
++		tunable_data[1]=3D__("Script");
++
++		for (i =3D 0; i < all_tunables.size(); i++) {
++			int gb;
++			gb =3D all_tunables[i]->good_bad();
++			if (gb !=3D TUNE_BAD)
++				continue;
++			tunable_data[idx]=3Dstring(all_tunables[i]->description());
++			idx+=3D1;
++			tunable_data[idx]=3Dstring(all_tunables[i]->toggle_script());
++			idx+=3D1;
++		}
++
++		/* Report Output */
++		report.add_title(&title_attr,__("Software Settings in Need of Tuning"));
++		report.add_table(tunable_data, &tune_table_css);
++	}
+ =
 
-RnJvbSBkMWRhZWM2ZmQ5YzFkNjUzNGQ4MWRmMWMzYzczZGU5ZDcxNGI3MTk2IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiA9P1VURi04P3E/SmFyb3NsYXY9MjA9QzU9QTBrYXJ2YWRhPz0g
-PGpza2FydmFkQHJlZGhhdC5jb20+CkRhdGU6IFR1ZSwgMjkgT2N0IDIwMTMgMTA6MTI6MTIgKzAx
-MDAKU3ViamVjdDogW1BBVENIXSBuZXR3b3JrOiBmaXhlZCAncmVxdWVzdGluZyB1bnJlZ2lzdGVy
-ZWQgcGFyYW1ldGVyJyBpZiBOSUMgaXMKIGFkZGVkCk1JTUUtVmVyc2lvbjogMS4wCkNvbnRlbnQt
-VHlwZTogdGV4dC9wbGFpbjsgY2hhcnNldD1VVEYtOApDb250ZW50LVRyYW5zZmVyLUVuY29kaW5n
-OiA4Yml0CgpTaWduZWQtb2ZmLWJ5OiBKYXJvc2xhdiDFoGthcnZhZGEgPGpza2FydmFkQHJlZGhh
-dC5jb20+Ci0tLQogc3JjL2RldmljZXMvbmV0d29yay5jcHAgfCAyMSArKysrKysrKysrKysrKysr
-KysrKysKIDEgZmlsZSBjaGFuZ2VkLCAyMSBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvc3Jj
-L2RldmljZXMvbmV0d29yay5jcHAgYi9zcmMvZGV2aWNlcy9uZXR3b3JrLmNwcAppbmRleCBkMDgy
-N2VmLi4wMDI2MDBiIDEwMDY0NAotLS0gYS9zcmMvZGV2aWNlcy9uZXR3b3JrLmNwcAorKysgYi9z
-cmMvZGV2aWNlcy9uZXR3b3JrLmNwcApAQCAtMzQ1LDExICszNDUsMzIgQEAgY29uc3QgY2hhciAq
-IG5ldHdvcms6OmRldmljZV9uYW1lKHZvaWQpCiAKIHN0YXRpYyB2b2lkIG5ldGRldl9jYWxsYmFj
-ayhjb25zdCBjaGFyICpkX25hbWUpCiB7CisJY2hhciBkZXZuYW1lWzEyOF07CisKIAlzdGQ6OnN0
-cmluZyBmX25hbWUoIi9zeXMvY2xhc3MvbmV0LyIpOwogCWlmIChzdHJjbXAoZF9uYW1lLCAibG8i
-KSA9PSAwKQogCQlyZXR1cm47CiAKIAlmX25hbWUuYXBwZW5kKGRfbmFtZSk7CisKKwlzcHJpbnRm
-KGRldm5hbWUsICIlcy11cCIsIGRfbmFtZSk7CisJcmVnaXN0ZXJfcGFyYW1ldGVyKGRldm5hbWUp
-OworCisJc3ByaW50ZihkZXZuYW1lLCAiJXMtcG93ZXJ1bnNhdmUiLCBkX25hbWUpOworCXJlZ2lz
-dGVyX3BhcmFtZXRlcihkZXZuYW1lKTsKKworCXNwcmludGYoZGV2bmFtZSwgIiVzLWxpbmstMTAw
-IiwgZF9uYW1lKTsKKwlyZWdpc3Rlcl9wYXJhbWV0ZXIoZGV2bmFtZSk7CisKKwlzcHJpbnRmKGRl
-dm5hbWUsICIlcy1saW5rLTEwMDAiLCBkX25hbWUpOworCXJlZ2lzdGVyX3BhcmFtZXRlcihkZXZu
-YW1lKTsKKworCXNwcmludGYoZGV2bmFtZSwgIiVzLWxpbmstaGlnaCIsIGRfbmFtZSk7CisJcmVn
-aXN0ZXJfcGFyYW1ldGVyKGRldm5hbWUpOworCisJc3ByaW50ZihkZXZuYW1lLCAiJXMtcGFja2V0
-cyIsIGRfbmFtZSk7CisJcmVnaXN0ZXJfcGFyYW1ldGVyKGRldm5hbWUpOworCiAJbmV0d29yayAq
-YmwgPSBuZXcoc3RkOjpub3Rocm93KSBjbGFzcyBuZXR3b3JrKGRfbmFtZSwgZl9uYW1lLmNfc3Ry
-KCkpOwogCWlmIChibCkgewogCQlhbGxfZGV2aWNlcy5wdXNoX2JhY2soYmwpOwotLSAKMS44LjMu
-MQoK
+ 	/* Second Table */
+ 	/* Set Table attributes, rows, and cols */
+@@ -257,12 +267,7 @@ void report_show_tunables(void)
+ 		untunable_data[i+1]=3D string(all_untunables[i]->description());
+ =
 
---===============2288559116949547498==--
+ 	/* Report Output */
+-<<<<<<< HEAD
+-	report.add_div(&div_attr);
+ 	report.add_title(&title_attr,__("Untunable Software Issues"));
+-=3D=3D=3D=3D=3D=3D=3D
+-	report.add_title(&title_attr,"Untunable Software Issues");
+->>>>>>> 4d9b82e... report-html: fixed not hidding sections errors
+ 	report.add_table(untunable_data, &tune_table_css);
+ =
+
+ 	/* Third Table */
+-- =
+
+1.7.9.5
+
+
+--===============4034784768716263745==--
 
