@@ -1,222 +1,133 @@
-Content-Type: multipart/mixed; boundary="===============3264344332252678648=="
+Content-Type: multipart/mixed; boundary="===============6483108321839961585=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] patch: tell user if the system is running out of FDs
-Date: Tue, 08 Oct 2013 16:21:37 +0300
-Message-ID: <20131008132137.GB2452@swordfish.minsk.epam.com>
-In-Reply-To: 988443702.3413079.1381237003703.JavaMail.root@redhat.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH v2 21/31] report: Redesign Device Activity csv &
+ html report
+Date: Fri, 15 Nov 2013 16:29:08 -0800
+Message-ID: <1384561758-21516-22-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1384561758-21516-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3264344332252678648==
+--===============6483108321839961585==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/08/13 08:56), Jaroslav Skarvada wrote:
-> Date: Tue, 8 Oct 2013 08:56:43 -0400 (EDT)
-> From: Jaroslav Skarvada <jskarvad(a)redhat.com>
-> To: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
-> Cc: powertop(a)ml01.01.org
-> Subject: Re: [Powertop] patch: tell user if the system is running out of =
-FDs
-> X-Mailer: Zimbra 8.0.3_GA_5664 (ZimbraWebClient - FF24
->  (Linux)/8.0.3_GA_5664)
-> =
+Enables new design for "Process Device Activity" table part of
+"Device info" section, while preserving translation macros.
 
-> =
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+---
+ src/devices/device.cpp |    1 -
+ src/devlist.cpp        |   46 +++++++++++++++++++++++++++++++-------------=
+--
+ 2 files changed, 31 insertions(+), 16 deletions(-)
 
-> =
+diff --git a/src/devices/device.cpp b/src/devices/device.cpp
+index 4120b9c..83ee02f 100644
+--- a/src/devices/device.cpp
++++ b/src/devices/device.cpp
+@@ -286,7 +286,6 @@ void show_report_devices(void)
+ 	report.add_div(&div_attr);
+ 	report.add_title(&title_attr, __("Device Power Report"));
+ 	report.add_table(device_data, &std_table_css);
+-	report.end_div();
+ }
+ =
 
-> ----- Original Message -----
-> > On (10/08/13 08:08), Jaroslav Skarvada wrote:
-> > > > Hello,
-> > > > =
+ =
 
-> > > > > I used Youquan's patch, but we have noticed that it can only over=
-come
-> > > > > soft
-> > > > > limits,
-> > > > > but not hard limits. E.g. on Fedora (and probably others) there i=
-s a
-> > > > > soft
-> > > > > limit
-> > > > > of 1024 and a hard limit of 4096, so if powertop opens at least 1=
-5 file
-> > > > > descriptors
-> > > > > per CPU, then this will fail on a system with >273 CPUs.
-> > > > =
+diff --git a/src/devlist.cpp b/src/devlist.cpp
+index 633a568..ada3538 100644
+--- a/src/devlist.cpp
++++ b/src/devlist.cpp
+@@ -45,6 +45,7 @@ using namespace std;
+ #include "lib.h"
+ #include "report/report.h"
+ #include "report/report-maker.h"
++#include "report/report-data-html.h"
+ =
 
-> > > > that's a pretty big system
-> > > > =
+ #include "process/process.h"
+ #include "devices/device.h"
+@@ -284,9 +285,9 @@ void report_show_open_devices(void)
+ 	vector<struct devuser *> *target;
+ 	unsigned int i;
+ 	char prev[128], proc[128];
++	int idx, cols, rows;
+ =
 
-> > > > > In case you think we can also temporally increase the hard limit =
-(as we
-> > > > > already have
-> > > > > the privilege), the attached patch will do it. In case you think =
-the
-> > > > > hard
-> > > > > limits set by
-> > > > > the system administrator are untouchable (e.g. violation of system
-> > > > > resources hard limits
-> > > > > could result in a bad effects like explosion in a nuclear power p=
-lant
-> > > > > :),
-> > > > > the
-> > > > > previously sent patch that fixes the error message needs to be al=
-so
-> > > > > used
-> > > > =
+ 	prev[0] =3D 0;
+-
+ 	if (phase =3D=3D 1)
+ 		target =3D &one;
+ 	else
+@@ -295,27 +296,42 @@ void report_show_open_devices(void)
+ 	if (target->size() =3D=3D 0)
+ 		return;
+ =
 
-> > > > hm, need to think about this for a moment. both your patches make s=
-ense.
-> > > > I'd probably go with `temporally increase the hard limit' solution,=
- to
-> > > > make
-> > > > someones life easier. what do you, guys, think?
-> > > > =
+-	sort(target->begin(), target->end(), devlist_sort);
++	/* div attr css_class and css_id */
++	tag_attr div_attr;
++	init_div(&div_attr, "", "device");
++
++	/* Set Table attributes, rows, and cols */
++	table_attributes std_table_css;
++	cols =3D 2;
++	idx =3D cols;
++	rows=3D target->size() + 1;
++	init_std_table_attr(&std_table_css, rows, cols);
++
++	/* Set Title attributes */
++	tag_attr title_attr;
++	init_title_attr(&title_attr);
+ =
 
-> > > > =
+-	report.add_header("Process device activity");
+-	report.begin_table(TABLE_WIDE);
+-	report.begin_row();
+-	report.begin_cell(CELL_DEVACTIVITY_PROCESS);
+-	report.add("Process");
+-	report.begin_cell(CELL_DEVACTIVITY_DEVICE);
+-	report.add("Device");
++	/* Set array of data in row Major order */
++	string process_data[cols * rows];
++
++	sort(target->begin(), target->end(), devlist_sort);
++	process_data[0]=3D__("Process");
++	process_data[1]=3D__("Device");
+ =
 
-> > > > 	-ss
-> > > > =
+ 	for (i =3D 0; i < target->size(); i++) {
+ 		proc[0] =3D 0;
+-
+ 		if (strcmp(prev, (*target)[i]->comm) !=3D 0)
+ 			sprintf(proc, "%s", (*target)[i]->comm);
+ =
 
-> > > > > regards
-> > > > > =
+-		report.begin_row(ROW_DEVPOWER);
+-		report.begin_cell();
+-		report.add(proc);
+-		report.begin_cell();
+-		report.add((*target)[i]->device);
++		process_data[idx]=3Dstring(proc);
++		idx+=3D1;
++		process_data[idx]=3Dstring((*target)[i]->device);
++		idx+=3D1;
+ 		sprintf(prev, "%s", (*target)[i]->comm);
+ 	}
++
++	/* Report Output */
++	report.add_title(&title_attr, __("Process Device Activity"));
++	report.add_table(process_data, &std_table_css);
++	report.end_div();
+ }
+-- =
 
-> > > > > Jaroslav
-> > > > =
+1.7.9.5
 
-> > > > > diff --git a/src/main.cpp b/src/main.cpp
-> > > > > index 0883424..e0e8a71 100644
-> > > > > --- a/src/main.cpp
-> > > > > +++ b/src/main.cpp
-> > > > > @@ -36,6 +36,8 @@
-> > > > >  #include <getopt.h>
-> > > > >  #include <unistd.h>
-> > > > >  #include <locale.h>
-> > > > > +#include <sys/resource.h>
-> > > > > +#include <linux/limits.h>
-> > > > >  =
 
-> > > > >  #include "cpu/cpu.h"
-> > > > >  #include "process/process.h"
-> > > > > @@ -283,11 +285,16 @@ static void powertop_init(void)
-> > > > >  	static char initialized =3D 0;
-> > > > >  	int ret;
-> > > > >  	struct statfs st_fs;
-> > > > > +	struct rlimit rlmt;
-> > > > >  =
-
-> > > > >  	if (initialized)
-> > > > >  		return;
-> > > > >  =
-
-> > > > >  	checkroot();
-> > > > > +
-> > > > > +	rlmt.rlim_cur =3D rlmt.rlim_max =3D NR_OPEN;
-> > > =
-
-> > > This seems to be wrong. On my system NR_OPEN is 1024, but
-> > > /proc/sys/fs/nr_open gives me 1048576. It seems the linux kernel
-> > > hardcodes 1024 * 1024 as the default kernel limit. This default
-> > > limit can be raised to:
-> > > =
-
-> > > sysctl_nr_open_max =3D min((size_t)INT_MAX, ~(size_t)0/sizeof(void *)=
-) &
-> > >   -BITS_PER_LONG;
-> > > =
-
-> > > which is 2 Gi - 63 on my 64 bit system. I think we shouldn't
-> > > touch/increase this. It seems there is no header definition for these
-> > > limits.
-> > > =
-
-> > > I am proposing new patch, which reads the current kernel limit from t=
-he
-> > > /proc. I am not sure about the portability, but at least it shouldn't
-> > > break anything.
-> > > =
-
-> > > Finally I think, the first patch could be applied together with this =
-patch
-> > > (probably with the changed message) to notify user that he/she reached
-> > > the FDs limit, because there is still some limit. This could also
-> > > occur if some process would decrease the /proc/sys/fs/nr_open after
-> > > it is read by powertop and before the ulimit is set
-> > > =
-
-> > > regards
-> > > =
-
-> > > Jaroslav
-> > =
-
-> > > diff --git a/src/main.cpp b/src/main.cpp
-> > > index 0883424..16b1613 100644
-> > > --- a/src/main.cpp
-> > > +++ b/src/main.cpp
-> > > @@ -28,6 +28,7 @@
-> > >   *	Arjan van de Ven <arjan(a)linux.intel.com>
-> > >   */
-> > >  #include <iostream>
-> > > +#include <fstream>
-> > >  #include <stdlib.h>
-> > >  #include <stdio.h>
-> > >  #include <time.h>
-> > > @@ -36,6 +37,7 @@
-> > >  #include <getopt.h>
-> > >  #include <unistd.h>
-> > >  #include <locale.h>
-> > > +#include <sys/resource.h>
-> > >  =
-
-> > >  #include "cpu/cpu.h"
-> > >  #include "process/process.h"
-> > > @@ -60,6 +62,8 @@
-> > >  =
-
-> > >  #define DEBUGFS_MAGIC          0x64626720
-> > >  =
-
-> > > +#define NR_OPEN_DEF 1024 * 1024
-> > >  int debug_learning =3D 0;
-> > >  unsigned time_out =3D 20;
-> > >  int leave_powertop =3D 0;
-> > > @@ -278,16 +282,35 @@ static void checkroot() {
-> > >  =
-
-> > >  }
-> > >  =
-
-> > > +static int get_nr_open(void) {
-> > > +	int nr_open =3D NR_OPEN_DEF;
-> > > +	ifstream file;
-> > > +
-> > > +	file.open("/proc/sys/fs/nr_open", ios::in);
-> > > +	if (file) {
-> > > +		file >> nr_open;
-> > > +		if (!file)
-> > > +			nr_open =3D NR_OPEN_DEF;
-> > =
-
-> > =
-
-> > what if /proc/sys/fs/nr_open is less than 4096 or (NR_OPEN_DEF)?
-> > you probaly want max()?
-> =
-
-> I think you cannot set ulimit beyond /proc/sys/fs/nr_open. You
-> need to increase /proc/sys/fs/nr_open first, which is something
-> we should avoid
-
-fair enough. I'm gonna apply it through the -next tree (the
-patch requires some modification to apply).
-
-thanks.
-
-	-ss
-
---===============3264344332252678648==--
+--===============6483108321839961585==--
 
