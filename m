@@ -1,50 +1,97 @@
-Content-Type: multipart/mixed; boundary="===============2989128169230041749=="
+Content-Type: multipart/mixed; boundary="===============9173694339548227039=="
 MIME-Version: 1.0
-From: Kristen Carlson Accardi <kristen at linux.intel.com>
-Subject: Re: [Powertop] v2.5-rc1 testing: accounting still very wrong
-Date: Mon, 04 Nov 2013 10:31:05 -0800
-Message-ID: <20131104103105.5bb4711b@bluebird.jf.intel.com>
-In-Reply-To: 20131102195015.GJ5519@merlins.org
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH v2 00/31] Report Redesign
+Date: Fri, 15 Nov 2013 16:28:47 -0800
+Message-ID: <1384561758-21516-1-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: Report Redesign v2
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2989128169230041749==
+--===============9173694339548227039==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, 2 Nov 2013 12:50:15 -0700
-Marc MERLIN <marc_powertop(a)merlins.org> wrote:
+This patches are to be applied post release 2.5.
 
-> On Sat, Nov 02, 2013 at 06:48:02AM -0700, Marc MERLIN wrote:
-> > On Fri, Oct 18, 2013 at 11:09:26AM -0700, Kristen Carlson Accardi wrote:
-> > > Please test.
-> > =
+This set of patches include the redesign changes for HTML and CSV reports a=
+nd
+cleans up unused reporting functions.  Additionally, removes the suggestion
+to use on demand CPU frequency governor.  This feature was removed because
+the Intel P-States driver is the Intel recommended method for CPU frequency.
 
-> > Still the same power counting bugs than previous versions.
-> > After a few minutes, on battery, it went from 12W to 20W because of an
-> > rsync in the background, and when that rsync was finished (sigstop), I =
-got this.
-> > =
+Igor Zhbanov reported that the localization macro __(=E2=80=A6) was left ou=
+t from
+previous version.  These patches changed to add the localization macro to
+all report components.
 
-> > Somehow I very much doubt that e17 was using 1550W.
-> > =
+Alexandra Yates (31):
+  report-formater-html: add logo
+  report: call powertop logo
+  html-report: add title and div tags
+  report: report maker add title and div
+  report-csv: title, div, logo, header
+  report-html: summary list and navigation
+  report-maker: navigation & summary
+  report-csv: Added navigation & summary list
+  report-html: Table generation
+  report-maker: modular table generation
+  report-csv: modular table
+  report: Logo and system Information
+  report-html-css: html 5 and css for new design
+  report-summary: enable html and csv new styles
+  report: redesign html menu
+  report: CPU Idle section redesigned html & csv
+  report: Fixed html summary & menu colapse styles
+  report: CPU Frequency html & csv
+  report: redesign Software Information csv and html
+  report: redesign Device Power Report csv & html
+  report: Redesign Device Activity csv & html report
+  report: cleanup csv title and unused vars
+  report: report tuning with new desig html & csv
+  report-html: fixed not hidding sections errors
+  report: fixed empty SW settings in need of tunning
+  report: design batery discharge/system baseline
+  report: conditional runs ncurses & cpu html report
+  report: logo size & menu compatibility
+  tunables: removed on-demand cpu frequency governor
+  report-cleanup: removed old table, row, & cell.
+  report-cleanup: removed html & csv old methods
 
-> > Clearly there is at least an assert missing that should ensure that the=
- list
-> > of power estimated values clearly exceeds the total power.
-> > =
+ PowerTop.png                         |  Bin 0 -> 6975 bytes
+ src/Makefile.am                      |    5 +-
+ src/cpu/cpu.cpp                      |  327 ++++++++++++++++++--------
+ src/devices/device.cpp               |   81 ++++---
+ src/devlist.cpp                      |   44 ++--
+ src/main.cpp                         |    7 +-
+ src/powertop.css                     |  287 ++++++++++-------------
+ src/process/do_process.cpp           |  233 +++++++++++--------
+ src/report/report-data-html.cpp      |  118 ++++++++++
+ src/report/report-data-html.h        |   69 ++++++
+ src/report/report-formatter-csv.cpp  |  189 ++++++---------
+ src/report/report-formatter-csv.h    |   42 ++--
+ src/report/report-formatter-html.cpp |  417 +++++++++---------------------=
+----
+ src/report/report-formatter-html.h   |   71 ++----
+ src/report/report-formatter.h        |   32 +--
+ src/report/report-maker.cpp          |  180 ++-------------
+ src/report/report-maker.h            |  114 ++--------
+ src/report/report.cpp                |   83 ++++---
+ src/tuning/cpufreq.cpp               |  213 -----------------
+ src/tuning/cpufreq.h                 |   50 ----
+ src/tuning/tuning.cpp                |  131 ++++++-----
+ 21 files changed, 1141 insertions(+), 1552 deletions(-)
+ create mode 100644 PowerTop.png
+ create mode 100644 src/report/report-data-html.cpp
+ create mode 100644 src/report/report-data-html.h
+ delete mode 100644 src/tuning/cpufreq.cpp
+ delete mode 100644 src/tuning/cpufreq.h
 
-> > Even if I stop enligthenment, which seems to be most of the wakeups, bad
-> > accounting is all wrong in many ways, see below:
+-- =
 
-Thanks for the detailed report.  I think we aren't going to be able to
-address this for the 2.5 release, but I will put it on my list of
-things to do to see if we can duplicate this issue on another machine
-and start figuring out what is going on.  We'll try to put a test case
-for something like this together for the 2.6 release just to confirm
-that we are within the realm of possibilities for estimation.
+1.7.9.5
 
 
---===============2989128169230041749==--
+--===============9173694339548227039==--
 
