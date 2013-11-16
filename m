@@ -1,83 +1,97 @@
-Content-Type: multipart/mixed; boundary="===============2062742015686744201=="
+Content-Type: multipart/mixed; boundary="===============8681798054309122758=="
 MIME-Version: 1.0
-From: Mukherjee, Adrip <adrip.mukherjee at intel.com>
-Subject: [Powertop] PowerTop Basics
-Date: Wed, 13 Nov 2013 03:58:58 +0000
-Message-ID: <F9A26558D30ED241A8204F06F9947260257F8DA6@BGSMSX102.gar.corp.intel.com>
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH v2 11/31] report-csv: modular table
+Date: Fri, 15 Nov 2013 16:28:58 -0800
+Message-ID: <1384561758-21516-12-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1384561758-21516-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2062742015686744201==
+--===============8681798054309122758==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi ,
-           Could you please let me know if there is any SAS document availa=
-ble for PowerTop to understand the features it supports. From the sharepoin=
-t : https://opensource.intel.com/projects/powertop i came to know that it m=
-onitors CPU c and P states , device and software activity. Also I am new to=
- the Android environment so it will be helpful if there is a detailed proce=
-dure on how to preload Android and install powertop.
+Generates a modular table to the csv report using the table_size and a
+set of data stored in a single dimensional array stored in row major
+order.
 
-regards
-Adrip
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+---
+ src/report/report-formatter-csv.cpp |   28 ++++++++++++++++++++++++++++
+ src/report/report-formatter-csv.h   |    2 ++
+ 2 files changed, 30 insertions(+)
+
+diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-format=
+ter-csv.cpp
+index 2981940..b9336ad 100644
+--- a/src/report/report-formatter-csv.cpp
++++ b/src/report/report-formatter-csv.cpp
+@@ -33,6 +33,7 @@
+ #include <stdarg.h>
+ =
+
+ #include "report-formatter-csv.h"
++#include "report-data-html.h"
+ =
+
+ static const char report_csv_header[] =3D "PowerTOP Report";
+ =
+
+@@ -279,3 +280,30 @@ report_formatter_csv::add_summary_list(string *list, i=
+nt size)
+ 	add_exact("\n");
+ }
+ =
+
++void
++report_formatter_csv::add_table(string *system_data, struct table_size *si=
+ze,
++		struct table_attributes* tb_attr)
++{
++	int i, j;
++	int offset=3D0;
++	string tmp_str=3D"";
++	int empty_row=3D0;
++	add_exact("\n");
++	for (i=3D0; i < size->rows; i++){
++		for (j=3D0; j < size->cols; j++){
++			offset =3D i * (size->cols) + j;
++			tmp_str=3Dsystem_data[offset];
++
++			if(tmp_str =3D=3D "&nbsp;")
++				empty_row+=3D1;
++			else{
++				addf_exact("%s", system_data[offset].c_str());
++				if(j < (size->cols - 1))
++					add_exact(",");
++			}
++		}
++		if(empty_row < size->cols)
++		add_exact("\n");
++		empty_row=3D0;
++	}
++}
+diff --git a/src/report/report-formatter-csv.h b/src/report/report-formatte=
+r-csv.h
+index daf723e..994b765 100644
+--- a/src/report/report-formatter-csv.h
++++ b/src/report/report-formatter-csv.h
+@@ -82,6 +82,8 @@ public:
+ 	void add_title(struct tag_attr *title_att, const char *title);
+ 	void add_navigation();
+ 	void add_summary_list(string *list, int size);
++	void add_table(string *system_data, struct table_size *size,
++			struct table_attributes *tb_attr);
+ =
+
+ private:
+ 	void add_doc_header();
+-- =
+
+1.7.9.5
 
 
---===============2062742015686744201==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
-
-PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
-bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
-YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
-cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
-VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
-bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
-ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTUgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
-PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseToiQ2Ft
-YnJpYSBNYXRoIjsKCXBhbm9zZS0xOjIgNCA1IDMgNSA0IDYgMyAyIDQ7fQpAZm9udC1mYWNlCgl7
-Zm9udC1mYW1pbHk6Q2FsaWJyaTsKCXBhbm9zZS0xOjIgMTUgNSAyIDIgMiA0IDMgMiA0O30KQGZv
-bnQtZmFjZQoJe2ZvbnQtZmFtaWx5OlZpdmFsZGk7CglwYW5vc2UtMTozIDIgNiAyIDUgNSA2IDkg
-OCA0O30KLyogU3R5bGUgRGVmaW5pdGlvbnMgKi8KcC5Nc29Ob3JtYWwsIGxpLk1zb05vcm1hbCwg
-ZGl2Lk1zb05vcm1hbAoJe21hcmdpbjowY207CgltYXJnaW4tYm90dG9tOi4wMDAxcHQ7Cglmb250
-LXNpemU6MTEuMHB0OwoJZm9udC1mYW1pbHk6IkNhbGlicmkiLCJzYW5zLXNlcmlmIjt9CmE6bGlu
-aywgc3Bhbi5Nc29IeXBlcmxpbmsKCXttc28tc3R5bGUtcHJpb3JpdHk6OTk7Cgljb2xvcjpibHVl
-OwoJdGV4dC1kZWNvcmF0aW9uOnVuZGVybGluZTt9CmE6dmlzaXRlZCwgc3Bhbi5Nc29IeXBlcmxp
-bmtGb2xsb3dlZAoJe21zby1zdHlsZS1wcmlvcml0eTo5OTsKCWNvbG9yOnB1cnBsZTsKCXRleHQt
-ZGVjb3JhdGlvbjp1bmRlcmxpbmU7fQpzcGFuLkVtYWlsU3R5bGUxNwoJe21zby1zdHlsZS10eXBl
-OnBlcnNvbmFsLWNvbXBvc2U7Cglmb250LWZhbWlseToiQ2FsaWJyaSIsInNhbnMtc2VyaWYiOwoJ
-Y29sb3I6d2luZG93dGV4dDt9Ci5Nc29DaHBEZWZhdWx0Cgl7bXNvLXN0eWxlLXR5cGU6ZXhwb3J0
-LW9ubHk7Cglmb250LXNpemU6MTAuMHB0OwoJZm9udC1mYW1pbHk6IkNhbGlicmkiLCJzYW5zLXNl
-cmlmIjt9CkBwYWdlIFdvcmRTZWN0aW9uMQoJe3NpemU6NjEyLjBwdCA3OTIuMHB0OwoJbWFyZ2lu
-OjcyLjBwdCA3Mi4wcHQgNzIuMHB0IDcyLjBwdDt9CmRpdi5Xb3JkU2VjdGlvbjEKCXtwYWdlOldv
-cmRTZWN0aW9uMTt9Ci0tPjwvc3R5bGU+PCEtLVtpZiBndGUgbXNvIDldPjx4bWw+CjxvOnNoYXBl
-ZGVmYXVsdHMgdjpleHQ9ImVkaXQiIHNwaWRtYXg9IjEwMjYiIC8+CjwveG1sPjwhW2VuZGlmXS0t
-PjwhLS1baWYgZ3RlIG1zbyA5XT48eG1sPgo8bzpzaGFwZWxheW91dCB2OmV4dD0iZWRpdCI+Cjxv
-OmlkbWFwIHY6ZXh0PSJlZGl0IiBkYXRhPSIxIiAvPgo8L286c2hhcGVsYXlvdXQ+PC94bWw+PCFb
-ZW5kaWZdLS0+CjwvaGVhZD4KPGJvZHkgbGFuZz0iRU4tSU4iIGxpbms9ImJsdWUiIHZsaW5rPSJw
-dXJwbGUiPgo8ZGl2IGNsYXNzPSJXb3JkU2VjdGlvbjEiPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48
-c3BhbiBsYW5nPSJFTi1VUyI+SGkgLDxvOnA+PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1z
-b05vcm1hbCI+PHNwYW4gbGFuZz0iRU4tVVMiPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBDb3VsZCB5b3UgcGxlYXNlIGxldCBtZSBr
-bm93IGlmIHRoZXJlIGlzIGFueSBTQVMgZG9jdW1lbnQgYXZhaWxhYmxlIGZvciBQb3dlclRvcCB0
-byB1bmRlcnN0YW5kIHRoZSBmZWF0dXJlcyBpdCBzdXBwb3J0cy4gRnJvbSB0aGUgc2hhcmVwb2lu
-dCA6CjxhIGhyZWY9Imh0dHBzOi8vb3BlbnNvdXJjZS5pbnRlbC5jb20vcHJvamVjdHMvcG93ZXJ0
-b3AiPmh0dHBzOi8vb3BlbnNvdXJjZS5pbnRlbC5jb20vcHJvamVjdHMvcG93ZXJ0b3A8L2E+IGkg
-Y2FtZSB0byBrbm93IHRoYXQgaXQgbW9uaXRvcnMgQ1BVIGMgYW5kIFAgc3RhdGVzICwgZGV2aWNl
-IGFuZCBzb2Z0d2FyZSBhY3Rpdml0eS4gQWxzbyBJIGFtIG5ldyB0byB0aGUgQW5kcm9pZCBlbnZp
-cm9ubWVudCBzbyBpdCB3aWxsIGJlIGhlbHBmdWwgaWYKIHRoZXJlIGlzIGEgZGV0YWlsZWQgcHJv
-Y2VkdXJlIG9uIGhvdyB0byBwcmVsb2FkIEFuZHJvaWQgYW5kIGluc3RhbGwgcG93ZXJ0b3AuPG86
-cD48L286cD48L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBsYW5nPSJFTi1V
-UyI+PG86cD4mbmJzcDs8L286cD48L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3Bh
-biBsYW5nPSJFTi1VUyIgc3R5bGU9ImZvbnQtc2l6ZToxNC4wcHQ7Zm9udC1mYW1pbHk6Vml2YWxk
-aTtjb2xvcjojNDAzMTUyIj5yZWdhcmRzPG86cD48L286cD48L3NwYW4+PC9wPgo8cCBjbGFzcz0i
-TXNvTm9ybWFsIj48c3BhbiBsYW5nPSJFTi1VUyIgc3R5bGU9ImZvbnQtc2l6ZToxNC4wcHQ7Zm9u
-dC1mYW1pbHk6Vml2YWxkaTtjb2xvcjojNDAzMTUyIj5BZHJpcDxvOnA+PC9vOnA+PC9zcGFuPjwv
-cD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gbGFuZz0iRU4tVVMiPjxvOnA+Jm5ic3A7PC9v
-OnA+PC9zcGFuPjwvcD4KPC9kaXY+CjwvYm9keT4KPC9odG1sPgo=
-
---===============2062742015686744201==--
+--===============8681798054309122758==--
 
