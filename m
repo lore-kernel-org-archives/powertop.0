@@ -1,97 +1,83 @@
-Content-Type: multipart/mixed; boundary="===============5107177549493864878=="
+Content-Type: multipart/mixed; boundary="===============0007636894884117909=="
 MIME-Version: 1.0
 From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH v2 02/31] report: call powertop logo
-Date: Fri, 15 Nov 2013 16:28:49 -0800
-Message-ID: <1384561758-21516-3-git-send-email-alexandra.yates@linux.intel.com>
+Subject: [Powertop] [PATCH v2 26/31] report: design batery discharge/system
+ baseline
+Date: Fri, 15 Nov 2013 16:29:13 -0800
+Message-ID: <1384561758-21516-27-git-send-email-alexandra.yates@linux.intel.com>
 In-Reply-To: 1384561758-21516-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5107177549493864878==
+--===============0007636894884117909==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Implements add_logo in report generator
+Redesigns the header section on Device Power Report to include the
+battery discharge report and system baseline power, while preserving the
+translation macros.
 
 Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
 ---
- src/report/report-formatter.h |    5 +++++
- src/report/report-maker.cpp   |   21 +++++++++++++++++++++
- src/report/report-maker.h     |    5 +++++
- 3 files changed, 31 insertions(+)
+ src/devices/device.cpp |   24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/src/report/report-formatter.h b/src/report/report-formatter.h
-index d532f30..449fae7 100644
---- a/src/report/report-formatter.h
-+++ b/src/report/report-formatter.h
-@@ -60,6 +60,11 @@ public:
+diff --git a/src/devices/device.cpp b/src/devices/device.cpp
+index a916bf6..da595a8 100644
+--- a/src/devices/device.cpp
++++ b/src/devices/device.cpp
+@@ -219,6 +219,7 @@ void show_report_devices(void)
+ {
+ 	unsigned int i;
+ 	int show_power, cols, rows, idx;
++	double pw;
  =
 
- 	/* For quad-colouring CPU tables in HTML */
- 	virtual void set_cpu_number(int nr) {}
+ 	show_power =3D global_power_valid();
+ 	sort(all_devices.begin(), all_devices.end(), power_device_sort);
+@@ -241,6 +242,28 @@ void show_report_devices(void)
+         tag_attr title_attr;
+         init_title_attr(&title_attr);
+ =
+
++	/* Add section */
++	report.add_div(&div_attr);
 +
-+	/* *** Report Style *** */
-+	virtual void add_logo() {}
-+	virtual void add_header() {}
-+	virtual void end_hheader() {}
- };
- =
-
- #endif /* _REPORT_FORMATTER_H_ */
-diff --git a/src/report/report-maker.cpp b/src/report/report-maker.cpp
-index 59e83d9..8eba618 100644
---- a/src/report/report-maker.cpp
-+++ b/src/report/report-maker.cpp
-@@ -329,3 +329,24 @@ report_maker::end_paragraph()
- 	paragraph_opened =3D false;
- 	formatter->end_paragraph();
++	/* Device Summary */
++	int summary_size=3D2;
++        string summary[summary_size];
++	pw =3D global_joules_consumed();
++	char buf[32];
++	if (pw > 0.0001) {
++		summary[0]=3D __("The battery reports a discharge rate of: ");
++		summary[1]=3Dstring(fmt_prefix(pw, buf));
++		summary[1].append(" W");
++		report.add_summary_list(summary, summary_size);
++	}
++
++	if (show_power) {
++		summary[0]=3D__("The system baseline power is estimated at: ");
++		summary[1]=3Dstring(fmt_prefix(get_parameter_value("base power"), buf));
++		summary[1].append(" W");
++		report.add_summary_list(summary, summary_size);
++	}
++
+         /* Set array of data in row Major order */
+ 	string device_data[cols * rows];
+ 	device_data[0]=3D __("Usage");
+@@ -283,7 +306,6 @@ void show_report_devices(void)
+ 		}
+ 	}
+ 	/* Report Output */
+-	report.add_div(&div_attr);
+ 	report.add_title(&title_attr, __("Device Power Report"));
+ 	report.add_table(device_data, &std_table_css);
  }
-+
-+
-+/* *** Report Style *** */
-+void
-+report_maker::add_logo()
-+{
-+	formatter->add_logo();
-+}
-+
-+void
-+report_maker::add_header()
-+{
-+	formatter->add_header();
-+}
-+
-+void
-+report_maker::end_hheader()
-+{
-+	formatter->end_hheader();
-+}
-+
-diff --git a/src/report/report-maker.h b/src/report/report-maker.h
-index 75e0d06..fab9589 100644
---- a/src/report/report-maker.h
-+++ b/src/report/report-maker.h
-@@ -192,6 +192,11 @@ public:
- =
-
- 	void set_cpu_number(int nr);
- =
-
-+	/* *** Report Style *** */
-+	void add_header();
-+	void end_hheader();
-+	void add_logo();
-+
- private:
- 	void setup_report_formatter();
- =
-
 -- =
 
 1.7.9.5
 
 
---===============5107177549493864878==--
+--===============0007636894884117909==--
 
