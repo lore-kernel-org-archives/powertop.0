@@ -1,601 +1,416 @@
-Content-Type: multipart/mixed; boundary="===============3538868324482878983=="
+Content-Type: multipart/mixed; boundary="===============6986937300321088717=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] powertop doesnt show watts
-Date: Thu, 31 Oct 2013 10:55:27 +0300
-Message-ID: <20131031075527.GA2209@swordfish.minsk.epam.com>
-In-Reply-To: 0A69F75AE33F46479629A1B92848A62C04B0501E@SHSMSX104.ccr.corp.intel.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH v3 16/31] report: CPU Idle section redesigned html
+ & csv
+Date: Mon, 18 Nov 2013 12:27:07 -0800
+Message-ID: <1384806442-20294-17-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1384806442-20294-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3538868324482878983==
+--===============6986937300321088717==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/31/13 06:34), Zhang, Xiaofeng wrote:
-> Hi =
+Enables "CPU Idle" section redesign for html and csv reports preserving
+translation macros.
 
-> =
-
-> From this mail thread, I see a result format like this:
-> Power est.  Events/s    Category       Description
-> 8.18 W    100.0%      Device         USB device: Yubico Yubikey II (Yubic=
-o)
-> 8.13 W    100.0%      Device         USB device: Integrated Camera (Chico=
-ny
-> =
-
-> However, when I use powertop on my Ubuntu laptop, I can't get the first c=
-olumn (8.18W, etc.). I use the commond "powertop --calibrate ", while my la=
-ptop in discharging mode.
-> I can't find the solution in README or website, could you help?
-> =
-
-
-Hello,
-I think you're talking about "Power est." column. quote from the source
-code
-
-	/*
-	 * only report power numbers once we have 3* more measurements than
-	 * we have parameters; anything less and our model fit is highly
-	 * suspect
-	 */
-
-
-so powertop need some number of previous measurements in order to start
-estimating.
-
-	-ss
-
-> =
-
-> Best Regards =E2=98=BA
-> Xiaofeng Zhang
-> =
-
-> -----Original Message-----
-> From: powertop-bounces(a)lists.01.org [mailto:powertop-bounces(a)lists.01=
-.org] On Behalf Of powertop-request(a)lists.01.org
-> Sent: Saturday, October 19, 2013 3:00 AM
-> To: powertop(a)lists.01.org
-> Subject: PowerTop Digest, Vol 18, Issue 19
-> =
-
-> Send PowerTop mailing list submissions to
-> 	powertop(a)lists.01.org
-> =
-
-> To subscribe or unsubscribe via the World Wide Web, visit
-> 	https://lists.01.org/mailman/listinfo/powertop
-> or, via email, send a message with subject or body 'help' to
-> 	powertop-request(a)lists.01.org
-> =
-
-> You can reach the person managing the list at
-> 	powertop-owner(a)lists.01.org
-> =
-
-> When replying, please edit your Subject line so it is more specific than =
-"Re: Contents of PowerTop digest..."
-> =
-
-> =
-
-> Today's Topics:
-> =
-
->    1. [PATCH -next] intel cpus: add proper C-states init
->       (Sergey Senozhatsky)
->    2. Re: USB devices get wrong power use values (Marc MERLIN)
->    3. Re: USB devices get wrong power use values (Marc MERLIN)
->    4. Re: [PATCH -next] intel cpus: add proper C-states init
->       (Kristen Carlson Accardi)
->    5. [Announce] v2.5-rc1 (Kristen Carlson Accardi)
-> =
-
-> =
-
-> ----------------------------------------------------------------------
-> =
-
-> Message: 1
-> Date: Thu, 17 Oct 2013 23:37:51 +0300
-> From: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
-> To: powertop(a)lists.01.org
-> Subject: [Powertop] [PATCH -next] intel cpus: add proper C-states init
-> Message-ID: <20131017203751.GA2280(a)swordfish>
-> Content-Type: text/plain; charset=3Dus-ascii
-> =
-
-> add missing has_c2c7_res init to nhm_core() .ctor and has_c8c9c10_res/has=
-_c2c7_res init to nhm_package() .ctor.
-> =
-
-> uninitialised has_c2c7_res/has_c8c9c10_res/has_c2c7_res
-> may be used in core/package measurement_start()/measurement_end().
-> =
-
-> Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
-> =
-
-> ---
-> =
-
-> src/cpu/intel_cpus.cpp | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> =
-
-> diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp index 194dc7=
-5..ad80337 100644
-> --- a/src/cpu/intel_cpus.cpp
-> +++ b/src/cpu/intel_cpus.cpp
-> @@ -87,6 +87,8 @@ static uint64_t get_msr(int cpu, uint64_t offset)
->  =
-
->  nhm_core::nhm_core(int model)
->  {
-> +	has_c2c7_res =3D 0;
-> +
->  	switch(model) {
->  		case 0x2A:	/* SNB */
->  		case 0x2D:	/* SNB Xeon */
-> @@ -252,6 +254,9 @@ char * nhm_core::fill_pstate_line(int line_nr, char *=
-buffer)
->  =
-
->  nhm_package::nhm_package(int model)
->  {
-> +	has_c8c9c10_res =3D 0;
-> +	has_c2c7_res =3D 0;
-> +
->  	switch(model) {
->  		case 0x2A:	/* SNB */
->  		case 0x2D:	/* SNB Xeon */
-> @@ -269,7 +274,6 @@ nhm_package::nhm_package(int model)
->  	else
->  		has_c3_res =3D 1;
->  =
-
-> -
->  	/* Haswell-ULT has C8/9/10*/
->  	if (model =3D=3D 0x45)
->  		has_c8c9c10_res =3D 1;
-> =
-
-> =
-
-> =
-
-> ------------------------------
-> =
-
-> Message: 2
-> Date: Thu, 17 Oct 2013 17:01:54 -0700
-> From: Marc MERLIN <marc_powertop(a)merlins.org>
-> To: Arjan van de Ven <arjan(a)linux.intel.com>
-> Cc: powertop(a)ml01.01.org
-> Subject: Re: [Powertop] USB devices get wrong power use values
-> Message-ID: <20131018000154.GA5362(a)merlins.org>
-> Content-Type: text/plain; charset=3Dus-ascii
-> =
-
-> On Sun, Oct 13, 2013 at 09:22:12AM -0700, Marc MERLIN wrote:
-> > On Sun, Oct 13, 2013 at 08:33:51AM -0700, Arjan van de Ven wrote:
-> > > On 9/22/2013 4:54 PM, Marc MERLIN wrote:
-> > > >So, I asked on the linux-usb list, and one thing I quickly found =
-
-> > > >out is that the Watt value given by powertop 2.4 is way off for USB =
-devices:
-> > > =
-
-> > > what makes you think the value is off?
-> > > =
-
-> > > >>Power est.  Events/s    Category       Description
-> > > >>   8.18 W    100.0%      Device         USB device: Yubico Yubikey =
-II (Yubico)
-> > > >>   8.13 W    100.0%      Device         USB device: Integrated Came=
-ra (Chicony Electronics Co., Ltd.)
-> > > =
-
-> > > having a USB device active also generally makes the CPU/etc use much =
-
-> > > more power, which Powertop "charges" to the USB device in question.
-> > > =
-
-> > > 8 Watts sounds entirely reasonable for that to me...
-> > =
-
-> > Aah, if the CPU gets involved, then yes, it's a bit more possible.
-> > So, a simple USB keyboard that's unused can keep one core awake and =
-
-> > burn 8 watts if something else goes wrong in the kernel to cause that?
-> =
-
-> So, I just upgraded to 3.11.5, and see things like this below. Can alsa s=
-ound really take 10W when I'm batteries?
-> Let me put it another way, it just cannot be correct. Full power use is 1=
-5W and if you removed 10W for audio (I'm sure that's wrong) and 3W for wifi=
- (that may be correct) it means my quad core laptop is running at 2W with t=
-he screen on?
-> Not possible at all.
-> =
-
-> So there has to be a bug in powertop 2.4 USB device power calculation.
-> =
-
-> For what it's worth, I got the data below right after running powertop --=
-calibrate and letting it go through a full cycle.
-> =
-
-> -------------------------------------------------------------------------=
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
 ---
-> The battery reports a discharge rate of 15.1 W The estimated remaining ti=
-me is 4 hours, 53 minutes
-> =
+ src/cpu/cpu.cpp                 |  188 +++++++++++++++++++++++++++--------=
+----
+ src/report/report-data-html.cpp |   39 ++++++++
+ src/report/report-data-html.h   |   18 ++++
+ 3 files changed, 187 insertions(+), 58 deletions(-)
 
-> Summary: 572.4 wakeups/second,  18.3 GPU ops/seconds, 0.0 VFS ops/sec and=
- 8.3% CPU use
-> =
+diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+index 4a7e197..b8f74a8 100644
+--- a/src/cpu/cpu.cpp
++++ b/src/cpu/cpu.cpp
+@@ -41,6 +41,7 @@
+ #include "../display.h"
+ #include "../report/report.h"
+ #include "../report/report-maker.h"
++#include "../report/report-data-html.h"
+ =
 
-> Power est.              Usage       Events/s    Category       Description
->   10.5 W    100.0%                      Device         Audio codec alsa:h=
-wC0D0: thinkpad (Realtek)
->   3.10 W      7.0 pkts/s                Device         Network interface:=
- wlan0 (iwlwifi)
->   772 mW     25.1 ms/s     208.4        Process        /usr/bin/enlighten=
-ment
->  13.4 mW      1.2 ms/s       8.5        Process        xfce4-terminal -T =
-window10 --role=3Dwindow10 --tab
-> (...)
-> -------------------------------------------------------------------------=
----
-> =
+ static class abstract_cpu system_level;
+ =
 
-> Calibrate results if that helps:
-> gandalfthegreat:~# powertop --calibrate
-> Loaded 750 prior measurements
-> RAPL device for cpu 0
-> RAPL device for cpu 0
-> RAPL device for cpu 0
-> Starting PowerTOP power estimate calibration Calibrating idle
-> Calibrating: disk usage
-> Calibrating backlight
-> .... device /sys/class/backlight/intel_backlight/brightness
-> .... device /sys/class/backlight/acpi_video0/brightness
-> Calibrating idle
-> Calibrating: CPU usage on 1 threads
-> Calibrating: CPU usage on 4 threads
-> Calibrating: CPU wakeup power consumption
-> Calibrating: CPU wakeup power consumption
-> Calibrating: CPU wakeup power consumption Calibrating USB devices .... de=
-vice /sys/bus/usb/devices/3-1/power/control
-> .... device /sys/bus/usb/devices/4-1/power/control
-> .... device /sys/bus/usb/devices/usb1/power/control
-> .... device /sys/bus/usb/devices/usb2/power/control
-> .... device /sys/bus/usb/devices/usb3/power/control
-> .... device /sys/bus/usb/devices/usb4/power/control
-> .... device /sys/bus/usb/devices/3-1.2/power/control
-> .... device /sys/bus/usb/devices/3-1.6/power/control
-> Calibrating radio devices
-> .... device /sys/class/rfkill/rfkill0/soft .... device /sys/class/rfkill/=
-rfkill1/soft .... device /sys/class/rfkill/rfkill0/soft .... device /sys/cl=
-ass/rfkill/rfkill1/soft Finishing PowerTOP power estimate calibration Param=
-eters after calibration:
-> =
+@@ -420,122 +421,193 @@ static int get_cstates_num(void)
+ =
 
-> =
+ void report_display_cpu_cstates(void)
+ {
+-	char buffer[512], buffer2[512];
++	char buffer[512], buffer2[512], tmp_num[50];
+ 	unsigned int package, core, cpu;
+-	int line, cstates_num;
++	int line, cstates_num, title=3D0, core_num=3D0;
+ 	class abstract_cpu *_package, * _core, * _cpu;
+ =
 
-> Parameter state
-> ----------------------------------
-> Value		Name
->  2.23		alsa-codec-power (2)
->  0.37		backlight (3)
->  3.51		backlight-boost-100 (4)
->  2.52		backlight-boost-40 (5)
->  6.65		backlight-boost-80 (6)
->  0.00		backlight-power (7)
->  0.21		base power (8)
->  0.00		cpu-consumption (9)
->  0.00		cpu-wakeups (10)
->  0.00		disk-operations (11)
->  0.00		disk-operations-hard (12)
->  0.00		eth0-link-100 (13)
-> 10.93		eth0-link-1000 (14)
->  0.00		eth0-link-high (15)
->  0.00		eth0-packets (16)
->  0.00		eth0-powerunsave (17)
->  0.00		eth0-up (18)
->  0.20		gpu-operations (19)
->  0.00		radio:hci0 (20)
->  0.00		radio:phy0 (21)
->  0.31		radio:tpacpi_bluetooth_sw (22)
->  0.00		runtime-0000:00:00.0 (23)
->  0.00		runtime-0000:00:02.0 (24)
->  0.00		runtime-0000:00:14.0 (25)
->  0.00		runtime-0000:00:16.0 (26)
->  0.00		runtime-0000:00:16.3 (27)
->  0.00		runtime-0000:00:19.0 (28)
->  0.00		runtime-0000:00:1a.0 (29)
->  0.00		runtime-0000:00:1b.0 (30)
->  0.00		runtime-0000:00:1c.0 (31)
->  0.00		runtime-0000:00:1c.1 (32)
->  0.00		runtime-0000:00:1c.2 (33)
->  0.00		runtime-0000:00:1d.0 (34)
->  0.00		runtime-0000:00:1f.0 (35)
->  0.00		runtime-0000:00:1f.2 (36)
->  0.00		runtime-0000:00:1f.3 (37)
->  0.00		runtime-0000:02:00.0 (38)
->  0.00		runtime-0000:03:00.0 (39)
->  0.00		thinkpad-fan (40)
->  0.00		thinkpad-fan-cub (41)
->  0.00		thinkpad-fan-sqr (42)
->  0.00		thinkpad-light (43)
->  0.00		usb-device-0403-6001 (44)
->  0.00		usb-device-04e8-6860 (45)
->  0.00		usb-device-04e8-6864 (46)
->  2.58		usb-device-04f2-b2ea (47)
->  0.00		usb-device-058f-6387 (48)
->  0.00		usb-device-091e-0003 (49)
->  1.34		usb-device-0a5c-21e6 (50)
->  9.82		usb-device-1050-0010 (51)
->  0.00		usb-device-18d1-4ee2 (52)
->  0.00		usb-device-18d1-4ee4 (53)
->  0.00		usb-device-1d6b-0002 (54)
->  0.00		usb-device-1d6b-0003 (55)
->  0.00		usb-device-8087-0024 (56)
->  0.00		usb0-link-100 (57)
->  0.00		usb0-link-1000 (58)
->  0.00		usb0-link-high (59)
->  0.00		usb0-packets (60)
->  0.00		usb0-powerunsave (61)
->  0.00		usb0-up (62)
->  0.00		vboxnet0-link-100 (63)
->  0.00		vboxnet0-link-1000 (64)
->  0.00		vboxnet0-link-high (65)
->  0.00		vboxnet0-packets (66)
->  0.00		vboxnet0-powerunsave (67)
->  0.00		vboxnet0-up (68)
->  0.00		wlan0-link-100 (69)
->  0.00		wlan0-link-1000 (70)
->  0.00		wlan0-link-high (71)
->  0.00		wlan0-packets (72)
->  1.64		wlan0-powerunsave (73)
->  0.00		wlan0-up (74)
->  0.00		xwakes (75)
-> =
+ 	cstates_num =3D get_cstates_num();
++	/* div attr css_class and css_id */
++	tag_attr div_attr;
++	init_div(&div_attr, "clear_block", "cpuidle");
++
++	/* Set Table attributes, rows, and cols */
++	table_attributes std_table_css;
++	table_size pkg_tbl_size;
++	table_size core_tbl_size;
++	table_size cpu_tbl_size;
++
++
++	/* Set Title attributes */
++	tag_attr title_attr;
++	init_title_attr(&title_attr);
+ =
 
-> Score:    2.6  (104691.5)
-> Guess:   13.2
-> Actual:  13.6
-> ----------------------------------
-> =
+-	report.begin_section(SECTION_CPUIDLE);
+-	report.add_header("Processor Idle state report");
++	/* Report add section */
++	report.add_div(&div_attr);
++	report.add_title(&title_attr, __("Processor Idle State Report"));
++
++	/* Set array of data in row Major order */
++       	int idx1, idx2, idx3;
++	string tmp_str;
+ =
 
-> =
+ 	for (package =3D 0; package < system_level.children.size(); package++) {
+ 		bool first_core =3D true;
++		idx1=3D0;
++		idx2=3D0;
++		idx3=3D0;
+ =
 
-> --
-> "A mouse is a device used to point at the xterm you want to type in" - A.=
-S.R.
-> Microsoft is to operating systems ....
->                                       .... what McDonalds is to gourmet c=
-ooking Home page: http://marc.merlins.org/  =
+ 		_package =3D system_level.children[package];
+ 		if (!_package)
+ 			continue;
++		/* Tables for PKG, CORE, CPU */
++		pkg_tbl_size.cols=3D2;
++		pkg_tbl_size.rows=3D cstates_num+1;
++		string pkg_data[pkg_tbl_size.cols * pkg_tbl_size.rows];
++
++		core_tbl_size.cols=3D2;
++		core_tbl_size.rows=3D(cstates_num *_package->children.size())
++				+ _package->children.size();
++		string core_data[core_tbl_size.cols * core_tbl_size.rows];
++		int num_cpus=3D0;
++
++		for (core =3D 0; core < _package->children.size(); core++) {
++			_core =3D _package->children[core];
++			if (!_core)
++				continue;
++			for (cpu =3D 0; cpu < _core->children.size(); cpu++) {
++				if (!_cpu)
++					continue;
++				_cpu =3D _core->children[cpu];
++				num_cpus+=3D1;
++			}
++		}
++
++		cpu_tbl_size.cols=3D((2 * num_cpus)+1) ;
++		cpu_tbl_size.rows=3D cstates_num * _package->children.size();
++
++		string cpu_data[cpu_tbl_size.cols * cpu_tbl_size.rows];
+ =
 
-> =
+-		report.begin_table(TABLE_WIDE);
+ 		for (core =3D 0; core < _package->children.size(); core++) {
++			cpu_data[idx3]=3D"&nbsp;";
++			idx3+=3D1;
+ 			_core =3D _package->children[core];
++
+ 			if (!_core)
+ 				continue;
+ =
 
-> =
++			/* *** PKG STARTS *** */
+ 			for (line =3D LEVEL_HEADER; line <=3D cstates_num; line++) {
+ 				bool first_cpu =3D true;
+-
+ 				if (!_package->has_cstate_level(line))
+-					continue;
+-
+-				report.begin_row();
++				continue;
+ 				buffer[0] =3D 0;
+ 				buffer2[0] =3D 0;
+-
+ 				if (line =3D=3D LEVEL_HEADER) {
+ 					if (first_core) {
+-						report.begin_cell(CELL_FIRST_PACKAGE_HEADER);
+-						report.addf(__("Package %i"), _package->get_number());
+-					} else {
+-						report.begin_cell(CELL_EMPTY_PACKAGE_HEADER);
+-						report.add_empty_cell();
++						pkg_data[idx1]=3D__("Package");
++						idx1+=3D1;
++						sprintf(tmp_num,"%d",  _package->get_number());
++						pkg_data[idx1]=3D string(tmp_num);
++						idx1+=3D1;
+ 					}
+ 				} else if (first_core) {
+-					report.begin_cell(CELL_STATE_NAME);
+-					report.add(_package->fill_cstate_name(line, buffer));
+-					report.begin_cell(CELL_PACKAGE_STATE_VALUE);
+-					report.add(_package->fill_cstate_line(line, buffer2));
+-				} else {
+-					report.begin_cell(CELL_EMPTY_PACKAGE_STATE);
+-					report.add_empty_cell();
++					tmp_str=3Dstring(_package->fill_cstate_name(line, buffer));
++					pkg_data[idx1]=3D(tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
++					idx1+=3D1;
++					tmp_str=3Dstring(_package->fill_cstate_line(line, buffer2));
++					pkg_data[idx1]=3D(tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
++					idx1+=3D1;
+ 				}
+ =
 
-> ------------------------------
-> =
+-				report.begin_cell(CELL_SEPARATOR);
+-				report.add_empty_cell();
+-
++				/* *** CORE STARTS *** */
+ 				if (!_core->can_collapse()) {
+ 					buffer[0] =3D 0;
+ 					buffer2[0] =3D 0;
+ =
 
-> Message: 3
-> Date: Thu, 17 Oct 2013 17:24:41 -0700
-> From: Marc MERLIN <marc_powertop(a)merlins.org>
-> To: Arjan van de Ven <arjan(a)linux.intel.com>
-> Cc: powertop(a)ml01.01.org
-> Subject: Re: [Powertop] USB devices get wrong power use values
-> Message-ID: <20131018002441.GB5362(a)merlins.org>
-> Content-Type: text/plain; charset=3Dus-ascii
-> =
+ 					if (line =3D=3D LEVEL_HEADER) {
+-						report.begin_cell(CELL_CORE_HEADER);
+ 						/* Here we need to check for which core type we
+-  						 * are using. Do not use the core type for the =
 
-> On Thu, Oct 17, 2013 at 05:01:54PM -0700, Marc MERLIN wrote:
-> > On Sun, Oct 13, 2013 at 09:22:12AM -0700, Marc MERLIN wrote:
-> > > On Sun, Oct 13, 2013 at 08:33:51AM -0700, Arjan van de Ven wrote:
-> > > > On 9/22/2013 4:54 PM, Marc MERLIN wrote:
-> > > > >So, I asked on the linux-usb list, and one thing I quickly found o=
-ut is that the
-> > > > >Watt value given by powertop 2.4 is way off for USB devices:
-> > > > =
+-  						 * report.addf as it breaks an important macro use =
 
-> > > > what makes you think the value is off?
-> > > > =
+-  						 * for translation decision making for the reports. =
 
-> > > > >>Power est.  Events/s    Category       Description
-> > > > >>   8.18 W    100.0%      Device         USB device: Yubico Yubike=
-y II (Yubico)
-> > > > >>   8.13 W    100.0%      Device         USB device: Integrated Ca=
-mera (Chicony Electronics Co., Ltd.)
-> > > > =
+-  						   */
+-						const char* core_type =3D _core->get_type(); =
 
-> > > > having a USB device active also generally makes the CPU/etc use muc=
-h more power,
-> > > > which Powertop "charges" to the USB device in question.
-> > > > =
+-					        if (core_type !=3D NULL) {	=
 
-> > > > 8 Watts sounds entirely reasonable for that to me...
-> > > =
++						* are using. Do not use the core type for the
++						* report.addf as it breaks an important macro use
++						* for translation decision making for the reports.
++						* */
++						const char* core_type =3D _core->get_type();
++						if (core_type !=3D NULL) {
+ 							if (strcmp(core_type, "Core") =3D=3D 0 ) {
+-								report.addf(__("Core %i"), _core->get_number());
++								core_data[idx2]=3D"";
++								idx2+=3D1;
++								sprintf(tmp_num, __("Core %d"),_core->get_number());
++								core_data[idx2]=3Dstring(tmp_num);
++								idx2+=3D1;
++								core_num+=3D1;
+ 							} else {
+-								report.addf(__("GPU %i"), _core->get_number());
+-							} =
 
-> > > Aah, if the CPU gets involved, then yes, it's a bit more possible.
-> > > So, a simple USB keyboard that's unused can keep one core awake and b=
-urn 8
-> > > watts if something else goes wrong in the kernel to cause that?
-> > =
++								core_data[idx2]=3D"";
++								idx2+=3D1;
++								sprintf(tmp_num,__("GPU %d"),_core->get_number());
++								core_data[idx2]=3Dstring(tmp_num);
++								idx2+=3D1;
++							}
+ 						}
+-                                       } else {
+-                                                report.begin_cell(CELL_STA=
+TE_NAME);
+-                                                report.add(_core->fill_cst=
+ate_name(line, buffer));
+-						report.begin_cell(CELL_CORE_STATE_VALUE);
+-						report.add(_core->fill_cstate_line(line, buffer2));
++					} else {
++						tmp_str=3Dstring(_core->fill_cstate_name(line, buffer));
++						core_data[idx2]=3D(tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
++						idx2+=3D1;
++						tmp_str=3Dstring(_core->fill_cstate_line(line, buffer2));
++						core_data[idx2]=3D(tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
++						idx2+=3D1;
+ 					}
+ 				}
+-
+-				report.begin_cell(CELL_SEPARATOR);
+-				report.add_empty_cell();
+-
++				// *** CPU STARTS ***
+ 				for (cpu =3D 0; cpu < _core->children.size(); cpu++) {
+ 					_cpu =3D _core->children[cpu];
++
+ 					if (!_cpu)
+ 						continue;
+-
+-					report.set_cpu_number(cpu);
+ 					if (line =3D=3D LEVEL_HEADER) {
+-						report.begin_cell(CELL_CPU_CSTATE_HEADER);
+-						report.addf(__("CPU %i"), _cpu->get_number());
++						cpu_data[idx3] =3D __("CPU");
++						idx3+=3D1;
++						sprintf(tmp_num,"%d",_cpu->get_number());
++						cpu_data[idx3]=3Dstring(tmp_num);
++						idx3+=3D1;
+ 						continue;
+ 					}
+ =
 
-> > So, I just upgraded to 3.11.5, and see things like this below. Can alsa=
- sound
-> > really take 10W when I'm batteries?
-> > Let me put it another way, it just cannot be correct. Full power use is=
- 15W and
-> > if you removed 10W for audio (I'm sure that's wrong) and 3W for wifi (t=
-hat may be correct)
-> > it means my quad core laptop is running at 2W with the screen on?
-> > Not possible at all.
-> =
+ 					if (first_cpu) {
+-						report.begin_cell(CELL_STATE_NAME);
+-						report.add(_cpu->fill_cstate_name(line, buffer));
++						title+=3D1;
++						cpu_data[idx3]=3D(string(_cpu->fill_cstate_name(line, buffer)));
++						idx3+=3D1;
+ 						first_cpu =3D false;
+ 					}
+ =
 
-> > So there has to be a bug in powertop 2.4 USB device power calculation.
-> > =
+ 					buffer[0] =3D 0;
+-					report.begin_cell(CELL_CPU_STATE_VALUE);
+-					report.add(_cpu->fill_cstate_percentage(line, buffer));
+-					report.begin_cell(CELL_CPU_STATE_VALUE);
+-					if (line !=3D LEVEL_C0)
+-						report.add(_cpu->fill_cstate_time(line, buffer));
+-					else
+-						report.add_empty_cell();
++					tmp_str=3Dstring(_cpu->fill_cstate_percentage(line, buffer));
++					cpu_data[idx3]=3D(tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
++					idx3+=3D1;
++
++					if (line !=3D LEVEL_C0){
++						tmp_str=3Dstring(_cpu->fill_cstate_time(line, buffer));
++						cpu_data[idx3]=3D(tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
++						idx3+=3D1;
++					} else {
++						cpu_data[idx3]=3D"&nbsp;";
++						idx3+=3D1;
++					}
+ 				}
+ 			}
+-
+ 			first_core =3D false;
+ 		}
++
++		/* Report Output */
++		title=3Dtitle/core_num;
++		init_pkg_table_attr(&std_table_css, pkg_tbl_size.rows,  pkg_tbl_size.col=
+s);
++		report.add_table(pkg_data, &std_table_css);
++		init_core_table_attr(&std_table_css, title+1, core_tbl_size.rows,
++				core_tbl_size.cols);
++		report.add_table(core_data, &std_table_css);
++		init_cpu_table_attr(&std_table_css, title+1, cpu_tbl_size.rows,
++				cpu_tbl_size.cols);
++		report.add_table(cpu_data, &std_table_css);
+ 	}
++	report.end_div();
+ }
+ =
 
-> > For what it's worth, I got the data below right after running
-> > powertop --calibrate and letting it go through a full cycle.
-> > =
+ void report_display_cpu_pstates(void)
+diff --git a/src/report/report-data-html.cpp b/src/report/report-data-html.=
+cpp
+index ed0d692..28732c9 100644
+--- a/src/report/report-data-html.cpp
++++ b/src/report/report-data-html.cpp
+@@ -35,6 +35,45 @@ void init_std_table_attr(struct table_attributes *table_=
+css, int rows, int cols)
+ 	table_css->cols=3Dcols;
+ }
+ =
 
-> > -----------------------------------------------------------------------=
------
-> > The battery reports a discharge rate of 15.1 W
-> > The estimated remaining time is 4 hours, 53 minutes
-> > =
++void init_pkg_table_attr(struct table_attributes *table_css, int rows, int=
+ cols){
++	table_css->table_class=3D"emphasis2 side_by_side_left";
++	table_css->tr_class=3D"";
++	table_css->th_class=3D"title";
++	table_css->td_class=3D"package";
++	table_css->pos_table_title=3DT;
++	table_css->title_mod=3D0;
++	table_css->rows=3Drows;
++	table_css->cols=3Dcols;
++}
++
++void init_core_table_attr(struct table_attributes *table_css, int title_mo=
+d,
++		int rows, int cols){
++	table_css->table_class=3D"emphasis2 side_by_side_left";
++	table_css->tr_class=3D"";
++	table_css->th_class=3D"title";
++	table_css->td_class=3D"core";
++	table_css->pos_table_title=3DTC;
++	table_css->title_mod=3Dtitle_mod;
++	table_css->rows=3Drows;
++	table_css->cols=3Dcols;
++}
++
++void init_cpu_table_attr(struct table_attributes *table_css, int title_mod,
++		int rows, int cols){
++	table_css->table_class=3D"emphasis2 side_by_side_left";
++	table_css->tr_class=3D"";
++	table_css->th_class=3D"title";
++	table_css->td_class=3D"cpu";
++	table_css->pos_table_title=3DTLC;
++	table_css->title_mod=3Dtitle_mod;
++	table_css->rows=3Drows;
++	table_css->cols=3Dcols;
++}
++
++
++
++
++
+ /* Other Helper Functions */
+ string
+ double_to_string(double dval)
+diff --git a/src/report/report-data-html.h b/src/report/report-data-html.h
+index 524cd24..61e75c0 100644
+--- a/src/report/report-data-html.h
++++ b/src/report/report-data-html.h
+@@ -21,6 +21,12 @@ struct table_attributes {
+ 	int cols;
+ };
+ =
 
-> > Summary: 572.4 wakeups/second,  18.3 GPU ops/seconds, 0.0 VFS ops/sec a=
-nd 8.3% CPU use
-> > =
++struct table_size {
++	int rows;
++	int cols;
++};
++
++
+ /* Definition of css atributes for the cases that apply to powertop
+  * html report
+  * */
+@@ -37,6 +43,18 @@ init_title_attr(struct tag_attr *title_attr);
+ void
+ init_std_table_attr(struct table_attributes *table_css, int rows, int cols=
+);
+ =
 
-> > Power est.              Usage       Events/s    Category       Descript=
-ion
-> >   10.5 W    100.0%                      Device         Audio codec alsa=
-:hwC0D0: thinkpad (Realtek)
-> >   3.10 W      7.0 pkts/s                Device         Network interfac=
-e: wlan0 (iwlwifi)
-> >   772 mW     25.1 ms/s     208.4        Process        /usr/bin/enlight=
-enment
-> >  13.4 mW      1.2 ms/s       8.5        Process        xfce4-terminal -=
-T window10 --role=3Dwindow10 --tab
-> > (...)
-> > -----------------------------------------------------------------------=
------
-> =
++void
++init_pkg_table_attr(struct table_attributes *table_css, int rows, int cols=
+);
++
++void
++init_core_table_attr(struct table_attributes *table_css, int title_mod,
++		int rows, int cols);
++
++void
++init_cpu_table_attr(struct table_attributes *table_css, int title_mod,
++		int rows, int cols);
++
++
+ /* Other helper functions */
+ string
+ double_to_string(double dval);
+-- =
 
-> Just after I wrote this, I'm now seeing my yubikey back to 10W when it was
-> alsa holding the slot earlier.
->  =
+1.7.9.5
 
-> > -----------------------------------------------------------------------=
------
-> The battery reports a discharge rate of 21.3 W
-> The estimated remaining time is 3 hours, 0 minutes
-> =
 
-> Summary: 2685.1 wakeups/second,  149.8 GPU ops/seconds, 0.0 VFS ops/sec a=
-nd 31.2% CPU use
-> =
-
-> Power est.              Usage       Events/s    Category       Description
->   10.4 W    100.0%                      Device         USB device: Yubico=
- Yubikey II (Yubico)
->   5.50 W     13.0%                      Device         Display backlight
->   1.51 W     17.4 pkts/s                Device         Network interface:=
- wlan0 (iwlwifi)
->   566 mW     85.8 ms/s     1520.4       Process        /usr/bin/enlighten=
-ment
->   109 mW    100.0%                      Device         Audio codec alsa:h=
-wC0D0: thinkpad (Realtek)
->  43.2 mW      5.2 ms/s      72.9        Process        xfce4-terminal -T =
-window5 --role=3Dwindow5
->  25.9 mW      0.8 ms/s      14.8        Process        xfce4-terminal -T =
-window9 --role=3Dwindow9 --tab
-> > -----------------------------------------------------------------------=
------
-> =
-
-> I hope this is useful.
-> =
-
-> Marc
-> -- =
-
-> "A mouse is a device used to point at the xterm you want to type in" - A.=
-S.R.
-> Microsoft is to operating systems ....
->                                       .... what McDonalds is to gourmet c=
-ooking
-> Home page: http://marc.merlins.org/  =
-
-> =
-
-> =
-
-> ------------------------------
-> =
-
-> Message: 4
-> Date: Fri, 18 Oct 2013 11:07:25 -0700
-> From: Kristen Carlson Accardi <kristen(a)linux.intel.com>
-> To: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
-> Cc: powertop(a)lists.01.org
-> Subject: Re: [Powertop] [PATCH -next] intel cpus: add proper C-states
-> 	init
-> Message-ID: <20131018110725.7a2b1459(a)bluebird.jf.intel.com>
-> Content-Type: text/plain; charset=3DUS-ASCII
-> =
-
-> On Thu, 17 Oct 2013 23:37:51 +0300
-> Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com> wrote:
-> =
-
-> > add missing has_c2c7_res init to nhm_core() .ctor and
-> > has_c8c9c10_res/has_c2c7_res init to nhm_package() .ctor.
-> > =
-
-> > uninitialised has_c2c7_res/has_c8c9c10_res/has_c2c7_res
-> > may be used in core/package measurement_start()/measurement_end().
-> > =
-
-> > Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
-> =
-
-> Applied, thanks.
-> =
-
-> =
-
-> ------------------------------
-> =
-
-> Message: 5
-> Date: Fri, 18 Oct 2013 11:09:26 -0700
-> From: Kristen Carlson Accardi <kristen(a)linux.intel.com>
-> To: powertop(a)lists.01.org
-> Subject: [Powertop] [Announce] v2.5-rc1
-> Message-ID: <20131018110926.2deb6450(a)bluebird.jf.intel.com>
-> Content-Type: text/plain; charset=3DUS-ASCII
-> =
-
-> Please test.
-> =
-
-> Thanks,
-> Kristen
-> =
-
-> =
-
-> ------------------------------
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
-> =
-
-> =
-
-> End of PowerTop Digest, Vol 18, Issue 19
-> ****************************************
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
-
---===============3538868324482878983==--
+--===============6986937300321088717==--
 
