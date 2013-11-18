@@ -1,37 +1,89 @@
-Content-Type: multipart/mixed; boundary="===============8458356839764396923=="
+Content-Type: multipart/mixed; boundary="===============4837098073053308756=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [Announce] v2.5-rc1
-Date: Sat, 19 Oct 2013 10:00:02 +0300
-Message-ID: <20131019070002.GA2175@swordfish.minsk.epam.com>
-In-Reply-To: 5B3EBE90AD716C428A6F03AC478C54067FB7C10F@ORSMSX105.amr.corp.intel.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH v3 04/31] report: report maker add title and div
+Date: Mon, 18 Nov 2013 12:26:55 -0800
+Message-ID: <1384806442-20294-5-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1384806442-20294-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8458356839764396923==
+--===============4837098073053308756==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/18/13 22:33), Yates, Alexandra wrote:
-> Tested PowerTop different platforms including Linux and Windows.  The fol=
-lowing patch breaks IE compatibility. =
+Calls to add a title and add a division from report maker using report
+object to the generated report.
 
-> =
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+---
+ src/report/report-formatter.h |    3 +++
+ src/report/report-maker.cpp   |   18 ++++++++++++++++++
+ src/report/report-maker.h     |    3 +++
+ 3 files changed, 24 insertions(+)
 
-> https://lists.01.org/pipermail/powertop/2013-September/000925.html =
+diff --git a/src/report/report-formatter.h b/src/report/report-formatter.h
+index 449fae7..78382d8 100644
+--- a/src/report/report-formatter.h
++++ b/src/report/report-formatter.h
+@@ -65,6 +65,9 @@ public:
+ 	virtual void add_logo() {}
+ 	virtual void add_header() {}
+ 	virtual void end_hheader() {}
++	virtual void add_div(struct tag_attr *div_attr) {}
++	virtual void end_div() {}
++	virtual void add_title(struct tag_attr *att_title, const char *title) {}
+ };
+ =
 
-> =
+ #endif /* _REPORT_FORMATTER_H_ */
+diff --git a/src/report/report-maker.cpp b/src/report/report-maker.cpp
+index 8eba618..ff87f1e 100644
+--- a/src/report/report-maker.cpp
++++ b/src/report/report-maker.cpp
+@@ -350,3 +350,21 @@ report_maker::end_hheader()
+ 	formatter->end_hheader();
+ }
+ =
+
++void
++report_maker::add_title(struct tag_attr *att_title, const char *title)
++{
++	formatter->add_title(att_title, title);
++}
++
++void
++report_maker::add_div(struct tag_attr * div_attr)
++{
++	formatter->add_div(div_attr);
++}
++
++void
++report_maker::end_div()
++{
++	formatter->end_div();
++}
++
+diff --git a/src/report/report-maker.h b/src/report/report-maker.h
+index fab9589..0c17635 100644
+--- a/src/report/report-maker.h
++++ b/src/report/report-maker.h
+@@ -196,6 +196,9 @@ public:
+ 	void add_header();
+ 	void end_hheader();
+ 	void add_logo();
++	void add_div(struct tag_attr *div_attr);
++	void end_div();
++	void add_title(struct tag_attr *att_title, const char *title);
+ =
+
+ private:
+ 	void setup_report_formatter();
+-- =
+
+1.7.9.5
 
 
-more details please: what IE version; how do we break it?
-
-powertop.html
-
--- firebug console: no errors
--- w3c validation: no error, passed (green)
-
-	-ss
-
---===============8458356839764396923==--
+--===============4837098073053308756==--
 
