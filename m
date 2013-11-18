@@ -1,149 +1,150 @@
-Content-Type: multipart/mixed; boundary="===============5932587788368878543=="
+Content-Type: multipart/mixed; boundary="===============5014559978026106729=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [Announce] v2.5-rc2
-Date: Wed, 13 Nov 2013 01:12:49 +0300
-Message-ID: <20131112221249.GD5709@swordfish>
-In-Reply-To: 20131112210828.GA5709@swordfish
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH v3 20/31] report: redesign Device Power Report csv
+ & html
+Date: Mon, 18 Nov 2013 12:27:11 -0800
+Message-ID: <1384806442-20294-21-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1384806442-20294-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5932587788368878543==
+--===============5014559978026106729==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (11/13/13 00:08), Sergey Senozhatsky wrote:
-> On (11/05/13 12:34), Kristen Carlson Accardi wrote:
-> > > > Thanks for your report, I bisected this issue down to this commit:
-> > > > commit 2b980e1b36cf6150308a9db07b958726dad36571
-> > > > Author: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
-> > > > Date:   Tue Oct 8 22:35:53 2013 +0300
-> > > > =
+Redesign Device Power Report table part of "Device Info" section, while
+preserving translation macros.
 
-> > > >     traceevent: update libtraceevent code base (3.12)
-> > > > =
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+---
+ src/devices/device.cpp |   72 +++++++++++++++++++++++---------------------=
+----
+ 1 file changed, 35 insertions(+), 37 deletions(-)
 
-> > > > Sergey?  See report below for how to duplicate.
-> > > =
+diff --git a/src/devices/device.cpp b/src/devices/device.cpp
+index 00ec5e6..4120b9c 100644
+--- a/src/devices/device.cpp
++++ b/src/devices/device.cpp
+@@ -49,6 +49,7 @@ using namespace std;
+ #include "../lib.h"
+ #include "../report/report.h"
+ #include "../report/report-maker.h"
++#include "../report/report-data-html.h"
+ #include "../measurement/measurement.h"
+ #include "../devlist.h"
+ #include <unistd.h>
+@@ -217,43 +218,35 @@ void report_devices(void)
+ void show_report_devices(void)
+ {
+ 	unsigned int i;
+-	int show_power;
+-	double pw;
++	int show_power, cols, rows, idx;
+ =
 
-> > > hm... big problem, libtraceevent unable to support hrtimers event at
-> > > the moment with arg construction in TP_printk()
-> > > =
+ 	show_power =3D global_power_valid();
+ 	sort(all_devices.begin(), all_devices.end(), power_device_sort);
+ =
 
-> > =
+-	report.begin_section(SECTION_DEVPOWER);
+-	report.add_header("Device Power Report");
++	/* div attr css_class and css_id */
++        tag_attr div_attr;
++        init_div(&div_attr, "", "device");
+ =
 
-> > OK, I am thinking that we'll consider this a showstopper and delay the
-> > release of 2.5 until it is fixed if we need to.
-> > =
+-	pw =3D global_joules_consumed();
+-	if (pw > 0.0001) {
+-		char buf[32];
++        /* Set Table attributes, rows, and cols */
++        table_attributes std_table_css;
++	cols=3D2;
++        if (show_power)
++                cols=3D3;
+ =
 
-> =
+-		report.begin_paragraph();
+-		report.addf("The battery reports a discharge rate of %sW",
+-			    fmt_prefix(pw, buf));
+-	}
++	idx =3D cols;
++ 	rows=3D all_devices.size() + 1;
++        init_std_table_attr(&std_table_css, rows, cols);
+ =
 
-> Hello,
-> sorry it took me so long to get back to this.
-> =
+-	if (show_power) {
+-		char buf[32];
++        /* Set Title attributes */
++        tag_attr title_attr;
++        init_title_attr(&title_attr);
+ =
 
-> after short investigation, I don't think we need to postpone 2.5 release.
-> yes, libtraceevent does not handle nicely
-> /** nor trace-cmd does
->      kworker/1:0-3925  [001]  1626.266585: hrtimer_cancel:       hrtimer=
-=3D0xffff880157c8df80
->                X-2175  [000]  1626.266585: hrtimer_cancel:       hrtimer=
-=3D0xffff880157c0df80
->                X-2175  [000]  1626.266586: hrtimer_expire_entry: [FAILED =
-TO PARSE] hrtimer=3D0xffff880157c0df80 now=3D1625348004324 function=3D0xfff=
-fffff810cadf0
->      kworker/1:0-3925  [001]  1626.266586: hrtimer_expire_entry: [FAILED =
-TO PARSE] hrtimer=3D0xffff880157c8df80 now=3D1625348004320 function=3D0xfff=
-fffff810cadf0
->      kworker/1:0-3925  [001]  1626.266591: hrtimer_expire_exit:  hrtimer=
-=3D0xffff880157c8df80
->      kworker/1:0-3925  [001]  1626.266592: hrtimer_start:        [FAILED =
-TO PARSE] hrtimer=3D0xffff880157c8df80 function=3D0xffffffff810cadf0 expire=
-s=3D1625352000000 softexpires=3D1625352000000
->                X-2175  [000]  1626.266593: hrtimer_expire_exit:  hrtimer=
-=3D0xffff880157c0df80
->                X-2175  [000]  1626.266594: hrtimer_start:        [FAILED =
-TO PARSE] hrtimer=3D0xffff880157c0df80 function=3D0xffffffff810cadf0 expire=
-s=3D1625352000000 softexpires=3D1625352000000
->      kworker/1:0-3925  [001]  1626.266596: timer_cancel:         timer=3D=
-0xffff880157c8ff28
+-		report.begin_paragraph();
+-		report.addf("System baseline power is estimated at %sW",
+-			    fmt_prefix(get_parameter_value("base power"), buf));
+-	}
+-
+-	report.begin_table(TABLE_WIDE);
+-	report.begin_row();
+-	if (show_power) {
+-		report.begin_cell(CELL_DEVPOWER_HEADER);
+-		report.add("Power est.");
+-	}
+-
+-	report.begin_cell(CELL_DEVPOWER_HEADER);
+-	report.add("Usage");
+-	report.begin_cell(CELL_DEVPOWER_DEV_NAME);
+-	report.add("Device name");
++        /* Set array of data in row Major order */
++	string device_data[cols * rows];
++	device_data[0]=3D __("Usage");
++	device_data[1]=3D __("Device Name");
++	if (show_power)
++		device_data[2]=3D __("PW Estimate");
+ =
 
-taking my words about trace-cmd back.
-trace-cmd can parse it, just need proper plugin placement
-[..]
-         <idle>-0     [000]  7126.976512: hrtimer_cancel:       hrtimer=3D0=
-xffff880157c0df80
-              ls-21607 [001]  7126.976513: hrtimer_expire_entry: hrtimer=3D=
-0xffff880157c8df80 now=3D7123856003259 function=3Dtick_sched_timer/0x0
-          <idle>-0     [000]  7126.976513: hrtimer_expire_entry: hrtimer=3D=
-0xffff880157c0df80 now=3D7123856003132 function=3Dtick_sched_timer/0x0
-               X-2175  [003]  7126.976513: hrtimer_cancel:       hrtimer=3D=
-0xffff880157d8df80
-               X-2175  [003]  7126.976515: hrtimer_expire_entry: hrtimer=3D=
-0xffff880157d8df80 now=3D7123856003882 function=3Dtick_sched_timer/0x0
-              ls-21607 [001]  7126.976518: hrtimer_expire_exit:  hrtimer=3D=
-0xffff880157c8df80
-          <idle>-0     [000]  7126.976519: hrtimer_expire_exit:  hrtimer=3D=
-0xffff880157c0df80
-              ls-21607 [001]  7126.976519: hrtimer_start:        hrtimer=3D=
-0xffff880157c8df80 function=3Dtick_sched_timer expires=3D7123860000000 soft=
-expires=3D7123860000000
-          <idle>-0     [000]  7126.976519: hrtimer_start:        hrtimer=3D=
-0xffff880157c0df80 function=3Dtick_sched_timer expires=3D7123860000000 soft=
-expires=3D7123860000000
-               X-2175  [003]  7126.976522: hrtimer_expire_exit:  hrtimer=3D=
-0xffff880157d8df80
-[..]
+ 	for (i =3D 0; i < all_devices.size(); i++) {
+ 		double P;
+@@ -278,17 +271,22 @@ void show_report_devices(void)
+ 		if (!show_power || !all_devices[i]->power_valid())
+ 			strcpy(power, "           ");
+ =
 
-powertop does not use char function name representation, but instead uint64=
-_t (passing to find_create_timer(uint64_t func)).
+-		report.begin_row(ROW_DEVPOWER);
++		device_data[idx]=3D string(util);
++		idx+=3D1;
++
++		device_data[idx]=3D string(all_devices[i]->human_name());
++		idx+=3D1;
++
+ 		if (show_power) {
+-			report.begin_cell(CELL_DEVPOWER_POWER);
+-			report.add(power);
++			device_data[idx]=3D string(power);
++			idx+=3D1;
+ 		}
+-
+-		report.begin_cell(CELL_DEVPOWER_UTIL);
+-		report.add(util);
+-		report.begin_cell();
+-		report.add(all_devices[i]->human_name());
+ 	}
++	/* Report Output */
++	report.add_div(&div_attr);
++	report.add_title(&title_attr, __("Device Power Report"));
++	report.add_table(device_data, &std_table_css);
++	report.end_div();
+ }
+ =
 
-	-ss
+ =
 
-> **/
-> some of hrtimer events printk format [e.g. hrtimer_expire_entry]
-> =
+-- =
 
-> 	print fmt: "hrtimer=3D%p function=3D%pf now=3D%llu", REC->hrtimer, REC->=
-function, (unsigned long long)(((ktime_t) { .tv64 =3D REC->now }).tv64)
-> =
+1.7.9.5
 
-> having issues with arg construction { .tv64 =3D REC->now }.tv64 (and that=
- unknown op '{' warning),
-> however, we're able to parse hrtimer event and to handle it. /* as far as=
- I understand, correct me if I'm wrong */
-> =
 
-> debug output from do_process perf_process_bundle::handle_trace_point()
-> =
-
-> [..]
-> >> hrtimer_expire_exit: pop_consumer: 0
->   >> timer done: 0x8683f90 5941
->   >> timer created: 0x8683f90 [timer]
-> >> hrtimer_expire_entry: push_consumer: 0
->   >> timer created: 0x8683f90 [timer]
-> >> hrtimer_expire_entry: push_consumer: 2
-> >> hrtimer_expire_exit: pop_consumer: 0
->   >> timer done: 0x8683f90 9857
-> >> hrtimer_expire_exit: pop_consumer: 2
->   >> timer done: 0x8683f90 12529
->   >> timer created: 0x8683f90 [timer]
-> >> hrtimer_expire_entry: push_consumer: 0
->   >> timer created: 0x8683f90 [timer]
-> >> hrtimer_expire_entry: push_consumer: 2
-> >> hrtimer_expire_exit: pop_consumer: 0
->   >> timer done: 0x8683f90 4481
-> >> hrtimer_expire_exit: pop_consumer: 2
->   >> timer done: 0x8683f90 6535
-> [..]
-> =
-
-> any objections?
-> =
-
-> 	-ss
-
---===============5932587788368878543==--
+--===============5014559978026106729==--
 
