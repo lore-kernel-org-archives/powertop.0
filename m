@@ -1,89 +1,117 @@
-Content-Type: multipart/mixed; boundary="===============4837098073053308756=="
+Content-Type: multipart/mixed; boundary="===============8386943686390805854=="
 MIME-Version: 1.0
 From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH v3 04/31] report: report maker add title and div
-Date: Mon, 18 Nov 2013 12:26:55 -0800
-Message-ID: <1384806442-20294-5-git-send-email-alexandra.yates@linux.intel.com>
+Subject: [Powertop] [PATCH v3 08/31] report-csv: Added navigation & summary
+ list
+Date: Mon, 18 Nov 2013 12:26:59 -0800
+Message-ID: <1384806442-20294-9-git-send-email-alexandra.yates@linux.intel.com>
 In-Reply-To: 1384806442-20294-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4837098073053308756==
+--===============8386943686390805854==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Calls to add a title and add a division from report maker using report
-object to the generated report.
+Implements csv report functionality to add navigation and summary on the
+csv report.
 
 Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
 ---
- src/report/report-formatter.h |    3 +++
- src/report/report-maker.cpp   |   18 ++++++++++++++++++
- src/report/report-maker.h     |    3 +++
- 3 files changed, 24 insertions(+)
+ src/report/report-formatter-csv.cpp |   22 ++++++++++++++++++++--
+ src/report/report-formatter-csv.h   |    6 +++++-
+ 2 files changed, 25 insertions(+), 3 deletions(-)
 
-diff --git a/src/report/report-formatter.h b/src/report/report-formatter.h
-index 449fae7..78382d8 100644
---- a/src/report/report-formatter.h
-+++ b/src/report/report-formatter.h
-@@ -65,6 +65,9 @@ public:
- 	virtual void add_logo() {}
- 	virtual void add_header() {}
- 	virtual void end_hheader() {}
-+	virtual void add_div(struct tag_attr *div_attr) {}
-+	virtual void end_div() {}
-+	virtual void add_title(struct tag_attr *att_title, const char *title) {}
- };
+diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-format=
+ter-csv.cpp
+index bd9dfd3..2981940 100644
+--- a/src/report/report-formatter-csv.cpp
++++ b/src/report/report-formatter-csv.cpp
+@@ -189,10 +189,10 @@ report_formatter_csv::end_paragraph()
  =
 
- #endif /* _REPORT_FORMATTER_H_ */
-diff --git a/src/report/report-maker.cpp b/src/report/report-maker.cpp
-index 8eba618..ff87f1e 100644
---- a/src/report/report-maker.cpp
-+++ b/src/report/report-maker.cpp
-@@ -350,3 +350,21 @@ report_maker::end_hheader()
- 	formatter->end_hheader();
+ /* ***********************************************************************=
+* */
+ =
+
+-std::string
++string
+ report_formatter_csv::escape_string(const char *str)
+ {
+-	std::string res;
++	string res;
+ =
+
+ 	assert(str);
+ =
+
+@@ -261,3 +261,21 @@ report_formatter_csv::add_title(struct tag_attr *title=
+_att, const char *title)
+ 	add_exact("______________________________________________________________=
+______\n");
+ 	addf_exact(" *  *  *   %s   *  *  *\n", title);
  }
++
++void
++report_formatter_csv::add_navigation()
++{
++	/* No nav in csv - thinking on table of contents */
++}
++
++void
++report_formatter_csv::add_summary_list(string *list, int size)
++{
++	int i;
++	add_exact("\n");
++	for (i=3D0; i < size; i+=3D2){
++		addf_exact("%s %s,", list[i].c_str(), list[i+1].c_str());
++	}
++	add_exact("\n");
++}
++
+diff --git a/src/report/report-formatter-csv.h b/src/report/report-formatte=
+r-csv.h
+index 2c1c0fd..daf723e 100644
+--- a/src/report/report-formatter-csv.h
++++ b/src/report/report-formatter-csv.h
+@@ -42,6 +42,8 @@
+ /* Whether to escape with quotes empty cell values with spaces */
+ /*#define REPORT_CSV_SPACE_NEED_QUOTES*/
  =
 
-+void
-+report_maker::add_title(struct tag_attr *att_title, const char *title)
-+{
-+	formatter->add_title(att_title, title);
-+}
++using namespace std;
 +
-+void
-+report_maker::add_div(struct tag_attr * div_attr)
-+{
-+	formatter->add_div(div_attr);
-+}
-+
-+void
-+report_maker::end_div()
-+{
-+	formatter->end_div();
-+}
-+
-diff --git a/src/report/report-maker.h b/src/report/report-maker.h
-index fab9589..0c17635 100644
---- a/src/report/report-maker.h
-+++ b/src/report/report-maker.h
-@@ -196,6 +196,9 @@ public:
- 	void add_header();
- 	void end_hheader();
- 	void add_logo();
-+	void add_div(struct tag_attr *div_attr);
-+	void end_div();
-+	void add_title(struct tag_attr *att_title, const char *title);
+ /* ***********************************************************************=
+* */
+ =
+
+ class report_formatter_csv: public report_formatter_string_base
+@@ -78,13 +80,15 @@ public:
+ 	void add_div(struct tag_attr *div_attr);
+ 	void end_div();
+ 	void add_title(struct tag_attr *title_att, const char *title);
++	void add_navigation();
++	void add_summary_list(string *list, int size);
  =
 
  private:
- 	void setup_report_formatter();
+ 	void add_doc_header();
+ =
+
+ 	void add_quotes();
+ =
+
+-	std::string escape_string(const char *str);
++	string escape_string(const char *str);
+ =
+
+ 	bool csv_need_quotes;
+ 	size_t table_cell_number, text_start;
 -- =
 
 1.7.9.5
 
 
---===============4837098073053308756==--
+--===============8386943686390805854==--
 
