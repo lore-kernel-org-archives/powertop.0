@@ -1,106 +1,129 @@
-Content-Type: multipart/mixed; boundary="===============3387540322694001468=="
+Content-Type: multipart/mixed; boundary="===============7618139693351485626=="
 MIME-Version: 1.0
-From: Maksim Melnikau <maxposedon at gmail.com>
-Subject: [Powertop] [BUG] powertop shows estimates only for 1st battery from 2
-Date: Fri, 11 Oct 2013 09:19:16 +0300
-Message-ID: <CAGbmdnXgHmeKcVxJ0gvNtmixc8E8=Ah9JDeqb-0fwYRm+w187g@mail.gmail.com>
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH v3 15/31] report: redesign html menu
+Date: Mon, 18 Nov 2013 12:27:06 -0800
+Message-ID: <1384806442-20294-16-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1384806442-20294-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3387540322694001468==
+--===============7618139693351485626==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello!
+Changes menu design to align under logo and system Information
+following dashboard design rules for readability and functionality.
 
-I have 2 batteries in my thinkpad helix laptop, and it looks like powertop
-shows "the estimated remaining time" just for first battery, what is a bit
-confusing. May be it somehow connected to some hardware features of
-batteries switching.
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+---
+ src/powertop.css |   57 +++++++++++++++++++++++++++-----------------------=
+----
+ 1 file changed, 28 insertions(+), 29 deletions(-)
 
-# powertop, Overview page
-The battery reports a discharge rate of 7.67 W
-The estimated remaining time is 2 hours, 17 minutes
+diff --git a/src/powertop.css b/src/powertop.css
+index 19b9484..d724ead 100644
+--- a/src/powertop.css
++++ b/src/powertop.css
+@@ -44,7 +44,7 @@ var powertop =3D {
+   return x;
+  },
+  setupbuttons: function() {
+-   var t =3D document.getElementById('top');
++   var t =3D document.getElementById('main_menu');
+    if (t) {
+      for (var b in powertop.blocks) {
+        t.appendChild(powertop.newbutton(b, powertop.blocks[b]));
+@@ -216,51 +216,50 @@ body {
+ 	font-size: 14px;
+ }
+ =
 
-# powertop -V
-PowerTOP versionv2.4, compiled on Jul 29 2013
+-#top {
+-	background-color: #ccc;
+-	border-bottom: 1px solid #666;
+-	color: #222;
+-	display: block;
+-	font-size: 20px;
++#main_menu {
++	display: inline-block;
+ 	font-weight: bold;
+-	padding: 10px 0;
++	padding: 5px 0;
+ 	text-align: center;
+-	text-decoration: none;
+-	text-shadow: 0px 1px 1px #fff;
+ 	background-image: -webkit-gradient(linear, left top, left bottom,
+-						from(#ccc), to(#999));
++		from(#aaa), to(#eee));
++	background: -moz-linear-gradient(top,  #aaa,  #eee);
+ }
+ =
 
-# cat /sys/class/power_supply/BAT0/uevent
-POWER_SUPPLY_NAME=3DBAT0
-POWER_SUPPLY_STATUS=3DUnknown
-POWER_SUPPLY_PRESENT=3D1
-POWER_SUPPLY_TECHNOLOGY=3DLi-poly
-POWER_SUPPLY_CYCLE_COUNT=3D0
-POWER_SUPPLY_VOLTAGE_MIN_DESIGN=3D11100000
-POWER_SUPPLY_VOLTAGE_NOW=3D12503000
-POWER_SUPPLY_POWER_NOW=3D0
-POWER_SUPPLY_ENERGY_FULL_DESIGN=3D42010000
-POWER_SUPPLY_ENERGY_FULL=3D42010000
-POWER_SUPPLY_ENERGY_NOW=3D41940000
-POWER_SUPPLY_CAPACITY=3D99
-POWER_SUPPLY_MODEL_NAME=3D45N1103
-POWER_SUPPLY_MANUFACTURER=3DSMP
-POWER_SUPPLY_SERIAL_NUMBER=3D 3507
+ =
 
-# cat /sys/class/power_supply/BAT1/uevent
-POWER_SUPPLY_NAME=3DBAT1
-POWER_SUPPLY_STATUS=3DDischarging
-POWER_SUPPLY_PRESENT=3D1
-POWER_SUPPLY_TECHNOLOGY=3DLi-poly
-POWER_SUPPLY_CYCLE_COUNT=3D0
-POWER_SUPPLY_VOLTAGE_MIN_DESIGN=3D14800000
-POWER_SUPPLY_VOLTAGE_NOW=3D15178000
-POWER_SUPPLY_POWER_NOW=3D8165000
-POWER_SUPPLY_ENERGY_FULL_DESIGN=3D28050000
-POWER_SUPPLY_ENERGY_FULL=3D26370000
-POWER_SUPPLY_ENERGY_NOW=3D16750000
-POWER_SUPPLY_CAPACITY=3D63
-POWER_SUPPLY_MODEL_NAME=3D45N1101
-POWER_SUPPLY_MANUFACTURER=3DSMP
-POWER_SUPPLY_SERIAL_NUMBER=3D 1840
+-#top div {
+-	height: 30px;
++#main_menu div {
++	font-size: 12px;
+ 	font-weight: bold;
+-	text-align: center;
+ 	color: white;
+-	text-shadow: rgba(0,0,0,0.6) 0px -1px 1px;
+-	line-height: 28px;
+-	border-width:0px 8px 0px 8px;
+ }
+-#top div.nav_button {
+- display: inline;
+- cursor: pointer;
+- padding: 0.3em 0.5em;
+- margin: 0 0.2em;
++
++#main_menu div.nav_button {
++	margin: 0 0.2em;
++	display: inline;
++	cursor: pointer;
++	color: #223232;
++	font-size: 13px;
++	font-weight: bold;
++	padding: 5px;
++	text-align: center;
++	text-decoration: none;
+ }
+ =
 
---===============3387540322694001468==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+ div.pressed {
+-	background-color: #000000;
+-	border: 1px solid #000000;
+-	color: #000000;
+-	border-radius: 8px;
++	border: -webkit-gradient(linear, left top, left bottom,
++		from(#b2ffb2), to(#e0ffe0));
++	border-width:0px 8px 0px 8px;
++	background: #999;
++	background-image: -webkit-gradient(linear, left top, left bottom,
++		from(#b2ffb2), to(#e0ffe0));
++	background: -moz-linear-gradient(top,  #b2ffb2,  #e0ffe0);
+ }
++
+ div.hide {
+- display: none;
++	display: none;
+ }
+ </style>
+ </head>
+ =
 
-PGRpdiBkaXI9Imx0ciI+PGRpdj5IZWxsbyE8L2Rpdj48ZGl2Pjxicj48L2Rpdj5JIGhhdmUgMiBi
-YXR0ZXJpZXMgaW4gbXkgdGhpbmtwYWQgaGVsaXggbGFwdG9wLCBhbmQgaXQgbG9va3MgbGlrZSBw
-b3dlcnRvcCBzaG93cyAmcXVvdDt0aGUgZXN0aW1hdGVkIHJlbWFpbmluZyB0aW1lJnF1b3Q7IGp1
-c3QgZm9yIGZpcnN0IGJhdHRlcnksIHdoYXQgaXMgYSBiaXQgY29uZnVzaW5nLiBNYXkgYmUgaXQg
-c29tZWhvdyBjb25uZWN0ZWQgdG8gc29tZSBoYXJkd2FyZSBmZWF0dXJlcyBvZiBiYXR0ZXJpZXMg
-c3dpdGNoaW5nLjxkaXY+Cjxicj48L2Rpdj48ZGl2PiMgcG93ZXJ0b3AsIE92ZXJ2aWV3IHBhZ2U8
-L2Rpdj48ZGl2PjxkaXY+VGhlIGJhdHRlcnkgcmVwb3J0cyBhIGRpc2NoYXJnZSByYXRlIG9mIDcu
-NjcgVzwvZGl2PjxkaXY+VGhlIGVzdGltYXRlZCByZW1haW5pbmcgdGltZSBpcyAyIGhvdXJzLCAx
-NyBtaW51dGVzPC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj4jIHBvd2VydG9wIC1WPC9kaXY+PGRp
-dj5Qb3dlclRPUCB2ZXJzaW9udjIuNCwgY29tcGlsZWQgb24gSnVsIDI5IDIwMTM8YnI+CjwvZGl2
-PjwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+PGRpdj4jIGNhdCAvc3lzL2NsYXNzL3Bvd2VyX3N1
-cHBseS9CQVQwL3VldmVudDwvZGl2PjxkaXY+UE9XRVJfU1VQUExZX05BTUU9QkFUMDwvZGl2Pjxk
-aXY+UE9XRVJfU1VQUExZX1NUQVRVUz1Vbmtub3duPC9kaXY+PGRpdj5QT1dFUl9TVVBQTFlfUFJF
-U0VOVD0xPC9kaXY+PGRpdj5QT1dFUl9TVVBQTFlfVEVDSE5PTE9HWT1MaS1wb2x5PC9kaXY+Cjxk
-aXY+UE9XRVJfU1VQUExZX0NZQ0xFX0NPVU5UPTA8L2Rpdj48ZGl2PlBPV0VSX1NVUFBMWV9WT0xU
-QUdFX01JTl9ERVNJR049MTExMDAwMDA8L2Rpdj48ZGl2PlBPV0VSX1NVUFBMWV9WT0xUQUdFX05P
-Vz0xMjUwMzAwMDwvZGl2PjxkaXY+UE9XRVJfU1VQUExZX1BPV0VSX05PVz0wPC9kaXY+PGRpdj5Q
-T1dFUl9TVVBQTFlfRU5FUkdZX0ZVTExfREVTSUdOPTQyMDEwMDAwPC9kaXY+PGRpdj4KUE9XRVJf
-U1VQUExZX0VORVJHWV9GVUxMPTQyMDEwMDAwPC9kaXY+PGRpdj5QT1dFUl9TVVBQTFlfRU5FUkdZ
-X05PVz00MTk0MDAwMDwvZGl2PjxkaXY+UE9XRVJfU1VQUExZX0NBUEFDSVRZPTk5PC9kaXY+PGRp
-dj5QT1dFUl9TVVBQTFlfTU9ERUxfTkFNRT00NU4xMTAzPC9kaXY+PGRpdj5QT1dFUl9TVVBQTFlf
-TUFOVUZBQ1RVUkVSPVNNUDwvZGl2PjxkaXY+UE9XRVJfU1VQUExZX1NFUklBTF9OVU1CRVI9IDM1
-MDc8L2Rpdj4KPGRpdj48YnI+PC9kaXY+PGRpdj4jIGNhdCAvc3lzL2NsYXNzL3Bvd2VyX3N1cHBs
-eS9CQVQxL3VldmVudDwvZGl2PjxkaXY+UE9XRVJfU1VQUExZX05BTUU9QkFUMTwvZGl2PjxkaXY+
-UE9XRVJfU1VQUExZX1NUQVRVUz1EaXNjaGFyZ2luZzwvZGl2PjxkaXY+UE9XRVJfU1VQUExZX1BS
-RVNFTlQ9MTwvZGl2PjxkaXY+UE9XRVJfU1VQUExZX1RFQ0hOT0xPR1k9TGktcG9seTwvZGl2Pjxk
-aXY+ClBPV0VSX1NVUFBMWV9DWUNMRV9DT1VOVD0wPC9kaXY+PGRpdj5QT1dFUl9TVVBQTFlfVk9M
-VEFHRV9NSU5fREVTSUdOPTE0ODAwMDAwPC9kaXY+PGRpdj5QT1dFUl9TVVBQTFlfVk9MVEFHRV9O
-T1c9MTUxNzgwMDA8L2Rpdj48ZGl2PlBPV0VSX1NVUFBMWV9QT1dFUl9OT1c9ODE2NTAwMDwvZGl2
-PjxkaXY+UE9XRVJfU1VQUExZX0VORVJHWV9GVUxMX0RFU0lHTj0yODA1MDAwMDwvZGl2PjxkaXY+
-ClBPV0VSX1NVUFBMWV9FTkVSR1lfRlVMTD0yNjM3MDAwMDwvZGl2PjxkaXY+UE9XRVJfU1VQUExZ
-X0VORVJHWV9OT1c9MTY3NTAwMDA8L2Rpdj48ZGl2PlBPV0VSX1NVUFBMWV9DQVBBQ0lUWT02Mzwv
-ZGl2PjxkaXY+UE9XRVJfU1VQUExZX01PREVMX05BTUU9NDVOMTEwMTwvZGl2PjxkaXY+UE9XRVJf
-U1VQUExZX01BTlVGQUNUVVJFUj1TTVA8L2Rpdj48ZGl2PlBPV0VSX1NVUFBMWV9TRVJJQUxfTlVN
-QkVSPSAxODQwPC9kaXY+CjwvZGl2PjxkaXY+PGJyPjwvZGl2PjwvZGl2Pgo=
+ <body onload=3D'powertop.onload();'>
+-<div id=3D'top'>
+-</div>
+ =
 
---===============3387540322694001468==--
+-- =
+
+1.7.9.5
+
+
+--===============7618139693351485626==--
 
