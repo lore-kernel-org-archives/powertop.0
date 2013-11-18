@@ -1,162 +1,75 @@
-Content-Type: multipart/mixed; boundary="===============8450904088628623648=="
+Content-Type: multipart/mixed; boundary="===============4874810328826220975=="
 MIME-Version: 1.0
-From: Yates, Alexandra <alexandra.yates at intel.com>
-Subject: Re: [Powertop] (no subject)
-Date: Wed, 16 Oct 2013 20:33:09 +0000
-Message-ID: <5B3EBE90AD716C428A6F03AC478C54067FB6FE79@ORSMSX105.amr.corp.intel.com>
-In-Reply-To: CADy9ZNCnbhd2PBg0H8UPhpCSjVHRT0-PuRn31nvJ15WeUAcrpQ@mail.gmail.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH v3 06/31] report-html: summary list and navigation
+Date: Mon, 18 Nov 2013 12:26:57 -0800
+Message-ID: <1384806442-20294-7-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1384806442-20294-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8450904088628623648==
+--===============4874810328826220975==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Bill,
+Generates the html tags to add navigation and summary including css
+attribute support.
 
-This is great news.  I'm currently working on changing the UI for PowerTOP,=
- expect to see the changes up streamed in the days to come.  There is a pro=
-ject we can work together.
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+---
+ src/report/report-formatter-html.cpp |   18 ++++++++++++++++++
+ src/report/report-formatter-html.h   |    2 ++
+ 2 files changed, 20 insertions(+)
 
-I will send you all details in a separate email off the list so that we can=
- start a discussion for your development.  Meanwhile,   I like you to visit=
- https://01.org/powertop/ clone PowerTOP's repo and start familiarizing you=
-rself with the code.
+diff --git a/src/report/report-formatter-html.cpp b/src/report/report-forma=
+tter-html.cpp
+index 2e59725..93a4c48 100644
+--- a/src/report/report-formatter-html.cpp
++++ b/src/report/report-formatter-html.cpp
+@@ -516,3 +516,21 @@ report_formatter_html::add_title(struct tag_attr *titl=
+e_att, const char *title)
+ 	addf_exact("<h2 class=3D\"%s\"> %s </h2>\n", title_att->css_class, title);
+ }
+ =
 
-Start with src/main.cpp and make your way through the code to find src/repo=
-rt/* files.
++void
++report_formatter_html::add_navigation()
++{
++	add_exact("<br/><nav id=3D\"main_menu\"> </nav>\n");
++}
++
++void
++report_formatter_html::add_summary_list(std::string *list, int size)
++{
++	int i;
++	add_exact("<div><br/> <ul>\n");
++	for (i=3D0; i < size; i+=3D2){
++		addf_exact("<li class=3D\"summary_list\"> <b> %s </b> %s </li>",
++				list[i].c_str(), list[i+1].c_str());
++	}
++	add_exact("</ul> </div> <br />\n");
++}
++
+diff --git a/src/report/report-formatter-html.h b/src/report/report-formatt=
+er-html.h
+index 0f508d3..261e0dd 100644
+--- a/src/report/report-formatter-html.h
++++ b/src/report/report-formatter-html.h
+@@ -89,6 +89,8 @@ public:
+ 	void add_div(struct tag_attr *div_attr);
+ 	void end_div();
+ 	void add_title(struct tag_attr *title_att, const char *title);
++	void add_navigation();
++	void add_summary_list(std::string *list, int size);
+ =
+
+ private:
+ 	/* Document structure related functions */
+-- =
+
+1.7.9.5
 
 
-Thank you,
-
-Alexandra.
-
-From: powertop-bounces(a)lists.01.org [mailto:powertop-bounces(a)lists.01.o=
-rg] On Behalf Of Bill Vyzas
-Sent: Tuesday, October 15, 2013 8:06 AM
-To: powertop(a)lists.01.org
-Subject: [Powertop] (no subject)
-
-Hello people,
-My name is Bill and I am third year computer science student. I am looking =
-for a project to work on my final year project and I would be interested to=
- work on power management on linux platforms.
-One idea I have about my final year project is to develop a GUI that will m=
-ake powertop more user friendly and maybe add some more functionality to th=
-e source.
-Any advices and ideas are more than appreciated.
-Thanks,
-Bill
-
---===============8450904088628623648==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
-
-PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
-bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
-YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
-cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
-VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
-bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
-ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTUgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
-PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseTpHdWxp
-bTsKCXBhbm9zZS0xOjIgMTEgNiAwIDAgMSAxIDEgMSAxO30KQGZvbnQtZmFjZQoJe2ZvbnQtZmFt
-aWx5OiJDYW1icmlhIE1hdGgiOwoJcGFub3NlLTE6MiA0IDUgMyA1IDQgNiAzIDIgNDt9CkBmb250
-LWZhY2UKCXtmb250LWZhbWlseTpDYWxpYnJpOwoJcGFub3NlLTE6MiAxNSA1IDIgMiAyIDQgMyAy
-IDQ7fQpAZm9udC1mYWNlCgl7Zm9udC1mYW1pbHk6IlxAR3VsaW0iOwoJcGFub3NlLTE6MiAxMSA2
-IDAgMCAxIDEgMSAxIDE7fQovKiBTdHlsZSBEZWZpbml0aW9ucyAqLwpwLk1zb05vcm1hbCwgbGku
-TXNvTm9ybWFsLCBkaXYuTXNvTm9ybWFsCgl7bWFyZ2luOjBpbjsKCW1hcmdpbi1ib3R0b206LjAw
-MDFwdDsKCWZvbnQtc2l6ZToxMi4wcHQ7Cglmb250LWZhbWlseToiVGltZXMgTmV3IFJvbWFuIiwi
-c2VyaWYiO30KYTpsaW5rLCBzcGFuLk1zb0h5cGVybGluawoJe21zby1zdHlsZS1wcmlvcml0eTo5
-OTsKCWNvbG9yOiMwNTYzQzE7Cgl0ZXh0LWRlY29yYXRpb246dW5kZXJsaW5lO30KYTp2aXNpdGVk
-LCBzcGFuLk1zb0h5cGVybGlua0ZvbGxvd2VkCgl7bXNvLXN0eWxlLXByaW9yaXR5Ojk5OwoJY29s
-b3I6Izk1NEY3MjsKCXRleHQtZGVjb3JhdGlvbjp1bmRlcmxpbmU7fQpzcGFuLkVtYWlsU3R5bGUx
-NwoJe21zby1zdHlsZS10eXBlOnBlcnNvbmFsLXJlcGx5OwoJZm9udC1mYW1pbHk6IkNhbGlicmki
-LCJzYW5zLXNlcmlmIjsKCWNvbG9yOiMwMDAwQ0M7Cglmb250LXdlaWdodDpub3JtYWw7Cglmb250
-LXN0eWxlOm5vcm1hbDsKCXRleHQtZGVjb3JhdGlvbjpub25lIG5vbmU7fQouTXNvQ2hwRGVmYXVs
-dAoJe21zby1zdHlsZS10eXBlOmV4cG9ydC1vbmx5OwoJZm9udC1mYW1pbHk6IkNhbGlicmkiLCJz
-YW5zLXNlcmlmIjt9CkBwYWdlIFdvcmRTZWN0aW9uMQoJe3NpemU6OC41aW4gMTEuMGluOwoJbWFy
-Z2luOjEuMGluIDEuMGluIDEuMGluIDEuMGluO30KZGl2LldvcmRTZWN0aW9uMQoJe3BhZ2U6V29y
-ZFNlY3Rpb24xO30KLS0+PC9zdHlsZT48IS0tW2lmIGd0ZSBtc28gOV0+PHhtbD4KPG86c2hhcGVk
-ZWZhdWx0cyB2OmV4dD0iZWRpdCIgc3BpZG1heD0iMTAyNiIgLz4KPC94bWw+PCFbZW5kaWZdLS0+
-PCEtLVtpZiBndGUgbXNvIDldPjx4bWw+CjxvOnNoYXBlbGF5b3V0IHY6ZXh0PSJlZGl0Ij4KPG86
-aWRtYXAgdjpleHQ9ImVkaXQiIGRhdGE9IjEiIC8+CjwvbzpzaGFwZWxheW91dD48L3htbD48IVtl
-bmRpZl0tLT4KPC9oZWFkPgo8Ym9keSBsYW5nPSJFTi1VUyIgbGluaz0iIzA1NjNDMSIgdmxpbms9
-IiM5NTRGNzIiPgo8ZGl2IGNsYXNzPSJXb3JkU2VjdGlvbjEiPgo8cCBjbGFzcz0iTXNvTm9ybWFs
-Ij48c3BhbiBzdHlsZT0iZm9udC1zaXplOjExLjBwdDtmb250LWZhbWlseTomcXVvdDtDYWxpYnJp
-JnF1b3Q7LCZxdW90O3NhbnMtc2VyaWYmcXVvdDs7Y29sb3I6IzAwMDBDQyI+SGkgQmlsbCwKPG86
-cD48L286cD48L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iZm9u
-dC1zaXplOjExLjBwdDtmb250LWZhbWlseTomcXVvdDtDYWxpYnJpJnF1b3Q7LCZxdW90O3NhbnMt
-c2VyaWYmcXVvdDs7Y29sb3I6IzAwMDBDQyI+PG86cD4mbmJzcDs8L286cD48L3NwYW4+PC9wPgo8
-cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iZm9udC1zaXplOjExLjBwdDtmb250LWZh
-bWlseTomcXVvdDtDYWxpYnJpJnF1b3Q7LCZxdW90O3NhbnMtc2VyaWYmcXVvdDs7Y29sb3I6IzAw
-MDBDQyI+VGhpcyBpcyBncmVhdCBuZXdzLiZuYnNwOyBJJiM4MjE3O20gY3VycmVudGx5IHdvcmtp
-bmcgb24gY2hhbmdpbmcgdGhlIFVJIGZvciBQb3dlclRPUCwgZXhwZWN0IHRvIHNlZSB0aGUgY2hh
-bmdlcyB1cCBzdHJlYW1lZCBpbiB0aGUgZGF5cyB0byBjb21lLiZuYnNwOyBUaGVyZSBpcyBhIHBy
-b2plY3Qgd2UKIGNhbiB3b3JrIHRvZ2V0aGVyLiZuYnNwOyA8bzpwPjwvbzpwPjwvc3Bhbj48L3A+
-CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTEuMHB0O2ZvbnQt
-ZmFtaWx5OiZxdW90O0NhbGlicmkmcXVvdDssJnF1b3Q7c2Fucy1zZXJpZiZxdW90Oztjb2xvcjoj
-MDAwMENDIj48bzpwPiZuYnNwOzwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwi
-PjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTEuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0NhbGlicmkm
-cXVvdDssJnF1b3Q7c2Fucy1zZXJpZiZxdW90Oztjb2xvcjojMDAwMENDIj5JIHdpbGwgc2VuZCB5
-b3UgYWxsIGRldGFpbHMgaW4gYSBzZXBhcmF0ZSBlbWFpbCBvZmYgdGhlIGxpc3Qgc28gdGhhdCB3
-ZSBjYW4gc3RhcnQgYSBkaXNjdXNzaW9uIGZvciB5b3VyIGRldmVsb3BtZW50LiZuYnNwOyBNZWFu
-d2hpbGUsICZuYnNwOyZuYnNwO0kgbGlrZSB5b3UgdG8gdmlzaXQKPC9zcGFuPjxhIGhyZWY9Imh0
-dHBzOi8vMDEub3JnL3Bvd2VydG9wLyI+aHR0cHM6Ly8wMS5vcmcvcG93ZXJ0b3AvPC9hPjxzcGFu
-IHN0eWxlPSJmb250LXNpemU6MTEuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0NhbGlicmkmcXVvdDss
-JnF1b3Q7c2Fucy1zZXJpZiZxdW90Oztjb2xvcjojMDAwMENDIj4gY2xvbmUgUG93ZXJUT1AmIzgy
-MTc7cyByZXBvIGFuZCBzdGFydCBmYW1pbGlhcml6aW5nIHlvdXJzZWxmIHdpdGggdGhlIGNvZGUu
-Jm5ic3A7CjxvOnA+PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4g
-c3R5bGU9ImZvbnQtc2l6ZToxMS4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7Q2FsaWJyaSZxdW90Oywm
-cXVvdDtzYW5zLXNlcmlmJnF1b3Q7O2NvbG9yOiMwMDAwQ0MiPjxvOnA+Jm5ic3A7PC9vOnA+PC9z
-cGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMS4w
-cHQ7Zm9udC1mYW1pbHk6JnF1b3Q7Q2FsaWJyaSZxdW90OywmcXVvdDtzYW5zLXNlcmlmJnF1b3Q7
-O2NvbG9yOiMwMDAwQ0MiPlN0YXJ0IHdpdGggc3JjL21haW4uY3BwIGFuZCBtYWtlIHlvdXIgd2F5
-IHRocm91Z2ggdGhlIGNvZGUgdG8gZmluZCBzcmMvcmVwb3J0LyogZmlsZXMuPG86cD48L286cD48
-L3NwYW4+PC9wPgo8dGFibGUgY2xhc3M9Ik1zb05vcm1hbFRhYmxlIiBib3JkZXI9IjAiIGNlbGxz
-cGFjaW5nPSIwIiBjZWxscGFkZGluZz0iMCI+Cjx0Ym9keT4KPHRyPgo8dGQgc3R5bGU9InBhZGRp
-bmc6MGluIDBpbiAwaW4gMGluIj4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImZv
-bnQtc2l6ZToxMC4wcHQ7Y29sb3I6IzQ0NTQ2QTttc28tZmFyZWFzdC1sYW5ndWFnZTpLTyI+PG86
-cD4mbmJzcDs8L286cD48L3NwYW4+PC9wPgo8L3RkPgo8L3RyPgo8L3Rib2R5Pgo8L3RhYmxlPgo8
-cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iZm9udC1zaXplOjExLjBwdDtmb250LWZh
-bWlseTomcXVvdDtDYWxpYnJpJnF1b3Q7LCZxdW90O3NhbnMtc2VyaWYmcXVvdDs7Y29sb3I6IzAw
-MDBDQyI+VGhhbmsgeW91LAo8bzpwPjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29Ob3Jt
-YWwiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTEuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0NhbGli
-cmkmcXVvdDssJnF1b3Q7c2Fucy1zZXJpZiZxdW90Oztjb2xvcjojMDAwMENDIj48bzpwPiZuYnNw
-OzwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJmb250
-LXNpemU6MTEuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0NhbGlicmkmcXVvdDssJnF1b3Q7c2Fucy1z
-ZXJpZiZxdW90Oztjb2xvcjojMDAwMENDIj5BbGV4YW5kcmEuCjxvOnA+PC9vOnA+PC9zcGFuPjwv
-cD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMS4wcHQ7Zm9u
-dC1mYW1pbHk6JnF1b3Q7Q2FsaWJyaSZxdW90OywmcXVvdDtzYW5zLXNlcmlmJnF1b3Q7O2NvbG9y
-OiMwMDAwQ0MiPjxvOnA+Jm5ic3A7PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1h
-bCI+PGI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMS4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7Q2Fs
-aWJyaSZxdW90OywmcXVvdDtzYW5zLXNlcmlmJnF1b3Q7Ij5Gcm9tOjwvc3Bhbj48L2I+PHNwYW4g
-c3R5bGU9ImZvbnQtc2l6ZToxMS4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7Q2FsaWJyaSZxdW90Oywm
-cXVvdDtzYW5zLXNlcmlmJnF1b3Q7Ij4gcG93ZXJ0b3AtYm91bmNlc0BsaXN0cy4wMS5vcmcgW21h
-aWx0bzpwb3dlcnRvcC1ib3VuY2VzQGxpc3RzLjAxLm9yZ10KPGI+T24gQmVoYWxmIE9mIDwvYj5C
-aWxsIFZ5emFzPGJyPgo8Yj5TZW50OjwvYj4gVHVlc2RheSwgT2N0b2JlciAxNSwgMjAxMyA4OjA2
-IEFNPGJyPgo8Yj5Ubzo8L2I+IHBvd2VydG9wQGxpc3RzLjAxLm9yZzxicj4KPGI+U3ViamVjdDo8
-L2I+IFtQb3dlcnRvcF0gKG5vIHN1YmplY3QpPG86cD48L286cD48L3NwYW4+PC9wPgo8cCBjbGFz
-cz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPGRpdj4KPGRpdj4KPGRpdj4KPGRp
-dj4KPGRpdj4KPGRpdj4KPGRpdj4KPGRpdj4KPGRpdj4KPGRpdj4KPGRpdj4KPHAgY2xhc3M9Ik1z
-b05vcm1hbCIgc3R5bGU9Im1hcmdpbi1ib3R0b206MTIuMHB0Ij5IZWxsbyBwZW9wbGUsPG86cD48
-L286cD48L3A+CjwvZGl2Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIiBzdHlsZT0ibWFyZ2luLWJvdHRv
-bToxMi4wcHQiPk15IG5hbWUgaXMgQmlsbCBhbmQgSSBhbSB0aGlyZCB5ZWFyIGNvbXB1dGVyIHNj
-aWVuY2Ugc3R1ZGVudC4gSSBhbSBsb29raW5nIGZvciBhIHByb2plY3QgdG8gd29yayBvbiBteSBm
-aW5hbCB5ZWFyIHByb2plY3QgYW5kIEkgd291bGQgYmUgaW50ZXJlc3RlZCB0byB3b3JrIG9uIHBv
-d2VyIG1hbmFnZW1lbnQgb24gbGludXggcGxhdGZvcm1zLjxvOnA+PC9vOnA+PC9wPgo8L2Rpdj4K
-PC9kaXY+CjwvZGl2Pgo8L2Rpdj4KPC9kaXY+CjwvZGl2Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIiBz
-dHlsZT0ibWFyZ2luLWJvdHRvbToxMi4wcHQiPk9uZSBpZGVhIEkgaGF2ZSBhYm91dCBteSBmaW5h
-bCB5ZWFyIHByb2plY3QgaXMgdG8gZGV2ZWxvcCBhIEdVSSB0aGF0IHdpbGwgbWFrZSBwb3dlcnRv
-cCBtb3JlIHVzZXIgZnJpZW5kbHkgYW5kIG1heWJlIGFkZCBzb21lIG1vcmUgZnVuY3Rpb25hbGl0
-eSB0byB0aGUgc291cmNlLjxvOnA+PC9vOnA+PC9wPgo8L2Rpdj4KPHAgY2xhc3M9Ik1zb05vcm1h
-bCIgc3R5bGU9Im1hcmdpbi1ib3R0b206MTIuMHB0Ij5BbnkgYWR2aWNlcyBhbmQgaWRlYXMgYXJl
-IG1vcmUgdGhhbiBhcHByZWNpYXRlZC48bzpwPjwvbzpwPjwvcD4KPC9kaXY+CjxwIGNsYXNzPSJN
-c29Ob3JtYWwiPlRoYW5rcyw8bzpwPjwvbzpwPjwvcD4KPC9kaXY+CjxwIGNsYXNzPSJNc29Ob3Jt
-YWwiPkJpbGwgPG86cD48L286cD48L3A+CjwvZGl2Pgo8L2Rpdj4KPC9ib2R5Pgo8L2h0bWw+Cg==
-
---===============8450904088628623648==--
+--===============4874810328826220975==--
 
