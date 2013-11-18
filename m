@@ -1,101 +1,97 @@
-Content-Type: multipart/mixed; boundary="===============3113538480867805958=="
+Content-Type: multipart/mixed; boundary="===============1507378492812391605=="
 MIME-Version: 1.0
 From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH v3 07/31] report-maker: navigation & summary
-Date: Mon, 18 Nov 2013 12:26:58 -0800
-Message-ID: <1384806442-20294-8-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: 1384806442-20294-1-git-send-email-alexandra.yates@linux.intel.com
+Subject: [Powertop] [PATCH v3 00/31] Report Redesign
+Date: Mon, 18 Nov 2013 12:26:51 -0800
+Message-ID: <1384806442-20294-1-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: Report Redesign
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3113538480867805958==
+--===============1507378492812391605==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Implements methods to generate navigation and summary from the report
-object.
+This patches are to be applied post release 2.5.
 
-Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
----
- src/report/report-formatter.h |    3 +++
- src/report/report-maker.cpp   |   12 ++++++++++++
- src/report/report-maker.h     |    4 +++-
- 3 files changed, 18 insertions(+), 1 deletion(-)
+This set of patches include the redesign changes for HTML and CSV reports a=
+nd
+cleans up unused reporting functions.  Additionally, removes the suggestion
+to use on demand CPU frequency governor.  This feature was removed because
+the Intel P-States driver is the Intel recommended method for CPU frequency.
 
-diff --git a/src/report/report-formatter.h b/src/report/report-formatter.h
-index 78382d8..5e5b8d7 100644
---- a/src/report/report-formatter.h
-+++ b/src/report/report-formatter.h
-@@ -27,6 +27,7 @@
- #define _REPORT_FORMATTER_H_
- =
+Igor Zhbanov reported that the localization macro __(=E2=80=A6)  was left o=
+ut from
+previous version.  These patches changed to add the localization macro to
+all report components.
 
- #include "report-maker.h"
-+using namespace std;
- =
+Alexandra Yates (31):
+  report-formater-html: add logo
+  report: call powertop logo
+  html-report: add title and div tags
+  report: report maker add title and div
+  report-csv: title, div, logo, header
+  report-html: summary list and navigation
+  report-maker: navigation & summary
+  report-csv: Added navigation & summary list
+  report-html: Table generation
+  report-maker: modular table generation
+  report-csv: modular table
+  report: Logo and system Information
+  report-html-css: html 5 and css for new design
+  report-summary: enable html and csv new styles
+  report: redesign html menu
+  report: CPU Idle section redesigned html & csv
+  report: Fixed html summary & menu colapse styles
+  report: CPU Frequency html & csv
+  report: redesign Software Information csv and html
+  report: redesign Device Power Report csv & html
+  report: Redesign Device Activity csv & html report
+  report: cleanup csv title and unused vars
+  report: report tuning with new desig html & csv
+  report-html: fixed not hidding sections errors
+  report: fixed empty SW settings in need of tunning
+  report: design batery discharge/system baseline
+  report: conditional runs ncurses & cpu html report
+  report: logo size & menu compatibility
+  tunables: removed on-demand cpu frequency governor
+  report-cleanup: removed old table, row, & cell.
+  report-cleanup: removed html & csv old methods
 
- class report_formatter
- {
-@@ -68,6 +69,8 @@ public:
- 	virtual void add_div(struct tag_attr *div_attr) {}
- 	virtual void end_div() {}
- 	virtual void add_title(struct tag_attr *att_title, const char *title) {}
-+	virtual void add_navigation() {}
-+	virtual void add_summary_list(string *list, int size) {}
- };
- =
+ PowerTop.png                         |  Bin 0 -> 6975 bytes
+ src/Makefile.am                      |    5 +-
+ src/cpu/cpu.cpp                      |  327 ++++++++++++++++++--------
+ src/devices/device.cpp               |   81 ++++---
+ src/devlist.cpp                      |   44 ++--
+ src/main.cpp                         |    7 +-
+ src/powertop.css                     |  287 ++++++++++-------------
+ src/process/do_process.cpp           |  233 +++++++++++--------
+ src/report/report-data-html.cpp      |  118 ++++++++++
+ src/report/report-data-html.h        |   69 ++++++
+ src/report/report-formatter-csv.cpp  |  189 ++++++---------
+ src/report/report-formatter-csv.h    |   42 ++--
+ src/report/report-formatter-html.cpp |  417 +++++++++---------------------=
+----
+ src/report/report-formatter-html.h   |   71 ++----
+ src/report/report-formatter.h        |   32 +--
+ src/report/report-maker.cpp          |  180 ++-------------
+ src/report/report-maker.h            |  114 ++--------
+ src/report/report.cpp                |   83 ++++---
+ src/tuning/cpufreq.cpp               |  213 -----------------
+ src/tuning/cpufreq.h                 |   50 ----
+ src/tuning/tuning.cpp                |  131 ++++++-----
+ 21 files changed, 1142 insertions(+), 1551 deletions(-)
+ create mode 100644 PowerTop.png
+ create mode 100644 src/report/report-data-html.cpp
+ create mode 100644 src/report/report-data-html.h
+ delete mode 100644 src/tuning/cpufreq.cpp
+ delete mode 100644 src/tuning/cpufreq.h
 
- #endif /* _REPORT_FORMATTER_H_ */
-diff --git a/src/report/report-maker.cpp b/src/report/report-maker.cpp
-index ff87f1e..ccfbec4 100644
---- a/src/report/report-maker.cpp
-+++ b/src/report/report-maker.cpp
-@@ -368,3 +368,15 @@ report_maker::end_div()
- 	formatter->end_div();
- }
- =
-
-+void
-+report_maker::add_navigation()
-+{
-+	formatter->add_navigation();
-+}
-+
-+void
-+report_maker::add_summary_list(string *list, int size)
-+{
-+	formatter->add_summary_list(list, size);
-+}
-+
-diff --git a/src/report/report-maker.h b/src/report/report-maker.h
-index 0c17635..6e5f4d1 100644
---- a/src/report/report-maker.h
-+++ b/src/report/report-maker.h
-@@ -73,7 +73,7 @@
- #include <stdarg.h>
- =
-
- #include <string>
--
-+using namespace std;
- /* Conditional gettext. We need original strings for CSV. */
- #define __(STRING) \
- 	((report.get_type() =3D=3D REPORT_CSV) ? (STRING) : gettext(STRING))
-@@ -199,6 +199,8 @@ public:
- 	void add_div(struct tag_attr *div_attr);
- 	void end_div();
- 	void add_title(struct tag_attr *att_title, const char *title);
-+	void add_navigation();
-+	void add_summary_list(string *list, int size);
- =
-
- private:
- 	void setup_report_formatter();
 -- =
 
 1.7.9.5
 
 
---===============3113538480867805958==--
+--===============1507378492812391605==--
 
