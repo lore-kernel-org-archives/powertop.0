@@ -1,210 +1,62 @@
-Content-Type: multipart/mixed; boundary="===============4894149544677395079=="
+Content-Type: multipart/mixed; boundary="===============1659169658021830187=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] patch: tell user if the system is running out of FDs
-Date: Tue, 08 Oct 2013 15:49:05 +0300
-Message-ID: <20131008124905.GA2452@swordfish.minsk.epam.com>
-In-Reply-To: 32937649.3381028.1381234097785.JavaMail.root@redhat.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH v3 22/31] report: cleanup csv title and unused vars
+Date: Mon, 18 Nov 2013 12:27:13 -0800
+Message-ID: <1384806442-20294-23-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1384806442-20294-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4894149544677395079==
+--===============1659169658021830187==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/08/13 08:08), Jaroslav Skarvada wrote:
-> > Hello,
-> > =
+Removed old csv headder to avoid redundancy. Removed unused variables
+from report.cpp str2 and str3.
 
-> > > I used Youquan's patch, but we have noticed that it can only overcome=
- soft
-> > > limits,
-> > > but not hard limits. E.g. on Fedora (and probably others) there is a =
-soft
-> > > limit
-> > > of 1024 and a hard limit of 4096, so if powertop opens at least 15 fi=
-le
-> > > descriptors
-> > > per CPU, then this will fail on a system with >273 CPUs.
-> > =
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+---
+ src/report/report-formatter-csv.cpp |    2 +-
+ src/report/report.cpp               |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-> > that's a pretty big system
-> > =
+diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-format=
+ter-csv.cpp
+index facdd4d..0ab1091 100644
+--- a/src/report/report-formatter-csv.cpp
++++ b/src/report/report-formatter-csv.cpp
+@@ -57,7 +57,7 @@ report_formatter_csv::finish_report()
+ void
+ report_formatter_csv::add_doc_header()
+ {
+-	add_header(report_csv_header, 1);
++	/*add_header(report_csv_header, 1);*/
+ }
+ =
 
-> > > In case you think we can also temporally increase the hard limit (as =
-we
-> > > already have
-> > > the privilege), the attached patch will do it. In case you think the =
-hard
-> > > limits set by
-> > > the system administrator are untouchable (e.g. violation of system
-> > > resources hard limits
-> > > could result in a bad effects like explosion in a nuclear power plant=
- :),
-> > > the
-> > > previously sent patch that fixes the error message needs to be also u=
-sed
-> > =
+ /* ***********************************************************************=
+* */
+diff --git a/src/report/report.cpp b/src/report/report.cpp
+index 3b46f58..56232a6 100644
+--- a/src/report/report.cpp
++++ b/src/report/report.cpp
+@@ -100,7 +100,7 @@ static string read_os_release(const string &filename)
+ =
 
-> > hm, need to think about this for a moment. both your patches make sense.
-> > I'd probably go with `temporally increase the hard limit' solution, to =
-make
-> > someones life easier. what do you, guys, think?
-> > =
+ static void system_info(void)
+ {
+-	string str, str2, str3;
++	string str;
+ =
 
-> > =
+ 	/* div attr css_class and css_id */
+ 	tag_attr div_attr;
+-- =
 
-> > 	-ss
-> > =
-
-> > > regards
-> > > =
-
-> > > Jaroslav
-> > =
-
-> > > diff --git a/src/main.cpp b/src/main.cpp
-> > > index 0883424..e0e8a71 100644
-> > > --- a/src/main.cpp
-> > > +++ b/src/main.cpp
-> > > @@ -36,6 +36,8 @@
-> > >  #include <getopt.h>
-> > >  #include <unistd.h>
-> > >  #include <locale.h>
-> > > +#include <sys/resource.h>
-> > > +#include <linux/limits.h>
-> > >  =
-
-> > >  #include "cpu/cpu.h"
-> > >  #include "process/process.h"
-> > > @@ -283,11 +285,16 @@ static void powertop_init(void)
-> > >  	static char initialized =3D 0;
-> > >  	int ret;
-> > >  	struct statfs st_fs;
-> > > +	struct rlimit rlmt;
-> > >  =
-
-> > >  	if (initialized)
-> > >  		return;
-> > >  =
-
-> > >  	checkroot();
-> > > +
-> > > +	rlmt.rlim_cur =3D rlmt.rlim_max =3D NR_OPEN;
-> =
-
-> This seems to be wrong. On my system NR_OPEN is 1024, but
-> /proc/sys/fs/nr_open gives me 1048576. It seems the linux kernel
-> hardcodes 1024 * 1024 as the default kernel limit. This default
-> limit can be raised to:
-> =
-
-> sysctl_nr_open_max =3D min((size_t)INT_MAX, ~(size_t)0/sizeof(void *)) &
->   -BITS_PER_LONG;
-> =
-
-> which is 2 Gi - 63 on my 64 bit system. I think we shouldn't
-> touch/increase this. It seems there is no header definition for these
-> limits.
-> =
-
-> I am proposing new patch, which reads the current kernel limit from the
-> /proc. I am not sure about the portability, but at least it shouldn't
-> break anything.
-> =
-
-> Finally I think, the first patch could be applied together with this patch
-> (probably with the changed message) to notify user that he/she reached
-> the FDs limit, because there is still some limit. This could also
-> occur if some process would decrease the /proc/sys/fs/nr_open after
-> it is read by powertop and before the ulimit is set
-> =
-
-> regards
-> =
-
-> Jaroslav
-
-> diff --git a/src/main.cpp b/src/main.cpp
-> index 0883424..16b1613 100644
-> --- a/src/main.cpp
-> +++ b/src/main.cpp
-> @@ -28,6 +28,7 @@
->   *	Arjan van de Ven <arjan(a)linux.intel.com>
->   */
->  #include <iostream>
-> +#include <fstream>
->  #include <stdlib.h>
->  #include <stdio.h>
->  #include <time.h>
-> @@ -36,6 +37,7 @@
->  #include <getopt.h>
->  #include <unistd.h>
->  #include <locale.h>
-> +#include <sys/resource.h>
->  =
-
->  #include "cpu/cpu.h"
->  #include "process/process.h"
-> @@ -60,6 +62,8 @@
->  =
-
->  #define DEBUGFS_MAGIC          0x64626720
->  =
-
-> +#define NR_OPEN_DEF 1024 * 1024
->  int debug_learning =3D 0;
->  unsigned time_out =3D 20;
->  int leave_powertop =3D 0;
-> @@ -278,16 +282,35 @@ static void checkroot() {
->  =
-
->  }
->  =
-
-> +static int get_nr_open(void) {
-> +	int nr_open =3D NR_OPEN_DEF;
-> +	ifstream file;
-> +
-> +	file.open("/proc/sys/fs/nr_open", ios::in);
-> +	if (file) {
-> +		file >> nr_open;
-> +		if (!file)
-> +			nr_open =3D NR_OPEN_DEF;
+1.7.9.5
 
 
-what if /proc/sys/fs/nr_open is less than 4096 or (NR_OPEN_DEF)?
-you probaly want max()?
-
-	-ss
-
-> +		file.close();
-> +	}
-> +	return nr_open;
-> +}
-> +
->  static void powertop_init(void)
->  {
->  	static char initialized =3D 0;
->  	int ret;
->  	struct statfs st_fs;
-> +	struct rlimit rlmt;
->  =
-
->  	if (initialized)
->  		return;
->  =
-
->  	checkroot();
-> +
-> +	rlmt.rlim_cur =3D rlmt.rlim_max =3D get_nr_open();
-> +	setrlimit (RLIMIT_NOFILE, &rlmt);
-> +
->  	ret =3D system("/sbin/modprobe cpufreq_stats > /dev/null 2>&1");
->  	ret =3D system("/sbin/modprobe msr > /dev/null 2>&1");
->  	statfs("/sys/kernel/debug", &st_fs);
-
-
---===============4894149544677395079==--
+--===============1659169658021830187==--
 
