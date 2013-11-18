@@ -1,106 +1,203 @@
-Content-Type: multipart/mixed; boundary="===============4981973111752637373=="
+Content-Type: multipart/mixed; boundary="===============5092065823555722568=="
 MIME-Version: 1.0
-From: Magnus Fromreide <magfr at lysator.liu.se>
-Subject: Re: [Powertop] [PATCH 2/2] tuning: print executed toggle script
-Date: Wed, 09 Oct 2013 15:54:35 +0200
-Message-ID: <1381326875.9101.52.camel@sara>
-In-Reply-To: 20131009131734.GB2305@swordfish.minsk.epam.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH v3 09/31] report-html: Table generation
+Date: Mon, 18 Nov 2013 12:27:00 -0800
+Message-ID: <1384806442-20294-10-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: 1384806442-20294-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4981973111752637373==
+--===============5092065823555722568==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2013-10-09 at 16:17 +0300, Sergey Senozhatsky wrote:
-> report executed toggle_script back to user via ui_notify_user().
-> =
+Generates modular html tables using table_size, css_attributes,
+and a set of data. The data is stored in a single dimesional array,
+using row major order.
 
-> Example:
->  Execute: echo 'auto' > '/sys/bus/pci/devices/0000:00:1c.1/power/control';
->  Execute: echo 'on' > '/sys/bus/pci/devices/0000:00:1c.1/power/control';
-> =
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+---
+ src/report/report-data-html.h        |   18 +++++++++++
+ src/report/report-formatter-html.cpp |   59 ++++++++++++++++++++++++++++++=
++---
+ src/report/report-formatter-html.h   |    9 ++++--
+ 3 files changed, 79 insertions(+), 7 deletions(-)
 
-> Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
-> =
+diff --git a/src/report/report-data-html.h b/src/report/report-data-html.h
+index 70ccbdb..282d8b5 100644
+--- a/src/report/report-data-html.h
++++ b/src/report/report-data-html.h
+@@ -2,3 +2,21 @@ struct tag_attr {
+ 	const char *css_class;
+ 	const char *css_id;
+ };
++/* T:Top, L:Left, TL:Top-Left, TLC: Top-Left-Center */
++enum position { T, L, TL, TC, TLC };
++
++struct table_attributes {
++	const char *table_class;
++	const char *td_class;
++	const char *tr_class;
++	const char *th_class;
++	position pos_table_title;
++	int title_mod;
++};
++
++
++struct table_size {
++	int rows;
++	int cols;
++};
++
+diff --git a/src/report/report-formatter-html.cpp b/src/report/report-forma=
+tter-html.cpp
+index 93a4c48..f508ae0 100644
+--- a/src/report/report-formatter-html.cpp
++++ b/src/report/report-formatter-html.cpp
+@@ -420,10 +420,10 @@ report_formatter_html::end_paragraph()
+ =
 
-> ---
->  src/tuning/tuning.cpp | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> =
+ /* ***********************************************************************=
+* */
+ =
 
-> diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
-> index ff3d715..5adcbfe 100644
-> --- a/src/tuning/tuning.cpp
-> +++ b/src/tuning/tuning.cpp
-> @@ -141,11 +141,15 @@ void tuning_window::repaint(void)
->  void tuning_window::cursor_enter(void)
->  {
->  	class tunable *tun;
-> -
-> +	const char *toggle_script;
->  	tun =3D all_tunables[cursor_pos];
->  	if (!tun)
->  		return;
-> +	/** device will change its state so need to store toggle script before
-> +	 * we toggle()*/
-> +	toggle_script =3D tun->toggle_script();
->  	tun->toggle();
-> +	ui_notify_user("Execute: %s\n", toggle_script);
->  }
->  =
+-std::string
++string
+ report_formatter_html::escape_string(const char *str)
+ {
+-	std::string res;
++	string res;
+ =
 
->  static bool tunables_sort(class tunable * i, class tunable * j)
+ 	assert(str);
+ =
 
-This only shows the toggle script when you run it, right?
+@@ -487,8 +487,8 @@ report_formatter_html::end_hheader()
+ void
+ report_formatter_html::add_div(struct tag_attr * div_attr)
+ {
+-	std::string empty=3D"";
+-	std::string tmp_str;
++	string empty=3D"";
++	string tmp_str;
+ =
 
-What about the following:
-
-diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
-index ff3d715..505274c 100644
---- a/src/tuning/tuning.cpp
-+++ b/src/tuning/tuning.cpp
-@@ -119,7 +119,11 @@ static void __tuning_update_display(int cursor_pos)
- 			wattrset(win, A_REVERSE);
- 			wprintw(win, ">> ");
- 		}
--		wprintw(win, "%s  %s\n", _(res), _(desc));
-+                if (all_tunables[i]->good_bad() !=3D TUNE_BAD)
-+                        wprintw(win, "%s  %s\n", _(res), _(desc));
-+                else
-+                        wprintw(win, "%s  %s  %s\n", _(res), _(desc),
-+                                all_tunables[i]->toggle_script());
- 	}
+ 	if (div_attr->css_class =3D=3D empty && div_attr->css_id =3D=3D empty)
+ 		add_exact("<div>\n");
+@@ -523,7 +523,7 @@ report_formatter_html::add_navigation()
  }
  =
 
-which shows it in the list of bad tunables.
+ void
+-report_formatter_html::add_summary_list(std::string *list, int size)
++report_formatter_html::add_summary_list(string *list, int size)
+ {
+ 	int i;
+ 	add_exact("<div><br/> <ul>\n");
+@@ -534,3 +534,52 @@ report_formatter_html::add_summary_list(std::string *l=
+ist, int size)
+ 	add_exact("</ul> </div> <br />\n");
+ }
+ =
 
-Maybe both are useful as my version have the disadvantage of not showing
-anything after the script is executed.
++
++void
++report_formatter_html::add_table(string *system_data, struct table_size *s=
+ize, struct table_attributes* tb_attr)
++{
++	int i, j;
++	int offset=3D0;
++	string  empty=3D"";
++
++	if (tb_attr->table_class =3D=3D empty)
++		add_exact("<table>\n");
++	else
++		addf_exact("<table class=3D\"%s\">\n", tb_attr->table_class);
++
++	for (i=3D0; i < size->rows; i++){
++		if (tb_attr->tr_class =3D=3D empty)
++			add_exact("<tr> ");
++		else
++			addf_exact("<tr class=3D\"%s\"> ", tb_attr->tr_class);
++
++		for (j=3D0; j < size->cols; j++){
++			offset =3D i * (size->cols) + j;
++
++			if (tb_attr->pos_table_title =3D=3D T &&  i=3D=3D0)
++				addf_exact("<th class=3D\"%s\"> %s </th> ",
++				tb_attr->th_class,system_data[offset].c_str());
++			else if (tb_attr->pos_table_title =3D=3D L &&  j=3D=3D0)
++				addf_exact("<th class=3D\"%s\"> %s </th> ",
++				tb_attr->th_class, system_data[offset].c_str());
++			else if (tb_attr->pos_table_title =3D=3D TL && ( i=3D=3D0 || j=3D=3D0 ))
++				addf_exact("<th class=3D\"%s\"> %s </th> ",
++				tb_attr->th_class, system_data[offset].c_str());
++			else if (tb_attr->pos_table_title =3D=3D TC && ((i % tb_attr->title_mod=
+ ) =3D=3D 0))
++				addf_exact("<th class=3D\"%s\"> %s </th> ", tb_attr->th_class,
++					system_data[offset].c_str());
++			else if (tb_attr->pos_table_title =3D=3D TLC && ((i % tb_attr->title_mo=
+d) =3D=3D 0 || j=3D=3D0))
++				addf_exact("<th class=3D\"%s\"> %s </th> ", tb_attr->th_class,
++				system_data[offset].c_str());
++			else
++				if ( tb_attr->td_class =3D=3D empty)
++					addf_exact("<td > %s </td> ", system_data[offset].c_str());
++				else
++					addf_exact("<td class=3D\"%s\"> %s </td> ", tb_attr->td_class,
++						system_data[offset].c_str());
++		}
++		add_exact("</tr>\n");
++	}
++	add_exact("</table>\n");
++}
++
+diff --git a/src/report/report-formatter-html.h b/src/report/report-formatt=
+er-html.h
+index 261e0dd..d625ced 100644
+--- a/src/report/report-formatter-html.h
++++ b/src/report/report-formatter-html.h
+@@ -30,6 +30,9 @@
+ =
 
-/MF
+ #include "report-formatter-base.h"
+ #include "report-data-html.h"
++
++using namespace std;
++
+ /* Whether to replace " and ' in HTML by &quot; and &apos; respectively */
+ /*#define REPORT_HTML_ESCAPE_QUOTES*/
+ =
 
-(attached a copy of the patch for easier applying)
+@@ -90,7 +93,9 @@ public:
+ 	void end_div();
+ 	void add_title(struct tag_attr *title_att, const char *title);
+ 	void add_navigation();
+-	void add_summary_list(std::string *list, int size);
++	void add_summary_list(string *list, int size);
++	void add_table(string *system_data, struct table_size *size,
++			struct table_attributes *tb_attr);
+ =
 
---===============4981973111752637373==
-Content-Type: text/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="show-toggle-script.diff"
+ private:
+ 	/* Document structure related functions */
+@@ -113,7 +118,7 @@ private:
+ 	void add_doc_header();
+ 	void add_doc_footer();
+ =
 
-ZGlmZiAtLWdpdCBhL3NyYy90dW5pbmcvdHVuaW5nLmNwcCBiL3NyYy90dW5pbmcvdHVuaW5nLmNw
-cAppbmRleCBmZjNkNzE1Li41MDUyNzRjIDEwMDY0NAotLS0gYS9zcmMvdHVuaW5nL3R1bmluZy5j
-cHAKKysrIGIvc3JjL3R1bmluZy90dW5pbmcuY3BwCkBAIC0xMTksNyArMTE5LDExIEBAIHN0YXRp
-YyB2b2lkIF9fdHVuaW5nX3VwZGF0ZV9kaXNwbGF5KGludCBjdXJzb3JfcG9zKQogCQkJd2F0dHJz
-ZXQod2luLCBBX1JFVkVSU0UpOwogCQkJd3ByaW50dyh3aW4sICI+PiAiKTsKIAkJfQotCQl3cHJp
-bnR3KHdpbiwgIiVzICAlc1xuIiwgXyhyZXMpLCBfKGRlc2MpKTsKKyAgICAgICAgICAgICAgICBp
-ZiAoYWxsX3R1bmFibGVzW2ldLT5nb29kX2JhZCgpICE9IFRVTkVfQkFEKQorICAgICAgICAgICAg
-ICAgICAgICAgICAgd3ByaW50dyh3aW4sICIlcyAgJXNcbiIsIF8ocmVzKSwgXyhkZXNjKSk7Cisg
-ICAgICAgICAgICAgICAgZWxzZQorICAgICAgICAgICAgICAgICAgICAgICAgd3ByaW50dyh3aW4s
-ICIlcyAgJXMgICVzXG4iLCBfKHJlcyksIF8oZGVzYyksCisgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIGFsbF90dW5hYmxlc1tpXS0+dG9nZ2xlX3NjcmlwdCgpKTsKIAl9CiB9CiAK
+-	std::string escape_string(const char *str);
++	string escape_string(const char *str);
+ =
 
---===============4981973111752637373==--
+ 	html_section sections[SECTION_MAX];
+ 	html_table tables[TABLE_MAX];
+-- =
+
+1.7.9.5
+
+
+--===============5092065823555722568==--
 
