@@ -1,99 +1,100 @@
-Content-Type: multipart/mixed; boundary="===============0033415913352426450=="
+Content-Type: multipart/mixed; boundary="===============2103930296231774401=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: [Powertop] [PATCH 1/2] [PATCH] resolve android build errors
-Date: Wed, 23 Oct 2013 22:27:02 +0300
-Message-ID: <2df9d4c2355dda36565e5e5c64b90ff144be36c6.1382555988.git.sergey.senozhatsky@gmail.com>
-In-Reply-To: cover.1382555988.git.sergey.senozhatsky@gmail.com
+From: Mukherjee, Adrip <adrip.mukherjee at intel.com>
+Subject: [Powertop] PowerTop Installation issue
+Date: Wed, 20 Nov 2013 11:33:28 +0000
+Message-ID: <F9A26558D30ED241A8204F06F9947260257FADBB@BGSMSX102.gar.corp.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0033415913352426450==
+--===============2103930296231774401==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Sanjay Singh Rawat <sanjay.rawat(a)linaro.org>
+Hi ,
+       This is Adrip from Intel India PCCG group. Recently I was trying to =
+install powertop in my HSW PVT2 system having Android JellyBean internal ve=
+rsion . According to the installation steps listed here:
 
-- for android receiving compilation error
-rapl_interface.cpp:195:40: error: call of overloaded 'pow(int, uint64_t)' i=
-s ambiguous
+To build and install PowerTOP type the following commands,
+        ./configure
+        ./make
+        ./make install
+Its failing to configure with a message : "permission denied" even though I=
+ have rooted my terminal emulator. Can you please tell me what I need to fo=
+llow to run the powertop tool on Android in a Haswell SDS system.
 
-include/math.h:222:8: note: double pow(double, double).
-stlport/stlport/stl/_cmath.h:453:24: note: float pow(float, float)
-
-- these files are missing in the android makefile
-
-Signed-off-by: Sanjay Singh Rawat <sanjay.rawat(a)linaro.org>
----
- Android.mk                      | 4 ++++
- src/cpu/rapl/rapl_interface.cpp | 6 +++---
- 2 files changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/Android.mk b/Android.mk
-index ec47c4b..cf13fe8 100644
---- a/Android.mk
-+++ b/Android.mk
-@@ -31,6 +31,9 @@ LOCAL_SRC_FILES +=3D \
- 	src/cpu/cpu_core.cpp \
- 	src/cpu/cpu_package.cpp \
- 	src/cpu/abstract_cpu.cpp \
-+	src/cpu/cpu_rapl_device.cpp \
-+	src/cpu/dram_rapl_device.cpp \
-+	src/cpu/rapl/rapl_interface.cpp \
- 	src/measurement/measurement.cpp \
- 	src/measurement/acpi.cpp \
- 	src/measurement/extech.cpp \
-@@ -62,6 +65,7 @@ LOCAL_SRC_FILES +=3D \
- 	src/devices/backlight.cpp \
- 	src/devices/network.cpp \
- 	src/devices/device.cpp \
-+	src/devices/gpu_rapl_device.cpp \
- 	src/devlist.cpp \
- 	src/calibrate/calibrate.cpp \
- 	src/lib.cpp \
-diff --git a/src/cpu/rapl/rapl_interface.cpp b/src/cpu/rapl/rapl_interface.=
-cpp
-index 8f236eb..6dd7b26 100644
---- a/src/cpu/rapl/rapl_interface.cpp
-+++ b/src/cpu/rapl/rapl_interface.cpp
-@@ -192,7 +192,7 @@ double c_rapl_interface::get_power_unit()
- 		return ret;
- 	}
- =
-
--	return (double) 1/pow(2, value & 0xf);
-+	return (double) 1/pow((double)2, (double)(value & 0xf));
- }
- =
-
- double c_rapl_interface::get_energy_status_unit()
-@@ -206,7 +206,7 @@ double c_rapl_interface::get_energy_status_unit()
- 		return ret;
- 	}
- =
-
--	return (double)1/ pow(2, (value & 0x1f00) >> 8);
-+	return (double)1/ pow((double)2, (double)((value & 0x1f00) >> 8));
- }
- =
-
- double c_rapl_interface::get_time_unit()
-@@ -220,7 +220,7 @@ double c_rapl_interface::get_time_unit()
- 		return ret;
- 	}
- =
-
--	return (double)1 / pow(2, (value & 0xf0000) >> 16);
-+	return (double)1 / pow((double)2, (double)((value & 0xf0000) >> 16));
- }
- =
-
- int c_rapl_interface::get_pkg_energy_status(double *status)
--- =
-
-1.8.4.1.780.ga09e2a8
+regards
+Adrip
 
 
---===============0033415913352426450==--
+--===============2103930296231774401==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
+bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
+YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6ZHQ9InV1aWQ6QzJGNDEwMTAtNjVC
+My0xMWQxLUEyOUYtMDBBQTAwQzE0ODgyIiB4bWxuczptPSJodHRwOi8vc2NoZW1hcy5taWNyb3Nv
+ZnQuY29tL29mZmljZS8yMDA0LzEyL29tbWwiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy9UUi9S
+RUMtaHRtbDQwIj4KPGhlYWQ+CjxtZXRhIGh0dHAtZXF1aXY9IkNvbnRlbnQtVHlwZSIgY29udGVu
+dD0idGV4dC9odG1sOyBjaGFyc2V0PXVzLWFzY2lpIj4KPG1ldGEgbmFtZT0iR2VuZXJhdG9yIiBj
+b250ZW50PSJNaWNyb3NvZnQgV29yZCAxNCAoZmlsdGVyZWQgbWVkaXVtKSI+CjxzdHlsZT48IS0t
+Ci8qIEZvbnQgRGVmaW5pdGlvbnMgKi8KQGZvbnQtZmFjZQoJe2ZvbnQtZmFtaWx5OkNhbGlicmk7
+CglwYW5vc2UtMToyIDE1IDUgMiAyIDIgNCAzIDIgNDt9CkBmb250LWZhY2UKCXtmb250LWZhbWls
+eTpWaXZhbGRpOwoJcGFub3NlLTE6MyAyIDYgMiA1IDUgNiA5IDggNDt9CkBmb250LWZhY2UKCXtm
+b250LWZhbWlseTpDb25zb2xhczsKCXBhbm9zZS0xOjIgMTEgNiA5IDIgMiA0IDMgMiA0O30KLyog
+U3R5bGUgRGVmaW5pdGlvbnMgKi8KcC5Nc29Ob3JtYWwsIGxpLk1zb05vcm1hbCwgZGl2Lk1zb05v
+cm1hbAoJe21hcmdpbjowaW47CgltYXJnaW4tYm90dG9tOi4wMDAxcHQ7Cglmb250LXNpemU6MTEu
+MHB0OwoJZm9udC1mYW1pbHk6IkNhbGlicmkiLCJzYW5zLXNlcmlmIjt9CmE6bGluaywgc3Bhbi5N
+c29IeXBlcmxpbmsKCXttc28tc3R5bGUtcHJpb3JpdHk6OTk7Cgljb2xvcjpibHVlOwoJdGV4dC1k
+ZWNvcmF0aW9uOnVuZGVybGluZTt9CmE6dmlzaXRlZCwgc3Bhbi5Nc29IeXBlcmxpbmtGb2xsb3dl
+ZAoJe21zby1zdHlsZS1wcmlvcml0eTo5OTsKCWNvbG9yOnB1cnBsZTsKCXRleHQtZGVjb3JhdGlv
+bjp1bmRlcmxpbmU7fQpwCgl7bXNvLXN0eWxlLXByaW9yaXR5Ojk5OwoJbXNvLW1hcmdpbi10b3At
+YWx0OmF1dG87CgltYXJnaW4tcmlnaHQ6MGluOwoJbXNvLW1hcmdpbi1ib3R0b20tYWx0OmF1dG87
+CgltYXJnaW4tbGVmdDowaW47Cglmb250LXNpemU6MTIuMHB0OwoJZm9udC1mYW1pbHk6IlRpbWVz
+IE5ldyBSb21hbiIsInNlcmlmIjt9CnNwYW4uRW1haWxTdHlsZTE3Cgl7bXNvLXN0eWxlLXR5cGU6
+cGVyc29uYWwtY29tcG9zZTsKCWZvbnQtZmFtaWx5OiJDYWxpYnJpIiwic2Fucy1zZXJpZiI7Cglj
+b2xvcjp3aW5kb3d0ZXh0O30KLk1zb0NocERlZmF1bHQKCXttc28tc3R5bGUtdHlwZTpleHBvcnQt
+b25seTsKCWZvbnQtZmFtaWx5OiJDYWxpYnJpIiwic2Fucy1zZXJpZiI7fQouTXNvUGFwRGVmYXVs
+dAoJe21zby1zdHlsZS10eXBlOmV4cG9ydC1vbmx5OwoJbXNvLW1hcmdpbi10b3AtYWx0OmF1dG87
+Cgltc28tbWFyZ2luLWJvdHRvbS1hbHQ6YXV0bzt9CkBwYWdlIFdvcmRTZWN0aW9uMQoJe3NpemU6
+OC41aW4gMTEuMGluOwoJbWFyZ2luOjEuMGluIDEuMGluIDEuMGluIDEuMGluO30KZGl2LldvcmRT
+ZWN0aW9uMQoJe3BhZ2U6V29yZFNlY3Rpb24xO30KLS0+PC9zdHlsZT48IS0tW2lmIGd0ZSBtc28g
+OV0+PHhtbD4KPG86c2hhcGVkZWZhdWx0cyB2OmV4dD0iZWRpdCIgc3BpZG1heD0iMTAyNiIgLz4K
+PC94bWw+PCFbZW5kaWZdLS0+PCEtLVtpZiBndGUgbXNvIDldPjx4bWw+CjxvOnNoYXBlbGF5b3V0
+IHY6ZXh0PSJlZGl0Ij4KPG86aWRtYXAgdjpleHQ9ImVkaXQiIGRhdGE9IjEiIC8+CjwvbzpzaGFw
+ZWxheW91dD48L3htbD48IVtlbmRpZl0tLT4KPC9oZWFkPgo8Ym9keSBsYW5nPSJFTi1VUyIgbGlu
+az0iYmx1ZSIgdmxpbms9InB1cnBsZSI+CjxkaXYgY2xhc3M9IldvcmRTZWN0aW9uMSI+CjxwIGNs
+YXNzPSJNc29Ob3JtYWwiPkhpICw8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+
+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IFRoaXMgaXMgQWRyaXAgZnJvbSBJ
+bnRlbCBJbmRpYSBQQ0NHIGdyb3VwLiBSZWNlbnRseSBJIHdhcyB0cnlpbmcgdG8gaW5zdGFsbCBw
+b3dlcnRvcCBpbiBteSBIU1cgUFZUMiBzeXN0ZW0gaGF2aW5nIEFuZHJvaWQgSmVsbHlCZWFuIGlu
+dGVybmFsIHZlcnNpb24gLiBBY2NvcmRpbmcgdG8gdGhlIGluc3RhbGxhdGlvbiBzdGVwcyBsaXN0
+ZWQgaGVyZToKPG86cD48L286cD48L3A+CjxwIHN0eWxlPSJtYXJnaW46MGluO21hcmdpbi1ib3R0
+b206LjAwMDFwdCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMS41cHQ7Zm9udC1mYW1pbHk6Q29u
+c29sYXM7Y29sb3I6IzMzMzMzMyI+VG8gYnVpbGQgYW5kIGluc3RhbGwgUG93ZXJUT1AgdHlwZSB0
+aGUgZm9sbG93aW5nIGNvbW1hbmRzLAo8YnI+CiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
+OyZuYnNwOyZuYnNwOyZuYnNwOzwvc3Bhbj48c3BhbiBzdHlsZT0iZm9udC1zaXplOjExLjVwdDtm
+b250LWZhbWlseTpDb25zb2xhcztjb2xvcjpyZWQiPi4vY29uZmlndXJlCjwvc3Bhbj48c3BhbiBz
+dHlsZT0iZm9udC1zaXplOjExLjVwdDtmb250LWZhbWlseTpDb25zb2xhcztjb2xvcjojMzMzMzMz
+Ij48YnI+CiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOy4v
+bWFrZTxicj4KJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+Li9tYWtlIGluc3RhbGw8bzpwPjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwi
+Pkl0cyBmYWlsaW5nIHRvIGNvbmZpZ3VyZSB3aXRoIGEgbWVzc2FnZSA6ICYjODIyMDtwZXJtaXNz
+aW9uIGRlbmllZCYjODIyMTsgZXZlbiB0aG91Z2ggSSBoYXZlIHJvb3RlZCBteSB0ZXJtaW5hbCBl
+bXVsYXRvci4gQ2FuIHlvdSBwbGVhc2UgdGVsbCBtZSB3aGF0IEkgbmVlZCB0byBmb2xsb3cgdG8g
+cnVuIHRoZSBwb3dlcnRvcCB0b29sIG9uIEFuZHJvaWQgaW4gYSBIYXN3ZWxsIFNEUyBzeXN0ZW0u
+PG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9w
+Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iZm9udC1zaXplOjEwLjBwdDtmb250
+LWZhbWlseTpWaXZhbGRpO2NvbG9yOiM0MDMxNTIiPnJlZ2FyZHM8bzpwPjwvbzpwPjwvc3Bhbj48
+L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTAuMHB0O2Zv
+bnQtZmFtaWx5OlZpdmFsZGk7Y29sb3I6IzQwMzE1MiI+QWRyaXA8bzpwPjwvbzpwPjwvc3Bhbj48
+L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8L2Rpdj4KPC9i
+b2R5Pgo8L2h0bWw+Cg==
+
+--===============2103930296231774401==--
 
