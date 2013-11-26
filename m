@@ -1,75 +1,83 @@
-Content-Type: multipart/mixed; boundary="===============4874810328826220975=="
+Content-Type: multipart/mixed; boundary="===============1482107194208525812=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH v3 06/31] report-html: summary list and navigation
-Date: Mon, 18 Nov 2013 12:26:57 -0800
-Message-ID: <1384806442-20294-7-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: 1384806442-20294-1-git-send-email-alexandra.yates@linux.intel.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: [Powertop] [PATCH 2/2] tuningsysfs: use lib process_directory() helper
+Date: Tue, 26 Nov 2013 22:27:10 +0300
+Message-ID: <1385494030-22556-3-git-send-email-sergey.senozhatsky@gmail.com>
+In-Reply-To: 1385494030-22556-1-git-send-email-sergey.senozhatsky@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4874810328826220975==
+--===============1482107194208525812==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Generates the html tags to add navigation and summary including css
-attribute support.
+use process_directory() helper while processing sata tunables.
 
-Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
 ---
- src/report/report-formatter-html.cpp |   18 ++++++++++++++++++
- src/report/report-formatter-html.h   |    2 ++
- 2 files changed, 20 insertions(+)
+ src/tuning/tuningsysfs.cpp | 33 ++++++++-------------------------
+ 1 file changed, 8 insertions(+), 25 deletions(-)
 
-diff --git a/src/report/report-formatter-html.cpp b/src/report/report-forma=
-tter-html.cpp
-index 2e59725..93a4c48 100644
---- a/src/report/report-formatter-html.cpp
-+++ b/src/report/report-formatter-html.cpp
-@@ -516,3 +516,21 @@ report_formatter_html::add_title(struct tag_attr *titl=
-e_att, const char *title)
- 	addf_exact("<h2 class=3D\"%s\"> %s </h2>\n", title_att->css_class, title);
+diff --git a/src/tuning/tuningsysfs.cpp b/src/tuning/tuningsysfs.cpp
+index f70dc23..0859a0c 100644
+--- a/src/tuning/tuningsysfs.cpp
++++ b/src/tuning/tuningsysfs.cpp
+@@ -113,34 +113,17 @@ void add_sysfs_tunable(const char *str, const char *_=
+sysfs_path, const char *_ta
+ 	all_tunables.push_back(tunable);
  }
  =
 
-+void
-+report_formatter_html::add_navigation()
-+{
-+	add_exact("<br/><nav id=3D\"main_menu\"> </nav>\n");
-+}
-+
-+void
-+report_formatter_html::add_summary_list(std::string *list, int size)
-+{
-+	int i;
-+	add_exact("<div><br/> <ul>\n");
-+	for (i=3D0; i < size; i+=3D2){
-+		addf_exact("<li class=3D\"summary_list\"> <b> %s </b> %s </li>",
-+				list[i].c_str(), list[i+1].c_str());
-+	}
-+	add_exact("</ul> </div> <br />\n");
-+}
-+
-diff --git a/src/report/report-formatter-html.h b/src/report/report-formatt=
-er-html.h
-index 0f508d3..261e0dd 100644
---- a/src/report/report-formatter-html.h
-+++ b/src/report/report-formatter-html.h
-@@ -89,6 +89,8 @@ public:
- 	void add_div(struct tag_attr *div_attr);
- 	void end_div();
- 	void add_title(struct tag_attr *title_att, const char *title);
-+	void add_navigation();
-+	void add_summary_list(std::string *list, int size);
+-void add_sata_tunables(void)
++static void add_sata_tunables_callback(const char *d_name)
+ {
+-	struct dirent *entry;
+-	DIR *dir;
+ 	char filename[4096];
+ 	char msg[4096];
  =
 
- private:
- 	/* Document structure related functions */
+-	dir =3D opendir("/sys/class/scsi_host");
+-
+-	if (!dir)
+-		return;
+-
+-        while (1) {
+-		entry =3D readdir(dir);
+-
+-		if (!entry)
+-			break;
+-
+-		if (entry->d_name[0] =3D=3D '.')
+-			continue;
+-
+-		sprintf(filename, "/sys/class/scsi_host/%s/link_power_management_policy"=
+, entry->d_name);
+-
+-	        sprintf(msg, _("Enable SATA link power management for %s"),entry-=
+>d_name);
+-
+-		add_sysfs_tunable(msg, filename,"min_power");
+-
+-        }
++	sprintf(filename, "/sys/class/scsi_host/%s/link_power_management_policy",=
+ d_name);
++	sprintf(msg, _("Enable SATA link power management for %s"), d_name);
++	add_sysfs_tunable(msg, filename,"min_power");
++}
+ =
+
+-        closedir(dir);
++void add_sata_tunables(void)
++{
++	process_directory("/sys/class/scsi_host", add_sata_tunables_callback);
+ }
 -- =
 
-1.7.9.5
+1.8.5.rc3.362.gdf10213.dirty
 
 
---===============4874810328826220975==--
+--===============1482107194208525812==--
 
