@@ -1,40 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============2575212802253319208=="
+Content-Type: multipart/mixed; boundary="===============0602184482901616844=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: [Powertop] [PATCH 0/2] tuningsysfs patches
-Date: Tue, 26 Nov 2013 22:27:08 +0300
-Message-ID: <1385494030-22556-1-git-send-email-sergey.senozhatsky@gmail.com>
+From: Gijs Hillenius <gijs at hillenius.net>
+Subject: [Powertop] typo in Powertop 'managmenet' -> management
+Date: Tue, 26 Nov 2013 17:38:15 +0100
+Message-ID: <87r4a3ru95.fsf@hillenius.net>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2575212802253319208==
+--===============0602184482901616844==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
-two small patches in -next.
 
-tuningsysfs:
-- fix tuningsysfs typo
-- use process_directory() helper function
+Hi all, =
 
 
-please pull from:
-https://github.com/sergey-senozhatsky/powertop2-next.git
+This could be an interesting way to get users to join the
+mailinglist. Or it is just a typo:
 
 
-Sergey Senozhatsky (2):
-  tuningsysfs: fix msg typo
-  tuningsysfs: use lib process_directory() helper
+Enable SATA link power Managmenet for host0
 
- src/tuning/tuningsysfs.cpp | 33 ++++++++-------------------------
- 1 file changed, 8 insertions(+), 25 deletions(-)
+that should be Managment, I'd think?
+
+Rgrds
+
+Gijs
 
 -- =
 
-1.8.5.rc3.362.gdf10213.dirty
+BOFH excuse #73:
 
+Daemons did it
 
---===============2575212802253319208==--
+--===============0602184482901616844==--
 
