@@ -1,37 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============3825894733721431070=="
+Content-Type: multipart/mixed; boundary="===============3629365469055001636=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] [Announce] v2.5-rc1
-Date: Wed, 23 Oct 2013 09:12:39 -0700
-Message-ID: <63704.10.24.1.152.1382544759.squirrel@linux.intel.com>
-In-Reply-To: 20131022214422.GA2274@swordfish
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: [Powertop] [PATCH 1/2] tuningsysfs: fix msg typo
+Date: Tue, 26 Nov 2013 22:27:09 +0300
+Message-ID: <1385494030-22556-2-git-send-email-sergey.senozhatsky@gmail.com>
+In-Reply-To: 1385494030-22556-1-git-send-email-sergey.senozhatsky@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3825894733721431070==
+--===============3629365469055001636==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+fix 'Managmenet' typo.
 
-> On (10/22/13 11:05), Alexandra Yates wrote:
->>
->> This change enables the menu links and mouse over, but the font and the
->> button background are all black, I don't think the css are working here.
->> I will send you the image to your email that way you get to see it.
->>
->
-> thanks. well, that's weird. I found rdesktop-ed win box around and tested
-> generated report on IE (don't know the version - 8 or 9). what IE version
-> is on the picture?
->
-> 	-ss
->
+Reported-by: Gijs Hillenius <gijs(a)hillenius.net>
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+---
+ src/tuning/tuningsysfs.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-You are welcome, what version of IE are you running?
+diff --git a/src/tuning/tuningsysfs.cpp b/src/tuning/tuningsysfs.cpp
+index ec1ca6b..f70dc23 100644
+--- a/src/tuning/tuningsysfs.cpp
++++ b/src/tuning/tuningsysfs.cpp
+@@ -136,7 +136,7 @@ void add_sata_tunables(void)
+ =
 
-Thank you,
-Alexandra.
+ 		sprintf(filename, "/sys/class/scsi_host/%s/link_power_management_policy"=
+, entry->d_name);
+ =
 
---===============3825894733721431070==--
+-	        sprintf(msg, _("Enable SATA link power Managmenet for %s"),entry-=
+>d_name);
++	        sprintf(msg, _("Enable SATA link power management for %s"),entry-=
+>d_name);
+ =
+
+ 		add_sysfs_tunable(msg, filename,"min_power");
+ =
+
+-- =
+
+1.8.5.rc3.362.gdf10213.dirty
+
+
+--===============3629365469055001636==--
 
