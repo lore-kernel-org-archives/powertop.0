@@ -1,152 +1,350 @@
-Content-Type: multipart/mixed; boundary="===============5955900168191463524=="
+Content-Type: multipart/mixed; boundary="===============3042006766461656263=="
 MIME-Version: 1.0
-From: Wout Mertens <wout.mertens at gmail.com>
-Subject: Re: [Powertop] HIgh power concumption on network interface
-Date: Thu, 20 Feb 2014 07:35:10 +0100
-Message-ID: <CAO3V83+w2XL8aSAoLNbqrw4ArRVV+HSq1RpQaA4=Zm_oN2ueBw@mail.gmail.com>
-In-Reply-To: CABsxX9JF6W7tQ4HanzyuR6an8Ji5OEgedYavx3X+qMfNNbBH6Q@mail.gmail.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH v3 18/31] report: CPU Frequency html & csv
+Date: Tue, 10 Dec 2013 23:12:30 +0300
+Message-ID: <20131210201230.GC2422@swordfish>
+In-Reply-To: 1384806442-20294-19-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5955900168191463524==
+--===============3042006766461656263==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Alright I'll give that a shot, thanks!
+On (11/18/13 12:27), Alexandra Yates wrote:
+> Enables html and csv report new stlyes for "CPU Frequency" section,
+> While preserving translation macros.
+> =
 
-As a side question though, is 20W a reasonable idle power consumption for a
-high-end recent laptop?
+> Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+> ---
+>  src/cpu/cpu.cpp |  139 ++++++++++++++++++++++++++++++++++++++++---------=
+------
+>  1 file changed, 101 insertions(+), 38 deletions(-)
+> =
 
-Cheers,
+> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+> index b8f74a8..c3787e6 100644
+> --- a/src/cpu/cpu.cpp
+> +++ b/src/cpu/cpu.cpp
+> @@ -612,29 +612,81 @@ void report_display_cpu_cstates(void)
+>  =
 
-Wout.
-On Feb 19, 2014 7:53 PM, "Kok, Auke-jan H" <auke-jan.h.kok(a)intel.com> wro=
-te:
+>  void report_display_cpu_pstates(void)
+>  {
+> -	char buffer[512], buffer2[512];
+> +	char buffer[512], buffer2[512], tmp_num[50];
+>  	unsigned int package, core, cpu;
+>  	int line;
+>  	class abstract_cpu *_package, * _core, * _cpu;
+>  	unsigned int i, pstates_num;
+>  =
 
->
->
->
-> On Wed, Feb 19, 2014 at 1:13 AM, Wout Mertens <wout.mertens(a)gmail.com>w=
-rote:
->
->> kingma at bluewin.ch wrote on Wed Feb 12 23:32:27 PST 2014:
->>
->> > I observe a sustained high power consumption of 5- 10 W on the ehternet
->> adaptor e1000e on a lenovo thinkgpad t430s. Such I high power drain cann=
-ot
->> be correct can it? the total power consumption is around 25 W which is a
->> concern for battery life.
->>
->> I'm noticing the same thing on my Dell Latitude E6540. It also has an
->> e1000 and powertop reports it as being the highest consumer, at around 1=
-5W.
->> When I unplug the system, the battery reports a drain of about 20W while
->> idle which is pretty bad IMHO. With the 68Wh battery it translates to ab=
-out
->> 2.5 hours battery life.
->>
->> Lowest I've seen for battery drain is 14W, with the screen at lowest
->> brightness, Google Chrome turned off, disk spun down. I'm using the
->> built-in Intel graphics and the system has 16GB of ram and a quad-core i=
-7.
->>
->> I never ran windows on this laptop so I don't know what to expect but
->> reviews are claiming 7+ hours on the 90Wh battery. That would mean an
->> average of 13W, while doing actual work.
->>
->> So I'm really wondering: Is the e1000 really eating up 15W or is powertop
->> misreporting?
->>
->
->
-> There have been plenty of reports that point to the calibration being
-> incomplete (Let's just call it that).
->
-> Obviously e1000 won't eat 15W of power - 15W could power a 10gig Fiber
-> Optic transceiver (a high-powered laser, basically). Power consumption is
-> more in the order of a few watts max, with idle power much, much lower.
->
-> Calibration could fail if during the calibration phase powertop is unable
-> to toggle power to components or enable/disable devices. As a fallback, y=
-ou
-> can run the calibration multiple times and vary the enabled devices in the
-> system. You could for instance go into the BIOS and disable the ethernet
-> device entirely, calibrate, reboot and enable the ethernet device, then
-> calibrate again. The extra data points should improve the power estimates
-> for devices.
->
-> Cheers,
->
-> Auke
->
->
+> -	for (i =3D 0, pstates_num =3D 0; i < all_cpus.size(); i++)
+> +	/* div attr css_class and css_id */
+> +	tag_attr div_attr;
+> +	init_div(&div_attr, "clear_block", "cpufreq");
+> +
+> +	/* Set Table attributes, rows, and cols */
+> +	table_attributes std_table_css;
+> +	table_size pkg_tbl_size;
+> +	table_size core_tbl_size;
+> +	table_size cpu_tbl_size;
+> +
+> +
+> +	/* Set Title attributes */
+> +	tag_attr title_attr;
+> +	init_title_attr(&title_attr);
+> +
+> +	/* Report add section */
+> +        report.add_div(&div_attr);
+> +        report.add_title(&title_attr, __("Processor Frequency Report"));
+> +
+> +        /* Set array of data in row Major order */
+> +	int idx1, idx2, idx3, num_cpus=3D0;
+> +        string tmp_str;
+> +
+> +	for (i =3D 0, pstates_num =3D 0; i < all_cpus.size(); i++) {
+>  		if (all_cpus[i])
+>  			pstates_num =3D std::max<unsigned int>(pstates_num,
+> -								all_cpus[i]->pstates.size());
+> -
+> -	report.begin_section(SECTION_CPUFREQ);
+> -	report.add_header("Processor Frequency Report");
+> +				all_cpus[i]->pstates.size());
+> +	}
+>  =
 
---===============5955900168191463524==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+>  	for (package =3D 0; package < system_level.children.size(); package++) {
+>  		bool first_core =3D true;
+> +		idx1=3D0;
+> +		idx2=3D0;
+> +		idx3=3D0;
+>  =
 
-PHAgZGlyPSJsdHIiPkFscmlnaHQgSSYjMzk7bGwgZ2l2ZSB0aGF0IGEgc2hvdCwgdGhhbmtzITwv
-cD4KPHAgZGlyPSJsdHIiPkFzIGEgc2lkZSBxdWVzdGlvbiB0aG91Z2gsIGlzIDIwVyBhIHJlYXNv
-bmFibGUgaWRsZSBwb3dlciBjb25zdW1wdGlvbiBmb3IgYSBoaWdoLWVuZCByZWNlbnQgbGFwdG9w
-PzwvcD4KPHAgZGlyPSJsdHIiPkNoZWVycyw8L3A+CjxwIGRpcj0ibHRyIj5Xb3V0LjwvcD4KPGRp
-diBjbGFzcz0iZ21haWxfcXVvdGUiPk9uIEZlYiAxOSwgMjAxNCA3OjUzIFBNLCAmcXVvdDtLb2ss
-IEF1a2UtamFuIEgmcXVvdDsgJmx0OzxhIGhyZWY9Im1haWx0bzphdWtlLWphbi5oLmtva0BpbnRl
-bC5jb20iPmF1a2UtamFuLmgua29rQGludGVsLmNvbTwvYT4mZ3Q7IHdyb3RlOjxiciB0eXBlPSJh
-dHRyaWJ1dGlvbiI+PGJsb2NrcXVvdGUgY2xhc3M9ImdtYWlsX3F1b3RlIiBzdHlsZT0ibWFyZ2lu
-OjAgMCAwIC44ZXg7Ym9yZGVyLWxlZnQ6MXB4ICNjY2Mgc29saWQ7cGFkZGluZy1sZWZ0OjFleCI+
-CjxkaXYgZGlyPSJsdHIiPjxkaXY+PGJyPjwvZGl2PjxkaXYgY2xhc3M9ImdtYWlsX2V4dHJhIj48
-YnI+PGJyPjxkaXYgY2xhc3M9ImdtYWlsX3F1b3RlIj5PbiBXZWQsIEZlYiAxOSwgMjAxNCBhdCAx
-OjEzIEFNLCBXb3V0IE1lcnRlbnMgPHNwYW4gZGlyPSJsdHIiPiZsdDs8YSBocmVmPSJtYWlsdG86
-d291dC5tZXJ0ZW5zQGdtYWlsLmNvbSIgdGFyZ2V0PSJfYmxhbmsiPndvdXQubWVydGVuc0BnbWFp
-bC5jb208L2E+Jmd0Ozwvc3Bhbj4gd3JvdGU6PGJyPgoKPGJsb2NrcXVvdGUgY2xhc3M9ImdtYWls
-X3F1b3RlIiBzdHlsZT0ibWFyZ2luOjBweCAwcHggMHB4IDAuOGV4O2JvcmRlci1sZWZ0LXdpZHRo
-OjFweDtib3JkZXItbGVmdC1jb2xvcjpyZ2IoMjA0LDIwNCwyMDQpO2JvcmRlci1sZWZ0LXN0eWxl
-OnNvbGlkO3BhZGRpbmctbGVmdDoxZXgiPjxkaXYgZGlyPSJsdHIiPmtpbmdtYSBhdCA8YSBocmVm
-PSJodHRwOi8vYmx1ZXdpbi5jaCIgdGFyZ2V0PSJfYmxhbmsiPmJsdWV3aW4uY2g8L2E+IHdyb3Rl
-IG9uIFdlZCBGZWIgMTIgMjM6MzI6MjcgUFNUIDIwMTQ6PGRpdj4KCjxkaXY+PGJyPjwvZGl2Pjxk
-aXY+Jmd0OyBJIG9ic2VydmUgYSBzdXN0YWluZWQgaGlnaCBwb3dlciBjb25zdW1wdGlvbiBvZiA1
-LSAxMCBXIG9uIHRoZSBlaHRlcm5ldCBhZGFwdG9yIGUxMDAwZSBvbiBhIGxlbm92byB0aGlua2dw
-YWQgdDQzMHMuIFN1Y2ggSSBoaWdoIHBvd2VyIGRyYWluIGNhbm5vdCBiZSBjb3JyZWN0IGNhbiBp
-dD8gdGhlIHRvdGFsIHBvd2VyIGNvbnN1bXB0aW9uIGlzIGFyb3VuZCAyNSBXIHdoaWNoIGlzIGEg
-Y29uY2VybiBmb3IgYmF0dGVyeSBsaWZlLjwvZGl2PgoKCgo8ZGl2Pjxicj48L2Rpdj48L2Rpdj48
-ZGl2PkkmIzM5O20gbm90aWNpbmcgdGhlIHNhbWUgdGhpbmcgb24gbXkgRGVsbCBMYXRpdHVkZSBF
-NjU0MC4gSXQgYWxzbyBoYXMgYW4gZTEwMDAgYW5kIHBvd2VydG9wIHJlcG9ydHMgaXQgYXMgYmVp
-bmcgdGhlIGhpZ2hlc3QgY29uc3VtZXIsIGF0IGFyb3VuZCAxNVcuIFdoZW4gSSB1bnBsdWcgdGhl
-IHN5c3RlbSwgdGhlIGJhdHRlcnkgcmVwb3J0cyBhIGRyYWluIG9mIGFib3V0IDIwVyB3aGlsZSBp
-ZGxlIHdoaWNoIGlzIHByZXR0eSBiYWQgSU1ITy4gV2l0aCB0aGUgNjhXaCBiYXR0ZXJ5IGl0IHRy
-YW5zbGF0ZXMgdG8gYWJvdXQgMi41IGhvdXJzIGJhdHRlcnkgbGlmZS48L2Rpdj4KCgo8ZGl2Pjxi
-cj48L2Rpdj48ZGl2Pkxvd2VzdCBJJiMzOTt2ZSBzZWVuIGZvciBiYXR0ZXJ5IGRyYWluIGlzIDE0
-Vywgd2l0aCB0aGUgc2NyZWVuIGF0IGxvd2VzdCBicmlnaHRuZXNzLCBHb29nbGUgQ2hyb21lIHR1
-cm5lZCBvZmYsIGRpc2sgc3B1biBkb3duLiBJJiMzOTttIHVzaW5nIHRoZSBidWlsdC1pbiBJbnRl
-bCBncmFwaGljcyBhbmQgdGhlIHN5c3RlbSBoYXMgMTZHQiBvZiByYW0gYW5kIGEgcXVhZC1jb3Jl
-IGk3LjwvZGl2PgoKCgo8ZGl2Pjxicj48L2Rpdj48ZGl2PkkgbmV2ZXIgcmFuIHdpbmRvd3Mgb24g
-dGhpcyBsYXB0b3Agc28gSSBkb24mIzM5O3Qga25vdyB3aGF0IHRvIGV4cGVjdCBidXQgcmV2aWV3
-cyBhcmUgY2xhaW1pbmcgNysgaG91cnMgb24gdGhlIDkwV2ggYmF0dGVyeS4gVGhhdCB3b3VsZCBt
-ZWFuIGFuIGF2ZXJhZ2Ugb2YgMTNXLCB3aGlsZSBkb2luZyBhY3R1YWwgd29yay48L2Rpdj48ZGl2
-Pjxicj48L2Rpdj4KCgoKPGRpdj5TbyBJJiMzOTttIHJlYWxseSB3b25kZXJpbmc6IElzIHRoZSBl
-MTAwMCByZWFsbHkgZWF0aW5nIHVwIDE1VyBvciBpcyBwb3dlcnRvcCBtaXNyZXBvcnRpbmc/PC9k
-aXY+PC9kaXY+PC9ibG9ja3F1b3RlPjwvZGl2PjwvZGl2PjxkaXYgY2xhc3M9ImdtYWlsX2V4dHJh
-Ij48ZGl2Pjxicj48L2Rpdj48ZGl2Pjxicj5UaGVyZSBoYXZlIGJlZW4gcGxlbnR5IG9mIHJlcG9y
-dHMgdGhhdCBwb2ludCB0byB0aGUgY2FsaWJyYXRpb24gYmVpbmcgaW5jb21wbGV0ZSAoTGV0JiMz
-OTtzIGp1c3QgY2FsbCBpdCB0aGF0KS48L2Rpdj4KCjxkaXY+PGJyPjwvZGl2PjxkaXY+T2J2aW91
-c2x5IGUxMDAwIHdvbiYjMzk7dCBlYXQgMTVXIG9mIHBvd2VyIC0gMTVXIGNvdWxkIHBvd2VyIGEg
-MTBnaWcgRmliZXIgT3B0aWMgdHJhbnNjZWl2ZXIgKGEgaGlnaC1wb3dlcmVkIGxhc2VyLCBiYXNp
-Y2FsbHkpLiBQb3dlciBjb25zdW1wdGlvbiBpcyBtb3JlIGluIHRoZSBvcmRlciBvZiBhIGZldyB3
-YXR0cyBtYXgsIHdpdGggaWRsZSBwb3dlciBtdWNoLCBtdWNoIGxvd2VyLjwvZGl2PgoKPGRpdj48
-YnI+PC9kaXY+PGRpdj5DYWxpYnJhdGlvbiBjb3VsZCBmYWlsIGlmIGR1cmluZyB0aGUgY2FsaWJy
-YXRpb24gcGhhc2UgcG93ZXJ0b3AgaXMgdW5hYmxlIHRvIHRvZ2dsZSBwb3dlciB0byBjb21wb25l
-bnRzIG9yIGVuYWJsZS9kaXNhYmxlIGRldmljZXMuIEFzIGEgZmFsbGJhY2ssIHlvdSBjYW4gcnVu
-IHRoZSBjYWxpYnJhdGlvbiBtdWx0aXBsZSB0aW1lcyBhbmQgdmFyeSB0aGUgZW5hYmxlZCBkZXZp
-Y2VzIGluIHRoZSBzeXN0ZW0uIFlvdSBjb3VsZCBmb3IgaW5zdGFuY2UgZ28gaW50byB0aGUgQklP
-UyBhbmQgZGlzYWJsZSB0aGUgZXRoZXJuZXQgZGV2aWNlIGVudGlyZWx5LCBjYWxpYnJhdGUsIHJl
-Ym9vdCBhbmQgZW5hYmxlIHRoZSBldGhlcm5ldCBkZXZpY2UsIHRoZW4gY2FsaWJyYXRlIGFnYWlu
-LiBUaGUgZXh0cmEgZGF0YSBwb2ludHMgc2hvdWxkIGltcHJvdmUgdGhlIHBvd2VyIGVzdGltYXRl
-cyBmb3IgZGV2aWNlcy48L2Rpdj4KCjxkaXY+PGJyPjwvZGl2PjxkaXY+Q2hlZXJzLDwvZGl2Pjxk
-aXY+PGJyPjwvZGl2PjxkaXY+QXVrZTwvZGl2PjxkaXY+PGJyPjwvZGl2PjwvZGl2PjwvZGl2Pgo8
-L2Jsb2NrcXVvdGU+PC9kaXY+Cg==
+>  		_package =3D system_level.children[package];
+>  		if (!_package)
+>  			continue;
+>  =
 
---===============5955900168191463524==--
+> -		report.begin_table(TABLE_WIDE);
+> +		/*  Tables for PKG, CORE, CPU */
+> +		pkg_tbl_size.cols=3D2;
+> +		pkg_tbl_size.rows=3Dpstates_num+2;
+> +		string pkg_data[pkg_tbl_size.cols * pkg_tbl_size.rows];
+> +
+> +		core_tbl_size.cols=3D2;
+> +		core_tbl_size.rows=3D((pstates_num+2) *_package->children.size());
+> +		string core_data[core_tbl_size.cols * core_tbl_size.rows];
+> +
+> +		/* PKG */
+> +		num_cpus=3D0;
+> +		for (core =3D 0; core < _package->children.size(); core++) {
+> +			_core =3D _package->children[core];
+> +			if (!_core)
+> +				continue;
+> +			for (cpu =3D 0; cpu < _core->children.size(); cpu++) {
+> +				if (!_cpu)
+> +				continue;
+> +				_cpu =3D _core->children[cpu];
+> +				num_cpus+=3D1;
+> +			}
+> +		}
+> +		cpu_tbl_size.cols=3D num_cpus+1;
+> +		cpu_tbl_size.rows=3D (pstates_num+2)* _package->children.size();
+> +		string cpu_data[cpu_tbl_size.cols * cpu_tbl_size.rows];
+> +
+> +		/* Core */
+>  		for (core =3D 0; core < _package->children.size(); core++) {
+> +			cpu_data[idx3]=3D"&nbsp;";
+> +			idx3+=3D1;
+>  			_core =3D _package->children[core];
+>  			if (!_core)
+>  				continue;
+> @@ -646,75 +698,86 @@ void report_display_cpu_pstates(void)
+>  				bool first_cpu =3D true;
+>  =
+
+>  				if (!_package->has_pstate_level(line))
+> -					continue;
+> -
+> -				report.begin_row();
+> +				continue;
+>  =
+
+>  				buffer[0] =3D 0;
+>  				buffer2[0] =3D 0;
+>  				if (first_core) {
+>  					if (line =3D=3D LEVEL_HEADER) {
+> -						report.begin_cell(CELL_FIRST_PACKAGE_HEADER);
+> -						report.addf(__("Package %i"), _package->get_number());
+> +						pkg_data[idx1]=3D__("Package");
+> +						idx1+=3D1;
+> +						sprintf(tmp_num,"%d",  _package->get_number());
+> +						pkg_data[idx1]=3D string(tmp_num);
+> +						idx1+=3D1;
+
+
+initialisation:
+
+       report.begin_section(SECTION_CPUFREQ);
+       report.add_header("Processor Frequency Report");
+
+       report.begin_table(TABLE_WIDE);
+
+vs
+
+       /* div attr css_class and css_id */
+       tag_attr div_attr;
+       init_div(&div_attr, "clear_block", "cpufreq");
+
+       /* Set Table attributes, rows, and cols */
+       table_attributes std_table_css;
+       table_size pkg_tbl_size;
+       table_size core_tbl_size;
+       table_size cpu_tbl_size;
+
+
+       /* Set Title attributes */
+       tag_attr title_attr;
+       init_title_attr(&title_attr);
+
+       /* Report add section */
+        report.add_div(&div_attr);
+        report.add_title(&title_attr, __("Processor Frequency Report"));
+
+        /* Set array of data in row Major order */
+       int idx1, idx2, idx3, num_cpus=3D0;
+        string tmp_str;
+
+
+
+
+
+reporter usage:
+
+
+         report.begin_cell(CELL_CORE_HEADER);
+         report.addf(__("Core %i"), _core->get_number());
+
+vs
+
+         core_data[idx2]=3D"";
+         idx2+=3D1;
+         sprintf(tmp_num,__("Core %d"),_core->get_number());
+         core_data[idx2]=3Dstring(tmp_num);
+         idx2+=3D1;
+
+
+
+
+
+and
+
+
+
+
+
+         report.begin_cell(CELL_STATE_NAME);
+         report.add(_core->fill_pstate_name(line, buffer));
+         report.begin_cell(CELL_PACKAGE_STATE_VALUE);
+         report.add(_core->fill_pstate_line(line, buffer2));
+
+vs
+
+         tmp_str=3Dstring(_core->fill_pstate_name(line, buffer));
+         core_data[idx2]=3D (tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
+         idx2+=3D1;
+         tmp_str=3Dstring(_core->fill_pstate_line(line, buffer2));
+         core_data[idx2]=3D (tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
+         idx2+=3D1;
+
+
+sorry, but the existing one really looks easier to follow and use. current =
+reporter user
+cares less about reporter internall details.
+
+	-ss
+
+
+>  					} else {
+> -						report.begin_cell(CELL_STATE_NAME);
+> -						report.add(_package->fill_pstate_name(line, buffer));
+> -						report.begin_cell(CELL_PACKAGE_STATE_VALUE);
+> -						report.add(_package->fill_pstate_line(line, buffer2));
+> +						tmp_str=3Dstring(_package->fill_pstate_name(line, buffer));
+> +						pkg_data[idx1]=3D(tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
+> +						idx1+=3D1;
+> +						tmp_str=3Dstring(_package->fill_pstate_line(line, buffer2));
+> +						pkg_data[idx1]=3D(tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
+> +						idx1+=3D1;
+>  					}
+> -				} else {
+> -					report.begin_cell(CELL_EMPTY_PACKAGE_STATE);
+> -					report.add_empty_cell();
+>  				}
+>  =
+
+> -				report.begin_cell(CELL_SEPARATOR);
+> -				report.add_empty_cell();
+>  =
+
+>  				if (!_core->can_collapse()) {
+>  					buffer[0] =3D 0;
+>  					buffer2[0] =3D 0;
+>  					if (line =3D=3D LEVEL_HEADER) {
+> -						report.begin_cell(CELL_CORE_HEADER);
+> -						report.addf(__("Core %i"), _core->get_number());
+> +						core_data[idx2]=3D"";
+> +						idx2+=3D1;
+> +						sprintf(tmp_num,__("Core %d"),_core->get_number());
+> +						core_data[idx2]=3Dstring(tmp_num);
+> +						idx2+=3D1;
+>  					} else {
+> -						report.begin_cell(CELL_STATE_NAME);
+> -						report.add(_core->fill_pstate_name(line, buffer));
+> -						report.begin_cell(CELL_PACKAGE_STATE_VALUE);
+> -						report.add(_core->fill_pstate_line(line, buffer2));
+> +						tmp_str=3Dstring(_core->fill_pstate_name(line, buffer));
+> +						core_data[idx2]=3D (tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
+> +						idx2+=3D1;
+> +						tmp_str=3Dstring(_core->fill_pstate_line(line, buffer2));
+> +						core_data[idx2]=3D (tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
+> +						idx2+=3D1;
+>  					}
+>  				}
+>  =
+
+> -				report.begin_cell(CELL_SEPARATOR);
+> -				report.add_empty_cell();
+> -
+> +				/* CPU */
+>  				for (cpu =3D 0; cpu < _core->children.size(); cpu++) {
+>  					buffer[0] =3D 0;
+>  					_cpu =3D _core->children[cpu];
+>  					if (!_cpu)
+>  						continue;
+>  =
+
+> -					report.set_cpu_number(cpu);
+>  					if (line =3D=3D LEVEL_HEADER) {
+> -						report.begin_cell(CELL_CPU_PSTATE_HEADER);
+> -						report.addf(__("CPU %i"), _cpu->get_number());
+> +						sprintf(tmp_num,__("CPU %d"),_cpu->get_number());
+> +						cpu_data[idx3] =3D string(tmp_num);
+> +						idx3+=3D1;
+>  						continue;
+>  					}
+>  =
+
+>  					if (first_cpu) {
+> -						report.begin_cell(CELL_STATE_NAME);
+> -						report.add(_cpu->fill_pstate_name(line, buffer));
+> +						tmp_str=3Dstring(_cpu->fill_pstate_name(line, buffer));
+> +						cpu_data[idx3]=3D(tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
+> +						idx3+=3D1;
+>  						first_cpu =3D false;
+>  					}
+>  =
+
+>  					buffer[0] =3D 0;
+> -					report.begin_cell(CELL_CPU_STATE_VALUE);
+> -					report.add(_cpu->fill_pstate_line(line, buffer));
+> +					tmp_str=3Dstring(_cpu->fill_pstate_line(line, buffer));
+> +					cpu_data[idx3]=3D(tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
+> +					idx3+=3D1;
+>  				}
+>  			}
+> -
+>  			first_core =3D false;
+>  		}
+> +		init_pkg_table_attr(&std_table_css, pkg_tbl_size.rows, pkg_tbl_size.co=
+ls);
+> +		report.add_table(pkg_data, &std_table_css);
+> +		init_core_table_attr(&std_table_css, (pstates_num+2),
+> +				core_tbl_size.rows, core_tbl_size.cols);
+> +		report.add_table(core_data, &std_table_css);
+> +		init_cpu_table_attr(&std_table_css, (pstates_num+2),
+> +				cpu_tbl_size.rows, cpu_tbl_size.cols);
+> +		report.add_table(cpu_data, &std_table_css);
+>  	}
+> +	report.end_div();
+>  }
+>  =
+
+>  void impl_w_display_cpu_states(int state)
+> -- =
+
+> 1.7.9.5
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>=20
+
+--===============3042006766461656263==--
 
