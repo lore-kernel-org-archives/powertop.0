@@ -1,146 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============5198471085224774300=="
+Content-Type: multipart/mixed; boundary="===============3769180075829163612=="
 MIME-Version: 1.0
-From: Kalowsky, Daniel <daniel.kalowsky at intel.com>
-Subject: [Powertop] A series of patches towards limiting memory corruption and
- foot print
-Date: Wed, 30 Apr 2014 00:15:15 +0000
-Message-ID: <4628F0C61321354285DF2950999754456DF926B0@ORSMSX114.amr.corp.intel.com>
+From: Kok, Auke-jan H <auke-jan.h.kok at intel.com>
+Subject: Re: [Powertop] GitHub issue
+Date: Wed, 11 Dec 2013 09:47:22 -0800
+Message-ID: <CABsxX9KU_YpaEegyTEi+4DmQu7SGW33HX+Rkf2mUkUwdKjAO7A@mail.gmail.com>
+In-Reply-To: F9A26558D30ED241A8204F06F994726025800F5B@BGSMSX102.gar.corp.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5198471085224774300==
+--===============3769180075829163612==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Powertop,
+On Wed, Dec 11, 2013 at 2:06 AM, Mukherjee, Adrip
+<adrip.mukherjee(a)intel.com> wrote:
+> Hi ,
+>
+>       I tried to clone the powertop repository using github to download
+> latest source in my build machine. But the installation fails with attach=
+ed
+> error. Has anyone encountered similar issue with GitHub? Will be thankful=
+ to
+> get any BKM for this.
 
-I've been working with the interactive mode and have run into cases where p=
-owertop will crash due to a series of memory corruptions.  The following se=
-ries of patches have helped to reduce the frequency of the issue, although =
-not completely solved it.  The issues arise much faster on platforms where =
-there are constrained amounts of RAM to work within.
+Github is working fine for all of us.... perhaps it's because we're using L=
+inux?
 
-Patch 1 - When shutting down the interactive display, the display bits of m=
-emory is not correctly released.  This patch provides a method for correctl=
-y doing so.
+If you just want to read the source code, use the github webinterface
+to read the source code. If you want to build it, and run it, you
+really have to use Linux.
 
-Patch 2 - Solving a documented memory leak with a non-elegant solution.  Th=
-e path either adds the bundle to the stack, or it forgets about it.  If it =
-is forgotten about, make sure to clear that memory before moving on.  This =
-is done with a simple flag variable being set.
+Cheers,
 
-Patch 3 - When the tuning window is updated, the current pointer is just se=
-t adrift and not properly free'd.  This patch catches that issue and remove=
-s the dangling pointer by holding a reference to the pointer until it is re=
-set or specifically free'd.
+Auke
 
-Patch 4 - Someone actually added in the code to create a onetime pretty-pri=
-nt array, this patch just puts it to use by setting the variable.
-
-Patch 5 - Limiting the buffer copy to the size of the allocated buffer with=
- snprintf.
-
-Patch 6 - There exist some processes and entries that can and do extend bey=
-ond the length of these buffers.  This limits those entries so as not to co=
-rrupt other memory on the system when in interactive mode.
-
-Patch 7 - This is an untested patch, but follows along the same lines of Pa=
-tch 6.  It applies the same principals only for the report method.
-
-Patch 8 - Creates a clean_shutdown function that can be used to cleanup the=
- memory space at shutdown time.  Calls upon parts of Patch 1 to make this h=
-appen.
-
-There will more than likely be some more patches in the future as time perm=
-its.
-
---===============5198471085224774300==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
-
-PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
-bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
-YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
-cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
-VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
-bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
-ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTUgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
-PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseToiQ2Ft
-YnJpYSBNYXRoIjsKCXBhbm9zZS0xOjIgNCA1IDMgNSA0IDYgMyAyIDQ7fQpAZm9udC1mYWNlCgl7
-Zm9udC1mYW1pbHk6Q2FsaWJyaTsKCXBhbm9zZS0xOjIgMTUgNSAyIDIgMiA0IDMgMiA0O30KLyog
-U3R5bGUgRGVmaW5pdGlvbnMgKi8KcC5Nc29Ob3JtYWwsIGxpLk1zb05vcm1hbCwgZGl2Lk1zb05v
-cm1hbAoJe21hcmdpbjowaW47CgltYXJnaW4tYm90dG9tOi4wMDAxcHQ7Cglmb250LXNpemU6MTEu
-MHB0OwoJZm9udC1mYW1pbHk6IkNhbGlicmkiLCJzYW5zLXNlcmlmIjt9CmE6bGluaywgc3Bhbi5N
-c29IeXBlcmxpbmsKCXttc28tc3R5bGUtcHJpb3JpdHk6OTk7Cgljb2xvcjojMDU2M0MxOwoJdGV4
-dC1kZWNvcmF0aW9uOnVuZGVybGluZTt9CmE6dmlzaXRlZCwgc3Bhbi5Nc29IeXBlcmxpbmtGb2xs
-b3dlZAoJe21zby1zdHlsZS1wcmlvcml0eTo5OTsKCWNvbG9yOiM5NTRGNzI7Cgl0ZXh0LWRlY29y
-YXRpb246dW5kZXJsaW5lO30Kc3Bhbi5FbWFpbFN0eWxlMTcKCXttc28tc3R5bGUtdHlwZTpwZXJz
-b25hbDsKCWZvbnQtZmFtaWx5OiJDYWxpYnJpIiwic2Fucy1zZXJpZiI7Cgljb2xvcjp3aW5kb3d0
-ZXh0O30Kc3Bhbi5FbWFpbFN0eWxlMTgKCXttc28tc3R5bGUtdHlwZTpwZXJzb25hbC1yZXBseTsK
-CWZvbnQtZmFtaWx5OiJDYWxpYnJpIiwic2Fucy1zZXJpZiI7Cgljb2xvcjojMUY0OTdEO30KLk1z
-b0NocERlZmF1bHQKCXttc28tc3R5bGUtdHlwZTpleHBvcnQtb25seTsKCWZvbnQtc2l6ZToxMC4w
-cHQ7fQpAcGFnZSBXb3JkU2VjdGlvbjEKCXtzaXplOjguNWluIDExLjBpbjsKCW1hcmdpbjoxLjBp
-biAxLjBpbiAxLjBpbiAxLjBpbjt9CmRpdi5Xb3JkU2VjdGlvbjEKCXtwYWdlOldvcmRTZWN0aW9u
-MTt9Ci0tPjwvc3R5bGU+PCEtLVtpZiBndGUgbXNvIDldPjx4bWw+CjxvOnNoYXBlZGVmYXVsdHMg
-djpleHQ9ImVkaXQiIHNwaWRtYXg9IjEwMjYiIC8+CjwveG1sPjwhW2VuZGlmXS0tPjwhLS1baWYg
-Z3RlIG1zbyA5XT48eG1sPgo8bzpzaGFwZWxheW91dCB2OmV4dD0iZWRpdCI+CjxvOmlkbWFwIHY6
-ZXh0PSJlZGl0IiBkYXRhPSIxIiAvPgo8L286c2hhcGVsYXlvdXQ+PC94bWw+PCFbZW5kaWZdLS0+
-CjwvaGVhZD4KPGJvZHkgbGFuZz0iRU4tVVMiIGxpbms9IiMwNTYzQzEiIHZsaW5rPSIjOTU0Rjcy
-Ij4KPGRpdiBjbGFzcz0iV29yZFNlY3Rpb24xIj4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+SGkgUG93
-ZXJ0b3AsPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9v
-OnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5JJiM4MjE3O3ZlIGJlZW4gd29ya2luZyB3aXRo
-IHRoZSBpbnRlcmFjdGl2ZSBtb2RlIGFuZCBoYXZlIHJ1biBpbnRvIGNhc2VzIHdoZXJlIHBvd2Vy
-dG9wIHdpbGwgY3Jhc2ggZHVlIHRvIGEgc2VyaWVzIG9mIG1lbW9yeSBjb3JydXB0aW9ucy4mbmJz
-cDsgVGhlIGZvbGxvd2luZyBzZXJpZXMgb2YgcGF0Y2hlcyBoYXZlIGhlbHBlZCB0byByZWR1Y2Ug
-dGhlIGZyZXF1ZW5jeSBvZiB0aGUgaXNzdWUsIGFsdGhvdWdoIG5vdCBjb21wbGV0ZWx5CiBzb2x2
-ZWQgaXQuJm5ic3A7IFRoZSBpc3N1ZXMgYXJpc2UgbXVjaCBmYXN0ZXIgb24gcGxhdGZvcm1zIHdo
-ZXJlIHRoZXJlIGFyZSBjb25zdHJhaW5lZCBhbW91bnRzIG9mIFJBTSB0byB3b3JrIHdpdGhpbi4K
-PG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9w
-Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5QYXRjaCAxICYjODIxMTsgV2hlbiBzaHV0dGluZyBkb3du
-IHRoZSBpbnRlcmFjdGl2ZSBkaXNwbGF5LCB0aGUgZGlzcGxheSBiaXRzIG9mIG1lbW9yeSBpcyBu
-b3QgY29ycmVjdGx5IHJlbGVhc2VkLiZuYnNwOyBUaGlzIHBhdGNoIHByb3ZpZGVzIGEgbWV0aG9k
-IGZvciBjb3JyZWN0bHkgZG9pbmcgc28uJm5ic3A7CjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0i
-TXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+UGF0
-Y2ggMiAmIzgyMTE7IFNvbHZpbmcgYSBkb2N1bWVudGVkIG1lbW9yeSBsZWFrIHdpdGggYSBub24t
-ZWxlZ2FudCBzb2x1dGlvbi4mbmJzcDsgVGhlIHBhdGggZWl0aGVyIGFkZHMgdGhlIGJ1bmRsZSB0
-byB0aGUgc3RhY2ssIG9yIGl0IGZvcmdldHMgYWJvdXQgaXQuJm5ic3A7IElmIGl0IGlzIGZvcmdv
-dHRlbiBhYm91dCwgbWFrZSBzdXJlIHRvIGNsZWFyIHRoYXQgbWVtb3J5IGJlZm9yZSBtb3Zpbmcg
-b24uJm5ic3A7IFRoaXMgaXMgZG9uZSB3aXRoCiBhIHNpbXBsZSBmbGFnIHZhcmlhYmxlIGJlaW5n
-IHNldC4mbmJzcDsgPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5i
-c3A7PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5QYXRjaCAzICYjODIxMTsgV2hlbiB0
-aGUgdHVuaW5nIHdpbmRvdyBpcyB1cGRhdGVkLCB0aGUgY3VycmVudCBwb2ludGVyIGlzIGp1c3Qg
-c2V0IGFkcmlmdCBhbmQgbm90IHByb3Blcmx5IGZyZWUmIzgyMTc7ZC4mbmJzcDsgVGhpcyBwYXRj
-aCBjYXRjaGVzIHRoYXQgaXNzdWUgYW5kIHJlbW92ZXMgdGhlIGRhbmdsaW5nIHBvaW50ZXIgYnkg
-aG9sZGluZyBhIHJlZmVyZW5jZSB0byB0aGUgcG9pbnRlciB1bnRpbCBpdCBpcyByZXNldCBvciBz
-cGVjaWZpY2FsbHkKIGZyZWUmIzgyMTc7ZC48bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05v
-cm1hbCI+PG86cD4mbmJzcDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPlBhdGNoIDQg
-JiM4MjExOyBTb21lb25lIGFjdHVhbGx5IGFkZGVkIGluIHRoZSBjb2RlIHRvIGNyZWF0ZSBhIG9u
-ZXRpbWUgcHJldHR5LXByaW50IGFycmF5LCB0aGlzIHBhdGNoIGp1c3QgcHV0cyBpdCB0byB1c2Ug
-Ynkgc2V0dGluZyB0aGUgdmFyaWFibGUuJm5ic3A7CjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0i
-TXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+UGF0
-Y2ggNSAmIzgyMTE7IExpbWl0aW5nIHRoZSBidWZmZXIgY29weSB0byB0aGUgc2l6ZSBvZiB0aGUg
-YWxsb2NhdGVkIGJ1ZmZlciB3aXRoIHNucHJpbnRmLjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0i
-TXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+UGF0
-Y2ggNiAmIzgyMTE7IFRoZXJlIGV4aXN0IHNvbWUgcHJvY2Vzc2VzIGFuZCBlbnRyaWVzIHRoYXQg
-Y2FuIGFuZCBkbyBleHRlbmQgYmV5b25kIHRoZSBsZW5ndGggb2YgdGhlc2UgYnVmZmVycy4mbmJz
-cDsgVGhpcyBsaW1pdHMgdGhvc2UgZW50cmllcyBzbyBhcyBub3QgdG8gY29ycnVwdCBvdGhlciBt
-ZW1vcnkgb24gdGhlIHN5c3RlbSB3aGVuIGluIGludGVyYWN0aXZlIG1vZGUuJm5ic3A7CjxvOnA+
-PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPHAg
-Y2xhc3M9Ik1zb05vcm1hbCI+UGF0Y2ggNyAmIzgyMTE7IFRoaXMgaXMgYW4gdW50ZXN0ZWQgcGF0
-Y2gsIGJ1dCBmb2xsb3dzIGFsb25nIHRoZSBzYW1lIGxpbmVzIG9mIFBhdGNoIDYuJm5ic3A7IEl0
-IGFwcGxpZXMgdGhlIHNhbWUgcHJpbmNpcGFscyBvbmx5IGZvciB0aGUgcmVwb3J0IG1ldGhvZC4m
-bmJzcDsKPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9v
-OnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5QYXRjaCA4ICYjODIxMTsgQ3JlYXRlcyBhIGNs
-ZWFuX3NodXRkb3duIGZ1bmN0aW9uIHRoYXQgY2FuIGJlIHVzZWQgdG8gY2xlYW51cCB0aGUgbWVt
-b3J5IHNwYWNlIGF0IHNodXRkb3duIHRpbWUuJm5ic3A7IENhbGxzIHVwb24gcGFydHMgb2YgUGF0
-Y2ggMSB0byBtYWtlIHRoaXMgaGFwcGVuLiZuYnNwOwo8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9
-Ik1zb05vcm1hbCI+PG86cD4mbmJzcDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPlRo
-ZXJlIHdpbGwgbW9yZSB0aGFuIGxpa2VseSBiZSBzb21lIG1vcmUgcGF0Y2hlcyBpbiB0aGUgZnV0
-dXJlIGFzIHRpbWUgcGVybWl0cy4mbmJzcDsKPG86cD48L286cD48L3A+CjwvZGl2Pgo8L2JvZHk+
-CjwvaHRtbD4K
-
---===============5198471085224774300==--
+--===============3769180075829163612==--
 
