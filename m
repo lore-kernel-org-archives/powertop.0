@@ -1,231 +1,219 @@
-Content-Type: multipart/mixed; boundary="===============6350437795381870107=="
+Content-Type: multipart/mixed; boundary="===============8189476121072237816=="
 MIME-Version: 1.0
-From: Mukherjee, Adrip <adrip.mukherjee at intel.com>
-Subject: [Powertop] Using Git Hub for powertop in Linux
-Date: Fri, 13 Dec 2013 16:12:16 +0000
-Message-ID: <F9A26558D30ED241A8204F06F994726025801959@BGSMSX102.gar.corp.intel.com>
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] [PATCH v3 09/31] report-html: Table generation
+Date: Tue, 10 Dec 2013 16:33:31 -0800
+Message-ID: <55508.10.7.198.70.1386722011.squirrel@linux.intel.com>
+In-Reply-To: 20131210195739.GB2422@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6350437795381870107==
+--===============8189476121072237816==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi ,
-   I tried to download the latest powertop sources using this command in my=
- linux machine. Can you please point me to the contact for granting me acce=
-ss to the repo?
 
-git clone git(a)github.com:fer/powertop.git
+> On (11/18/13 12:27), Alexandra Yates wrote:
+>> Generates modular html tables using table_size, css_attributes,
+>> and a set of data. The data is stored in a single dimesional array,
+>> using row major order.
+>>
+>> Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+>> ---
+>>  src/report/report-data-html.h        |   18 +++++++++++
+>>  src/report/report-formatter-html.cpp |   59
+>> +++++++++++++++++++++++++++++++---
+>>  src/report/report-formatter-html.h   |    9 ++++--
+>>  3 files changed, 79 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/src/report/report-data-html.h
+>> b/src/report/report-data-html.h
+>> index 70ccbdb..282d8b5 100644
+>> --- a/src/report/report-data-html.h
+>> +++ b/src/report/report-data-html.h
+>> @@ -2,3 +2,21 @@ struct tag_attr {
+>>  	const char *css_class;
+>>  	const char *css_id;
+>>  };
+>> +/* T:Top, L:Left, TL:Top-Left, TLC: Top-Left-Center */
+>> +enum position { T, L, TL, TC, TLC };
+>> +
+>> +struct table_attributes {
+>> +	const char *table_class;
+>> +	const char *td_class;
+>> +	const char *tr_class;
+>> +	const char *th_class;
+>> +	position pos_table_title;
+>> +	int title_mod;
+>> +};
+>> +
+>> +
+>> +struct table_size {
+>> +	int rows;
+>> +	int cols;
+>> +};
+>> +
+>> diff --git a/src/report/report-formatter-html.cpp
+>> b/src/report/report-formatter-html.cpp
+>> index 93a4c48..f508ae0 100644
+>> --- a/src/report/report-formatter-html.cpp
+>> +++ b/src/report/report-formatter-html.cpp
+>> @@ -420,10 +420,10 @@ report_formatter_html::end_paragraph()
+>>
+>>  /*
+>> ************************************************************************
+>> */
+>>
+>> -std::string
+>> +string
+>>  report_formatter_html::escape_string(const char *str)
+>>  {
+>> -	std::string res;
+>> +	string res;
+>>
+>>  	assert(str);
+>>
+>> @@ -487,8 +487,8 @@ report_formatter_html::end_hheader()
+>>  void
+>>  report_formatter_html::add_div(struct tag_attr * div_attr)
+>>  {
+>> -	std::string empty=3D"";
+>> -	std::string tmp_str;
+>> +	string empty=3D"";
+>> +	string tmp_str;
+>>
+>>  	if (div_attr->css_class =3D=3D empty && div_attr->css_id =3D=3D empty)
+>>  		add_exact("<div>\n");
+>> @@ -523,7 +523,7 @@ report_formatter_html::add_navigation()
+>>  }
+>>
+>>  void
+>> -report_formatter_html::add_summary_list(std::string *list, int size)
+>> +report_formatter_html::add_summary_list(string *list, int size)
+>>  {
+>>  	int i;
+>>  	add_exact("<div><br/> <ul>\n");
+>> @@ -534,3 +534,52 @@ report_formatter_html::add_summary_list(std::string
+>> *list, int size)
+>>  	add_exact("</ul> </div> <br />\n");
+>>  }
+>>
+>> +
+>> +void
+>> +report_formatter_html::add_table(string *system_data, struct table_size
+>> *size, struct table_attributes* tb_attr)
+>> +{
+>> +	int i, j;
+>> +	int offset=3D0;
+>> +	string  empty=3D"";
+>> +
+>> +	if (tb_attr->table_class =3D=3D empty)
+>> +		add_exact("<table>\n");
+>> +	else
+>> +		addf_exact("<table class=3D\"%s\">\n", tb_attr->table_class);
+>> +
+>> +	for (i=3D0; i < size->rows; i++){
+>> +		if (tb_attr->tr_class =3D=3D empty)
+>> +			add_exact("<tr> ");
+>> +		else
+>> +			addf_exact("<tr class=3D\"%s\"> ", tb_attr->tr_class);
+>> +
+>> +		for (j=3D0; j < size->cols; j++){
+>> +			offset =3D i * (size->cols) + j;
+>> +
+>> +			if (tb_attr->pos_table_title =3D=3D T &&  i=3D=3D0)
+>> +				addf_exact("<th class=3D\"%s\"> %s </th> ",
+>> +				tb_attr->th_class,system_data[offset].c_str());
+>> +			else if (tb_attr->pos_table_title =3D=3D L &&  j=3D=3D0)
+>> +				addf_exact("<th class=3D\"%s\"> %s </th> ",
+>> +				tb_attr->th_class, system_data[offset].c_str());
+>> +			else if (tb_attr->pos_table_title =3D=3D TL && ( i=3D=3D0 || j=3D=3D=
+0 ))
+>> +				addf_exact("<th class=3D\"%s\"> %s </th> ",
+>> +				tb_attr->th_class, system_data[offset].c_str());
+>> +			else if (tb_attr->pos_table_title =3D=3D TC && ((i % tb_attr->title_=
+mod
+>> ) =3D=3D 0))
+>> +				addf_exact("<th class=3D\"%s\"> %s </th> ", tb_attr->th_class,
+>> +					system_data[offset].c_str());
+>> +			else if (tb_attr->pos_table_title =3D=3D TLC && ((i %
+>> tb_attr->title_mod) =3D=3D 0 || j=3D=3D0))
+>
+> this is cryptic.
+> can we change enum to contain TOP, LEFT, CENTER and so, it will make
+> code better:
+>
+> 	`tb_attr->pos_table_title =3D=3D T' vs `tb_attr->pos_table_title =3D=3D
+> POSITION_TOP'
+> 	or `tb_attr->pos_table_title =3D=3D TOP'
+>
+> 	-ss
+>
+>
+>> +				addf_exact("<th class=3D\"%s\"> %s </th> ", tb_attr->th_class,
+>> +				system_data[offset].c_str());
+>> +			else
+>> +				if ( tb_attr->td_class =3D=3D empty)
+>> +					addf_exact("<td > %s </td> ", system_data[offset].c_str());
+>> +				else
+>> +					addf_exact("<td class=3D\"%s\"> %s </td> ", tb_attr->td_class,
+>> +						system_data[offset].c_str());
+>> +		}
+>> +		add_exact("</tr>\n");
+>> +	}
+>> +	add_exact("</table>\n");
+>> +}
+>> +
+>> diff --git a/src/report/report-formatter-html.h
+>> b/src/report/report-formatter-html.h
+>> index 261e0dd..d625ced 100644
+>> --- a/src/report/report-formatter-html.h
+>> +++ b/src/report/report-formatter-html.h
+>> @@ -30,6 +30,9 @@
+>>
+>>  #include "report-formatter-base.h"
+>>  #include "report-data-html.h"
+>> +
+>> +using namespace std;
+>> +
+>>  /* Whether to replace " and ' in HTML by &quot; and &apos; respectively
+>> */
+>>  /*#define REPORT_HTML_ESCAPE_QUOTES*/
+>>
+>> @@ -90,7 +93,9 @@ public:
+>>  	void end_div();
+>>  	void add_title(struct tag_attr *title_att, const char *title);
+>>  	void add_navigation();
+>> -	void add_summary_list(std::string *list, int size);
+>> +	void add_summary_list(string *list, int size);
+>> +	void add_table(string *system_data, struct table_size *size,
+>> +			struct table_attributes *tb_attr);
+>>
+>>  private:
+>>  	/* Document structure related functions */
+>> @@ -113,7 +118,7 @@ private:
+>>  	void add_doc_header();
+>>  	void add_doc_footer();
+>>
+>> -	std::string escape_string(const char *str);
+>> +	string escape_string(const char *str);
+>>
+>>  	html_section sections[SECTION_MAX];
+>>  	html_table tables[TABLE_MAX];
+>> --
+>> 1.7.9.5
+>>
+>> _______________________________________________
+>> PowerTop mailing list
+>> PowerTop(a)lists.01.org
+>> https://lists.01.org/mailman/listinfo/powertop
+>>
+>
+This is a good point.  I didn't think about that. We could do that.
 
+Thank you,
+Alexandra.
 
-
-[cid:image001.png(a)01CEF84C.2CA1D790]
-
-I need to use Git and eclipse to analyze the code structure and the web bas=
-ed interface is not much helpful for this.
-So can you please point out the steps for integrating gitHub with eclipse?
-regards
-Adrip
-
-
---===============6350437795381870107==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
-
-PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
-bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
-YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6ZHQ9InV1aWQ6QzJGNDEwMTAtNjVC
-My0xMWQxLUEyOUYtMDBBQTAwQzE0ODgyIiB4bWxuczptPSJodHRwOi8vc2NoZW1hcy5taWNyb3Nv
-ZnQuY29tL29mZmljZS8yMDA0LzEyL29tbWwiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy9UUi9S
-RUMtaHRtbDQwIj4KPGhlYWQ+CjxtZXRhIGh0dHAtZXF1aXY9IkNvbnRlbnQtVHlwZSIgY29udGVu
-dD0idGV4dC9odG1sOyBjaGFyc2V0PXVzLWFzY2lpIj4KPG1ldGEgbmFtZT0iR2VuZXJhdG9yIiBj
-b250ZW50PSJNaWNyb3NvZnQgV29yZCAxNCAoZmlsdGVyZWQgbWVkaXVtKSI+CjwhLS1baWYgIW1z
-b10+PHN0eWxlPnZcOioge2JlaGF2aW9yOnVybCgjZGVmYXVsdCNWTUwpO30Kb1w6KiB7YmVoYXZp
-b3I6dXJsKCNkZWZhdWx0I1ZNTCk7fQp3XDoqIHtiZWhhdmlvcjp1cmwoI2RlZmF1bHQjVk1MKTt9
-Ci5zaGFwZSB7YmVoYXZpb3I6dXJsKCNkZWZhdWx0I1ZNTCk7fQo8L3N0eWxlPjwhW2VuZGlmXS0t
-PjxzdHlsZT48IS0tCi8qIEZvbnQgRGVmaW5pdGlvbnMgKi8KQGZvbnQtZmFjZQoJe2ZvbnQtZmFt
-aWx5OkNhbGlicmk7CglwYW5vc2UtMToyIDE1IDUgMiAyIDIgNCAzIDIgNDt9CkBmb250LWZhY2UK
-CXtmb250LWZhbWlseTpUYWhvbWE7CglwYW5vc2UtMToyIDExIDYgNCAzIDUgNCA0IDIgNDt9CkBm
-b250LWZhY2UKCXtmb250LWZhbWlseTpBbmRhbHVzOwoJcGFub3NlLTE6MiAyIDYgMyA1IDQgNSAy
-IDMgNDt9CkBmb250LWZhY2UKCXtmb250LWZhbWlseTpWaXZhbGRpOwoJcGFub3NlLTE6MyAyIDYg
-MiA1IDUgNiA5IDggNDt9Ci8qIFN0eWxlIERlZmluaXRpb25zICovCnAuTXNvTm9ybWFsLCBsaS5N
-c29Ob3JtYWwsIGRpdi5Nc29Ob3JtYWwKCXttYXJnaW46MGluOwoJbWFyZ2luLWJvdHRvbTouMDAw
-MXB0OwoJZm9udC1zaXplOjExLjBwdDsKCWZvbnQtZmFtaWx5OiJDYWxpYnJpIiwic2Fucy1zZXJp
-ZiI7fQphOmxpbmssIHNwYW4uTXNvSHlwZXJsaW5rCgl7bXNvLXN0eWxlLXByaW9yaXR5Ojk5OwoJ
-Y29sb3I6Ymx1ZTsKCXRleHQtZGVjb3JhdGlvbjp1bmRlcmxpbmU7fQphOnZpc2l0ZWQsIHNwYW4u
-TXNvSHlwZXJsaW5rRm9sbG93ZWQKCXttc28tc3R5bGUtcHJpb3JpdHk6OTk7Cgljb2xvcjpwdXJw
-bGU7Cgl0ZXh0LWRlY29yYXRpb246dW5kZXJsaW5lO30KcAoJe21zby1zdHlsZS1wcmlvcml0eTo5
-OTsKCW1zby1tYXJnaW4tdG9wLWFsdDphdXRvOwoJbWFyZ2luLXJpZ2h0OjBpbjsKCW1zby1tYXJn
-aW4tYm90dG9tLWFsdDphdXRvOwoJbWFyZ2luLWxlZnQ6MGluOwoJZm9udC1zaXplOjEyLjBwdDsK
-CWZvbnQtZmFtaWx5OiJUaW1lcyBOZXcgUm9tYW4iLCJzZXJpZiI7fQpwLk1zb0FjZXRhdGUsIGxp
-Lk1zb0FjZXRhdGUsIGRpdi5Nc29BY2V0YXRlCgl7bXNvLXN0eWxlLXByaW9yaXR5Ojk5OwoJbXNv
-LXN0eWxlLWxpbms6IkJhbGxvb24gVGV4dCBDaGFyIjsKCW1hcmdpbjowaW47CgltYXJnaW4tYm90
-dG9tOi4wMDAxcHQ7Cglmb250LXNpemU6OC4wcHQ7Cglmb250LWZhbWlseToiVGFob21hIiwic2Fu
-cy1zZXJpZiI7fQpzcGFuLkVtYWlsU3R5bGUxNwoJe21zby1zdHlsZS10eXBlOnBlcnNvbmFsLWNv
-bXBvc2U7Cglmb250LWZhbWlseToiQW5kYWx1cyIsInNlcmlmIjsKCWNvbG9yOndpbmRvd3RleHQ7
-Cglmb250LXdlaWdodDpub3JtYWw7Cglmb250LXN0eWxlOm5vcm1hbDt9CnNwYW4uQmFsbG9vblRl
-eHRDaGFyCgl7bXNvLXN0eWxlLW5hbWU6IkJhbGxvb24gVGV4dCBDaGFyIjsKCW1zby1zdHlsZS1w
-cmlvcml0eTo5OTsKCW1zby1zdHlsZS1saW5rOiJCYWxsb29uIFRleHQiOwoJZm9udC1mYW1pbHk6
-IlRhaG9tYSIsInNhbnMtc2VyaWYiO30KLk1zb0NocERlZmF1bHQKCXttc28tc3R5bGUtdHlwZTpl
-eHBvcnQtb25seTsKCWZvbnQtZmFtaWx5OiJDYWxpYnJpIiwic2Fucy1zZXJpZiI7fQouTXNvUGFw
-RGVmYXVsdAoJe21zby1zdHlsZS10eXBlOmV4cG9ydC1vbmx5OwoJbXNvLW1hcmdpbi10b3AtYWx0
-OmF1dG87Cgltc28tbWFyZ2luLWJvdHRvbS1hbHQ6YXV0bzt9CkBwYWdlIFdvcmRTZWN0aW9uMQoJ
-e3NpemU6OC41aW4gMTEuMGluOwoJbWFyZ2luOjEuMGluIDEuMGluIDEuMGluIDEuMGluO30KZGl2
-LldvcmRTZWN0aW9uMQoJe3BhZ2U6V29yZFNlY3Rpb24xO30KLS0+PC9zdHlsZT48IS0tW2lmIGd0
-ZSBtc28gOV0+PHhtbD4KPG86c2hhcGVkZWZhdWx0cyB2OmV4dD0iZWRpdCIgc3BpZG1heD0iMTAy
-NiIgLz4KPC94bWw+PCFbZW5kaWZdLS0+PCEtLVtpZiBndGUgbXNvIDldPjx4bWw+CjxvOnNoYXBl
-bGF5b3V0IHY6ZXh0PSJlZGl0Ij4KPG86aWRtYXAgdjpleHQ9ImVkaXQiIGRhdGE9IjEiIC8+Cjwv
-bzpzaGFwZWxheW91dD48L3htbD48IVtlbmRpZl0tLT4KPC9oZWFkPgo8Ym9keSBsYW5nPSJFTi1V
-UyIgbGluaz0iYmx1ZSIgdmxpbms9InB1cnBsZSI+CjxkaXYgY2xhc3M9IldvcmRTZWN0aW9uMSI+
-CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTIuMHB0O2ZvbnQt
-ZmFtaWx5OiZxdW90O0FuZGFsdXMmcXVvdDssJnF1b3Q7c2VyaWYmcXVvdDsiPkhpICw8bzpwPjwv
-bzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJmb250LXNp
-emU6MTIuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0FuZGFsdXMmcXVvdDssJnF1b3Q7c2VyaWYmcXVv
-dDsiPiZuYnNwOyZuYnNwOyBJIHRyaWVkIHRvIGRvd25sb2FkIHRoZSBsYXRlc3QgcG93ZXJ0b3Ag
-c291cmNlcyB1c2luZyB0aGlzIGNvbW1hbmQgaW4gbXkgbGludXggbWFjaGluZS4gQ2FuIHlvdSBw
-bGVhc2UgcG9pbnQgbWUgdG8gdGhlIGNvbnRhY3QgZm9yIGdyYW50aW5nIG1lIGFjY2VzcyB0byB0
-aGUgcmVwbz88bzpwPjwvbzpwPjwvc3Bhbj48L3A+CjxwIHN0eWxlPSJtYXJnaW46MGluO21hcmdp
-bi1ib3R0b206LjAwMDFwdCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMS4wcHQ7Zm9udC1mYW1p
-bHk6JnF1b3Q7Q2FsaWJyaSZxdW90OywmcXVvdDtzYW5zLXNlcmlmJnF1b3Q7O2NvbG9yOiNDMDAw
-MDAiPmdpdCBjbG9uZSBnaXRAZ2l0aHViLmNvbTpmZXIvcG93ZXJ0b3AuZ2l0PG86cD48L286cD48
-L3NwYW4+PC9wPgo8cCBzdHlsZT0ibWFyZ2luOjBpbjttYXJnaW4tYm90dG9tOi4wMDAxcHQiPjxz
-cGFuIHN0eWxlPSJmb250LXNpemU6MTEuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0NhbGlicmkmcXVv
-dDssJnF1b3Q7c2Fucy1zZXJpZiZxdW90Oztjb2xvcjojQzAwMDAwIj48bzpwPiZuYnNwOzwvbzpw
-Pjwvc3Bhbj48L3A+CjxwIHN0eWxlPSJtYXJnaW46MGluO21hcmdpbi1ib3R0b206LjAwMDFwdCI+
-PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMS4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7Q2FsaWJyaSZx
-dW90OywmcXVvdDtzYW5zLXNlcmlmJnF1b3Q7O2NvbG9yOiNDMDAwMDAiPjxpbWcgd2lkdGg9IjY0
-OCIgaGVpZ2h0PSIxNDgiIGlkPSJQaWN0dXJlX3gwMDIwXzEiIHNyYz0iY2lkOmltYWdlMDAxLnBu
-Z0AwMUNFRjg0Qy4yQ0ExRDc5MCI+PC9zcGFuPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTEuMHB0
-O2ZvbnQtZmFtaWx5OiZxdW90O0NhbGlicmkmcXVvdDssJnF1b3Q7c2Fucy1zZXJpZiZxdW90Oztj
-b2xvcjojQzAwMDAwIj48bzpwPjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwi
-PjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTIuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0FuZGFsdXMm
-cXVvdDssJnF1b3Q7c2VyaWYmcXVvdDsiPjxvOnA+Jm5ic3A7PC9vOnA+PC9zcGFuPjwvcD4KPHAg
-Y2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMi4wcHQ7Zm9udC1mYW1p
-bHk6JnF1b3Q7QW5kYWx1cyZxdW90OywmcXVvdDtzZXJpZiZxdW90OyI+SSBuZWVkIHRvIHVzZSBH
-aXQgYW5kIGVjbGlwc2UgdG8gYW5hbHl6ZSB0aGUgY29kZSBzdHJ1Y3R1cmUgYW5kIHRoZSB3ZWIg
-YmFzZWQgaW50ZXJmYWNlIGlzIG5vdCBtdWNoIGhlbHBmdWwgZm9yIHRoaXMuPG86cD48L286cD48
-L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iZm9udC1zaXplOjEy
-LjBwdDtmb250LWZhbWlseTomcXVvdDtBbmRhbHVzJnF1b3Q7LCZxdW90O3NlcmlmJnF1b3Q7Ij5T
-byBjYW4geW91IHBsZWFzZSBwb2ludCBvdXQgdGhlIHN0ZXBzIGZvciBpbnRlZ3JhdGluZyBnaXRI
-dWIgd2l0aCBlY2xpcHNlPzxvOnA+PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1h
-bCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxNC4wcHQ7Zm9udC1mYW1pbHk6Vml2YWxkaTtjb2xv
-cjojNDAzMTUyIj5yZWdhcmRzPG86cD48L286cD48L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9y
-bWFsIj48c3BhbiBzdHlsZT0iZm9udC1zaXplOjE0LjBwdDtmb250LWZhbWlseTpWaXZhbGRpO2Nv
-bG9yOiM0MDMxNTIiPkFkcmlwPG86cD48L286cD48L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9y
-bWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPC9kaXY+CjwvYm9keT4KPC9odG1sPgo=
-
---===============6350437795381870107==
-Content-Type: image/png
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="image001.png"
-
-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
---===============6350437795381870107==--
+--===============8189476121072237816==--
 
