@@ -1,161 +1,78 @@
-Content-Type: multipart/mixed; boundary="===============8645631740660447639=="
+Content-Type: multipart/mixed; boundary="===============2524979907998313584=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] [Announce] PowerTOP v2.6-rc1
-Date: Fri, 25 Apr 2014 16:52:25 -0700
-Message-ID: <56179.10.254.3.215.1398469945.squirrel@linux.intel.com>
-In-Reply-To: AC81B6AA7676DD448250A85A459C1F412F13C074@IRSMSX102.ger.corp.intel.com
+From: Mukherjee, Adrip <adrip.mukherjee at intel.com>
+Subject: [Powertop] SAS document for PowerTop 2.5
+Date: Wed, 11 Dec 2013 06:19:25 +0000
+Message-ID: <F9A26558D30ED241A8204F06F994726025800DD9@BGSMSX102.gar.corp.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8645631740660447639==
+--===============2524979907998313584==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-I'm holding up release for the time being, there are a couple of bugs that
-need to be workout before release.
+Hi ,
+        I am looking to understand the architecture for powertop code base.=
+ Can someone please let me know if there is any software architecture spec =
+document available for this.
 
-Thank you,
-Alexandra.
-
-> Hello,
->
->
->
-> Here are results of PowerTop 2.6 rc1 validation.
->
->
->
-> Note:
->
-> Results seem bad but most of reported bugs deal with cosmetic.
->
-> The most serious problem appears when trying to reach the deeper state and
-> only stats for Core C7 state are reported.
->
->
->
-> Results:
-> 44
->
-> Pass
->
-> 13
->
-> Fail
->
-> 1
->
-> Warning
->
-> 7
->
-> Blocked
->
-> 0
->
-> Not run
->
-> 65
->
-> Total
->
-> 100.0%
->
-> Run rate
->
-> 67.7%
->
-> Pass
->
-> 20.0%
->
-> Fail
->
-> 1.5%
->
-> Warning
->
-> 10.8%
->
-> Blocked
->
-> 0.0%
->
-> Not run
->
->
->
->
-> Setup:
->
-> PowerTop 2.6: 8f56e9f12f66e13f602eb436d9c53614d6816253 from
-> https://github.com/fenrus75/powertop.git
->
-> Linux distribution: Ubuntu 13.10 64 bits
->
-> Kernel 3.14.0 from
-> git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
->
->
->
-> Bugs:
-> Duration of measurement is not indicated in report
->
-> Several warnings when compiling PowerTop
->
-> System out of order when enabling SATA link power management for hosts
->
-> PowerTop must be launched twice to see correct AHCI ALPM Residency
-> Statistics
->
-> PowerTop logo is missing in html report when created outside source folder
->
-> "Not Applicable" can be displayed in the product name
->
-> CSV report contains an error 510
->
-> Some cells are not in the appropriate column when device name contains a
-> coma
->
-> Section "Process Device Activity" is not well aligned
->
-> W3C validator "Markup Validation Service" returns one error
->
-> W3C validator "CSS Validation Service" returns one error and five warnings
->
-> Wrong values of Package and Cores residency when trying to reach the
-> deeper state
->
-> Only Core C7 state stats are reported
->
-> Problems when changing language
->
-> Need to clarify which Package C states are reported by PowerTop on
-> Baytrail
->
->
-> ---------------------------------------------------------------------
-> Intel Corporation SAS (French simplified joint stock company)
-> Registered headquarters: "Les Montalets"- 2, rue de Paris,
-> 92196 Meudon Cedex, France
-> Registration Number:  302 456 199 R.C.S. NANTERRE
-> Capital: 4,572,000 Euros
->
-> This e-mail and any attachments may contain confidential material for
-> the sole use of the intended recipient(s). Any review or distribution
-> by others is strictly prohibited. If you are not the intended
-> recipient, please contact the sender and delete all copies.
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->
+regards
+Adrip
 
 
-Thank you,
-Alexandra.
+--===============2524979907998313584==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
---===============8645631740660447639==--
+PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
+bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
+YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
+cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
+VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
+bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
+ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTUgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
+PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseToiQ2Ft
+YnJpYSBNYXRoIjsKCXBhbm9zZS0xOjIgNCA1IDMgNSA0IDYgMyAyIDQ7fQpAZm9udC1mYWNlCgl7
+Zm9udC1mYW1pbHk6Q2FsaWJyaTsKCXBhbm9zZS0xOjIgMTUgNSAyIDIgMiA0IDMgMiA0O30KQGZv
+bnQtZmFjZQoJe2ZvbnQtZmFtaWx5OkNvbnNvbGFzOwoJcGFub3NlLTE6MiAxMSA2IDkgMiAyIDQg
+MyAyIDQ7fQpAZm9udC1mYWNlCgl7Zm9udC1mYW1pbHk6IkZyZWVzdHlsZSBTY3JpcHQiOwoJcGFu
+b3NlLTE6MyA4IDQgMiAzIDIgNSAxMSA0IDQ7fQovKiBTdHlsZSBEZWZpbml0aW9ucyAqLwpwLk1z
+b05vcm1hbCwgbGkuTXNvTm9ybWFsLCBkaXYuTXNvTm9ybWFsCgl7bWFyZ2luOjBjbTsKCW1hcmdp
+bi1ib3R0b206LjAwMDFwdDsKCWZvbnQtc2l6ZToxMS4wcHQ7Cglmb250LWZhbWlseToiQ2FsaWJy
+aSIsInNhbnMtc2VyaWYiOwoJbXNvLWZhcmVhc3QtbGFuZ3VhZ2U6RU4tVVM7fQphOmxpbmssIHNw
+YW4uTXNvSHlwZXJsaW5rCgl7bXNvLXN0eWxlLXByaW9yaXR5Ojk5OwoJY29sb3I6IzA1NjNDMTsK
+CXRleHQtZGVjb3JhdGlvbjp1bmRlcmxpbmU7fQphOnZpc2l0ZWQsIHNwYW4uTXNvSHlwZXJsaW5r
+Rm9sbG93ZWQKCXttc28tc3R5bGUtcHJpb3JpdHk6OTk7Cgljb2xvcjojOTU0RjcyOwoJdGV4dC1k
+ZWNvcmF0aW9uOnVuZGVybGluZTt9CnNwYW4uRW1haWxTdHlsZTE3Cgl7bXNvLXN0eWxlLXR5cGU6
+cGVyc29uYWwtY29tcG9zZTsKCWZvbnQtZmFtaWx5OkNvbnNvbGFzOwoJY29sb3I6d2luZG93dGV4
+dDt9Ci5Nc29DaHBEZWZhdWx0Cgl7bXNvLXN0eWxlLXR5cGU6ZXhwb3J0LW9ubHk7Cglmb250LWZh
+bWlseToiQ2FsaWJyaSIsInNhbnMtc2VyaWYiOwoJbXNvLWZhcmVhc3QtbGFuZ3VhZ2U6RU4tVVM7
+fQpAcGFnZSBXb3JkU2VjdGlvbjEKCXtzaXplOjYxMi4wcHQgNzkyLjBwdDsKCW1hcmdpbjo3Mi4w
+cHQgNzIuMHB0IDcyLjBwdCA3Mi4wcHQ7fQpkaXYuV29yZFNlY3Rpb24xCgl7cGFnZTpXb3JkU2Vj
+dGlvbjE7fQotLT48L3N0eWxlPjwhLS1baWYgZ3RlIG1zbyA5XT48eG1sPgo8bzpzaGFwZWRlZmF1
+bHRzIHY6ZXh0PSJlZGl0IiBzcGlkbWF4PSIxMDI2IiAvPgo8L3htbD48IVtlbmRpZl0tLT48IS0t
+W2lmIGd0ZSBtc28gOV0+PHhtbD4KPG86c2hhcGVsYXlvdXQgdjpleHQ9ImVkaXQiPgo8bzppZG1h
+cCB2OmV4dD0iZWRpdCIgZGF0YT0iMSIgLz4KPC9vOnNoYXBlbGF5b3V0PjwveG1sPjwhW2VuZGlm
+XS0tPgo8L2hlYWQ+Cjxib2R5IGxhbmc9IkVOLUlOIiBsaW5rPSIjMDU2M0MxIiB2bGluaz0iIzk1
+NEY3MiI+CjxkaXYgY2xhc3M9IldvcmRTZWN0aW9uMSI+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxz
+cGFuIHN0eWxlPSJmb250LXNpemU6MTIuMHB0O2ZvbnQtZmFtaWx5OkNvbnNvbGFzIj5IaSAsPG86
+cD48L286cD48L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iZm9u
+dC1zaXplOjEyLjBwdDtmb250LWZhbWlseTpDb25zb2xhcyI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IEkgYW0gbG9va2luZyB0byB1bmRlcnN0YW5kIHRoZSBhcmNo
+aXRlY3R1cmUgZm9yIHBvd2VydG9wIGNvZGUgYmFzZS4gQ2FuIHNvbWVvbmUgcGxlYXNlIGxldCBt
+ZSBrbm93IGlmIHRoZXJlIGlzIGFueSBzb2Z0d2FyZSBhcmNoaXRlY3R1cmUgc3BlYyBkb2N1bWVu
+dCBhdmFpbGFibGUgZm9yIHRoaXMuCjxvOnA+PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1z
+b05vcm1hbCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMi4wcHQ7Zm9udC1mYW1pbHk6Q29uc29s
+YXMiPjxvOnA+Jm5ic3A7PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNw
+YW4gc3R5bGU9ImZvbnQtc2l6ZToxNi4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7RnJlZXN0eWxlIFNj
+cmlwdCZxdW90Ozttc28tZmFyZWFzdC1sYW5ndWFnZTpFTi1JTiI+cmVnYXJkczxvOnA+PC9vOnA+
+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZTox
+Ni4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7RnJlZXN0eWxlIFNjcmlwdCZxdW90Ozttc28tZmFyZWFz
+dC1sYW5ndWFnZTpFTi1JTiI+QWRyaXA8bzpwPjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJN
+c29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8L2Rpdj4KPC9ib2R5Pgo8L2h0bWw+Cg==
+
+--===============2524979907998313584==--
 
