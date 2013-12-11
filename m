@@ -1,169 +1,163 @@
-Content-Type: multipart/mixed; boundary="===============8336035495378868585=="
+Content-Type: multipart/mixed; boundary="===============1477317321900047435=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] segmentation fault when shutting down
-Date: Fri, 09 May 2014 11:18:00 +0300
-Message-ID: <20140509081800.GC937@swordfish>
-In-Reply-To: 20140509061416.GE32300@rhrk.uni-kl.de
+From: Mukherjee, Adrip <adrip.mukherjee at intel.com>
+Subject: [Powertop] GitHub issue
+Date: Wed, 11 Dec 2013 10:06:21 +0000
+Message-ID: <F9A26558D30ED241A8204F06F994726025800F5B@BGSMSX102.gar.corp.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8336035495378868585==
+--===============1477317321900047435==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (05/09/14 08:14), Joerg Mayer wrote:
-> I also get a segfault.
-> =
+Hi ,
+      I tried to clone the powertop repository using github to download lat=
+est source in my build machine. But the installation fails with attached er=
+ror. Has anyone encountered similar issue with GitHub? Will be thankful to =
+get any BKM for this.
 
-> Ciao
->     J=C3=B6rg
-> =
-
-> powertop (git describe: v2.6-rc2-1-gb162f5d)
-> =
-
-> (gdb) bt
-> #0  0x00000010 in ?? ()
-> #1  0x0805339b in close_display () at ../../src/display.cpp:94
-> #2  0x08090c30 in clean_shutdown () at ../../src/main.cpp:365
-> #3  0x0804e575 in main (argc=3D1, argv=3D0xbff65814) at ../../src/main.cp=
-p:500
-> (gdb) quit
-> =
+regards
+Adrip
 
 
-ok... I took a quick look, and I didn't understand some things.
+--===============1477317321900047435==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
+PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
+bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
+YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
+cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
+VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
+bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
+ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTQgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
+PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseTpDYWxp
+YnJpOwoJcGFub3NlLTE6MiAxNSA1IDIgMiAyIDQgMyAyIDQ7fQpAZm9udC1mYWNlCgl7Zm9udC1m
+YW1pbHk6QW5kYWx1czsKCXBhbm9zZS0xOjIgMiA2IDMgNSA0IDUgMiAzIDQ7fQpAZm9udC1mYWNl
+Cgl7Zm9udC1mYW1pbHk6Vml2YWxkaTsKCXBhbm9zZS0xOjMgMiA2IDIgNSA1IDYgOSA4IDQ7fQov
+KiBTdHlsZSBEZWZpbml0aW9ucyAqLwpwLk1zb05vcm1hbCwgbGkuTXNvTm9ybWFsLCBkaXYuTXNv
+Tm9ybWFsCgl7bWFyZ2luOjBpbjsKCW1hcmdpbi1ib3R0b206LjAwMDFwdDsKCWZvbnQtc2l6ZTox
+MS4wcHQ7Cglmb250LWZhbWlseToiQ2FsaWJyaSIsInNhbnMtc2VyaWYiO30KYTpsaW5rLCBzcGFu
+Lk1zb0h5cGVybGluawoJe21zby1zdHlsZS1wcmlvcml0eTo5OTsKCWNvbG9yOmJsdWU7Cgl0ZXh0
+LWRlY29yYXRpb246dW5kZXJsaW5lO30KYTp2aXNpdGVkLCBzcGFuLk1zb0h5cGVybGlua0ZvbGxv
+d2VkCgl7bXNvLXN0eWxlLXByaW9yaXR5Ojk5OwoJY29sb3I6cHVycGxlOwoJdGV4dC1kZWNvcmF0
+aW9uOnVuZGVybGluZTt9CnNwYW4uRW1haWxTdHlsZTE3Cgl7bXNvLXN0eWxlLXR5cGU6cGVyc29u
+YWwtY29tcG9zZTsKCWZvbnQtZmFtaWx5OiJBbmRhbHVzIiwic2VyaWYiOwoJY29sb3I6d2luZG93
+dGV4dDsKCWZvbnQtd2VpZ2h0Om5vcm1hbDsKCWZvbnQtc3R5bGU6bm9ybWFsO30KLk1zb0NocERl
+ZmF1bHQKCXttc28tc3R5bGUtdHlwZTpleHBvcnQtb25seTsKCWZvbnQtZmFtaWx5OiJDYWxpYnJp
+Iiwic2Fucy1zZXJpZiI7fQouTXNvUGFwRGVmYXVsdAoJe21zby1zdHlsZS10eXBlOmV4cG9ydC1v
+bmx5OwoJbXNvLW1hcmdpbi10b3AtYWx0OmF1dG87Cgltc28tbWFyZ2luLWJvdHRvbS1hbHQ6YXV0
+bzt9CkBwYWdlIFdvcmRTZWN0aW9uMQoJe3NpemU6OC41aW4gMTEuMGluOwoJbWFyZ2luOjEuMGlu
+IDEuMGluIDEuMGluIDEuMGluO30KZGl2LldvcmRTZWN0aW9uMQoJe3BhZ2U6V29yZFNlY3Rpb24x
+O30KLS0+PC9zdHlsZT48IS0tW2lmIGd0ZSBtc28gOV0+PHhtbD4KPG86c2hhcGVkZWZhdWx0cyB2
+OmV4dD0iZWRpdCIgc3BpZG1heD0iMTAyNiIgLz4KPC94bWw+PCFbZW5kaWZdLS0+PCEtLVtpZiBn
+dGUgbXNvIDldPjx4bWw+CjxvOnNoYXBlbGF5b3V0IHY6ZXh0PSJlZGl0Ij4KPG86aWRtYXAgdjpl
+eHQ9ImVkaXQiIGRhdGE9IjEiIC8+CjwvbzpzaGFwZWxheW91dD48L3htbD48IVtlbmRpZl0tLT4K
+PC9oZWFkPgo8Ym9keSBsYW5nPSJFTi1VUyIgbGluaz0iYmx1ZSIgdmxpbms9InB1cnBsZSI+Cjxk
+aXYgY2xhc3M9IldvcmRTZWN0aW9uMSI+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxl
+PSJmb250LXNpemU6MTIuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0FuZGFsdXMmcXVvdDssJnF1b3Q7
+c2VyaWYmcXVvdDsiPkhpICw8bzpwPjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29Ob3Jt
+YWwiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTIuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0FuZGFs
+dXMmcXVvdDssJnF1b3Q7c2VyaWYmcXVvdDsiPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
+OyBJIHRyaWVkIHRvIGNsb25lIHRoZSBwb3dlcnRvcCByZXBvc2l0b3J5IHVzaW5nIGdpdGh1YiB0
+byBkb3dubG9hZCBsYXRlc3Qgc291cmNlIGluIG15IGJ1aWxkIG1hY2hpbmUuIEJ1dCB0aGUgaW5z
+dGFsbGF0aW9uIGZhaWxzIHdpdGggYXR0YWNoZWQgZXJyb3IuIEhhcyBhbnlvbmUgZW5jb3VudGVy
+ZWQKIHNpbWlsYXIgaXNzdWUgd2l0aCBHaXRIdWI/IFdpbGwgYmUgdGhhbmtmdWwgdG8gZ2V0IGFu
+eSBCS00gZm9yIHRoaXMuPG86cD48L286cD48L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFs
+Ij48c3BhbiBzdHlsZT0iZm9udC1zaXplOjEyLjBwdDtmb250LWZhbWlseTomcXVvdDtBbmRhbHVz
+JnF1b3Q7LCZxdW90O3NlcmlmJnF1b3Q7Ij48bzpwPiZuYnNwOzwvbzpwPjwvc3Bhbj48L3A+Cjxw
+IGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTQuMHB0O2ZvbnQtZmFt
+aWx5OlZpdmFsZGk7Y29sb3I6IzQwMzE1MiI+cmVnYXJkczxvOnA+PC9vOnA+PC9zcGFuPjwvcD4K
+PHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxNC4wcHQ7Zm9udC1m
+YW1pbHk6Vml2YWxkaTtjb2xvcjojNDAzMTUyIj5BZHJpcDxvOnA+PC9vOnA+PC9zcGFuPjwvcD4K
+PHAgY2xhc3M9Ik1zb05vcm1hbCI+PG86cD4mbmJzcDs8L286cD48L3A+CjwvZGl2Pgo8L2JvZHk+
+CjwvaHRtbD4K
 
-commit eb08d4480969c8e48347c7621bd96dc248ee2138
-Author: Dan Kalowsky <daniel.kalowsky(a)intel.com>
-Date:   Mon Apr 28 13:52:05 2014 -0700
+--===============1477317321900047435==
+Content-Type: application/octet-stream
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="CAJ1MZXB.log"
 
-    Remove another memory leak
-    =
-
-    Pointer gets over written without ever being properly cleaned up.  This
-    should solve that problem.
-
-
-	+class tuning_window *tune_window;
-	+
-	 class tuning_window: public tab_window {
-	 public:
-	        virtual void repaint(void);
-	@@ -80,6 +82,11 @@ void initialize_tuning(void)
-	        init_tuning();
-	 =
-
-	        w->cursor_max =3D all_tunables.size() - 1;
-	+
-	+       if (tune_window)
-	+               delete tune_window;
-	+
-	+       tune_window =3D w;
-	 }
-	 =
-
-	=
-
-	@@ -305,6 +312,10 @@ void clear_tuning()
-	                delete all_untunables[i];
-	        }
-	        all_untunables.clear();
-	+
-	+       if (tune_window)
-	+               delete tune_window;
-	+       tune_window =3D NULL;
-		^^^^^^^^^
-	 }
-	 =
-
-	 void auto_toggle_tuning()
-
-
-tuning_window::window_refresh() calls clear_tuning(). which deletes tune_wi=
-ndow
-and sets it to NULL. then init_tuning() called.
-
-the fishy part is that it all happens within that `if (w)' in display.cpp w=
-indow_refresh()
-
-        if (w) {
-                w->ypad_pos =3D 0;
-                w->xpad_pos =3D 0;
-                w->window_refresh();
-		^^^^^ here we kill tuning_window
-                w->repaint();
-		^^^^^ and here we try to execute its function?
-        }
-
-can someone check (or prove me wrong) if we actually have problems here?
-if we do -- then was it actually tested?
-
-	-ss
-
-> jmayer(a)egg:~/work/power/powertop/git/build(master)> lsb_release -a
-> LSB Version: core-2.0-noarch:core-3.2-noarch:core-4.0-noarch:core-2.0-ia3=
-2:core-3.2-ia32:core-4.0-ia32:desktop-4.0-ia32:desktop-4.0-noarch:graphics-=
-2.0-ia32:graphics-2.0-noarch:graphics-3.2-ia32:graphics-3.2-noarch:graphics=
--4.0-ia32:graphics-4.0-noarch
-> Distributor ID: openSUSE project
-> Description:    openSUSE 13.1 (Bottle) (i586)
-> Release:        13.1
-> Codename:       Bottle
-> =
-
-> jmayer(a)egg:~/work/power/powertop/git/build(master)> uname -a
-> Linux egg 3.14.2-1.g1474ea5-desktop #1 SMP PREEMPT Sun Apr 27 14:35:22 UT=
-C 2014 (1474ea5) i686 i686 i386 GNU/Linux
-> =
-
-> =
-
-> jmayer(a)egg:~/work/power/powertop/git/build(master)> cat /proc/cpuinfo
-> processor       : 0
-> vendor_id       : GenuineIntel
-> cpu family      : 6
-> model           : 23
-> model name      : Intel(R) Core(TM)2 Duo CPU     T8300  @ 2.40GHz
-> stepping        : 6
-> microcode       : 0x60f
-> cpu MHz         : 2400.000
-> cache size      : 3072 KB
-> physical id     : 0
-> siblings        : 2
-> core id         : 0
-> cpu cores       : 2
-> apicid          : 0
-> initial apicid  : 0
-> fdiv_bug        : no
-> f00f_bug        : no
-> coma_bug        : no
-> fpu             : yes
-> fpu_exception   : yes
-> cpuid level     : 10
-> wp              : yes
-> flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
-a cmov pat
-> +pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe nx lm constant_tsc=
- arch_perfmon
-> +pebs bts aperfmperf pni dtes64 monitor ds_cpl vmx est tm2 ssse3 cx16 xtp=
-r pdcm sse4_1
-> +lahf_lm ida dtherm tpr_shadow vnmi flexpriority
-> bogomips        : 4788.29
-> clflush size    : 64
-> cache_alignment : 64
-> address sizes   : 36 bits physical, 48 bits virtual
-> power management:
-> [output for processor 1 deleted]
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
-
---===============8336035495378868585==--
+//5QAEwAQQBUAEYATwBSAE0AIABWAEUAUgBTAEkATwBOACAASQBOAEYATwANAAoACQBXAGkAbgBk
+AG8AdwBzACAACQAJAAkAOgAgADYALgAxAC4ANwA2ADAAMQAuADYANQA1ADMANgAgACgAVwBpAG4A
+MwAyAE4AVAApAA0ACgAJAEMAbwBtAG0AbwBuACAATABhAG4AZwB1AGEAZwBlACAAUgB1AG4AdABp
+AG0AZQAgAAkAOgAgADQALgAwAC4AMwAwADMAMQA5AC4AMQA4ADAANQAyAA0ACgAJAFMAeQBzAHQA
+ZQBtAC4ARABlAHAAbABvAHkAbQBlAG4AdAAuAGQAbABsACAACQAJADoAIAA0AC4AMAAuADMAMAAz
+ADEAOQAuADEANwA5ADIAOQAgAGIAdQBpAGwAdAAgAGIAeQA6ACAARgBYADQANQBSAFQATQBSAEUA
+TAANAAoACQBjAGwAcgAuAGQAbABsACAACQAJAAkAOgAgADQALgAwAC4AMwAwADMAMQA5AC4AMQA4
+ADAANQAyACAAYgB1AGkAbAB0ACAAYgB5ADoAIABGAFgANAA1AFIAVABNAEcARABSAA0ACgAJAGQA
+ZgBkAGwAbAAuAGQAbABsACAACQAJAAkAOgAgADQALgAwAC4AMwAwADMAMQA5AC4AMQA3ADkAMgA5
+ACAAYgB1AGkAbAB0ACAAYgB5ADoAIABGAFgANAA1AFIAVABNAFIARQBMAA0ACgAJAGQAZgBzAGgA
+aQBtAC4AZABsAGwAIAAJAAkACQA6ACAANAAuADAALgA0ADEAMgAwADkALgAwACAAKABNAGEAaQBu
+AC4AMAA0ADEAMgAwADkALQAwADAAMAAwACkADQAKAA0ACgBTAE8AVQBSAEMARQBTAA0ACgAJAEQA
+ZQBwAGwAbwB5AG0AZQBuAHQAIAB1AHIAbAAJAAkACQA6ACAAaAB0AHQAcAA6AC8ALwBnAGkAdABo
+AHUAYgAtAHcAaQBuAGQAbwB3AHMALgBzADMALgBhAG0AYQB6AG8AbgBhAHcAcwAuAGMAbwBtAC8A
+RwBpAHQASAB1AGIALgBhAHAAcABsAGkAYwBhAHQAaQBvAG4ADQAKAA0ACgBFAFIAUgBPAFIAIABT
+AFUATQBNAEEAUgBZAA0ACgAJAEIAZQBsAG8AdwAgAGkAcwAgAGEAIABzAHUAbQBtAGEAcgB5ACAA
+bwBmACAAdABoAGUAIABlAHIAcgBvAHIAcwAsACAAZABlAHQAYQBpAGwAcwAgAG8AZgAgAHQAaABl
+AHMAZQAgAGUAcgByAG8AcgBzACAAYQByAGUAIABsAGkAcwB0AGUAZAAgAGwAYQB0AGUAcgAgAGkA
+bgAgAHQAaABlACAAbABvAGcALgANAAoACQAqACAAQQBjAHQAaQB2AGEAdABpAG8AbgAgAG8AZgAg
+AGgAdAB0AHAAOgAvAC8AZwBpAHQAaAB1AGIALQB3AGkAbgBkAG8AdwBzAC4AcwAzAC4AYQBtAGEA
+egBvAG4AYQB3AHMALgBjAG8AbQAvAEcAaQB0AEgAdQBiAC4AYQBwAHAAbABpAGMAYQB0AGkAbwBu
+ACAAcgBlAHMAdQBsAHQAZQBkACAAaQBuACAAZQB4AGMAZQBwAHQAaQBvAG4ALgAgAEYAbwBsAGwA
+bwB3AGkAbgBnACAAZgBhAGkAbAB1AHIAZQAgAG0AZQBzAHMAYQBnAGUAcwAgAHcAZQByAGUAIABk
+AGUAdABlAGMAdABlAGQAOgANAAoACQAJACsAIABUAGgAZQAgAHMAeQBzAHQAZQBtACAAYwBhAG4A
+bgBvAHQAIABmAGkAbgBkACAAdABoAGUAIABmAGkAbABlACAAcwBwAGUAYwBpAGYAaQBlAGQALgAg
+ACgARQB4AGMAZQBwAHQAaQBvAG4AIABmAHIAbwBtACAASABSAEUAUwBVAEwAVAA6ACAAMAB4ADgA
+MAAwADcAMAAwADAAMgApAA0ACgANAAoAQwBPAE0AUABPAE4ARQBOAFQAIABTAFQATwBSAEUAIABU
+AFIAQQBOAFMAQQBDAFQASQBPAE4AIABGAEEASQBMAFUAUgBFACAAUwBVAE0ATQBBAFIAWQANAAoA
+CQBOAG8AIAB0AHIAYQBuAHMAYQBjAHQAaQBvAG4AIABlAHIAcgBvAHIAIAB3AGEAcwAgAGQAZQB0
+AGUAYwB0AGUAZAAuAA0ACgANAAoAVwBBAFIATgBJAE4ARwBTAA0ACgAJAFQAaABlAHIAZQAgAHcA
+ZQByAGUAIABuAG8AIAB3AGEAcgBuAGkAbgBnAHMAIABkAHUAcgBpAG4AZwAgAHQAaABpAHMAIABv
+AHAAZQByAGEAdABpAG8AbgAuAA0ACgANAAoATwBQAEUAUgBBAFQASQBPAE4AIABQAFIATwBHAFIA
+RQBTAFMAIABTAFQAQQBUAFUAUwANAAoACQAqACAAWwAxADIALwAxADEALwAyADAAMQAzACAAMwA6
+ADMAMgA6ADMAOAAgAFAATQBdACAAOgAgAEEAYwB0AGkAdgBhAHQAaQBvAG4AIABvAGYAIABoAHQA
+dABwADoALwAvAGcAaQB0AGgAdQBiAC0AdwBpAG4AZABvAHcAcwAuAHMAMwAuAGEAbQBhAHoAbwBu
+AGEAdwBzAC4AYwBvAG0ALwBHAGkAdABIAHUAYgAuAGEAcABwAGwAaQBjAGEAdABpAG8AbgAgAGgA
+YQBzACAAcwB0AGEAcgB0AGUAZAAuAA0ACgANAAoARQBSAFIATwBSACAARABFAFQAQQBJAEwAUwAN
+AAoACQBGAG8AbABsAG8AdwBpAG4AZwAgAGUAcgByAG8AcgBzACAAdwBlAHIAZQAgAGQAZQB0AGUA
+YwB0AGUAZAAgAGQAdQByAGkAbgBnACAAdABoAGkAcwAgAG8AcABlAHIAYQB0AGkAbwBuAC4ADQAK
+AAkAKgAgAFsAMQAyAC8AMQAxAC8AMgAwADEAMwAgADMAOgAzADIAOgAzADkAIABQAE0AXQAgAFMA
+eQBzAHQAZQBtAC4ASQBPAC4ARgBpAGwAZQBOAG8AdABGAG8AdQBuAGQARQB4AGMAZQBwAHQAaQBv
+AG4ADQAKAAkACQAtACAAVABoAGUAIABzAHkAcwB0AGUAbQAgAGMAYQBuAG4AbwB0ACAAZgBpAG4A
+ZAAgAHQAaABlACAAZgBpAGwAZQAgAHMAcABlAGMAaQBmAGkAZQBkAC4AIAAoAEUAeABjAGUAcAB0
+AGkAbwBuACAAZgByAG8AbQAgAEgAUgBFAFMAVQBMAFQAOgAgADAAeAA4ADAAMAA3ADAAMAAwADIA
+KQANAAoACQAJAC0AIABTAG8AdQByAGMAZQA6ACAAUwB5AHMAdABlAG0ALgBEAGUAcABsAG8AeQBt
+AGUAbgB0AA0ACgAJAAkALQAgAFMAdABhAGMAawAgAHQAcgBhAGMAZQA6AA0ACgAJAAkACQBhAHQA
+IABTAHkAcwB0AGUAbQAuAEQAZQBwAGwAbwB5AG0AZQBuAHQALgBJAG4AdABlAHIAbgBhAGwALgBJ
+AHMAbwBsAGEAdABpAG8AbgAuAEkAcwBvAGwAYQB0AGkAbwBuAEkAbgB0AGUAcgBvAHAALgBHAGUA
+dABVAHMAZQByAFMAdABvAHIAZQAoAFUASQBuAHQAMwAyACAARgBsAGEAZwBzACwAIABJAG4AdABQ
+AHQAcgAgAGgAVABvAGsAZQBuACwAIABHAHUAaQBkACYAIAByAGkAaQBkACkADQAKAAkACQAJAGEA
+dAAgAFMAeQBzAHQAZQBtAC4ARABlAHAAbABvAHkAbQBlAG4AdAAuAEEAcABwAGwAaQBjAGEAdABp
+AG8AbgAuAEMAbwBtAHAAbwBuAGUAbgB0AFMAdABvAHIAZQAuAC4AYwB0AG8AcgAoAEMAbwBtAHAA
+bwBuAGUAbgB0AFMAdABvAHIAZQBUAHkAcABlACAAcwB0AG8AcgBlAFQAeQBwAGUALAAgAFMAdQBi
+AHMAYwByAGkAcAB0AGkAbwBuAFMAdABvAHIAZQAgAHMAdQBiAFMAdABvAHIAZQApAA0ACgAJAAkA
+CQBhAHQAIABTAHkAcwB0AGUAbQAuAEQAZQBwAGwAbwB5AG0AZQBuAHQALgBBAHAAcABsAGkAYwBh
+AHQAaQBvAG4ALgBTAHUAYgBzAGMAcgBpAHAAdABpAG8AbgBTAHQAbwByAGUALgAuAGMAdABvAHIA
+KABTAHQAcgBpAG4AZwAgAGQAZQBwAGwAbwB5AFAAYQB0AGgALAAgAFMAdAByAGkAbgBnACAAdABl
+AG0AcABQAGEAdABoACwAIABDAG8AbQBwAG8AbgBlAG4AdABTAHQAbwByAGUAVAB5AHAAZQAgAHMA
+dABvAHIAZQBUAHkAcABlACkADQAKAAkACQAJAGEAdAAgAFMAeQBzAHQAZQBtAC4ARABlAHAAbABv
+AHkAbQBlAG4AdAAuAEEAcABwAGwAaQBjAGEAdABpAG8AbgAuAFMAdQBiAHMAYwByAGkAcAB0AGkA
+bwBuAFMAdABvAHIAZQAuAGcAZQB0AF8AQwB1AHIAcgBlAG4AdABVAHMAZQByACgAKQANAAoACQAJ
+AAkAYQB0ACAAUwB5AHMAdABlAG0ALgBEAGUAcABsAG8AeQBtAGUAbgB0AC4AQQBwAHAAbABpAGMA
+YQB0AGkAbwBuAC4AQQBwAHAAbABpAGMAYQB0AGkAbwBuAEEAYwB0AGkAdgBhAHQAbwByAC4AUABl
+AHIAZgBvAHIAbQBEAGUAcABsAG8AeQBtAGUAbgB0AEEAYwB0AGkAdgBhAHQAaQBvAG4AKABVAHIA
+aQAgAGEAYwB0AGkAdgBhAHQAaQBvAG4AVQByAGkALAAgAEIAbwBvAGwAZQBhAG4AIABpAHMAUwBo
+AG8AcgB0AGMAdQB0ACwAIABTAHQAcgBpAG4AZwAgAHQAZQB4AHQAdQBhAGwAUwB1AGIASQBkACwA
+IABTAHQAcgBpAG4AZwAgAGQAZQBwAGwAbwB5AG0AZQBuAHQAUAByAG8AdgBpAGQAZQByAFUAcgBs
+AEYAcgBvAG0ARQB4AHQAZQBuAHMAaQBvAG4ALAAgAEIAcgBvAHcAcwBlAHIAUwBlAHQAdABpAG4A
+ZwBzACAAYgByAG8AdwBzAGUAcgBTAGUAdAB0AGkAbgBnAHMALAAgAFMAdAByAGkAbgBnACYAIABl
+AHIAcgBvAHIAUABhAGcAZQBVAHIAbAApAA0ACgAJAAkACQBhAHQAIABTAHkAcwB0AGUAbQAuAEQA
+ZQBwAGwAbwB5AG0AZQBuAHQALgBBAHAAcABsAGkAYwBhAHQAaQBvAG4ALgBBAHAAcABsAGkAYwBh
+AHQAaQBvAG4AQQBjAHQAaQB2AGEAdABvAHIALgBBAGMAdABpAHYAYQB0AGUARABlAHAAbABvAHkA
+bQBlAG4AdABXAG8AcgBrAGUAcgAoAE8AYgBqAGUAYwB0ACAAcwB0AGEAdABlACkADQAKAA0ACgBD
+AE8ATQBQAE8ATgBFAE4AVAAgAFMAVABPAFIARQAgAFQAUgBBAE4AUwBBAEMAVABJAE8ATgAgAEQA
+RQBUAEEASQBMAFMADQAKAAkATgBvACAAdAByAGEAbgBzAGEAYwB0AGkAbwBuACAAaQBuAGYAbwBy
+AG0AYQB0AGkAbwBuACAAaQBzACAAYQB2AGEAaQBsAGEAYgBsAGUALgANAAoADQAKAA==
+--===============1477317321900047435==--
 
