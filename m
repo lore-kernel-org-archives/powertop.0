@@ -1,51 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============6827676262164464402=="
+Content-Type: multipart/mixed; boundary="===============2712615806895257925=="
 MIME-Version: 1.0
-From: Joerg Mayer <jmpt at loplof.de>
-Subject: Re: [Powertop] Fix out of tree builds [Was: PowerTOP v2.6.1 released]
-Date: Thu, 05 Jun 2014 01:39:32 +0200
-Message-ID: <20140604233932.GH39023@rhrk.uni-kl.de>
-In-Reply-To: 62350.10.24.5.211.1401916818.squirrel@linux.intel.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] Using Git Hub for powertop in Linux
+Date: Fri, 13 Dec 2013 10:08:18 -0800
+Message-ID: <49270.10.7.198.57.1386958098.squirrel@linux.intel.com>
+In-Reply-To: F9A26558D30ED241A8204F06F994726025801959@BGSMSX102.gar.corp.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6827676262164464402==
+--===============2712615806895257925==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hallo  Alexandra,
 
-On Wed, Jun 04, 2014 at 02:20:18PM -0700, Alexandra Yates wrote:
-> Unfortunately the patches you sent don't fix the issue.  Here is how to
-> reproduced the issue:
-> 1- Applied your patches.
-> 2- Generated an new dist/tarball,
-> 3- Untared on different location
-> 4- Executed: ./autogen; ./configure; make; make clean; make
-> =
+> Hi ,
+>    I tried to download the latest powertop sources using this command in
+> my linux machine. Can you please point me to the contact for granting
+> me access to the repo?
+>
+> git clone git(a)github.com:fer/powertop.git
+>
+>
+>
+> [cid:image001.png(a)01CEF84C.2CA1D790]
+>
+> I need to use Git and eclipse to analyze the code structure and the web
+> based interface is not much helpful for this.
+> So can you please point out the steps for integrating gitHub with eclipse?
+> regards
+> Adrip
+>
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>
+Hi Adrip,
 
-> The error still points that /bin/bash: ./csstoh.sh: No such file or direc=
-tory
+You can clone powertop on your local linux machine using:
 
-> make[2]: Entering directory `/home/magd/Downloads/powertop-2.6.1/src'
-> /bin/bash ./csstoh.sh ./powertop.css css.h
-> /bin/bash: ./csstoh.sh: No such file or directory
+git clone git://github.com/fenrus75/powertop.git
 
-Luckily you included your workflow - it contains a bug. As you can see the
-system has not picked up the new path (the text ./csstoh.sh no longer exists
-in the source). Correct order would be:
-1- apply patches
-2- ./autogen && ./configure
-3- make distcheck
-4- cp powertop-2.6.1.tar.gz <wherever>
+Thank you,
+Alexandra.
 
-Ciao
-   J=C3=B6rg
--- =
-
-Joerg Mayer                                           <jmayer(a)loplof.de>
-We are stuck with technology when what we really want is just stuff that
-works. Some say that should read Microsoft instead of technology.
-
---===============6827676262164464402==--
+--===============2712615806895257925==--
 
