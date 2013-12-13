@@ -1,55 +1,77 @@
-Content-Type: multipart/mixed; boundary="===============2438172233981437759=="
+Content-Type: multipart/mixed; boundary="===============4049626646377414377=="
 MIME-Version: 1.0
-From: thibaut bethune <thibaut.bethune at gmail.com>
-Subject: [Powertop] Settings modified from Powertop are not persistent
-Date: Wed, 22 Jan 2014 12:15:56 +0100
-Message-ID: <CAACN17h=DqX7XU7h+X-jONngb4qmUgQYoZDBHtGdCqEbByjNYg@mail.gmail.com>
+From: Mukherjee, Adrip <adrip.mukherjee at intel.com>
+Subject: [Powertop] Building and installing Powertop for Android
+Date: Fri, 13 Dec 2013 13:22:14 +0000
+Message-ID: <F9A26558D30ED241A8204F06F9947260258018D3@BGSMSX102.gar.corp.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2438172233981437759==
+--===============4049626646377414377==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Thanks Auke. So now I have been able to build the powertop binary and run i=
+t in Linux system. In order to run it in Android platform what needs to be =
+done differently. How can I use the Android.mk file provided with the relea=
+se? Could not find any documentation on that.
 
-I'm using Powertop with root privilege on Debian GNU/Linux 64 bits
-with my Core i3-3225.
+regards
+Adrip
 
-Although I modify settings to follow advices given by Powertop, each
-time I restart my computer these settings are restored !
 
-Thes settings are :
+--===============4049626646377414377==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
-Bad VM writeback timeout
-Bad NMI watchdog should be turned off
-Bad Enable Audio codec power management
-Bad Enable SATA link power Managmenet for host4
-Bad Enable SATA link power Managmenet for host5
-Bad Enable SATA link power Managmenet for host2
-Bad Enable SATA link power Managmenet for host3
-Bad Enable SATA link power Managmenet for host0
-Bad Enable SATA link power Managmenet for host1
-Bad Autosuspend for USB device USB Keyboard [CHESEN]
-Bad Runtime PM for PCI Device Intel Corporation Xeon E3-1200 v2/3rd
-Bad Runtime PM for PCI Device Intel Corporation 7 Series/C210 Serie
-Bad Runtime PM for PCI Device Intel Corporation 7 Series/C210 Serie
-Bad Runtime PM for PCI Device Intel Corporation 7 Series/C210 Serie
-Bad Runtime PM for PCI Device ASMedia Technology Inc. ASM1083/1085
-Bad Runtime PM for PCI Device Realtek Semiconductor Co., Ltd. RTL81
-Bad Runtime PM for PCI Device Intel Corporation 7 Series/C210 Serie
-Bad Runtime PM for PCI Device Intel Corporation 7 Series/C210 Serie
-Bad Runtime PM for PCI Device Intel Corporation 82801 PCI Bridge
-Bad Runtime PM for PCI Device Intel Corporation H77 Express Chipset
-Bad Runtime PM for PCI Device Intel Corporation 7 Series/C210 Serie
-Bad Runtime PM for PCI Device Intel Corporation 7 Series/C210 Serie
-Bad Runtime PM for PCI Device Intel Corporation 7 Series/C210 Serie
-Bad Runtime PM for PCI Device Intel Corporation Xeon E3-1200 v2/3rd
-Bad Runtime PM for PCI Device Intel Corporation 7 Series/C210 Serie
-Bad Wake-on-lan status for device eth0
+PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
+bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
+YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
+cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
+VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
+bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
+ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTQgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
+PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseTpDYWxp
+YnJpOwoJcGFub3NlLTE6MiAxNSA1IDIgMiAyIDQgMyAyIDQ7fQpAZm9udC1mYWNlCgl7Zm9udC1m
+YW1pbHk6QW5kYWx1czsKCXBhbm9zZS0xOjIgMiA2IDMgNSA0IDUgMiAzIDQ7fQpAZm9udC1mYWNl
+Cgl7Zm9udC1mYW1pbHk6Vml2YWxkaTsKCXBhbm9zZS0xOjMgMiA2IDIgNSA1IDYgOSA4IDQ7fQov
+KiBTdHlsZSBEZWZpbml0aW9ucyAqLwpwLk1zb05vcm1hbCwgbGkuTXNvTm9ybWFsLCBkaXYuTXNv
+Tm9ybWFsCgl7bWFyZ2luOjBpbjsKCW1hcmdpbi1ib3R0b206LjAwMDFwdDsKCWZvbnQtc2l6ZTox
+MS4wcHQ7Cglmb250LWZhbWlseToiQ2FsaWJyaSIsInNhbnMtc2VyaWYiO30KYTpsaW5rLCBzcGFu
+Lk1zb0h5cGVybGluawoJe21zby1zdHlsZS1wcmlvcml0eTo5OTsKCWNvbG9yOmJsdWU7Cgl0ZXh0
+LWRlY29yYXRpb246dW5kZXJsaW5lO30KYTp2aXNpdGVkLCBzcGFuLk1zb0h5cGVybGlua0ZvbGxv
+d2VkCgl7bXNvLXN0eWxlLXByaW9yaXR5Ojk5OwoJY29sb3I6cHVycGxlOwoJdGV4dC1kZWNvcmF0
+aW9uOnVuZGVybGluZTt9CnNwYW4uRW1haWxTdHlsZTE3Cgl7bXNvLXN0eWxlLXR5cGU6cGVyc29u
+YWwtY29tcG9zZTsKCWZvbnQtZmFtaWx5OiJBbmRhbHVzIiwic2VyaWYiOwoJY29sb3I6d2luZG93
+dGV4dDsKCWZvbnQtd2VpZ2h0Om5vcm1hbDsKCWZvbnQtc3R5bGU6bm9ybWFsO30KLk1zb0NocERl
+ZmF1bHQKCXttc28tc3R5bGUtdHlwZTpleHBvcnQtb25seTsKCWZvbnQtZmFtaWx5OiJDYWxpYnJp
+Iiwic2Fucy1zZXJpZiI7fQouTXNvUGFwRGVmYXVsdAoJe21zby1zdHlsZS10eXBlOmV4cG9ydC1v
+bmx5OwoJbXNvLW1hcmdpbi10b3AtYWx0OmF1dG87Cgltc28tbWFyZ2luLWJvdHRvbS1hbHQ6YXV0
+bzt9CkBwYWdlIFdvcmRTZWN0aW9uMQoJe3NpemU6OC41aW4gMTEuMGluOwoJbWFyZ2luOjEuMGlu
+IDEuMGluIDEuMGluIDEuMGluO30KZGl2LldvcmRTZWN0aW9uMQoJe3BhZ2U6V29yZFNlY3Rpb24x
+O30KLS0+PC9zdHlsZT48IS0tW2lmIGd0ZSBtc28gOV0+PHhtbD4KPG86c2hhcGVkZWZhdWx0cyB2
+OmV4dD0iZWRpdCIgc3BpZG1heD0iMTAyNiIgLz4KPC94bWw+PCFbZW5kaWZdLS0+PCEtLVtpZiBn
+dGUgbXNvIDldPjx4bWw+CjxvOnNoYXBlbGF5b3V0IHY6ZXh0PSJlZGl0Ij4KPG86aWRtYXAgdjpl
+eHQ9ImVkaXQiIGRhdGE9IjEiIC8+CjwvbzpzaGFwZWxheW91dD48L3htbD48IVtlbmRpZl0tLT4K
+PC9oZWFkPgo8Ym9keSBsYW5nPSJFTi1VUyIgbGluaz0iYmx1ZSIgdmxpbms9InB1cnBsZSI+Cjxk
+aXYgY2xhc3M9IldvcmRTZWN0aW9uMSI+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPlRoYW5rcyBBdWtl
+LiBTbyBub3cgSSBoYXZlIGJlZW4gYWJsZSB0byBidWlsZCB0aGUgcG93ZXJ0b3AgYmluYXJ5IGFu
+ZCBydW4gaXQgaW4gTGludXggc3lzdGVtLiBJbiBvcmRlciB0byBydW4gaXQgaW4gQW5kcm9pZCBw
+bGF0Zm9ybSB3aGF0IG5lZWRzIHRvIGJlIGRvbmUgZGlmZmVyZW50bHkuIEhvdyBjYW4gSSB1c2Ug
+dGhlIEFuZHJvaWQubWsgZmlsZSBwcm92aWRlZCB3aXRoIHRoZSByZWxlYXNlPyBDb3VsZCBub3QK
+IGZpbmQgYW55IGRvY3VtZW50YXRpb24gb24gdGhhdC48c3BhbiBzdHlsZT0iZm9udC1zaXplOjEy
+LjBwdDtmb250LWZhbWlseTomcXVvdDtBbmRhbHVzJnF1b3Q7LCZxdW90O3NlcmlmJnF1b3Q7Ij48
+bzpwPjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJm
+b250LXNpemU6MTIuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0FuZGFsdXMmcXVvdDssJnF1b3Q7c2Vy
+aWYmcXVvdDsiPjxvOnA+Jm5ic3A7PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1h
+bCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxNC4wcHQ7Zm9udC1mYW1pbHk6Vml2YWxkaTtjb2xv
+cjojNDAzMTUyIj5yZWdhcmRzPG86cD48L286cD48L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9y
+bWFsIj48c3BhbiBzdHlsZT0iZm9udC1zaXplOjE0LjBwdDtmb250LWZhbWlseTpWaXZhbGRpO2Nv
+bG9yOiM0MDMxNTIiPkFkcmlwPG86cD48L286cD48L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9y
+bWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPC9kaXY+CjwvYm9keT4KPC9odG1sPgo=
 
-Thanks !
-
---===============2438172233981437759==--
+--===============4049626646377414377==--
 
