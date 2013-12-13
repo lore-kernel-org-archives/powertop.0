@@ -1,92 +1,100 @@
-Content-Type: multipart/mixed; boundary="===============3482922359775313189=="
+Content-Type: multipart/mixed; boundary="===============2931219356807824366=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH v3 06/31] report-html: summary list and
- navigation
-Date: Tue, 10 Dec 2013 22:53:41 +0300
-Message-ID: <20131210195341.GA2422@swordfish>
-In-Reply-To: 1384806442-20294-7-git-send-email-alexandra.yates@linux.intel.com
+From: Kristen Carlson Accardi <kristen at linux.intel.com>
+Subject: Re: [Powertop] [PATCH v3 29/31] tunables: removed on-demand cpu
+ frequency governor
+Date: Fri, 13 Dec 2013 10:43:49 -0800
+Message-ID: <20131213104349.47f57798@kcaccard-desk.amr.corp.intel.com>
+In-Reply-To: 20131210202752.GE2422@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3482922359775313189==
+--===============2931219356807824366==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (11/18/13 12:26), Alexandra Yates wrote:
-> Generates the html tags to add navigation and summary including css
-> attribute support.
+On Tue, 10 Dec 2013 23:27:52 +0300
+Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com> wrote:
+
+> On (11/18/13 12:27), Alexandra Yates wrote:
+> > Remove suggestion to use the on-demand cpu frequency governor from
+> > PowerTOP tunables as that is no longer a good suggestion since the
+> > P-State driver is the Intel recommended replacement.
 > =
 
-> Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
-> ---
->  src/report/report-formatter-html.cpp |   18 ++++++++++++++++++
->  src/report/report-formatter-html.h   |    2 ++
->  2 files changed, 20 insertions(+)
+> I need to think about it.
 > =
 
-> diff --git a/src/report/report-formatter-html.cpp b/src/report/report-for=
-matter-html.cpp
-> index 2e59725..93a4c48 100644
-> --- a/src/report/report-formatter-html.cpp
-> +++ b/src/report/report-formatter-html.cpp
-> @@ -516,3 +516,21 @@ report_formatter_html::add_title(struct tag_attr *ti=
-tle_att, const char *title)
->  	addf_exact("<h2 class=3D\"%s\"> %s </h2>\n", title_att->css_class, titl=
-e);
->  }
->  =
-
-> +void
-> +report_formatter_html::add_navigation()
-> +{
-> +	add_exact("<br/><nav id=3D\"main_menu\"> </nav>\n");
-> +}
-> +
-> +void
-> +report_formatter_html::add_summary_list(std::string *list, int size)
-> +{
-> +	int i;
-> +	add_exact("<div><br/> <ul>\n");
-> +	for (i=3D0; i < size; i+=3D2){
-
-
-summary list is guaranteed to contain `2 * n' elements?
-
-	-ss
-
-> +		addf_exact("<li class=3D\"summary_list\"> <b> %s </b> %s </li>",
-> +				list[i].c_str(), list[i+1].c_str());
-> +	}
-> +	add_exact("</ul> </div> <br />\n");
-> +}
-> +
-> diff --git a/src/report/report-formatter-html.h b/src/report/report-forma=
-tter-html.h
-> index 0f508d3..261e0dd 100644
-> --- a/src/report/report-formatter-html.h
-> +++ b/src/report/report-formatter-html.h
-> @@ -89,6 +89,8 @@ public:
->  	void add_div(struct tag_attr *div_attr);
->  	void end_div();
->  	void add_title(struct tag_attr *title_att, const char *title);
-> +	void add_navigation();
-> +	void add_summary_list(std::string *list, int size);
->  =
-
->  private:
->  	/* Document structure related functions */
-> -- =
-
-> 1.7.9.5
+> IIRC, in this email
+> https://lists.01.org/pipermail/powertop/2013-September/000952.html
 > =
 
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
+> Christian Krause wrote:
+> =
 
---===============3482922359775313189==--
+> >
+> >tunables show:
+> >
+> >    Bad           Using 'ondemand' cpufreq governor
+> >
+> >but: I don't have a ondemand cpufreq governor -- that is what I just fou=
+nd out: since some kernel
+> >versions ago the intel_pstate driver is the default for my cpu:
+> >
+> >    # zgrep PSTATE /proc/config.gz
+> >    CONFIG_X86_INTEL_PSTATE=3Dy
+> >
+> >    # cat /sys/devices/system/cpu/cpu[0-9]*/cpufreq/scaling_driver
+> >    intel_pstate
+> >    intel_pstate
+> >    intel_pstate
+> >    intel_pstate
+> >
+> =
+
+> =
+
+> =
+
+> I'm not really sure why we delete cpufreq code and kill this feature.
+> =
+
+> =
+
+> =
+
+> for example:
+> =
+
+> $ cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors
+> ondemand performance
+> =
+
+> $ cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+> performance
+> =
+
+> =
+
+> =
+
+> powertop can help here
+> =
+
+> =
+
+> 	-ss
+> =
+
+
+Actually, in most cases using performance would be preferred over
+ondemand unless you are on ancient hardware.  You may be interested in
+reading this article which sort of summarizes the situation.
+
+http://www.phoronix.com/scan.php?page=3Dnews_item&px=3DMTM3NDQ
+
+
+
+--===============2931219356807824366==--
 
