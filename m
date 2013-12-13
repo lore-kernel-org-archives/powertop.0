@@ -1,49 +1,73 @@
-Content-Type: multipart/mixed; boundary="===============7523470329561777017=="
+Content-Type: multipart/mixed; boundary="===============1276966894532713894=="
 MIME-Version: 1.0
-From: Joerg Mayer <jmpt at loplof.de>
-Subject: Re: [Powertop] [Announce] PowerTOP v2.6.1 released
-Date: Wed, 28 May 2014 11:43:30 +0200
-Message-ID: <20140528094330.GD615@rhrk.uni-kl.de>
-In-Reply-To: 55204.10.24.1.189.1401211484.squirrel@linux.intel.com
+From: Srinivas Pandruvada <srinivas.pandruvada at linux.intel.com>
+Subject: Re: [Powertop] Building and installing Powertop for Android
+Date: Fri, 13 Dec 2013 08:06:59 -0800
+Message-ID: <52AB30A3.7040904@linux.intel.com>
+In-Reply-To: F9A26558D30ED241A8204F06F9947260258018D3@BGSMSX102.gar.corp.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7523470329561777017==
+--===============1276966894532713894==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 27, 2014 at 10:24:44AM -0700, Alexandra Yates wrote:
-> > Also it is not possible to compile it after running:
-> > $ make clean
-> >
-> > It seems csstoh.sh script is missing
+On 12/13/2013 05:22 AM, Mukherjee, Adrip wrote:
+> Thanks Auke. So now I have been able to build the powertop binary and run=
+ it in Linux system. In order to run it in Android platform what needs to b=
+e done differently. How can I use the Android.mk file provided with the rel=
+ease? Could not find any documentation on that.
+Android OTC repo contains powertop under "external" folder. This may be =
 
-I've had this patch in my tree for at least some months...
+older version, but you can merge the latest version.
 
-Ciao
-     J=C3=B6rg
--- =
+Thanks,
+Srinivas
+> regards
+> Adrip
+>
+>
+>
+>
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
 
-Joerg Mayer                                           <jmayer(a)loplof.de>
-We are stuck with technology when what we really want is just stuff that
-works. Some say that should read Microsoft instead of technology.
 
---===============7523470329561777017==
-Content-Type: text/x-diff
+--===============1276966894532713894==
+Content-Type: text/html
 MIME-Version: 1.0
 Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="csstoh.sh.patch"
+Content-Disposition: attachment; filename="attachment.html"
 
-Rml4IGJ1aWxkIGluIGEgY2xlYW4gdHJlZQoKU2lnbmVkLW9mZi1ieTogSm9lcmcgTWF5ZXIgPGpt
-YXllckBsb3Bsb2YuZGU+CgpkaWZmIC0tZ2l0IGEvc3JjL01ha2VmaWxlLmFtIGIvc3JjL01ha2Vm
-aWxlLmFtCmluZGV4IDBmZTNjMDQuLjYwNWYyODUgMTAwNjQ0Ci0tLSBhL3NyYy9NYWtlZmlsZS5h
-bQorKysgYi9zcmMvTWFrZWZpbGUuYW0KQEAgLTUwLDUgKzUwLDUgQEAgQU1fTERGTEFHUyA9ICQo
-TElCUykgJChOQ1VSU0VTX0xJQlMpICQoUENJVVRJTFNfTElCUykgJChMSUJOTF9MSUJTKSAkKExJ
-QlpfTElCUykKIEJVSUxUX1NPVVJDRVMgPSBjc3MuaAogQ0xFQU5GSUxFUyA9IGNzcy5oCiBjc3Mu
-aDogcG93ZXJ0b3AuY3NzCi0JJChTSEVMTCkgLi9jc3N0b2guc2ggcG93ZXJ0b3AuY3NzIGNzcy5o
-CisJJChTSEVMTCkgJHtzcmNkaXJ9L2Nzc3RvaC5zaCAke3NyY2Rpcn0vcG93ZXJ0b3AuY3NzIGNz
-cy5oCiAK
+PGh0bWw+CiAgPGhlYWQ+CiAgICA8bWV0YSBjb250ZW50PSJ0ZXh0L2h0bWw7IGNoYXJzZXQ9SVNP
+LTg4NTktMSIKICAgICAgaHR0cC1lcXVpdj0iQ29udGVudC1UeXBlIj4KICA8L2hlYWQ+CiAgPGJv
+ZHkgYmdjb2xvcj0iI0ZGRkZGRiIgdGV4dD0iIzAwMDAwMCI+CiAgICA8ZGl2IGNsYXNzPSJtb3ot
+Y2l0ZS1wcmVmaXgiPk9uIDEyLzEzLzIwMTMgMDU6MjIgQU0sIE11a2hlcmplZSwKICAgICAgQWRy
+aXAgd3JvdGU6PGJyPgogICAgPC9kaXY+CiAgICA8YmxvY2txdW90ZQpjaXRlPSJtaWQ6RjlBMjY1
+NThEMzBFRDI0MUE4MjA0RjA2Rjk5NDcyNjAyNTgwMThEM0BCR1NNU1gxMDIuZ2FyLmNvcnAuaW50
+ZWwuY29tIgogICAgICB0eXBlPSJjaXRlIj4KICAgICAgPHByZSB3cmFwPSIiPlRoYW5rcyBBdWtl
+LiBTbyBub3cgSSBoYXZlIGJlZW4gYWJsZSB0byBidWlsZCB0aGUgcG93ZXJ0b3AgYmluYXJ5IGFu
+ZCBydW4gaXQgaW4gTGludXggc3lzdGVtLiBJbiBvcmRlciB0byBydW4gaXQgaW4gQW5kcm9pZCBw
+bGF0Zm9ybSB3aGF0IG5lZWRzIHRvIGJlIGRvbmUgZGlmZmVyZW50bHkuIEhvdyBjYW4gSSB1c2Ug
+dGhlIEFuZHJvaWQubWsgZmlsZSBwcm92aWRlZCB3aXRoIHRoZSByZWxlYXNlPyBDb3VsZCBub3Qg
+ZmluZCBhbnkgZG9jdW1lbnRhdGlvbiBvbiB0aGF0Lgo8L3ByZT4KICAgIDwvYmxvY2txdW90ZT4K
+ICAgIEFuZHJvaWQgT1RDIHJlcG8gY29udGFpbnMgcG93ZXJ0b3AgdW5kZXIgImV4dGVybmFsIiBm
+b2xkZXIuIFRoaXMgbWF5CiAgICBiZSBvbGRlciB2ZXJzaW9uLCBidXQgeW91IGNhbiBtZXJnZSB0
+aGUgbGF0ZXN0IHZlcnNpb24uPGJyPgogICAgPGJyPgogICAgVGhhbmtzLDxicj4KICAgIFNyaW5p
+dmFzPGJyPgogICAgPGJsb2NrcXVvdGUKY2l0ZT0ibWlkOkY5QTI2NTU4RDMwRUQyNDFBODIwNEYw
+NkY5OTQ3MjYwMjU4MDE4RDNAQkdTTVNYMTAyLmdhci5jb3JwLmludGVsLmNvbSIKICAgICAgdHlw
+ZT0iY2l0ZSI+CiAgICAgIDxwcmUgd3JhcD0iIj4KcmVnYXJkcwpBZHJpcAoKCjwvcHJlPgogICAg
+ICA8YnI+CiAgICAgIDxmaWVsZHNldCBjbGFzcz0ibWltZUF0dGFjaG1lbnRIZWFkZXIiPjwvZmll
+bGRzZXQ+CiAgICAgIDxicj4KICAgICAgPHByZSB3cmFwPSIiPl9fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fClBvd2VyVG9wIG1haWxpbmcgbGlzdAo8YSBjbGFz
+cz0ibW96LXR4dC1saW5rLWFiYnJldmlhdGVkIiBocmVmPSJtYWlsdG86UG93ZXJUb3BAbGlzdHMu
+MDEub3JnIj5Qb3dlclRvcEBsaXN0cy4wMS5vcmc8L2E+CjxhIGNsYXNzPSJtb3otdHh0LWxpbmst
+ZnJlZXRleHQiIGhyZWY9Imh0dHBzOi8vbGlzdHMuMDEub3JnL21haWxtYW4vbGlzdGluZm8vcG93
+ZXJ0b3AiPmh0dHBzOi8vbGlzdHMuMDEub3JnL21haWxtYW4vbGlzdGluZm8vcG93ZXJ0b3A8L2E+
+CjwvcHJlPgogICAgPC9ibG9ja3F1b3RlPgogICAgPGJyPgogIDwvYm9keT4KPC9odG1sPgo=
 
---===============7523470329561777017==--
+--===============1276966894532713894==--
 
