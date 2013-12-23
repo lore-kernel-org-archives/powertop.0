@@ -1,45 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============1117335285963605175=="
+Content-Type: multipart/mixed; boundary="===============4969288603434989761=="
 MIME-Version: 1.0
-From: Magnus Fromreide <magfr at lysator.liu.se>
-Subject: [Powertop] [PATCH] Allow compilation with C++11
-Date: Thu, 08 May 2014 08:45:48 +0200
-Message-ID: <20140508064548.GA19338@sara.home>
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] bt_tunable: Translate Good, Bad, Unknown
+Date: Mon, 23 Dec 2013 12:18:15 -0800
+Message-ID: <60337.10.252.135.84.1387829895.squirrel@linux.intel.com>
+In-Reply-To: 1387809519-16695-1-git-send-email-themineo@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1117335285963605175==
+--===============4969288603434989761==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-In C++11 "string"Identifier is seen as a user-defined literal. Add a space =
-to
-make it clear that this isn't what is meant here.
+> Signed-off-by: Wieland Hoffmann <themineo(a)gmail.com>
+> ---
+>  src/tuning/bluetooth.cpp | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/src/tuning/bluetooth.cpp b/src/tuning/bluetooth.cpp
+> index e0bdf12..2b34277 100644
+> --- a/src/tuning/bluetooth.cpp
+> +++ b/src/tuning/bluetooth.cpp
+> @@ -43,7 +43,7 @@
+>  #include "../lib.h"
+>  #include "bluetooth.h"
+>
+> -bt_tunable::bt_tunable(void) : tunable("", 1.0, "Good", "Bad", "Unknown")
+> +bt_tunable::bt_tunable(void) : tunable("", 1.0, _("Good"), _("Bad"),
+> _("Unknown"))
+>  {
+>  	sprintf(desc, _("Bluetooth device interface status"));
+>  	strcpy(toggle_bad, "/usr/sbin/hciconfig hci0 up &> /dev/null &");
+> --
+> 1.8.4.2
+>
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>
+Hi Wieland,
 
-Signed-off-by: Magnus Fromreide <magfr(a)lysator.liu.se>
----
- src/lib.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thank you for your patch.  I just applied it.
 
-diff --git a/src/lib.h b/src/lib.h
-index adcc4a2..1777a36 100644
---- a/src/lib.h
-+++ b/src/lib.h
-@@ -35,7 +35,7 @@
- =
+Thank you,
+Alexandra.
 
- #define _(STRING)    gettext(STRING)
- =
-
--#define POWERTOP_VERSION "v"PACKAGE_VERSION
-+#define POWERTOP_VERSION "v" PACKAGE_VERSION
- #define POWERTOP_SHORT_VERSION PACKAGE_VERSION
- =
-
- extern int is_turbo(uint64_t freq, uint64_t max, uint64_t maxmo);
--- =
-
-2.0.0.rc0
-
---===============1117335285963605175==--
+--===============4969288603434989761==--
 
