@@ -1,88 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============3938779089649447545=="
+Content-Type: multipart/mixed; boundary="===============3996219608580571805=="
 MIME-Version: 1.0
-From: Kalowsky, Daniel <daniel.kalowsky at intel.com>
-Subject: Re: [Powertop] segmentation fault when shutting
-Date: Wed, 14 May 2014 19:26:07 +0000
-Message-ID: <4628F0C61321354285DF2950999754456DF9880F@ORSMSX114.amr.corp.intel.com>
-In-Reply-To: 58306.10.24.2.65.1399936957.squirrel@linux.intel.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] 64bit-portability-issue
+Date: Sat, 28 Dec 2013 15:43:10 +0100
+Message-ID: <52BEE37E.1060600@linux.intel.com>
+In-Reply-To: 52BED799.3020805@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3938779089649447545==
+--===============3996219608580571805==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Not all patches are at fault here so reverting the entire series seems shor=
-t sighted.  Even the patch in question isn't causing issues on all platform=
-s.  =
-
-
-
------Original Message-----
-From: Alexandra Yates [mailto:alexandra.yates(a)linux.intel.com] =
-
-Sent: Monday, May 12, 2014 4:23 PM
-To: powertop(a)lists.01.org
-Cc: Kalowsky, Daniel
-Subject: Re: [Powertop] segmentation fault when shutting
-
-> On (05/09/14 00:22), Martin Ziegler wrote:
->> The bisection resulted in
->>
->> commit 5f5976f8b42e4e4717f2d573cf43cb87ccd88fa2
->> Author: Dan Kalowsky <daniel.kalowsky(a)intel.com>
->> Date:   Tue Apr 29 15:55:31 2014 -0700
->>
->>     Adding a clean_shutdown function
->>
->>     Function is designed to be a on stop place to clean up
->>     the entire application at shutdown time.
->>
->> as the first bad commit.
->>
+On 12/28/2013 2:52 PM, denisart benjamin2 wrote:
 >
-> thanks, Martin.
+> Hello everyone,
 >
-> yes... well
+> I'm a openSUSE maintainer and I have an issue with powertop 2.5 about
+> implicit implementation, classic stdio.h,... Obviously, I tried to patch
+> event-parce.c but it doesn't work
 >
-> a) clean_shutdown() calls close_display() which iterates =
-
-> tab_windows[tab_names[i]] and deletes every tab_window. the problem is =
-
-> that prior to
-> close_display() main executes clear_tuning(), which [surprise =
-
-> surprise] does `delete tune_window' since commit
-> eb08d4480969c8e48347c7621bd96dc248ee2138
-> ("Remove another memory leak") , whilst tab_windows[tab_names[i]] =
-
-> still holds a pointer which we just secretly free()-d. so this is =
-
-> double free().
-> and it has no other option (and will never have) than to crash.
+> I: Program is using implicit definitions of functions getting
+>     pointers or implemented by macros. These functions need to use their
+>     correct prototypes to allow correct argument passing on e.g. x86_64 .
+>     - Implicit memory/string functions need #include <string.h>.
+>     - Implicit *printf functions need #include <stdio.h>.
+>     - Implicit *printf functions need #include <stdio.h>.
+>     - Implicit *read* functions need #include <unistd.h>.
+>     - Implicit *recv* functions need #include <sys/socket.h>.
+> W: powertop implicit-pointer-decl event-parse.c:856
+> E: powertop 64bit-portability-issue event-parse.c:5120
 >
-> this obviously has not been tested before push.
->
->
-> b) there is no point in free()-ing memory which will be free()-d =
+adding Steve since this is his upstream code...
 
-> anyway, because we exit() the program.
->
-> 	-ss
->
+btw this code will be a standalone upstream library very soon...
+... I assume OpenSUSE will include this library ?
 
-Martin, thank you for reporting and bisecting the culprit.
 
-Sergey, thank you for poking the issues.
-
-Dan, please fix the patches and resend them.  They will be included after r=
-elease 2.6 is completed.
-
-I reverted Dan Kalowsky's patches.
-
-Thank you,
-Alexandra.
-
---===============3938779089649447545==--
+--===============3996219608580571805==--
 
