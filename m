@@ -1,77 +1,92 @@
-Content-Type: multipart/mixed; boundary="===============6550149130864593284=="
+Content-Type: multipart/mixed; boundary="===============9192827886378705604=="
 MIME-Version: 1.0
-From: Wout Mertens <wout.mertens at gmail.com>
-Subject: Re: [Powertop] HIgh power concumption on network interface
-Date: Wed, 19 Feb 2014 10:13:48 +0100
-Message-ID: <CAO3V83KaAWbeeDyW6vOMFihmpk2JNGa-6XQuChUGPW2fpDYqqg@mail.gmail.com>
+From: Mukherjee, Adrip <adrip.mukherjee at intel.com>
+Subject: [Powertop] SAS document for Powertop 2.5
+Date: Sat, 28 Dec 2013 06:37:29 +0000
+Message-ID: <F9A26558D30ED241A8204F06F9947260258043A4@BGSMSX102.gar.corp.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6550149130864593284==
+--===============9192827886378705604==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-kingma at bluewin.ch wrote on Wed Feb 12 23:32:27 PST 2014:
+Hi,
+     Does anyone has the SAS document for the powertop tool? Currently I am=
+ going through the implementation details and it will be helpful to have th=
+e spec to understand the design. Also few other queries which I came across:
+- how powertop retrieves the C state counters?
+- how to use the tuning option? In the GUI there is a separate tab for this=
+ and I can see GOOD and BAD values associated with every entry. How to inte=
+rpret this information?
 
-> I observe a sustained high power consumption of 5- 10 W on the ehternet
-adaptor e1000e on a lenovo thinkgpad t430s. Such I high power drain cannot
-be correct can it? the total power consumption is around 25 W which is a
-concern for battery life.
+regards
+Adrip
 
-I'm noticing the same thing on my Dell Latitude E6540. It also has an e1000
-and powertop reports it as being the highest consumer, at around 15W. When
-I unplug the system, the battery reports a drain of about 20W while idle
-which is pretty bad IMHO. With the 68Wh battery it translates to about 2.5
-hours battery life.
 
-Lowest I've seen for battery drain is 14W, with the screen at lowest
-brightness, Google Chrome turned off, disk spun down. I'm using the
-built-in Intel graphics and the system has 16GB of ram and a quad-core i7.
-
-I never ran windows on this laptop so I don't know what to expect but
-reviews are claiming 7+ hours on the 90Wh battery. That would mean an
-average of 13W, while doing actual work.
-
-So I'm really wondering: Is the e1000 really eating up 15W or is powertop
-misreporting?
-
-I already calibrated powertop, without a change.
-
-Wout.
-
---===============6550149130864593284==
+--===============9192827886378705604==
 Content-Type: text/html
 MIME-Version: 1.0
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="attachment.html"
 
-PGRpdiBkaXI9Imx0ciI+a2luZ21hIGF0IDxhIGhyZWY9Imh0dHA6Ly9ibHVld2luLmNoIiB0YXJn
-ZXQ9Il9ibGFuayI+Ymx1ZXdpbi5jaDwvYT4gd3JvdGUgb24gV2VkIEZlYiAxMiAyMzozMjoyNyBQ
-U1QgMjAxNDo8ZGl2Pjxicj48L2Rpdj48ZGl2PiZndDsgSSBvYnNlcnZlIGEgc3VzdGFpbmVkIGhp
-Z2ggcG93ZXIgY29uc3VtcHRpb24gb2YgNS0gMTAgVyBvbiB0aGUgZWh0ZXJuZXQgYWRhcHRvciBl
-MTAwMGUgb24gYSBsZW5vdm8gdGhpbmtncGFkIHQ0MzBzLiBTdWNoIEkgaGlnaCBwb3dlciBkcmFp
-biBjYW5ub3QgYmUgY29ycmVjdCBjYW4gaXQ/IHRoZSB0b3RhbCBwb3dlciBjb25zdW1wdGlvbiBp
-cyBhcm91bmQgMjUgVyB3aGljaCBpcyBhIGNvbmNlcm4gZm9yIGJhdHRlcnkgbGlmZS48L2Rpdj4K
-CjxkaXY+PGJyPjwvZGl2PjxkaXY+SSYjMzk7bSBub3RpY2luZyB0aGUgc2FtZSB0aGluZyBvbiBt
-eSBEZWxsIExhdGl0dWRlIEU2NTQwLiBJdCBhbHNvIGhhcyBhbiBlMTAwMCBhbmQgcG93ZXJ0b3Ag
-cmVwb3J0cyBpdCBhcyBiZWluZyB0aGUgaGlnaGVzdCBjb25zdW1lciwgYXQgYXJvdW5kIDE1Vy4g
-V2hlbiBJIHVucGx1ZyB0aGUgc3lzdGVtLCB0aGUgYmF0dGVyeSByZXBvcnRzIGEgZHJhaW4gb2Yg
-YWJvdXQgMjBXIHdoaWxlIGlkbGUgd2hpY2ggaXMgcHJldHR5IGJhZCBJTUhPLiBXaXRoIHRoZSA2
-OFdoIGJhdHRlcnkgaXQgdHJhbnNsYXRlcyB0byBhYm91dCAyLjUgaG91cnMgYmF0dGVyeSBsaWZl
-LjwvZGl2Pgo8ZGl2Pjxicj48L2Rpdj48ZGl2Pkxvd2VzdCBJJiMzOTt2ZSBzZWVuIGZvciBiYXR0
-ZXJ5IGRyYWluIGlzIDE0Vywgd2l0aCB0aGUgc2NyZWVuIGF0IGxvd2VzdCBicmlnaHRuZXNzLCBH
-b29nbGUgQ2hyb21lIHR1cm5lZCBvZmYsIGRpc2sgc3B1biBkb3duLiBJJiMzOTttIHVzaW5nIHRo
-ZSBidWlsdC1pbiBJbnRlbCBncmFwaGljcyBhbmQgdGhlIHN5c3RlbSBoYXMgMTZHQiBvZiByYW0g
-YW5kIGEgcXVhZC1jb3JlIGk3LjwvZGl2PgoKPGRpdj48YnI+PC9kaXY+PGRpdj5JIG5ldmVyIHJh
-biB3aW5kb3dzIG9uIHRoaXMgbGFwdG9wIHNvIEkgZG9uJiMzOTt0IGtub3cgd2hhdCB0byBleHBl
-Y3QgYnV0IHJldmlld3MgYXJlIGNsYWltaW5nIDcrIGhvdXJzIG9uIHRoZSA5MFdoIGJhdHRlcnku
-IFRoYXQgd291bGQgbWVhbiBhbiBhdmVyYWdlIG9mIDEzVywgd2hpbGUgZG9pbmcgYWN0dWFsIHdv
-cmsuPC9kaXY+PGRpdj48YnI+PC9kaXY+Cgo8ZGl2PlNvIEkmIzM5O20gcmVhbGx5IHdvbmRlcmlu
-ZzogSXMgdGhlIGUxMDAwIHJlYWxseSBlYXRpbmcgdXAgMTVXIG9yIGlzIHBvd2VydG9wIG1pc3Jl
-cG9ydGluZz88L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2PkkgYWxyZWFkeSBjYWxpYnJhdGVkIHBv
-d2VydG9wLCB3aXRob3V0IGEgY2hhbmdlLjwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+V291dC48
-L2Rpdj48L2Rpdj4K
+PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
+bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
+YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
+cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
+VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
+bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
+ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTQgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
+PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseTpDYWxp
+YnJpOwoJcGFub3NlLTE6MiAxNSA1IDIgMiAyIDQgMyAyIDQ7fQpAZm9udC1mYWNlCgl7Zm9udC1m
+YW1pbHk6Vml2YWxkaTsKCXBhbm9zZS0xOjMgMiA2IDIgNSA1IDYgOSA4IDQ7fQpAZm9udC1mYWNl
+Cgl7Zm9udC1mYW1pbHk6QW5kYWx1czsKCXBhbm9zZS0xOjIgMiA2IDMgNSA0IDUgMiAzIDQ7fQov
+KiBTdHlsZSBEZWZpbml0aW9ucyAqLwpwLk1zb05vcm1hbCwgbGkuTXNvTm9ybWFsLCBkaXYuTXNv
+Tm9ybWFsCgl7bWFyZ2luOjBpbjsKCW1hcmdpbi1ib3R0b206LjAwMDFwdDsKCWZvbnQtc2l6ZTox
+MS4wcHQ7Cglmb250LWZhbWlseToiQ2FsaWJyaSIsInNhbnMtc2VyaWYiO30KYTpsaW5rLCBzcGFu
+Lk1zb0h5cGVybGluawoJe21zby1zdHlsZS1wcmlvcml0eTo5OTsKCWNvbG9yOmJsdWU7Cgl0ZXh0
+LWRlY29yYXRpb246dW5kZXJsaW5lO30KYTp2aXNpdGVkLCBzcGFuLk1zb0h5cGVybGlua0ZvbGxv
+d2VkCgl7bXNvLXN0eWxlLXByaW9yaXR5Ojk5OwoJY29sb3I6cHVycGxlOwoJdGV4dC1kZWNvcmF0
+aW9uOnVuZGVybGluZTt9CnNwYW4uRW1haWxTdHlsZTE3Cgl7bXNvLXN0eWxlLXR5cGU6cGVyc29u
+YWwtY29tcG9zZTsKCWZvbnQtZmFtaWx5OiJBbmRhbHVzIiwic2VyaWYiOwoJY29sb3I6d2luZG93
+dGV4dDsKCWZvbnQtd2VpZ2h0Om5vcm1hbDsKCWZvbnQtc3R5bGU6bm9ybWFsO30KLk1zb0NocERl
+ZmF1bHQKCXttc28tc3R5bGUtdHlwZTpleHBvcnQtb25seTsKCWZvbnQtZmFtaWx5OiJDYWxpYnJp
+Iiwic2Fucy1zZXJpZiI7fQouTXNvUGFwRGVmYXVsdAoJe21zby1zdHlsZS10eXBlOmV4cG9ydC1v
+bmx5OwoJbXNvLW1hcmdpbi10b3AtYWx0OmF1dG87Cgltc28tbWFyZ2luLWJvdHRvbS1hbHQ6YXV0
+bzt9CkBwYWdlIFdvcmRTZWN0aW9uMQoJe3NpemU6OC41aW4gMTEuMGluOwoJbWFyZ2luOjEuMGlu
+IDEuMGluIDEuMGluIDEuMGluO30KZGl2LldvcmRTZWN0aW9uMQoJe3BhZ2U6V29yZFNlY3Rpb24x
+O30KLS0+PC9zdHlsZT48IS0tW2lmIGd0ZSBtc28gOV0+PHhtbD4KPG86c2hhcGVkZWZhdWx0cyB2
+OmV4dD0iZWRpdCIgc3BpZG1heD0iMTAyNiIgLz4KPC94bWw+PCFbZW5kaWZdLS0+PCEtLVtpZiBn
+dGUgbXNvIDldPjx4bWw+CjxvOnNoYXBlbGF5b3V0IHY6ZXh0PSJlZGl0Ij4KPG86aWRtYXAgdjpl
+eHQ9ImVkaXQiIGRhdGE9IjEiIC8+CjwvbzpzaGFwZWxheW91dD48L3htbD48IVtlbmRpZl0tLT4K
+PC9oZWFkPgo8Ym9keSBsYW5nPSJFTi1VUyIgbGluaz0iYmx1ZSIgdmxpbms9InB1cnBsZSI+Cjxk
+aXYgY2xhc3M9IldvcmRTZWN0aW9uMSI+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxl
+PSJmb250LXNpemU6MTIuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0FuZGFsdXMmcXVvdDssJnF1b3Q7
+c2VyaWYmcXVvdDsiPkhpLDxvOnA+PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1h
+bCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMi4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7QW5kYWx1
+cyZxdW90OywmcXVvdDtzZXJpZiZxdW90OyI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IERvZXMg
+YW55b25lIGhhcyB0aGUgU0FTIGRvY3VtZW50IGZvciB0aGUgcG93ZXJ0b3AgdG9vbD8gQ3VycmVu
+dGx5IEkgYW0gZ29pbmcgdGhyb3VnaCB0aGUgaW1wbGVtZW50YXRpb24gZGV0YWlscyBhbmQgaXQg
+d2lsbCBiZSBoZWxwZnVsIHRvIGhhdmUgdGhlIHNwZWMgdG8gdW5kZXJzdGFuZCB0aGUKIGRlc2ln
+bi4gQWxzbyBmZXcgb3RoZXIgcXVlcmllcyB3aGljaCBJIGNhbWUgYWNyb3NzOiAmbmJzcDs8bzpw
+PjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJmb250
+LXNpemU6MTIuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0FuZGFsdXMmcXVvdDssJnF1b3Q7c2VyaWYm
+cXVvdDsiPi0gaG93IHBvd2VydG9wIHJldHJpZXZlcyB0aGUgQyBzdGF0ZSBjb3VudGVycz88bzpw
+PjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJmb250
+LXNpemU6MTIuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0FuZGFsdXMmcXVvdDssJnF1b3Q7c2VyaWYm
+cXVvdDsiPi0gaG93IHRvIHVzZSB0aGUgdHVuaW5nIG9wdGlvbj8gSW4gdGhlIEdVSSB0aGVyZSBp
+cyBhIHNlcGFyYXRlIHRhYiBmb3IgdGhpcyBhbmQgSSBjYW4gc2VlIEdPT0QgYW5kIEJBRCB2YWx1
+ZXMgYXNzb2NpYXRlZCB3aXRoIGV2ZXJ5IGVudHJ5LiBIb3cgdG8gaW50ZXJwcmV0IHRoaXMgaW5m
+b3JtYXRpb24/ICZuYnNwOyZuYnNwOzxvOnA+PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1z
+b05vcm1hbCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMi4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7
+QW5kYWx1cyZxdW90OywmcXVvdDtzZXJpZiZxdW90OyI+PG86cD4mbmJzcDs8L286cD48L3NwYW4+
+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iZm9udC1zaXplOjE0LjBwdDtm
+b250LWZhbWlseTpWaXZhbGRpO2NvbG9yOiM0MDMxNTIiPnJlZ2FyZHM8bzpwPjwvbzpwPjwvc3Bh
+bj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTQuMHB0
+O2ZvbnQtZmFtaWx5OlZpdmFsZGk7Y29sb3I6IzQwMzE1MiI+QWRyaXA8bzpwPjwvbzpwPjwvc3Bh
+bj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8L2Rpdj4K
+PC9ib2R5Pgo8L2h0bWw+Cg==
 
---===============6550149130864593284==--
+--===============9192827886378705604==--
 
