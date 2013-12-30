@@ -1,104 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============7821708850042155084=="
+Content-Type: multipart/mixed; boundary="===============0518941875271748010=="
 MIME-Version: 1.0
-From: Joerg Mayer <jmpt at loplof.de>
-Subject: Re: [Powertop] Fix out of tree builds [Was: PowerTOP v2.6.1 released]
-Date: Tue, 10 Jun 2014 09:29:44 +0200
-Message-ID: <20140610072944.GA7132@rhrk.uni-kl.de>
-In-Reply-To: 39770.10.7.201.30.1402355690.squirrel@linux.intel.com
+From: Peter F. Patel-Schneider <pfpschneider at gmail.com>
+Subject: [Powertop] powertop putting far too much blame on wifi
+Date: Mon, 30 Dec 2013 09:36:08 -0800
+Message-ID: <52C1AF08.8000602@gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7821708850042155084==
+--===============0518941875271748010==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello Alexandra,
+Hi:
 
-On Mon, Jun 09, 2014 at 04:14:50PM -0700, Alexandra Yates wrote:
-> > On Wed, Jun 04, 2014 at 02:20:18PM -0700, Alexandra Yates wrote:
-> >> Unfortunately the patches you sent don't fix the issue.  Here is how to
-> >> reproduced the issue:
-...
-> >> The error still points that /bin/bash: ./csstoh.sh: No such file or
-> >> directory
-...
-> I still get the error, even after following your steps.  You may have
-> other commits I don't.
+I just got a Lenovo Yoga 2 Pro, and I'mrunning Fedora 20 on it.
 
-I don't have any other patches applied (the only differences result from
-my patches and some regenerated files):
+I'm trying to get power usage down with powertop, but it is producing some =
 
-jmayer(a)egg:~/work/power/powertop/git(master)> git status --ignored
-#       modified:   po/ca.po           <=3D=3D=3D=3D Automagically regenera=
-ted
-#       modified:   po/cs_CZ.po        <=3D=3D=3D=3D (only timestamps and
-#       modified:   po/de_DE.po        <=3D=3D=3D=3D line numbers differ. T=
-he
-#       modified:   po/en_GB.po        <=3D=3D=3D=3D differing line numbers
-#       modified:   po/en_US.po        <=3D=3D=3D=3D indicate that these fi=
-les
-#       modified:   po/es_ES.po        <=3D=3D=3D=3D should be regenerated =
-before
-#       modified:   po/hu_HU.po        <=3D=3D=3D=3D doing a distribution a=
-s well)
-#       modified:   po/id_ID.po
-#       modified:   po/nl_NL.po
-#       modified:   po/powertop.pot
-#       modified:   po/zh_TW.po
-#       modified:   src/Makefile.am    <=3D=3D=3D=3D My changes
+screwy numbers.   When I run the machine with wifi on, I get idle consumpti=
+on =
 
-And git diff for src/Makefile.am only shows my two changes.
+just under 7.2W but almost 5W of that is assigned to the WiFi interface, ev=
+en =
 
->From the top of your git directory please run
-grep -r \\./csstoh.sh .
-If something is found, delete it. Even better (assuming you have no extra
-directories in your source tree that are not checked in and not worth
-keeping): Please run "git clean -dfX" from the top of your git tree.
-Verify that the changes are applied ("git diff src/Makefile.am").
-Then rebuild.
+though there is little traffic. When I turn the wifi off, power consumption =
 
-I'm very sure that my tree is clean as I do development in branches:
-jmayer(a)egg:~/work/power/powertop/git(master)> git branch
-* master
-  out-of-tree-build-fix
-  tuning-packaging-fix
-I tested my patches on top of master to make sure I work on a pristine
-source tree.
+only drops to just under 7W.  I don't think that there is a phantom WiFi th=
+at =
 
-I'm a) quite sure it's something in your setup/workflow and b) quite
-determined to find out what it going wrong there if you are willing to
-let me :)
+is still consuming power, so it appears to me that powertop is assigning to=
+o =
 
-OK, I've written a small script that tries to insure that things are build
-correctly - please try (note that it will run "git clean -dfX").
+much blame to the WiFi interface.
 
-Thanks
-   J=C3=B6rg
--- =
+Is there away of fixing the assignment of blame here?
 
-Joerg Mayer                                           <jmayer(a)loplof.de>
-We are stuck with technology when what we really want is just stuff that
-works. Some say that should read Microsoft instead of technology.
+peter
 
---===============7821708850042155084==
-Content-Type: application/x-sh
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="build-release.sh"
+PS: Here are truncated typical powertop outputs, first with wifi on and the=
+n =
 
-IyEvYmluL3NoCgojIFRlcm1pbmF0ZSBzY3JpcHQgb24gZXJyb3IKc2V0IC1lCgppZiBbICEgLWQg
-LmdpdCBdOyB0aGVuCiAgZWNobwogIGVjaG8gIlBsZWFzZSBydW4gZnJvbSB0b3Agb2YgZ2l0IHNv
-dXJjZSB0cmVlIgogIGVjaG8KICBleGl0IDEKZmkKCmVjaG8KZWNobyAiPT09PT09PT09PT0gQ2xl
-YW5pbmcgdXAgc291cmNlIHRyZWUgPT09PT09PT09PT09PT09PT0iCmVjaG8KZ2l0IGNsZWFuIC1k
-ZlgKCmVjaG8KZWNobyAiPT09PT09PT09PT0gTGlzdCBvZiBtb2RpZmllZCBmaWxlcyA9PT09PT09
-PT09PT09PT09PT0iCmVjaG8KZ2l0IHN0YXR1cyAtLWlnbm9yZWQKCmVjaG8KZWNobyAiPT09PT09
-PT09PT0gU2V0dGluZyB1cCBidWlsZCBlbnZpcm9ubW5ldCA9PT09PT09PT09PT0iCmVjaG8KLi9h
-dXRvZ2VuLnNoID4vZGV2L251bGwKLi9jb25maWd1cmUgPi9kZXYvbnVsbAoKZWNobwplY2hvICI9
-PT09PT09PT09PSBQYWNrYWdpbmcgc291cmNlID09PT09PT09PT09PT09PT09PT09PT09PSIKZWNo
-bwptYWtlIGRpc3QgPi9kZXYvbnVsbAoKZWNobwplY2hvICI9PT09PT09PT09PSBDaGVja2luZyBw
-YWNrYWdlZCBzb3VyY2UgPT09PT09PT09PT09PT09PSIKZWNobwptYWtlIGRpc3RjaGVjayA+L2Rl
-di9udWxsCgplY2hvCmVjaG8gIiBBbGwgZ29vZCBmb3IgcmVsZWFzZSIKZWNobwoKZXhpdCAwCgo=
+with wifi off.
 
---===============7821708850042155084==--
+1/
+The battery reports a discharge rate of 7.15 W
+The estimated remaining time is 3 hours, 39 minutes
+
+Summary: 251.9 wakeups/second, 4.2 GPU ops/seconds, 0.0 VFS ops/sec and 1.6=
+% =
+
+CPU use
+
+Power est. Usage Events/s Category Description
+   4.82 W 1.2 pkts/s Device Network interface: wlp1s0 (iwlwifi)
+   1.72 W 10.0% Device Display backlight
+   131 mW 13.1 ms/s 188.4 Process /usr/lib64/thunderbird/thunderbird
+  11.7 mW 398.5 =C2=B5s/s 19.9 Process [irq/61-iwlwifi]
+
+
+2/
+The battery reports a discharge rate of 6.92 W
+The estimated remaining time is 3 hours, 42 minutes
+
+Summary: 453.6 wakeups/second, 23.2 GPU ops/seconds, 0.0 VFS ops/sec and 3.=
+0% =
+
+CPU use
+
+Power est. Usage Events/s Category Description
+   1.47 W 10.0% Device Display backlight
+   205 mW 14.4 ms/s 197.5 Process /usr/lib64/thunderbird/thunderbird
+   184 mW 2.2 ms/s 34.1 Process /usr/bin/xfce4-terminal
+   110 mW 2.4 ms/s 164.4 Interrupt PS/2 Touchpad / Keyboard / Mouse
+
+
+--===============0518941875271748010==--
 
