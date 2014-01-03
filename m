@@ -1,145 +1,106 @@
-Content-Type: multipart/mixed; boundary="===============0220940625355795966=="
+Content-Type: multipart/mixed; boundary="===============8886919606495522480=="
 MIME-Version: 1.0
-From: Gopal, Saranya <saranya.gopal at intel.com>
-Subject: Re: [Powertop] Powertop on chromeos
-Date: Thu, 06 Mar 2014 09:56:13 +0000
-Message-ID: <C672AA6DAAC36042A98BAD0B0B25BDA92251A081@BGSMSX104.gar.corp.intel.com>
-In-Reply-To: C672AA6DAAC36042A98BAD0B0B25BDA922519F68@BGSMSX104.gar.corp.intel.com
+From: Ivan Shapovalov <intelfx100 at gmail.com>
+Subject: Re: [Powertop] powertop putting far too much blame on wifi
+Date: Fri, 03 Jan 2014 16:01:27 +0400
+Message-ID: <3003802.GAEoeOe9H7@intelfx-laptop>
+In-Reply-To: 52C1AF08.8000602@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0220940625355795966==
+--===============8886919606495522480==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+On Monday 30 December 2013 at 09:36:08, Peter wrote:
+> Hi:
+> =
 
-I was just missing '=3D' in my commands.
-Right command was: powertop --time=3D60
-Thanks Christophe for pointing it out.
+> I just got a Lenovo Yoga 2 Pro, and I'mrunning Fedora 20 on it.
+> =
 
-Thanks,
-Saranya
+> I'm trying to get power usage down with powertop, but it is producing some
+> screwy numbers.   When I run the machine with wifi on, I get idle
+> consumption just under 7.2W but almost 5W of that is assigned to the WiFi
+> interface, even though there is little traffic. When I turn the wifi off,
+> power consumption only drops to just under 7W.  I don't think that there =
+is
+> a phantom WiFi that is still consuming power, so it appears to me that
+> powertop is assigning too much blame to the WiFi interface.
+> =
 
-From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of Gopal,=
- Saranya
-Sent: Thursday, March 06, 2014 1:51 PM
-To: powertop(a)lists.01.org
-Subject: [Powertop] Powertop on chromeos
+> Is there away of fixing the assignment of blame here?
+> =
 
-Hi all,
+> peter
+> =
 
-I am trying to use PowerTop on a baytrail-M board running chromeOS.
-I downloaded the source from https://github.com/fenrus75/powertop and compi=
-led in my host machine (Ubuntu 12.04)
-Then I copied the binary to the baytrail-M board on which I need to take me=
-asurements.
-When I run the powertop binary, it seems to work and I could even get the o=
-utput in csv or html format.
-But, my problem is that I could not configure any other parameter while run=
-ning the tool.
-For example, powertop --time 60 does not work. Neither does powertop --iter=
-ation 3
-It always says it is taking 1 measurement in 20 seconds.
-I notice that it reports that it could not load from file /var/cache/powert=
-op/saved-parameters.powertop.
-Is that an issue?
-Should I install some configuration file somewhere in my target machine?
-Has anyone tried running powertop on chromeOS?
-Any pointers to fix this issue would be of great help to me.
+> PS: Here are truncated typical powertop outputs, first with wifi on and t=
+hen
+> with wifi off.
+> =
 
-Thanks,
-Saranya
+> 1/
+> The battery reports a discharge rate of 7.15 W
+> The estimated remaining time is 3 hours, 39 minutes
+> =
 
---===============0220940625355795966==
-Content-Type: text/html
+> Summary: 251.9 wakeups/second, 4.2 GPU ops/seconds, 0.0 VFS ops/sec and 1=
+.6%
+> CPU use
+> =
+
+> Power est. Usage Events/s Category Description
+>    4.82 W 1.2 pkts/s Device Network interface: wlp1s0 (iwlwifi)
+>    1.72 W 10.0% Device Display backlight
+>    131 mW 13.1 ms/s 188.4 Process /usr/lib64/thunderbird/thunderbird
+>   11.7 mW 398.5 =C2=B5s/s 19.9 Process [irq/61-iwlwifi]
+> =
+
+> =
+
+> 2/
+> The battery reports a discharge rate of 6.92 W
+> The estimated remaining time is 3 hours, 42 minutes
+> =
+
+> Summary: 453.6 wakeups/second, 23.2 GPU ops/seconds, 0.0 VFS ops/sec and
+> 3.0% CPU use
+> =
+
+> Power est. Usage Events/s Category Description
+>    1.47 W 10.0% Device Display backlight
+>    205 mW 14.4 ms/s 197.5 Process /usr/lib64/thunderbird/thunderbird
+>    184 mW 2.2 ms/s 34.1 Process /usr/bin/xfce4-terminal
+>    110 mW 2.4 ms/s 164.4 Interrupt PS/2 Touchpad / Keyboard / Mouse
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+
+Yeah. The computation algorithm seems totally off for me.
+
+Currently I get 16.8W for backlight while total is 24W,
+and CPU is reported to consume 0W despite ~70% usage.
+
+-- =
+
+Ivan Shapovalov / intelfx /
+
+--===============8886919606495522480==
+Content-Type: application/pgp-signature
 MIME-Version: 1.0
 Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+Content-Disposition: attachment; filename="signature.asc"
 
-PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
-bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
-YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
-cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
-VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
-bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
-ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTQgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
-PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseTpDYWxp
-YnJpOwoJcGFub3NlLTE6MiAxNSA1IDIgMiAyIDQgMyAyIDQ7fQpAZm9udC1mYWNlCgl7Zm9udC1m
-YW1pbHk6VGFob21hOwoJcGFub3NlLTE6MiAxMSA2IDQgMyA1IDQgNCAyIDQ7fQovKiBTdHlsZSBE
-ZWZpbml0aW9ucyAqLwpwLk1zb05vcm1hbCwgbGkuTXNvTm9ybWFsLCBkaXYuTXNvTm9ybWFsCgl7
-bWFyZ2luOjBpbjsKCW1hcmdpbi1ib3R0b206LjAwMDFwdDsKCWZvbnQtc2l6ZToxMS4wcHQ7Cglm
-b250LWZhbWlseToiQ2FsaWJyaSIsInNhbnMtc2VyaWYiO30KYTpsaW5rLCBzcGFuLk1zb0h5cGVy
-bGluawoJe21zby1zdHlsZS1wcmlvcml0eTo5OTsKCWNvbG9yOmJsdWU7Cgl0ZXh0LWRlY29yYXRp
-b246dW5kZXJsaW5lO30KYTp2aXNpdGVkLCBzcGFuLk1zb0h5cGVybGlua0ZvbGxvd2VkCgl7bXNv
-LXN0eWxlLXByaW9yaXR5Ojk5OwoJY29sb3I6cHVycGxlOwoJdGV4dC1kZWNvcmF0aW9uOnVuZGVy
-bGluZTt9CnNwYW4uRW1haWxTdHlsZTE3Cgl7bXNvLXN0eWxlLXR5cGU6cGVyc29uYWw7Cglmb250
-LWZhbWlseToiQ2FsaWJyaSIsInNhbnMtc2VyaWYiOwoJY29sb3I6d2luZG93dGV4dDt9CnNwYW4u
-RW1haWxTdHlsZTE4Cgl7bXNvLXN0eWxlLXR5cGU6cGVyc29uYWwtcmVwbHk7Cglmb250LWZhbWls
-eToiQ2FsaWJyaSIsInNhbnMtc2VyaWYiOwoJY29sb3I6IzFGNDk3RDt9Ci5Nc29DaHBEZWZhdWx0
-Cgl7bXNvLXN0eWxlLXR5cGU6ZXhwb3J0LW9ubHk7Cglmb250LXNpemU6MTAuMHB0O30KQHBhZ2Ug
-V29yZFNlY3Rpb24xCgl7c2l6ZTo4LjVpbiAxMS4waW47CgltYXJnaW46MS4waW4gMS4waW4gMS4w
-aW4gMS4waW47fQpkaXYuV29yZFNlY3Rpb24xCgl7cGFnZTpXb3JkU2VjdGlvbjE7fQotLT48L3N0
-eWxlPjwhLS1baWYgZ3RlIG1zbyA5XT48eG1sPgo8bzpzaGFwZWRlZmF1bHRzIHY6ZXh0PSJlZGl0
-IiBzcGlkbWF4PSIxMDI2IiAvPgo8L3htbD48IVtlbmRpZl0tLT48IS0tW2lmIGd0ZSBtc28gOV0+
-PHhtbD4KPG86c2hhcGVsYXlvdXQgdjpleHQ9ImVkaXQiPgo8bzppZG1hcCB2OmV4dD0iZWRpdCIg
-ZGF0YT0iMSIgLz4KPC9vOnNoYXBlbGF5b3V0PjwveG1sPjwhW2VuZGlmXS0tPgo8L2hlYWQ+Cjxi
-b2R5IGxhbmc9IkVOLVVTIiBsaW5rPSJibHVlIiB2bGluaz0icHVycGxlIj4KPGRpdiBjbGFzcz0i
-V29yZFNlY3Rpb24xIj4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImNvbG9yOiMx
-RjQ5N0QiPkhpIGFsbCw8bzpwPjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwi
-PjxzcGFuIHN0eWxlPSJjb2xvcjojMUY0OTdEIj48bzpwPiZuYnNwOzwvbzpwPjwvc3Bhbj48L3A+
-CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJjb2xvcjojMUY0OTdEIj5JIHdhcyBq
-dXN0IG1pc3NpbmcgJiM4MjE2Oz0mIzgyMTc7IGluIG15IGNvbW1hbmRzLjxvOnA+PC9vOnA+PC9z
-cGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImNvbG9yOiMxRjQ5N0Qi
-PlJpZ2h0IGNvbW1hbmQgd2FzOiBwb3dlcnRvcCAtLXRpbWU9NjA8bzpwPjwvbzpwPjwvc3Bhbj48
-L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJjb2xvcjojMUY0OTdEIj5UaGFu
-a3MgQ2hyaXN0b3BoZSBmb3IgcG9pbnRpbmcgaXQgb3V0LjxvOnA+PC9vOnA+PC9zcGFuPjwvcD4K
-PHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImNvbG9yOiMxRjQ5N0QiPjxvOnA+Jm5i
-c3A7PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImNv
-bG9yOiMxRjQ5N0QiPlRoYW5rcyw8bzpwPjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29O
-b3JtYWwiPjxzcGFuIHN0eWxlPSJjb2xvcjojMUY0OTdEIj5TYXJhbnlhPG86cD48L286cD48L3Nw
-YW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iY29sb3I6IzFGNDk3RCI+
-PG86cD4mbmJzcDs8L286cD48L3NwYW4+PC9wPgo8ZGl2Pgo8ZGl2IHN0eWxlPSJib3JkZXI6bm9u
-ZTtib3JkZXItdG9wOnNvbGlkICNCNUM0REYgMS4wcHQ7cGFkZGluZzozLjBwdCAwaW4gMGluIDBp
-biI+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTAuMHB0
-O2ZvbnQtZmFtaWx5OiZxdW90O1RhaG9tYSZxdW90OywmcXVvdDtzYW5zLXNlcmlmJnF1b3Q7Ij5G
-cm9tOjwvc3Bhbj48L2I+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMC4wcHQ7Zm9udC1mYW1pbHk6
-JnF1b3Q7VGFob21hJnF1b3Q7LCZxdW90O3NhbnMtc2VyaWYmcXVvdDsiPiBQb3dlclRvcCBbbWFp
-bHRvOnBvd2VydG9wLWJvdW5jZXNAbGlzdHMuMDEub3JnXQo8Yj5PbiBCZWhhbGYgT2YgPC9iPkdv
-cGFsLCBTYXJhbnlhPGJyPgo8Yj5TZW50OjwvYj4gVGh1cnNkYXksIE1hcmNoIDA2LCAyMDE0IDE6
-NTEgUE08YnI+CjxiPlRvOjwvYj4gcG93ZXJ0b3BAbGlzdHMuMDEub3JnPGJyPgo8Yj5TdWJqZWN0
-OjwvYj4gW1Bvd2VydG9wXSBQb3dlcnRvcCBvbiBjaHJvbWVvczxvOnA+PC9vOnA+PC9zcGFuPjwv
-cD4KPC9kaXY+CjwvZGl2Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwv
-cD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+SGkgYWxsLDxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0i
-TXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+SSBh
-bSB0cnlpbmcgdG8gdXNlIFBvd2VyVG9wIG9uIGEgYmF5dHJhaWwtTSBib2FyZCBydW5uaW5nIGNo
-cm9tZU9TLjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5JIGRvd25sb2FkZWQg
-dGhlIHNvdXJjZSBmcm9tIDxhIGhyZWY9Imh0dHBzOi8vZ2l0aHViLmNvbS9mZW5ydXM3NS9wb3dl
-cnRvcCI+Cmh0dHBzOi8vZ2l0aHViLmNvbS9mZW5ydXM3NS9wb3dlcnRvcDwvYT4gYW5kIGNvbXBp
-bGVkIGluIG15IGhvc3QgbWFjaGluZSAoVWJ1bnR1IDEyLjA0KTxvOnA+PC9vOnA+PC9wPgo8cCBj
-bGFzcz0iTXNvTm9ybWFsIj5UaGVuIEkgY29waWVkIHRoZSBiaW5hcnkgdG8gdGhlIGJheXRyYWls
-LU0gYm9hcmQgb24gd2hpY2ggSSBuZWVkIHRvIHRha2UgbWVhc3VyZW1lbnRzLjxvOnA+PC9vOnA+
-PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5XaGVuIEkgcnVuIHRoZSBwb3dlcnRvcCBiaW5hcnks
-IGl0IHNlZW1zIHRvIHdvcmsgYW5kIEkgY291bGQgZXZlbiBnZXQgdGhlIG91dHB1dCBpbiBjc3Yg
-b3IgaHRtbCBmb3JtYXQuPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPkJ1dCwg
-bXkgcHJvYmxlbSBpcyB0aGF0IEkgY291bGQgbm90IGNvbmZpZ3VyZSBhbnkgb3RoZXIgcGFyYW1l
-dGVyIHdoaWxlIHJ1bm5pbmcgdGhlIHRvb2wuPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29O
-b3JtYWwiPkZvciBleGFtcGxlLCBwb3dlcnRvcCAtLXRpbWUgNjAgZG9lcyBub3Qgd29yay4gTmVp
-dGhlciBkb2VzIHBvd2VydG9wIC0taXRlcmF0aW9uIDM8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9
-Ik1zb05vcm1hbCI+SXQgYWx3YXlzIHNheXMgaXQgaXMgdGFraW5nIDEgbWVhc3VyZW1lbnQgaW4g
-MjAgc2Vjb25kcy48bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+SSBub3RpY2Ug
-dGhhdCBpdCByZXBvcnRzIHRoYXQgaXQgY291bGQgbm90IGxvYWQgZnJvbSBmaWxlIC92YXIvY2Fj
-aGUvcG93ZXJ0b3Avc2F2ZWQtcGFyYW1ldGVycy5wb3dlcnRvcC48bzpwPjwvbzpwPjwvcD4KPHAg
-Y2xhc3M9Ik1zb05vcm1hbCI+SXMgdGhhdCBhbiBpc3N1ZT88bzpwPjwvbzpwPjwvcD4KPHAgY2xh
-c3M9Ik1zb05vcm1hbCI+U2hvdWxkIEkgaW5zdGFsbCBzb21lIGNvbmZpZ3VyYXRpb24gZmlsZSBz
-b21ld2hlcmUgaW4gbXkgdGFyZ2V0IG1hY2hpbmU/PG86cD48L286cD48L3A+CjxwIGNsYXNzPSJN
-c29Ob3JtYWwiPkhhcyBhbnlvbmUgdHJpZWQgcnVubmluZyBwb3dlcnRvcCBvbiBjaHJvbWVPUz88
-bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+QW55IHBvaW50ZXJzIHRvIGZpeCB0
-aGlzIGlzc3VlIHdvdWxkIGJlIG9mIGdyZWF0IGhlbHAgdG8gbWUuPG86cD48L286cD48L3A+Cjxw
-IGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9y
-bWFsIj5UaGFua3MsPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPlNhcmFueWE8
-bzpwPjwvbzpwPjwvcD4KPC9kaXY+CjwvYm9keT4KPC9odG1sPgo=
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjIuMC4yMiAoR05V
+L0xpbnV4KQoKaUY0RUFCRUlBQVlGQWxMR3Bwd0FDZ2tReFVLbGpTSU1BbkR2UHdEOUhtVFBlZFZE
+RDZIZVArT3Y1QzFhdGZKNApaajRmR0RHNHkxeXJIQ0dPNWN3QkFPQTBsTE03TEplbFh4R3J0MElv
+em4vd0EyNmpyMG80TlYycDNiQURMT3llCj05WW92Ci0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0t
+LQo=
 
---===============0220940625355795966==--
+--===============8886919606495522480==--
 
