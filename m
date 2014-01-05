@@ -1,90 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============7426662194465651065=="
+Content-Type: multipart/mixed; boundary="===============2610345164102359628=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH 3/3] fix-warnings: Ignoring return value
-Date: Fri, 13 Jun 2014 15:18:29 -0700
-Message-ID: <1402697910-29154-4-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: 1402697910-29154-1-git-send-email-alexandra.yates@linux.intel.com
+From: Marc MERLIN <marc_powertop at merlins.org>
+Subject: Re: [Powertop] powertop putting far too much blame on wifi
+Date: Sat, 04 Jan 2014 22:01:26 -0800
+Message-ID: <20140105060126.GB11749@merlins.org>
+In-Reply-To: 3003802.GAEoeOe9H7@intelfx-laptop
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7426662194465651065==
+--===============2610345164102359628==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Added error handling to write() calls.
+On Fri, Jan 03, 2014 at 04:01:27PM +0400, Ivan Shapovalov wrote:
+> On Monday 30 December 2013 at 09:36:08, Peter wrote:
+> > Hi:
+> > =
 
-Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
----
- src/measurement/extech.cpp |   13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+> > I just got a Lenovo Yoga 2 Pro, and I'mrunning Fedora 20 on it.
+> > =
 
-diff --git a/src/measurement/extech.cpp b/src/measurement/extech.cpp
-index 4e8bf8a..e014a5d 100644
---- a/src/measurement/extech.cpp
-+++ b/src/measurement/extech.cpp
-@@ -287,13 +287,14 @@ extech_power_meter::extech_power_meter(const char *ex=
-tech_name)
- void extech_power_meter::measure(void)
- {
- 	/* trigger the extech to send data */
--	write(fd, " ", 1);
-+	if(write(fd, " ", 1) =3D=3D -1)
-+		 printf("Error: %s\n", strerror(errno));
- =
+> > I'm trying to get power usage down with powertop, but it is producing s=
+ome
+> > screwy numbers.   When I run the machine with wifi on, I get idle
+> > consumption just under 7.2W but almost 5W of that is assigned to the Wi=
+Fi
+> > interface, even though there is little traffic. When I turn the wifi of=
+f,
+> > power consumption only drops to just under 7W.  I don't think that ther=
+e is
+> > a phantom WiFi that is still consuming power, so it appears to me that
+> > powertop is assigning too much blame to the WiFi interface.
+> > =
 
- 	rate =3D extech_read(fd);
- =
+> > Is there away of fixing the assignment of blame here?
 
- }
- =
+Unfortunately, it's not just you. I've reported the same problem
+multiple times over the last year, but not heard back from anyone yet
+(except you saying you see the same).
 
--void extech_power_meter::sample(void) =
+I had this on a T530, and now it's even worse on a T540:
+The battery reports a discharge rate of 28.5 W
+The estimated remaining time is 1 hours, 53 minutes
 
-+void extech_power_meter::sample(void)
- {
- 	ssize_t ret;
- 	struct timespec tv;
-@@ -306,16 +307,16 @@ void extech_power_meter::sample(void)
- 		ret =3D write(fd, " ", 1);
- 		if (ret < 0)
- 			continue;
--		=
+Summary: 689.5 wakeups/second,  214.0 GPU ops/seconds, 0.0 VFS ops/sec and =
+10.4% CPU use
 
-+
- 		sum +=3D extech_read(fd);
- 		samples++;
--	=
+Power est.              Usage       Events/s    Category       Description
+  15.3 W     95.8%                      Device         Display backlight
+  2.07 W     36.0 ms/s     642.4        Process        /usr/bin/enlightenme=
+nt
+  115 mW      4.5 ms/s      62.3        Interrupt      PS/2 Touchpad / Keyb=
+oard / Mouse
+ 86.8 mW      0.9 ms/s      37.0        Process        xfce4-terminal -T wi=
+ndow11 --role=3Dwindow11 --tab
+ 71.3 mW     35.4 ms/s      36.2        Process        /usr/bin/X :0 vt7 -b=
+r -nolisten tcp -auth /var/r
+ 51.2 mW      0.8 ms/s      27.9        Timer          hrtimer_wakeup
 
-+
- 	}
- }
- =
+15W for my backlight at mid brightness? I don't think so.
 
- extern "C"
- {
--	void* thread_proc(void *arg) =
+Last time, I was getting unrealistic values for a USB key, then other
+things, it's just all over the map :(
 
-+	void* thread_proc(void *arg)
- 	{
- 		class extech_power_meter *parent;
- 		parent =3D (class extech_power_meter*)arg;
-@@ -339,7 +340,7 @@ void extech_power_meter::start_measurement(void)
- {
- 	end_thread =3D 0;
- 	sum =3D samples =3D 0;
--	=
-
-+
- 	if (pthread_create(&thread, NULL, thread_proc, this))
- 		fprintf(stderr, "ERROR: extech measurement thread creation failed\n");
- =
-
+Marc
 -- =
 
-1.7.9.5
+"A mouse is a device used to point at the xterm you want to type in" - A.S.=
+R.
+Microsoft is to operating systems ....
+                                      .... what McDonalds is to gourmet coo=
+king
+Home page: http://marc.merlins.org/                         | PGP 1024R/763=
+BE901
 
-
---===============7426662194465651065==--
+--===============2610345164102359628==--
 
