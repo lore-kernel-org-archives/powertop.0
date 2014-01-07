@@ -1,199 +1,97 @@
-Content-Type: multipart/mixed; boundary="===============4394017342827794389=="
+Content-Type: multipart/mixed; boundary="===============7105410756364993516=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH v3 18/31] report: CPU Frequency html & csv
-Date: Thu, 12 Dec 2013 11:02:19 +0300
-Message-ID: <20131212080219.GA2320@swordfish.minsk.epam.com>
-In-Reply-To: 55741.10.7.198.65.1386788910.squirrel@linux.intel.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] powertop putting far too much blame on wifi
+Date: Tue, 07 Jan 2014 15:30:38 -0800
+Message-ID: <55179.10.24.5.142.1389137438.squirrel@linux.intel.com>
+In-Reply-To: 2793300.TEfDgR9LBO@intelfx-laptop
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4394017342827794389==
+--===============7105410756364993516==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (12/11/13 11:08), Alexandra Yates wrote:
-> >> On (11/18/13 12:27), Alexandra Yates wrote:
-[..]
-> >>
-> >>
-> >> initialisation:
-> >>
-> >>        report.begin_section(SECTION_CPUFREQ);
-> >>        report.add_header("Processor Frequency Report");
-> >>
-> >>        report.begin_table(TABLE_WIDE);
-> >>
-> >> vs
-> >>
-> >>        /* div attr css_class and css_id */
-> >>        tag_attr div_attr;
-> >>        init_div(&div_attr, "clear_block", "cpufreq");
-> >>
-> >>        /* Set Table attributes, rows, and cols */
-> >>        table_attributes std_table_css;
-> >>        table_size pkg_tbl_size;
-> >>        table_size core_tbl_size;
-> >>        table_size cpu_tbl_size;
-> >>
-> >>
-> >>        /* Set Title attributes */
-> >>        tag_attr title_attr;
-> >>        init_title_attr(&title_attr);
-> >>
-> >>        /* Report add section */
-> >>         report.add_div(&div_attr);
-> >>         report.add_title(&title_attr, __("Processor Frequency Report")=
-);
-> >>
-> >>         /* Set array of data in row Major order */
-> >>        int idx1, idx2, idx3, num_cpus=3D0;
-> >>         string tmp_str;
-> >>
-> >>
-> >>
-> >>
-> >>
-> >> reporter usage:
-> >>
-> >>
-> >>          report.begin_cell(CELL_CORE_HEADER);
-> >>          report.addf(__("Core %i"), _core->get_number());
-> >>
-> >> vs
-> >>
-> >>          core_data[idx2]=3D"";
-> >>          idx2+=3D1;
-> >>          sprintf(tmp_num,__("Core %d"),_core->get_number());
-> >>          core_data[idx2]=3Dstring(tmp_num);
-> >>          idx2+=3D1;
-> >>
-> >>
-> >>
-> >>
-> >>
-> >> and
-> >>
-> >>
-> >>
-> >>
-> >>
-> >>          report.begin_cell(CELL_STATE_NAME);
-> >>          report.add(_core->fill_pstate_name(line, buffer));
-> >>          report.begin_cell(CELL_PACKAGE_STATE_VALUE);
-> >>          report.add(_core->fill_pstate_line(line, buffer2));
-> >>
-> >> vs
-> >>
-> >>          tmp_str=3Dstring(_core->fill_pstate_name(line, buffer));
-> >>          core_data[idx2]=3D (tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
-> >>          idx2+=3D1;
-> >>          tmp_str=3Dstring(_core->fill_pstate_line(line, buffer2));
-> >>          core_data[idx2]=3D (tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
-> >>          idx2+=3D1;
-> >>
-> >>
-> >> sorry, but the existing one really looks easier to follow and use.
-> >> current
-> >> reporter user
-> >> cares less about reporter internall details.
-> >>
-[..]
-> >
-> > This is matter of opinion.   I found this module the most difficult to
-> > manipulate in general because the complexity of the current code.
-> >
-> > If you look the other examples they are pretty straight forward.
-> >
-> > Thank you,
-> > Alexandra.
-> >
-> =
+> On Monday 06 January 2014 at 11:53:15, Andreas wrote:
+>> Hi,
+>>
+>> On Sun, Jan 05, 2014 at 12:00:02PM -0800, powertop-request(a)lists.01.org
+> wrote:
+>> > From: Marc MERLIN <marc_powertop(a)merlins.org>
+>> >
+>> > Unfortunately, it's not just you. I've reported the same problem
+>> > multiple times over the last year, but not heard back from anyone yet
+>> > (except you saying you see the same).
+>> >
+>> > I had this on a T530, and now it's even worse on a T540:
+>> > The battery reports a discharge rate of 28.5 W
+>> > The estimated remaining time is 1 hours, 53 minutes
+>> >
+>> > Summary: 689.5 wakeups/second,  214.0 GPU ops/seconds, 0.0 VFS ops/sec
+>> and
+>> > 10.4% CPU use
+>> >
+>> > Power est.              Usage       Events/s    Category
+>> Description
+>> >
+>> >   15.3 W     95.8%                      Device         Display
+>> backlight
+>> >   2.07 W     36.0 ms/s     642.4        Process
+>> >   /usr/bin/enlightenment
+>> >   115 mW      4.5 ms/s      62.3        Interrupt      PS/2 Touchpad /
+>> >   Keyboard / Mouse>
+>> >  86.8 mW      0.9 ms/s      37.0        Process        xfce4-terminal
+>> -T
+>> >  window11 --role=3Dwindow11 --tab 71.3 mW     35.4 ms/s      36.2
+>> >  Process        /usr/bin/X :0 vt7 -br -nolisten tcp -auth /var/r 51.2
+>> mW
+>> >      0.8 ms/s      27.9        Timer          hrtimer_wakeup>
+>> > 15W for my backlight at mid brightness? I don't think so.
+>>
+>> 600+ wakeups/second sounds like the usual intermediate activity
+>> due to touchpad/mouse movement (that figure is exactly what I usually
+>> got
+>> on my machine), and if that is the case
+>> (what happens if the human part gets its dirty fingers off the machine?
+>> :)
+>> then it's strange to see this otherwise *very high* value (642.4)
+>> attributed to /usr/bin/enlightenment (a very seasoned/stable WM, for
+>> crying out loud) rather than mouse as in the *directly following*
+>>     PS/2 Touchpad / Keyboard / Mouse
+>> line.
+>>
+>> Or, in other words, this example hints at a rather mischievous mixup of
+>> data, e.g. an off-by-1 or a post-insert of certain items without
+>> accounting
+>> for other columns (within the data model, of course), or perhaps (the
+>> column data values might even support such a suspicion) even completely
+>> wrong (re-sorted) display of data.
+>>
+>> Perhaps I should actually test/investigate a recent powertop version...
+>> ;)
+>>
+>> Andreas Mohr
+>
+> IMHO, the usage and event counters seem to be valid. What's wrong is
+> energy
+> estimation: it is done entirely in software, using some strange
+> semi-heuristic
+> guesswork.
+>
+> --
+> Ivan Shapovalov / intelfx /_______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>
 
-> Hi Sergey,
+Try disabling the device and rerunning PowerTOP see if there is a
+difference there. You could send the debug output to find out what are
+your wifi parameters.
 
-Hi,
+Thank you,
+Alexandra.
 
-> I gave more thought at your feedback and you are right to bring attention
-> to  the items here.  As I mentioned before during this iteration of
-> changes I tried to reuse as much code as possible, therefore the current
-> result is not optimal.
-
-and saying that you pushed NACK-ed patchset to the master. there is a
-`git branch' command for `incremental-make-it-ready-for-master' work.
-my concerns are not about some fancy coding styles or my own opinion.
-new reporter API simply asks for error. and you made off by one error
-using your own `pretty straight forward' API.
-
-
-[PATCH 19/31]
-
-+       int show_power, cols, rows, idx;
-
-[..]
-
-+       cols=3D7;
-+       if (show_power)
-+               cols=3D8;
-
-[..]
-
-+       if (show_power)
-+               software_data[7]=3D__("PW Estimate");
-+
-+       sort(all_power.begin(), all_power.end(), power_cpu_sort);
-+       show_power =3D global_power_valid();
-
-[..]
-
-+               software_data[idx]=3Dstring(usage);
-+               idx+=3D1;
-+
-+               software_data[idx]=3Dstring(wakes);
-+               idx+=3D1;
-+
-+               software_data[idx]=3Dstring(gpus);
-+               idx+=3D1;
-+
-+               software_data[idx]=3Dstring(disks);
-+               idx+=3D1;
-+
-+               software_data[idx]=3Dstring(xwakes);
-+               idx+=3D1;
-+
-+               software_data[idx]=3Dstring(name);
-+               idx+=3D1;
-+
-+               software_data[idx]=3Dstring(pretty_print(all_power[i]->desc=
-ription(), descr, 128));
-+               idx+=3D1;
-                if (show_power) {
--                       report.begin_cell(CELL_SOFTWARE_POWER);
--                       report.add(power);
-+                       software_data[idx]=3Dstring(power);
-+                       idx+=3D1;
-                }
-
-
-
-I'm not sure that powertop master now even works.
-
-	-ss
-
-> However, it is part of my plan to continue changing the UI code to remove
-> clutter like the once you pointed.  But this changes will come in the next
-> phase of development, because it will be more intrusive. The current
-> changes  are incremental so that we have a chance to do testing in between
-> the big changes of the UI.
-> =
-
-> Thank you again for taking the time to look at my code and your feedback,
-> I will make sure to incorporate it as a requirement for phase two.
-> =
-
-> Alexandra.
-
-
---===============4394017342827794389==--
+--===============7105410756364993516==--
 
