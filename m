@@ -1,91 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============2781975446127624716=="
+Content-Type: multipart/mixed; boundary="===============2438172233981437759=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] segmentation fault when shutting
-Date: Wed, 14 May 2014 13:04:34 -0700
-Message-ID: <49931.10.24.5.78.1400097874.squirrel@linux.intel.com>
-In-Reply-To: 4628F0C61321354285DF2950999754456DF9880F@ORSMSX114.amr.corp.intel.com
+From: thibaut bethune <thibaut.bethune at gmail.com>
+Subject: [Powertop] Settings modified from Powertop are not persistent
+Date: Wed, 22 Jan 2014 12:15:56 +0100
+Message-ID: <CAACN17h=DqX7XU7h+X-jONngb4qmUgQYoZDBHtGdCqEbByjNYg@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2781975446127624716==
+--===============2438172233981437759==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Hi,
 
-> Not all patches are at fault here so reverting the entire series seems
-> short sighted.  Even the patch in question isn't causing issues on all
-> platforms.
->
->
-> -----Original Message-----
-> From: Alexandra Yates [mailto:alexandra.yates(a)linux.intel.com]
-> Sent: Monday, May 12, 2014 4:23 PM
-> To: powertop(a)lists.01.org
-> Cc: Kalowsky, Daniel
-> Subject: Re: [Powertop] segmentation fault when shutting
->
->> On (05/09/14 00:22), Martin Ziegler wrote:
->>> The bisection resulted in
->>>
->>> commit 5f5976f8b42e4e4717f2d573cf43cb87ccd88fa2
->>> Author: Dan Kalowsky <daniel.kalowsky(a)intel.com>
->>> Date:   Tue Apr 29 15:55:31 2014 -0700
->>>
->>>     Adding a clean_shutdown function
->>>
->>>     Function is designed to be a on stop place to clean up
->>>     the entire application at shutdown time.
->>>
->>> as the first bad commit.
->>>
->>
->> thanks, Martin.
->>
->> yes... well
->>
->> a) clean_shutdown() calls close_display() which iterates
->> tab_windows[tab_names[i]] and deletes every tab_window. the problem is
->> that prior to
->> close_display() main executes clear_tuning(), which [surprise
->> surprise] does `delete tune_window' since commit
->> eb08d4480969c8e48347c7621bd96dc248ee2138
->> ("Remove another memory leak") , whilst tab_windows[tab_names[i]]
->> still holds a pointer which we just secretly free()-d. so this is
->> double free().
->> and it has no other option (and will never have) than to crash.
->>
->> this obviously has not been tested before push.
->>
->>
->> b) there is no point in free()-ing memory which will be free()-d
->> anyway, because we exit() the program.
->>
->> 	-ss
->>
->
-> Martin, thank you for reporting and bisecting the culprit.
->
-> Sergey, thank you for poking the issues.
->
-> Dan, please fix the patches and resend them.  They will be included after
-> release 2.6 is completed.
->
-> I reverted Dan Kalowsky's patches.
->
-> Thank you,
-> Alexandra.
->
+I'm using Powertop with root privilege on Debian GNU/Linux 64 bits
+with my Core i3-3225.
 
-Hi Dan,
+Although I modify settings to follow advices given by Powertop, each
+time I restart my computer these settings are restored !
 
-I'm aware of that. However, I made an executive decision in favor of
-PowerTOP2.6 release.  Your patches will go in and will be included in the
-next release after properly fixed and tested.
+Thes settings are :
 
-Thank you,
-Alexandra.
+Bad VM writeback timeout
+Bad NMI watchdog should be turned off
+Bad Enable Audio codec power management
+Bad Enable SATA link power Managmenet for host4
+Bad Enable SATA link power Managmenet for host5
+Bad Enable SATA link power Managmenet for host2
+Bad Enable SATA link power Managmenet for host3
+Bad Enable SATA link power Managmenet for host0
+Bad Enable SATA link power Managmenet for host1
+Bad Autosuspend for USB device USB Keyboard [CHESEN]
+Bad Runtime PM for PCI Device Intel Corporation Xeon E3-1200 v2/3rd
+Bad Runtime PM for PCI Device Intel Corporation 7 Series/C210 Serie
+Bad Runtime PM for PCI Device Intel Corporation 7 Series/C210 Serie
+Bad Runtime PM for PCI Device Intel Corporation 7 Series/C210 Serie
+Bad Runtime PM for PCI Device ASMedia Technology Inc. ASM1083/1085
+Bad Runtime PM for PCI Device Realtek Semiconductor Co., Ltd. RTL81
+Bad Runtime PM for PCI Device Intel Corporation 7 Series/C210 Serie
+Bad Runtime PM for PCI Device Intel Corporation 7 Series/C210 Serie
+Bad Runtime PM for PCI Device Intel Corporation 82801 PCI Bridge
+Bad Runtime PM for PCI Device Intel Corporation H77 Express Chipset
+Bad Runtime PM for PCI Device Intel Corporation 7 Series/C210 Serie
+Bad Runtime PM for PCI Device Intel Corporation 7 Series/C210 Serie
+Bad Runtime PM for PCI Device Intel Corporation 7 Series/C210 Serie
+Bad Runtime PM for PCI Device Intel Corporation Xeon E3-1200 v2/3rd
+Bad Runtime PM for PCI Device Intel Corporation 7 Series/C210 Serie
+Bad Wake-on-lan status for device eth0
 
---===============2781975446127624716==--
+Thanks !
+
+--===============2438172233981437759==--
 
