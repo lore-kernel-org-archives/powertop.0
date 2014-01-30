@@ -1,40 +1,100 @@
-Content-Type: multipart/mixed; boundary="===============1775886461596634860=="
+Content-Type: multipart/mixed; boundary="===============6213446144475579317=="
 MIME-Version: 1.0
-From: Kok, Auke-jan H <auke-jan.h.kok at intel.com>
-Subject: Re: [Powertop] RaspberryPI bug
-Date: Mon, 05 May 2014 09:18:18 -0700
-Message-ID: <CABsxX9+XUJYazrsp1sZeei=ANg2o-rx_w18c4HOMtSyrD4hLiA@mail.gmail.com>
-In-Reply-To: CAJSB6HPJo8yha4TSZhMnZT8Eui2kAdhovbe2bKF1Fcvd_6i+-Q@mail.gmail.com
+From: Marc MERLIN <marc_powertop at merlins.org>
+Subject: [Powertop] Stilll seeing bogus wattage reported to USB devices
+Date: Thu, 30 Jan 2014 10:23:45 -0800
+Message-ID: <20140130182345.GA26750@merlins.org>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1775886461596634860==
+--===============6213446144475579317==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 5, 2014 at 8:38 AM, Adam Klobukowski
-<adamklobukowski(a)gmail.com> wrote:
-> Hello
->
-> On RaspberryPI, Powertop 2.5 shows:
->
-> Summary: nan wakeups/second,  nan GPU ops/seconds, nan VFS ops/sec and -0=
-,0%
-> CPU use
->
-> Not very useful message :)
+With powertop 2.5, see these 3 report taken a minute apart with no
+change of load.
+All I did was remove the yubikey and put it back in, and unload wlan0
 
-Feel free to submit code ...
 
-Power measurement and CPU stats are very different on non-x86
-architectures, and someone has to write that code. Nobody has
-apparently stepped up to provide patches and code to support this
-particular board.
 
-Cheers,
+> Yubikey was showing 6W, so I removed it. that didn't change the discharge=
+ rate:
 
-Auke
+The battery reports a discharge rate of 19.9 W
+The estimated remaining time is 3 hours, 23 minutes
 
---===============1775886461596634860==--
+Summary: 1196.2 wakeups/second,  74.9 GPU ops/seconds, 0.0 VFS ops/sec and =
+16.6% CPU use
+
+Power est.              Usage       Events/s    Category       Description
+  10.7 W     48.4 pkts/s                Device         Network interface: w=
+lan0 (iwlwifi)
+  2.39 W     57.1%                      Device         Display backlight
+  2.39 W     17.3%                      Device         Display backlight
+  395 mW      8.5 ms/s     249.8        Process        /usr/local/opt/googl=
+e/chrome-beta/chrome
+  363 mW      6.4 ms/s     168.0        Process        /usr/local/opt/googl=
+e/chrome-beta/chrome
+  226 mW      5.7 ms/s     155.7        Timer          hrtimer_wakeup
+
+
+
+> So I put the yubikey back and and unloaded wlan0 since it was said to
+> take 10W (I knew that was false).
+No real change either (little drop from removing wireless, but not 10W)
+
+The battery reports a discharge rate of 17.8 W
+The estimated remaining time is 3 hours, 43 minutes
+
+Summary: 1155.3 wakeups/second,  81.8 GPU ops/seconds, 0.0 VFS ops/sec and =
+7.9% CPU use
+
+Power est.              Usage       Events/s    Category       Description
+  5.90 W    100.0%                      Device         USB device: Yubico =
+
+  3.15 W     57.1%                      Device         Display backlight
+  3.15 W     17.3%                      Device         Display backlight
+  353 mW      3.7 ms/s     170.1        Process        /usr/local/opt/googl=
+e/chrome-beta/chrome
+  340 mW     13.0 ms/s     252.8        Process        /usr/local/opt/googl=
+e/chrome-beta/chrome
+  320 mW      6.1 ms/s     238.4        Timer          hrtimer_wakeup
+
+
+> Yubikye is said to take 6W again, really? I know that's a lie. I removed
+and power went up 0.4W (normal variance unrelated to yubikey).
+
+The battery reports a discharge rate of 18.2 W
+The estimated remaining time is 3 hours, 38 minutes
+
+Summary: 1284.1 wakeups/second,  36.2 GPU ops/seconds, 0.0 VFS ops/sec and
+
+Power est.              Usage       Events/s    Category       Description
+  3.15 W     57.1%                      Device         Display backlight
+  3.15 W     17.3%                      Device         Display backlight
+  426 mW     20.8 ms/s     166.8        Process        /usr/bin/enlightenm
+  343 mW     11.8 ms/s     236.3        Process        /usr/local/opt/googl=
+e/chrome-beta/chrome
+  301 mW      6.3 ms/s     207.0        Timer          hrtimer_wakeup
+  168 mW      2.8 ms/s     115.6        Interrupt      PS/2 Touchpad / Keyb=
+oard / Mouse
+
+
+Is anyone closer to fixing this bug? It's impossible to get real battery
+usage and due tuning with it present.
+
+Thanks
+Marc
+-- =
+
+"A mouse is a device used to point at the xterm you want to type in" - A.S.=
+R.
+Microsoft is to operating systems ....
+                                      .... what McDonalds is to gourmet coo=
+king
+Home page: http://marc.merlins.org/                         | PGP 1024R/763=
+BE901
+
+--===============6213446144475579317==--
 
