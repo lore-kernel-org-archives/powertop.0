@@ -1,88 +1,73 @@
-Content-Type: multipart/mixed; boundary="===============3519469823877985326=="
+Content-Type: multipart/mixed; boundary="===============6629941704853519008=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] Gentoo: v2.6.1 breaks packaging traditions
-Date: Mon, 02 Jun 2014 15:03:34 -0700
-Message-ID: <60013.10.24.3.27.1401746614.squirrel@linux.intel.com>
+From: Wout Mertens <wout.mertens at gmail.com>
+Subject: Re: [Powertop] HIgh power concumption on network interface
+Date: Thu, 20 Feb 2014 21:37:34 +0100
+Message-ID: <CAO3V83LOc6ZCBjhgLaOyH6STt+s=xRJL8h=Dy+bugNnAS0q_fw@mail.gmail.com>
+In-Reply-To: 53061A07.2080701@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3519469823877985326==
+--===============6629941704853519008==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-All,
+On Thu, Feb 20, 2014 at 4:06 PM, Arjan van de Ven <arjan(a)linux.intel.com>=
+wrote:
 
-Please excuse the trashing the posted tar file(s) created.
-
-There was a problem with the web services that didn't allow to remove an
-erroneous tar I uploaded, it set a side the correct tar with a different
-name breaking all conventions.
-
-I worked today with the 01.org team to fix the problem.  The correct
-release tar ball is updated now.  I didn't spin a new version since the
-tar file was correct.
-
-Joe, thank you for reporting the issue.  Thank all for the Best Known
-Methods to create the release.  Hopefully next release will go smoother.
-
-Regards,
-Alexandra.
-
-
-> -----BEGIN PGP SIGNED MESSAGE-----
-> Hash: SHA1
+> On 2/19/2014 10:35 PM, Wout Mertens wrote:
 >
-> On 05/30/2014 06:03 PM, Arjan van de Ven wrote:
->>>
->>> Are there any plans to remedy this?
+>> Alright I'll give that a shot, thanks!
 >>
->> I'll work with Alexandra to get a good release out, probably on Monday
->>
-> 2.6 is in gentoo already (since the day of release) and the fixes in
-> 2.6.1 were pretty minor so I didn't bother to package it.  If upstream
-> wants to release a working 2.6.2 tarball or something that's great.
->
-> It keeps occurring so I feel inclined to mention it, please run make
-> clean first.
->
-> Thanks,
-> Zero
->>
->> _______________________________________________
->> PowerTop mailing list
->> PowerTop(a)lists.01.org
->> https://lists.01.org/mailman/listinfo/powertop
+>> As a side question though, is 20W a reasonable idle power consumption for
+>> a high-end recent laptop?
 >>
 >
-> -----BEGIN PGP SIGNATURE-----
-> Version: GnuPG v2.0.22 (GNU/Linux)
-> Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
->
-> iQIcBAEBAgAGBQJTiQ/YAAoJEKXdFCfdEflKW/cQAK5d8fU8d+IDSFEdKkqMjtTM
-> EMUJe3XxqhO/J7wR/2uO1HsUDz4aHraHDSKgcUV5RPetJjbtBri3n5eJlue3r1PI
-> sB4spPC5eH7pARJrGF7ZJXBBJXSt8151Cy3Pihk1H/kkSYgfAiPJOk0IW1dnvYE2
-> ttYUb/C515gDK16WPZbMmmQ0nwnGIobd63A0J6dUtdDxl7uxN7YzJG8CWrwx4Rfh
-> xQb1hJSWAbT/rgDTwAPL3MM0Yxn7eJdnkAxC9GYGcQMzYfxV6/Jqb4qjxjPx3Jy2
-> 2PygbmqY+M1q5hjTRplsRJyxPVqkHUEY4sQ0uHJDR0kS0TpoVPV0htPDtjtJQ/I/
-> Jd1RZRwFA2O4T3s6Pjo+tTYfnCGR1gSaPhSTLihadc64Omef2sitUh+KjLK/JCkx
-> pd/AMzKSfID2GBTGXqJnWzx7MTFWeAB84W7Fb3XLNCrR4meDrarvnKhj8nulm6Lp
-> KE5TWVW8rXN77YixWSz6UqoEpGuAzXbtWnZh2R9LsHKXTVUzybfESfqI4ySoGR2n
-> xHwOEuxrZ7MrZW7jEFBM2xBltNCXPdLfDulmus2b3d2Z2fr8OtiKzTXw/kfcJKnu
-> 7Vssl8+Z+TYpiyQ297Ta2QCkVRy+oAVnyo+umrDo8IgdZqouWRPqvHe+Z34qD+yC
-> HTAHBkNus92Sa3OHIGwQ
-> =3Djmov
-> -----END PGP SIGNATURE-----
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
+> that's quite on the high side
+> Having said that, screen takes a lot of power at full brightness ;)
 >
 
+Well this was at the lowest brightness I could set it at. I just tested,
+and with the laptop going into "light sleep" (screen off, disk off, idle
+processes) it seems to use 12W.
 
-Thank you,
-Alexandra.
+Any tips for finding out what might cause the drain? Perhaps the 16GB RAM
+is suspect? Or maybe just the CPU (it's an i7-4800MQ with a 47W TDP).
 
---===============3519469823877985326==--
+Wout.
+
+--===============6629941704853519008==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+PGRpdiBkaXI9Imx0ciI+PGRpdiBjbGFzcz0iZ21haWxfZXh0cmEiPjxkaXYgY2xhc3M9ImdtYWls
+X3F1b3RlIj5PbiBUaHUsIEZlYiAyMCwgMjAxNCBhdCA0OjA2IFBNLCBBcmphbiB2YW4gZGUgVmVu
+IDxzcGFuIGRpcj0ibHRyIj4mbHQ7PGEgaHJlZj0ibWFpbHRvOmFyamFuQGxpbnV4LmludGVsLmNv
+bSIgdGFyZ2V0PSJfYmxhbmsiPmFyamFuQGxpbnV4LmludGVsLmNvbTwvYT4mZ3Q7PC9zcGFuPiB3
+cm90ZTo8YnI+CjxibG9ja3F1b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9Im1hcmdpbjow
+cHggMHB4IDBweCAwLjhleDtib3JkZXItbGVmdC13aWR0aDoxcHg7Ym9yZGVyLWxlZnQtY29sb3I6
+cmdiKDIwNCwyMDQsMjA0KTtib3JkZXItbGVmdC1zdHlsZTpzb2xpZDtwYWRkaW5nLWxlZnQ6MWV4
+Ij48ZGl2IGNsYXNzPSIiPk9uIDIvMTkvMjAxNCAxMDozNSBQTSwgV291dCBNZXJ0ZW5zIHdyb3Rl
+Ojxicj4KCjxibG9ja3F1b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9Im1hcmdpbjowcHgg
+MHB4IDBweCAwLjhleDtib3JkZXItbGVmdC13aWR0aDoxcHg7Ym9yZGVyLWxlZnQtY29sb3I6cmdi
+KDIwNCwyMDQsMjA0KTtib3JkZXItbGVmdC1zdHlsZTpzb2xpZDtwYWRkaW5nLWxlZnQ6MWV4Ij4K
+QWxyaWdodCBJJiMzOTtsbCBnaXZlIHRoYXQgYSBzaG90LCB0aGFua3MhPGJyPgo8YnI+CkFzIGEg
+c2lkZSBxdWVzdGlvbiB0aG91Z2gsIGlzIDIwVyBhIHJlYXNvbmFibGUgaWRsZSBwb3dlciBjb25z
+dW1wdGlvbiBmb3IgYSBoaWdoLWVuZCByZWNlbnQgbGFwdG9wPzxicj4KPC9ibG9ja3F1b3RlPgo8
+YnI+PC9kaXY+CnRoYXQmIzM5O3MgcXVpdGUgb24gdGhlIGhpZ2ggc2lkZTxicj4KSGF2aW5nIHNh
+aWQgdGhhdCwgc2NyZWVuIHRha2VzIGEgbG90IG9mIHBvd2VyIGF0IGZ1bGwgYnJpZ2h0bmVzcyA7
+KTxicj48L2Jsb2NrcXVvdGU+PGRpdj48YnI+PC9kaXY+V2VsbCB0aGlzIHdhcyBhdCB0aGUgbG93
+ZXN0IGJyaWdodG5lc3MgSSBjb3VsZCBzZXQgaXQgYXQuIEkganVzdCB0ZXN0ZWQsIGFuZCB3aXRo
+IHRoZSBsYXB0b3AgZ29pbmcgaW50byAmcXVvdDtsaWdodCBzbGVlcCZxdW90OyAoc2NyZWVuIG9m
+ZiwgZGlzayBvZmYsIGlkbGUgcHJvY2Vzc2VzKSBpdCBzZWVtcyB0byB1c2UgMTJXLjwvZGl2Pgo8
+ZGl2IGNsYXNzPSJnbWFpbF9xdW90ZSI+PGJyPjwvZGl2PjxkaXYgY2xhc3M9ImdtYWlsX3F1b3Rl
+Ij5BbnkgdGlwcyBmb3IgZmluZGluZyBvdXQgd2hhdCBtaWdodCBjYXVzZSB0aGUgZHJhaW4/IFBl
+cmhhcHMgdGhlIDE2R0IgUkFNIGlzIHN1c3BlY3Q/IE9yIG1heWJlIGp1c3QgdGhlIENQVSAoaXQm
+IzM5O3MgYW4gaTctNDgwME1RIHdpdGggYSA0N1cgVERQKS48ZGl2PqA8L2Rpdj48L2Rpdj4KV291
+dC48L2Rpdj48L2Rpdj4K
+
+--===============6629941704853519008==--
 
