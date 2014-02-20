@@ -1,52 +1,27 @@
-Content-Type: multipart/mixed; boundary="===============3212408052828045703=="
+Content-Type: multipart/mixed; boundary="===============5589206532390320212=="
 MIME-Version: 1.0
-From: Marti Raudsepp <marti at juffo.org>
-Subject: Re: [Powertop] PowerTOP 2.0 bugs
-Date: Tue, 15 May 2012 02:11:10 +0300
-Message-ID: <CABRT9RDdKghGM67oP6awBXDoF8mvxg9w0xib7u6yyxiNDpSxNA@mail.gmail.com>
-In-Reply-To: 4FB181A0.9020803@linux.intel.com
+From: Sree Harsha Totakura <sreeharsha at totakura.in>
+Subject: Re: [Powertop] HIgh power concumption on network interface
+Date: Thu, 20 Feb 2014 10:34:28 +0100
+Message-ID: <5305CC24.3020407@totakura.in>
+In-Reply-To: CAO3V83+w2XL8aSAoLNbqrw4ArRVV+HSq1RpQaA4=Zm_oN2ueBw@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3212408052828045703==
+--===============5589206532390320212==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 15, 2012 at 1:05 AM, Chris Ferron
-<chris.e.ferron(a)linux.intel.com> wrote:
-> Can you please tell me what system, processors and distro (and version) y=
-ou
-> are running?
-> Also are you running in a VM by chance?
+On 02/20/2014 07:35 AM, Wout Mertens wrote:
+> As a side question though, is 20W a reasonable idle power consumption for=
+ a
+> high-end recent laptop?
 
-No VM, physical hardware. Arch Linux (testing repos enabled), kernel
-3.3.5, x86_64.
+In most cases, NO.  I have a T440s, it takes upto 7W with medium
+brightness setting when idle.
 
-Bug #1 occurs on my desktop (AMD Phenom II X4 965) as well as laptop
-(Intel Core i5-560M)
+Sree
 
-Bugs #2 and #3 only occur on the AMD box.
-
->> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Usage =C2=A0 =C2=
-=A0 =C2=A0 Events/s =C2=A0 =C2=A0Category =C2=A0 =C2=A0 =C2=A0 Description
->> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1816 ms/s =C2=A0 =C2=A0 =C2=A0=
-0.00 =C2=A0 =C2=A0 =C2=A0 =C2=A0Process =C2=A0 =C2=A0 =C2=A0 =C2=A0openssl =
-speed
->> The usage numbers are clearly bogus.
-
-> Why do you think theyt
-
-Not sure what you meant to ask...
-
-> I have spent three hours testing this bug using your test case above, and=
- am
-> not seeing the issue.
-
-Yeah, these issues are immediately obvious on my machine.
-
-Regards,
-Marti
-
---===============3212408052828045703==--
+--===============5589206532390320212==--
 
