@@ -1,32 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============2849945024542831490=="
+Content-Type: multipart/mixed; boundary="===============1219848748860496989=="
 MIME-Version: 1.0
-From: kingma at bluewin.ch
-Subject: [Powertop] HIgh power concumption on network interface
-Date: Sat, 28 Sep 2019 02:01:14 +0000
-Message-ID: <19592850.4247.1392276748004.JavaMail.webmail@bluewin.ch>
+From: Ferron, Chris E <chris.e.ferron at intel.com>
+Subject: Re: [Powertop] High power consumption on network interface
+Date: Fri, 21 Feb 2014 17:37:22 +0000
+Message-ID: <E351AD52FA1E154C8FFF4F9FCD2CA84336E9A441@ORSMSX101.amr.corp.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2849945024542831490==
+--===============1219848748860496989==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-I observe a sustained high power consumption of 5- 10 W on the ehternet ada=
-ptor e1000e on a lenovo thinkgpad t430s. Such I high power drain cannot be =
-correct can it? the total power consumption is around 25 W which is a conce=
-rn for battery life.
 
---===============2849945024542831490==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
 
-SSBvYnNlcnZlIGEgc3VzdGFpbmVkIGhpZ2ggcG93ZXIgY29uc3VtcHRpb24gb2YgNS0gMTAgVyBv
-biB0aGUgZWh0ZXJuZXQgYWRhcHRvciBlMTAwMGUgb24gYSBsZW5vdm8gdGhpbmtncGFkIHQ0MzBz
-LiBTdWNoIEkgaGlnaCBwb3dlciBkcmFpbiBjYW5ub3QgYmUgY29ycmVjdCBjYW4gaXQ/IHRoZSB0
-b3RhbCBwb3dlciBjb25zdW1wdGlvbiBpcyBhcm91bmQgMjUgVyB3aGljaCBpcyBhIGNvbmNlcm4g
-Zm9yIGJhdHRlcnkgbGlmZS48YnI+
---===============2849945024542831490==--
+> -----Original Message-----
+> From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of Sree
+> Harsha Totakura
+> Sent: Thursday, February 20, 2014 1:34 AM
+> To: powertop(a)lists.01.org
+> Subject: Re: [Powertop] HIgh power concumption on network interface
+> =
+
+> On 02/20/2014 07:35 AM, Wout Mertens wrote:
+> > As a side question though, is 20W a reasonable idle power consumption
+> > for a high-end recent laptop?
+> =
+
+> In most cases, NO.  I have a T440s, it takes upto 7W with medium brightne=
+ss
+> setting when idle.
+Even that is a bit high for a i7-4600U that comes in a T440. =
+
+> =
+
+> Sree
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+
+--===============1219848748860496989==--
 
