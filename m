@@ -1,50 +1,145 @@
-Content-Type: multipart/mixed; boundary="===============9074753213537555578=="
+Content-Type: multipart/mixed; boundary="===============0220940625355795966=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH 1/3] fix-warnings: Ignoring return value of system()
-Date: Fri, 13 Jun 2014 15:18:27 -0700
-Message-ID: <1402697910-29154-2-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: 1402697910-29154-1-git-send-email-alexandra.yates@linux.intel.com
+From: Gopal, Saranya <saranya.gopal at intel.com>
+Subject: Re: [Powertop] Powertop on chromeos
+Date: Thu, 06 Mar 2014 09:56:13 +0000
+Message-ID: <C672AA6DAAC36042A98BAD0B0B25BDA92251A081@BGSMSX104.gar.corp.intel.com>
+In-Reply-To: C672AA6DAAC36042A98BAD0B0B25BDA922519F68@BGSMSX104.gar.corp.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============9074753213537555578==
+--===============0220940625355795966==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Added error handling to system() for  bluetooth.cpp.
+Hi all,
 
-Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
----
- src/tuning/bluetooth.cpp |    6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+I was just missing '=3D' in my commands.
+Right command was: powertop --time=3D60
+Thanks Christophe for pointing it out.
 
-diff --git a/src/tuning/bluetooth.cpp b/src/tuning/bluetooth.cpp
-index 2b34277..92f5835 100644
---- a/src/tuning/bluetooth.cpp
-+++ b/src/tuning/bluetooth.cpp
-@@ -176,10 +176,12 @@ void bt_tunable::toggle(void)
- 	good =3D good_bad();
- =
+Thanks,
+Saranya
 
- 	if (good =3D=3D TUNE_GOOD) {
--		system("/usr/sbin/hciconfig hci0 up &> /dev/null &");
-+		if(!system("/usr/sbin/hciconfig hci0 up &> /dev/null &"))
-+			printf("System is not available\n");
- 		return;
- 	}
--	system("/usr/sbin/hciconfig hci0 down &> /dev/null");
-+	if(!system("/usr/sbin/hciconfig hci0 down &> /dev/null"))
-+		printf("System is not available\n");
- }
- =
+From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of Gopal,=
+ Saranya
+Sent: Thursday, March 06, 2014 1:51 PM
+To: powertop(a)lists.01.org
+Subject: [Powertop] Powertop on chromeos
 
- const char *bt_tunable::toggle_script(void)
--- =
+Hi all,
 
-1.7.9.5
+I am trying to use PowerTop on a baytrail-M board running chromeOS.
+I downloaded the source from https://github.com/fenrus75/powertop and compi=
+led in my host machine (Ubuntu 12.04)
+Then I copied the binary to the baytrail-M board on which I need to take me=
+asurements.
+When I run the powertop binary, it seems to work and I could even get the o=
+utput in csv or html format.
+But, my problem is that I could not configure any other parameter while run=
+ning the tool.
+For example, powertop --time 60 does not work. Neither does powertop --iter=
+ation 3
+It always says it is taking 1 measurement in 20 seconds.
+I notice that it reports that it could not load from file /var/cache/powert=
+op/saved-parameters.powertop.
+Is that an issue?
+Should I install some configuration file somewhere in my target machine?
+Has anyone tried running powertop on chromeOS?
+Any pointers to fix this issue would be of great help to me.
 
+Thanks,
+Saranya
 
---===============9074753213537555578==--
+--===============0220940625355795966==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
+bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
+YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
+cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
+VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
+bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
+ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTQgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
+PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseTpDYWxp
+YnJpOwoJcGFub3NlLTE6MiAxNSA1IDIgMiAyIDQgMyAyIDQ7fQpAZm9udC1mYWNlCgl7Zm9udC1m
+YW1pbHk6VGFob21hOwoJcGFub3NlLTE6MiAxMSA2IDQgMyA1IDQgNCAyIDQ7fQovKiBTdHlsZSBE
+ZWZpbml0aW9ucyAqLwpwLk1zb05vcm1hbCwgbGkuTXNvTm9ybWFsLCBkaXYuTXNvTm9ybWFsCgl7
+bWFyZ2luOjBpbjsKCW1hcmdpbi1ib3R0b206LjAwMDFwdDsKCWZvbnQtc2l6ZToxMS4wcHQ7Cglm
+b250LWZhbWlseToiQ2FsaWJyaSIsInNhbnMtc2VyaWYiO30KYTpsaW5rLCBzcGFuLk1zb0h5cGVy
+bGluawoJe21zby1zdHlsZS1wcmlvcml0eTo5OTsKCWNvbG9yOmJsdWU7Cgl0ZXh0LWRlY29yYXRp
+b246dW5kZXJsaW5lO30KYTp2aXNpdGVkLCBzcGFuLk1zb0h5cGVybGlua0ZvbGxvd2VkCgl7bXNv
+LXN0eWxlLXByaW9yaXR5Ojk5OwoJY29sb3I6cHVycGxlOwoJdGV4dC1kZWNvcmF0aW9uOnVuZGVy
+bGluZTt9CnNwYW4uRW1haWxTdHlsZTE3Cgl7bXNvLXN0eWxlLXR5cGU6cGVyc29uYWw7Cglmb250
+LWZhbWlseToiQ2FsaWJyaSIsInNhbnMtc2VyaWYiOwoJY29sb3I6d2luZG93dGV4dDt9CnNwYW4u
+RW1haWxTdHlsZTE4Cgl7bXNvLXN0eWxlLXR5cGU6cGVyc29uYWwtcmVwbHk7Cglmb250LWZhbWls
+eToiQ2FsaWJyaSIsInNhbnMtc2VyaWYiOwoJY29sb3I6IzFGNDk3RDt9Ci5Nc29DaHBEZWZhdWx0
+Cgl7bXNvLXN0eWxlLXR5cGU6ZXhwb3J0LW9ubHk7Cglmb250LXNpemU6MTAuMHB0O30KQHBhZ2Ug
+V29yZFNlY3Rpb24xCgl7c2l6ZTo4LjVpbiAxMS4waW47CgltYXJnaW46MS4waW4gMS4waW4gMS4w
+aW4gMS4waW47fQpkaXYuV29yZFNlY3Rpb24xCgl7cGFnZTpXb3JkU2VjdGlvbjE7fQotLT48L3N0
+eWxlPjwhLS1baWYgZ3RlIG1zbyA5XT48eG1sPgo8bzpzaGFwZWRlZmF1bHRzIHY6ZXh0PSJlZGl0
+IiBzcGlkbWF4PSIxMDI2IiAvPgo8L3htbD48IVtlbmRpZl0tLT48IS0tW2lmIGd0ZSBtc28gOV0+
+PHhtbD4KPG86c2hhcGVsYXlvdXQgdjpleHQ9ImVkaXQiPgo8bzppZG1hcCB2OmV4dD0iZWRpdCIg
+ZGF0YT0iMSIgLz4KPC9vOnNoYXBlbGF5b3V0PjwveG1sPjwhW2VuZGlmXS0tPgo8L2hlYWQ+Cjxi
+b2R5IGxhbmc9IkVOLVVTIiBsaW5rPSJibHVlIiB2bGluaz0icHVycGxlIj4KPGRpdiBjbGFzcz0i
+V29yZFNlY3Rpb24xIj4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImNvbG9yOiMx
+RjQ5N0QiPkhpIGFsbCw8bzpwPjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwi
+PjxzcGFuIHN0eWxlPSJjb2xvcjojMUY0OTdEIj48bzpwPiZuYnNwOzwvbzpwPjwvc3Bhbj48L3A+
+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJjb2xvcjojMUY0OTdEIj5JIHdhcyBq
+dXN0IG1pc3NpbmcgJiM4MjE2Oz0mIzgyMTc7IGluIG15IGNvbW1hbmRzLjxvOnA+PC9vOnA+PC9z
+cGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImNvbG9yOiMxRjQ5N0Qi
+PlJpZ2h0IGNvbW1hbmQgd2FzOiBwb3dlcnRvcCAtLXRpbWU9NjA8bzpwPjwvbzpwPjwvc3Bhbj48
+L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJjb2xvcjojMUY0OTdEIj5UaGFu
+a3MgQ2hyaXN0b3BoZSBmb3IgcG9pbnRpbmcgaXQgb3V0LjxvOnA+PC9vOnA+PC9zcGFuPjwvcD4K
+PHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImNvbG9yOiMxRjQ5N0QiPjxvOnA+Jm5i
+c3A7PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImNv
+bG9yOiMxRjQ5N0QiPlRoYW5rcyw8bzpwPjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29O
+b3JtYWwiPjxzcGFuIHN0eWxlPSJjb2xvcjojMUY0OTdEIj5TYXJhbnlhPG86cD48L286cD48L3Nw
+YW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iY29sb3I6IzFGNDk3RCI+
+PG86cD4mbmJzcDs8L286cD48L3NwYW4+PC9wPgo8ZGl2Pgo8ZGl2IHN0eWxlPSJib3JkZXI6bm9u
+ZTtib3JkZXItdG9wOnNvbGlkICNCNUM0REYgMS4wcHQ7cGFkZGluZzozLjBwdCAwaW4gMGluIDBp
+biI+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTAuMHB0
+O2ZvbnQtZmFtaWx5OiZxdW90O1RhaG9tYSZxdW90OywmcXVvdDtzYW5zLXNlcmlmJnF1b3Q7Ij5G
+cm9tOjwvc3Bhbj48L2I+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMC4wcHQ7Zm9udC1mYW1pbHk6
+JnF1b3Q7VGFob21hJnF1b3Q7LCZxdW90O3NhbnMtc2VyaWYmcXVvdDsiPiBQb3dlclRvcCBbbWFp
+bHRvOnBvd2VydG9wLWJvdW5jZXNAbGlzdHMuMDEub3JnXQo8Yj5PbiBCZWhhbGYgT2YgPC9iPkdv
+cGFsLCBTYXJhbnlhPGJyPgo8Yj5TZW50OjwvYj4gVGh1cnNkYXksIE1hcmNoIDA2LCAyMDE0IDE6
+NTEgUE08YnI+CjxiPlRvOjwvYj4gcG93ZXJ0b3BAbGlzdHMuMDEub3JnPGJyPgo8Yj5TdWJqZWN0
+OjwvYj4gW1Bvd2VydG9wXSBQb3dlcnRvcCBvbiBjaHJvbWVvczxvOnA+PC9vOnA+PC9zcGFuPjwv
+cD4KPC9kaXY+CjwvZGl2Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwv
+cD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+SGkgYWxsLDxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0i
+TXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+SSBh
+bSB0cnlpbmcgdG8gdXNlIFBvd2VyVG9wIG9uIGEgYmF5dHJhaWwtTSBib2FyZCBydW5uaW5nIGNo
+cm9tZU9TLjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5JIGRvd25sb2FkZWQg
+dGhlIHNvdXJjZSBmcm9tIDxhIGhyZWY9Imh0dHBzOi8vZ2l0aHViLmNvbS9mZW5ydXM3NS9wb3dl
+cnRvcCI+Cmh0dHBzOi8vZ2l0aHViLmNvbS9mZW5ydXM3NS9wb3dlcnRvcDwvYT4gYW5kIGNvbXBp
+bGVkIGluIG15IGhvc3QgbWFjaGluZSAoVWJ1bnR1IDEyLjA0KTxvOnA+PC9vOnA+PC9wPgo8cCBj
+bGFzcz0iTXNvTm9ybWFsIj5UaGVuIEkgY29waWVkIHRoZSBiaW5hcnkgdG8gdGhlIGJheXRyYWls
+LU0gYm9hcmQgb24gd2hpY2ggSSBuZWVkIHRvIHRha2UgbWVhc3VyZW1lbnRzLjxvOnA+PC9vOnA+
+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5XaGVuIEkgcnVuIHRoZSBwb3dlcnRvcCBiaW5hcnks
+IGl0IHNlZW1zIHRvIHdvcmsgYW5kIEkgY291bGQgZXZlbiBnZXQgdGhlIG91dHB1dCBpbiBjc3Yg
+b3IgaHRtbCBmb3JtYXQuPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPkJ1dCwg
+bXkgcHJvYmxlbSBpcyB0aGF0IEkgY291bGQgbm90IGNvbmZpZ3VyZSBhbnkgb3RoZXIgcGFyYW1l
+dGVyIHdoaWxlIHJ1bm5pbmcgdGhlIHRvb2wuPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29O
+b3JtYWwiPkZvciBleGFtcGxlLCBwb3dlcnRvcCAtLXRpbWUgNjAgZG9lcyBub3Qgd29yay4gTmVp
+dGhlciBkb2VzIHBvd2VydG9wIC0taXRlcmF0aW9uIDM8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9
+Ik1zb05vcm1hbCI+SXQgYWx3YXlzIHNheXMgaXQgaXMgdGFraW5nIDEgbWVhc3VyZW1lbnQgaW4g
+MjAgc2Vjb25kcy48bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+SSBub3RpY2Ug
+dGhhdCBpdCByZXBvcnRzIHRoYXQgaXQgY291bGQgbm90IGxvYWQgZnJvbSBmaWxlIC92YXIvY2Fj
+aGUvcG93ZXJ0b3Avc2F2ZWQtcGFyYW1ldGVycy5wb3dlcnRvcC48bzpwPjwvbzpwPjwvcD4KPHAg
+Y2xhc3M9Ik1zb05vcm1hbCI+SXMgdGhhdCBhbiBpc3N1ZT88bzpwPjwvbzpwPjwvcD4KPHAgY2xh
+c3M9Ik1zb05vcm1hbCI+U2hvdWxkIEkgaW5zdGFsbCBzb21lIGNvbmZpZ3VyYXRpb24gZmlsZSBz
+b21ld2hlcmUgaW4gbXkgdGFyZ2V0IG1hY2hpbmU/PG86cD48L286cD48L3A+CjxwIGNsYXNzPSJN
+c29Ob3JtYWwiPkhhcyBhbnlvbmUgdHJpZWQgcnVubmluZyBwb3dlcnRvcCBvbiBjaHJvbWVPUz88
+bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+QW55IHBvaW50ZXJzIHRvIGZpeCB0
+aGlzIGlzc3VlIHdvdWxkIGJlIG9mIGdyZWF0IGhlbHAgdG8gbWUuPG86cD48L286cD48L3A+Cjxw
+IGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9y
+bWFsIj5UaGFua3MsPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPlNhcmFueWE8
+bzpwPjwvbzpwPjwvcD4KPC9kaXY+CjwvYm9keT4KPC9odG1sPgo=
+
+--===============0220940625355795966==--
 
