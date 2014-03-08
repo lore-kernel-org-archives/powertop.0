@@ -1,102 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============4845229867349624307=="
+Content-Type: multipart/mixed; boundary="===============2691665545058824850=="
 MIME-Version: 1.0
-From: Gopal, Saranya <saranya.gopal at intel.com>
-Subject: [Powertop] Powertop on chromeos
-Date: Thu, 06 Mar 2014 08:20:54 +0000
-Message-ID: <C672AA6DAAC36042A98BAD0B0B25BDA922519F68@BGSMSX104.gar.corp.intel.com>
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] Dynamically changing data
+Date: Sat, 08 Mar 2014 09:45:55 -0800
+Message-ID: <531B5753.5060908@linux.intel.com>
+In-Reply-To: CADy9ZNBw0xzQW5H_wsWnQ-6EsNLueA8NK8RoZzi3TFZuUzYgyw@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4845229867349624307==
+--===============2691665545058824850==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+On 3/8/2014 8:27 AM, Bill Vyzas wrote:
+> Hi all,
+>
+> When the tool is launched are there any components that change dynamicall=
+y or the user can alter them? For example the Tunables section can be refre=
+shed by the user, is
+> there any other interface or value that will change dynamically as I am r=
+unning the tool?
+>
+by default, it'll refresh every 20 seconds but also if you hit the "R" key =
+it will refresh immediately.
 
-I am trying to use PowerTop on a baytrail-M board running chromeOS.
-I downloaded the source from https://github.com/fenrus75/powertop and compi=
-led in my host machine (Ubuntu 12.04)
-Then I copied the binary to the baytrail-M board on which I need to take me=
-asurements.
-When I run the powertop binary, it seems to work and I could even get the o=
-utput in csv or html format.
-But, my problem is that I could not configure any other parameter while run=
-ning the tool.
-For example, powertop --time 60 does not work. Neither does powertop --iter=
-ation 3
-It always says it is taking 1 measurement in 20 seconds.
-I notice that it reports that it could not load from file /var/cache/powert=
-op/saved-parameters.powertop.
-Is that an issue?
-Should I install some configuration file somewhere in my target machine?
-Has anyone tried running powertop on chromeOS?
-Any pointers to fix this issue would be of great help to me.
 
-Thanks,
-Saranya
 
---===============4845229867349624307==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
-
-PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
-bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
-YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
-cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
-VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
-bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
-ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTQgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
-PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseTpDYWxp
-YnJpOwoJcGFub3NlLTE6MiAxNSA1IDIgMiAyIDQgMyAyIDQ7fQovKiBTdHlsZSBEZWZpbml0aW9u
-cyAqLwpwLk1zb05vcm1hbCwgbGkuTXNvTm9ybWFsLCBkaXYuTXNvTm9ybWFsCgl7bWFyZ2luOjBp
-bjsKCW1hcmdpbi1ib3R0b206LjAwMDFwdDsKCWZvbnQtc2l6ZToxMS4wcHQ7Cglmb250LWZhbWls
-eToiQ2FsaWJyaSIsInNhbnMtc2VyaWYiO30KYTpsaW5rLCBzcGFuLk1zb0h5cGVybGluawoJe21z
-by1zdHlsZS1wcmlvcml0eTo5OTsKCWNvbG9yOmJsdWU7Cgl0ZXh0LWRlY29yYXRpb246dW5kZXJs
-aW5lO30KYTp2aXNpdGVkLCBzcGFuLk1zb0h5cGVybGlua0ZvbGxvd2VkCgl7bXNvLXN0eWxlLXBy
-aW9yaXR5Ojk5OwoJY29sb3I6cHVycGxlOwoJdGV4dC1kZWNvcmF0aW9uOnVuZGVybGluZTt9CnNw
-YW4uRW1haWxTdHlsZTE3Cgl7bXNvLXN0eWxlLXR5cGU6cGVyc29uYWwtY29tcG9zZTsKCWZvbnQt
-ZmFtaWx5OiJDYWxpYnJpIiwic2Fucy1zZXJpZiI7Cgljb2xvcjp3aW5kb3d0ZXh0O30KLk1zb0No
-cERlZmF1bHQKCXttc28tc3R5bGUtdHlwZTpleHBvcnQtb25seTsKCWZvbnQtZmFtaWx5OiJDYWxp
-YnJpIiwic2Fucy1zZXJpZiI7fQpAcGFnZSBXb3JkU2VjdGlvbjEKCXtzaXplOjguNWluIDExLjBp
-bjsKCW1hcmdpbjoxLjBpbiAxLjBpbiAxLjBpbiAxLjBpbjt9CmRpdi5Xb3JkU2VjdGlvbjEKCXtw
-YWdlOldvcmRTZWN0aW9uMTt9Ci0tPjwvc3R5bGU+PCEtLVtpZiBndGUgbXNvIDldPjx4bWw+Cjxv
-OnNoYXBlZGVmYXVsdHMgdjpleHQ9ImVkaXQiIHNwaWRtYXg9IjEwMjYiIC8+CjwveG1sPjwhW2Vu
-ZGlmXS0tPjwhLS1baWYgZ3RlIG1zbyA5XT48eG1sPgo8bzpzaGFwZWxheW91dCB2OmV4dD0iZWRp
-dCI+CjxvOmlkbWFwIHY6ZXh0PSJlZGl0IiBkYXRhPSIxIiAvPgo8L286c2hhcGVsYXlvdXQ+PC94
-bWw+PCFbZW5kaWZdLS0+CjwvaGVhZD4KPGJvZHkgbGFuZz0iRU4tVVMiIGxpbms9ImJsdWUiIHZs
-aW5rPSJwdXJwbGUiPgo8ZGl2IGNsYXNzPSJXb3JkU2VjdGlvbjEiPgo8cCBjbGFzcz0iTXNvTm9y
-bWFsIj5IaSBhbGwsPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5i
-c3A7PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5JIGFtIHRyeWluZyB0byB1c2UgUG93
-ZXJUb3Agb24gYSBiYXl0cmFpbC1NIGJvYXJkIHJ1bm5pbmcgY2hyb21lT1MuPG86cD48L286cD48
-L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPkkgZG93bmxvYWRlZCB0aGUgc291cmNlIGZyb20gPGEg
-aHJlZj0iaHR0cHM6Ly9naXRodWIuY29tL2ZlbnJ1czc1L3Bvd2VydG9wIj4KaHR0cHM6Ly9naXRo
-dWIuY29tL2ZlbnJ1czc1L3Bvd2VydG9wPC9hPiBhbmQgY29tcGlsZWQgaW4gbXkgaG9zdCBtYWNo
-aW5lIChVYnVudHUgMTIuMDQpPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPlRo
-ZW4gSSBjb3BpZWQgdGhlIGJpbmFyeSB0byB0aGUgYmF5dHJhaWwtTSBib2FyZCBvbiB3aGljaCBJ
-IG5lZWQgdG8gdGFrZSBtZWFzdXJlbWVudHMuPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29O
-b3JtYWwiPldoZW4gSSBydW4gdGhlIHBvd2VydG9wIGJpbmFyeSwgaXQgc2VlbXMgdG8gd29yayBh
-bmQgSSBjb3VsZCBldmVuIGdldCB0aGUgb3V0cHV0IGluIGNzdiBvciBodG1sIGZvcm1hdC48bzpw
-PjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+QnV0LCBteSBwcm9ibGVtIGlzIHRoYXQg
-SSBjb3VsZCBub3QgY29uZmlndXJlIGFueSBvdGhlciBwYXJhbWV0ZXIgd2hpbGUgcnVubmluZyB0
-aGUgdG9vbC48bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+Rm9yIGV4YW1wbGUs
-IHBvd2VydG9wIC0tdGltZSA2MCBkb2VzIG5vdCB3b3JrLiBOZWl0aGVyIGRvZXMgcG93ZXJ0b3Ag
-LS1pdGVyYXRpb24gMzxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5JdCBhbHdh
-eXMgc2F5cyBpdCBpcyB0YWtpbmcgMSBtZWFzdXJlbWVudCBpbiAyMCBzZWNvbmRzLjxvOnA+PC9v
-OnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5JIG5vdGljZSB0aGF0IGl0IHJlcG9ydHMgdGhh
-dCBpdCBjb3VsZCBub3QgbG9hZCBmcm9tIGZpbGUgL3Zhci9jYWNoZS9wb3dlcnRvcC9zYXZlZC1w
-YXJhbWV0ZXJzLnBvd2VydG9wLjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5J
-cyB0aGF0IGFuIGlzc3VlPzxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5TaG91
-bGQgSSBpbnN0YWxsIHNvbWUgY29uZmlndXJhdGlvbiBmaWxlIHNvbWV3aGVyZSBpbiBteSB0YXJn
-ZXQgbWFjaGluZT88bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+SGFzIGFueW9u
-ZSB0cmllZCBydW5uaW5nIHBvd2VydG9wIG9uIGNocm9tZU9TPzxvOnA+PC9vOnA+PC9wPgo8cCBj
-bGFzcz0iTXNvTm9ybWFsIj5BbnkgcG9pbnRlcnMgdG8gZml4IHRoaXMgaXNzdWUgd291bGQgYmUg
-b2YgZ3JlYXQgaGVscCB0byBtZS48bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+
-PG86cD4mbmJzcDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPlRoYW5rcyw8bzpwPjwv
-bzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+U2FyYW55YTxvOnA+PC9vOnA+PC9wPgo8L2Rp
-dj4KPC9ib2R5Pgo8L2h0bWw+Cg==
-
---===============4845229867349624307==--
+--===============2691665545058824850==--
 
