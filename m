@@ -1,105 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============4126920691447605410=="
+Content-Type: multipart/mixed; boundary="===============8287787487011142423=="
 MIME-Version: 1.0
-From: Amit Kucheria <amit.kucheria at linaro.org>
-Subject: Re: [Powertop] [PATCH POWERTOP] Fix various resource leaks
-Date: Tue, 01 Jul 2014 17:54:15 +0530
-Message-ID: <CAP245DVj8JEWx2oDUvoUBB2+jTKkP9P8CaUXmUbPcfHSUZ9ikg@mail.gmail.com>
-In-Reply-To: CAHu9=sPEBKA2odDPSsopbnPMrni5xm49weEJzz+-A29tn6Ksyg@mail.gmail.com
+From: Bill Vyzas <vizasb at gmail.com>
+Subject: [Powertop] Power Est. is missing
+Date: Fri, 21 Mar 2014 20:00:21 +0000
+Message-ID: <CADy9ZNC9eoAhQYdOpyH=qBdcTQ-dgiW141aJNwtzUhXrJfK3cA@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4126920691447605410==
+--===============8287787487011142423==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Mohammad,
+Hello all,
 
-This fix should go upstream. cc'ing the powertop list.
+Two days ago my laptop crashed and I had to reinstall ubuntu and powertop
+again. Now whenever I am running powertop the power estimate column from
+the overview and the device stats interfaces is missing.
 
-Regards,
-Amit
+I am running Ubuntu 13.10 with the 3.12 kernel. Do I miss any libraries or
+there is something else going on?
 
-On Thu, Jun 26, 2014 at 12:42 PM, Mohammad Merajul Islam Molla
-<meraj.enigma(a)gmail.com> wrote:
-> Fixes some resource leaks detected by valgrind and coverity scan.
->
->
-> diff --git a/src/devices/ahci.cpp b/src/devices/ahci.cpp
-> index ac06460..7f704b6 100644
-> --- a/src/devices/ahci.cpp
-> +++ b/src/devices/ahci.cpp
-> @@ -64,8 +64,10 @@ static string disk_name(char *path, char *target,
-> char *shortname)
->                 sprintf(line, "%s/%s/model", pathname, dirent->d_name);
->                 file =3D fopen(line, "r");
->                 if (file) {
-> -                       if (fgets(line, 4096, file) =3D=3D NULL)
-> +                       if (fgets(line, 4096, file) =3D=3D NULL) {
-> +                               fclose(file);
->                                 break;
-> +                       }
->                         fclose(file);
->                         c =3D strchr(line, '\n');
->                         if (c)
-> diff --git a/src/devices/devfreq.cpp b/src/devices/devfreq.cpp
-> index e16951c..23c4b0c 100644
-> --- a/src/devices/devfreq.cpp
-> +++ b/src/devices/devfreq.cpp
-> @@ -238,6 +238,7 @@ void create_all_devfreq_devices(void)
->
->         callback fn =3D &devfreq_dev_callback;
->         process_directory(p.c_str(), fn);
-> +       closedir(dir);
->  }
->
->  void initialize_devfreq(void)
-> diff --git a/src/perf/perf_bundle.cpp b/src/perf/perf_bundle.cpp
-> index b0e982b..cf1ae11 100644
-> --- a/src/perf/perf_bundle.cpp
-> +++ b/src/perf/perf_bundle.cpp
-> @@ -142,8 +142,10 @@ static void parse_event_format(const char *event_nam=
-e)
->
->         buf =3D read_file(file);
->         free(file);
-> -       if (!buf)
-> +       if (!buf) {
-> +               free(name);
->                 return;
-> +       }
->
->         pevent_parse_event(perf_event::pevent, buf, strlen(buf), sys);
->         free(name);
-> diff --git a/src/tuning/bluetooth.cpp b/src/tuning/bluetooth.cpp
-> index e0bdf12..5100a8a 100644
-> --- a/src/tuning/bluetooth.cpp
-> +++ b/src/tuning/bluetooth.cpp
-> @@ -144,8 +144,10 @@ int bt_tunable::good_bad(void)
->                 if (file) {
->                         char line[2048];
->                         /* first line is standard header */
-> -                       if (fgets(line, 2047, file) =3D=3D NULL)
-> +                       if (fgets(line, 2047, file) =3D=3D NULL) {
-> +                               pclose(file);
->                                 goto out;
-> +                       }
->                         memset(line, 0, 2048);
->                         if (fgets(line, 2047, file) =3D=3D NULL) {
->                                 result =3D last_check_result =3D TUNE_GOO=
-D;
->
->
->
-> --
-> Thanks,
-> -Meraj
->
-> _______________________________________________
-> linaro-dev mailing list
-> linaro-dev(a)lists.linaro.org
-> http://lists.linaro.org/mailman/listinfo/linaro-dev
->
+Thanks
+Vasileios
 
---===============4126920691447605410==--
+--===============8287787487011142423==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+PGRpdiBkaXI9Imx0ciI+PGRpdj48ZGl2PjxkaXY+PGRpdj5IZWxsbyBhbGwsPGJyPjxicj48L2Rp
+dj5Ud28gZGF5cyBhZ28gbXkgbGFwdG9wIGNyYXNoZWQgYW5kIEkgaGFkIHRvIHJlaW5zdGFsbCB1
+YnVudHUgYW5kIHBvd2VydG9wIGFnYWluLiBOb3cgd2hlbmV2ZXIgSSBhbSBydW5uaW5nIHBvd2Vy
+dG9wIHRoZSBwb3dlciBlc3RpbWF0ZSBjb2x1bW4gZnJvbSB0aGUgb3ZlcnZpZXcgYW5kIHRoZSBk
+ZXZpY2Ugc3RhdHMgaW50ZXJmYWNlcyBpcyBtaXNzaW5nLiA8YnI+Cjxicj48L2Rpdj5JIGFtIHJ1
+bm5pbmcgVWJ1bnR1IDEzLjEwIHdpdGggdGhlIDMuMTIga2VybmVsLiBEbyBJIG1pc3MgYW55IGxp
+YnJhcmllcyBvciB0aGVyZSBpcyBzb21ldGhpbmcgZWxzZSBnb2luZyBvbj88YnI+PGJyPjwvZGl2
+PlRoYW5rczxicj48L2Rpdj5WYXNpbGVpb3M8YnI+PC9kaXY+Cg==
+
+--===============8287787487011142423==--
 
