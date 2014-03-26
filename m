@@ -1,51 +1,62 @@
-Content-Type: multipart/mixed; boundary="===============8416053960108107325=="
+Content-Type: multipart/mixed; boundary="===============0493483334166725267=="
 MIME-Version: 1.0
-From: Adam Klobukowski <adamklobukowski at gmail.com>
-Subject: [Powertop] RaspberryPI bug
-Date: Mon, 05 May 2014 17:38:37 +0200
-Message-ID: <CAJSB6HPJo8yha4TSZhMnZT8Eui2kAdhovbe2bKF1Fcvd_6i+-Q@mail.gmail.com>
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop]  [Announce] PowerTOP Change on March Release Dates
+Date: Wed, 26 Mar 2014 10:32:00 -0700
+Message-ID: <53020.10.7.201.85.1395855120.squirrel@linux.intel.com>
+In-Reply-To: 64110.10.24.1.192.1392406371.squirrel@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8416053960108107325==
+--===============0493483334166725267==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello
+All,
 
-On RaspberryPI, Powertop 2.5 shows:
+I had to be out office for a couple of weeks on March due to illness. =
 
-Summary: nan wakeups/second,  nan GPU ops/seconds, nan VFS ops/sec and
--0,0% CPU use
+Therefore, I had to postpone the release to April.
 
-Not very useful message :)
+Here are the new dates:
 
--- =
+April 4st (string freeze)
+April 18th (code freeze v2.6)
+April 25th (release v2.6)
+April 30th (community meeting about v2.7)
 
-Semper Fidelis
 
-Adam Klobukowski
-adamklobukowski(a)gmail.com
+> Schedule 2014
+> Note: Dates are subject to change.  If changes are needed, they will be
+> announced via mailing list and updated here.
+>
+> March 3st (string freeze)
+> March 14th (code freeze v2.6)
+> March 27th (release v2.6)
+> March 31nd (community meeting about v2.7)
+>
+> Jul 14th (string freeze)
+> Jul 25th (code freeze v2.8)
+> Aug 8th (release v2.8)
+> Aug 11th (community meeting about v2.9)
+>
+> Nov 3rd (string freeze)
+> Nov 14th (code freeze v2.9)
+> Nov 21th (release v2.9)
+> Dec 2nd (community meeting about v2.10)
+>
+> Thank you,
+> Alexandra.
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>
 
---===============8416053960108107325==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
 
-PGRpdiBkaXI9Imx0ciI+PHNwYW4gc3R5bGU9ImZvbnQtZmFtaWx5OmFyaWFsLHNhbnMtc2VyaWY7
-Zm9udC1zaXplOjEzcHgiPkhlbGxvPC9zcGFuPjxkaXYgc3R5bGU9ImZvbnQtZmFtaWx5OmFyaWFs
-LHNhbnMtc2VyaWY7Zm9udC1zaXplOjEzcHgiPjxicj48L2Rpdj48ZGl2IHN0eWxlPSJmb250LWZh
-bWlseTphcmlhbCxzYW5zLXNlcmlmO2ZvbnQtc2l6ZToxM3B4Ij5PbiBSYXNwYmVycnlQSSwgUG93
-ZXJ0b3AgMi41IHNob3dzOjwvZGl2Pgo8ZGl2IHN0eWxlPSJmb250LWZhbWlseTphcmlhbCxzYW5z
-LXNlcmlmO2ZvbnQtc2l6ZToxM3B4Ij48YnI+PC9kaXY+PGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6
-YXJpYWwsc2Fucy1zZXJpZjtmb250LXNpemU6MTNweCI+PGRpdj5TdW1tYXJ5OiBuYW4gd2FrZXVw
-cy9zZWNvbmQsIMKgbmFuIEdQVSBvcHMvc2Vjb25kcywgbmFuIFZGUyBvcHMvc2VjIGFuZCAtMCww
-JSBDUFUgdXNlPC9kaXY+PGRpdj4KPGJyPjwvZGl2PjxkaXY+Tm90IHZlcnkgdXNlZnVsIG1lc3Nh
-Z2UgOik8L2Rpdj48L2Rpdj48ZGl2Pjxicj48L2Rpdj4tLSA8YnI+U2VtcGVyIEZpZGVsaXM8YnI+
-PGJyPkFkYW0gS2xvYnVrb3dza2k8YnI+PGEgaHJlZj0ibWFpbHRvOmFkYW1rbG9idWtvd3NraUBn
-bWFpbC5jb20iPmFkYW1rbG9idWtvd3NraUBnbWFpbC5jb208L2E+CjwvZGl2Pgo=
+Thank you,
+Alexandra.
 
---===============8416053960108107325==--
+--===============0493483334166725267==--
 
