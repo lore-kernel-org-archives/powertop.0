@@ -1,431 +1,93 @@
-Content-Type: multipart/mixed; boundary="===============9031963281781235905=="
+Content-Type: multipart/mixed; boundary="===============2997497966692511280=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH v3 29/31] tunables: removed on-demand cpu
- frequency governor
-Date: Tue, 10 Dec 2013 23:27:52 +0300
-Message-ID: <20131210202752.GE2422@swordfish>
-In-Reply-To: 1384806442-20294-30-git-send-email-alexandra.yates@linux.intel.com
+From: Hafiz Muhammad Shafiq <hafiz.shafiq at kics.edu.pk>
+Subject: [Powertop] powertop query
+Date: Thu, 03 Apr 2014 09:12:11 +0500
+Message-ID: <CAK96rjK20CUiNSwmymsz5fxvf0Wkj_PWR7V8BOfAS7QqZyf2dQ@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============9031963281781235905==
+--===============2997497966692511280==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (11/18/13 12:27), Alexandra Yates wrote:
-> Remove suggestion to use the on-demand cpu frequency governor from
-> PowerTOP tunables as that is no longer a good suggestion since the
-> P-State driver is the Intel recommended replacement.
+Sir,
+I am working on power consumption anaysis of different machines we have in
+our lab ( servers, power pcs). I came to know about powertop for power
+analysis. till now, I have used it on my laptop only and analyse power when
+laptop is on battery and connected to power also(plugged). Now I have to
+move on servers etc. There are some questions in my mind and searched a lot
+but stilled confused. Please guide me about these questions.
+1. Can powertop be used on PCs and servers ( having backups or not) 2. I
+experiment it and it worked on servers but watts etc colunm is not appeared
+that's what I main problem.
+3. How watts etc can be appeared on powertop when running on servers.
+4.If I  sum all the power usage (watts etc colunm) on my laptop when
+plugged.
+Is that value total power comsumed on my system.
+5. How much accurate powertop is(%).
+6. What is working principle of powertop i.e.  from where it get
+informations about power usage.Is it read some specific registers? If you
+donot want to give  the answer of this question then just inform me a
+littlebit. I am a student and not belong to a big company.
+7. I want to know can I use powertop for mips( octeon) linux system. I have
+tried to install. It is completed but when I launch It, it shows nothing
+but says following
 
-I need to think about it.
+No detailed statistics available; please enable the CONFIG_TIMER_STATS
+kernel option This option is located in the Kernel Debugging section of
+menuconfig (which is CONFIG_DEBUG_KERNEL=3Dy in the config file)
+Note: this is only available in 2.6.21 and later kernels
 
-IIRC, in this email
-https://lists.01.org/pipermail/powertop/2013-September/000952.html
+Suggestion: Enable the CONFIG_NO_HZ kernel configuration option.
+This option is required to get any kind of longer sleep times in the CPU.
 
-Christian Krause wrote:
+How to solve it. what is this
 
->
->tunables show:
->
->    Bad           Using 'ondemand' cpufreq governor
->
->but: I don't have a ondemand cpufreq governor -- that is what I just found=
- out: since some kernel
->versions ago the intel_pstate driver is the default for my cpu:
->
->    # zgrep PSTATE /proc/config.gz
->    CONFIG_X86_INTEL_PSTATE=3Dy
->
->    # cat /sys/devices/system/cpu/cpu[0-9]*/cpufreq/scaling_driver
->    intel_pstate
->    intel_pstate
->    intel_pstate
->    intel_pstate
->
+Please reply
+Regards
+Shafiq
 
+--===============2997497966692511280==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
+PGRpdiBkaXI9Imx0ciI+U2lyLDxicj4KSSBhbSB3b3JraW5nIG9uIHBvd2VyIGNvbnN1bXB0aW9u
+IGFuYXlzaXMgb2YgZGlmZmVyZW50IG1hY2hpbmVzIHdlIGhhdmUgCmluIG91ciBsYWIgKCBzZXJ2
+ZXJzLCBwb3dlciBwY3MpLiBJIGNhbWUgdG8ga25vdyBhYm91dCBwb3dlcnRvcCBmb3IgCnBvd2Vy
+IGFuYWx5c2lzLiB0aWxsIG5vdywgSSBoYXZlIHVzZWQgaXQgb24gbXkgbGFwdG9wIG9ubHkgYW5k
+IGFuYWx5c2UgCnBvd2VyIHdoZW4gbGFwdG9wIGlzIG9uIGJhdHRlcnkgYW5kIGNvbm5lY3RlZCB0
+byBwb3dlciBhbHNvKHBsdWdnZWQpLiAKTm93IEkgaGF2ZSB0byBtb3ZlIG9uIHNlcnZlcnMgZXRj
+LiBUaGVyZSBhcmUgc29tZSBxdWVzdGlvbnMgaW4gbXkgbWluZCAKYW5kIHNlYXJjaGVkIGEgbG90
+IGJ1dCBzdGlsbGVkIGNvbmZ1c2VkLiBQbGVhc2UgZ3VpZGUgbWUgYWJvdXQgdGhlc2UgCnF1ZXN0
+aW9ucy48YnI+CjEuIENhbiBwb3dlcnRvcCBiZSB1c2VkIG9uIFBDcyBhbmQgc2VydmVycyAoIGhh
+dmluZyBiYWNrdXBzIG9yIG5vdCkgMi4gSQogZXhwZXJpbWVudCBpdCBhbmQgaXQgd29ya2VkIG9u
+IHNlcnZlcnMgYnV0IHdhdHRzIGV0YyBjb2x1bm0gaXMgbm90IAphcHBlYXJlZCB0aGF0JiMzOTtz
+IHdoYXQgSSBtYWluIHByb2JsZW0uPGJyPgozLiBIb3cgd2F0dHMgZXRjIGNhbiBiZSBhcHBlYXJl
+ZCBvbiBwb3dlcnRvcCB3aGVuIHJ1bm5pbmcgb24gc2VydmVycy48YnI+CjQuSWYgSSCgc3VtIGFs
+bCB0aGUgcG93ZXIgdXNhZ2UgKHdhdHRzIGV0YyBjb2x1bm0pIG9uIG15IGxhcHRvcCB3aGVuIHBs
+dWdnZWQuPGJyPgpJcyB0aGF0IHZhbHVlIHRvdGFsIHBvd2VyIGNvbXN1bWVkIG9uIG15IHN5c3Rl
+bS48YnI+CjUuIEhvdyBtdWNoIGFjY3VyYXRlIHBvd2VydG9wIGlzKCUpLjxicj4KNi4gV2hhdCBp
+cyB3b3JraW5nIHByaW5jaXBsZSBvZiBwb3dlcnRvcCBpLmUuIKBmcm9tIHdoZXJlIGl0IGdldCAK
+aW5mb3JtYXRpb25zIGFib3V0IHBvd2VyIHVzYWdlLklzIGl0IHJlYWQgc29tZSBzcGVjaWZpYyBy
+ZWdpc3RlcnM/IElmIAp5b3UgZG9ub3Qgd2FudCB0byBnaXZlIKB0aGUgYW5zd2VyIG9mIHRoaXMg
+cXVlc3Rpb24gdGhlbiBqdXN0IGluZm9ybSBtZSBhCiBsaXR0bGViaXQuIEkgYW0gYSBzdHVkZW50
+IGFuZCBub3QgYmVsb25nIHRvIGEgYmlnIGNvbXBhbnkuPGJyPjcuIEkgd2FudCB0byBrbm93IGNh
+biBJIHVzZSBwb3dlcnRvcCBmb3IgbWlwcyggb2N0ZW9uKSBsaW51eCBzeXN0ZW0uIEkgaGF2ZQog
+dHJpZWQgdG8gaW5zdGFsbC4gSXQgaXMgY29tcGxldGVkIGJ1dCB3aGVuIEkgbGF1bmNoIEl0LCBp
+dCBzaG93cyBub3RoaW5noCBidXQgc2F5cyBmb2xsb3dpbmc8YnI+Cjxicj4KTm8gZGV0YWlsZWQg
+c3RhdGlzdGljcyBhdmFpbGFibGU7IHBsZWFzZSBlbmFibGUgdGhlIENPTkZJR19USU1FUl9TVEFU
+UyAKa2VybmVsIG9wdGlvbiBUaGlzIG9wdGlvbiBpcyBsb2NhdGVkIGluIHRoZSBLZXJuZWwgRGVi
+dWdnaW5nIHNlY3Rpb24gb2YgCm1lbnVjb25maWcgKHdoaWNoIGlzIENPTkZJR19ERUJVR19LRVJO
+RUw9eSBpbiB0aGUgY29uZmlnIGZpbGUpPGJyPgpOb3RlOiB0aGlzIGlzIG9ubHkgYXZhaWxhYmxl
+IGluIDIuNi4yMSBhbmQgbGF0ZXIga2VybmVsczxicj4KPGJyPgpTdWdnZXN0aW9uOiBFbmFibGUg
+dGhlIENPTkZJR19OT19IWiBrZXJuZWwgY29uZmlndXJhdGlvbiBvcHRpb24uPGJyPgpUaGlzIG9w
+dGlvbiBpcyByZXF1aXJlZCB0byBnZXQgYW55IGtpbmQgb2YgbG9uZ2VyIHNsZWVwIHRpbWVzIGlu
+IHRoZSBDUFUuPGJyPgo8YnI+CkhvdyB0byBzb2x2ZSBpdC4gd2hhdCBpcyB0aGlzPGJyPgo8YnI+
+ClBsZWFzZSByZXBseTxicj4KUmVnYXJkczxicj4KU2hhZmlxCjwvZGl2Pgo=
 
-I'm not really sure why we delete cpufreq code and kill this feature.
-
-
-
-for example:
-
-$ cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors
-ondemand performance
-
-$ cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-performance
-
-
-
-powertop can help here
-
-
-	-ss
-
-
-> Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
-> ---
->  src/Makefile.am        |    4 +-
->  src/tuning/cpufreq.cpp |  213 ------------------------------------------=
-------
->  src/tuning/cpufreq.h   |   50 ------------
->  src/tuning/tuning.cpp  |    2 -
->  4 files changed, 2 insertions(+), 267 deletions(-)
->  delete mode 100644 src/tuning/cpufreq.cpp
->  delete mode 100644 src/tuning/cpufreq.h
-> =
-
-> diff --git a/src/Makefile.am b/src/Makefile.am
-> index e19b606..0fe3c04 100644
-> --- a/src/Makefile.am
-> +++ b/src/Makefile.am
-> @@ -18,8 +18,8 @@ powertop_SOURCES =3D parameters/persistent.cpp paramete=
-rs/learn.cpp parameters/par
->  		devices/thinkpad-light.cpp devices/ahci.h devices/i915-gpu.h devices/n=
-etwork.h \
->  		devices/rfkill.cpp devices/alsa.h devices/thinkpad-fan.h devices/devic=
-e.h \
->  		devices/usb.h devices/backlight.h devices/backlight.cpp devices/runtim=
-e_pm.h \
-> -		devices/thinkpad-light.h devices/network.cpp lib.h tuning tuning/cpufr=
-eq.h \
-> -		tuning/bluetooth.cpp tuning/cpufreq.cpp tuning/tuning.cpp tuning/tunin=
-gusb.cpp \
-> +		devices/thinkpad-light.h devices/network.cpp lib.h tuning \
-> +		tuning/bluetooth.cpp tuning/tuning.cpp tuning/tuningusb.cpp \
->  		tuning/ethernet.cpp tuning/bluetooth.h tuning/tuning.h tuning/ethernet=
-.h \
->  		tuning/tunable.cpp tuning/nl80211.h tuning/iw.c tuning/wifi.cpp tuning=
-/tuningsysfs.h \
->  		tuning/tuningsysfs.cpp tuning/wifi.h tuning/runtime.cpp tuning/tunable=
-.h \
-> diff --git a/src/tuning/cpufreq.cpp b/src/tuning/cpufreq.cpp
-> deleted file mode 100644
-> index e870559..0000000
-> --- a/src/tuning/cpufreq.cpp
-> +++ /dev/null
-> @@ -1,213 +0,0 @@
-> -/*
-> - * Copyright 2010, Intel Corporation
-> - *
-> - * This file is part of PowerTOP
-> - *
-> - * This program file is free software; you can redistribute it and/or mo=
-dify it
-> - * under the terms of the GNU General Public License as published by the
-> - * Free Software Foundation; version 2 of the License.
-> - *
-> - * This program is distributed in the hope that it will be useful, but W=
-ITHOUT
-> - * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> - * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-> - * for more details.
-> - *
-> - * You should have received a copy of the GNU General Public License
-> - * along with this program in a file named COPYING; if not, write to the
-> - * Free Software Foundation, Inc,
-> - * 51 Franklin Street, Fifth Floor,
-> - * Boston, MA 02110-1301 USA
-> - * or just google for it.
-> - *
-> - * Authors:
-> - *	Arjan van de Ven <arjan(a)linux.intel.com>
-> - */
-> -
-> -#include "tuning.h"
-> -#include "tunable.h"
-> -#include <unistd.h>
-> -#include <stdio.h>
-> -#include <stdlib.h>
-> -#include <string.h>
-> -#include <utility>
-> -#include <iostream>
-> -#include <fstream>
-> -#include <unistd.h>
-> -#include <dirent.h>
-> -#include <errno.h>
-> -#include <sys/stat.h>
-> -#include <ctype.h>
-> -
-> -#include "../lib.h"
-> -#include "cpufreq.h"
-> -
-> -cpufreq_tunable::cpufreq_tunable(void) : tunable("", 0.3, _("Good"), _("=
-Bad"), _("Unknown"))
-> -{
-> -	string str;
-> -	sprintf(desc, _("Using 'ondemand' cpufreq governor"));
-> -
-> -	str =3D read_sysfs_string("/sys/devices/system/cpu/cpu0/cpufreq/scaling=
-_governor");
-> -	strcpy(original, str.c_str());
-> -	if (strlen(original) < 1)
-> -		strcpy(original, "ondemand");
-> -}
-> -
-> -
-> -int cpufreq_tunable::good_bad(void)
-> -{
-> -	DIR *dir;
-> -	struct dirent *dirent;
-> -	FILE *file;
-> -	char filename[PATH_MAX];
-> -	char line[1024];
-> -
-> -	char gov[1024];
-> -	int ret =3D TUNE_GOOD;
-> -
-> -
-> -	gov[0] =3D 0;
-> -
-> -
-> -	dir =3D opendir("/sys/devices/system/cpu");
-> -	if (!dir)
-> -		return ret;
-> -
-> -	while ((dirent =3D readdir(dir))) {
-> -		if (strncmp(dirent->d_name, "cpu", 3) !=3D 0 || !isdigit(dirent->d_nam=
-e[3]))
-> -			continue;
-> -		sprintf(filename, "/sys/devices/system/cpu/%s/cpufreq/scaling_governor=
-", dirent->d_name);
-> -		file =3D fopen(filename, "r");
-> -		if (!file)
-> -			continue;
-> -		memset(line, 0, 1024);
-> -		if (fgets(line, 1023,file)=3D=3DNULL) {
-> -			fclose(file);
-> -			continue;
-> -		}
-> -		if (strlen(gov)=3D=3D0)
-> -			strcpy(gov, line);
-> -		else
-> -			/* if the governors are inconsistent, warn */
-> -			if (strcmp(gov, line))
-> -				ret =3D TUNE_BAD;
-> -		fclose(file);
-> -	}
-> -
-> -	closedir(dir);
-> -
-> -	/* if the governor is set to userspace, also warn */
-> -	if (strstr(gov, "userspace"))
-> -		ret =3D TUNE_BAD;
-> -
-> -	/* if the governor is set to performance, also warn */
-> -	/* FIXME: check if this is fair on all cpus */
-> -	if (strstr(gov, "performance"))
-> -		ret =3D TUNE_BAD;
-> -
-> -	return ret;
-> -}
-> -
-> -void cpufreq_tunable::toggle(void)
-> -{
-> -	DIR *dir;
-> -	struct dirent *dirent;
-> -	FILE *file;
-> -	char filename[PATH_MAX];
-> -	int good;
-> -	good =3D good_bad();
-> -
-> -	system("/sbin/modprobe cpufreq_ondemand > /dev/null 2>&1");
-> -
-> -	if (good =3D=3D TUNE_GOOD) {
-> -		dir =3D opendir("/sys/devices/system/cpu");
-> -		if (!dir)
-> -			return;
-> -
-> -		while ((dirent =3D readdir(dir))) {
-> -			if (strncmp(dirent->d_name, "cpu", 3) !=3D 0 || !isdigit(dirent->d_na=
-me[3]))
-> -				continue;
-> -			sprintf(filename, "/sys/devices/system/cpu/%s/cpufreq/scaling_governo=
-r", dirent->d_name);
-> -			file =3D fopen(filename, "w");
-> -			if (!file)
-> -				continue;
-> -			fprintf(file, "%s\n", original);
-> -			fclose(file);
-> -		}
-> -
-> -		closedir(dir);
-> -		return;
-> -	}
-> -	dir =3D opendir("/sys/devices/system/cpu");
-> -	if (!dir)
-> -		return;
-> -
-> -	while ((dirent =3D readdir(dir))) {
-> -		if (strncmp(dirent->d_name, "cpu", 3) !=3D 0 || !isdigit(dirent->d_nam=
-e[3]))
-> -			continue;
-> -		sprintf(filename, "/sys/devices/system/cpu/%s/cpufreq/scaling_governor=
-", dirent->d_name);
-> -		file =3D fopen(filename, "w");
-> -		if (!file)
-> -			continue;
-> -		fprintf(file, "ondemand\n");
-> -		fclose(file);
-> -	}
-> -
-> -	closedir(dir);
-> -}
-> -
-> -const char *cpufreq_tunable::toggle_script(void) {
-> -	DIR *dir;
-> -	struct dirent *dirent;
-> -	char filename[PATH_MAX];
-> -	char tmp[4096];
-> -	struct stat statbuf;
-> -	int good;
-> -	good =3D good_bad();
-> -
-> -	strcpy(toggle_good, "/sbin/modprobe cpufreq_ondemand > /dev/null 2>&1\n=
-");
-> -
-> -	if (good =3D=3D TUNE_GOOD) {
-> -		dir =3D opendir("/sys/devices/system/cpu");
-> -		if (!dir)
-> -			return NULL;
-> -
-> -		while ((dirent =3D readdir(dir))) {
-> -			if (strncmp(dirent->d_name, "cpu", 3) !=3D 0 || !isdigit(dirent->d_na=
-me[3]))
-> -				continue;
-> -			sprintf(filename, "/sys/devices/system/cpu/%s/cpufreq/scaling_governo=
-r", dirent->d_name);
-> -			if (stat(filename, &statbuf) =3D=3D -1)
-> -				continue;
-> -			sprintf(tmp, "echo '%s' > '%s';\n", original, filename);
-> -			strcat(toggle_good, tmp);
-> -		}
-> -
-> -		closedir(dir);
-> -		return toggle_good;
-> -	}
-> -
-> -	dir =3D opendir("/sys/devices/system/cpu");
-> -	if (!dir)
-> -		return NULL;
-> -
-> -	while ((dirent =3D readdir(dir))) {
-> -		if (strncmp(dirent->d_name, "cpu", 3) !=3D 0 || !isdigit(dirent->d_nam=
-e[3]))
-> -			continue;
-> -		sprintf(filename, "/sys/devices/system/cpu/%s/cpufreq/scaling_governor=
-", dirent->d_name);
-> -		if (stat(filename, &statbuf) =3D=3D -1)
-> -			continue;
-> -		sprintf(tmp, "echo 'ondemand' > '%s';\n", filename);
-> -		strcat(toggle_good, tmp);
-> -	}
-> -
-> -	closedir(dir);
-> -	return toggle_good;
-> -}
-> -
-> -
-> -void add_cpufreq_tunable(void)
-> -{
-> -	class cpufreq_tunable *cf;
-> -
-> -	cf =3D new class cpufreq_tunable();
-> -	all_tunables.push_back(cf);
-> -}
-> diff --git a/src/tuning/cpufreq.h b/src/tuning/cpufreq.h
-> deleted file mode 100644
-> index 983f813..0000000
-> --- a/src/tuning/cpufreq.h
-> +++ /dev/null
-> @@ -1,50 +0,0 @@
-> -/*
-> - * Copyright 2010, Intel Corporation
-> - *
-> - * This file is part of PowerTOP
-> - *
-> - * This program file is free software; you can redistribute it and/or mo=
-dify it
-> - * under the terms of the GNU General Public License as published by the
-> - * Free Software Foundation; version 2 of the License.
-> - *
-> - * This program is distributed in the hope that it will be useful, but W=
-ITHOUT
-> - * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> - * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-> - * for more details.
-> - *
-> - * You should have received a copy of the GNU General Public License
-> - * along with this program in a file named COPYING; if not, write to the
-> - * Free Software Foundation, Inc,
-> - * 51 Franklin Street, Fifth Floor,
-> - * Boston, MA 02110-1301 USA
-> - * or just google for it.
-> - *
-> - * Authors:
-> - *	Arjan van de Ven <arjan(a)linux.intel.com>
-> - */
-> -#ifndef _INCLUDE_GUARD_CPUFREQ_TUNE_H
-> -#define _INCLUDE_GUARD_CPUFREQ_TUNE_H
-> -
-> -#include <vector>
-> -
-> -#include "tunable.h"
-> -
-> -using namespace std;
-> -
-> -class cpufreq_tunable : public tunable {
-> -	char original[4096];
-> -public:
-> -	cpufreq_tunable(void);
-> -
-> -	virtual int good_bad(void);
-> -
-> -	virtual void toggle(void);
-> -
-> -	virtual const char *toggle_script(void);
-> -
-> -};
-> -
-> -extern void add_cpufreq_tunable(void);
-> -
-> -
-> -#endif
-> diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
-> index 67d604f..ec7d2ad 100644
-> --- a/src/tuning/tuning.cpp
-> +++ b/src/tuning/tuning.cpp
-> @@ -35,7 +35,6 @@
->  #include "tuningusb.h"
->  #include "runtime.h"
->  #include "bluetooth.h"
-> -#include "cpufreq.h"
->  #include "ethernet.h"
->  #include "wifi.h"
->  #include "../display.h"
-> @@ -67,7 +66,6 @@ static void init_tuning(void)
->  	add_ethernet_tunable();
->  	add_bt_tunable();
->  	add_wifi_tunables();
-> -	add_cpufreq_tunable();
->  =
-
->  	sort_tunables();
->  }
-> -- =
-
-> 1.7.9.5
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============9031963281781235905==--
+--===============2997497966692511280==--
 
