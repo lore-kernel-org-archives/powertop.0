@@ -1,41 +1,107 @@
-Content-Type: multipart/mixed; boundary="===============0599048821702787656=="
+Content-Type: multipart/mixed; boundary="===============4973336415660152712=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] Why C++ is the language of implementation?
-Date: Mon, 31 Mar 2014 08:48:48 -0700
-Message-ID: <53398E60.50904@linux.intel.com>
-In-Reply-To: CADy9ZNA_1wW69nyNNS=yqL0iqoWZZB=UiTt2BCkft=nqwZP5Sg@mail.gmail.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH] use pkg-config to find ncurses
+Date: Wed, 16 Apr 2014 22:54:42 +0300
+Message-ID: <20140416195442.GB936@swordfish>
+In-Reply-To: CABsxX9LT9hHOcuHDVDtbzMw94mexBFwHyZ=uWNZM5PbBrU5bMg@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0599048821702787656==
+--===============4973336415660152712==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 3/31/2014 8:43 AM, Bill Vyzas wrote:
-> Hi all,
->
-> I am curious to know why PowerTOP is using C++ as the language of impleme=
-ntation but the majority of the program is written with the C standards. I =
-checked also some other
-> open source programs like the Gnome Power Manager and its doing the same =
-thing.
->
-> I know that C++ can also call C and I also know that there are couple of =
-classes on the program but why use C++ for a few classes when you can have =
-structs, which are
-> basically classes, instead.
+On (04/16/14 12:41), Kok, Auke-jan H wrote:
+> ncurses by itself does not provide a pkgconfig check, it is however
+> manually added by various distributions, but not all of them.
+> =
+
+> So, the patch below breaks building powertop for those distributions.
+> =
 
 
-C++ and objects are a very useful paradigm for certain things (especially i=
-f they map
-to actual physical things)... and powertop uses that.
+yes. good point. apparently ncurses provides pkg-config files these days.
+but there still may be distributions that use older ncurses versions.
 
-I'm not one of those people who goes overboard and sees objects for things =
-that are not
-really objects, just pieces of data.
+	-ss
 
+> I suggest that if you really want to make it use pkg-config, you write
+> it in such a way that if pkg-config checking fails, it will still
+> attempt to search for the appropriate libs instead.
+> =
 
---===============0599048821702787656==--
+> Auke
+> =
+
+> =
+
+> =
+
+> On Wed, Apr 16, 2014 at 8:20 AM, Rick "Zero_Chaos" Farina
+> <zerochaos(a)gentoo.org> wrote:
+> > -----BEGIN PGP SIGNED MESSAGE-----
+> > Hash: SHA1
+> >
+> > Original bug report: https://bugs.gentoo.org/show_bug.cgi?id=3D486124
+> >
+> > Depending on how ncurses is built, it may require different information
+> > passed to the linker.  Use pkg-config to detect the correct information:
+> >
+> > - --- a/configure.ac
+> > +++ b/configure.ac
+> > @@ -46,7 +46,7 @@
+> >  AC_FUNC_STRTOD
+> >  AC_CHECK_FUNCS([fdatasync getpagesize gettimeofday memmove memset mkdir
+> > munmap pow realpath regcomp select setlocale socket sqrt strcasecmp
+> > strchr strdup strerror strncasecmp strstr strtoul strtoull])
+> >
+> > - -AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], AC_MSG_ERROR([ncurs=
+es
+> > is required but was not found]), [])
+> > +PKG_CHECK_MODULES(ncurses, ncurses, [LIBS=3D"$LIBS $ncurses_LIBS"],
+> > AC_MSG_ERROR([ncurses is required but was not found]))
+> >
+> >  has_libpci=3D0
+> >  PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=3D1],[
+> >
+> >
+> > Original patch:
+> > http://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/sys-power/power=
+top/files/powertop-2.4-tinfo.patch?revision=3D1.1&view=3Dmarkup
+> >
+> > Please include this fix.
+> >
+> > thanks,
+> > Zero
+> > -----BEGIN PGP SIGNATURE-----
+> > Version: GnuPG v2.0.22 (GNU/Linux)
+> > Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+> >
+> > iQIcBAEBAgAGBQJTTp+2AAoJEKXdFCfdEflKJVkP/19iu4BWlFZ5TV0XVKvi0lm9
+> > DsIK9gkN+Kpa5F3QjTgDOCA7K72VdTGCv8os3A0KHPocrQ55tNb0lyILJYs6/rdL
+> > YSCMrd1TjacVhZujwTjia99BA/EwkPGpeogKdKuzHfRI6EYk6QFDaeljG11Jjds+
+> > VQ/sW3Fbe63/Sw6jvvHYTi0wE2hu30ot9Y+GQXkaNfJMpvk16S2GevKr+PG6wAqF
+> > gL1hLG7b5NNTgZxNLZJMDMIFZcUA/VMBUPZta5KyGpzjrMcVcZkNZ3YegwkwIJQ/
+> > Dq0xA/HhXUSgCIcp2cTuBF2YZrKE/linFmFHyKJ0NEvbaEpAsPLkhzpz3E8d+b++
+> > t8ceoTAYYRGpJU9fGNLcHCaHmREtzQMJn7hTT85Rbz0+duohaj6xqkKTemlPykTu
+> > ZDM+48oUXEe+iwcfp4ctbJILwZaw+IIzA2GhtR3QATjfQZe4lXczHHt2VW50toIb
+> > hFaKrg/uYqHe7KpHq/+rdtjNhOsP7Ckaq+USTQ7/AmoFLB6Bt+3NM9sIHdyeWUfG
+> > XXnOKPPpPSOZXFE/mKodqI0tOP0cngbMuLr60axELZi0gxiUiDVxKuRAOlukVRSY
+> > RQFKRIucrEeR/uwDH/sbq1xQ0dnE0JdJs4VO8K40KkSskE7eHOoBIJ8c3kL02Sfm
+> > c6KasduRgzZfWUo4plC1
+> > =3Dyt9+
+> > -----END PGP SIGNATURE-----
+> > _______________________________________________
+> > PowerTop mailing list
+> > PowerTop(a)lists.01.org
+> > https://lists.01.org/mailman/listinfo/powertop
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>=20
+
+--===============4973336415660152712==--
 
