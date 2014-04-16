@@ -1,105 +1,116 @@
-Content-Type: multipart/mixed; boundary="===============6102162431741228126=="
+Content-Type: multipart/mixed; boundary="===============8683258859635949865=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] Fix out of tree builds [Was: PowerTOP v2.6.1 released]
-Date: Wed, 04 Jun 2014 14:20:18 -0700
-Message-ID: <62350.10.24.5.211.1401916818.squirrel@linux.intel.com>
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH] Optionally disable NLS
+Date: Wed, 16 Apr 2014 22:58:20 +0300
+Message-ID: <20140416195818.GC936@swordfish>
+In-Reply-To: 534E9FED.4080608@gentoo.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6102162431741228126==
+--===============8683258859635949865==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Joerg,
-
-Unfortunately the patches you sent don't fix the issue.  Here is how to
-reproduced the issue:
-1- Applied your patches.
-2- Generated an new dist/tarball,
-3- Untared on different location
-4- Executed: ./autogen; ./configure; make; make clean; make
-
-The error still points that /bin/bash: ./csstoh.sh: No such file or directo=
-ry
-
-=3D=3D=3D=3D=3D Complete output =3D=3D=3D=3D=3D=3D
-
-make  all-recursive
-make[1]: Entering directory `/home/magd/Downloads/powertop-2.6.1'
-Making all in traceevent
-make[2]: Entering directory `/home/magd/Downloads/powertop-2.6.1/traceevent'
-  CC     event-parse.lo
-  CC     parse-filter.lo
-  CC     parse-utils.lo
-  CC     trace-seq.lo
-  CCLD   libtraceevnet.la
-make[2]: Leaving directory `/home/magd/Downloads/powertop-2.6.1/traceevent'
-Making all in src
-make[2]: Entering directory `/home/magd/Downloads/powertop-2.6.1/src'
-/bin/bash ./csstoh.sh ./powertop.css css.h
-/bin/bash: ./csstoh.sh: No such file or directory
-make[2]: *** [css.h] Error 127
-make[2]: Leaving directory `/home/magd/Downloads/powertop-2.6.1/src'
-make[1]: *** [all-recursive] Error 1
-make[1]: Leaving directory `/home/magd/Downloads/powertop-2.6.1'
-make: *** [all] Error 2
-
-
-> On Wed, May 28, 2014 at 09:28:12AM -0700, Alexandra Yates wrote:
->> > On Tue, May 27, 2014 at 10:24:44AM -0700, Alexandra Yates wrote:
->> >> > Also it is not possible to compile it after running:
->> >> > $ make clean
->> >> >
->> >> > It seems csstoh.sh script is missing
->> >
->> > I've had this patch in my tree for at least some months...
->>
->> Can you send the patch to the mailing list?
->
-> I verified that I did attach it. For people who prefer inline patches
-> find a regenerated version below. Btw, to find out about problems with
-> the source: Please run "make distcheck" before doing a release - which
-> will currently fail due to the included object files.
->
-> Ciao
->    J=C3=83=C2=B6rg
->
-> From 22a76b66041f27017de302ae5650ec973471a01a Mon Sep 17 00:00:00 2001
-> From: Joerg Mayer <jmpt(a)loplof.de>
-> Date: Sun, 1 Jun 2014 09:36:17 +0200
-> Subject: [PATCH] Fix out of tree builds
->
-> Signed-off-by: Joerg Mayer <jmpt(a)loplof.de>
-> ---
->  src/Makefile.am | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/src/Makefile.am b/src/Makefile.am
-> index 0fe3c04..605f285 100644
-> --- a/src/Makefile.am
-> +++ b/src/Makefile.am
-> @@ -50,5 +50,5 @@ AM_LDFLAGS =3D $(LIBS) $(NCURSES_LIBS) $(PCIUTILS_LIBS)
-> $(LIBNL_LIBS) $(LIBZ_LIBS)
->  BUILT_SOURCES =3D css.h
->  CLEANFILES =3D css.h
->  css.h: powertop.css
-> -	$(SHELL) ./csstoh.sh powertop.css css.h
-> +	$(SHELL) ${srcdir}/csstoh.sh ${srcdir}/powertop.css css.h
->
-> --
-> 1.8.4.5
->
-> --
-> Joerg Mayer                                           <jmayer(a)loplof.de>
-> We are stuck with technology when what we really want is just stuff that
-> works. Some say that should read Microsoft instead of technology.
+On (04/16/14 11:21), Rick "Zero_Chaos" Farina wrote:
+> A report on Gentoo's bug tracker
+> (https://bugs.gentoo.org/show_bug.cgi?id=3D505366) notes that while the
+> configure script support --disable-nls, the nls code is not
+> conditionally disabled which causes build failures on uclibc.  This
+> patch from Ren=C3=A9 Rh=C3=A9aume fixes the affected code:
 >
 
+looks good.
 
-Thank you,
-Alexandra.
+	-ss
 
---===============6102162431741228126==--
+> - --- powertop-2.5/src/lib.h
+> +++ powertop-2.5-nls/src/lib.h
+> @@ -33,7 +33,11 @@
+>  #include "config.h"
+>  #endif
+> =
+
+> +#ifdef ENABLE_NLS
+>  #define _(STRING)    gettext(STRING)
+> +#else
+> +#define _(STRING)    (STRING)
+> +#endif
+> =
+
+>  #define POWERTOP_VERSION "v"PACKAGE_VERSION
+>  #define POWERTOP_SHORT_VERSION PACKAGE_VERSION
+> - --- powertop-2.5/src/main.cpp
+> +++ powertop-2.5-nls/src/main.cpp
+> @@ -369,8 +369,10 @@ int main(int argc, char **argv)
+>  	set_new_handler(out_of_memory);
+> =
+
+>  	setlocale (LC_ALL, "");
+> +#ifdef ENABLE_NLS
+>  	bindtextdomain (PACKAGE, LOCALEDIR);
+>  	textdomain (PACKAGE);
+> +#endif
+> =
+
+>  	while (1) { /* parse commandline options */
+>  		c =3D getopt_long (argc, argv, "ch:C:i:t:uVw:q", long_options,
+> &option_index);
+> - --- powertop-2.5/src/report/report-maker.h
+> +++ powertop-2.5-nls/src/report/report-maker.h
+> @@ -75,8 +75,13 @@
+>  #include <string>
+> =
+
+>  /* Conditional gettext. We need original strings for CSV. */
+> +#ifdef ENABLE_NLS
+>  #define __(STRING) \
+>  	((report.get_type() =3D=3D REPORT_CSV) ? (STRING) : gettext(STRING))
+> +#else
+> +#define __(STRING) (STRING)
+> +#endif
+> +
+> =
+
+>  #ifndef UNUSED
+>  #define UNUSED __attribute__((unused))
+> =
+
+> =
+
+> original patch: https://505366.bugs.gentoo.org/attachment.cgi?id=3D373272
+> =
+
+> Please accept this patch.
+> =
+
+> Thanks,
+> Zero
+> -----BEGIN PGP SIGNATURE-----
+> Version: GnuPG v2.0.22 (GNU/Linux)
+> Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+> =
+
+> iQIcBAEBAgAGBQJTTp/tAAoJEKXdFCfdEflKqIMP/14P/29kiuSFkm7R3A1AdiHq
+> R9t7uS6b34dFQ+NX2loegFqwsyxcRvn3+19iG/u6Oa3uYIKRs1XnIuilZ6AQKQEW
+> 79yDNm9bH/B/K+68hCXOWBnfO625GxTeaOt/vJDYJiUSJR7/VI4eu1+eeC87BS/p
+> +d9XxbsDyn+SKdCuPAk7/Vju9XISQdjGla7DwEZYDF331iKZCFEdPkX09RW5/Zss
+> iQGbHzsRZWyOpnHVeYwMKIdGUBfOB3dlnVMyecaXoBv/ybyxxw2cgLjZpav4m6D4
+> wLIgL6Fc7tRDmCO7aNuUVUznjx1XvxsZuh64wXc36E8XBO10xtMHlk03di0tn7RC
+> 0eT6qwOkUpBsqFZKVRvfC25FrpgjI3b/XNnWctJvlJPvQRzTRe+OCERhnJlR+NND
+> T/PzGSlqGyCIpLhuXlJ0MUgwDW9BaUFjY84Fi0sruuFOleqN/UKPcJJO3IPwNvXH
+> 98Yia9cve8rzaJJgvtwkAEnjiph4SlDlU3w/K8XBmrOTl7c2CZUGoesv5A7YH57y
+> rcWzRLS7H5XUqpdn+l3dqBdsWTOsP9n/76VXNaUh6BSvK56b1Ud10VvY5ayxtDs1
+> xCFYRbgTc34oAtk3P8xNwX08wqIyZu8UfT9HhYkUNrDxExnC5XRmgpfaHCXT101k
+> d5ix6cGYZiikCtzUlB1M
+> =3DH1V6
+> -----END PGP SIGNATURE-----
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>=20
+
+--===============8683258859635949865==--
 
