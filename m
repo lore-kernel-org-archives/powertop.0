@@ -1,93 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============8192140684678642815=="
+Content-Type: multipart/mixed; boundary="===============2613533857144776534=="
 MIME-Version: 1.0
-From: Jaroslav Skarvada <jskarvad at redhat.com>
-Subject: Re: [Powertop] [Announce] PowerTOP v2.6.1 released
-Date: Mon, 26 May 2014 09:12:40 -0400
-Message-ID: <514352428.8211738.1401109960163.JavaMail.zimbra@redhat.com>
-In-Reply-To: 58373.10.24.4.100.1400870500.squirrel@linux.intel.com
+From: Rick "Zero_Chaos" Farina <zerochaos at gentoo.org>
+Subject: [Powertop] [PATCH]  use pkg-config to find ncurses
+Date: Wed, 16 Apr 2014 11:20:22 -0400
+Message-ID: <534E9FB6.6080402@gentoo.org>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8192140684678642815==
+--===============2613533857144776534==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
------ Original Message -----
-> We are pleased to announce the release of PowerTOP v2.6.1
-> =
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> =
+Original bug report: https://bugs.gentoo.org/show_bug.cgi?id=3D486124
 
-> About PowerTOP
-> =
+Depending on how ncurses is built, it may require different information
+passed to the linker.  Use pkg-config to detect the correct information:
 
-> PowerTOP is a Linux tool to diagnose issues with power consumption and
-> power management. In addition to being a diagnostic tool, PowerTOP also
-> has an interactive mode you can use to experiment with various power
-> management settings, for cases where the Linux distribution has not
-> enabled those settings.
-> =
+- --- a/configure.ac
++++ b/configure.ac
+@@ -46,7 +46,7 @@
+ AC_FUNC_STRTOD
+ AC_CHECK_FUNCS([fdatasync getpagesize gettimeofday memmove memset mkdir
+munmap pow realpath regcomp select setlocale socket sqrt strcasecmp
+strchr strdup strerror strncasecmp strstr strtoul strtoull])
 
-> PowerTOP reports which components in the system are most likely to blame
-> for higher-than-needed power consumption, ranging from software
-> applications to active components in the system. Detailed screens are
-> available for CPU C and P states, device activity, and software activity.
-> =
+- -AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], AC_MSG_ERROR([ncurses
+is required but was not found]), [])
++PKG_CHECK_MODULES(ncurses, ncurses, [LIBS=3D"$LIBS $ncurses_LIBS"],
+AC_MSG_ERROR([ncurses is required but was not found]))
 
-> For many years, PowerTOP has been used heavily by Intel, Linux
-> distributors, and various parts of the open source community.
-> =
-
-> =
-
-> =
-
-> Fixes
-> =
-
-> Segmentation faults with PowerTOP2.6 reported by Julian Wollrath
-> <jwollrath(a)web.de>
-> Packaging issues reported by Julian Wollrath <jwollrath(a)web.de>
-> Thank you to everyone who contributed to this release!
-> =
-
-> Alexandra Yates (3):
-> =
-
->       Bug-fix:Seg-fault with powertop --html & --csv
-> =
-
->       Update translation files and configuration
-> =
-
->       PowerTOP version 2.6.1
-> =
-
-> =
-
-> Thank you,
-> Alexandra.
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
-> =
+ has_libpci=3D0
+ PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=3D1],[
 
 
-Hi,
+Original patch:
+http://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/sys-power/powertop/=
+files/powertop-2.4-tinfo.patch?revision=3D1.1&view=3Dmarkup
 
-the source tarball contains 32 bit object files under
-/src/tuning
+Please include this fix.
 
-Also it is not possible to compile it after running:
-$ make clean
+thanks,
+Zero
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-It seems csstoh.sh script is missing
+iQIcBAEBAgAGBQJTTp+2AAoJEKXdFCfdEflKJVkP/19iu4BWlFZ5TV0XVKvi0lm9
+DsIK9gkN+Kpa5F3QjTgDOCA7K72VdTGCv8os3A0KHPocrQ55tNb0lyILJYs6/rdL
+YSCMrd1TjacVhZujwTjia99BA/EwkPGpeogKdKuzHfRI6EYk6QFDaeljG11Jjds+
+VQ/sW3Fbe63/Sw6jvvHYTi0wE2hu30ot9Y+GQXkaNfJMpvk16S2GevKr+PG6wAqF
+gL1hLG7b5NNTgZxNLZJMDMIFZcUA/VMBUPZta5KyGpzjrMcVcZkNZ3YegwkwIJQ/
+Dq0xA/HhXUSgCIcp2cTuBF2YZrKE/linFmFHyKJ0NEvbaEpAsPLkhzpz3E8d+b++
+t8ceoTAYYRGpJU9fGNLcHCaHmREtzQMJn7hTT85Rbz0+duohaj6xqkKTemlPykTu
+ZDM+48oUXEe+iwcfp4ctbJILwZaw+IIzA2GhtR3QATjfQZe4lXczHHt2VW50toIb
+hFaKrg/uYqHe7KpHq/+rdtjNhOsP7Ckaq+USTQ7/AmoFLB6Bt+3NM9sIHdyeWUfG
+XXnOKPPpPSOZXFE/mKodqI0tOP0cngbMuLr60axELZi0gxiUiDVxKuRAOlukVRSY
+RQFKRIucrEeR/uwDH/sbq1xQ0dnE0JdJs4VO8K40KkSskE7eHOoBIJ8c3kL02Sfm
+c6KasduRgzZfWUo4plC1
+=3Dyt9+
+-----END PGP SIGNATURE-----
 
-regards
-
-Jaroslav
-
---===============8192140684678642815==--
+--===============2613533857144776534==--
 
