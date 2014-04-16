@@ -1,190 +1,96 @@
-Content-Type: multipart/mixed; boundary="===============7826822377014430335=="
+Content-Type: multipart/mixed; boundary="===============2365331841473198342=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Does PowerTop support MHz numbers for Intel Xeon L5410
- CPUs ?
-Date: Mon, 07 Jul 2014 20:24:54 +0900
-Message-ID: <20140707112453.GC1135@swordfish>
-In-Reply-To: 53BA80F7.5050101@nfon.com
+From: Rick "Zero_Chaos" Farina <zerochaos at gentoo.org>
+Subject: [Powertop] [PATCH] Optionally disable NLS
+Date: Wed, 16 Apr 2014 11:21:17 -0400
+Message-ID: <534E9FED.4080608@gentoo.org>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7826822377014430335==
+--===============2365331841473198342==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (07/07/14 13:13), Valentin Hoebel wrote:
-> Hi,
-> =
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> thanks a lot for your efforts, I appreciate it.
-> My co-worker applied your patch and sent me the following output:
-> =
+A report on Gentoo's bug tracker
+(https://bugs.gentoo.org/show_bug.cgi?id=3D505366) notes that while the
+configure script support --disable-nls, the nls code is not
+conditionally disabled which causes build failures on uclibc.  This
+patch from Ren=C3=A9 Rh=C3=A9aume fixes the affected code:
 
->   --------------------------------------------------
-> /   ./powertop -t 1 --csv
->                                             =E2=8F=8E
->
+- --- powertop-2.5/src/lib.h
++++ powertop-2.5-nls/src/lib.h
+@@ -33,7 +33,11 @@
+ #include "config.h"
+ #endif
 
-thanks! ok, so cpu model 0x17 is not listed as a supported one in
-src/cpu/intel_cpus.cpp:intel_cpu_models[] to begin with, and no
-C-states are initialized as a result. Let's wait for Intel devs
-to add cpu/core/package models and corresponding C-states.
++#ifdef ENABLE_NLS
+ #define _(STRING)    gettext(STRING)
++#else
++#define _(STRING)    (STRING)
++#endif
 
-Alexandra, will you take care of this?
+ #define POWERTOP_VERSION "v"PACKAGE_VERSION
+ #define POWERTOP_SHORT_VERSION PACKAGE_VERSION
+- --- powertop-2.5/src/main.cpp
++++ powertop-2.5-nls/src/main.cpp
+@@ -369,8 +369,10 @@ int main(int argc, char **argv)
+ 	set_new_handler(out_of_memory);
 
-	-ss
+ 	setlocale (LC_ALL, "");
++#ifdef ENABLE_NLS
+ 	bindtextdomain (PACKAGE, LOCALEDIR);
+ 	textdomain (PACKAGE);
++#endif
 
-> Loaded 0 prior measurements
-> Cannot load from file /var/cache/powertop/saved_parameters.powertop
-> check cpu model 0x17
-> ERROR: not supported
-> RAPL device for cpu 0
-> RAPL device for cpu 0
-> check cpu model 0x17
-> ERROR: not supported
-> check cpu model 0x17
-> ERROR: not supported
-> check cpu model 0x17
-> ERROR: not supported
-> check cpu model 0x17
-> ERROR: not supported
-> check cpu model 0x17
-> ERROR: not supported
-> check cpu model 0x17
-> ERROR: not supported
-> check cpu model 0x17
-> ERROR: not supported
-> check cpu model 0x17
-> ERROR: not supported
-> Cannot load from file /var/cache/powertop/saved_parameters.powertop
-> Preparing to take measurements
->   unknown op '{'
-> Taking 1 measurement(s) for a duration of 1 second(s) each.
-> PowerTOP outputing using base filename powertop.csv
-> =
+ 	while (1) { /* parse commandline options */
+ 		c =3D getopt_long (argc, argv, "ch:C:i:t:uVw:q", long_options,
+&option_index);
+- --- powertop-2.5/src/report/report-maker.h
++++ powertop-2.5-nls/src/report/report-maker.h
+@@ -75,8 +75,13 @@
+ #include <string>
 
-> \ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-> =
+ /* Conditional gettext. We need original strings for CSV. */
++#ifdef ENABLE_NLS
+ #define __(STRING) \
+ 	((report.get_type() =3D=3D REPORT_CSV) ? (STRING) : gettext(STRING))
++#else
++#define __(STRING) (STRING)
++#endif
++
 
-> I hope this helps.
-> =
+ #ifndef UNUSED
+ #define UNUSED __attribute__((unused))
 
-> Best regards
-> Valentin
-> =
 
-> =
+original patch: https://505366.bugs.gentoo.org/attachment.cgi?id=3D373272
 
-> =
+Please accept this patch.
 
-> Am 07.07.2014 12:28, schrieb Sergey Senozhatsky:
-> >On (07/07/14 19:26), Sergey Senozhatsky wrote:
-> >>On (07/07/14 10:21), Valentin Hoebel wrote:
-> >>>Hi,
-> >>>
-> >>>as you already guessed Debian still uses a 2.0 version.
-> >>>However, I git cloned 2.6.1 and the "head" versions from GitHub, built=
- them
-> >>>both and tried them - still the same result.
-> >>>
-> >>>Is it known if this particular CPU model does not support reading out =
-the
-> >>>CPU frequency values or could this be another problem?
-> >>
-> >>hm... a *wild* guess. can you check what cpu model is getting passed to
-> >>nhm_core::nhm_core(int model)? the problem might be (or might be not) t=
-hat we
-> >>don't set any of C-state flags. if none of C-states set, then no MSR wo=
-rk is
-> >>getting done, and hence nothing is reported back. (yeah... we could che=
-ck
-> >>documentation, search the web, etc. but let's do it the lazy way).
-> >>
-> >>
-> >>something like this
-> >>
-> >
-> >oh. the patch is against the current upstream (iow, git) powertop source=
- code.
-> >
-> >	-ss
-> >
-> >>NOTE:
-> >>NOT TESTED, NOT EVEN COMPILE-TESTED. NOT A PATCH, NOT A FIX.
-> >>FOR TESTING PURPOSE ONLY.
-> >>
-> >>---
-> >>
-> >>  src/cpu/intel_cpus.cpp | 7 +++++++
-> >>  1 file changed, 7 insertions(+)
-> >>
-> >>diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
-> >>index e3cdaf2..ae083cf 100644
-> >>--- a/src/cpu/intel_cpus.cpp
-> >>+++ b/src/cpu/intel_cpus.cpp
-> >>@@ -64,10 +64,13 @@ int is_supported_intel_cpu(int model)
-> >>  {
-> >>  	int i;
-> >>
-> >>+	fprintf(stderr, "check cpu model 0x%X\n", model);
-> >>+
-> >>  	for (i =3D 0; intel_cpu_models[i] !=3D 0; i++)
-> >>  		if (model =3D=3D intel_cpu_models[i])
-> >>  			return 1;
-> >>
-> >>+	printf(stderr, "ERROR: not supported\n");
-> >>  	return 0;
-> >>  }
-> >>
-> >>@@ -91,6 +94,8 @@ nhm_core::nhm_core(int model)
-> >>  {
-> >>  	has_c2c7_res =3D 0;
-> >>
-> >>+	fprintf(stderr, "nhm_core model: 0x%X\n", model);
-> >>+
-> >>  	switch(model) {
-> >>  		case 0x2A:	/* SNB */
-> >>  		case 0x2D:	/* SNB Xeon */
-> >>@@ -260,6 +265,8 @@ nhm_package::nhm_package(int model)
-> >>  	has_c8c9c10_res =3D 0;
-> >>  	has_c2c7_res =3D 0;
-> >>
-> >>+	fprintf(stderr, "nhm_package model: 0x%X\n", model);
-> >>+
-> >>  	switch(model) {
-> >>  		case 0x2A:	/* SNB */
-> >>  		case 0x2D:	/* SNB Xeon */
-> >>
-> =
+Thanks,
+Zero
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-> -- =
+iQIcBAEBAgAGBQJTTp/tAAoJEKXdFCfdEflKqIMP/14P/29kiuSFkm7R3A1AdiHq
+R9t7uS6b34dFQ+NX2loegFqwsyxcRvn3+19iG/u6Oa3uYIKRs1XnIuilZ6AQKQEW
+79yDNm9bH/B/K+68hCXOWBnfO625GxTeaOt/vJDYJiUSJR7/VI4eu1+eeC87BS/p
++d9XxbsDyn+SKdCuPAk7/Vju9XISQdjGla7DwEZYDF331iKZCFEdPkX09RW5/Zss
+iQGbHzsRZWyOpnHVeYwMKIdGUBfOB3dlnVMyecaXoBv/ybyxxw2cgLjZpav4m6D4
+wLIgL6Fc7tRDmCO7aNuUVUznjx1XvxsZuh64wXc36E8XBO10xtMHlk03di0tn7RC
+0eT6qwOkUpBsqFZKVRvfC25FrpgjI3b/XNnWctJvlJPvQRzTRe+OCERhnJlR+NND
+T/PzGSlqGyCIpLhuXlJ0MUgwDW9BaUFjY84Fi0sruuFOleqN/UKPcJJO3IPwNvXH
+98Yia9cve8rzaJJgvtwkAEnjiph4SlDlU3w/K8XBmrOTl7c2CZUGoesv5A7YH57y
+rcWzRLS7H5XUqpdn+l3dqBdsWTOsP9n/76VXNaUh6BSvK56b1Ud10VvY5ayxtDs1
+xCFYRbgTc34oAtk3P8xNwX08wqIyZu8UfT9HhYkUNrDxExnC5XRmgpfaHCXT101k
+d5ix6cGYZiikCtzUlB1M
+=3DH1V6
+-----END PGP SIGNATURE-----
 
-> Mit freundlichen Gr=C3=BC=C3=9Fen
-> =
-
-> Valentin H=C3=B6bel
-> Cloud Architect
-> =
-
-> NFON AG
-> Leonrodstra=C3=9Fe 68
-> D-80636 M=C3=BCnchen
-> =
-
-> Telefon +49 89 45300-407
-> valentin.hoebel(a)nfon.com
-> www.nfon.com
-> =
-
-> Support-Hotline der NFON AG
-> Telefon 0800 - 6366 555
-> =
-
-> Die gesetzlichen Pflichtangaben finden Sie unter
-> https://www.nfon.net/pflichtangaben
->=20
-
---===============7826822377014430335==--
+--===============2365331841473198342==--
 
