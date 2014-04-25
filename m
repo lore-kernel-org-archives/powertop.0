@@ -1,150 +1,128 @@
-Content-Type: multipart/mixed; boundary="===============1553106680229828995=="
+Content-Type: multipart/mixed; boundary="===============0147792682398881557=="
 MIME-Version: 1.0
-From: Amit Kucheria <amit.kucheria at linaro.org>
-Subject: Re: [Powertop] [PATCH POWERTOP] Fix various resource leaks
-Date: Wed, 02 Jul 2014 16:23:12 +0530
-Message-ID: <CAP245DXTOnU0q-U-mP-A8rJ_xNDTb+ZwgUd4khm9wVF+FCazfQ@mail.gmail.com>
-In-Reply-To: CAHu9=sMUAuovnSDmNfCyv_c6huJaxWyAgHODKQd1MxP0Zr3-Cw@mail.gmail.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] use pkg-config to find ncurses
+Date: Fri, 25 Apr 2014 16:58:55 -0700
+Message-ID: <56235.10.254.3.215.1398470335.squirrel@linux.intel.com>
+In-Reply-To: 534EF035.8040802@gentoo.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1553106680229828995==
+--===============0147792682398881557==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Mohammad,
+Hi Zero,
 
-We've got a couple of patches that haven't been upstreamed yet. We'll
-get to it. Sorry I didn't notice that your patch was to that code.
+Based on Sergey's feedback can you send a revision for your patches?
 
-Regards,
-Amit
-
-On Wed, Jul 2, 2014 at 3:41 PM, Mohammad Merajul Islam Molla
-<meraj.enigma(a)gmail.com> wrote:
-> I cloned powertop repo from -
-> git://git.linaro.org/power/powertop-2.0.git. When I build and run, I
-> see an additional tab "Device Freq stats" and powertop version shows
-> 2.4.
+thank you,
+Alex
+> -----BEGIN PGP SIGNED MESSAGE-----
+> Hash: SHA1
 >
-> I got the copy from github (pointed to by Sergey) now. When I build
-> and run, I don't see any "Device Freq stats" tab and powertop version
-> shows 2.6.1.
+> On 04/16/2014 03:54 PM, Sergey Senozhatsky wrote:
+>> On (04/16/14 12:41), Kok, Auke-jan H wrote:
+>>> ncurses by itself does not provide a pkgconfig check, it is however
+>>> manually added by various distributions, but not all of them.
+>>>
+>>> So, the patch below breaks building powertop for those distributions.
+>>>
+>>
+>> yes. good point. apparently ncurses provides pkg-config files these
+>> days.
+>> but there still may be distributions that use older ncurses versions.
 >
 >
+> pkgconfig support was added on 20090103 according to the changelog here:
+> http://invisible-island.net/ncurses/NEWS.html.
 >
-> On Tue, Jul 1, 2014 at 6:47 PM, Sergey Senozhatsky
-> <sergey.senozhatsky(a)gmail.com> wrote:
->> On (07/01/14 17:54), Amit Kucheria wrote:
->>> Date: Tue, 1 Jul 2014 17:54:15 +0530
->>> From: Amit Kucheria <amit.kucheria(a)linaro.org>
->>> To: Mohammad Merajul Islam Molla <meraj.enigma(a)gmail.com>,
->>>  powertop(a)lists.01.org
->>> Cc: Lists linaro-dev <linaro-dev(a)lists.linaro.org>
->>> Subject: Re: [Powertop] [PATCH POWERTOP] Fix various resource leaks
->>>
->>> Mohammad,
->>>
->>> This fix should go upstream. cc'ing the powertop list.
->>>
->>> Regards,
->>> Amit
->>>
->>> On Thu, Jun 26, 2014 at 12:42 PM, Mohammad Merajul Islam Molla
->>> <meraj.enigma(a)gmail.com> wrote:
->>> > Fixes some resource leaks detected by valgrind and coverity scan.
->>> >
->>> >
->>> > diff --git a/src/devices/ahci.cpp b/src/devices/ahci.cpp
->>> > index ac06460..7f704b6 100644
->>> > --- a/src/devices/ahci.cpp
->>> > +++ b/src/devices/ahci.cpp
->>> > @@ -64,8 +64,10 @@ static string disk_name(char *path, char *target,
->>> > char *shortname)
->>> >                 sprintf(line, "%s/%s/model", pathname, dirent->d_name=
-);
->>> >                 file =3D fopen(line, "r");
->>> >                 if (file) {
->>> > -                       if (fgets(line, 4096, file) =3D=3D NULL)
->>> > +                       if (fgets(line, 4096, file) =3D=3D NULL) {
->>> > +                               fclose(file);
->>> >                                 break;
->>> > +                       }
->>> >                         fclose(file);
->>> >                         c =3D strchr(line, '\n');
->>> >                         if (c)
->>> > diff --git a/src/devices/devfreq.cpp b/src/devices/devfreq.cpp
->>> > index e16951c..23c4b0c 100644
->>> > --- a/src/devices/devfreq.cpp
->>> > +++ b/src/devices/devfreq.cpp
->>> > @@ -238,6 +238,7 @@ void create_all_devfreq_devices(void)
->>> >
->>> >         callback fn =3D &devfreq_dev_callback;
->>> >         process_directory(p.c_str(), fn);
->>> > +       closedir(dir);
+> Is is really a major concern to to require a version of ncurses released
+> within the last 5 years?
+>
+> - -Zero
 >>
->> I don't see this file at
->> https://github.com/fenrus75/powertop/tree/master/src/devices
+>> 	-ss
 >>
->> afair, process_directory() closes dir.
+>>> I suggest that if you really want to make it use pkg-config, you write
+>>> it in such a way that if pkg-config checking fails, it will still
+>>> attempt to search for the appropriate libs instead.
+>>>
+>>> Auke
+>>>
+>>>
+>>>
+>>> On Wed, Apr 16, 2014 at 8:20 AM, Rick "Zero_Chaos" Farina
+>>> <zerochaos(a)gentoo.org> wrote:
+>> Original bug report: https://bugs.gentoo.org/show_bug.cgi?id=3D486124
 >>
->>         -ss
+>> Depending on how ncurses is built, it may require different information
+>> passed to the linker.  Use pkg-config to detect the correct information:
 >>
->>> >  }
->>> >
->>> >  void initialize_devfreq(void)
->>> > diff --git a/src/perf/perf_bundle.cpp b/src/perf/perf_bundle.cpp
->>> > index b0e982b..cf1ae11 100644
->>> > --- a/src/perf/perf_bundle.cpp
->>> > +++ b/src/perf/perf_bundle.cpp
->>> > @@ -142,8 +142,10 @@ static void parse_event_format(const char *event=
-_name)
->>> >
->>> >         buf =3D read_file(file);
->>> >         free(file);
->>> > -       if (!buf)
->>> > +       if (!buf) {
->>> > +               free(name);
->>> >                 return;
->>> > +       }
->>> >
->>> >         pevent_parse_event(perf_event::pevent, buf, strlen(buf), sys);
->>> >         free(name);
->>> > diff --git a/src/tuning/bluetooth.cpp b/src/tuning/bluetooth.cpp
->>> > index e0bdf12..5100a8a 100644
->>> > --- a/src/tuning/bluetooth.cpp
->>> > +++ b/src/tuning/bluetooth.cpp
->>> > @@ -144,8 +144,10 @@ int bt_tunable::good_bad(void)
->>> >                 if (file) {
->>> >                         char line[2048];
->>> >                         /* first line is standard header */
->>> > -                       if (fgets(line, 2047, file) =3D=3D NULL)
->>> > +                       if (fgets(line, 2047, file) =3D=3D NULL) {
->>> > +                               pclose(file);
->>> >                                 goto out;
->>> > +                       }
->>> >                         memset(line, 0, 2048);
->>> >                         if (fgets(line, 2047, file) =3D=3D NULL) {
->>> >                                 result =3D last_check_result =3D TUNE=
-_GOOD;
->>> >
->>> >
->>> >
->>> > --
->>> > Thanks,
->>> > -Meraj
->>> >
->>> > _______________________________________________
->>> > linaro-dev mailing list
->>> > linaro-dev(a)lists.linaro.org
->>> > http://lists.linaro.org/mailman/listinfo/linaro-dev
->>> >
+>> --- a/configure.ac
+>> +++ b/configure.ac
+>> @@ -46,7 +46,7 @@
+>>  AC_FUNC_STRTOD
+>>  AC_CHECK_FUNCS([fdatasync getpagesize gettimeofday memmove memset mkdir
+>> munmap pow realpath regcomp select setlocale socket sqrt strcasecmp
+>> strchr strdup strerror strncasecmp strstr strtoul strtoull])
+>>
+>> -AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], AC_MSG_ERROR([ncurses
+>> is required but was not found]), [])
+>> +PKG_CHECK_MODULES(ncurses, ncurses, [LIBS=3D"$LIBS $ncurses_LIBS"],
+>> AC_MSG_ERROR([ncurses is required but was not found]))
+>>
+>>  has_libpci=3D0
+>>  PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=3D1],[
+>>
+>>
+>> Original patch:
+>> http://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/sys-power/powert=
+op/files/powertop-2.4-tinfo.patch?revision=3D1.1&view=3Dmarkup
+>>
+>> Please include this fix.
+>>
+>> thanks,
+>> Zero
+>>>> _______________________________________________
+>>>> PowerTop mailing list
+>>>> PowerTop(a)lists.01.org
+>>>> https://lists.01.org/mailman/listinfo/powertop
 >>> _______________________________________________
 >>> PowerTop mailing list
 >>> PowerTop(a)lists.01.org
 >>> https://lists.01.org/mailman/listinfo/powertop
 >>>
+>>
+>
+> -----BEGIN PGP SIGNATURE-----
+> Version: GnuPG v2.0.22 (GNU/Linux)
+> Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+>
+> iQIcBAEBAgAGBQJTTvA1AAoJEKXdFCfdEflK/VYP/2D9II4S6BMw/1flPtHfj5Yn
+> 2L+iy9KpIbRAaV0n6XI4/0ppGM+21xXbw372z56ne/MBKqJD0TCOF2AyHhD/178U
+> oNkTjAt0aJuToO/IDZAR5Q4oD8KXQAO67lsH+VHkuV3R93hpxQ49COaGnPW62TvR
+> I3nBRJMiqN6sixQa5M5wT2OlQz9mzs7GxEt2VeRXNHtoLAvPScJYM6p1v1An/Vcz
+> a6YvLmKB0S5t5m3a8Nc7EAvcqJNgnKKtMBgfv8d6zi5ueFtdn4TxAKxqXZeNpgiV
+> uY/lKa1Ycz924ftd+iLTAf6q3H6PVY7GJnYbRXZ7niz0PqXtExgOmZ6JonZIhdBC
+> +TX161fjRQYjTf6JjwMYzKTc4Vx9lUjX4f/0jsPDmC/Wu0NcDL8GbBqP45AYIktX
+> I1uo6vDqglxg6vQDL3OrL+6oolDITfJaSTFFZ7QezdyA9uflCR9uQaCbnJ7zKCF/
+> acD1Vh9gabRQw2Mq1n9ATB9mpuFUESclVz6Xs/PCiWCTLM5XyIhfUU/RCeOEjG2j
+> ooEx999sAlrdjK5WH+chL1A/yQyamcfuH8cQmOO2p7o70Z6++/u18OdwbCRkgioe
+> 87LaoT2VRwNAcQhR9X7XVYqGC8CbCtCISDPzEmH+AcCy8rPBNb3i9S7SNDiaVOAo
+> vc7kO3EajD6QYFp6aH2K
+> =3Do+vQ
+> -----END PGP SIGNATURE-----
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>
 
---===============1553106680229828995==--
+
+Thank you,
+Alexandra.
+
+--===============0147792682398881557==--
 
