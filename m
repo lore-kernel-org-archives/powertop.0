@@ -1,88 +1,146 @@
-Content-Type: multipart/mixed; boundary="===============1055860466772839081=="
+Content-Type: multipart/mixed; boundary="===============5198471085224774300=="
 MIME-Version: 1.0
-From: Kok, Auke-jan H <auke-jan.h.kok at intel.com>
-Subject: Re: [Powertop] [PATCH] use pkg-config to find ncurses
-Date: Wed, 16 Apr 2014 12:41:29 -0700
-Message-ID: <CABsxX9LT9hHOcuHDVDtbzMw94mexBFwHyZ=uWNZM5PbBrU5bMg@mail.gmail.com>
-In-Reply-To: 534E9FB6.6080402@gentoo.org
+From: Kalowsky, Daniel <daniel.kalowsky at intel.com>
+Subject: [Powertop] A series of patches towards limiting memory corruption and
+ foot print
+Date: Wed, 30 Apr 2014 00:15:15 +0000
+Message-ID: <4628F0C61321354285DF2950999754456DF926B0@ORSMSX114.amr.corp.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1055860466772839081==
+--===============5198471085224774300==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-ncurses by itself does not provide a pkgconfig check, it is however
-manually added by various distributions, but not all of them.
+Hi Powertop,
 
-So, the patch below breaks building powertop for those distributions.
+I've been working with the interactive mode and have run into cases where p=
+owertop will crash due to a series of memory corruptions.  The following se=
+ries of patches have helped to reduce the frequency of the issue, although =
+not completely solved it.  The issues arise much faster on platforms where =
+there are constrained amounts of RAM to work within.
 
-I suggest that if you really want to make it use pkg-config, you write
-it in such a way that if pkg-config checking fails, it will still
-attempt to search for the appropriate libs instead.
+Patch 1 - When shutting down the interactive display, the display bits of m=
+emory is not correctly released.  This patch provides a method for correctl=
+y doing so.
 
-Auke
+Patch 2 - Solving a documented memory leak with a non-elegant solution.  Th=
+e path either adds the bundle to the stack, or it forgets about it.  If it =
+is forgotten about, make sure to clear that memory before moving on.  This =
+is done with a simple flag variable being set.
 
+Patch 3 - When the tuning window is updated, the current pointer is just se=
+t adrift and not properly free'd.  This patch catches that issue and remove=
+s the dangling pointer by holding a reference to the pointer until it is re=
+set or specifically free'd.
 
+Patch 4 - Someone actually added in the code to create a onetime pretty-pri=
+nt array, this patch just puts it to use by setting the variable.
 
-On Wed, Apr 16, 2014 at 8:20 AM, Rick "Zero_Chaos" Farina
-<zerochaos(a)gentoo.org> wrote:
-> -----BEGIN PGP SIGNED MESSAGE-----
-> Hash: SHA1
->
-> Original bug report: https://bugs.gentoo.org/show_bug.cgi?id=3D486124
->
-> Depending on how ncurses is built, it may require different information
-> passed to the linker.  Use pkg-config to detect the correct information:
->
-> - --- a/configure.ac
-> +++ b/configure.ac
-> @@ -46,7 +46,7 @@
->  AC_FUNC_STRTOD
->  AC_CHECK_FUNCS([fdatasync getpagesize gettimeofday memmove memset mkdir
-> munmap pow realpath regcomp select setlocale socket sqrt strcasecmp
-> strchr strdup strerror strncasecmp strstr strtoul strtoull])
->
-> - -AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], AC_MSG_ERROR([ncurses
-> is required but was not found]), [])
-> +PKG_CHECK_MODULES(ncurses, ncurses, [LIBS=3D"$LIBS $ncurses_LIBS"],
-> AC_MSG_ERROR([ncurses is required but was not found]))
->
->  has_libpci=3D0
->  PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=3D1],[
->
->
-> Original patch:
-> http://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/sys-power/powerto=
-p/files/powertop-2.4-tinfo.patch?revision=3D1.1&view=3Dmarkup
->
-> Please include this fix.
->
-> thanks,
-> Zero
-> -----BEGIN PGP SIGNATURE-----
-> Version: GnuPG v2.0.22 (GNU/Linux)
-> Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
->
-> iQIcBAEBAgAGBQJTTp+2AAoJEKXdFCfdEflKJVkP/19iu4BWlFZ5TV0XVKvi0lm9
-> DsIK9gkN+Kpa5F3QjTgDOCA7K72VdTGCv8os3A0KHPocrQ55tNb0lyILJYs6/rdL
-> YSCMrd1TjacVhZujwTjia99BA/EwkPGpeogKdKuzHfRI6EYk6QFDaeljG11Jjds+
-> VQ/sW3Fbe63/Sw6jvvHYTi0wE2hu30ot9Y+GQXkaNfJMpvk16S2GevKr+PG6wAqF
-> gL1hLG7b5NNTgZxNLZJMDMIFZcUA/VMBUPZta5KyGpzjrMcVcZkNZ3YegwkwIJQ/
-> Dq0xA/HhXUSgCIcp2cTuBF2YZrKE/linFmFHyKJ0NEvbaEpAsPLkhzpz3E8d+b++
-> t8ceoTAYYRGpJU9fGNLcHCaHmREtzQMJn7hTT85Rbz0+duohaj6xqkKTemlPykTu
-> ZDM+48oUXEe+iwcfp4ctbJILwZaw+IIzA2GhtR3QATjfQZe4lXczHHt2VW50toIb
-> hFaKrg/uYqHe7KpHq/+rdtjNhOsP7Ckaq+USTQ7/AmoFLB6Bt+3NM9sIHdyeWUfG
-> XXnOKPPpPSOZXFE/mKodqI0tOP0cngbMuLr60axELZi0gxiUiDVxKuRAOlukVRSY
-> RQFKRIucrEeR/uwDH/sbq1xQ0dnE0JdJs4VO8K40KkSskE7eHOoBIJ8c3kL02Sfm
-> c6KasduRgzZfWUo4plC1
-> =3Dyt9+
-> -----END PGP SIGNATURE-----
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
+Patch 5 - Limiting the buffer copy to the size of the allocated buffer with=
+ snprintf.
 
---===============1055860466772839081==--
+Patch 6 - There exist some processes and entries that can and do extend bey=
+ond the length of these buffers.  This limits those entries so as not to co=
+rrupt other memory on the system when in interactive mode.
+
+Patch 7 - This is an untested patch, but follows along the same lines of Pa=
+tch 6.  It applies the same principals only for the report method.
+
+Patch 8 - Creates a clean_shutdown function that can be used to cleanup the=
+ memory space at shutdown time.  Calls upon parts of Patch 1 to make this h=
+appen.
+
+There will more than likely be some more patches in the future as time perm=
+its.
+
+--===============5198471085224774300==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
+bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
+YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
+cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
+VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
+bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
+ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTUgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
+PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseToiQ2Ft
+YnJpYSBNYXRoIjsKCXBhbm9zZS0xOjIgNCA1IDMgNSA0IDYgMyAyIDQ7fQpAZm9udC1mYWNlCgl7
+Zm9udC1mYW1pbHk6Q2FsaWJyaTsKCXBhbm9zZS0xOjIgMTUgNSAyIDIgMiA0IDMgMiA0O30KLyog
+U3R5bGUgRGVmaW5pdGlvbnMgKi8KcC5Nc29Ob3JtYWwsIGxpLk1zb05vcm1hbCwgZGl2Lk1zb05v
+cm1hbAoJe21hcmdpbjowaW47CgltYXJnaW4tYm90dG9tOi4wMDAxcHQ7Cglmb250LXNpemU6MTEu
+MHB0OwoJZm9udC1mYW1pbHk6IkNhbGlicmkiLCJzYW5zLXNlcmlmIjt9CmE6bGluaywgc3Bhbi5N
+c29IeXBlcmxpbmsKCXttc28tc3R5bGUtcHJpb3JpdHk6OTk7Cgljb2xvcjojMDU2M0MxOwoJdGV4
+dC1kZWNvcmF0aW9uOnVuZGVybGluZTt9CmE6dmlzaXRlZCwgc3Bhbi5Nc29IeXBlcmxpbmtGb2xs
+b3dlZAoJe21zby1zdHlsZS1wcmlvcml0eTo5OTsKCWNvbG9yOiM5NTRGNzI7Cgl0ZXh0LWRlY29y
+YXRpb246dW5kZXJsaW5lO30Kc3Bhbi5FbWFpbFN0eWxlMTcKCXttc28tc3R5bGUtdHlwZTpwZXJz
+b25hbDsKCWZvbnQtZmFtaWx5OiJDYWxpYnJpIiwic2Fucy1zZXJpZiI7Cgljb2xvcjp3aW5kb3d0
+ZXh0O30Kc3Bhbi5FbWFpbFN0eWxlMTgKCXttc28tc3R5bGUtdHlwZTpwZXJzb25hbC1yZXBseTsK
+CWZvbnQtZmFtaWx5OiJDYWxpYnJpIiwic2Fucy1zZXJpZiI7Cgljb2xvcjojMUY0OTdEO30KLk1z
+b0NocERlZmF1bHQKCXttc28tc3R5bGUtdHlwZTpleHBvcnQtb25seTsKCWZvbnQtc2l6ZToxMC4w
+cHQ7fQpAcGFnZSBXb3JkU2VjdGlvbjEKCXtzaXplOjguNWluIDExLjBpbjsKCW1hcmdpbjoxLjBp
+biAxLjBpbiAxLjBpbiAxLjBpbjt9CmRpdi5Xb3JkU2VjdGlvbjEKCXtwYWdlOldvcmRTZWN0aW9u
+MTt9Ci0tPjwvc3R5bGU+PCEtLVtpZiBndGUgbXNvIDldPjx4bWw+CjxvOnNoYXBlZGVmYXVsdHMg
+djpleHQ9ImVkaXQiIHNwaWRtYXg9IjEwMjYiIC8+CjwveG1sPjwhW2VuZGlmXS0tPjwhLS1baWYg
+Z3RlIG1zbyA5XT48eG1sPgo8bzpzaGFwZWxheW91dCB2OmV4dD0iZWRpdCI+CjxvOmlkbWFwIHY6
+ZXh0PSJlZGl0IiBkYXRhPSIxIiAvPgo8L286c2hhcGVsYXlvdXQ+PC94bWw+PCFbZW5kaWZdLS0+
+CjwvaGVhZD4KPGJvZHkgbGFuZz0iRU4tVVMiIGxpbms9IiMwNTYzQzEiIHZsaW5rPSIjOTU0Rjcy
+Ij4KPGRpdiBjbGFzcz0iV29yZFNlY3Rpb24xIj4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+SGkgUG93
+ZXJ0b3AsPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9v
+OnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5JJiM4MjE3O3ZlIGJlZW4gd29ya2luZyB3aXRo
+IHRoZSBpbnRlcmFjdGl2ZSBtb2RlIGFuZCBoYXZlIHJ1biBpbnRvIGNhc2VzIHdoZXJlIHBvd2Vy
+dG9wIHdpbGwgY3Jhc2ggZHVlIHRvIGEgc2VyaWVzIG9mIG1lbW9yeSBjb3JydXB0aW9ucy4mbmJz
+cDsgVGhlIGZvbGxvd2luZyBzZXJpZXMgb2YgcGF0Y2hlcyBoYXZlIGhlbHBlZCB0byByZWR1Y2Ug
+dGhlIGZyZXF1ZW5jeSBvZiB0aGUgaXNzdWUsIGFsdGhvdWdoIG5vdCBjb21wbGV0ZWx5CiBzb2x2
+ZWQgaXQuJm5ic3A7IFRoZSBpc3N1ZXMgYXJpc2UgbXVjaCBmYXN0ZXIgb24gcGxhdGZvcm1zIHdo
+ZXJlIHRoZXJlIGFyZSBjb25zdHJhaW5lZCBhbW91bnRzIG9mIFJBTSB0byB3b3JrIHdpdGhpbi4K
+PG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9w
+Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5QYXRjaCAxICYjODIxMTsgV2hlbiBzaHV0dGluZyBkb3du
+IHRoZSBpbnRlcmFjdGl2ZSBkaXNwbGF5LCB0aGUgZGlzcGxheSBiaXRzIG9mIG1lbW9yeSBpcyBu
+b3QgY29ycmVjdGx5IHJlbGVhc2VkLiZuYnNwOyBUaGlzIHBhdGNoIHByb3ZpZGVzIGEgbWV0aG9k
+IGZvciBjb3JyZWN0bHkgZG9pbmcgc28uJm5ic3A7CjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0i
+TXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+UGF0
+Y2ggMiAmIzgyMTE7IFNvbHZpbmcgYSBkb2N1bWVudGVkIG1lbW9yeSBsZWFrIHdpdGggYSBub24t
+ZWxlZ2FudCBzb2x1dGlvbi4mbmJzcDsgVGhlIHBhdGggZWl0aGVyIGFkZHMgdGhlIGJ1bmRsZSB0
+byB0aGUgc3RhY2ssIG9yIGl0IGZvcmdldHMgYWJvdXQgaXQuJm5ic3A7IElmIGl0IGlzIGZvcmdv
+dHRlbiBhYm91dCwgbWFrZSBzdXJlIHRvIGNsZWFyIHRoYXQgbWVtb3J5IGJlZm9yZSBtb3Zpbmcg
+b24uJm5ic3A7IFRoaXMgaXMgZG9uZSB3aXRoCiBhIHNpbXBsZSBmbGFnIHZhcmlhYmxlIGJlaW5n
+IHNldC4mbmJzcDsgPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5i
+c3A7PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5QYXRjaCAzICYjODIxMTsgV2hlbiB0
+aGUgdHVuaW5nIHdpbmRvdyBpcyB1cGRhdGVkLCB0aGUgY3VycmVudCBwb2ludGVyIGlzIGp1c3Qg
+c2V0IGFkcmlmdCBhbmQgbm90IHByb3Blcmx5IGZyZWUmIzgyMTc7ZC4mbmJzcDsgVGhpcyBwYXRj
+aCBjYXRjaGVzIHRoYXQgaXNzdWUgYW5kIHJlbW92ZXMgdGhlIGRhbmdsaW5nIHBvaW50ZXIgYnkg
+aG9sZGluZyBhIHJlZmVyZW5jZSB0byB0aGUgcG9pbnRlciB1bnRpbCBpdCBpcyByZXNldCBvciBz
+cGVjaWZpY2FsbHkKIGZyZWUmIzgyMTc7ZC48bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05v
+cm1hbCI+PG86cD4mbmJzcDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPlBhdGNoIDQg
+JiM4MjExOyBTb21lb25lIGFjdHVhbGx5IGFkZGVkIGluIHRoZSBjb2RlIHRvIGNyZWF0ZSBhIG9u
+ZXRpbWUgcHJldHR5LXByaW50IGFycmF5LCB0aGlzIHBhdGNoIGp1c3QgcHV0cyBpdCB0byB1c2Ug
+Ynkgc2V0dGluZyB0aGUgdmFyaWFibGUuJm5ic3A7CjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0i
+TXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+UGF0
+Y2ggNSAmIzgyMTE7IExpbWl0aW5nIHRoZSBidWZmZXIgY29weSB0byB0aGUgc2l6ZSBvZiB0aGUg
+YWxsb2NhdGVkIGJ1ZmZlciB3aXRoIHNucHJpbnRmLjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0i
+TXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+UGF0
+Y2ggNiAmIzgyMTE7IFRoZXJlIGV4aXN0IHNvbWUgcHJvY2Vzc2VzIGFuZCBlbnRyaWVzIHRoYXQg
+Y2FuIGFuZCBkbyBleHRlbmQgYmV5b25kIHRoZSBsZW5ndGggb2YgdGhlc2UgYnVmZmVycy4mbmJz
+cDsgVGhpcyBsaW1pdHMgdGhvc2UgZW50cmllcyBzbyBhcyBub3QgdG8gY29ycnVwdCBvdGhlciBt
+ZW1vcnkgb24gdGhlIHN5c3RlbSB3aGVuIGluIGludGVyYWN0aXZlIG1vZGUuJm5ic3A7CjxvOnA+
+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPHAg
+Y2xhc3M9Ik1zb05vcm1hbCI+UGF0Y2ggNyAmIzgyMTE7IFRoaXMgaXMgYW4gdW50ZXN0ZWQgcGF0
+Y2gsIGJ1dCBmb2xsb3dzIGFsb25nIHRoZSBzYW1lIGxpbmVzIG9mIFBhdGNoIDYuJm5ic3A7IEl0
+IGFwcGxpZXMgdGhlIHNhbWUgcHJpbmNpcGFscyBvbmx5IGZvciB0aGUgcmVwb3J0IG1ldGhvZC4m
+bmJzcDsKPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9v
+OnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5QYXRjaCA4ICYjODIxMTsgQ3JlYXRlcyBhIGNs
+ZWFuX3NodXRkb3duIGZ1bmN0aW9uIHRoYXQgY2FuIGJlIHVzZWQgdG8gY2xlYW51cCB0aGUgbWVt
+b3J5IHNwYWNlIGF0IHNodXRkb3duIHRpbWUuJm5ic3A7IENhbGxzIHVwb24gcGFydHMgb2YgUGF0
+Y2ggMSB0byBtYWtlIHRoaXMgaGFwcGVuLiZuYnNwOwo8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9
+Ik1zb05vcm1hbCI+PG86cD4mbmJzcDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPlRo
+ZXJlIHdpbGwgbW9yZSB0aGFuIGxpa2VseSBiZSBzb21lIG1vcmUgcGF0Y2hlcyBpbiB0aGUgZnV0
+dXJlIGFzIHRpbWUgcGVybWl0cy4mbmJzcDsKPG86cD48L286cD48L3A+CjwvZGl2Pgo8L2JvZHk+
+CjwvaHRtbD4K
+
+--===============5198471085224774300==--
 
