@@ -1,35 +1,23 @@
-Content-Type: multipart/mixed; boundary="===============7803366529383089126=="
+Content-Type: multipart/mixed; boundary="===============2356098515860751275=="
 MIME-Version: 1.0
 From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH 0/3] Fix all warnings
-Date: Fri, 13 Jun 2014 15:18:26 -0700
-Message-ID: <1402697910-29154-1-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: Fix all warnings
+Subject: [Powertop]  [Announce] PowerTOP v2.6-rc2
+Date: Mon, 05 May 2014 11:16:32 -0700
+Message-ID: <50137.10.24.6.59.1399313792.squirrel@linux.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7803366529383089126==
+--===============2356098515860751275==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This patch fixes all warning encountered when building PowerTOP. =
+PowerTOP v2.6-rc2 was released today.  Please send results of your testing.
 
+All high priority bugs were resolved.
 
-Alexandra Yates (3):
-  fix-warnings: Ignoring return value of system()
-  fix-warnings: Ignoring return value
-  fix-warnings: Ignoring return value
+Thank you,
+Alexandra.
 
- src/calibrate/calibrate.cpp |   16 +++++++++++-----
- src/measurement/extech.cpp  |   13 +++++++------
- src/tuning/bluetooth.cpp    |    6 ++++--
- 3 files changed, 22 insertions(+), 13 deletions(-)
-
--- =
-
-1.7.9.5
-
-
---===============7803366529383089126==--
+--===============2356098515860751275==--
 
