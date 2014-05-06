@@ -1,54 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============7319575554512690438=="
+Content-Type: multipart/mixed; boundary="===============3503548887185887066=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] Does PowerTop support MHz numbers for Intel Xeon L5410
- CPUs ?
-Date: Mon, 07 Jul 2014 07:00:06 -0700
-Message-ID: <53BAA7E6.8070200@linux.intel.com>
-In-Reply-To: 20140707112453.GC1135@swordfish
+From: Kok, Auke-jan H <auke-jan.h.kok at intel.com>
+Subject: Re: [Powertop] [PATCH] use pkg-config to find ncurses
+Date: Mon, 05 May 2014 23:40:47 -0700
+Message-ID: <CABsxX9LK5OxR1ZDHfSpGk5nf=AixgQUtd5RAPQx4DCMpX5QTKg@mail.gmail.com>
+In-Reply-To: CAO3V83JaYKrJPYT1Zd07dn64voGFdwkRBX+k=nWs18KD7cNNaw@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7319575554512690438==
+--===============3503548887185887066==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 7/7/2014 4:24 AM, Sergey Senozhatsky wrote:
-> On (07/07/14 13:13), Valentin Hoebel wrote:
->> Hi,
->>
->> thanks a lot for your efforts, I appreciate it.
->> My co-worker applied your patch and sent me the following output:
->>
->>    --------------------------------------------------
->> /   ./powertop -t 1 --csv
->>                                              =E2=8F=8E
->>
->
-> thanks! ok, so cpu model 0x17 is not listed as a supported one in
-> src/cpu/intel_cpus.cpp:intel_cpu_models[] to begin with, and no
-> C-states are initialized as a result. Let's wait for Intel devs
-> to add cpu/core/package models and corresponding C-states.
->
-> Alexandra, will you take care of this?
->
-> 	-ss
->
->> Loaded 0 prior measurements
->> Cannot load from file /var/cache/powertop/saved_parameters.powertop
->> check cpu model 0x17
->> ERROR: not supported
->> RAPL device for cpu 0
->> RAPL device for cpu 0
->> check cpu model 0x17
+On Mon, May 5, 2014 at 9:57 PM, Wout Mertens <wout.mertens(a)gmail.com> wro=
+te:
+> I'm confused, how does requiring a pkgconfig file break the tool?
 
-so turns out the L5410 is one generation prior to NHM, and does not support=
- some of the internal MSRs we're using.
-I'll talk to Alexandra (pending vacations, it's that season) to see what we=
- can do
+I'm sure Alexandra means "breaks people's builds".
 
+> If a user somehow finds them in a situation where they need to build a
+> recent powertop but can't build a recent ncurses, they can manually add t=
+he
+> file... Or use an older version of powertop...
 
+The problem is that someone found a simple problem, and made a
+somewhat simplified fix that creates a regression for others.
+Introducing regressions, especially in something as simple as the
+autotools code shouldn't be needed.
 
---===============7319575554512690438==--
+Someone just has to come up with a clean way to make both the old
+ncurses (that does not have pkgconfig) and the new version work at the
+same time, that's all.
+
+BTW, I'm not sure where the 2009 number comes from, but there are
+plenty of people still building against ncurses-5.9, and that has no
+pkgconfig file, so the proposed patch actually fixes _my_ build of
+powertop. (sure, you can complain I run ancient code, I certainly
+concede that).
+
+Asking people to create a pkgconfig file out of thin air is... not
+appropriate ;^)
+
+I'll send a tentative patch in a second that I think should solve the
+problem correctly.
+
+Auke
+
+--===============3503548887185887066==--
 
