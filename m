@@ -1,56 +1,63 @@
-Content-Type: multipart/mixed; boundary="===============0919002762990748749=="
+Content-Type: multipart/mixed; boundary="===============6648024792300928704=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Bug-fix:Segmentation fault with powertop --html
-Date: Thu, 22 May 2014 14:56:18 -0700
-Message-ID: <53028.10.24.1.89.1400795778.squirrel@linux.intel.com>
-In-Reply-To: 20140522154532.79d1ffe3@ilfaris
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Optionally check for ncurses pkgconfig file.
+Date: Thu, 08 May 2014 10:06:19 -0700
+Message-ID: <20140508170619.GA17120@jbkonno-beef.jf.intel.com>
+In-Reply-To: CABsxX9LV5E9w6eNKtAmoD4kUm1rryCgwDiQKiCN17MDeqxByyA@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0919002762990748749==
+--===============6648024792300928704==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+On Tue, May 06, 2014 at 05:38:24PM -0700, Kok, Auke-jan H wrote:
+> On Tue, May 6, 2014 at 12:53 AM, Sergey Senozhatsky
+> <sergey.senozhatsky(a)gmail.com> wrote:
+> > On (05/05/14 23:42), Auke Kok wrote:
+> >> ---
+> >>  configure.ac | 3 ++-
+> >>  1 file changed, 2 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/configure.ac b/configure.ac
+> >> index baa5faa..5a90fe3 100644
+> >> --- a/configure.ac
+> >> +++ b/configure.ac
+> >> @@ -46,7 +46,8 @@ AC_FUNC_REALLOC
+> >>  AC_FUNC_STRTOD
+> >>  AC_CHECK_FUNCS([fdatasync getpagesize gettimeofday memmove memset mkd=
+ir munmap pow realpath regcomp select setlocale socket sqrt strcasecmp strc=
+hr strdup strerror strncasecmp strstr strtoul strtoull])
+> >>
+> >> -AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], AC_MSG_ERROR([ncurse=
+s is required but was not found]), [])
+> >> +PKG_CHECK_MODULES([NCURSES], [ncurses], [LIBS=3D"$LIBS $ncurses_LIBS"=
+],
+> >                                 ^^^^^^^^^
+> >                                 [ncursesw ncurses]?
 
->> Julian can you test the patch please. thank you. AY.
-> Thank you for the patch but unfortunately powertop still segfaults:
-> $ powertop --html
-> Loaded 750 prior measurements
-> RAPL device for cpu 0
-> RAPL device for cpu 0
-> Preparing to take measurements
->   unknown op '{'
-> *** Error in `powertop': free(): invalid pointer: 0x000000000187cdef ***
-> Taking 1 measurement(s) for a duration of 20 second(s) each.
-> [1]    22616 segmentation fault (core dumped)  powertop --html
->
-> Backtrace:
-> #0  0x00007f63d8c8e1af in std::string::assign(std::string const&) ()
->    from /usr/lib/x86_64-linux-gnu/libstdc++.so.6
-> #1  0x0000000000410f31 in operator=3D (__str=3D"C1", this=3D0x7fff65b509a=
-0)
->     at /usr/include/c++/4.8/bits/basic_string.h:547
-> #2  report_display_cpu_cstates () at cpu/cpu.cpp:587
-> #3  0x00000000004493f4 in one_measurement (seconds=3Dseconds(a)entry=3D20,
-> workload=3Dworkload(a)entry=3D0x7fff65b521b0 "") at main.cpp:221
-> #4  0x00000000004496a6 in make_report (time=3D20,
-> workload=3Dworkload(a)entry=3D0x7fff65b521b0 "",
-> iterations=3Diterations(a)entry=3D1, file=3Dfile(a)entry=3D0x7fff65b511b0
-> "powertop.html") at main.cpp:264 #5  0x000000000040741d in main
-> (argc=3D2, argv=3D0x7fff65b532d8) at main.cpp:441
->
->
-> Cheers,
-> Julian
->
+On my gentoo system (x86_64) with ncurses 5.9, after applying this patch,
+-lncurses is linked, but not -lncursesw.
 
-Julian, thank you for testing. The patches I sent you yesterday fixed the
-previous segfault.  I'm currently looking into another solution.
+> =
 
-Thank you,
-Alexandra.
+> Good question, I actually do not know, and I don't have an ncurses
+> pkgconfig around to see if that works.
+> =
 
---===============0919002762990748749==--
+> Alexandra, can you see if this works with:
+> =
+
+> +PKG_CHECK_MODULES([NCURSES], [ncursesw ncurses], [LIBS=3D"$LIBS $ncurses=
+_LIBS"],
+
+After hacking in this change, both -lncursesw and -lncurses are linked.
+
+If I checkout the v2.5 tag, only -lncursesw is linked.
+
+So, three different linking scenarios. Which one is "correct" for powertop?
+
+--===============6648024792300928704==--
 
