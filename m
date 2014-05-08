@@ -1,46 +1,122 @@
-Content-Type: multipart/mixed; boundary="===============4801676123563643862=="
+Content-Type: multipart/mixed; boundary="===============0615257135036618834=="
 MIME-Version: 1.0
 From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [PATCH] Bug-fix: for html & csv value for CPU Information
-Date: Mon, 16 Jun 2014 12:28:22 -0700
-Message-ID: <1402946904-20472-2-git-send-email-alexandra.yates@linux.intel.com>
-In-Reply-To: 1402946904-20472-1-git-send-email-alexandra.yates@linux.intel.com
+Subject: Re: [Powertop] [PATCH] Optionally disable NLS
+Date: Thu, 08 May 2014 09:34:02 -0700
+Message-ID: <61074.10.24.17.174.1399566842.squirrel@linux.intel.com>
+In-Reply-To: 20140416195818.GC936@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4801676123563643862==
+--===============0615257135036618834==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Added cast from long-int to string to correct printout for
-"CPU Information" field on html and csv report.
 
-Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
----
- src/report/report.cpp |    4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+> On (04/16/14 11:21), Rick "Zero_Chaos" Farina wrote:
+>> A report on Gentoo's bug tracker
+>> (https://bugs.gentoo.org/show_bug.cgi?id=3D505366) notes that while the
+>> configure script support --disable-nls, the nls code is not
+>> conditionally disabled which causes build failures on uclibc.  This
+>> patch from Ren=C3=A9 Rh=C3=A9aume fixes the affected code:
+>>
+>
+> looks good.
+>
+> 	-ss
+>
+>> - --- powertop-2.5/src/lib.h
+>> +++ powertop-2.5-nls/src/lib.h
+>> @@ -33,7 +33,11 @@
+>>  #include "config.h"
+>>  #endif
+>>
+>> +#ifdef ENABLE_NLS
+>>  #define _(STRING)    gettext(STRING)
+>> +#else
+>> +#define _(STRING)    (STRING)
+>> +#endif
+>>
+>>  #define POWERTOP_VERSION "v"PACKAGE_VERSION
+>>  #define POWERTOP_SHORT_VERSION PACKAGE_VERSION
+>> - --- powertop-2.5/src/main.cpp
+>> +++ powertop-2.5-nls/src/main.cpp
+>> @@ -369,8 +369,10 @@ int main(int argc, char **argv)
+>>  	set_new_handler(out_of_memory);
+>>
+>>  	setlocale (LC_ALL, "");
+>> +#ifdef ENABLE_NLS
+>>  	bindtextdomain (PACKAGE, LOCALEDIR);
+>>  	textdomain (PACKAGE);
+>> +#endif
+>>
+>>  	while (1) { /* parse commandline options */
+>>  		c =3D getopt_long (argc, argv, "ch:C:i:t:uVw:q", long_options,
+>> &option_index);
+>> - --- powertop-2.5/src/report/report-maker.h
+>> +++ powertop-2.5-nls/src/report/report-maker.h
+>> @@ -75,8 +75,13 @@
+>>  #include <string>
+>>
+>>  /* Conditional gettext. We need original strings for CSV. */
+>> +#ifdef ENABLE_NLS
+>>  #define __(STRING) \
+>>  	((report.get_type() =3D=3D REPORT_CSV) ? (STRING) : gettext(STRING))
+>> +#else
+>> +#define __(STRING) (STRING)
+>> +#endif
+>> +
+>>
+>>  #ifndef UNUSED
+>>  #define UNUSED __attribute__((unused))
+>>
+>>
+>> original patch: https://505366.bugs.gentoo.org/attachment.cgi?id=3D373272
+>>
+>> Please accept this patch.
+>>
+>> Thanks,
+>> Zero
+>> -----BEGIN PGP SIGNATURE-----
+>> Version: GnuPG v2.0.22 (GNU/Linux)
+>> Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+>>
+>> iQIcBAEBAgAGBQJTTp/tAAoJEKXdFCfdEflKqIMP/14P/29kiuSFkm7R3A1AdiHq
+>> R9t7uS6b34dFQ+NX2loegFqwsyxcRvn3+19iG/u6Oa3uYIKRs1XnIuilZ6AQKQEW
+>> 79yDNm9bH/B/K+68hCXOWBnfO625GxTeaOt/vJDYJiUSJR7/VI4eu1+eeC87BS/p
+>> +d9XxbsDyn+SKdCuPAk7/Vju9XISQdjGla7DwEZYDF331iKZCFEdPkX09RW5/Zss
+>> iQGbHzsRZWyOpnHVeYwMKIdGUBfOB3dlnVMyecaXoBv/ybyxxw2cgLjZpav4m6D4
+>> wLIgL6Fc7tRDmCO7aNuUVUznjx1XvxsZuh64wXc36E8XBO10xtMHlk03di0tn7RC
+>> 0eT6qwOkUpBsqFZKVRvfC25FrpgjI3b/XNnWctJvlJPvQRzTRe+OCERhnJlR+NND
+>> T/PzGSlqGyCIpLhuXlJ0MUgwDW9BaUFjY84Fi0sruuFOleqN/UKPcJJO3IPwNvXH
+>> 98Yia9cve8rzaJJgvtwkAEnjiph4SlDlU3w/K8XBmrOTl7c2CZUGoesv5A7YH57y
+>> rcWzRLS7H5XUqpdn+l3dqBdsWTOsP9n/76VXNaUh6BSvK56b1Ud10VvY5ayxtDs1
+>> xCFYRbgTc34oAtk3P8xNwX08wqIyZu8UfT9HhYkUNrDxExnC5XRmgpfaHCXT101k
+>> d5ix6cGYZiikCtzUlB1M
+>> =3DH1V6
+>> -----END PGP SIGNATURE-----
+>> _______________________________________________
+>> PowerTop mailing list
+>> PowerTop(a)lists.01.org
+>> https://lists.01.org/mailman/listinfo/powertop
+>>
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>
 
-diff --git a/src/report/report.cpp b/src/report/report.cpp
-index 9e94607..6eb2b63 100644
---- a/src/report/report.cpp
-+++ b/src/report/report.cpp
-@@ -136,7 +136,9 @@ static void system_info(void)
- 	system_data[5].append(str.c_str());
- 	str =3D cpu_model();
- 	system_data[6]=3D__("CPU Information");
--	system_data[7]=3D sysconf(_SC_NPROCESSORS_ONLN);
-+	stringstream n_proc;;
-+	n_proc << sysconf(_SC_NPROCESSORS_ONLN);
-+	system_data[7]=3D n_proc.str();
- 	system_data[7].append(str.c_str());
- =
+I'm having issues adding this patch to the repo.  I get error:
 
- 	str =3D read_sysfs_string("/etc/system-release");
--- =
+Patch is empty.  Was it split wrong?
 
-1.7.9.5
+Sergey, did you have any problems applying this patch to your branch?
 
+Rick, please check your patch and send it?
 
---===============4801676123563643862==--
+Thank you,
+Alexandra.
+
+--===============0615257135036618834==--
 
