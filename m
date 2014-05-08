@@ -1,140 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============4822043894829952585=="
+Content-Type: multipart/mixed; boundary="===============4050156343571712915=="
 MIME-Version: 1.0
 From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [Fwd: [PATCH] Bug-fix:Seg-fault with powertop --html &
- --csv]
-Date: Thu, 22 May 2014 16:44:21 -0700
-Message-ID: <63774.10.24.1.89.1400802261.squirrel@linux.intel.com>
+Subject: Re: [Powertop] segmentation fault when shutting down
+Date: Thu, 08 May 2014 14:41:28 -0700
+Message-ID: <63496.10.24.17.174.1399585288.squirrel@linux.intel.com>
+In-Reply-To: E1WiULH-0003wm-PQ@tux00.mathematik.uni-freiburg.de
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4822043894829952585==
+--===============4050156343571712915==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 
+> When shutting down powertop segfaults:
+>
+>
+> ioctl(1, SNDCTL_TMR_TIMEBASE or TCGETS, {B38400 opost isig icanon echo
+> ...}) =3D 0
+> ioctl(1, SNDCTL_TMR_STOP or TCSETSW, {B38400 opost isig icanon -echo ...})
+> =3D 0
+> ioctl(1, SNDCTL_TMR_TIMEBASE or TCGETS, {B38400 opost isig icanon -echo
+> ...}) =3D 0
+> ioctl(1, SNDCTL_TMR_TIMEBASE or TCGETS, {B38400 opost isig icanon -echo
+> ...}) =3D 0
+> ioctl(1, SNDCTL_TMR_STOP or TCSETSW, {B38400 opost isig icanon echo ...})
+> =3D 0
+> ioctl(1, SNDCTL_TMR_TIMEBASE or TCGETS, {B38400 opost isig icanon echo
+> ...}) =3D 0
+> --- SIGSEGV (Segmentation fault) @ 0 (0) ---
+> +++ killed by SIGSEGV +++
+>
+>
+> This occured on v2.6-rc2 and on kernels 3.13,3.14,3.15-rc4
+>
+> Regards
+>
+> (Martin Ziegler)
+>
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>
 
----------------------------- Original Message ----------------------------
-Subject: [PATCH] Bug-fix:Seg-fault with powertop --html & --csv
-From:    "Alexandra Yates" <alexandra.yates(a)linux.intel.com>
-Date:    Thu, May 22, 2014 4:19 pm
-To:      jwollrath(a)web.de
-         powertop-dev(a)linux.intel.com
-Cc:      "Alexandra Yates" <alexandra.yates(a)linux.intel.com>
---------------------------------------------------------------------------
+This is interesting, I tested PowerTOP v2.6-rc2 on Linux Kernel 3.13.7,
+3.14.2, 3.15.0-rc3. On Ubuntu 14.04 in four different platforms and I
+can't reproducer the segmentation faults you are seen.
 
-This patch allows the supported no Intel CPUs to be included on html &
-CSV reports.  It fixes the rows index needed for package data.
-Additionally, fixes the calculation of title indexes when cores are absent
-from the CPU.  These changes are related to C-states and P-states
-reports
-
-Bug reported & tested by: Julian Wollrath <jwollrath(a)web.de>
-
-Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
----
- src/cpu/cpu.cpp |   34 ++++++++++++++++++++++------------
- 1 file changed, 22 insertions(+), 12 deletions(-)
-
-diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-index 0a7c487..b3b6166 100644
---- a/src/cpu/cpu.cpp
-+++ b/src/cpu/cpu.cpp
-@@ -466,7 +466,7 @@ void report_display_cpu_cstates(void)
- 			continue;
- 		/* Tables for PKG, CORE, CPU */
- 		pkg_tbl_size.cols=3D2;
--		pkg_tbl_size.rows=3D cstates_num+1;
-+		pkg_tbl_size.rows=3D ((cstates_num+1)-LEVEL_HEADER)+1;
- 		string pkg_data[pkg_tbl_size.cols * pkg_tbl_size.rows];
-
- 		core_tbl_size.cols=3D2;
-@@ -491,11 +491,9 @@ void report_display_cpu_cstates(void)
- 				num_cpus+=3D1;
- 			}
- 		}
--
- 		cpu_tbl_size.cols=3D(2 * (num_cpus / num_cores)) + 1;
--		cpu_tbl_size.rows =3D (cstates_num * _package->children.size())
-+		cpu_tbl_size.rows =3D ((cstates_num+1-LEVEL_HEADER) *
-_package->children.size())
- 				+ _package->children.size();
--
- 		string cpu_data[cpu_tbl_size.cols * cpu_tbl_size.rows];
-
- 		for (core =3D 0; core < _package->children.size(); core++) {
-@@ -608,12 +606,18 @@ void report_display_cpu_cstates(void)
- 		}
-
- 		/* Report Output */
--		title=3Dtitle/core_num;
-+		if(core_num > 0)
-+			title=3Dtitle/core_num;
-+		else if( _core->children.size() > 0)
-+			title=3Dtitle/_core->children.size();
-+
- 		init_pkg_table_attr(&std_table_css, pkg_tbl_size.rows, =
-
-pkg_tbl_size.cols);
- 		report.add_table(pkg_data, &std_table_css);
--		init_core_table_attr(&std_table_css, title+1, core_tbl_size.rows,
-+		if (!_core->can_collapse()){
-+			init_core_table_attr(&std_table_css, title+1, core_tbl_size.rows,
- 				core_tbl_size.cols);
--		report.add_table(core_data, &std_table_css);
-+			report.add_table(core_data, &std_table_css);
-+		}
- 		init_cpu_table_attr(&std_table_css, title+1, cpu_tbl_size.rows,
- 				cpu_tbl_size.cols);
- 		report.add_table(cpu_data, &std_table_css);
-@@ -625,7 +629,7 @@ void report_display_cpu_pstates(void)
- {
- 	char buffer[512], buffer2[512], tmp_num[50];
- 	unsigned int package, core, cpu;
--	int line;
-+	int line, title=3D0;
- 	class abstract_cpu *_package, * _core, * _cpu;
- 	unsigned int i, pstates_num;
- 	const char* core_type =3D NULL;
-@@ -671,7 +675,7 @@ void report_display_cpu_pstates(void)
-
- 		/*  Tables for PKG, CORE, CPU */
- 		pkg_tbl_size.cols=3D2;
--		pkg_tbl_size.rows=3Dpstates_num+2;
-+		pkg_tbl_size.rows=3D((pstates_num+1)-LEVEL_HEADER)+2;
- 		string pkg_data[pkg_tbl_size.cols * pkg_tbl_size.rows];
-
- 		core_tbl_size.cols=3D2;
-@@ -790,10 +794,16 @@ void report_display_cpu_pstates(void)
- 		}
- 		init_pkg_table_attr(&std_table_css, pkg_tbl_size.rows, pkg_tbl_size.cols=
-);
- 		report.add_table(pkg_data, &std_table_css);
--		init_core_table_attr(&std_table_css, (pstates_num+2),
-+		if(!_core->can_collapse()){
-+			title=3Dpstates_num+2;
-+			init_core_table_attr(&std_table_css, title,
- 				core_tbl_size.rows, core_tbl_size.cols);
--		report.add_table(core_data, &std_table_css);
--		init_cpu_table_attr(&std_table_css, (pstates_num+2),
-+			report.add_table(core_data, &std_table_css);
-+		} else {
-+			title=3Dpstates_num+1;
-+		}
-+
-+		init_cpu_table_attr(&std_table_css, title,
- 				cpu_tbl_size.rows, cpu_tbl_size.cols);
- 		report.add_table(cpu_data, &std_table_css);
- 	}
--- =
-
-1.7.9.5
-
-
+what distribution are you running?
 
 Thank you,
 Alexandra.
 
---===============4822043894829952585==--
+--===============4050156343571712915==--
 
