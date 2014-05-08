@@ -1,123 +1,67 @@
-Content-Type: multipart/mixed; boundary="===============2349843898711712409=="
+Content-Type: multipart/mixed; boundary="===============2370131580451541383=="
 MIME-Version: 1.0
-From: Valentin Hoebel <valentin.hoebel at nfon.com>
-Subject: Re: [Powertop] Does PowerTop support MHz numbers for Intel Xeon L5410
- CPUs ?
-Date: Mon, 07 Jul 2014 10:21:44 +0200
-Message-ID: <53BA5898.7050709@nfon.com>
-In-Reply-To: 20140703135949.GA993@swordfish
+From: Martin Ziegler <ziegler at email.mathematik.uni-freiburg.de>
+Subject: Re: [Powertop] segmentation fault when shutting down
+Date: Thu, 08 May 2014 23:55:01 +0200
+Message-ID: <alpine.DEB.2.10.1405082357180.28961@zertz.mathematik.uni-freiburg.de>
+In-Reply-To: 63496.10.24.17.174.1399585288.squirrel@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2349843898711712409==
+--===============2370131580451541383==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+I use debian/testing. I will try a bisection.
 
-as you already guessed Debian still uses a 2.0 version.
-However, I git cloned 2.6.1 and the "head" versions from GitHub, built =
+Regards
+Martin
 
-them both and tried them - still the same result.
+Am Do 08 Mai 2014 14:41:00 CET schrieb Alexandra Yates:
 
-Is it known if this particular CPU model does not support reading out =
-
-the CPU frequency values or could this be another problem?
-
-Best regards
-Valentin
-
-
-Am 03.07.2014 15:59, schrieb Sergey Senozhatsky:
-> On (07/03/14 14:26), Valentin Hoebel wrote:
->> Hello,
->>
->> I have been using PowerTop for some time now and would like to thank all
->> contributors for their work, especially Intel!
->>
->> However, when using PowerTop on Debian 7 (Kernel 3.2, PowerTop package
->> 2.0-0.3) and navigating to "Frequency stats", it does not show the MHz
->> numbers. Instead, it shows me the following:
 >
-> Hello,
-> am not really familiar with debian versioning, but if "2.0" means
-> upstream release v2.0, then you use a really-really outdated powertop
-> (several years). in that case I'd recommend to switch to recent version
-> (2.6 IIRC).
->
-> 	-ss
->
->>            CPU 0
->> Idle      138%
->>
->>            CPU 2
->> Idle      111,7%
->>
->>            CPU 1
->> Idle      111,7%
->>
->>            CPU 3
->> Idle      111,7%
->>
->> Is the CPU model Intel Xeon L5410 simply not supported or is there no wa=
-y to
->> read out the frequencies?
->>
->> Browsing the source code, I did not stumple accross this CPU model.
->>
->> Thanks in advance.
->>
->> Best regards
->> Valentin
+>> When shutting down powertop segfaults:
 >>
 >>
->> --
->> Mit freundlichen Gr=C3=BC=C3=9Fen
+>> ioctl(1, SNDCTL_TMR_TIMEBASE or TCGETS, {B38400 opost isig icanon echo
+>> ...}) =3D 0
+>> ioctl(1, SNDCTL_TMR_STOP or TCSETSW, {B38400 opost isig icanon -echo ...=
+})
+>> =3D 0
+>> ioctl(1, SNDCTL_TMR_TIMEBASE or TCGETS, {B38400 opost isig icanon -echo
+>> ...}) =3D 0
+>> ioctl(1, SNDCTL_TMR_TIMEBASE or TCGETS, {B38400 opost isig icanon -echo
+>> ...}) =3D 0
+>> ioctl(1, SNDCTL_TMR_STOP or TCSETSW, {B38400 opost isig icanon echo ...})
+>> =3D 0
+>> ioctl(1, SNDCTL_TMR_TIMEBASE or TCGETS, {B38400 opost isig icanon echo
+>> ...}) =3D 0
+>> --- SIGSEGV (Segmentation fault) @ 0 (0) ---
+>> +++ killed by SIGSEGV +++
 >>
->> Valentin H=C3=B6bel
->> Cloud Architect
 >>
->> NFON AG
->> Leonrodstra=C3=9Fe 68
->> D-80636 M=C3=BCnchen
+>> This occured on v2.6-rc2 and on kernels 3.13,3.14,3.15-rc4
 >>
->> Telefon +49 89 45300-407
->> valentin.hoebel(a)nfon.com
->> www.nfon.com
+>> Regards
 >>
->> Support-Hotline der NFON AG
->> Telefon 0800 - 6366 555
+>> (Martin Ziegler)
 >>
->> Die gesetzlichen Pflichtangaben finden Sie unter
->> https://www.nfon.net/pflichtangaben
 >> _______________________________________________
 >> PowerTop mailing list
 >> PowerTop(a)lists.01.org
 >> https://lists.01.org/mailman/listinfo/powertop
 >>
+>
+> This is interesting, I tested PowerTOP v2.6-rc2 on Linux Kernel 3.13.7,
+> 3.14.2, 3.15.0-rc3. On Ubuntu 14.04 in four different platforms and I
+> can't reproducer the segmentation faults you are seen.
+>
+> what distribution are you running?
+>
+> Thank you,
+> Alexandra.
+>
 
--- =
-
-Mit freundlichen Gr=C3=BC=C3=9Fen
-
-Valentin H=C3=B6bel
-Cloud Architect
-
-NFON AG
-Leonrodstra=C3=9Fe 68
-D-80636 M=C3=BCnchen
-
-Telefon +49 89 45300-407
-valentin.hoebel(a)nfon.com
-www.nfon.com
-
-Support-Hotline der NFON AG
-Telefon 0800 - 6366 555
-
-Die gesetzlichen Pflichtangaben finden Sie unter =
-
-https://www.nfon.net/pflichtangaben
-
---===============2349843898711712409==--
+--===============2370131580451541383==--
 
