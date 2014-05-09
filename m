@@ -1,75 +1,76 @@
-Content-Type: multipart/mixed; boundary="===============7469866973069064836=="
+Content-Type: multipart/mixed; boundary="===============6041987204633130587=="
 MIME-Version: 1.0
-From: Valentin Hoebel <valentin.hoebel at nfon.com>
-Subject: [Powertop] Does PowerTop support MHz numbers for Intel Xeon L5410
- CPUs ?
-Date: Thu, 03 Jul 2014 14:26:51 +0200
-Message-ID: <53B54C0B.2000500@nfon.com>
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH] Optionally check for ncurses pkgconfig file.
+Date: Fri, 09 May 2014 10:30:27 +0300
+Message-ID: <20140509073027.GB937@swordfish>
+In-Reply-To: 20140508170619.GA17120@jbkonno-beef.jf.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7469866973069064836==
+--===============6041987204633130587==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On (05/08/14 10:06), Joe Konno wrote:
+> On Tue, May 06, 2014 at 05:38:24PM -0700, Kok, Auke-jan H wrote:
+> > On Tue, May 6, 2014 at 12:53 AM, Sergey Senozhatsky
+> > <sergey.senozhatsky(a)gmail.com> wrote:
+> > > On (05/05/14 23:42), Auke Kok wrote:
+> > >> ---
+> > >>  configure.ac | 3 ++-
+> > >>  1 file changed, 2 insertions(+), 1 deletion(-)
+> > >>
+> > >> diff --git a/configure.ac b/configure.ac
+> > >> index baa5faa..5a90fe3 100644
+> > >> --- a/configure.ac
+> > >> +++ b/configure.ac
+> > >> @@ -46,7 +46,8 @@ AC_FUNC_REALLOC
+> > >>  AC_FUNC_STRTOD
+> > >>  AC_CHECK_FUNCS([fdatasync getpagesize gettimeofday memmove memset m=
+kdir munmap pow realpath regcomp select setlocale socket sqrt strcasecmp st=
+rchr strdup strerror strncasecmp strstr strtoul strtoull])
+> > >>
+> > >> -AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], AC_MSG_ERROR([ncur=
+ses is required but was not found]), [])
+> > >> +PKG_CHECK_MODULES([NCURSES], [ncurses], [LIBS=3D"$LIBS $ncurses_LIB=
+S"],
+> > >                                 ^^^^^^^^^
+> > >                                 [ncursesw ncurses]?
+> =
 
-I have been using PowerTop for some time now and would like to thank all =
+> On my gentoo system (x86_64) with ncurses 5.9, after applying this patch,
+> -lncurses is linked, but not -lncursesw.
+> =
 
-contributors for their work, especially Intel!
+> > =
 
-However, when using PowerTop on Debian 7 (Kernel 3.2, PowerTop package =
+> > Good question, I actually do not know, and I don't have an ncurses
+> > pkgconfig around to see if that works.
+> > =
 
-2.0-0.3) and navigating to "Frequency stats", it does not show the MHz =
+> > Alexandra, can you see if this works with:
+> > =
 
-numbers. Instead, it shows me the following:
+> > +PKG_CHECK_MODULES([NCURSES], [ncursesw ncurses], [LIBS=3D"$LIBS $ncurs=
+es_LIBS"],
+> =
 
-           CPU 0
-Idle      138%
+> After hacking in this change, both -lncursesw and -lncurses are linked.
+> =
 
-           CPU 2
-Idle      111,7%
+> If I checkout the v2.5 tag, only -lncursesw is linked.
+> =
 
-           CPU 1
-Idle      111,7%
-
-           CPU 3
-Idle      111,7%
-
-Is the CPU model Intel Xeon L5410 simply not supported or is there no =
-
-way to read out the frequencies?
-
-Browsing the source code, I did not stumple accross this CPU model.
-
-Thanks in advance.
-
-Best regards
-Valentin
+> So, three different linking scenarios. Which one is "correct" for powerto=
+p?
+> =
 
 
--- =
+ncursesw is preferred.
 
-Mit freundlichen Gr=C3=BC=C3=9Fen
+	-ss
 
-Valentin H=C3=B6bel
-Cloud Architect
-
-NFON AG
-Leonrodstra=C3=9Fe 68
-D-80636 M=C3=BCnchen
-
-Telefon +49 89 45300-407
-valentin.hoebel(a)nfon.com
-www.nfon.com
-
-Support-Hotline der NFON AG
-Telefon 0800 - 6366 555
-
-Die gesetzlichen Pflichtangaben finden Sie unter =
-
-https://www.nfon.net/pflichtangaben
-
---===============7469866973069064836==--
+--===============6041987204633130587==--
 
