@@ -1,128 +1,73 @@
-Content-Type: multipart/mixed; boundary="===============0147792682398881557=="
+Content-Type: multipart/mixed; boundary="===============6399323758380407760=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] use pkg-config to find ncurses
-Date: Fri, 25 Apr 2014 16:58:55 -0700
-Message-ID: <56235.10.254.3.215.1398470335.squirrel@linux.intel.com>
-In-Reply-To: 534EF035.8040802@gentoo.org
+From: Kok, Auke-jan H <auke-jan.h.kok at intel.com>
+Subject: Re: [Powertop] [PATCH] Optionally check for ncurses pkgconfig file.
+Date: Fri, 09 May 2014 14:59:46 -0700
+Message-ID: <CABsxX9L4SEXXhoRVCqCD19rBeBNJ=-nvMcj1Ed_oLktmc_UfGA@mail.gmail.com>
+In-Reply-To: 20140509073027.GB937@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0147792682398881557==
+--===============6399323758380407760==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Zero,
+On Fri, May 9, 2014 at 12:30 AM, Sergey Senozhatsky
+<sergey.senozhatsky(a)gmail.com> wrote:
+> On (05/08/14 10:06), Joe Konno wrote:
+>> On Tue, May 06, 2014 at 05:38:24PM -0700, Kok, Auke-jan H wrote:
+>> > On Tue, May 6, 2014 at 12:53 AM, Sergey Senozhatsky
+>> > <sergey.senozhatsky(a)gmail.com> wrote:
+>> > > On (05/05/14 23:42), Auke Kok wrote:
+>> > >> ---
+>> > >>  configure.ac | 3 ++-
+>> > >>  1 file changed, 2 insertions(+), 1 deletion(-)
+>> > >>
+>> > >> diff --git a/configure.ac b/configure.ac
+>> > >> index baa5faa..5a90fe3 100644
+>> > >> --- a/configure.ac
+>> > >> +++ b/configure.ac
+>> > >> @@ -46,7 +46,8 @@ AC_FUNC_REALLOC
+>> > >>  AC_FUNC_STRTOD
+>> > >>  AC_CHECK_FUNCS([fdatasync getpagesize gettimeofday memmove memset =
+mkdir munmap pow realpath regcomp select setlocale socket sqrt strcasecmp s=
+trchr strdup strerror strncasecmp strstr strtoul strtoull])
+>> > >>
+>> > >> -AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], AC_MSG_ERROR([ncu=
+rses is required but was not found]), [])
+>> > >> +PKG_CHECK_MODULES([NCURSES], [ncurses], [LIBS=3D"$LIBS $ncurses_LI=
+BS"],
+>> > >                                 ^^^^^^^^^
+>> > >                                 [ncursesw ncurses]?
+>>
+>> On my gentoo system (x86_64) with ncurses 5.9, after applying this patch,
+>> -lncurses is linked, but not -lncursesw.
+>>
+>> >
+>> > Good question, I actually do not know, and I don't have an ncurses
+>> > pkgconfig around to see if that works.
+>> >
+>> > Alexandra, can you see if this works with:
+>> >
+>> > +PKG_CHECK_MODULES([NCURSES], [ncursesw ncurses], [LIBS=3D"$LIBS $ncur=
+ses_LIBS"],
+>>
+>> After hacking in this change, both -lncursesw and -lncurses are linked.
+>>
+>> If I checkout the v2.5 tag, only -lncursesw is linked.
+>>
+>> So, three different linking scenarios. Which one is "correct" for powert=
+op?
+>>
+>
+> ncursesw is preferred.
 
-Based on Sergey's feedback can you send a revision for your patches?
+yup. I just sent a new version, which should be OK to merge for Alex.
 
-thank you,
-Alex
-> -----BEGIN PGP SIGNED MESSAGE-----
-> Hash: SHA1
->
-> On 04/16/2014 03:54 PM, Sergey Senozhatsky wrote:
->> On (04/16/14 12:41), Kok, Auke-jan H wrote:
->>> ncurses by itself does not provide a pkgconfig check, it is however
->>> manually added by various distributions, but not all of them.
->>>
->>> So, the patch below breaks building powertop for those distributions.
->>>
->>
->> yes. good point. apparently ncurses provides pkg-config files these
->> days.
->> but there still may be distributions that use older ncurses versions.
->
->
-> pkgconfig support was added on 20090103 according to the changelog here:
-> http://invisible-island.net/ncurses/NEWS.html.
->
-> Is is really a major concern to to require a version of ncurses released
-> within the last 5 years?
->
-> - -Zero
->>
->> 	-ss
->>
->>> I suggest that if you really want to make it use pkg-config, you write
->>> it in such a way that if pkg-config checking fails, it will still
->>> attempt to search for the appropriate libs instead.
->>>
->>> Auke
->>>
->>>
->>>
->>> On Wed, Apr 16, 2014 at 8:20 AM, Rick "Zero_Chaos" Farina
->>> <zerochaos(a)gentoo.org> wrote:
->> Original bug report: https://bugs.gentoo.org/show_bug.cgi?id=3D486124
->>
->> Depending on how ncurses is built, it may require different information
->> passed to the linker.  Use pkg-config to detect the correct information:
->>
->> --- a/configure.ac
->> +++ b/configure.ac
->> @@ -46,7 +46,7 @@
->>  AC_FUNC_STRTOD
->>  AC_CHECK_FUNCS([fdatasync getpagesize gettimeofday memmove memset mkdir
->> munmap pow realpath regcomp select setlocale socket sqrt strcasecmp
->> strchr strdup strerror strncasecmp strstr strtoul strtoull])
->>
->> -AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], AC_MSG_ERROR([ncurses
->> is required but was not found]), [])
->> +PKG_CHECK_MODULES(ncurses, ncurses, [LIBS=3D"$LIBS $ncurses_LIBS"],
->> AC_MSG_ERROR([ncurses is required but was not found]))
->>
->>  has_libpci=3D0
->>  PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=3D1],[
->>
->>
->> Original patch:
->> http://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/sys-power/powert=
-op/files/powertop-2.4-tinfo.patch?revision=3D1.1&view=3Dmarkup
->>
->> Please include this fix.
->>
->> thanks,
->> Zero
->>>> _______________________________________________
->>>> PowerTop mailing list
->>>> PowerTop(a)lists.01.org
->>>> https://lists.01.org/mailman/listinfo/powertop
->>> _______________________________________________
->>> PowerTop mailing list
->>> PowerTop(a)lists.01.org
->>> https://lists.01.org/mailman/listinfo/powertop
->>>
->>
->
-> -----BEGIN PGP SIGNATURE-----
-> Version: GnuPG v2.0.22 (GNU/Linux)
-> Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
->
-> iQIcBAEBAgAGBQJTTvA1AAoJEKXdFCfdEflK/VYP/2D9II4S6BMw/1flPtHfj5Yn
-> 2L+iy9KpIbRAaV0n6XI4/0ppGM+21xXbw372z56ne/MBKqJD0TCOF2AyHhD/178U
-> oNkTjAt0aJuToO/IDZAR5Q4oD8KXQAO67lsH+VHkuV3R93hpxQ49COaGnPW62TvR
-> I3nBRJMiqN6sixQa5M5wT2OlQz9mzs7GxEt2VeRXNHtoLAvPScJYM6p1v1An/Vcz
-> a6YvLmKB0S5t5m3a8Nc7EAvcqJNgnKKtMBgfv8d6zi5ueFtdn4TxAKxqXZeNpgiV
-> uY/lKa1Ycz924ftd+iLTAf6q3H6PVY7GJnYbRXZ7niz0PqXtExgOmZ6JonZIhdBC
-> +TX161fjRQYjTf6JjwMYzKTc4Vx9lUjX4f/0jsPDmC/Wu0NcDL8GbBqP45AYIktX
-> I1uo6vDqglxg6vQDL3OrL+6oolDITfJaSTFFZ7QezdyA9uflCR9uQaCbnJ7zKCF/
-> acD1Vh9gabRQw2Mq1n9ATB9mpuFUESclVz6Xs/PCiWCTLM5XyIhfUU/RCeOEjG2j
-> ooEx999sAlrdjK5WH+chL1A/yQyamcfuH8cQmOO2p7o70Z6++/u18OdwbCRkgioe
-> 87LaoT2VRwNAcQhR9X7XVYqGC8CbCtCISDPzEmH+AcCy8rPBNb3i9S7SNDiaVOAo
-> vc7kO3EajD6QYFp6aH2K
-> =3Do+vQ
-> -----END PGP SIGNATURE-----
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->
+Cheers,
 
+Auke
 
-Thank you,
-Alexandra.
-
---===============0147792682398881557==--
+--===============6399323758380407760==--
 
