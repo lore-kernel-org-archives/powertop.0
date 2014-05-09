@@ -1,68 +1,169 @@
-Content-Type: multipart/mixed; boundary="===============2613533857144776534=="
+Content-Type: multipart/mixed; boundary="===============8336035495378868585=="
 MIME-Version: 1.0
-From: Rick "Zero_Chaos" Farina <zerochaos at gentoo.org>
-Subject: [Powertop] [PATCH]  use pkg-config to find ncurses
-Date: Wed, 16 Apr 2014 11:20:22 -0400
-Message-ID: <534E9FB6.6080402@gentoo.org>
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] segmentation fault when shutting down
+Date: Fri, 09 May 2014 11:18:00 +0300
+Message-ID: <20140509081800.GC937@swordfish>
+In-Reply-To: 20140509061416.GE32300@rhrk.uni-kl.de
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2613533857144776534==
+--===============8336035495378868585==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+On (05/09/14 08:14), Joerg Mayer wrote:
+> I also get a segfault.
+> =
 
-Original bug report: https://bugs.gentoo.org/show_bug.cgi?id=3D486124
+> Ciao
+>     J=C3=B6rg
+> =
 
-Depending on how ncurses is built, it may require different information
-passed to the linker.  Use pkg-config to detect the correct information:
+> powertop (git describe: v2.6-rc2-1-gb162f5d)
+> =
 
-- --- a/configure.ac
-+++ b/configure.ac
-@@ -46,7 +46,7 @@
- AC_FUNC_STRTOD
- AC_CHECK_FUNCS([fdatasync getpagesize gettimeofday memmove memset mkdir
-munmap pow realpath regcomp select setlocale socket sqrt strcasecmp
-strchr strdup strerror strncasecmp strstr strtoul strtoull])
-
-- -AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], AC_MSG_ERROR([ncurses
-is required but was not found]), [])
-+PKG_CHECK_MODULES(ncurses, ncurses, [LIBS=3D"$LIBS $ncurses_LIBS"],
-AC_MSG_ERROR([ncurses is required but was not found]))
-
- has_libpci=3D0
- PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=3D1],[
+> (gdb) bt
+> #0  0x00000010 in ?? ()
+> #1  0x0805339b in close_display () at ../../src/display.cpp:94
+> #2  0x08090c30 in clean_shutdown () at ../../src/main.cpp:365
+> #3  0x0804e575 in main (argc=3D1, argv=3D0xbff65814) at ../../src/main.cp=
+p:500
+> (gdb) quit
+> =
 
 
-Original patch:
-http://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/sys-power/powertop/=
-files/powertop-2.4-tinfo.patch?revision=3D1.1&view=3Dmarkup
+ok... I took a quick look, and I didn't understand some things.
 
-Please include this fix.
 
-thanks,
-Zero
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+commit eb08d4480969c8e48347c7621bd96dc248ee2138
+Author: Dan Kalowsky <daniel.kalowsky(a)intel.com>
+Date:   Mon Apr 28 13:52:05 2014 -0700
 
-iQIcBAEBAgAGBQJTTp+2AAoJEKXdFCfdEflKJVkP/19iu4BWlFZ5TV0XVKvi0lm9
-DsIK9gkN+Kpa5F3QjTgDOCA7K72VdTGCv8os3A0KHPocrQ55tNb0lyILJYs6/rdL
-YSCMrd1TjacVhZujwTjia99BA/EwkPGpeogKdKuzHfRI6EYk6QFDaeljG11Jjds+
-VQ/sW3Fbe63/Sw6jvvHYTi0wE2hu30ot9Y+GQXkaNfJMpvk16S2GevKr+PG6wAqF
-gL1hLG7b5NNTgZxNLZJMDMIFZcUA/VMBUPZta5KyGpzjrMcVcZkNZ3YegwkwIJQ/
-Dq0xA/HhXUSgCIcp2cTuBF2YZrKE/linFmFHyKJ0NEvbaEpAsPLkhzpz3E8d+b++
-t8ceoTAYYRGpJU9fGNLcHCaHmREtzQMJn7hTT85Rbz0+duohaj6xqkKTemlPykTu
-ZDM+48oUXEe+iwcfp4ctbJILwZaw+IIzA2GhtR3QATjfQZe4lXczHHt2VW50toIb
-hFaKrg/uYqHe7KpHq/+rdtjNhOsP7Ckaq+USTQ7/AmoFLB6Bt+3NM9sIHdyeWUfG
-XXnOKPPpPSOZXFE/mKodqI0tOP0cngbMuLr60axELZi0gxiUiDVxKuRAOlukVRSY
-RQFKRIucrEeR/uwDH/sbq1xQ0dnE0JdJs4VO8K40KkSskE7eHOoBIJ8c3kL02Sfm
-c6KasduRgzZfWUo4plC1
-=3Dyt9+
------END PGP SIGNATURE-----
+    Remove another memory leak
+    =
 
---===============2613533857144776534==--
+    Pointer gets over written without ever being properly cleaned up.  This
+    should solve that problem.
+
+
+	+class tuning_window *tune_window;
+	+
+	 class tuning_window: public tab_window {
+	 public:
+	        virtual void repaint(void);
+	@@ -80,6 +82,11 @@ void initialize_tuning(void)
+	        init_tuning();
+	 =
+
+	        w->cursor_max =3D all_tunables.size() - 1;
+	+
+	+       if (tune_window)
+	+               delete tune_window;
+	+
+	+       tune_window =3D w;
+	 }
+	 =
+
+	=
+
+	@@ -305,6 +312,10 @@ void clear_tuning()
+	                delete all_untunables[i];
+	        }
+	        all_untunables.clear();
+	+
+	+       if (tune_window)
+	+               delete tune_window;
+	+       tune_window =3D NULL;
+		^^^^^^^^^
+	 }
+	 =
+
+	 void auto_toggle_tuning()
+
+
+tuning_window::window_refresh() calls clear_tuning(). which deletes tune_wi=
+ndow
+and sets it to NULL. then init_tuning() called.
+
+the fishy part is that it all happens within that `if (w)' in display.cpp w=
+indow_refresh()
+
+        if (w) {
+                w->ypad_pos =3D 0;
+                w->xpad_pos =3D 0;
+                w->window_refresh();
+		^^^^^ here we kill tuning_window
+                w->repaint();
+		^^^^^ and here we try to execute its function?
+        }
+
+can someone check (or prove me wrong) if we actually have problems here?
+if we do -- then was it actually tested?
+
+	-ss
+
+> jmayer(a)egg:~/work/power/powertop/git/build(master)> lsb_release -a
+> LSB Version: core-2.0-noarch:core-3.2-noarch:core-4.0-noarch:core-2.0-ia3=
+2:core-3.2-ia32:core-4.0-ia32:desktop-4.0-ia32:desktop-4.0-noarch:graphics-=
+2.0-ia32:graphics-2.0-noarch:graphics-3.2-ia32:graphics-3.2-noarch:graphics=
+-4.0-ia32:graphics-4.0-noarch
+> Distributor ID: openSUSE project
+> Description:    openSUSE 13.1 (Bottle) (i586)
+> Release:        13.1
+> Codename:       Bottle
+> =
+
+> jmayer(a)egg:~/work/power/powertop/git/build(master)> uname -a
+> Linux egg 3.14.2-1.g1474ea5-desktop #1 SMP PREEMPT Sun Apr 27 14:35:22 UT=
+C 2014 (1474ea5) i686 i686 i386 GNU/Linux
+> =
+
+> =
+
+> jmayer(a)egg:~/work/power/powertop/git/build(master)> cat /proc/cpuinfo
+> processor       : 0
+> vendor_id       : GenuineIntel
+> cpu family      : 6
+> model           : 23
+> model name      : Intel(R) Core(TM)2 Duo CPU     T8300  @ 2.40GHz
+> stepping        : 6
+> microcode       : 0x60f
+> cpu MHz         : 2400.000
+> cache size      : 3072 KB
+> physical id     : 0
+> siblings        : 2
+> core id         : 0
+> cpu cores       : 2
+> apicid          : 0
+> initial apicid  : 0
+> fdiv_bug        : no
+> f00f_bug        : no
+> coma_bug        : no
+> fpu             : yes
+> fpu_exception   : yes
+> cpuid level     : 10
+> wp              : yes
+> flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
+a cmov pat
+> +pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe nx lm constant_tsc=
+ arch_perfmon
+> +pebs bts aperfmperf pni dtes64 monitor ds_cpl vmx est tm2 ssse3 cx16 xtp=
+r pdcm sse4_1
+> +lahf_lm ida dtherm tpr_shadow vnmi flexpriority
+> bogomips        : 4788.29
+> clflush size    : 64
+> cache_alignment : 64
+> address sizes   : 36 bits physical, 48 bits virtual
+> power management:
+> [output for processor 1 deleted]
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+
+--===============8336035495378868585==--
 
