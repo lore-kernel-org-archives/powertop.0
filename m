@@ -1,116 +1,92 @@
-Content-Type: multipart/mixed; boundary="===============8683258859635949865=="
+Content-Type: multipart/mixed; boundary="===============7648394787356630939=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] Optionally disable NLS
-Date: Wed, 16 Apr 2014 22:58:20 +0300
-Message-ID: <20140416195818.GC936@swordfish>
-In-Reply-To: 534E9FED.4080608@gentoo.org
+From: Joerg Mayer <jmpt at loplof.de>
+Subject: Re: [Powertop] segmentation fault when shutting down
+Date: Fri, 09 May 2014 08:14:16 +0200
+Message-ID: <20140509061416.GE32300@rhrk.uni-kl.de>
+In-Reply-To: 63496.10.24.17.174.1399585288.squirrel@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8683258859635949865==
+--===============7648394787356630939==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (04/16/14 11:21), Rick "Zero_Chaos" Farina wrote:
-> A report on Gentoo's bug tracker
-> (https://bugs.gentoo.org/show_bug.cgi?id=3D505366) notes that while the
-> configure script support --disable-nls, the nls code is not
-> conditionally disabled which causes build failures on uclibc.  This
-> patch from Ren=C3=A9 Rh=C3=A9aume fixes the affected code:
->
+On Thu, May 08, 2014 at 02:41:28PM -0700, Alexandra Yates wrote:
+> This is interesting, I tested PowerTOP v2.6-rc2 on Linux Kernel 3.13.7,
+> 3.14.2, 3.15.0-rc3. On Ubuntu 14.04 in four different platforms and I
+> can't reproducer the segmentation faults you are seen.
+>                                                                          =
+            > what distribution are you running?
 
-looks good.
+I also get a segfault.
 
-	-ss
+Ciao
+    J=C3=B6rg
 
-> - --- powertop-2.5/src/lib.h
-> +++ powertop-2.5-nls/src/lib.h
-> @@ -33,7 +33,11 @@
->  #include "config.h"
->  #endif
-> =
+powertop (git describe: v2.6-rc2-1-gb162f5d)
 
-> +#ifdef ENABLE_NLS
->  #define _(STRING)    gettext(STRING)
-> +#else
-> +#define _(STRING)    (STRING)
-> +#endif
-> =
+(gdb) bt
+#0  0x00000010 in ?? ()
+#1  0x0805339b in close_display () at ../../src/display.cpp:94
+#2  0x08090c30 in clean_shutdown () at ../../src/main.cpp:365
+#3  0x0804e575 in main (argc=3D1, argv=3D0xbff65814) at ../../src/main.cpp:=
+500
+(gdb) quit
 
->  #define POWERTOP_VERSION "v"PACKAGE_VERSION
->  #define POWERTOP_SHORT_VERSION PACKAGE_VERSION
-> - --- powertop-2.5/src/main.cpp
-> +++ powertop-2.5-nls/src/main.cpp
-> @@ -369,8 +369,10 @@ int main(int argc, char **argv)
->  	set_new_handler(out_of_memory);
-> =
+jmayer(a)egg:~/work/power/powertop/git/build(master)> lsb_release -a
+LSB Version: core-2.0-noarch:core-3.2-noarch:core-4.0-noarch:core-2.0-ia32:=
+core-3.2-ia32:core-4.0-ia32:desktop-4.0-ia32:desktop-4.0-noarch:graphics-2.=
+0-ia32:graphics-2.0-noarch:graphics-3.2-ia32:graphics-3.2-noarch:graphics-4=
+.0-ia32:graphics-4.0-noarch
+Distributor ID: openSUSE project
+Description:    openSUSE 13.1 (Bottle) (i586)
+Release:        13.1
+Codename:       Bottle
 
->  	setlocale (LC_ALL, "");
-> +#ifdef ENABLE_NLS
->  	bindtextdomain (PACKAGE, LOCALEDIR);
->  	textdomain (PACKAGE);
-> +#endif
-> =
+jmayer(a)egg:~/work/power/powertop/git/build(master)> uname -a
+Linux egg 3.14.2-1.g1474ea5-desktop #1 SMP PREEMPT Sun Apr 27 14:35:22 UTC =
+2014 (1474ea5) i686 i686 i386 GNU/Linux
 
->  	while (1) { /* parse commandline options */
->  		c =3D getopt_long (argc, argv, "ch:C:i:t:uVw:q", long_options,
-> &option_index);
-> - --- powertop-2.5/src/report/report-maker.h
-> +++ powertop-2.5-nls/src/report/report-maker.h
-> @@ -75,8 +75,13 @@
->  #include <string>
-> =
 
->  /* Conditional gettext. We need original strings for CSV. */
-> +#ifdef ENABLE_NLS
->  #define __(STRING) \
->  	((report.get_type() =3D=3D REPORT_CSV) ? (STRING) : gettext(STRING))
-> +#else
-> +#define __(STRING) (STRING)
-> +#endif
-> +
-> =
+jmayer(a)egg:~/work/power/powertop/git/build(master)> cat /proc/cpuinfo
+processor       : 0
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 23
+model name      : Intel(R) Core(TM)2 Duo CPU     T8300  @ 2.40GHz
+stepping        : 6
+microcode       : 0x60f
+cpu MHz         : 2400.000
+cache size      : 3072 KB
+physical id     : 0
+siblings        : 2
+core id         : 0
+cpu cores       : 2
+apicid          : 0
+initial apicid  : 0
+fdiv_bug        : no
+f00f_bug        : no
+coma_bug        : no
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 10
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca =
+cmov pat
++pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe nx lm constant_tsc a=
+rch_perfmon
++pebs bts aperfmperf pni dtes64 monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr =
+pdcm sse4_1
++lahf_lm ida dtherm tpr_shadow vnmi flexpriority
+bogomips        : 4788.29
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 36 bits physical, 48 bits virtual
+power management:
+[output for processor 1 deleted]
 
->  #ifndef UNUSED
->  #define UNUSED __attribute__((unused))
-> =
 
-> =
-
-> original patch: https://505366.bugs.gentoo.org/attachment.cgi?id=3D373272
-> =
-
-> Please accept this patch.
-> =
-
-> Thanks,
-> Zero
-> -----BEGIN PGP SIGNATURE-----
-> Version: GnuPG v2.0.22 (GNU/Linux)
-> Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-> =
-
-> iQIcBAEBAgAGBQJTTp/tAAoJEKXdFCfdEflKqIMP/14P/29kiuSFkm7R3A1AdiHq
-> R9t7uS6b34dFQ+NX2loegFqwsyxcRvn3+19iG/u6Oa3uYIKRs1XnIuilZ6AQKQEW
-> 79yDNm9bH/B/K+68hCXOWBnfO625GxTeaOt/vJDYJiUSJR7/VI4eu1+eeC87BS/p
-> +d9XxbsDyn+SKdCuPAk7/Vju9XISQdjGla7DwEZYDF331iKZCFEdPkX09RW5/Zss
-> iQGbHzsRZWyOpnHVeYwMKIdGUBfOB3dlnVMyecaXoBv/ybyxxw2cgLjZpav4m6D4
-> wLIgL6Fc7tRDmCO7aNuUVUznjx1XvxsZuh64wXc36E8XBO10xtMHlk03di0tn7RC
-> 0eT6qwOkUpBsqFZKVRvfC25FrpgjI3b/XNnWctJvlJPvQRzTRe+OCERhnJlR+NND
-> T/PzGSlqGyCIpLhuXlJ0MUgwDW9BaUFjY84Fi0sruuFOleqN/UKPcJJO3IPwNvXH
-> 98Yia9cve8rzaJJgvtwkAEnjiph4SlDlU3w/K8XBmrOTl7c2CZUGoesv5A7YH57y
-> rcWzRLS7H5XUqpdn+l3dqBdsWTOsP9n/76VXNaUh6BSvK56b1Ud10VvY5ayxtDs1
-> xCFYRbgTc34oAtk3P8xNwX08wqIyZu8UfT9HhYkUNrDxExnC5XRmgpfaHCXT101k
-> d5ix6cGYZiikCtzUlB1M
-> =3DH1V6
-> -----END PGP SIGNATURE-----
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============8683258859635949865==--
+--===============7648394787356630939==--
 
