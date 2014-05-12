@@ -1,56 +1,68 @@
-Content-Type: multipart/mixed; boundary="===============0773586230306586980=="
+Content-Type: multipart/mixed; boundary="===============3847913792065611248=="
 MIME-Version: 1.0
 From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [Announce] PowerTOP v2.6.1 released
-Date: Fri, 23 May 2014 11:41:40 -0700
-Message-ID: <58373.10.24.4.100.1400870500.squirrel@linux.intel.com>
+Subject: Re: [Powertop] segmentation fault when shutting
+Date: Mon, 12 May 2014 16:22:37 -0700
+Message-ID: <58306.10.24.2.65.1399936957.squirrel@linux.intel.com>
+In-Reply-To: 20140509100640.GE937@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0773586230306586980==
+--===============3847913792065611248==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-We are pleased to announce the release of PowerTOP v2.6.1
+> On (05/09/14 00:22), Martin Ziegler wrote:
+>> The bisection resulted in
+>>
+>> commit 5f5976f8b42e4e4717f2d573cf43cb87ccd88fa2
+>> Author: Dan Kalowsky <daniel.kalowsky(a)intel.com>
+>> Date:   Tue Apr 29 15:55:31 2014 -0700
+>>
+>>     Adding a clean_shutdown function
+>>
+>>     Function is designed to be a on stop place to clean up
+>>     the entire application at shutdown time.
+>>
+>> as the first bad commit.
+>>
+>
+> thanks, Martin.
+>
+> yes... well
+>
+> a) clean_shutdown() calls close_display() which iterates
+> tab_windows[tab_names[i]]
+> and deletes every tab_window. the problem is that prior to
+> close_display() main executes clear_tuning(), which [surprise surprise]
+> does `delete tune_window' since commit
+> eb08d4480969c8e48347c7621bd96dc248ee2138
+> ("Remove another memory leak") , whilst tab_windows[tab_names[i]] still
+> holds
+> a pointer which we just secretly free()-d. so this is double free().
+> and it has no other option (and will never have) than to crash.
+>
+> this obviously has not been tested before push.
+>
+>
+> b) there is no point in free()-ing memory which will be free()-d anyway,
+> because we exit() the program.
+>
+> 	-ss
+>
 
+Martin, thank you for reporting and bisecting the culprit.
 
-About PowerTOP
+Sergey, thank you for poking the issues.
 
-PowerTOP is a Linux tool to diagnose issues with power consumption and
-power management. In addition to being a diagnostic tool, PowerTOP also
-has an interactive mode you can use to experiment with various power
-management settings, for cases where the Linux distribution has not
-enabled those settings.
+Dan, please fix the patches and resend them.  They will be included after
+release 2.6 is completed.
 
-PowerTOP reports which components in the system are most likely to blame
-for higher-than-needed power consumption, ranging from software
-applications to active components in the system. Detailed screens are
-available for CPU C and P states, device activity, and software activity.
-
-For many years, PowerTOP has been used heavily by Intel, Linux
-distributors, and various parts of the open source community.
-
-
-
-Fixes
-
-Segmentation faults with PowerTOP2.6 reported by Julian Wollrath
-<jwollrath(a)web.de>
-Packaging issues reported by Julian Wollrath <jwollrath(a)web.de>
-Thank you to everyone who contributed to this release!
-
-Alexandra Yates (3):
-
-      Bug-fix:Seg-fault with powertop --html & --csv
-
-      Update translation files and configuration
-
-      PowerTOP version 2.6.1
-
+I reverted Dan Kalowsky's patches.
 
 Thank you,
 Alexandra.
 
---===============0773586230306586980==--
+--===============3847913792065611248==--
 
