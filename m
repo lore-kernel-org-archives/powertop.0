@@ -1,157 +1,88 @@
-Content-Type: multipart/mixed; boundary="===============4012974830914501691=="
+Content-Type: multipart/mixed; boundary="===============3938779089649447545=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] A series of patches towards limiting memory corruption
- and foot print
-Date: Thu, 01 May 2014 22:28:43 +0300
-Message-ID: <20140501192843.GA938@swordfish>
-In-Reply-To: 4628F0C61321354285DF2950999754456DF935BE@ORSMSX114.amr.corp.intel.com
+From: Kalowsky, Daniel <daniel.kalowsky at intel.com>
+Subject: Re: [Powertop] segmentation fault when shutting
+Date: Wed, 14 May 2014 19:26:07 +0000
+Message-ID: <4628F0C61321354285DF2950999754456DF9880F@ORSMSX114.amr.corp.intel.com>
+In-Reply-To: 58306.10.24.2.65.1399936957.squirrel@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4012974830914501691==
+--===============3938779089649447545==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (05/01/14 14:11), Kalowsky, Daniel wrote:
->    Sorry about a second post, looks like email stripped the attachements.=
-=C2=A0
->    Second attempt here.
-
-Hello,
-
-it's much easier to review/comment/etc if a patch is inlined in your
-email, in plain text. (http://www.tux.org/lkml/#s1-10)
-
-care to resend using git send-email?
-thanks.
-
-	-ss
-
->    =C2=A0
-> =
-
->    From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of
->    Kalowsky, Daniel
->    Sent: Tuesday, April 29, 2014 5:15 PM
->    To: powertop(a)lists.01.org
->    Subject: [Powertop] A series of patches towards limiting memory corrup=
-tion
->    and foot print
-> =
-
->    =C2=A0
-> =
-
->    Hi Powertop,
-> =
-
->    =C2=A0
-> =
-
->    I=E2=80=99ve been working with the interactive mode and have run into =
-cases where
->    powertop will crash due to a series of memory corruptions.=C2=A0 The f=
-ollowing
->    series of patches have helped to reduce the frequency of the issue,
->    although not completely solved it.=C2=A0 The issues arise much faster =
-on
->    platforms where there are constrained amounts of RAM to work within.
-> =
-
->    =C2=A0
-> =
-
->    Patch 1 =E2=80=93 When shutting down the interactive display, the disp=
-lay bits of
->    memory is not correctly released.=C2=A0 This patch provides a method f=
-or
->    correctly doing so.=C2=A0
-> =
-
->    =C2=A0
-> =
-
->    Patch 2 =E2=80=93 Solving a documented memory leak with a non-elegant =
-solution.=C2=A0
->    The path either adds the bundle to the stack, or it forgets about it.=
-=C2=A0 If
->    it is forgotten about, make sure to clear that memory before moving on=
-.=C2=A0
->    This is done with a simple flag variable being set.=C2=A0
-> =
-
->    =C2=A0
-> =
-
->    Patch 3 =E2=80=93 When the tuning window is updated, the current point=
-er is just
->    set adrift and not properly free=E2=80=99d.=C2=A0 This patch catches t=
-hat issue and
->    removes the dangling pointer by holding a reference to the pointer unt=
-il
->    it is reset or specifically free=E2=80=99d.
-> =
-
->    =C2=A0
-> =
-
->    Patch 4 =E2=80=93 Someone actually added in the code to create a oneti=
-me
->    pretty-print array, this patch just puts it to use by setting the
->    variable.=C2=A0
-> =
-
->    =C2=A0
-> =
-
->    Patch 5 =E2=80=93 Limiting the buffer copy to the size of the allocate=
-d buffer
->    with snprintf.
-> =
-
->    =C2=A0
-> =
-
->    Patch 6 =E2=80=93 There exist some processes and entries that can and =
-do extend
->    beyond the length of these buffers.=C2=A0 This limits those entries so=
- as not
->    to corrupt other memory on the system when in interactive mode.=C2=A0
-> =
-
->    =C2=A0
-> =
-
->    Patch 7 =E2=80=93 This is an untested patch, but follows along the sam=
-e lines of
->    Patch 6.=C2=A0 It applies the same principals only for the report meth=
-od.=C2=A0
-> =
-
->    =C2=A0
-> =
-
->    Patch 8 =E2=80=93 Creates a clean_shutdown function that can be used t=
-o cleanup
->    the memory space at shutdown time.=C2=A0 Calls upon parts of Patch 1 t=
-o make
->    this happen.=C2=A0
-> =
-
->    =C2=A0
-> =
-
->    There will more than likely be some more patches in the future as time
->    permits.=C2=A0
+Not all patches are at fault here so reverting the entire series seems shor=
+t sighted.  Even the patch in question isn't causing issues on all platform=
+s.  =
 
 
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
 
+-----Original Message-----
+From: Alexandra Yates [mailto:alexandra.yates(a)linux.intel.com] =
 
---===============4012974830914501691==--
+Sent: Monday, May 12, 2014 4:23 PM
+To: powertop(a)lists.01.org
+Cc: Kalowsky, Daniel
+Subject: Re: [Powertop] segmentation fault when shutting
+
+> On (05/09/14 00:22), Martin Ziegler wrote:
+>> The bisection resulted in
+>>
+>> commit 5f5976f8b42e4e4717f2d573cf43cb87ccd88fa2
+>> Author: Dan Kalowsky <daniel.kalowsky(a)intel.com>
+>> Date:   Tue Apr 29 15:55:31 2014 -0700
+>>
+>>     Adding a clean_shutdown function
+>>
+>>     Function is designed to be a on stop place to clean up
+>>     the entire application at shutdown time.
+>>
+>> as the first bad commit.
+>>
+>
+> thanks, Martin.
+>
+> yes... well
+>
+> a) clean_shutdown() calls close_display() which iterates =
+
+> tab_windows[tab_names[i]] and deletes every tab_window. the problem is =
+
+> that prior to
+> close_display() main executes clear_tuning(), which [surprise =
+
+> surprise] does `delete tune_window' since commit
+> eb08d4480969c8e48347c7621bd96dc248ee2138
+> ("Remove another memory leak") , whilst tab_windows[tab_names[i]] =
+
+> still holds a pointer which we just secretly free()-d. so this is =
+
+> double free().
+> and it has no other option (and will never have) than to crash.
+>
+> this obviously has not been tested before push.
+>
+>
+> b) there is no point in free()-ing memory which will be free()-d =
+
+> anyway, because we exit() the program.
+>
+> 	-ss
+>
+
+Martin, thank you for reporting and bisecting the culprit.
+
+Sergey, thank you for poking the issues.
+
+Dan, please fix the patches and resend them.  They will be included after r=
+elease 2.6 is completed.
+
+I reverted Dan Kalowsky's patches.
+
+Thank you,
+Alexandra.
+
+--===============3938779089649447545==--
 
