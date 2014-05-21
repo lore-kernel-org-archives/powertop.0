@@ -1,28 +1,36 @@
-Content-Type: multipart/mixed; boundary="===============1755375772627641228=="
+Content-Type: multipart/mixed; boundary="===============9121016454803491738=="
 MIME-Version: 1.0
-From: Julian Wollrath <jwollrath at web.de>
-Subject: Re: [Powertop] [Announce] PowerTOP v2.6 released
-Date: Sat, 17 May 2014 10:34:44 +0200
-Message-ID: <20140517103444.304d5278@ilfaris>
-In-Reply-To: 54239.10.24.3.1.1400278620.squirrel@linux.intel.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH] Bug-fix:Segmentation fault with powertop --html
+Date: Wed, 21 May 2014 16:51:14 -0700
+Message-ID: <1400716276-26453-1-git-send-email-alexandra.yates@linux.intel.com>
+In-Reply-To: Re: [Powertop] Segmentation fault with powertop --html
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1755375772627641228==
+--===============9121016454803491738==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
-
-the release tarball includes the .git folder. Is this by intention or
-should it rather be not contained, e.g create the tarball via 'git
-archive'? It would also be nice, if a the tarball could be signed, so
-that one can check its integrity.
+This patch fixes the segmentation fault erros seen in powertop --html.  =
 
 
-Cheers,
-Julian
+Reported by: Julian Wollrath" <jwollrath(a)web.de>
 
---===============1755375772627641228==--
+Julian can you test the patch please. thank you. AY. =
+
+
+Alexandra Yates (1):
+  Bug-fix: html & csv report core indexes
+
+ src/cpu/cpu.cpp |   30 +++++++++++++++++++++---------
+ 1 file changed, 21 insertions(+), 9 deletions(-)
+
+-- =
+
+1.7.9.5
+
+
+--===============9121016454803491738==--
 
