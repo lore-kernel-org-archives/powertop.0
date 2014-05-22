@@ -1,73 +1,140 @@
-Content-Type: multipart/mixed; boundary="===============6629941704853519008=="
+Content-Type: multipart/mixed; boundary="===============4822043894829952585=="
 MIME-Version: 1.0
-From: Wout Mertens <wout.mertens at gmail.com>
-Subject: Re: [Powertop] HIgh power concumption on network interface
-Date: Thu, 20 Feb 2014 21:37:34 +0100
-Message-ID: <CAO3V83LOc6ZCBjhgLaOyH6STt+s=xRJL8h=Dy+bugNnAS0q_fw@mail.gmail.com>
-In-Reply-To: 53061A07.2080701@linux.intel.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [Fwd: [PATCH] Bug-fix:Seg-fault with powertop --html &
+ --csv]
+Date: Thu, 22 May 2014 16:44:21 -0700
+Message-ID: <63774.10.24.1.89.1400802261.squirrel@linux.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6629941704853519008==
+--===============4822043894829952585==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 20, 2014 at 4:06 PM, Arjan van de Ven <arjan(a)linux.intel.com>=
-wrote:
 
-> On 2/19/2014 10:35 PM, Wout Mertens wrote:
->
->> Alright I'll give that a shot, thanks!
->>
->> As a side question though, is 20W a reasonable idle power consumption for
->> a high-end recent laptop?
->>
->
-> that's quite on the high side
-> Having said that, screen takes a lot of power at full brightness ;)
->
 
-Well this was at the lowest brightness I could set it at. I just tested,
-and with the laptop going into "light sleep" (screen off, disk off, idle
-processes) it seems to use 12W.
+---------------------------- Original Message ----------------------------
+Subject: [PATCH] Bug-fix:Seg-fault with powertop --html & --csv
+From:    "Alexandra Yates" <alexandra.yates(a)linux.intel.com>
+Date:    Thu, May 22, 2014 4:19 pm
+To:      jwollrath(a)web.de
+         powertop-dev(a)linux.intel.com
+Cc:      "Alexandra Yates" <alexandra.yates(a)linux.intel.com>
+--------------------------------------------------------------------------
 
-Any tips for finding out what might cause the drain? Perhaps the 16GB RAM
-is suspect? Or maybe just the CPU (it's an i7-4800MQ with a 47W TDP).
+This patch allows the supported no Intel CPUs to be included on html &
+CSV reports.  It fixes the rows index needed for package data.
+Additionally, fixes the calculation of title indexes when cores are absent
+from the CPU.  These changes are related to C-states and P-states
+reports
 
-Wout.
+Bug reported & tested by: Julian Wollrath <jwollrath(a)web.de>
 
---===============6629941704853519008==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+---
+ src/cpu/cpu.cpp |   34 ++++++++++++++++++++++------------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
 
-PGRpdiBkaXI9Imx0ciI+PGRpdiBjbGFzcz0iZ21haWxfZXh0cmEiPjxkaXYgY2xhc3M9ImdtYWls
-X3F1b3RlIj5PbiBUaHUsIEZlYiAyMCwgMjAxNCBhdCA0OjA2IFBNLCBBcmphbiB2YW4gZGUgVmVu
-IDxzcGFuIGRpcj0ibHRyIj4mbHQ7PGEgaHJlZj0ibWFpbHRvOmFyamFuQGxpbnV4LmludGVsLmNv
-bSIgdGFyZ2V0PSJfYmxhbmsiPmFyamFuQGxpbnV4LmludGVsLmNvbTwvYT4mZ3Q7PC9zcGFuPiB3
-cm90ZTo8YnI+CjxibG9ja3F1b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9Im1hcmdpbjow
-cHggMHB4IDBweCAwLjhleDtib3JkZXItbGVmdC13aWR0aDoxcHg7Ym9yZGVyLWxlZnQtY29sb3I6
-cmdiKDIwNCwyMDQsMjA0KTtib3JkZXItbGVmdC1zdHlsZTpzb2xpZDtwYWRkaW5nLWxlZnQ6MWV4
-Ij48ZGl2IGNsYXNzPSIiPk9uIDIvMTkvMjAxNCAxMDozNSBQTSwgV291dCBNZXJ0ZW5zIHdyb3Rl
-Ojxicj4KCjxibG9ja3F1b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9Im1hcmdpbjowcHgg
-MHB4IDBweCAwLjhleDtib3JkZXItbGVmdC13aWR0aDoxcHg7Ym9yZGVyLWxlZnQtY29sb3I6cmdi
-KDIwNCwyMDQsMjA0KTtib3JkZXItbGVmdC1zdHlsZTpzb2xpZDtwYWRkaW5nLWxlZnQ6MWV4Ij4K
-QWxyaWdodCBJJiMzOTtsbCBnaXZlIHRoYXQgYSBzaG90LCB0aGFua3MhPGJyPgo8YnI+CkFzIGEg
-c2lkZSBxdWVzdGlvbiB0aG91Z2gsIGlzIDIwVyBhIHJlYXNvbmFibGUgaWRsZSBwb3dlciBjb25z
-dW1wdGlvbiBmb3IgYSBoaWdoLWVuZCByZWNlbnQgbGFwdG9wPzxicj4KPC9ibG9ja3F1b3RlPgo8
-YnI+PC9kaXY+CnRoYXQmIzM5O3MgcXVpdGUgb24gdGhlIGhpZ2ggc2lkZTxicj4KSGF2aW5nIHNh
-aWQgdGhhdCwgc2NyZWVuIHRha2VzIGEgbG90IG9mIHBvd2VyIGF0IGZ1bGwgYnJpZ2h0bmVzcyA7
-KTxicj48L2Jsb2NrcXVvdGU+PGRpdj48YnI+PC9kaXY+V2VsbCB0aGlzIHdhcyBhdCB0aGUgbG93
-ZXN0IGJyaWdodG5lc3MgSSBjb3VsZCBzZXQgaXQgYXQuIEkganVzdCB0ZXN0ZWQsIGFuZCB3aXRo
-IHRoZSBsYXB0b3AgZ29pbmcgaW50byAmcXVvdDtsaWdodCBzbGVlcCZxdW90OyAoc2NyZWVuIG9m
-ZiwgZGlzayBvZmYsIGlkbGUgcHJvY2Vzc2VzKSBpdCBzZWVtcyB0byB1c2UgMTJXLjwvZGl2Pgo8
-ZGl2IGNsYXNzPSJnbWFpbF9xdW90ZSI+PGJyPjwvZGl2PjxkaXYgY2xhc3M9ImdtYWlsX3F1b3Rl
-Ij5BbnkgdGlwcyBmb3IgZmluZGluZyBvdXQgd2hhdCBtaWdodCBjYXVzZSB0aGUgZHJhaW4/IFBl
-cmhhcHMgdGhlIDE2R0IgUkFNIGlzIHN1c3BlY3Q/IE9yIG1heWJlIGp1c3QgdGhlIENQVSAoaXQm
-IzM5O3MgYW4gaTctNDgwME1RIHdpdGggYSA0N1cgVERQKS48ZGl2PqA8L2Rpdj48L2Rpdj4KV291
-dC48L2Rpdj48L2Rpdj4K
+diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+index 0a7c487..b3b6166 100644
+--- a/src/cpu/cpu.cpp
++++ b/src/cpu/cpu.cpp
+@@ -466,7 +466,7 @@ void report_display_cpu_cstates(void)
+ 			continue;
+ 		/* Tables for PKG, CORE, CPU */
+ 		pkg_tbl_size.cols=3D2;
+-		pkg_tbl_size.rows=3D cstates_num+1;
++		pkg_tbl_size.rows=3D ((cstates_num+1)-LEVEL_HEADER)+1;
+ 		string pkg_data[pkg_tbl_size.cols * pkg_tbl_size.rows];
 
---===============6629941704853519008==--
+ 		core_tbl_size.cols=3D2;
+@@ -491,11 +491,9 @@ void report_display_cpu_cstates(void)
+ 				num_cpus+=3D1;
+ 			}
+ 		}
+-
+ 		cpu_tbl_size.cols=3D(2 * (num_cpus / num_cores)) + 1;
+-		cpu_tbl_size.rows =3D (cstates_num * _package->children.size())
++		cpu_tbl_size.rows =3D ((cstates_num+1-LEVEL_HEADER) *
+_package->children.size())
+ 				+ _package->children.size();
+-
+ 		string cpu_data[cpu_tbl_size.cols * cpu_tbl_size.rows];
+
+ 		for (core =3D 0; core < _package->children.size(); core++) {
+@@ -608,12 +606,18 @@ void report_display_cpu_cstates(void)
+ 		}
+
+ 		/* Report Output */
+-		title=3Dtitle/core_num;
++		if(core_num > 0)
++			title=3Dtitle/core_num;
++		else if( _core->children.size() > 0)
++			title=3Dtitle/_core->children.size();
++
+ 		init_pkg_table_attr(&std_table_css, pkg_tbl_size.rows, =
+
+pkg_tbl_size.cols);
+ 		report.add_table(pkg_data, &std_table_css);
+-		init_core_table_attr(&std_table_css, title+1, core_tbl_size.rows,
++		if (!_core->can_collapse()){
++			init_core_table_attr(&std_table_css, title+1, core_tbl_size.rows,
+ 				core_tbl_size.cols);
+-		report.add_table(core_data, &std_table_css);
++			report.add_table(core_data, &std_table_css);
++		}
+ 		init_cpu_table_attr(&std_table_css, title+1, cpu_tbl_size.rows,
+ 				cpu_tbl_size.cols);
+ 		report.add_table(cpu_data, &std_table_css);
+@@ -625,7 +629,7 @@ void report_display_cpu_pstates(void)
+ {
+ 	char buffer[512], buffer2[512], tmp_num[50];
+ 	unsigned int package, core, cpu;
+-	int line;
++	int line, title=3D0;
+ 	class abstract_cpu *_package, * _core, * _cpu;
+ 	unsigned int i, pstates_num;
+ 	const char* core_type =3D NULL;
+@@ -671,7 +675,7 @@ void report_display_cpu_pstates(void)
+
+ 		/*  Tables for PKG, CORE, CPU */
+ 		pkg_tbl_size.cols=3D2;
+-		pkg_tbl_size.rows=3Dpstates_num+2;
++		pkg_tbl_size.rows=3D((pstates_num+1)-LEVEL_HEADER)+2;
+ 		string pkg_data[pkg_tbl_size.cols * pkg_tbl_size.rows];
+
+ 		core_tbl_size.cols=3D2;
+@@ -790,10 +794,16 @@ void report_display_cpu_pstates(void)
+ 		}
+ 		init_pkg_table_attr(&std_table_css, pkg_tbl_size.rows, pkg_tbl_size.cols=
+);
+ 		report.add_table(pkg_data, &std_table_css);
+-		init_core_table_attr(&std_table_css, (pstates_num+2),
++		if(!_core->can_collapse()){
++			title=3Dpstates_num+2;
++			init_core_table_attr(&std_table_css, title,
+ 				core_tbl_size.rows, core_tbl_size.cols);
+-		report.add_table(core_data, &std_table_css);
+-		init_cpu_table_attr(&std_table_css, (pstates_num+2),
++			report.add_table(core_data, &std_table_css);
++		} else {
++			title=3Dpstates_num+1;
++		}
++
++		init_cpu_table_attr(&std_table_css, title,
+ 				cpu_tbl_size.rows, cpu_tbl_size.cols);
+ 		report.add_table(cpu_data, &std_table_css);
+ 	}
+-- =
+
+1.7.9.5
+
+
+
+Thank you,
+Alexandra.
+
+--===============4822043894829952585==--
 
