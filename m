@@ -1,146 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============1846708774562545826=="
+Content-Type: multipart/mixed; boundary="===============0919002762990748749=="
 MIME-Version: 1.0
-From: Ferron, Chris E <chris.e.ferron at intel.com>
-Subject: Re: [Powertop] High power consumption on network interface
-Date: Fri, 21 Feb 2014 17:31:15 +0000
-Message-ID: <E351AD52FA1E154C8FFF4F9FCD2CA84336E9A41D@ORSMSX101.amr.corp.intel.com>
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Bug-fix:Segmentation fault with powertop --html
+Date: Thu, 22 May 2014 14:56:18 -0700
+Message-ID: <53028.10.24.1.89.1400795778.squirrel@linux.intel.com>
+In-Reply-To: 20140522154532.79d1ffe3@ilfaris
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1846708774562545826==
+--===============0919002762990748749==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 
+>> Julian can you test the patch please. thank you. AY.
+> Thank you for the patch but unfortunately powertop still segfaults:
+> $ powertop --html
+> Loaded 750 prior measurements
+> RAPL device for cpu 0
+> RAPL device for cpu 0
+> Preparing to take measurements
+>   unknown op '{'
+> *** Error in `powertop': free(): invalid pointer: 0x000000000187cdef ***
+> Taking 1 measurement(s) for a duration of 20 second(s) each.
+> [1]    22616 segmentation fault (core dumped)  powertop --html
+>
+> Backtrace:
+> #0  0x00007f63d8c8e1af in std::string::assign(std::string const&) ()
+>    from /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+> #1  0x0000000000410f31 in operator=3D (__str=3D"C1", this=3D0x7fff65b509a=
+0)
+>     at /usr/include/c++/4.8/bits/basic_string.h:547
+> #2  report_display_cpu_cstates () at cpu/cpu.cpp:587
+> #3  0x00000000004493f4 in one_measurement (seconds=3Dseconds(a)entry=3D20,
+> workload=3Dworkload(a)entry=3D0x7fff65b521b0 "") at main.cpp:221
+> #4  0x00000000004496a6 in make_report (time=3D20,
+> workload=3Dworkload(a)entry=3D0x7fff65b521b0 "",
+> iterations=3Diterations(a)entry=3D1, file=3Dfile(a)entry=3D0x7fff65b511b0
+> "powertop.html") at main.cpp:264 #5  0x000000000040741d in main
+> (argc=3D2, argv=3D0x7fff65b532d8) at main.cpp:441
+>
+>
+> Cheers,
+> Julian
+>
 
-From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of Wout M=
-ertens
-Sent: Thursday, February 20, 2014 12:38 PM
-To: Arjan van de Ven
-Cc: powertop(a)lists.01.org
-Subject: Re: [Powertop] HIgh power concumption on network interface
+Julian, thank you for testing. The patches I sent you yesterday fixed the
+previous segfault.  I'm currently looking into another solution.
 
-On Thu, Feb 20, 2014 at 4:06 PM, Arjan van de Ven <arjan(a)linux.intel.com<=
-mailto:arjan(a)linux.intel.com>> wrote:
-On 2/19/2014 10:35 PM, Wout Mertens wrote:
-Alright I'll give that a shot, thanks!
+Thank you,
+Alexandra.
 
-As a side question though, is 20W a reasonable idle power consumption for a=
- high-end recent laptop?
-
-that's quite on the high side
-Having said that, screen takes a lot of power at full brightness ;)
-
-Well this was at the lowest brightness I could set it at. I just tested, an=
-d with the laptop going into "light sleep" (screen off, disk off, idle proc=
-esses) it seems to use 12W.
-
-12W is still really High. What is the C-State Residency of each core and th=
-e package?
-
-
-Any tips for finding out what might cause the drain? Perhaps the 16GB RAM i=
-s suspect? Or maybe just the CPU (it's an i7-4800MQ with a 47W TDP).
-Doubt it, I'm not sure what memory you have, but even if you have DDR3 I st=
-ill wouldn't expect > 5W due to memory.
-
-My guess is you have bad GPU or CPU Residency. Maybe you have a misbehaving=
- device.
-
-Wout.
-
---===============1846708774562545826==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
-
-PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
-bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
-YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
-cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
-VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
-bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
-ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTQgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
-PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseTpDYWxp
-YnJpOwoJcGFub3NlLTE6MiAxNSA1IDIgMiAyIDQgMyAyIDQ7fQpAZm9udC1mYWNlCgl7Zm9udC1m
-YW1pbHk6VGFob21hOwoJcGFub3NlLTE6MiAxMSA2IDQgMyA1IDQgNCAyIDQ7fQovKiBTdHlsZSBE
-ZWZpbml0aW9ucyAqLwpwLk1zb05vcm1hbCwgbGkuTXNvTm9ybWFsLCBkaXYuTXNvTm9ybWFsCgl7
-bWFyZ2luOjBpbjsKCW1hcmdpbi1ib3R0b206LjAwMDFwdDsKCWZvbnQtc2l6ZToxMi4wcHQ7Cglm
-b250LWZhbWlseToiVGltZXMgTmV3IFJvbWFuIiwic2VyaWYiO30KYTpsaW5rLCBzcGFuLk1zb0h5
-cGVybGluawoJe21zby1zdHlsZS1wcmlvcml0eTo5OTsKCWNvbG9yOmJsdWU7Cgl0ZXh0LWRlY29y
-YXRpb246dW5kZXJsaW5lO30KYTp2aXNpdGVkLCBzcGFuLk1zb0h5cGVybGlua0ZvbGxvd2VkCgl7
-bXNvLXN0eWxlLXByaW9yaXR5Ojk5OwoJY29sb3I6cHVycGxlOwoJdGV4dC1kZWNvcmF0aW9uOnVu
-ZGVybGluZTt9CnNwYW4uRW1haWxTdHlsZTE3Cgl7bXNvLXN0eWxlLXR5cGU6cGVyc29uYWwtcmVw
-bHk7Cglmb250LWZhbWlseToiQ2FsaWJyaSIsInNhbnMtc2VyaWYiOwoJY29sb3I6IzFGNDk3RDt9
-Ci5Nc29DaHBEZWZhdWx0Cgl7bXNvLXN0eWxlLXR5cGU6ZXhwb3J0LW9ubHk7Cglmb250LWZhbWls
-eToiQ2FsaWJyaSIsInNhbnMtc2VyaWYiO30KQHBhZ2UgV29yZFNlY3Rpb24xCgl7c2l6ZTo4LjVp
-biAxMS4waW47CgltYXJnaW46MS4waW4gMS4waW4gMS4waW4gMS4waW47fQpkaXYuV29yZFNlY3Rp
-b24xCgl7cGFnZTpXb3JkU2VjdGlvbjE7fQotLT48L3N0eWxlPjwhLS1baWYgZ3RlIG1zbyA5XT48
-eG1sPgo8bzpzaGFwZWRlZmF1bHRzIHY6ZXh0PSJlZGl0IiBzcGlkbWF4PSIxMDI2IiAvPgo8L3ht
-bD48IVtlbmRpZl0tLT48IS0tW2lmIGd0ZSBtc28gOV0+PHhtbD4KPG86c2hhcGVsYXlvdXQgdjpl
-eHQ9ImVkaXQiPgo8bzppZG1hcCB2OmV4dD0iZWRpdCIgZGF0YT0iMSIgLz4KPC9vOnNoYXBlbGF5
-b3V0PjwveG1sPjwhW2VuZGlmXS0tPgo8L2hlYWQ+Cjxib2R5IGxhbmc9IkVOLVVTIiBsaW5rPSJi
-bHVlIiB2bGluaz0icHVycGxlIj4KPGRpdiBjbGFzcz0iV29yZFNlY3Rpb24xIj4KPHAgY2xhc3M9
-Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMS4wcHQ7Zm9udC1mYW1pbHk6JnF1
-b3Q7Q2FsaWJyaSZxdW90OywmcXVvdDtzYW5zLXNlcmlmJnF1b3Q7O2NvbG9yOiMxRjQ5N0QiPjxv
-OnA+Jm5ic3A7PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5
-bGU9ImZvbnQtc2l6ZToxMS4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7Q2FsaWJyaSZxdW90OywmcXVv
-dDtzYW5zLXNlcmlmJnF1b3Q7O2NvbG9yOiMxRjQ5N0QiPjxvOnA+Jm5ic3A7PC9vOnA+PC9zcGFu
-PjwvcD4KPGRpdiBzdHlsZT0iYm9yZGVyOm5vbmU7Ym9yZGVyLWxlZnQ6c29saWQgYmx1ZSAxLjVw
-dDtwYWRkaW5nOjBpbiAwaW4gMGluIDQuMHB0Ij4KPGRpdj4KPGRpdiBzdHlsZT0iYm9yZGVyOm5v
-bmU7Ym9yZGVyLXRvcDpzb2xpZCAjQjVDNERGIDEuMHB0O3BhZGRpbmc6My4wcHQgMGluIDBpbiAw
-aW4iPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48Yj48c3BhbiBzdHlsZT0iZm9udC1zaXplOjEwLjBw
-dDtmb250LWZhbWlseTomcXVvdDtUYWhvbWEmcXVvdDssJnF1b3Q7c2Fucy1zZXJpZiZxdW90OyI+
-RnJvbTo8L3NwYW4+PC9iPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTAuMHB0O2ZvbnQtZmFtaWx5
-OiZxdW90O1RhaG9tYSZxdW90OywmcXVvdDtzYW5zLXNlcmlmJnF1b3Q7Ij4gUG93ZXJUb3AgW21h
-aWx0bzpwb3dlcnRvcC1ib3VuY2VzQGxpc3RzLjAxLm9yZ10KPGI+T24gQmVoYWxmIE9mIDwvYj5X
-b3V0IE1lcnRlbnM8YnI+CjxiPlNlbnQ6PC9iPiBUaHVyc2RheSwgRmVicnVhcnkgMjAsIDIwMTQg
-MTI6MzggUE08YnI+CjxiPlRvOjwvYj4gQXJqYW4gdmFuIGRlIFZlbjxicj4KPGI+Q2M6PC9iPiBw
-b3dlcnRvcEBsaXN0cy4wMS5vcmc8YnI+CjxiPlN1YmplY3Q6PC9iPiBSZTogW1Bvd2VydG9wXSBI
-SWdoIHBvd2VyIGNvbmN1bXB0aW9uIG9uIG5ldHdvcmsgaW50ZXJmYWNlPG86cD48L286cD48L3Nw
-YW4+PC9wPgo8L2Rpdj4KPC9kaXY+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9v
-OnA+PC9wPgo8ZGl2Pgo8ZGl2Pgo8ZGl2Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5PbiBUaHUsIEZl
-YiAyMCwgMjAxNCBhdCA0OjA2IFBNLCBBcmphbiB2YW4gZGUgVmVuICZsdDs8YSBocmVmPSJtYWls
-dG86YXJqYW5AbGludXguaW50ZWwuY29tIiB0YXJnZXQ9Il9ibGFuayI+YXJqYW5AbGludXguaW50
-ZWwuY29tPC9hPiZndDsgd3JvdGU6PG86cD48L286cD48L3A+CjxkaXY+CjxwIGNsYXNzPSJNc29O
-b3JtYWwiPk9uIDIvMTkvMjAxNCAxMDozNSBQTSwgV291dCBNZXJ0ZW5zIHdyb3RlOjxvOnA+PC9v
-OnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5BbHJpZ2h0IEknbGwgZ2l2ZSB0aGF0IGEgc2hv
-dCwgdGhhbmtzITxicj4KPGJyPgpBcyBhIHNpZGUgcXVlc3Rpb24gdGhvdWdoLCBpcyAyMFcgYSBy
-ZWFzb25hYmxlIGlkbGUgcG93ZXIgY29uc3VtcHRpb24gZm9yIGEgaGlnaC1lbmQgcmVjZW50IGxh
-cHRvcD88bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PG86cD4mbmJzcDs8L286
-cD48L3A+CjwvZGl2Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIj50aGF0J3MgcXVpdGUgb24gdGhlIGhp
-Z2ggc2lkZTxicj4KSGF2aW5nIHNhaWQgdGhhdCwgc2NyZWVuIHRha2VzIGEgbG90IG9mIHBvd2Vy
-IGF0IGZ1bGwgYnJpZ2h0bmVzcyA7KTxvOnA+PC9vOnA+PC9wPgo8ZGl2Pgo8cCBjbGFzcz0iTXNv
-Tm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPC9kaXY+CjxwIGNsYXNzPSJNc29Ob3JtYWwi
-PldlbGwgdGhpcyB3YXMgYXQgdGhlIGxvd2VzdCBicmlnaHRuZXNzIEkgY291bGQgc2V0IGl0IGF0
-LiBJIGp1c3QgdGVzdGVkLCBhbmQgd2l0aCB0aGUgbGFwdG9wIGdvaW5nIGludG8gJnF1b3Q7bGln
-aHQgc2xlZXAmcXVvdDsgKHNjcmVlbiBvZmYsIGRpc2sgb2ZmLCBpZGxlIHByb2Nlc3NlcykgaXQg
-c2VlbXMgdG8gdXNlIDEyVy48c3BhbiBzdHlsZT0iY29sb3I6IzFGNDk3RCI+PG86cD48L286cD48
-L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iY29sb3I6IzFGNDk3
-RCI+PG86cD4mbmJzcDs8L286cD48L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3Bh
-biBzdHlsZT0iY29sb3I6IzFGNDk3RCI+MTJXIGlzIHN0aWxsIHJlYWxseSBIaWdoLiBXaGF0IGlz
-IHRoZSBDLVN0YXRlIFJlc2lkZW5jeSBvZiBlYWNoIGNvcmUgYW5kIHRoZSBwYWNrYWdlPwo8bzpw
-PjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJjb2xv
-cjojMUY0OTdEIj4mbmJzcDs8bzpwPjwvbzpwPjwvc3Bhbj48L3A+CjwvZGl2Pgo8ZGl2Pgo8cCBj
-bGFzcz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPC9kaXY+CjxkaXY+CjxwIGNs
-YXNzPSJNc29Ob3JtYWwiPkFueSB0aXBzIGZvciBmaW5kaW5nIG91dCB3aGF0IG1pZ2h0IGNhdXNl
-IHRoZSBkcmFpbj8gUGVyaGFwcyB0aGUgMTZHQiBSQU0gaXMgc3VzcGVjdD8gT3IgbWF5YmUganVz
-dCB0aGUgQ1BVIChpdCdzIGFuIGk3LTQ4MDBNUSB3aXRoIGEgNDdXIFREUCkuPHNwYW4gc3R5bGU9
-ImNvbG9yOiMxRjQ5N0QiPjxvOnA+PC9vOnA+PC9zcGFuPjwvcD4KPGRpdj4KPHAgY2xhc3M9Ik1z
-b05vcm1hbCI+PGk+PHNwYW4gc3R5bGU9ImNvbG9yOiMxRjQ5N0QiPkRvdWJ0IGl0LCBJJiM4MjE3
-O20gbm90IHN1cmUgd2hhdCBtZW1vcnkgeW91IGhhdmUsIGJ1dCBldmVuIGlmIHlvdSBoYXZlIERE
-UjMgSSBzdGlsbCB3b3VsZG4mIzgyMTc7dCBleHBlY3QgJmd0OyA1VyBkdWUgdG8gbWVtb3J5Ljxv
-OnA+PC9vOnA+PC9zcGFuPjwvaT48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxpPjxzcGFuIHN0
-eWxlPSJjb2xvcjojMUY0OTdEIj48bzpwPiZuYnNwOzwvbzpwPjwvc3Bhbj48L2k+PC9wPgo8cCBj
-bGFzcz0iTXNvTm9ybWFsIj48aT48c3BhbiBzdHlsZT0iY29sb3I6IzFGNDk3RCI+TXkgZ3Vlc3Mg
-aXMgeW91IGhhdmUgYmFkIEdQVSBvciBDUFUKPC9zcGFuPjwvaT48c3BhbiBzdHlsZT0iY29sb3I6
-IzFGNDk3RCI+UmVzaWRlbmN5LiBNYXliZSB5b3UgaGF2ZSBhIG1pc2JlaGF2aW5nIGRldmljZS4K
-PGk+PG86cD48L286cD48L2k+PC9zcGFuPjwvcD4KPC9kaXY+CjwvZGl2Pgo8cCBjbGFzcz0iTXNv
-Tm9ybWFsIj48c3BhbiBzdHlsZT0iY29sb3I6IzFGNDk3RCI+PG86cD4mbmJzcDs8L286cD48L3Nw
-YW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5Xb3V0LjxvOnA+PC9vOnA+PC9wPgo8L2Rpdj4K
-PC9kaXY+CjwvZGl2Pgo8L2Rpdj4KPC9ib2R5Pgo8L2h0bWw+Cg==
-
---===============1846708774562545826==--
+--===============0919002762990748749==--
 
