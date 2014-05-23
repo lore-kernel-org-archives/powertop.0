@@ -1,48 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============4127720865036525455=="
+Content-Type: multipart/mixed; boundary="===============2860974046369840575=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Power Est. is missing
-Date: Sat, 22 Mar 2014 01:22:32 +0300
-Message-ID: <20140321222232.GA395@swordfish>
-In-Reply-To: CADy9ZNC9eoAhQYdOpyH=qBdcTQ-dgiW141aJNwtzUhXrJfK3cA@mail.gmail.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [Announce] PowerTOP v2.6.1 released]
+Date: Fri, 23 May 2014 11:42:47 -0700
+Message-ID: <58393.10.24.4.100.1400870567.squirrel@linux.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4127720865036525455==
+--===============2860974046369840575==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
-
-On (03/21/14 20:00), Bill Vyzas wrote:
->    Hello all,
-> =
-
->    Two days ago my laptop crashed and I had to reinstall ubuntu and power=
-top
->    again. Now whenever I am running powertop the power estimate column fr=
-om
->    the overview and the device stats interfaces is missing.
-> =
-
->    I am running Ubuntu 13.10 with the 3.12 kernel. Do I miss any librarie=
-s or
->    there is something else going on?
-
-powertop needs a number of measurements (3 times the number of parameters)
-in order to begin estimate. give it some time (running on battery).
-
-	-ss
-
->    Thanks
->    Vasileios
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
+We are pleased to announce the release of PowerTOP v2.6.1
 
 
---===============4127720865036525455==--
+About PowerTOP
+
+PowerTOP is a Linux tool to diagnose issues with power consumption and
+power management. In addition to being a diagnostic tool, PowerTOP also
+has an interactive mode you can use to experiment with various power
+management settings, for cases where the Linux distribution has not
+enabled those settings.
+
+PowerTOP reports which components in the system are most likely to blame
+for higher-than-needed power consumption, ranging from software
+applications to active components in the system. Detailed screens are
+available for CPU C and P states, device activity, and software activity.
+
+For many years, PowerTOP has been used heavily by Intel, Linux
+distributors, and various parts of the open source community.
+
+
+
+Fixes
+
+Segmentation faults with PowerTOP2.6 reported by Julian Wollrath
+<jwollrath(a)web.de>
+Packaging issues reported by Julian Wollrath <jwollrath(a)web.de>
+Thank you to everyone who contributed to this release!
+
+Alexandra Yates (3):
+
+      Bug-fix:Seg-fault with powertop --html & --csv
+
+      Update translation files and configuration
+
+      PowerTOP version 2.6.1
+
+
+Thank you,
+Alexandra.
+
+
+Thank you,
+Alexandra.
+
+--===============2860974046369840575==--
 
