@@ -1,71 +1,91 @@
-Content-Type: multipart/mixed; boundary="===============7448394788241037993=="
+Content-Type: multipart/mixed; boundary="===============6945607840947871715=="
 MIME-Version: 1.0
 From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Optionally check for ncurses pkgconfig file.
-Date: Thu, 08 May 2014 09:14:43 -0700
-Message-ID: <60402.10.24.17.174.1399565683.squirrel@linux.intel.com>
-In-Reply-To: 60893.10.24.20.10.1399490263.squirrel@linux.intel.com
+Subject: Re: [Powertop] [Announce] PowerTOP v2.6.1 released
+Date: Tue, 27 May 2014 10:24:44 -0700
+Message-ID: <55204.10.24.1.189.1401211484.squirrel@linux.intel.com>
+In-Reply-To: 514352428.8211738.1401109960163.JavaMail.zimbra@redhat.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7448394788241037993==
+--===============6945607840947871715==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 
->> On Tue, May 6, 2014 at 12:53 AM, Sergey Senozhatsky
->> <sergey.senozhatsky(a)gmail.com> wrote:
->>> On (05/05/14 23:42), Auke Kok wrote:
->>>> ---
->>>>  configure.ac | 3 ++-
->>>>  1 file changed, 2 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/configure.ac b/configure.ac
->>>> index baa5faa..5a90fe3 100644
->>>> --- a/configure.ac
->>>> +++ b/configure.ac
->>>> @@ -46,7 +46,8 @@ AC_FUNC_REALLOC
->>>>  AC_FUNC_STRTOD
->>>>  AC_CHECK_FUNCS([fdatasync getpagesize gettimeofday memmove memset
->>>> mkdir munmap pow realpath regcomp select setlocale socket sqrt
->>>> strcasecmp strchr strdup strerror strncasecmp strstr strtoul
->>>> strtoull])
->>>>
->>>> -AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [],
->>>> AC_MSG_ERROR([ncurses
->>>> is required but was not found]), [])
->>>> +PKG_CHECK_MODULES([NCURSES], [ncurses], [LIBS=3D"$LIBS $ncurses_LIBS"=
-],
->>>                                 ^^^^^^^^^
->>>                                 [ncursesw ncurses]?
+> ----- Original Message -----
+>> We are pleased to announce the release of PowerTOP v2.6.1
 >>
->> Good question, I actually do not know, and I don't have an ncurses
->> pkgconfig around to see if that works.
 >>
->> Alexandra, can you see if this works with:
+>> About PowerTOP
 >>
->> +PKG_CHECK_MODULES([NCURSES], [ncursesw ncurses], [LIBS=3D"$LIBS
->> $ncurses_LIBS"],
+>> PowerTOP is a Linux tool to diagnose issues with power consumption and
+>> power management. In addition to being a diagnostic tool, PowerTOP also
+>> has an interactive mode you can use to experiment with various power
+>> management settings, for cases where the Linux distribution has not
+>> enabled those settings.
 >>
->> That needs to be tested by someone with a new ncurses.
+>> PowerTOP reports which components in the system are most likely to blame
+>> for higher-than-needed power consumption, ranging from software
+>> applications to active components in the system. Detailed screens are
+>> available for CPU C and P states, device activity, and software
+>> activity.
 >>
->> Auke
+>> For many years, PowerTOP has been used heavily by Intel, Linux
+>> distributors, and various parts of the open source community.
+>>
+>>
+>>
+>> Fixes
+>>
+>> Segmentation faults with PowerTOP2.6 reported by Julian Wollrath
+>> <jwollrath(a)web.de>
+>> Packaging issues reported by Julian Wollrath <jwollrath(a)web.de>
+>> Thank you to everyone who contributed to this release!
+>>
+>> Alexandra Yates (3):
+>>
+>>       Bug-fix:Seg-fault with powertop --html & --csv
+>>
+>>       Update translation files and configuration
+>>
+>>       PowerTOP version 2.6.1
+>>
+>>
+>> Thank you,
+>> Alexandra.
+>> _______________________________________________
+>> PowerTop mailing list
+>> PowerTop(a)lists.01.org
+>> https://lists.01.org/mailman/listinfo/powertop
 >>
 >
-> I'm on training this week.  I will be able to test at the end of the day
-> after my class today.
+> Hi,
 >
-> Thank you,
-> Alexandra.
+> the source tarball contains 32 bit object files under
+> /src/tuning
 >
-I tested in ubuntu I'm running libncurses5 powertop configured and
-installed with out issues.
+> Also it is not possible to compile it after running:
+> $ make clean
+>
+> It seems csstoh.sh script is missing
+>
+> regards
+>
+> Jaroslav
+>
 
-Looking for someone to test on chrome.
+Hi Jaroslav,
+
+Thank you for reporting this bug.  This bug has been in PowerTOP for a
+while.  I tested PowerTOP-2.5 and I was able to reproduce it as well.
+
+Nevertheless, the bug needs to be fixed.  I'm adding this issue to our
+list of bugs to fix it in a future release.
 
 Thank you,
 Alexandra.
 
---===============7448394788241037993==--
+--===============6945607840947871715==--
 
