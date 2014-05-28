@@ -1,111 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============2310338032507003821=="
+Content-Type: multipart/mixed; boundary="===============4846022984431532104=="
 MIME-Version: 1.0
-From: Ivan Shapovalov <intelfx100 at gmail.com>
-Subject: Re: [Powertop] powertop putting far too much blame on wifi
-Date: Mon, 06 Jan 2014 15:26:15 +0400
-Message-ID: <2793300.TEfDgR9LBO@intelfx-laptop>
-In-Reply-To: 20140106105315.GA21266@rhlx01.hs-esslingen.de
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] [Announce] PowerTOP v2.6.1 released
+Date: Wed, 28 May 2014 09:28:12 -0700
+Message-ID: <61252.10.24.1.37.1401294492.squirrel@linux.intel.com>
+In-Reply-To: 20140528094330.GD615@rhrk.uni-kl.de
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2310338032507003821==
+--===============4846022984431532104==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Monday 06 January 2014 at 11:53:15, Andreas wrote:
-> Hi,
-> =
 
-> On Sun, Jan 05, 2014 at 12:00:02PM -0800, powertop-request(a)lists.01.org =
+> On Tue, May 27, 2014 at 10:24:44AM -0700, Alexandra Yates wrote:
+>> > Also it is not possible to compile it after running:
+>> > $ make clean
+>> >
+>> > It seems csstoh.sh script is missing
+>
+> I've had this patch in my tree for at least some months...
+>
+> Ciao
+>      J=C3=83=C2=B6rg
+> --
+> Joerg Mayer                                           <jmayer(a)loplof.de>
+> We are stuck with technology when what we really want is just stuff that
+> works. Some say that should read Microsoft instead of technology.
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>
+Hi Joerg,
 
-wrote:
-> > From: Marc MERLIN <marc_powertop(a)merlins.org>
-> > =
+Can you send the patch to the mailing list?
 
-> > Unfortunately, it's not just you. I've reported the same problem
-> > multiple times over the last year, but not heard back from anyone yet
-> > (except you saying you see the same).
-> > =
+Thank you,
+Alexandra.
 
-> > I had this on a T530, and now it's even worse on a T540:
-> > The battery reports a discharge rate of 28.5 W
-> > The estimated remaining time is 1 hours, 53 minutes
-> > =
-
-> > Summary: 689.5 wakeups/second,  214.0 GPU ops/seconds, 0.0 VFS ops/sec =
-and
-> > 10.4% CPU use
-> > =
-
-> > Power est.              Usage       Events/s    Category       Descript=
-ion
-> > =
-
-> >   15.3 W     95.8%                      Device         Display backlight
-> >   2.07 W     36.0 ms/s     642.4        Process       =
-
-> >   /usr/bin/enlightenment
-> >   115 mW      4.5 ms/s      62.3        Interrupt      PS/2 Touchpad /
-> >   Keyboard / Mouse>  =
-
-> >  86.8 mW      0.9 ms/s      37.0        Process        xfce4-terminal -T
-> >  window11 --role=3Dwindow11 --tab 71.3 mW     35.4 ms/s      36.2       =
-
-> >  Process        /usr/bin/X :0 vt7 -br -nolisten tcp -auth /var/r 51.2 m=
-W =
-
-> >      0.8 ms/s      27.9        Timer          hrtimer_wakeup> =
-
-> > 15W for my backlight at mid brightness? I don't think so.
-> =
-
-> 600+ wakeups/second sounds like the usual intermediate activity
-> due to touchpad/mouse movement (that figure is exactly what I usually got
-> on my machine), and if that is the case
-> (what happens if the human part gets its dirty fingers off the machine? :)
-> then it's strange to see this otherwise *very high* value (642.4)
-> attributed to /usr/bin/enlightenment (a very seasoned/stable WM, for
-> crying out loud) rather than mouse as in the *directly following*
->     PS/2 Touchpad / Keyboard / Mouse
-> line.
-> =
-
-> Or, in other words, this example hints at a rather mischievous mixup of
-> data, e.g. an off-by-1 or a post-insert of certain items without accounti=
-ng
-> for other columns (within the data model, of course), or perhaps (the
-> column data values might even support such a suspicion) even completely
-> wrong (re-sorted) display of data.
-> =
-
-> Perhaps I should actually test/investigate a recent powertop version... ;)
-> =
-
-> Andreas Mohr
-
-IMHO, the usage and event counters seem to be valid. What's wrong is energy =
-
-estimation: it is done entirely in software, using some strange semi-heuris=
-tic =
-
-guesswork.
-
--- =
-
-Ivan Shapovalov / intelfx /
-
---===============2310338032507003821==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjIuMC4yMiAoR05V
-L0xpbnV4KQoKaUY0RUFCRUlBQVlGQWxMS2t0d0FDZ2tReFVLbGpTSU1BbkRhc0FFQWtzMEFDTk4w
-YkVKaWVTSzdlSXlDU3BBcgp2ZTJJRHN4Z29qZ2UwWmUvSzUwQS8xWTRzQytrMW5NbnkwbDhha3NW
-WHBXL2grWjBVYXBkVUYyV3QyRjNld2FqCj0xMFY4Ci0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0t
-LQo=
-
---===============2310338032507003821==--
+--===============4846022984431532104==--
 
