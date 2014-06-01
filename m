@@ -1,77 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============4887796918351102647=="
+Content-Type: multipart/mixed; boundary="===============7517171038978792050=="
 MIME-Version: 1.0
-From: Mukherjee, Adrip <adrip.mukherjee at intel.com>
-Subject: Re: [Powertop] PowerTop Digest, Vol 20, Issue 9
-Date: Sat, 14 Dec 2013 14:40:52 +0000
-Message-ID: <F9A26558D30ED241A8204F06F994726025801A66@BGSMSX102.gar.corp.intel.com>
-In-Reply-To: mailman.2728.1386960245.1946.powertop@lists.01.org
+From: Joerg Mayer <jmpt at loplof.de>
+Subject: [Powertop] Fix out of tree builds [Was: PowerTOP v2.6.1 released]
+Date: Sun, 01 Jun 2014 09:51:06 +0200
+Message-ID: <20140601075106.GL615@rhrk.uni-kl.de>
+In-Reply-To: 61252.10.24.1.37.1401294492.squirrel@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4887796918351102647==
+--===============7517171038978792050==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Thanks Alexandra , Srinivas.
+On Wed, May 28, 2014 at 09:28:12AM -0700, Alexandra Yates wrote:
+> > On Tue, May 27, 2014 at 10:24:44AM -0700, Alexandra Yates wrote:
+> >> > Also it is not possible to compile it after running:
+> >> > $ make clean
+> >> >
+> >> > It seems csstoh.sh script is missing
+> >
+> > I've had this patch in my tree for at least some months...
+> =
 
-regards
-Adrip
+> Can you send the patch to the mailing list?
 
------Original Message-----
-From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of powert=
-op-request(a)lists.01.org
-Sent: Saturday, December 14, 2013 12:14 AM
-To: powertop(a)lists.01.org
-Subject: PowerTop Digest, Vol 20, Issue 9
+I verified that I did attach it. For people who prefer inline patches
+find a regenerated version below. Btw, to find out about problems with
+the source: Please run "make distcheck" before doing a release - which
+will currently fail due to the included object files.
 
-Send PowerTop mailing list submissions to
-	powertop(a)lists.01.org
+Ciao
+   J=C3=B6rg
 
-To subscribe or unsubscribe via the World Wide Web, visit
-	https://lists.01.org/mailman/listinfo/powertop
-or, via email, send a message with subject or body 'help' to
-	powertop-request(a)lists.01.org
+>From 22a76b66041f27017de302ae5650ec973471a01a Mon Sep 17 00:00:00 2001
+From: Joerg Mayer <jmpt(a)loplof.de>
+Date: Sun, 1 Jun 2014 09:36:17 +0200
+Subject: [PATCH] Fix out of tree builds
 
-You can reach the person managing the list at
-	powertop-owner(a)lists.01.org
+Signed-off-by: Joerg Mayer <jmpt(a)loplof.de>
+---
+ src/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-When replying, please edit your Subject line so it is more specific than "R=
-e: Contents of PowerTop digest..."
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 0fe3c04..605f285 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -50,5 +50,5 @@ AM_LDFLAGS =3D $(LIBS) $(NCURSES_LIBS) $(PCIUTILS_LIBS) $=
+(LIBNL_LIBS) $(LIBZ_LIBS)
+ BUILT_SOURCES =3D css.h
+ CLEANFILES =3D css.h
+ css.h: powertop.css
+-	$(SHELL) ./csstoh.sh powertop.css css.h
++	$(SHELL) ${srcdir}/csstoh.sh ${srcdir}/powertop.css css.h
+ =
 
+-- =
 
-Today's Topics:
+1.8.4.5
 
-   1. Building and installing Powertop for Android (Mukherjee, Adrip)
-   2. Re: Building and installing Powertop for Android
-      (Srinivas Pandruvada)
-   3. Using Git Hub for powertop in Linux (Mukherjee, Adrip)
-   4. Re: Using Git Hub for powertop in Linux (Alexandra Yates)
-   5. Re: [PATCH v3 29/31] tunables: removed on-demand cpu
-      frequency governor (Kristen Carlson Accardi)
+-- =
 
+Joerg Mayer                                           <jmayer(a)loplof.de>
+We are stuck with technology when what we really want is just stuff that
+works. Some say that should read Microsoft instead of technology.
 
-----------------------------------------------------------------------
-
-Message: 1
-Date: Fri, 13 Dec 2013 13:22:14 +0000
-From: "Mukherjee, Adrip" <adrip.mukherjee(a)intel.com>
-To: "powertop(a)lists.01.org" <powertop(a)lists.01.org>
-Subject: [Powertop] Building and installing Powertop for Android
-Message-ID:
-	<F9A26558D30ED241A8204F06F9947260258018D3(a)BGSMSX102.gar.corp.intel.com>
-	=
-
-Content-Type: text/plain; charset=3D"us-ascii"
-
-Thanks Auke. So now I have been able to build the powertop binary and run i=
-t in Linux system. In order to run it in Android platform what needs to be =
-done differently. How can I use the Android.mk file provided with the relea=
-se? Could not find any documentation on that.
-
-regards
-Adrip
-
-
---===============4887796918351102647==--
+--===============7517171038978792050==--
 
