@@ -1,266 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============8450809592088508580=="
+Content-Type: multipart/mixed; boundary="===============5516637158114157202=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH v3 19/31] report: redesign Software Information
- csv and html
-Date: Tue, 10 Dec 2013 23:14:46 +0300
-Message-ID: <20131210201446.GD2422@swordfish>
-In-Reply-To: 1384806442-20294-20-git-send-email-alexandra.yates@linux.intel.com
+From: Joerg Mayer <jmpt at loplof.de>
+Subject: [Powertop] Fix packaging extra files in src/tuning/ [Was: PowerTOP
+ v2.6.1 released]
+Date: Sun, 01 Jun 2014 10:09:29 +0200
+Message-ID: <20140601080929.GN615@rhrk.uni-kl.de>
+In-Reply-To: 20140601075106.GL615@rhrk.uni-kl.de
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8450809592088508580==
+--===============5516637158114157202==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (11/18/13 12:27), Alexandra Yates wrote:
-> Enabled "Overview of Software Power Consumers" section
-> for csv and html report redesign, while preserving
-> translation macros.
-> =
+> find a regenerated version below. Btw, to find out about problems with
+> the source: Please run "make distcheck" before doing a release - which
+> will currently fail due to the included object files.
 
-> Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
-> ---
->  src/process/do_process.cpp      |  113 ++++++++++++++++++++++-----------=
-------
->  src/report/report-data-html.cpp |   11 +++-
->  src/report/report-data-html.h   |    2 +
->  3 files changed, 77 insertions(+), 49 deletions(-)
-> =
+OK, while I'm at it: Fix the extra files in src/tuning/ as well. With this
+an the previous patch applied "make distcheck" succeeds on my system.
 
-> diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
-> index c676978..6fc7a5b 100644
-> --- a/src/process/do_process.cpp
-> +++ b/src/process/do_process.cpp
-> @@ -889,42 +889,48 @@ void report_process_update_display(void)
->  {
->  	unsigned int i;
->  	unsigned int total;
-> +	int show_power, cols, rows, idx;
->  =
-
-> -	int show_power;
-> -
-> -	sort(all_power.begin(), all_power.end(), power_cpu_sort);
-> -
-> -	show_power =3D global_power_valid();
-> +	/* div attr css_class and css_id */
-> +	tag_attr div_attr;
-> +	init_div(&div_attr, "clear_block", "software");
->  =
-
-> -	report.begin_section(SECTION_SOFTWARE);
-> -	report.add_header(__("Overview of Software Power Consumers"));
-> -	report.begin_table(TABLE_WIDE);
-> -	report.begin_row();
-> -	if (show_power) {
-> -		report.begin_cell(CELL_SOFTWARE_HEADER);
-> -		report.add(__("Power est."));
-> -	}
-> +	/* Set Table attributes, rows, and cols */
-> +	cols=3D7;
-> +	if (show_power)
-> +		cols=3D8;
->  =
-
-> -	report.begin_cell(CELL_SOFTWARE_HEADER);
-> -	report.add(__("Usage"));
-> -	report.begin_cell(CELL_SOFTWARE_HEADER);
-> -	report.add(__("Wakeups/s"));
-> -	report.begin_cell(CELL_SOFTWARE_HEADER);
-> -	report.add(__("GPU ops/s"));
-> -	report.begin_cell(CELL_SOFTWARE_HEADER);
-> -	report.add(__("Disk IO/s"));
-> -	report.begin_cell(CELL_SOFTWARE_HEADER);
-> -	report.add(__("GFX Wakeups/s"));
-> -	report.begin_cell(CELL_SOFTWARE_PROCESS);
-> -	report.add(__("Category"));
-> -	report.begin_cell(CELL_SOFTWARE_DESCRIPTION);
-> -	report.add(__("Description"));
-> +	idx=3Dcols;
->  =
-
->  	total =3D all_power.size();
-> -
->  	if (total > 100)
->  		total =3D 100;
->  =
-
-> +	rows=3Dtotal+1;
-> +	table_attributes std_table_css;
-> +	init_nowarp_table_attr(&std_table_css, rows, cols);
-> +
-> +
-> +	/* Set Title attributes */
-> +	tag_attr title_attr;
-> +	init_title_attr(&title_attr);
-> +
-> +	/* Set array of data in row Major order */
-> +	string  software_data[cols * rows];
-> +	software_data[0]=3D__("Usage");
-> +	software_data[1]=3D__("Wakeups/s");
-> +	software_data[2]=3D__("GPU ops/s");
-> +	software_data[3]=3D__("Disk IO/s");
-> +	software_data[4]=3D__("GFX Wakeups/s");
-> +	software_data[5]=3D__("Category");
-> +	software_data[6]=3D__("Description");
-> +
-> +	if (show_power)
-> +		software_data[7]=3D__("PW Estimate");
-> +
-> +	sort(all_power.begin(), all_power.end(), power_cpu_sort);
-> +	show_power =3D global_power_valid();
-> +
->  	for (i =3D 0; i < total; i++) {
->  		char power[16];
->  		char name[20];
-> @@ -943,7 +949,8 @@ void report_process_update_display(void)
->  		if (strcmp(name, "Device") =3D=3D 0)
->  			continue;
->  =
-
-> -		if (all_power[i]->events() =3D=3D 0 && all_power[i]->usage() =3D=3D 0 =
-&& all_power[i]->Witts() =3D=3D 0)
-> +		if (all_power[i]->events() =3D=3D 0 && all_power[i]->usage() =3D=3D 0
-> +				&& all_power[i]->Witts() =3D=3D 0)
->  			break;
->  =
-
->  		usage[0] =3D 0;
-> @@ -958,7 +965,7 @@ void report_process_update_display(void)
->  			sprintf(wakes, "%5.2f", all_power[i]->wake_ups / measurement_time);
->  		sprintf(gpus, "%5.1f", all_power[i]->gpu_ops / measurement_time);
->  		sprintf(disks, "%5.1f (%5.1f)", all_power[i]->hard_disk_hits / measure=
-ment_time,
-> -			all_power[i]->disk_hits / measurement_time);
-> +				all_power[i]->disk_hits / measurement_time);
->  		sprintf(xwakes, "%5.1f", all_power[i]->xwakes / measurement_time);
->  		if (!all_power[i]->show_events()) {
->  			wakes[0] =3D 0;
-> @@ -975,27 +982,37 @@ void report_process_update_display(void)
->  		if (all_power[i]->xwakes =3D=3D 0)
->  			xwakes[0] =3D 0;
->  =
-
-> -		report.begin_row(ROW_SOFTWARE);
-> +		software_data[idx]=3Dstring(usage);
-> +		idx+=3D1;
-> +
-> +		software_data[idx]=3Dstring(wakes);
-> +		idx+=3D1;
-> +
-> +		software_data[idx]=3Dstring(gpus);
-> +		idx+=3D1;
-> +
-> +		software_data[idx]=3Dstring(disks);
-> +		idx+=3D1;
-> +
-> +		software_data[idx]=3Dstring(xwakes);
-> +		idx+=3D1;
-> +
-> +		software_data[idx]=3Dstring(name);
-> +		idx+=3D1;
-
-/** just a side note*/
-
-I think C++ can help us. we can just declare std::vector and push_back().
-
-	-ss
+Ciao
+    J=C3=B6rg
 
 
-> +		software_data[idx]=3Dstring(pretty_print(all_power[i]->description(), =
-descr, 128));
-> +		idx+=3D1;
->  		if (show_power) {
-> -			report.begin_cell(CELL_SOFTWARE_POWER);
-> -			report.add(power);
-> +			software_data[idx]=3Dstring(power);
-> +			idx+=3D1;
->  		}
-> -
-> -		report.begin_cell(CELL_SOFTWARE_POWER);
-> -		report.add(usage);
-> -		report.begin_cell(CELL_SOFTWARE_POWER);
-> -		report.add(wakes);
-> -		report.begin_cell(CELL_SOFTWARE_POWER);
-> -		report.add(gpus);
-> -		report.begin_cell(CELL_SOFTWARE_POWER);
-> -		report.add(disks);
-> -		report.begin_cell(CELL_SOFTWARE_POWER);
-> -		report.add(xwakes);
-> -		report.begin_cell();
-> -		report.add(name);
-> -		report.begin_cell();
-> -		report.add(pretty_print(all_power[i]->description(), descr, 128));
->  	}
-> +
-> +	/* Report Output */
-> +	report.add_div(&div_attr);
-> +	report.add_title(&title_attr, __("Overview of Software Power Consumers"=
-));
-> +	report.add_table(software_data, &std_table_css);
-> +        report.end_div();
->  }
->  =
+>From 86f48b0eaf6b7128b70f96b47c1e176142eb7402 Mon Sep 17 00:00:00 2001
+From: Joerg Mayer <jmpt(a)loplof.de>
+Date: Sun, 1 Jun 2014 10:06:35 +0200
+Subject: [PATCH] Don't add the complete content of src/tuning/ when packagi=
+ng
+ the source.
 
->  void report_summary(void)
-> diff --git a/src/report/report-data-html.cpp b/src/report/report-data-htm=
-l.cpp
-> index 28732c9..f0d536d 100644
-> --- a/src/report/report-data-html.cpp
-> +++ b/src/report/report-data-html.cpp
-> @@ -71,7 +71,16 @@ void init_cpu_table_attr(struct table_attributes *tabl=
-e_css, int title_mod,
->  }
->  =
+Signed-off-by: Joerg Mayer <jmpt(a)loplof.de>
+---
+ src/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->  =
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 0fe3c04..62e1fd2 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -18,7 +18,7 @@ powertop_SOURCES =3D parameters/persistent.cpp parameters=
+/learn.cpp parameters/par
+ 		devices/thinkpad-light.cpp devices/ahci.h devices/i915-gpu.h devices/net=
+work.h \
+ 		devices/rfkill.cpp devices/alsa.h devices/thinkpad-fan.h devices/device.=
+h \
+ 		devices/usb.h devices/backlight.h devices/backlight.cpp devices/runtime_=
+pm.h \
+-		devices/thinkpad-light.h devices/network.cpp lib.h tuning \
++		devices/thinkpad-light.h devices/network.cpp lib.h \
+ 		tuning/bluetooth.cpp tuning/tuning.cpp tuning/tuningusb.cpp \
+ 		tuning/ethernet.cpp tuning/bluetooth.h tuning/tuning.h tuning/ethernet.h=
+ \
+ 		tuning/tunable.cpp tuning/nl80211.h tuning/iw.c tuning/wifi.cpp tuning/t=
+uningsysfs.h \
+-- =
 
-> -
-> +void init_nowarp_table_attr(struct table_attributes *table_css, int rows=
-, int cols){
-> +	table_css->table_class=3D"emphasis2";
-> +	table_css->tr_class=3D"emph1";
-> +	table_css->th_class=3D"emph_title";
-> +	table_css->td_class=3D"no_wrap";
-> +	table_css->pos_table_title=3DT;
-> +	table_css->title_mod=3D0;
-> +	table_css->rows=3Drows;
-> +	table_css->cols=3Dcols;
-> +}
->  =
+1.8.4.5
 
->  =
+-- =
 
->  /* Other Helper Functions */
-> diff --git a/src/report/report-data-html.h b/src/report/report-data-html.h
-> index 61e75c0..d2d782b 100644
-> --- a/src/report/report-data-html.h
-> +++ b/src/report/report-data-html.h
-> @@ -53,6 +53,8 @@ init_core_table_attr(struct table_attributes *table_css=
-, int title_mod,
->  void
->  init_cpu_table_attr(struct table_attributes *table_css, int title_mod,
->  		int rows, int cols);
-> +void
-> +init_nowarp_table_attr(struct table_attributes *table_css, int rows, int=
- cols);
->  =
+Joerg Mayer                                           <jmayer(a)loplof.de>
+We are stuck with technology when what we really want is just stuff that
+works. Some say that should read Microsoft instead of technology.
 
->  =
-
->  /* Other helper functions */
-> -- =
-
-> 1.7.9.5
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============8450809592088508580==--
+--===============5516637158114157202==--
 
