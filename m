@@ -1,130 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============6676726001591842586=="
+Content-Type: multipart/mixed; boundary="===============6827676262164464402=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH POWERTOP] Fix various resource leaks
-Date: Tue, 01 Jul 2014 21:47:14 +0900
-Message-ID: <20140701124714.GA1143@swordfish>
-In-Reply-To: CAP245DVj8JEWx2oDUvoUBB2+jTKkP9P8CaUXmUbPcfHSUZ9ikg@mail.gmail.com
+From: Joerg Mayer <jmpt at loplof.de>
+Subject: Re: [Powertop] Fix out of tree builds [Was: PowerTOP v2.6.1 released]
+Date: Thu, 05 Jun 2014 01:39:32 +0200
+Message-ID: <20140604233932.GH39023@rhrk.uni-kl.de>
+In-Reply-To: 62350.10.24.5.211.1401916818.squirrel@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6676726001591842586==
+--===============6827676262164464402==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (07/01/14 17:54), Amit Kucheria wrote:
-> Date: Tue, 1 Jul 2014 17:54:15 +0530
-> From: Amit Kucheria <amit.kucheria(a)linaro.org>
-> To: Mohammad Merajul Islam Molla <meraj.enigma(a)gmail.com>,
->  powertop(a)lists.01.org
-> Cc: Lists linaro-dev <linaro-dev(a)lists.linaro.org>
-> Subject: Re: [Powertop] [PATCH POWERTOP] Fix various resource leaks
+Hallo  Alexandra,
+
+On Wed, Jun 04, 2014 at 02:20:18PM -0700, Alexandra Yates wrote:
+> Unfortunately the patches you sent don't fix the issue.  Here is how to
+> reproduced the issue:
+> 1- Applied your patches.
+> 2- Generated an new dist/tarball,
+> 3- Untared on different location
+> 4- Executed: ./autogen; ./configure; make; make clean; make
 > =
 
-> Mohammad,
-> =
+> The error still points that /bin/bash: ./csstoh.sh: No such file or direc=
+tory
 
-> This fix should go upstream. cc'ing the powertop list.
-> =
+> make[2]: Entering directory `/home/magd/Downloads/powertop-2.6.1/src'
+> /bin/bash ./csstoh.sh ./powertop.css css.h
+> /bin/bash: ./csstoh.sh: No such file or directory
 
-> Regards,
-> Amit
-> =
+Luckily you included your workflow - it contains a bug. As you can see the
+system has not picked up the new path (the text ./csstoh.sh no longer exists
+in the source). Correct order would be:
+1- apply patches
+2- ./autogen && ./configure
+3- make distcheck
+4- cp powertop-2.6.1.tar.gz <wherever>
 
-> On Thu, Jun 26, 2014 at 12:42 PM, Mohammad Merajul Islam Molla
-> <meraj.enigma(a)gmail.com> wrote:
-> > Fixes some resource leaks detected by valgrind and coverity scan.
-> >
-> >
-> > diff --git a/src/devices/ahci.cpp b/src/devices/ahci.cpp
-> > index ac06460..7f704b6 100644
-> > --- a/src/devices/ahci.cpp
-> > +++ b/src/devices/ahci.cpp
-> > @@ -64,8 +64,10 @@ static string disk_name(char *path, char *target,
-> > char *shortname)
-> >                 sprintf(line, "%s/%s/model", pathname, dirent->d_name);
-> >                 file =3D fopen(line, "r");
-> >                 if (file) {
-> > -                       if (fgets(line, 4096, file) =3D=3D NULL)
-> > +                       if (fgets(line, 4096, file) =3D=3D NULL) {
-> > +                               fclose(file);
-> >                                 break;
-> > +                       }
-> >                         fclose(file);
-> >                         c =3D strchr(line, '\n');
-> >                         if (c)
-> > diff --git a/src/devices/devfreq.cpp b/src/devices/devfreq.cpp
-> > index e16951c..23c4b0c 100644
-> > --- a/src/devices/devfreq.cpp
-> > +++ b/src/devices/devfreq.cpp
-> > @@ -238,6 +238,7 @@ void create_all_devfreq_devices(void)
-> >
-> >         callback fn =3D &devfreq_dev_callback;
-> >         process_directory(p.c_str(), fn);
-> > +       closedir(dir);
+Ciao
+   J=C3=B6rg
+-- =
 
-I don't see this file at
-https://github.com/fenrus75/powertop/tree/master/src/devices
+Joerg Mayer                                           <jmayer(a)loplof.de>
+We are stuck with technology when what we really want is just stuff that
+works. Some say that should read Microsoft instead of technology.
 
-afair, process_directory() closes dir.
-
-	-ss
-
-> >  }
-> >
-> >  void initialize_devfreq(void)
-> > diff --git a/src/perf/perf_bundle.cpp b/src/perf/perf_bundle.cpp
-> > index b0e982b..cf1ae11 100644
-> > --- a/src/perf/perf_bundle.cpp
-> > +++ b/src/perf/perf_bundle.cpp
-> > @@ -142,8 +142,10 @@ static void parse_event_format(const char *event_n=
-ame)
-> >
-> >         buf =3D read_file(file);
-> >         free(file);
-> > -       if (!buf)
-> > +       if (!buf) {
-> > +               free(name);
-> >                 return;
-> > +       }
-> >
-> >         pevent_parse_event(perf_event::pevent, buf, strlen(buf), sys);
-> >         free(name);
-> > diff --git a/src/tuning/bluetooth.cpp b/src/tuning/bluetooth.cpp
-> > index e0bdf12..5100a8a 100644
-> > --- a/src/tuning/bluetooth.cpp
-> > +++ b/src/tuning/bluetooth.cpp
-> > @@ -144,8 +144,10 @@ int bt_tunable::good_bad(void)
-> >                 if (file) {
-> >                         char line[2048];
-> >                         /* first line is standard header */
-> > -                       if (fgets(line, 2047, file) =3D=3D NULL)
-> > +                       if (fgets(line, 2047, file) =3D=3D NULL) {
-> > +                               pclose(file);
-> >                                 goto out;
-> > +                       }
-> >                         memset(line, 0, 2048);
-> >                         if (fgets(line, 2047, file) =3D=3D NULL) {
-> >                                 result =3D last_check_result =3D TUNE_G=
-OOD;
-> >
-> >
-> >
-> > --
-> > Thanks,
-> > -Meraj
-> >
-> > _______________________________________________
-> > linaro-dev mailing list
-> > linaro-dev(a)lists.linaro.org
-> > http://lists.linaro.org/mailman/listinfo/linaro-dev
-> >
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============6676726001591842586==--
+--===============6827676262164464402==--
 
