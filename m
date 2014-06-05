@@ -1,350 +1,211 @@
-Content-Type: multipart/mixed; boundary="===============3042006766461656263=="
+Content-Type: multipart/mixed; boundary="===============2571509636626911736=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH v3 18/31] report: CPU Frequency html & csv
-Date: Tue, 10 Dec 2013 23:12:30 +0300
-Message-ID: <20131210201230.GC2422@swordfish>
-In-Reply-To: 1384806442-20294-19-git-send-email-alexandra.yates@linux.intel.com
+From: Srinivas Pandruvada <srinivas.pandruvada at linux.intel.com>
+Subject: [Powertop] [PATCH 1/3] RAPL: Use Powercap sysfs
+Date: Wed, 04 Jun 2014 17:35:21 -0700
+Message-ID: <1401928523-3378-1-git-send-email-srinivas.pandruvada@linux.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3042006766461656263==
+--===============2571509636626911736==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (11/18/13 12:27), Alexandra Yates wrote:
-> Enables html and csv report new stlyes for "CPU Frequency" section,
-> While preserving translation macros.
-> =
+Linux Powercap sysfs with Intel RAPL driver exists from 3.13.rc1.
+Use this to estimate RAPL domain power instead of MSRs. Since
+these MSRs are non-architectural, they can be changed from
+processor model to model. But by using powercap sysfs, kernel
+driver will take care about processor specific variations.
+---
+ src/cpu/rapl/rapl_interface.cpp | 91 +++++++++++++++++++++++++++++++++++++=
++++-
+ src/cpu/rapl/rapl_interface.h   |  7 +++-
+ 2 files changed, 96 insertions(+), 2 deletions(-)
 
-> Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
-> ---
->  src/cpu/cpu.cpp |  139 ++++++++++++++++++++++++++++++++++++++++---------=
-------
->  1 file changed, 101 insertions(+), 38 deletions(-)
-> =
+diff --git a/src/cpu/rapl/rapl_interface.cpp b/src/cpu/rapl/rapl_interface.=
+cpp
+index 6dd7b26..a19e0a9 100644
+--- a/src/cpu/rapl/rapl_interface.cpp
++++ b/src/cpu/rapl/rapl_interface.cpp
+@@ -27,6 +27,8 @@
+ #include <unistd.h>
+ #include <errno.h>
+ #include <math.h>
++#include <stdlib.h>
++#include <dirent.h>
+ #include "lib.h"
+ #include "rapl_interface.h"
+ =
 
-> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-> index b8f74a8..c3787e6 100644
-> --- a/src/cpu/cpu.cpp
-> +++ b/src/cpu/cpu.cpp
-> @@ -612,29 +612,81 @@ void report_display_cpu_cstates(void)
->  =
+@@ -68,7 +70,11 @@
+ #define PP0_DOMAIN_PRESENT	0x04
+ #define PP1_DOMAIN_PRESENT	0x08
+ =
 
->  void report_display_cpu_pstates(void)
->  {
-> -	char buffer[512], buffer2[512];
-> +	char buffer[512], buffer2[512], tmp_num[50];
->  	unsigned int package, core, cpu;
->  	int line;
->  	class abstract_cpu *_package, * _core, * _cpu;
->  	unsigned int i, pstates_num;
->  =
+-c_rapl_interface::c_rapl_interface(int cpu) :
++c_rapl_interface::c_rapl_interface(const char *dev_name, int cpu) :
++	powercap_sysfs_present(false),
++	powercap_core_path(),
++	powercap_uncore_path(),
++	powercap_dram_path(),
+ 	measurment_interval(def_sampling_interval),
+ 	first_cpu(cpu),
+ 	last_pkg_energy_status(0.0),
+@@ -78,10 +84,63 @@ c_rapl_interface::c_rapl_interface(int cpu) :
+ {
+ 	uint64_t value;
+ 	int ret;
++	string package_path;
++	DIR *dir;
++	struct dirent *entry;
+ =
 
-> -	for (i =3D 0, pstates_num =3D 0; i < all_cpus.size(); i++)
-> +	/* div attr css_class and css_id */
-> +	tag_attr div_attr;
-> +	init_div(&div_attr, "clear_block", "cpufreq");
-> +
-> +	/* Set Table attributes, rows, and cols */
-> +	table_attributes std_table_css;
-> +	table_size pkg_tbl_size;
-> +	table_size core_tbl_size;
-> +	table_size cpu_tbl_size;
-> +
-> +
-> +	/* Set Title attributes */
-> +	tag_attr title_attr;
-> +	init_title_attr(&title_attr);
-> +
-> +	/* Report add section */
-> +        report.add_div(&div_attr);
-> +        report.add_title(&title_attr, __("Processor Frequency Report"));
-> +
-> +        /* Set array of data in row Major order */
-> +	int idx1, idx2, idx3, num_cpus=3D0;
-> +        string tmp_str;
-> +
-> +	for (i =3D 0, pstates_num =3D 0; i < all_cpus.size(); i++) {
->  		if (all_cpus[i])
->  			pstates_num =3D std::max<unsigned int>(pstates_num,
-> -								all_cpus[i]->pstates.size());
-> -
-> -	report.begin_section(SECTION_CPUFREQ);
-> -	report.add_header("Processor Frequency Report");
-> +				all_cpus[i]->pstates.size());
-> +	}
->  =
+ 	RAPL_INFO_PRINT("RAPL device for cpu %d\n", cpu);
+ =
 
->  	for (package =3D 0; package < system_level.children.size(); package++) {
->  		bool first_core =3D true;
-> +		idx1=3D0;
-> +		idx2=3D0;
-> +		idx3=3D0;
->  =
+ 	rapl_domains =3D 0;
++
++	if (dev_name) {
++		string base_path =3D "/sys/class/powercap/intel-rapl/";
++		if ((dir =3D opendir(base_path.c_str())) !=3D NULL) {
++			while ((entry =3D readdir(dir)) !=3D NULL) {
++				string path =3D base_path + entry->d_name + "/name";
++				string str =3D read_sysfs_string(path);
++				if (str.length() > 0) {
++					if (str =3D=3D dev_name) {
++						package_path =3D base_path + entry->d_name + "/";
++						powercap_sysfs_present =3D true;
++						rapl_domains |=3D PKG_DOMAIN_PRESENT;
++						break;
++					}
++				}
++			}
++			closedir(dir);
++		}
++	}
++
++	if (powercap_sysfs_present) {
++		if ((dir =3D opendir(package_path.c_str())) !=3D NULL) {
++			while ((entry =3D readdir(dir)) !=3D NULL) {
++				string path =3D package_path + entry->d_name;
++				string str =3D read_sysfs_string(path + "/name");
++				if (str.length() > 0) {
++					if (str =3D=3D "core") {
++						rapl_domains |=3D PP0_DOMAIN_PRESENT;
++						powercap_core_path =3D path + "/";
++					}
++					else if (str =3D=3D "dram") {
++						rapl_domains |=3D DRAM_DOMAIN_PRESENT;
++						powercap_dram_path =3D path + "/";
++					}
++					else if (str =3D=3D "uncore") {
++						rapl_domains |=3D PP1_DOMAIN_PRESENT;
++						powercap_uncore_path =3D path + "/";
++					}
++				}
++			}
++			closedir(dir);
++		}
++
++		RAPL_INFO_PRINT("RAPL Using PowerCap Sysfs : Domain Mask %x\n",
++														rapl_domains);
++		return;
++	}
++
++	// Fallback to using MSRs
++
+ 	// presence of each domain
+ 	// Check presence of PKG domain
+ 	ret =3D read_msr(first_cpu, MSR_PKG_ENERY_STATUS, &value);
+@@ -312,6 +371,16 @@ int c_rapl_interface::get_dram_energy_status(double *s=
+tatus)
+ 		return -1;
+ 	}
+ =
 
->  		_package =3D system_level.children[package];
->  		if (!_package)
->  			continue;
->  =
++	if (powercap_sysfs_present) {
++		string str =3D read_sysfs_string(powercap_dram_path + "energy_uj");
++		if (str.length() > 0) {
++			*status =3D  atof(str.c_str()) / 1000000; // uj to Js
++			return 0;
++		}
++
++		return -EINVAL;
++	}
++
+ 	ret =3D read_msr(first_cpu, MSR_DRAM_ENERY_STATUS, &value);
+ 	if(ret < 0)
+ 	{
+@@ -393,6 +462,16 @@ int c_rapl_interface::get_pp0_energy_status(double *st=
+atus)
+ 		return -1;
+ 	}
+ =
 
-> -		report.begin_table(TABLE_WIDE);
-> +		/*  Tables for PKG, CORE, CPU */
-> +		pkg_tbl_size.cols=3D2;
-> +		pkg_tbl_size.rows=3Dpstates_num+2;
-> +		string pkg_data[pkg_tbl_size.cols * pkg_tbl_size.rows];
-> +
-> +		core_tbl_size.cols=3D2;
-> +		core_tbl_size.rows=3D((pstates_num+2) *_package->children.size());
-> +		string core_data[core_tbl_size.cols * core_tbl_size.rows];
-> +
-> +		/* PKG */
-> +		num_cpus=3D0;
-> +		for (core =3D 0; core < _package->children.size(); core++) {
-> +			_core =3D _package->children[core];
-> +			if (!_core)
-> +				continue;
-> +			for (cpu =3D 0; cpu < _core->children.size(); cpu++) {
-> +				if (!_cpu)
-> +				continue;
-> +				_cpu =3D _core->children[cpu];
-> +				num_cpus+=3D1;
-> +			}
-> +		}
-> +		cpu_tbl_size.cols=3D num_cpus+1;
-> +		cpu_tbl_size.rows=3D (pstates_num+2)* _package->children.size();
-> +		string cpu_data[cpu_tbl_size.cols * cpu_tbl_size.rows];
-> +
-> +		/* Core */
->  		for (core =3D 0; core < _package->children.size(); core++) {
-> +			cpu_data[idx3]=3D"&nbsp;";
-> +			idx3+=3D1;
->  			_core =3D _package->children[core];
->  			if (!_core)
->  				continue;
-> @@ -646,75 +698,86 @@ void report_display_cpu_pstates(void)
->  				bool first_cpu =3D true;
->  =
++	if (powercap_sysfs_present) {
++		string str =3D read_sysfs_string(powercap_core_path + "energy_uj");
++		if (str.length() > 0) {
++			*status =3D atof(str.c_str()) / 1000000; // uj to Js
++			return 0;
++		}
++
++		return -EINVAL;
++	}
++
+ 	ret =3D read_msr(first_cpu, MSR_PP0_ENERY_STATUS, &value);
+ 	if(ret < 0)
+ 	{
+@@ -471,6 +550,16 @@ int c_rapl_interface::get_pp1_energy_status(double *st=
+atus)
+ 		return -1;
+ 	}
+ =
 
->  				if (!_package->has_pstate_level(line))
-> -					continue;
-> -
-> -				report.begin_row();
-> +				continue;
->  =
++	if (powercap_sysfs_present) {
++		string str =3D read_sysfs_string(powercap_uncore_path + "energy_uj");
++		if (str.length() > 0) {
++			*status =3D  atof(str.c_str()) / 1000000; // uj to Js
++			return 0;
++		}
++
++		return -EINVAL;
++	}
++
+ 	ret =3D read_msr(first_cpu, MSR_PP1_ENERY_STATUS, &value);
+ 	if(ret < 0)
+ 	{
+diff --git a/src/cpu/rapl/rapl_interface.h b/src/cpu/rapl/rapl_interface.h
+index be863e2..744f595 100644
+--- a/src/cpu/rapl/rapl_interface.h
++++ b/src/cpu/rapl/rapl_interface.h
+@@ -28,6 +28,11 @@ class c_rapl_interface
+ {
+ private:
+ 	static const int def_sampling_interval =3D 1; //In seconds
++	bool powercap_sysfs_present;
++	string powercap_core_path;
++	string powercap_uncore_path;
++	string powercap_dram_path;
++
+ 	unsigned char rapl_domains;
+ 	int measurment_interval;
+ 	int first_cpu;
+@@ -45,7 +50,7 @@ private:
+ 	int write_msr(int cpu, unsigned int idx, uint64_t val);
+ =
 
->  				buffer[0] =3D 0;
->  				buffer2[0] =3D 0;
->  				if (first_core) {
->  					if (line =3D=3D LEVEL_HEADER) {
-> -						report.begin_cell(CELL_FIRST_PACKAGE_HEADER);
-> -						report.addf(__("Package %i"), _package->get_number());
-> +						pkg_data[idx1]=3D__("Package");
-> +						idx1+=3D1;
-> +						sprintf(tmp_num,"%d",  _package->get_number());
-> +						pkg_data[idx1]=3D string(tmp_num);
-> +						idx1+=3D1;
+ public:
+-	c_rapl_interface(int cpu =3D 0);
++	c_rapl_interface(const char *dev_name =3D "package-0", int cpu =3D 0);
+ =
 
+ 	int get_rapl_power_unit(uint64_t *value);
+ 	double get_power_unit();
+-- =
 
-initialisation:
-
-       report.begin_section(SECTION_CPUFREQ);
-       report.add_header("Processor Frequency Report");
-
-       report.begin_table(TABLE_WIDE);
-
-vs
-
-       /* div attr css_class and css_id */
-       tag_attr div_attr;
-       init_div(&div_attr, "clear_block", "cpufreq");
-
-       /* Set Table attributes, rows, and cols */
-       table_attributes std_table_css;
-       table_size pkg_tbl_size;
-       table_size core_tbl_size;
-       table_size cpu_tbl_size;
-
-
-       /* Set Title attributes */
-       tag_attr title_attr;
-       init_title_attr(&title_attr);
-
-       /* Report add section */
-        report.add_div(&div_attr);
-        report.add_title(&title_attr, __("Processor Frequency Report"));
-
-        /* Set array of data in row Major order */
-       int idx1, idx2, idx3, num_cpus=3D0;
-        string tmp_str;
-
-
-
-
-
-reporter usage:
-
-
-         report.begin_cell(CELL_CORE_HEADER);
-         report.addf(__("Core %i"), _core->get_number());
-
-vs
-
-         core_data[idx2]=3D"";
-         idx2+=3D1;
-         sprintf(tmp_num,__("Core %d"),_core->get_number());
-         core_data[idx2]=3Dstring(tmp_num);
-         idx2+=3D1;
-
-
-
-
-
-and
-
-
-
-
-
-         report.begin_cell(CELL_STATE_NAME);
-         report.add(_core->fill_pstate_name(line, buffer));
-         report.begin_cell(CELL_PACKAGE_STATE_VALUE);
-         report.add(_core->fill_pstate_line(line, buffer2));
-
-vs
-
-         tmp_str=3Dstring(_core->fill_pstate_name(line, buffer));
-         core_data[idx2]=3D (tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
-         idx2+=3D1;
-         tmp_str=3Dstring(_core->fill_pstate_line(line, buffer2));
-         core_data[idx2]=3D (tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
-         idx2+=3D1;
+1.7.11.7
 
 
-sorry, but the existing one really looks easier to follow and use. current =
-reporter user
-cares less about reporter internall details.
-
-	-ss
-
-
->  					} else {
-> -						report.begin_cell(CELL_STATE_NAME);
-> -						report.add(_package->fill_pstate_name(line, buffer));
-> -						report.begin_cell(CELL_PACKAGE_STATE_VALUE);
-> -						report.add(_package->fill_pstate_line(line, buffer2));
-> +						tmp_str=3Dstring(_package->fill_pstate_name(line, buffer));
-> +						pkg_data[idx1]=3D(tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
-> +						idx1+=3D1;
-> +						tmp_str=3Dstring(_package->fill_pstate_line(line, buffer2));
-> +						pkg_data[idx1]=3D(tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
-> +						idx1+=3D1;
->  					}
-> -				} else {
-> -					report.begin_cell(CELL_EMPTY_PACKAGE_STATE);
-> -					report.add_empty_cell();
->  				}
->  =
-
-> -				report.begin_cell(CELL_SEPARATOR);
-> -				report.add_empty_cell();
->  =
-
->  				if (!_core->can_collapse()) {
->  					buffer[0] =3D 0;
->  					buffer2[0] =3D 0;
->  					if (line =3D=3D LEVEL_HEADER) {
-> -						report.begin_cell(CELL_CORE_HEADER);
-> -						report.addf(__("Core %i"), _core->get_number());
-> +						core_data[idx2]=3D"";
-> +						idx2+=3D1;
-> +						sprintf(tmp_num,__("Core %d"),_core->get_number());
-> +						core_data[idx2]=3Dstring(tmp_num);
-> +						idx2+=3D1;
->  					} else {
-> -						report.begin_cell(CELL_STATE_NAME);
-> -						report.add(_core->fill_pstate_name(line, buffer));
-> -						report.begin_cell(CELL_PACKAGE_STATE_VALUE);
-> -						report.add(_core->fill_pstate_line(line, buffer2));
-> +						tmp_str=3Dstring(_core->fill_pstate_name(line, buffer));
-> +						core_data[idx2]=3D (tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
-> +						idx2+=3D1;
-> +						tmp_str=3Dstring(_core->fill_pstate_line(line, buffer2));
-> +						core_data[idx2]=3D (tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
-> +						idx2+=3D1;
->  					}
->  				}
->  =
-
-> -				report.begin_cell(CELL_SEPARATOR);
-> -				report.add_empty_cell();
-> -
-> +				/* CPU */
->  				for (cpu =3D 0; cpu < _core->children.size(); cpu++) {
->  					buffer[0] =3D 0;
->  					_cpu =3D _core->children[cpu];
->  					if (!_cpu)
->  						continue;
->  =
-
-> -					report.set_cpu_number(cpu);
->  					if (line =3D=3D LEVEL_HEADER) {
-> -						report.begin_cell(CELL_CPU_PSTATE_HEADER);
-> -						report.addf(__("CPU %i"), _cpu->get_number());
-> +						sprintf(tmp_num,__("CPU %d"),_cpu->get_number());
-> +						cpu_data[idx3] =3D string(tmp_num);
-> +						idx3+=3D1;
->  						continue;
->  					}
->  =
-
->  					if (first_cpu) {
-> -						report.begin_cell(CELL_STATE_NAME);
-> -						report.add(_cpu->fill_pstate_name(line, buffer));
-> +						tmp_str=3Dstring(_cpu->fill_pstate_name(line, buffer));
-> +						cpu_data[idx3]=3D(tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
-> +						idx3+=3D1;
->  						first_cpu =3D false;
->  					}
->  =
-
->  					buffer[0] =3D 0;
-> -					report.begin_cell(CELL_CPU_STATE_VALUE);
-> -					report.add(_cpu->fill_pstate_line(line, buffer));
-> +					tmp_str=3Dstring(_cpu->fill_pstate_line(line, buffer));
-> +					cpu_data[idx3]=3D(tmp_str=3D=3D"" ? "&nbsp;" : tmp_str);
-> +					idx3+=3D1;
->  				}
->  			}
-> -
->  			first_core =3D false;
->  		}
-> +		init_pkg_table_attr(&std_table_css, pkg_tbl_size.rows, pkg_tbl_size.co=
-ls);
-> +		report.add_table(pkg_data, &std_table_css);
-> +		init_core_table_attr(&std_table_css, (pstates_num+2),
-> +				core_tbl_size.rows, core_tbl_size.cols);
-> +		report.add_table(core_data, &std_table_css);
-> +		init_cpu_table_attr(&std_table_css, (pstates_num+2),
-> +				cpu_tbl_size.rows, cpu_tbl_size.cols);
-> +		report.add_table(cpu_data, &std_table_css);
->  	}
-> +	report.end_div();
->  }
->  =
-
->  void impl_w_display_cpu_states(int state)
-> -- =
-
-> 1.7.9.5
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============3042006766461656263==--
+--===============2571509636626911736==--
 
