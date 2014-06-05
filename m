@@ -1,60 +1,92 @@
-Content-Type: multipart/mixed; boundary="===============8539555611058939563=="
+Content-Type: multipart/mixed; boundary="===============1311051574458957362=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Optionally check for ncurses pkgconfig file.
-Date: Wed, 07 May 2014 12:17:43 -0700
-Message-ID: <60893.10.24.20.10.1399490263.squirrel@linux.intel.com>
-In-Reply-To: CABsxX9LV5E9w6eNKtAmoD4kUm1rryCgwDiQKiCN17MDeqxByyA@mail.gmail.com
+From: Srinivas Pandruvada <srinivas.pandruvada at linux.intel.com>
+Subject: [Powertop] [PATCH 2/3] Use package name to identify domains
+Date: Wed, 04 Jun 2014 17:35:22 -0700
+Message-ID: <1401928523-3378-2-git-send-email-srinivas.pandruvada@linux.intel.com>
+In-Reply-To: 1401928523-3378-1-git-send-email-srinivas.pandruvada@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8539555611058939563==
+--===============1311051574458957362==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-> On Tue, May 6, 2014 at 12:53 AM, Sergey Senozhatsky
-> <sergey.senozhatsky(a)gmail.com> wrote:
->> On (05/05/14 23:42), Auke Kok wrote:
->>> ---
->>>  configure.ac | 3 ++-
->>>  1 file changed, 2 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/configure.ac b/configure.ac
->>> index baa5faa..5a90fe3 100644
->>> --- a/configure.ac
->>> +++ b/configure.ac
->>> @@ -46,7 +46,8 @@ AC_FUNC_REALLOC
->>>  AC_FUNC_STRTOD
->>>  AC_CHECK_FUNCS([fdatasync getpagesize gettimeofday memmove memset
->>> mkdir munmap pow realpath regcomp select setlocale socket sqrt
->>> strcasecmp strchr strdup strerror strncasecmp strstr strtoul
->>> strtoull])
->>>
->>> -AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], AC_MSG_ERROR([ncurses
->>> is required but was not found]), [])
->>> +PKG_CHECK_MODULES([NCURSES], [ncurses], [LIBS=3D"$LIBS $ncurses_LIBS"],
->>                                 ^^^^^^^^^
->>                                 [ncursesw ncurses]?
->
-> Good question, I actually do not know, and I don't have an ncurses
-> pkgconfig around to see if that works.
->
-> Alexandra, can you see if this works with:
->
-> +PKG_CHECK_MODULES([NCURSES], [ncursesw ncurses], [LIBS=3D"$LIBS
-> $ncurses_LIBS"],
->
-> That needs to be tested by someone with a new ncurses.
->
-> Auke
->
+Here the cpu is identifying a package id. Currently the RAPL
+package name is not used, but by changing to powercap sysfs
+package name, it can be used to identify RAPL package domains
+in a multi processor system.
+---
+ src/cpu/cpu.cpp              | 4 ++--
+ src/cpu/cpu_rapl_device.cpp  | 4 ++--
+ src/cpu/dram_rapl_device.cpp | 4 ++--
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
-I'm on training this week.  I will be able to test at the end of the day
-after my class today.
+diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+index b3b6166..37cc409 100644
+--- a/src/cpu/cpu.cpp
++++ b/src/cpu/cpu.cpp
+@@ -82,14 +82,14 @@ static class abstract_cpu * new_package(int package, in=
+t cpu, char * vendor, int
+ 	cpudev =3D new class cpudevice(_("cpu package"), packagename, ret);
+ 	all_devices.push_back(cpudev);
+ =
 
-Thank you,
-Alexandra.
+-	sprintf(packagename, _("cpu rapl package %i"), cpu);
++	sprintf(packagename, _("package-%i"), cpu);
+ 	cpu_rapl_dev =3D new class cpu_rapl_device(cpudev, _("cpu rapl package"),=
+ packagename, ret);
+ 	if (cpu_rapl_dev->device_present())
+ 		all_devices.push_back(cpu_rapl_dev);
+ 	else
+ 		delete cpu_rapl_dev;
+ =
 
---===============8539555611058939563==--
+-	sprintf(packagename, _("dram rapl package %i"), cpu);
++	sprintf(packagename, _("package-%i"), cpu);
+ 	dram_rapl_dev =3D new class dram_rapl_device(cpudev, _("dram rapl package=
+"), packagename, ret);
+ 	if (dram_rapl_dev->device_present())
+ 		all_devices.push_back(dram_rapl_dev);
+diff --git a/src/cpu/cpu_rapl_device.cpp b/src/cpu/cpu_rapl_device.cpp
+index be10d9e..357a1c8 100644
+--- a/src/cpu/cpu_rapl_device.cpp
++++ b/src/cpu/cpu_rapl_device.cpp
+@@ -33,9 +33,9 @@ cpu_rapl_device::cpu_rapl_device(cpudevice *parent, const=
+ char *classname, const
+ 	  device_valid(false)
+ {
+ 	if (_cpu)
+-		rapl =3D new c_rapl_interface(cpu->get_first_cpu());
++		rapl =3D new c_rapl_interface(dev_name, cpu->get_first_cpu());
+ 	else
+-		rapl =3D new c_rapl_interface(0);
++		rapl =3D new c_rapl_interface();
+ 	last_time =3D time(NULL);
+ 	if (rapl->pp0_domain_present()) {
+ 		device_valid =3D true;
+diff --git a/src/cpu/dram_rapl_device.cpp b/src/cpu/dram_rapl_device.cpp
+index fd31cb5..36d47a2 100644
+--- a/src/cpu/dram_rapl_device.cpp
++++ b/src/cpu/dram_rapl_device.cpp
+@@ -34,9 +34,9 @@ dram_rapl_device::dram_rapl_device(cpudevice *parent, con=
+st char *classname, con
+ 	  device_valid(false)
+ {
+ 	if (_cpu)
+-		rapl =3D new c_rapl_interface(cpu->get_first_cpu());
++		rapl =3D new c_rapl_interface(dev_name, cpu->get_first_cpu());
+ 	else
+-		rapl =3D new c_rapl_interface(0);
++		rapl =3D new c_rapl_interface();
+ 	last_time =3D time(NULL);
+ 	if (rapl->dram_domain_present()) {
+ 		device_valid =3D true;
+-- =
+
+1.7.11.7
+
+
+--===============1311051574458957362==--
 
