@@ -1,42 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============5705992003754973792=="
+Content-Type: multipart/mixed; boundary="===============5384931628366878017=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] Simple Question
-Date: Mon, 07 Jul 2014 18:24:58 -0700
-Message-ID: <53BB486A.5060804@linux.intel.com>
-In-Reply-To: COL129-W476C4ACB661CB7F869CA41C60D0@phx.gbl
+From: Srinivas Pandruvada <srinivas.pandruvada at linux.intel.com>
+Subject: [Powertop] [PATCH] Fix compile warning in cpu.cpp
+Date: Wed, 04 Jun 2014 17:35:33 -0700
+Message-ID: <1401928533-3421-1-git-send-email-srinivas.pandruvada@linux.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5705992003754973792==
+--===============5384931628366878017==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 7/7/2014 4:53 PM, Christopher Mansour wrote:
->
-> Hello all,
->
-> I was wondering if I can use the PowerTop tool in order to observe the po=
-wer consumption of a thread. I am doing some experiments which would run on=
- 7 threads at the same
-> time, I need to know the power consumption of each thread. Is this feasib=
-le using the power top tool and how. I would appreciate your help and feedb=
-ack.
+Fix
+cpu/cpu.cpp: In function =E2=80=98void report_display_cpu_cstates()=E2=80=
+=99:
+cpu/cpu.cpp:616:28: warning: =E2=80=98_core=E2=80=99 may be used uninitiali=
+zed in this function [-Wmaybe-uninitialized]
+cpu/cpu.cpp: In function =E2=80=98void report_display_cpu_pstates()=E2=80=
+=99:
+cpu/cpu.cpp:797:27: warning: =E2=80=98_core=E2=80=99 may be used uninitiali=
+zed in this function [-Wmaybe-uninitialized]
+---
+ src/cpu/cpu.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Powertop, with its internal power model properly trained on the hardware in=
- question, will attribute power consumption to individual processes.
+diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+index 37cc409..d360f2f 100644
+--- a/src/cpu/cpu.cpp
++++ b/src/cpu/cpu.cpp
+@@ -428,7 +428,7 @@ void report_display_cpu_cstates(void)
+ 	char buffer[512], buffer2[512], tmp_num[50];
+ 	unsigned int package, core, cpu;
+ 	int line, cstates_num, title=3D0, core_num=3D0;
+-	class abstract_cpu *_package, * _core, * _cpu;
++	class abstract_cpu *_package, *_core =3D NULL, * _cpu;
+ 	const char* core_type =3D NULL;
+ =
 
-This is not an exact science; the machine learning model needs a whole bunc=
-h of samples to learn, and the power attribution logic is slightly rudiment=
-ary,
-but it's also not unreasonable at the same time.
-For example a thread gets accounted for the (modelled) CPU power proportion=
-al to the time it consumes, but also for the power of the audio chip if its=
- playing audio
-and if you have the right kernel patches, even for the IO it does.
+ 	cstates_num =3D get_cstates_num();
+@@ -608,7 +608,7 @@ void report_display_cpu_cstates(void)
+ 		/* Report Output */
+ 		if(core_num > 0)
+ 			title=3Dtitle/core_num;
+-		else if( _core->children.size() > 0)
++		else if(_core && _core->children.size() > 0)
+ 			title=3Dtitle/_core->children.size();
+ =
+
+ 		init_pkg_table_attr(&std_table_css, pkg_tbl_size.rows,  pkg_tbl_size.col=
+s);
+@@ -630,7 +630,7 @@ void report_display_cpu_pstates(void)
+ 	char buffer[512], buffer2[512], tmp_num[50];
+ 	unsigned int package, core, cpu;
+ 	int line, title=3D0;
+-	class abstract_cpu *_package, * _core, * _cpu;
++	class abstract_cpu *_package, *_core =3D NULL, * _cpu;
+ 	unsigned int i, pstates_num;
+ 	const char* core_type =3D NULL;
+ =
+
+@@ -794,7 +794,7 @@ void report_display_cpu_pstates(void)
+ 		}
+ 		init_pkg_table_attr(&std_table_css, pkg_tbl_size.rows, pkg_tbl_size.cols=
+);
+ 		report.add_table(pkg_data, &std_table_css);
+-		if(!_core->can_collapse()){
++		if(_core && !_core->can_collapse()){
+ 			title=3Dpstates_num+2;
+ 			init_core_table_attr(&std_table_css, title,
+ 				core_tbl_size.rows, core_tbl_size.cols);
+-- =
+
+1.7.11.7
 
 
-
---===============5705992003754973792==--
+--===============5384931628366878017==--
 
