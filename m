@@ -1,100 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============6213446144475579317=="
+Content-Type: multipart/mixed; boundary="===============8921888649914149645=="
 MIME-Version: 1.0
-From: Marc MERLIN <marc_powertop at merlins.org>
-Subject: [Powertop] Stilll seeing bogus wattage reported to USB devices
-Date: Thu, 30 Jan 2014 10:23:45 -0800
-Message-ID: <20140130182345.GA26750@merlins.org>
+From: Joerg Mayer <jmpt at loplof.de>
+Subject: [Powertop] Update .gitignore
+Date: Tue, 10 Jun 2014 09:56:52 +0200
+Message-ID: <20140610075652.GC7132@rhrk.uni-kl.de>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6213446144475579317==
+--===============8921888649914149645==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-With powertop 2.5, see these 3 report taken a minute apart with no
-change of load.
-All I did was remove the yubikey and put it back in, and unload wlan0
 
-
-
-> Yubikey was showing 6W, so I removed it. that didn't change the discharge=
- rate:
-
-The battery reports a discharge rate of 19.9 W
-The estimated remaining time is 3 hours, 23 minutes
-
-Summary: 1196.2 wakeups/second,  74.9 GPU ops/seconds, 0.0 VFS ops/sec and =
-16.6% CPU use
-
-Power est.              Usage       Events/s    Category       Description
-  10.7 W     48.4 pkts/s                Device         Network interface: w=
-lan0 (iwlwifi)
-  2.39 W     57.1%                      Device         Display backlight
-  2.39 W     17.3%                      Device         Display backlight
-  395 mW      8.5 ms/s     249.8        Process        /usr/local/opt/googl=
-e/chrome-beta/chrome
-  363 mW      6.4 ms/s     168.0        Process        /usr/local/opt/googl=
-e/chrome-beta/chrome
-  226 mW      5.7 ms/s     155.7        Timer          hrtimer_wakeup
-
-
-
-> So I put the yubikey back and and unloaded wlan0 since it was said to
-> take 10W (I knew that was false).
-No real change either (little drop from removing wireless, but not 10W)
-
-The battery reports a discharge rate of 17.8 W
-The estimated remaining time is 3 hours, 43 minutes
-
-Summary: 1155.3 wakeups/second,  81.8 GPU ops/seconds, 0.0 VFS ops/sec and =
-7.9% CPU use
-
-Power est.              Usage       Events/s    Category       Description
-  5.90 W    100.0%                      Device         USB device: Yubico =
-
-  3.15 W     57.1%                      Device         Display backlight
-  3.15 W     17.3%                      Device         Display backlight
-  353 mW      3.7 ms/s     170.1        Process        /usr/local/opt/googl=
-e/chrome-beta/chrome
-  340 mW     13.0 ms/s     252.8        Process        /usr/local/opt/googl=
-e/chrome-beta/chrome
-  320 mW      6.1 ms/s     238.4        Timer          hrtimer_wakeup
-
-
-> Yubikye is said to take 6W again, really? I know that's a lie. I removed
-and power went up 0.4W (normal variance unrelated to yubikey).
-
-The battery reports a discharge rate of 18.2 W
-The estimated remaining time is 3 hours, 38 minutes
-
-Summary: 1284.1 wakeups/second,  36.2 GPU ops/seconds, 0.0 VFS ops/sec and
-
-Power est.              Usage       Events/s    Category       Description
-  3.15 W     57.1%                      Device         Display backlight
-  3.15 W     17.3%                      Device         Display backlight
-  426 mW     20.8 ms/s     166.8        Process        /usr/bin/enlightenm
-  343 mW     11.8 ms/s     236.3        Process        /usr/local/opt/googl=
-e/chrome-beta/chrome
-  301 mW      6.3 ms/s     207.0        Timer          hrtimer_wakeup
-  168 mW      2.8 ms/s     115.6        Interrupt      PS/2 Touchpad / Keyb=
-oard / Mouse
-
-
-Is anyone closer to fixing this bug? It's impossible to get real battery
-usage and due tuning with it present.
-
-Thanks
-Marc
 -- =
 
-"A mouse is a device used to point at the xterm you want to type in" - A.S.=
-R.
-Microsoft is to operating systems ....
-                                      .... what McDonalds is to gourmet coo=
-king
-Home page: http://marc.merlins.org/                         | PGP 1024R/763=
-BE901
+Joerg Mayer                                           <jmayer(a)loplof.de>
+We are stuck with technology when what we really want is just stuff that
+works. Some say that should read Microsoft instead of technology.
 
---===============6213446144475579317==--
+--===============8921888649914149645==
+Content-Type: text/x-diff
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="0001-Ignore-src-cpu-rapl-.deps.patch"
+
+PkZyb20gMzgxYzk1MWIyMjg3ZGU5MGJmMzMwOGI5YmRjYzM3MGEzZDQzNGI2NyBNb24gU2VwIDE3
+IDAwOjAwOjAwIDIwMDEKRnJvbTogSm9lcmcgTWF5ZXIgPGptcHRAbG9wbG9mLmRlPgpEYXRlOiBU
+dWUsIDEwIEp1biAyMDE0IDA5OjUzOjI0ICswMjAwClN1YmplY3Q6IFtQQVRDSF0gSWdub3JlIHNy
+Yy9jcHUvcmFwbC8uZGVwcy8KClNpZ25lZC1vZmYtYnk6IEpvZXJnIE1heWVyIDxqbXB0QGxvcGxv
+Zi5kZT4KLS0tCiAuZ2l0aWdub3JlIHwgMSArCiAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24o
+KykKCmRpZmYgLS1naXQgYS8uZ2l0aWdub3JlIGIvLmdpdGlnbm9yZQppbmRleCAzNWQ0MWMyLi44
+Y2ExZTIyIDEwMDY0NAotLS0gYS8uZ2l0aWdub3JlCisrKyBiLy5naXRpZ25vcmUKQEAgLTQ0LDYg
+KzQ0LDcgQEAgc3JjLy5kZXBzLwogc3JjL01ha2VmaWxlCiBzcmMvY2FsaWJyYXRlLy5kZXBzLwog
+c3JjL2NwdS8uZGVwcy8KK3NyYy9jcHUvcmFwbC8uZGVwcy8KIHNyYy9kZXZpY2VzLy5kZXBzLwog
+c3JjL21lYXN1cmVtZW50Ly5kZXBzLwogc3JjL3BhcmFtZXRlcnMvLmRlcHMvCi0tIAoxLjguNC41
+Cgo=
+
+--===============8921888649914149645==--
 
