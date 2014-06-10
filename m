@@ -1,102 +1,142 @@
-Content-Type: multipart/mixed; boundary="===============0099338943625143796=="
+Content-Type: multipart/mixed; boundary="===============3548616726612259122=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Does PowerTop support MHz numbers for Intel Xeon L5410
- CPUs ?
-Date: Thu, 03 Jul 2014 22:59:50 +0900
-Message-ID: <20140703135949.GA993@swordfish>
-In-Reply-To: 53B54C0B.2000500@nfon.com
+From: Joerg Mayer <jmpt at loplof.de>
+Subject: Re: [Powertop] Fix out of tree builds [Was: PowerTOP v2.6.1 released]
+Date: Tue, 10 Jun 2014 09:41:56 +0200
+Message-ID: <20140610074156.GB7132@rhrk.uni-kl.de>
+In-Reply-To: 20140610072944.GA7132@rhrk.uni-kl.de
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0099338943625143796==
+--===============3548616726612259122==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (07/03/14 14:26), Valentin Hoebel wrote:
-> Hello,
-> =
+[Resend, this time with the script inlined as Intel's virus checker rejected
+the .sh attachment]
 
-> I have been using PowerTop for some time now and would like to thank all
-> contributors for their work, especially Intel!
-> =
+Hello Alexandra,
 
-> However, when using PowerTop on Debian 7 (Kernel 3.2, PowerTop package
-> 2.0-0.3) and navigating to "Frequency stats", it does not show the MHz
-> numbers. Instead, it shows me the following:
+On Mon, Jun 09, 2014 at 04:14:50PM -0700, Alexandra Yates wrote:
+> > On Wed, Jun 04, 2014 at 02:20:18PM -0700, Alexandra Yates wrote:
+> >> Unfortunately the patches you sent don't fix the issue.  Here is how to
+> >> reproduced the issue:
+...
+> >> The error still points that /bin/bash: ./csstoh.sh: No such file or
+> >> directory
+...
+> I still get the error, even after following your steps.  You may have
+> other commits I don't.
 
-Hello,
-am not really familiar with debian versioning, but if "2.0" means
-upstream release v2.0, then you use a really-really outdated powertop
-(several years). in that case I'd recommend to switch to recent version
-(2.6 IIRC).
+I don't have any other patches applied (the only differences result from
+my patches and some regenerated files):
 
-	-ss
+jmayer(a)egg:~/work/power/powertop/git(master)> git status --ignored
+#       modified:   po/ca.po           <=3D=3D=3D=3D Automagically regenera=
+ted
+#       modified:   po/cs_CZ.po        <=3D=3D=3D=3D (only timestamps and
+#       modified:   po/de_DE.po        <=3D=3D=3D=3D line numbers differ. T=
+he
+#       modified:   po/en_GB.po        <=3D=3D=3D=3D differing line numbers
+#       modified:   po/en_US.po        <=3D=3D=3D=3D indicate that these fi=
+les
+#       modified:   po/es_ES.po        <=3D=3D=3D=3D should be regenerated =
+before
+#       modified:   po/hu_HU.po        <=3D=3D=3D=3D doing a distribution a=
+s well)
+#       modified:   po/id_ID.po
+#       modified:   po/nl_NL.po
+#       modified:   po/powertop.pot
+#       modified:   po/zh_TW.po
+#       modified:   src/Makefile.am    <=3D=3D=3D=3D My changes
 
->           CPU 0
-> Idle      138%
-> =
+And git diff for src/Makefile.am only shows my two changes.
 
->           CPU 2
-> Idle      111,7%
-> =
+>From the top of your git directory please run
+grep -r \\./csstoh.sh .
+If something is found, delete it. Even better (assuming you have no extra
+directories in your source tree that are not checked in and not worth
+keeping): Please run "git clean -dfX" from the top of your git tree.
+Verify that the changes are applied ("git diff src/Makefile.am").
+Then rebuild.
 
->           CPU 1
-> Idle      111,7%
-> =
+I'm very sure that my tree is clean as I do development in branches:
+jmayer(a)egg:~/work/power/powertop/git(master)> git branch
+* master
+  out-of-tree-build-fix
+  tuning-packaging-fix
+I tested my patches on top of master to make sure I work on a pristine
+source tree.
 
->           CPU 3
-> Idle      111,7%
-> =
+I'm a) quite sure it's something in your setup/workflow and b) quite
+determined to find out what it going wrong there if you are willing to
+let me :)
 
-> Is the CPU model Intel Xeon L5410 simply not supported or is there no way=
- to
-> read out the frequencies?
-> =
+OK, I've written a small script that tries to insure that things are build
+correctly - please try (note that it will run "git clean -dfX").
 
-> Browsing the source code, I did not stumple accross this CPU model.
-> =
+Thanks
+   J=C3=B6rg
+-- =
 
-> Thanks in advance.
-> =
+Joerg Mayer                                           <jmayer(a)loplof.de>
+We are stuck with technology when what we really want is just stuff that
+works. Some say that should read Microsoft instead of technology.
 
-> Best regards
-> Valentin
-> =
 
-> =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D build-release.sh =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+#!/bin/sh
 
-> -- =
+# Terminate script on error
+set -e
 
-> Mit freundlichen Gr=C3=BC=C3=9Fen
-> =
+if [ ! -d .git ]; then
+  echo
+  echo "Please run from top of git source tree"
+  echo
+  exit 1
+fi
 
-> Valentin H=C3=B6bel
-> Cloud Architect
-> =
+echo
+echo "=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D Cleaning up source tree =3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D"
+echo
+git clean -dfX
 
-> NFON AG
-> Leonrodstra=C3=9Fe 68
-> D-80636 M=C3=BCnchen
-> =
+echo
+echo "=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D List of modified files =3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D"
+echo
+git status --ignored
 
-> Telefon +49 89 45300-407
-> valentin.hoebel(a)nfon.com
-> www.nfon.com
-> =
+echo
+echo "=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D Setting up build environmnet =3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D"
+echo
+./autogen.sh >/dev/null
+./configure >/dev/null
 
-> Support-Hotline der NFON AG
-> Telefon 0800 - 6366 555
-> =
+echo
+echo "=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D Packaging source =3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D"
+echo
+make dist >/dev/null
 
-> Die gesetzlichen Pflichtangaben finden Sie unter
-> https://www.nfon.net/pflichtangaben
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
+echo
+echo "=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D Checking packaged source =3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D"
+echo
+make distcheck >/dev/null
 
---===============0099338943625143796==--
+echo
+echo " All good for release"
+echo
+
+exit 0
+
+
+--===============3548616726612259122==--
 
