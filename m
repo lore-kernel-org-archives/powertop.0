@@ -1,64 +1,90 @@
-Content-Type: multipart/mixed; boundary="===============4729650204496926736=="
+Content-Type: multipart/mixed; boundary="===============7426662194465651065=="
 MIME-Version: 1.0
-From: Prigent, Christophe <christophe.prigent at intel.com>
-Subject: Re: [Powertop] [PATCH 0/3] Fix all warnings
-Date: Tue, 17 Jun 2014 15:26:06 +0000
-Message-ID: <AC81B6AA7676DD448250A85A459C1F4142B29A61@IRSMSX101.ger.corp.intel.com>
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [PATCH 3/3] fix-warnings: Ignoring return value
+Date: Fri, 13 Jun 2014 15:18:29 -0700
+Message-ID: <1402697910-29154-4-git-send-email-alexandra.yates@linux.intel.com>
 In-Reply-To: 1402697910-29154-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4729650204496926736==
+--===============7426662194465651065==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-I confirm there are no warning when building PowerTop with the 3 patches ap=
-plied.
-Tested with PowerTOP versionv2.6.1 commit dfc2ba97ffba44b51379fd3617a4f6fea=
-d40037d
+Added error handling to write() calls.
 
------Original Message-----
-From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of Alexan=
-dra Yates
-Sent: Saturday, June 14, 2014 12:18 AM
-To: powertop(a)lists.01.org
-Subject: [Powertop] [PATCH 0/3] Fix all warnings
+Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+---
+ src/measurement/extech.cpp |   13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-This patch fixes all warning encountered when building PowerTOP. =
+diff --git a/src/measurement/extech.cpp b/src/measurement/extech.cpp
+index 4e8bf8a..e014a5d 100644
+--- a/src/measurement/extech.cpp
++++ b/src/measurement/extech.cpp
+@@ -287,13 +287,14 @@ extech_power_meter::extech_power_meter(const char *ex=
+tech_name)
+ void extech_power_meter::measure(void)
+ {
+ 	/* trigger the extech to send data */
+-	write(fd, " ", 1);
++	if(write(fd, " ", 1) =3D=3D -1)
++		 printf("Error: %s\n", strerror(errno));
+ =
 
+ 	rate =3D extech_read(fd);
+ =
 
-Alexandra Yates (3):
-  fix-warnings: Ignoring return value of system()
-  fix-warnings: Ignoring return value
-  fix-warnings: Ignoring return value
+ }
+ =
 
- src/calibrate/calibrate.cpp |   16 +++++++++++-----
- src/measurement/extech.cpp  |   13 +++++++------
- src/tuning/bluetooth.cpp    |    6 ++++--
- 3 files changed, 22 insertions(+), 13 deletions(-)
+-void extech_power_meter::sample(void) =
+
++void extech_power_meter::sample(void)
+ {
+ 	ssize_t ret;
+ 	struct timespec tv;
+@@ -306,16 +307,16 @@ void extech_power_meter::sample(void)
+ 		ret =3D write(fd, " ", 1);
+ 		if (ret < 0)
+ 			continue;
+-		=
+
++
+ 		sum +=3D extech_read(fd);
+ 		samples++;
+-	=
+
++
+ 	}
+ }
+ =
+
+ extern "C"
+ {
+-	void* thread_proc(void *arg) =
+
++	void* thread_proc(void *arg)
+ 	{
+ 		class extech_power_meter *parent;
+ 		parent =3D (class extech_power_meter*)arg;
+@@ -339,7 +340,7 @@ void extech_power_meter::start_measurement(void)
+ {
+ 	end_thread =3D 0;
+ 	sum =3D samples =3D 0;
+-	=
+
++
+ 	if (pthread_create(&thread, NULL, thread_proc, this))
+ 		fprintf(stderr, "ERROR: extech measurement thread creation failed\n");
+ =
 
 -- =
 
 1.7.9.5
 
-_______________________________________________
-PowerTop mailing list
-PowerTop(a)lists.01.org
-https://lists.01.org/mailman/listinfo/powertop
----------------------------------------------------------------------
-Intel Corporation SAS (French simplified joint stock company)
-Registered headquarters: "Les Montalets"- 2, rue de Paris, =
 
-92196 Meudon Cedex, France
-Registration Number:  302 456 199 R.C.S. NANTERRE
-Capital: 4,572,000 Euros
-
-This e-mail and any attachments may contain confidential material for
-the sole use of the intended recipient(s). Any review or distribution
-by others is strictly prohibited. If you are not the intended
-recipient, please contact the sender and delete all copies.
-
-
---===============4729650204496926736==--
+--===============7426662194465651065==--
 
