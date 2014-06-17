@@ -1,87 +1,64 @@
-Content-Type: multipart/mixed; boundary="===============0216392191299159557=="
+Content-Type: multipart/mixed; boundary="===============4729650204496926736=="
 MIME-Version: 1.0
-From: corrupt <corrupt at gmail.com>
-Subject: Re: [Powertop] Any way to show HH:MM for time left instead of just
- minutes?
-Date: Sat, 12 May 2012 19:07:58 -0700
-Message-ID: <CAEoL4DPSsmxeCL6ubn7ao9_+22QsNDfSqkpJGvthK8mFwKfvyA@mail.gmail.com>
-In-Reply-To: CABsxX9LquOEQPs3uPPA8dB16jasfc-=MUFCk9z3rNrb-xXVBQw@mail.gmail.com
+From: Prigent, Christophe <christophe.prigent at intel.com>
+Subject: Re: [Powertop] [PATCH 0/3] Fix all warnings
+Date: Tue, 17 Jun 2014 15:26:06 +0000
+Message-ID: <AC81B6AA7676DD448250A85A459C1F4142B29A61@IRSMSX101.ger.corp.intel.com>
+In-Reply-To: 1402697910-29154-1-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0216392191299159557==
+--===============4729650204496926736==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-You're absolutely right.
-I don't know C++ very well, but I was able to make an amateur patch that
-does this.
+I confirm there are no warning when building PowerTop with the 3 patches ap=
+plied.
+Tested with PowerTOP versionv2.6.1 commit dfc2ba97ffba44b51379fd3617a4f6fea=
+d40037d
 
-If anyone wants the patch, here it is (it converts time left to HH:MM on
-the display): http://pastebin.com/raw.php?i=3DDf2ttb9e
+-----Original Message-----
+From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of Alexan=
+dra Yates
+Sent: Saturday, June 14, 2014 12:18 AM
+To: powertop(a)lists.01.org
+Subject: [Powertop] [PATCH 0/3] Fix all warnings
 
-On Sat, May 12, 2012 at 6:03 PM, Kok, Auke-jan H
-<auke-jan.h.kok(a)intel.com>wrote:
+This patch fixes all warning encountered when building PowerTOP. =
 
->
->
-> On Sat, May 12, 2012 at 5:58 PM, corrupt <corrupt(a)gmail.com> wrote:
->
->> I just upgraded to Powertop 2.0 and I'm frankly I'm disappointed with the
->> new interface.
->>
->> It shows how many minutes there is left on my battery (267 minutes),
->> which is kind of odd that it's not in HH:MM format like the previous
->> versions.
->>
->> Any way to change this?
->>
->
-> You could write a patch that divides the amount of minutes by 60, and
-> changes the display!
->
-> Cheers,
->
-> Auke
->
->
->
 
---===============0216392191299159557==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+Alexandra Yates (3):
+  fix-warnings: Ignoring return value of system()
+  fix-warnings: Ignoring return value
+  fix-warnings: Ignoring return value
 
-WW91JiMzOTtyZSBhYnNvbHV0ZWx5IHJpZ2h0LiCgPGRpdj5JIGRvbiYjMzk7dCBrbm93IEMrKyB2
-ZXJ5IHdlbGwsIGJ1dCBJIHdhcyBhYmxlIHRvIG1ha2UgYW6gYW1hdGV1cqBwYXRjaCB0aGF0IGRv
-ZXMgdGhpcy48ZGl2Pjxicj48L2Rpdj48ZGl2PklmIGFueW9uZSB3YW50cyB0aGUgcGF0Y2gsIGhl
-cmUgaXQgaXMgKGl0IGNvbnZlcnRzIHRpbWUgbGVmdCB0byBISDpNTSBvbiB0aGUgZGlzcGxheSk6
-oDxhIGhyZWY9Imh0dHA6Ly9wYXN0ZWJpbi5jb20vcmF3LnBocD9pPURmMnR0YjllIj5odHRwOi8v
-cGFzdGViaW4uY29tL3Jhdy5waHA/aT1EZjJ0dGI5ZTwvYT48YnI+Cgo8YnI+PGRpdiBjbGFzcz0i
-Z21haWxfcXVvdGUiPk9uIFNhdCwgTWF5IDEyLCAyMDEyIGF0IDY6MDMgUE0sIEtvaywgQXVrZS1q
-YW4gSCA8c3BhbiBkaXI9Imx0ciI+Jmx0OzxhIGhyZWY9Im1haWx0bzphdWtlLWphbi5oLmtva0Bp
-bnRlbC5jb20iIHRhcmdldD0iX2JsYW5rIj5hdWtlLWphbi5oLmtva0BpbnRlbC5jb208L2E+Jmd0
-Ozwvc3Bhbj4gd3JvdGU6PGJyPjxibG9ja3F1b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9
-Im1hcmdpbjowIDAgMCAuOGV4O2JvcmRlci1sZWZ0OjFweCAjY2NjIHNvbGlkO3BhZGRpbmctbGVm
-dDoxZXgiPgoKPGJyPjxicj48ZGl2IGNsYXNzPSJnbWFpbF9xdW90ZSI+PGRpdj48ZGl2IGNsYXNz
-PSJoNSI+T24gU2F0LCBNYXkgMTIsIDIwMTIgYXQgNTo1OCBQTSwgY29ycnVwdCA8c3BhbiBkaXI9
-Imx0ciI+Jmx0OzxhIGhyZWY9Im1haWx0bzpjb3JydXB0QGdtYWlsLmNvbSIgdGFyZ2V0PSJfYmxh
-bmsiPmNvcnJ1cHRAZ21haWwuY29tPC9hPiZndDs8L3NwYW4+IHdyb3RlOjxicj48YmxvY2txdW90
-ZSBjbGFzcz0iZ21haWxfcXVvdGUiIHN0eWxlPSJtYXJnaW46MCAwIDAgLjhleDtib3JkZXItbGVm
-dDoxcHggI2NjYyBzb2xpZDtwYWRkaW5nLWxlZnQ6MWV4Ij4KCgo8ZGl2PkkganVzdCB1cGdyYWRl
-ZCB0byBQb3dlcnRvcCAyLjAgYW5kIEkmIzM5O20gZnJhbmtseSBJJiMzOTttIGRpc2FwcG9pbnRl
-ZCB3aXRoIHRoZSBuZXcgaW50ZXJmYWNlLjwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+SXQgc2hv
-d3MgaG93IG1hbnkgbWludXRlcyB0aGVyZSBpcyBsZWZ0IG9uIG15IGJhdHRlcnkgKDI2NyBtaW51
-dGVzKSwgd2hpY2ggaXMga2luZCBvZiBvZGQgdGhhdCBpdCYjMzk7cyBub3QgaW4gSEg6TU0gZm9y
-bWF0IGxpa2UgdGhlIHByZXZpb3VzIHZlcnNpb25zLjwvZGl2PgoKCgoKPGRpdj48YnI+PC9kaXY+
-PGRpdj5Bbnkgd2F5IHRvIGNoYW5nZSB0aGlzPzwvZGl2PjwvYmxvY2txdW90ZT48ZGl2PqA8L2Rp
-dj48L2Rpdj48L2Rpdj48ZGl2PllvdSBjb3VsZCB3cml0ZSBhIHBhdGNoIHRoYXQgZGl2aWRlcyB0
-aGUgYW1vdW50IG9mIG1pbnV0ZXMgYnkgNjAsIGFuZCBjaGFuZ2VzIHRoZSBkaXNwbGF5ITwvZGl2
-PjxkaXY+PGJyPjwvZGl2PjxkaXY+Q2hlZXJzLDwvZGl2PgoKPGRpdj48YnI+PC9kaXY+CjxkaXY+
-QXVrZTwvZGl2PjxkaXY+PGJyPjwvZGl2PjwvZGl2Pjxicj4KPC9ibG9ja3F1b3RlPjwvZGl2Pjxi
-cj48L2Rpdj48L2Rpdj4K
+ src/calibrate/calibrate.cpp |   16 +++++++++++-----
+ src/measurement/extech.cpp  |   13 +++++++------
+ src/tuning/bluetooth.cpp    |    6 ++++--
+ 3 files changed, 22 insertions(+), 13 deletions(-)
 
---===============0216392191299159557==--
+-- =
+
+1.7.9.5
+
+_______________________________________________
+PowerTop mailing list
+PowerTop(a)lists.01.org
+https://lists.01.org/mailman/listinfo/powertop
+---------------------------------------------------------------------
+Intel Corporation SAS (French simplified joint stock company)
+Registered headquarters: "Les Montalets"- 2, rue de Paris, =
+
+92196 Meudon Cedex, France
+Registration Number:  302 456 199 R.C.S. NANTERRE
+Capital: 4,572,000 Euros
+
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
+
+
+--===============4729650204496926736==--
 
