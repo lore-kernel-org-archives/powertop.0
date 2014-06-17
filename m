@@ -1,38 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============5009476028591194172=="
+Content-Type: multipart/mixed; boundary="===============7870741409584942901=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: [Powertop] [Announce] PowerTOP 2014 Release Schedule
-Date: Fri, 14 Feb 2014 11:32:51 -0800
-Message-ID: <64110.10.24.1.192.1392406371.squirrel@linux.intel.com>
+From: Igor Zhbanov <i.zhbanov at samsung.com>
+Subject: Re: [Powertop] [PATCH] Bug-fix: for html & csv value for CPU
+ Information
+Date: Tue, 17 Jun 2014 12:50:03 +0400
+Message-ID: <53A0013B.4060501@samsung.com>
+In-Reply-To: 1402946904-20472-2-git-send-email-alexandra.yates@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5009476028591194172==
+--===============7870741409584942901==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Schedule 2014
-Note: Dates are subject to change.  If changes are needed, they will be
-announced via mailing list and updated here.
+Hi Alexandra,
 
-March 3st (string freeze)
-March 14th (code freeze v2.6)
-March 27th (release v2.6)
-March 31nd (community meeting about v2.7)
+Alexandra Yates wrote:
+> Added cast from long-int to string to correct printout for
+> "CPU Information" field on html and csv report.
+>
+> Signed-off-by: Alexandra Yates <alexandra.yates(a)linux.intel.com>
+> ---
+>   src/report/report.cpp |    4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/src/report/report.cpp b/src/report/report.cpp
+> index 9e94607..6eb2b63 100644
+> --- a/src/report/report.cpp
+> +++ b/src/report/report.cpp
+> @@ -136,7 +136,9 @@ static void system_info(void)
+>   	system_data[5].append(str.c_str());
+>   	str =3D cpu_model();
+>   	system_data[6]=3D__("CPU Information");
+> -	system_data[7]=3D sysconf(_SC_NPROCESSORS_ONLN);
+> +	stringstream n_proc;;
+Double semicolon.
+> +	n_proc << sysconf(_SC_NPROCESSORS_ONLN);
+> +	system_data[7]=3D n_proc.str();
+>   	system_data[7].append(str.c_str());
+>   =
 
-Jul 14th (string freeze)
-Jul 25th (code freeze v2.8)
-Aug 8th (release v2.8)
-Aug 11th (community meeting about v2.9)
+>   	str =3D read_sysfs_string("/etc/system-release");
 
-Nov 3rd (string freeze)
-Nov 14th (code freeze v2.9)
-Nov 21th (release v2.9)
-Dec 2nd (community meeting about v2.10)
+-- =
 
-Thank you,
-Alexandra.
+Best regards,
+Igor Zhbanov,
+Expert Software Engineer,
+phone: +7 (495) 797 25 00 ext 3981
+e-mail: i.zhbanov(a)samsung.com
 
---===============5009476028591194172==--
+B2B Solution group, Moscow R&D center, Samsung Electronics
+12 Dvintsev street, building 1
+127018, Moscow, Russian Federation
+
+
+--===============7870741409584942901==--
 
