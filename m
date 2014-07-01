@@ -1,29 +1,105 @@
-Content-Type: multipart/mixed; boundary="===============5783737743029603267=="
+Content-Type: multipart/mixed; boundary="===============4126920691447605410=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] segmentation fault when shutting
-Date: Wed, 14 May 2014 13:16:53 -0700
-Message-ID: <5373CF35.4000005@linux.intel.com>
-In-Reply-To: 4628F0C61321354285DF2950999754456DF9880F@ORSMSX114.amr.corp.intel.com
+From: Amit Kucheria <amit.kucheria at linaro.org>
+Subject: Re: [Powertop] [PATCH POWERTOP] Fix various resource leaks
+Date: Tue, 01 Jul 2014 17:54:15 +0530
+Message-ID: <CAP245DVj8JEWx2oDUvoUBB2+jTKkP9P8CaUXmUbPcfHSUZ9ikg@mail.gmail.com>
+In-Reply-To: CAHu9=sPEBKA2odDPSsopbnPMrni5xm49weEJzz+-A29tn6Ksyg@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5783737743029603267==
+--===============4126920691447605410==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 5/14/2014 12:26 PM, Kalowsky, Daniel wrote:
-> Not all patches are at fault here so reverting the entire series seems sh=
-ort sighted.  Even the patch in question isn't causing issues on all platfo=
-rms.
+Mohammad,
 
-reverting is I think the right thing.
-Lets revert, and then let these patches go through the normal mailing list =
-review cycle
-and then they can easily go back in ;-)
+This fix should go upstream. cc'ing the powertop list.
 
+Regards,
+Amit
 
+On Thu, Jun 26, 2014 at 12:42 PM, Mohammad Merajul Islam Molla
+<meraj.enigma(a)gmail.com> wrote:
+> Fixes some resource leaks detected by valgrind and coverity scan.
+>
+>
+> diff --git a/src/devices/ahci.cpp b/src/devices/ahci.cpp
+> index ac06460..7f704b6 100644
+> --- a/src/devices/ahci.cpp
+> +++ b/src/devices/ahci.cpp
+> @@ -64,8 +64,10 @@ static string disk_name(char *path, char *target,
+> char *shortname)
+>                 sprintf(line, "%s/%s/model", pathname, dirent->d_name);
+>                 file =3D fopen(line, "r");
+>                 if (file) {
+> -                       if (fgets(line, 4096, file) =3D=3D NULL)
+> +                       if (fgets(line, 4096, file) =3D=3D NULL) {
+> +                               fclose(file);
+>                                 break;
+> +                       }
+>                         fclose(file);
+>                         c =3D strchr(line, '\n');
+>                         if (c)
+> diff --git a/src/devices/devfreq.cpp b/src/devices/devfreq.cpp
+> index e16951c..23c4b0c 100644
+> --- a/src/devices/devfreq.cpp
+> +++ b/src/devices/devfreq.cpp
+> @@ -238,6 +238,7 @@ void create_all_devfreq_devices(void)
+>
+>         callback fn =3D &devfreq_dev_callback;
+>         process_directory(p.c_str(), fn);
+> +       closedir(dir);
+>  }
+>
+>  void initialize_devfreq(void)
+> diff --git a/src/perf/perf_bundle.cpp b/src/perf/perf_bundle.cpp
+> index b0e982b..cf1ae11 100644
+> --- a/src/perf/perf_bundle.cpp
+> +++ b/src/perf/perf_bundle.cpp
+> @@ -142,8 +142,10 @@ static void parse_event_format(const char *event_nam=
+e)
+>
+>         buf =3D read_file(file);
+>         free(file);
+> -       if (!buf)
+> +       if (!buf) {
+> +               free(name);
+>                 return;
+> +       }
+>
+>         pevent_parse_event(perf_event::pevent, buf, strlen(buf), sys);
+>         free(name);
+> diff --git a/src/tuning/bluetooth.cpp b/src/tuning/bluetooth.cpp
+> index e0bdf12..5100a8a 100644
+> --- a/src/tuning/bluetooth.cpp
+> +++ b/src/tuning/bluetooth.cpp
+> @@ -144,8 +144,10 @@ int bt_tunable::good_bad(void)
+>                 if (file) {
+>                         char line[2048];
+>                         /* first line is standard header */
+> -                       if (fgets(line, 2047, file) =3D=3D NULL)
+> +                       if (fgets(line, 2047, file) =3D=3D NULL) {
+> +                               pclose(file);
+>                                 goto out;
+> +                       }
+>                         memset(line, 0, 2048);
+>                         if (fgets(line, 2047, file) =3D=3D NULL) {
+>                                 result =3D last_check_result =3D TUNE_GOO=
+D;
+>
+>
+>
+> --
+> Thanks,
+> -Meraj
+>
+> _______________________________________________
+> linaro-dev mailing list
+> linaro-dev(a)lists.linaro.org
+> http://lists.linaro.org/mailman/listinfo/linaro-dev
+>
 
---===============5783737743029603267==--
+--===============4126920691447605410==--
 
