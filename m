@@ -1,92 +1,75 @@
-Content-Type: multipart/mixed; boundary="===============9192827886378705604=="
+Content-Type: multipart/mixed; boundary="===============7469866973069064836=="
 MIME-Version: 1.0
-From: Mukherjee, Adrip <adrip.mukherjee at intel.com>
-Subject: [Powertop] SAS document for Powertop 2.5
-Date: Sat, 28 Dec 2013 06:37:29 +0000
-Message-ID: <F9A26558D30ED241A8204F06F9947260258043A4@BGSMSX102.gar.corp.intel.com>
+From: Valentin Hoebel <valentin.hoebel at nfon.com>
+Subject: [Powertop] Does PowerTop support MHz numbers for Intel Xeon L5410
+ CPUs ?
+Date: Thu, 03 Jul 2014 14:26:51 +0200
+Message-ID: <53B54C0B.2000500@nfon.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============9192827886378705604==
+--===============7469866973069064836==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
-     Does anyone has the SAS document for the powertop tool? Currently I am=
- going through the implementation details and it will be helpful to have th=
-e spec to understand the design. Also few other queries which I came across:
-- how powertop retrieves the C state counters?
-- how to use the tuning option? In the GUI there is a separate tab for this=
- and I can see GOOD and BAD values associated with every entry. How to inte=
-rpret this information?
+Hello,
 
-regards
-Adrip
+I have been using PowerTop for some time now and would like to thank all =
+
+contributors for their work, especially Intel!
+
+However, when using PowerTop on Debian 7 (Kernel 3.2, PowerTop package =
+
+2.0-0.3) and navigating to "Frequency stats", it does not show the MHz =
+
+numbers. Instead, it shows me the following:
+
+           CPU 0
+Idle      138%
+
+           CPU 2
+Idle      111,7%
+
+           CPU 1
+Idle      111,7%
+
+           CPU 3
+Idle      111,7%
+
+Is the CPU model Intel Xeon L5410 simply not supported or is there no =
+
+way to read out the frequencies?
+
+Browsing the source code, I did not stumple accross this CPU model.
+
+Thanks in advance.
+
+Best regards
+Valentin
 
 
---===============9192827886378705604==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+-- =
 
-PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
-bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
-YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
-cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
-VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
-bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
-ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTQgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
-PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseTpDYWxp
-YnJpOwoJcGFub3NlLTE6MiAxNSA1IDIgMiAyIDQgMyAyIDQ7fQpAZm9udC1mYWNlCgl7Zm9udC1m
-YW1pbHk6Vml2YWxkaTsKCXBhbm9zZS0xOjMgMiA2IDIgNSA1IDYgOSA4IDQ7fQpAZm9udC1mYWNl
-Cgl7Zm9udC1mYW1pbHk6QW5kYWx1czsKCXBhbm9zZS0xOjIgMiA2IDMgNSA0IDUgMiAzIDQ7fQov
-KiBTdHlsZSBEZWZpbml0aW9ucyAqLwpwLk1zb05vcm1hbCwgbGkuTXNvTm9ybWFsLCBkaXYuTXNv
-Tm9ybWFsCgl7bWFyZ2luOjBpbjsKCW1hcmdpbi1ib3R0b206LjAwMDFwdDsKCWZvbnQtc2l6ZTox
-MS4wcHQ7Cglmb250LWZhbWlseToiQ2FsaWJyaSIsInNhbnMtc2VyaWYiO30KYTpsaW5rLCBzcGFu
-Lk1zb0h5cGVybGluawoJe21zby1zdHlsZS1wcmlvcml0eTo5OTsKCWNvbG9yOmJsdWU7Cgl0ZXh0
-LWRlY29yYXRpb246dW5kZXJsaW5lO30KYTp2aXNpdGVkLCBzcGFuLk1zb0h5cGVybGlua0ZvbGxv
-d2VkCgl7bXNvLXN0eWxlLXByaW9yaXR5Ojk5OwoJY29sb3I6cHVycGxlOwoJdGV4dC1kZWNvcmF0
-aW9uOnVuZGVybGluZTt9CnNwYW4uRW1haWxTdHlsZTE3Cgl7bXNvLXN0eWxlLXR5cGU6cGVyc29u
-YWwtY29tcG9zZTsKCWZvbnQtZmFtaWx5OiJBbmRhbHVzIiwic2VyaWYiOwoJY29sb3I6d2luZG93
-dGV4dDsKCWZvbnQtd2VpZ2h0Om5vcm1hbDsKCWZvbnQtc3R5bGU6bm9ybWFsO30KLk1zb0NocERl
-ZmF1bHQKCXttc28tc3R5bGUtdHlwZTpleHBvcnQtb25seTsKCWZvbnQtZmFtaWx5OiJDYWxpYnJp
-Iiwic2Fucy1zZXJpZiI7fQouTXNvUGFwRGVmYXVsdAoJe21zby1zdHlsZS10eXBlOmV4cG9ydC1v
-bmx5OwoJbXNvLW1hcmdpbi10b3AtYWx0OmF1dG87Cgltc28tbWFyZ2luLWJvdHRvbS1hbHQ6YXV0
-bzt9CkBwYWdlIFdvcmRTZWN0aW9uMQoJe3NpemU6OC41aW4gMTEuMGluOwoJbWFyZ2luOjEuMGlu
-IDEuMGluIDEuMGluIDEuMGluO30KZGl2LldvcmRTZWN0aW9uMQoJe3BhZ2U6V29yZFNlY3Rpb24x
-O30KLS0+PC9zdHlsZT48IS0tW2lmIGd0ZSBtc28gOV0+PHhtbD4KPG86c2hhcGVkZWZhdWx0cyB2
-OmV4dD0iZWRpdCIgc3BpZG1heD0iMTAyNiIgLz4KPC94bWw+PCFbZW5kaWZdLS0+PCEtLVtpZiBn
-dGUgbXNvIDldPjx4bWw+CjxvOnNoYXBlbGF5b3V0IHY6ZXh0PSJlZGl0Ij4KPG86aWRtYXAgdjpl
-eHQ9ImVkaXQiIGRhdGE9IjEiIC8+CjwvbzpzaGFwZWxheW91dD48L3htbD48IVtlbmRpZl0tLT4K
-PC9oZWFkPgo8Ym9keSBsYW5nPSJFTi1VUyIgbGluaz0iYmx1ZSIgdmxpbms9InB1cnBsZSI+Cjxk
-aXYgY2xhc3M9IldvcmRTZWN0aW9uMSI+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxl
-PSJmb250LXNpemU6MTIuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0FuZGFsdXMmcXVvdDssJnF1b3Q7
-c2VyaWYmcXVvdDsiPkhpLDxvOnA+PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1h
-bCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMi4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7QW5kYWx1
-cyZxdW90OywmcXVvdDtzZXJpZiZxdW90OyI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IERvZXMg
-YW55b25lIGhhcyB0aGUgU0FTIGRvY3VtZW50IGZvciB0aGUgcG93ZXJ0b3AgdG9vbD8gQ3VycmVu
-dGx5IEkgYW0gZ29pbmcgdGhyb3VnaCB0aGUgaW1wbGVtZW50YXRpb24gZGV0YWlscyBhbmQgaXQg
-d2lsbCBiZSBoZWxwZnVsIHRvIGhhdmUgdGhlIHNwZWMgdG8gdW5kZXJzdGFuZCB0aGUKIGRlc2ln
-bi4gQWxzbyBmZXcgb3RoZXIgcXVlcmllcyB3aGljaCBJIGNhbWUgYWNyb3NzOiAmbmJzcDs8bzpw
-PjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJmb250
-LXNpemU6MTIuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0FuZGFsdXMmcXVvdDssJnF1b3Q7c2VyaWYm
-cXVvdDsiPi0gaG93IHBvd2VydG9wIHJldHJpZXZlcyB0aGUgQyBzdGF0ZSBjb3VudGVycz88bzpw
-PjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJmb250
-LXNpemU6MTIuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0FuZGFsdXMmcXVvdDssJnF1b3Q7c2VyaWYm
-cXVvdDsiPi0gaG93IHRvIHVzZSB0aGUgdHVuaW5nIG9wdGlvbj8gSW4gdGhlIEdVSSB0aGVyZSBp
-cyBhIHNlcGFyYXRlIHRhYiBmb3IgdGhpcyBhbmQgSSBjYW4gc2VlIEdPT0QgYW5kIEJBRCB2YWx1
-ZXMgYXNzb2NpYXRlZCB3aXRoIGV2ZXJ5IGVudHJ5LiBIb3cgdG8gaW50ZXJwcmV0IHRoaXMgaW5m
-b3JtYXRpb24/ICZuYnNwOyZuYnNwOzxvOnA+PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1z
-b05vcm1hbCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMi4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7
-QW5kYWx1cyZxdW90OywmcXVvdDtzZXJpZiZxdW90OyI+PG86cD4mbmJzcDs8L286cD48L3NwYW4+
-PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iZm9udC1zaXplOjE0LjBwdDtm
-b250LWZhbWlseTpWaXZhbGRpO2NvbG9yOiM0MDMxNTIiPnJlZ2FyZHM8bzpwPjwvbzpwPjwvc3Bh
-bj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTQuMHB0
-O2ZvbnQtZmFtaWx5OlZpdmFsZGk7Y29sb3I6IzQwMzE1MiI+QWRyaXA8bzpwPjwvbzpwPjwvc3Bh
-bj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8L2Rpdj4K
-PC9ib2R5Pgo8L2h0bWw+Cg==
+Mit freundlichen Gr=C3=BC=C3=9Fen
 
---===============9192827886378705604==--
+Valentin H=C3=B6bel
+Cloud Architect
+
+NFON AG
+Leonrodstra=C3=9Fe 68
+D-80636 M=C3=BCnchen
+
+Telefon +49 89 45300-407
+valentin.hoebel(a)nfon.com
+www.nfon.com
+
+Support-Hotline der NFON AG
+Telefon 0800 - 6366 555
+
+Die gesetzlichen Pflichtangaben finden Sie unter =
+
+https://www.nfon.net/pflichtangaben
+
+--===============7469866973069064836==--
 
