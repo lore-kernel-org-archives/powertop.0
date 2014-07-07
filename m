@@ -1,48 +1,109 @@
-Content-Type: multipart/mixed; boundary="===============2205352828425269830=="
+Content-Type: multipart/mixed; boundary="===============2227289340656531960=="
 MIME-Version: 1.0
-From: Julian Wollrath <jwollrath at web.de>
-Subject: Re: [Powertop] [PATCH] Bug-fix:Segmentation fault with powertop --html
-Date: Thu, 22 May 2014 15:45:32 +0200
-Message-ID: <20140522154532.79d1ffe3@ilfaris>
-In-Reply-To: 1400716276-26453-1-git-send-email-alexandra.yates@linux.intel.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] Does PowerTop support MHz numbers for Intel Xeon L5410
+ CPUs ?
+Date: Mon, 07 Jul 2014 19:28:50 +0900
+Message-ID: <20140707102850.GB1135@swordfish>
+In-Reply-To: 20140707102629.GA1135@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2205352828425269830==
+--===============2227289340656531960==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-> Julian can you test the patch please. thank you. AY. =
+On (07/07/14 19:26), Sergey Senozhatsky wrote:
+> On (07/07/14 10:21), Valentin Hoebel wrote:
+> > Hi,
+> > =
 
-Thank you for the patch but unfortunately powertop still segfaults:
-$ powertop --html
-Loaded 750 prior measurements
-RAPL device for cpu 0
-RAPL device for cpu 0
-Preparing to take measurements
-  unknown op '{'
-*** Error in `powertop': free(): invalid pointer: 0x000000000187cdef ***
-Taking 1 measurement(s) for a duration of 20 second(s) each.
-[1]    22616 segmentation fault (core dumped)  powertop --html
+> > as you already guessed Debian still uses a 2.0 version.
+> > However, I git cloned 2.6.1 and the "head" versions from GitHub, built =
+them
+> > both and tried them - still the same result.
+> > =
 
-Backtrace:
-#0  0x00007f63d8c8e1af in std::string::assign(std::string const&) ()
-   from /usr/lib/x86_64-linux-gnu/libstdc++.so.6
-#1  0x0000000000410f31 in operator=3D (__str=3D"C1", this=3D0x7fff65b509a0)
-    at /usr/include/c++/4.8/bits/basic_string.h:547
-#2  report_display_cpu_cstates () at cpu/cpu.cpp:587
-#3  0x00000000004493f4 in one_measurement (seconds=3Dseconds(a)entry=3D20,
-workload=3Dworkload(a)entry=3D0x7fff65b521b0 "") at main.cpp:221
-#4  0x00000000004496a6 in make_report (time=3D20,
-workload=3Dworkload(a)entry=3D0x7fff65b521b0 "",
-iterations=3Diterations(a)entry=3D1, file=3Dfile(a)entry=3D0x7fff65b511b0
-"powertop.html") at main.cpp:264 #5  0x000000000040741d in main
-(argc=3D2, argv=3D0x7fff65b532d8) at main.cpp:441
+> > Is it known if this particular CPU model does not support reading out t=
+he
+> > CPU frequency values or could this be another problem?
+> =
+
+> hm... a *wild* guess. can you check what cpu model is getting passed to
+> nhm_core::nhm_core(int model)? the problem might be (or might be not) tha=
+t we
+> don't set any of C-state flags. if none of C-states set, then no MSR work=
+ is
+> getting done, and hence nothing is reported back. (yeah... we could check
+> documentation, search the web, etc. but let's do it the lazy way).
+> =
+
+> =
+
+> something like this
+> =
 
 
-Cheers,
-Julian
+oh. the patch is against the current upstream (iow, git) powertop source co=
+de.
 
---===============2205352828425269830==--
+	-ss
+
+> NOTE:
+> NOT TESTED, NOT EVEN COMPILE-TESTED. NOT A PATCH, NOT A FIX.
+> FOR TESTING PURPOSE ONLY.
+> =
+
+> ---
+> =
+
+>  src/cpu/intel_cpus.cpp | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> =
+
+> diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
+> index e3cdaf2..ae083cf 100644
+> --- a/src/cpu/intel_cpus.cpp
+> +++ b/src/cpu/intel_cpus.cpp
+> @@ -64,10 +64,13 @@ int is_supported_intel_cpu(int model)
+>  {
+>  	int i;
+>  =
+
+> +	fprintf(stderr, "check cpu model 0x%X\n", model);
+> +
+>  	for (i =3D 0; intel_cpu_models[i] !=3D 0; i++)
+>  		if (model =3D=3D intel_cpu_models[i])
+>  			return 1;
+>  =
+
+> +	printf(stderr, "ERROR: not supported\n");
+>  	return 0;
+>  }
+>  =
+
+> @@ -91,6 +94,8 @@ nhm_core::nhm_core(int model)
+>  {
+>  	has_c2c7_res =3D 0;
+>  =
+
+> +	fprintf(stderr, "nhm_core model: 0x%X\n", model);
+> +
+>  	switch(model) {
+>  		case 0x2A:	/* SNB */
+>  		case 0x2D:	/* SNB Xeon */
+> @@ -260,6 +265,8 @@ nhm_package::nhm_package(int model)
+>  	has_c8c9c10_res =3D 0;
+>  	has_c2c7_res =3D 0;
+>  =
+
+> +	fprintf(stderr, "nhm_package model: 0x%X\n", model);
+> +
+>  	switch(model) {
+>  		case 0x2A:	/* SNB */
+>  		case 0x2D:	/* SNB Xeon */
+>=20
+
+--===============2227289340656531960==--
 
