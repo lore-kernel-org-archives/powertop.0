@@ -1,96 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============5567085979688286534=="
+Content-Type: multipart/mixed; boundary="===============7168095257305687590=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Fix compile warning in cpu.cpp
-Date: Tue, 10 Jun 2014 14:41:06 -0700
-Message-ID: <57831.10.24.1.10.1402436466.squirrel@linux.intel.com>
-In-Reply-To: 1401928533-3421-1-git-send-email-srinivas.pandruvada@linux.intel.com
+From: Christopher Mansour <cmansour at outlook.com>
+Subject: [Powertop] Simple Question
+Date: Mon, 07 Jul 2014 19:53:04 -0400
+Message-ID: <COL129-W476C4ACB661CB7F869CA41C60D0@phx.gbl>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5567085979688286534==
+--===============7168095257305687590==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Hello all, =
 
-Hi Srinivas,
-
-Thank you for sending your patches, they were added today.
-
-Thank you,
-Alexandra.
-
-
-> Fix
-> cpu/cpu.cpp: In function =C3=A2=C2=80=C2=98void report_display_cpu_cstate=
-s()=C3=A2=C2=80=C2=99:
-> cpu/cpu.cpp:616:28: warning: =C3=A2=C2=80=C2=98_core=C3=A2=C2=80=C2=99 ma=
-y be used uninitialized in this
-> function [-Wmaybe-uninitialized]
-> cpu/cpu.cpp: In function =C3=A2=C2=80=C2=98void report_display_cpu_pstate=
-s()=C3=A2=C2=80=C2=99:
-> cpu/cpu.cpp:797:27: warning: =C3=A2=C2=80=C2=98_core=C3=A2=C2=80=C2=99 ma=
-y be used uninitialized in this
-> function [-Wmaybe-uninitialized]
-> ---
->  src/cpu/cpu.cpp | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-> index 37cc409..d360f2f 100644
-> --- a/src/cpu/cpu.cpp
-> +++ b/src/cpu/cpu.cpp
-> @@ -428,7 +428,7 @@ void report_display_cpu_cstates(void)
->  	char buffer[512], buffer2[512], tmp_num[50];
->  	unsigned int package, core, cpu;
->  	int line, cstates_num, title=3D0, core_num=3D0;
-> -	class abstract_cpu *_package, * _core, * _cpu;
-> +	class abstract_cpu *_package, *_core =3D NULL, * _cpu;
->  	const char* core_type =3D NULL;
->
->  	cstates_num =3D get_cstates_num();
-> @@ -608,7 +608,7 @@ void report_display_cpu_cstates(void)
->  		/* Report Output */
->  		if(core_num > 0)
->  			title=3Dtitle/core_num;
-> -		else if( _core->children.size() > 0)
-> +		else if(_core && _core->children.size() > 0)
->  			title=3Dtitle/_core->children.size();
->
->  		init_pkg_table_attr(&std_table_css, pkg_tbl_size.rows,
-> pkg_tbl_size.cols);
-> @@ -630,7 +630,7 @@ void report_display_cpu_pstates(void)
->  	char buffer[512], buffer2[512], tmp_num[50];
->  	unsigned int package, core, cpu;
->  	int line, title=3D0;
-> -	class abstract_cpu *_package, * _core, * _cpu;
-> +	class abstract_cpu *_package, *_core =3D NULL, * _cpu;
->  	unsigned int i, pstates_num;
->  	const char* core_type =3D NULL;
->
-> @@ -794,7 +794,7 @@ void report_display_cpu_pstates(void)
->  		}
->  		init_pkg_table_attr(&std_table_css, pkg_tbl_size.rows,
-> pkg_tbl_size.cols);
->  		report.add_table(pkg_data, &std_table_css);
-> -		if(!_core->can_collapse()){
-> +		if(_core && !_core->can_collapse()){
->  			title=3Dpstates_num+2;
->  			init_core_table_attr(&std_table_css, title,
->  				core_tbl_size.rows, core_tbl_size.cols);
-> --
-> 1.7.11.7
->
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->
+I was wondering if I can use the PowerTop tool in order to observe the powe=
+r consumption of a thread. I am doing some experiments which would run on 7=
+ threads at the same time, I need to know the power consumption of each thr=
+ead. Is this feasible using the power top tool and how. I would appreciate =
+your help and feedback. =
 
 
-Thank you,
-Alexandra.
+Chris.  		 	   		 =20
 
---===============5567085979688286534==--
+--===============7168095257305687590==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+PGh0bWw+CjxoZWFkPgo8c3R5bGU+PCEtLQouaG1tZXNzYWdlIFAKewptYXJnaW46MHB4OwpwYWRk
+aW5nOjBweAp9CmJvZHkuaG1tZXNzYWdlCnsKZm9udC1zaXplOiAxMnB0Owpmb250LWZhbWlseTpD
+YWxpYnJpCn0KLS0+PC9zdHlsZT48L2hlYWQ+Cjxib2R5IGNsYXNzPSdobW1lc3NhZ2UnPjxkaXYg
+ZGlyPSdsdHInPjxmb250IGZhY2U9IlRhaG9tYSI+PGJyIGlkPSJGb250QnJlYWsiPjwvZm9udD5I
+ZWxsbyBhbGwsJm5ic3A7PGRpdj48YnI+PC9kaXY+PGRpdj5JIHdhcyB3b25kZXJpbmcgaWYgSSBj
+YW4gdXNlIHRoZSBQb3dlclRvcCB0b29sIGluIG9yZGVyIHRvIG9ic2VydmUgdGhlIHBvd2VyIGNv
+bnN1bXB0aW9uIG9mIGEgdGhyZWFkLiBJIGFtIGRvaW5nIHNvbWUgZXhwZXJpbWVudHMgd2hpY2gg
+d291bGQgcnVuIG9uIDcgdGhyZWFkcyBhdCB0aGUgc2FtZSB0aW1lLCBJIG5lZWQgdG8ga25vdyB0
+aGUgcG93ZXIgY29uc3VtcHRpb24gb2YgZWFjaCB0aHJlYWQuIElzIHRoaXMgZmVhc2libGUgdXNp
+bmcgdGhlIHBvd2VyIHRvcCB0b29sIGFuZCBob3cuIEkgd291bGQgYXBwcmVjaWF0ZSB5b3VyIGhl
+bHAgYW5kIGZlZWRiYWNrLiZuYnNwOzxicj48ZGl2IHN0eWxlPSJjb2xvcjpyZ2IoMzQsIDM0LCAz
+NCk7Zm9udC1mYW1pbHk6YXJpYWwsIHNhbnMtc2VyaWY7Zm9udC1zaXplOjEzcHg7Ij48ZGl2IHN0
+eWxlPSJsaW5lLWhlaWdodDoyMnB4O2NvbG9yOnJnYig2OCwgNjgsIDY4KTtmb250LWZhbWlseTpD
+YWxpYnJpO2ZvbnQtc2l6ZToxNnB4OyI+PGJyPjwvZGl2PjxkaXYgc3R5bGU9ImxpbmUtaGVpZ2h0
+OjIycHg7Y29sb3I6cmdiKDY4LCA2OCwgNjgpO2ZvbnQtZmFtaWx5OkNhbGlicmk7Zm9udC1zaXpl
+OjE2cHg7Ij5DaHJpcy4mbmJzcDs8L2Rpdj48L2Rpdj48L2Rpdj4gCQkgCSAgIAkJICA8L2Rpdj48
+L2JvZHk+CjwvaHRtbD4=
+--===============7168095257305687590==--
 
