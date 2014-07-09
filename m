@@ -1,67 +1,103 @@
-Content-Type: multipart/mixed; boundary="===============0774072556584107712=="
+Content-Type: multipart/mixed; boundary="===============5757220397987381539=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] powertop: update build instructions
-Date: Sun, 13 Jul 2014 16:26:47 +0900
-Message-ID: <20140713072647.GA947@swordfish>
-In-Reply-To: 1405231562-24175-1-git-send-email-meraj.enigma@gmail.com
+From: Valentin Hoebel <valentin.hoebel at nfon.com>
+Subject: Re: [Powertop] Does PowerTop support MHz numbers for Intel Xeon L5410
+ CPUs ?
+Date: Wed, 09 Jul 2014 17:30:18 +0200
+Message-ID: <53BD600A.7020304@nfon.com>
+In-Reply-To: 20140708110542.GC947@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0774072556584107712==
+--===============5757220397987381539==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (07/13/14 12:06), Mohammad Merajul Islam Molla wrote:
-> update powertop build instuctions in README file.
-> =
+Hi,
 
-> Signed-off-by: Mohammad Merajul Islam Molla <meraj.enigma(a)gmail.com>
-> ---
->  README | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> =
+not sure if this is an important information or not, but I am getting =
 
-> diff --git a/README b/README
-> index cd38cc5..efe95c3 100644
-> --- a/README
-> +++ b/README
-> @@ -2,9 +2,10 @@
->  ------------------------------
->  =
+the "138% idle" behaviour for all of the systems where reading out the =
 
->  To build and install PowerTOP type the following commands, =
+current CPU frequencies via PowerTop is not possible.
 
-> -	./configure =
+Best regards
+Valentin
 
-> -	./make
-> -	./make install
-> +       autoreconf -sfi
 
-we have autogen.sh to deal with autoreconf. let's recommend to use
-it instead of direct autoreconf.
+Am 08.07.2014 13:05, schrieb Sergey Senozhatsky:
+> On (07/07/14 08:25), Arjan van de Ven wrote:
+>>> not sure that powertop performs any specific MSRs at all, since most of=
+ MSRs are
+>>> called correspondingly to c-state flags (has_cXXX), e.g.
+>>>
+>>> __init:
+>>> 	if (model =3D=3D 0x45 || model =3D=3D0x3D)
+>>> 		has_c8c9c10_res =3D 1;
+>>>
+>>>
+>>>
+>>> and later:
+>>>
+>>> 	if (has_c8c9c10_res) {
+>>> 		c8_before    =3D get_msr(number, MSR_PKG_C8_RESIDENCY);
+>>> 		c9_before    =3D get_msr(number, MSR_PKG_C9_RESIDENCY);
+>>> 		c10_before    =3D get_msr(number, MSR_PKG_C10_RESIDENCY);
+>>> 	}
+>>>
+>>> 	and so on.
+>>
+>>
+>> but if the set is empty, you don't get any data, and the "emulation" sid=
+e of powertop
+>> is likely a better choice... since there are C states, just not counters.
+>>
+>
+> looks like powertop checks C6 state `get_msr(number, MSR_PKG_C6_RESIDENCY=
+)' in start
+> and end measurement for any intel cpu, along with `get_msr(first_cpu, MSR=
+_TSC)'. anyway,
+> need to investigate. the output that Valentin sees is rather strange, say=
+ing that cpu0
+> is 138% Idle.
+>
+> 	          CPU 0
+> 	Idle      138%
+>
+> 	          CPU 2
+> 	Idle      111,7%
+>
+> 	          CPU 1
+> 	Idle      111,7%
+>
+> 	          CPU 3
+> 	Idle      111,7%
+>
+> 	-ss
+>
 
-	-ss
+-- =
 
-> +       ./configure
-> +       make
-> +       sudo make install
->  =
+Mit freundlichen Gr=C3=BC=C3=9Fen
 
->  Note: For Android (running Intel Architecture ) there is a Android.mk =
+Valentin H=C3=B6bel
+Cloud Architect
 
->  that was provided by community members, and at this time is supported
-> -- =
+NFON AG
+Leonrodstra=C3=9Fe 68
+D-80636 M=C3=BCnchen
 
-> 1.9.1
-> =
+Telefon +49 89 45300-407
+valentin.hoebel(a)nfon.com
+www.nfon.com
 
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
+Support-Hotline der NFON AG
+Telefon 0800 - 6366 555
 
---===============0774072556584107712==--
+Die gesetzlichen Pflichtangaben finden Sie unter =
+
+https://www.nfon.net/pflichtangaben
+
+--===============5757220397987381539==--
 
