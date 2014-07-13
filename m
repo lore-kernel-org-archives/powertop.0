@@ -1,42 +1,59 @@
-Content-Type: multipart/mixed; boundary="===============0237603880408948887=="
+Content-Type: multipart/mixed; boundary="===============3422146192027850688=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: Re: [Powertop] [PATCH v3 03/15] add src/cpu/rapl/.deps to .gitignore
-Date: Tue, 14 Oct 2014 16:32:00 -0700
-Message-ID: <543DB270.6080501@linux.intel.com>
-In-Reply-To: 1410125238-29600-4-git-send-email-kerolasa@iki.fi
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH UPDATED] powertop: update build instructions
+Date: Sun, 13 Jul 2014 17:55:58 +0900
+Message-ID: <20140713085558.GB947@swordfish>
+In-Reply-To: 1405238874-16384-1-git-send-email-meraj.enigma@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0237603880408948887==
+--===============3422146192027850688==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-LGTM.
-
-Reviewed-By: Joe Konno <joe.konno(a)intel.com>
-
-On 09/07/2014 02:27 PM, Sami Kerola wrote:
-> Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
-> ---
->  .gitignore | 1 +
->  1 file changed, 1 insertion(+)
+On (07/13/14 14:07), Mohammad Merajul Islam Molla wrote:
+> update powertop build instuctions in README file.
 > =
 
-> diff --git a/.gitignore b/.gitignore
-> index 35d41c2..d00973f 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -44,6 +44,7 @@ src/.deps/
->  src/Makefile
->  src/calibrate/.deps/
->  src/cpu/.deps/
-> +src/cpu/rapl/.deps
->  src/devices/.deps/
->  src/measurement/.deps/
->  src/parameters/.deps/
+
+thanks.
+
+	-ss
+
+> Signed-off-by: Mohammad Merajul Islam Molla <meraj.enigma(a)gmail.com>
+> ---
+>  README | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> =
+
+> diff --git a/README b/README
+> index cd38cc5..bc48d3d 100644
+> --- a/README
+> +++ b/README
+> @@ -2,9 +2,10 @@
+>  ------------------------------
+>  =
+
+>  To build and install PowerTOP type the following commands, =
+
+> +	./autogen.sh
+>  	./configure =
+
+> -	./make
+> -	./make install
+> +	make
+> +	sudo make install
+>  =
+
+>  Note: For Android (running Intel Architecture ) there is a Android.mk =
+
+>  that was provided by community members, and at this time is supported
+> -- =
+
+> 1.9.1
 >=20
 
---===============0237603880408948887==--
+--===============3422146192027850688==--
 
