@@ -1,52 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============5008323309342044866=="
+Content-Type: multipart/mixed; boundary="===============2267543616229722994=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] Complete build options for Pthread API
-Date: Sat, 25 Oct 2014 17:58:40 +0900
-Message-ID: <20141025085840.GA1572@swordfish>
-In-Reply-To: CAG27Bk2jDUn-1SoWqFQhb2ac22vdrpTBax8VU_Gv+e02Dw2_rw@mail.gmail.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [PATCH UPDATED] powertop: update build instructions
+Date: Sun, 13 Jul 2014 11:50:25 -0700
+Message-ID: <53C2D4F1.9060002@linux.intel.com>
+In-Reply-To: 20140713174100.GA15447@sara.bahnhof.se
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5008323309342044866==
+--===============2267543616229722994==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/22/14 15:33), Sami Kerola wrote:
-> On 22 October 2014 13:41, Sergey Senozhatsky
-> <sergey.senozhatsky(a)gmail.com> wrote:
-> > m4/* files are host-specific. they should never be part
-> > of the source code or a package.
-> =
+On 7/13/2014 10:41 AM, Magnus Fromreide wrote:
+> On Sun, Jul 13, 2014 at 02:07:54PM +0600, Mohammad Merajul Islam Molla wr=
+ote:
+>> update powertop build instuctions in README file.
+>
+> Should the README file reflect the repository code or the distributed
+> packages?
+>
+> Is it not part of distribution package generation to run autogen so that
+> the old README file was fine, the only change one could imagine is adding
+> a README.hacking that states that you might need to run autogen.sh
+> before the commit.
 
-> I would not say it so strongly. There are plenty of projects that have
-> files in m4 directory. Here's couple.
-> =
+it is supposed to be part of distribution package generation, but we've had=
+ a few slipups
+in that regard in recent releases unfortunately.
 
-> http://git.savannah.gnu.org/gitweb/?p=3Dcoreutils.git;a=3Dtree;f=3Dm4
-> https://github.com/karelzak/util-linux/tree/master/m4
+I more imagine a section in the readme than a second file, I mean, it's lik=
+e one extra paragraph
 
-yes, but powertop does not use any optional m4 macros/libs that
-are not basically available (afaik).
 
- https://lists.01.org/pipermail/powertop/2013-June/000855.html
-
-	-ss
-
-> But if powertop does not want to mix files autotools generate with own
-> files then an alternative path is needed. Perhaps powertop/m4/ could
-> be used. That would leave door open to various other project local
-> purposes as well files. What ever is done a maintainer decision is
-> needed. In best case the decision should be documented to
-> powertop/readmes/project_files.txt or something like that.
-> =
-
-> -- =
-
-> Sami Kerola
-> http://www.iki.fi/kerolasa/
->=20
-
---===============5008323309342044866==--
+--===============2267543616229722994==--
 
