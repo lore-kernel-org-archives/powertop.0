@@ -1,104 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============4514534591416774999=="
+Content-Type: multipart/mixed; boundary="===============5171796127974451345=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH 06/14] powertop.m4: GCC_FORTIFY_SOURCE_CC copy idea
- of macro from Archlinux pacman
-Date: Sat, 25 Oct 2014 18:33:53 +0100
-Message-ID: <1414258441-30099-7-git-send-email-kerolasa@iki.fi>
-In-Reply-To: 1414258441-30099-1-git-send-email-kerolasa@iki.fi
+From: Kok, Auke-jan H <auke-jan.h.kok at intel.com>
+Subject: Re: [Powertop] Requesting help to get the power consumption of each
+ thread or process id
+Date: Fri, 18 Jul 2014 14:54:37 -0700
+Message-ID: <CABsxX9+kqVccgWJQYKQyA-hRCQwoxk6q5UzDhwfA5Tw-KvEWkA@mail.gmail.com>
+In-Reply-To: COL129-W98C4A2DB02F064BE0A0F8C6F40@phx.gbl
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4514534591416774999==
+--===============5171796127974451345==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The powertop.m4 is a collection file for autoconf m4 helper macros, such
-as GCC_FORTIFY_SOURCE_CC.  The macro in case will define feature
-_FORTIFY_SOURCE=3D2 when it is possible, instead of trying to enable when
-it will not work, such as at times when optimization is turned off.
+On Thu, Jul 17, 2014 at 12:20 PM, Christopher Mansour
+<cmansour(a)outlook.com> wrote:
+> Hi,
+>
+> I was wondering if somebody can help in doing the following:
+> I want to get the power consumption of each thread running. I am doing an
+> experiment. I built a program that executes on several threads and I need=
+ to
+> know the power consumed by each thread or by each core of the eight CPU
+> cores I have.  I do know the process ID of the processes that start but I
+> don't know how to get their power consumption using powertop.
 
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
----
- configure.ac                |  2 ++
- m4/gcc_fortify_source_cc.m4 | 29 +++++++++++++++++++++++++++++
- src/Makefile.am             |  1 -
- 3 files changed, 31 insertions(+), 1 deletion(-)
- create mode 100644 m4/gcc_fortify_source_cc.m4
+This is pretty much impossible to do as there's no way to actually
+physically measure the power draw of a thread, and threads on a core
+aren't receiving power separately and are often grouped when it comes
+to power. Because of the complexity, there's just no solution to
+getting per-thread power simply from a normal system.
 
-diff --git a/configure.ac b/configure.ac
-index dc376ce..e56a451 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -34,6 +34,7 @@ AC_PROG_LIBTOOL
- AC_PROG_CC
- AC_PROG_INSTALL
- AM_PROG_CC_C_O
-+GCC_FORTIFY_SOURCE_CC
- =
+Auke
 
- # Checks for libraries.
- AX_PTHREAD([
-@@ -145,4 +146,5 @@ AC_SEARCH_LIBS([inet_aton], [resolv], [], [
- 	AC_MSG_ERROR([libresolv is required but was not found])
- ], [])
- =
-
-+
- AC_OUTPUT
-diff --git a/m4/gcc_fortify_source_cc.m4 b/m4/gcc_fortify_source_cc.m4
-new file mode 100644
-index 0000000..1206672
---- /dev/null
-+++ b/m4/gcc_fortify_source_cc.m4
-@@ -0,0 +1,29 @@
-+dnl GCC_FORTIFY_SOURCE_CC
-+dnl checks -D_FORTIFY_SOURCE with the C++ compiler, if it exists then
-+dnl updates CXXCPP
-+AC_DEFUN([GCC_FORTIFY_SOURCE_CC],[
-+  AC_LANG_ASSERT([C++])
-+  AS_IF([test "X$CXX" !=3D "X"], [
-+    AC_MSG_CHECKING([for FORTIFY_SOURCE support])
-+    fs_old_cxxcpp=3D"$CXXCPP"
-+    fs_old_cxxflags=3D"$CXXFLAGS"
-+    CXXCPP=3D"$CXXCPP -D_FORTIFY_SOURCE=3D2"
-+    CXXFLAGS=3D"$CXXFLAGS -Werror"
-+    AC_COMPILE_IFELSE([
-+      AC_LANG_PROGRAM([[]], [[
-+        int main(void) {
-+        #if !(__GNUC_PREREQ (4, 1) )
-+        #error No FORTIFY_SOURCE support
-+        #endif
-+          return 0;
-+        }
-+      ]], [
-+        AC_MSG_RESULT([yes])
-+      ], [
-+        AC_MSG_RESULT([no])
-+        CXXCPP=3D"$fs_old_cxxcpp"
-+      ])
-+    ])
-+    CXXFLAGS=3D"$fs_old_cxxflags"
-+  ])
-+])
-diff --git a/src/Makefile.am b/src/Makefile.am
-index 311b75e..bb2b369 100644
---- a/src/Makefile.am
-+++ b/src/Makefile.am
-@@ -134,7 +134,6 @@ powertop_CXXFLAGS =3D \
- =
-
- powertop_CPPFLAGS =3D \
- 	-DLOCALEDIR=3D\"$(localedir)\" \
--	-D_FORTIFY_SOURCE=3D2 \
- 	$(GLIB2_CFLAGS) \
- 	$(LIBNL_CFLAGS) \
- 	$(LIBZ_CFLAGS) \
--- =
-
-2.1.2
-
-
---===============4514534591416774999==--
+--===============5171796127974451345==--
 
