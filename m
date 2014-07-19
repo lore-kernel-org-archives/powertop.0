@@ -1,126 +1,37 @@
-Content-Type: multipart/mixed; boundary="===============6108770672311389678=="
+Content-Type: multipart/mixed; boundary="===============8562722061438153829=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH 06/12] remove unnecessary code reported by cppcheck
-Date: Sat, 02 Aug 2014 12:54:11 +0100
-Message-ID: <1406980457-19077-7-git-send-email-kerolasa@iki.fi>
-In-Reply-To: 1406980457-19077-1-git-send-email-kerolasa@iki.fi
+From: Marc MERLIN <marc_powertop at merlins.org>
+Subject: [Powertop] How to decrease PS/2 Touchpad / Keyboard / Mouse wakeups
+Date: Sat, 19 Jul 2014 09:51:28 -0700
+Message-ID: <20140719165128.GB26881@merlins.org>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6108770672311389678==
+--===============8562722061438153829==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
----
- src/cpu/rapl/rapl_interface.cpp | 4 ++--
- src/devices/alsa.cpp            | 1 -
- src/display.cpp                 | 9 ++-------
- src/tuning/runtime.cpp          | 4 ----
- src/tuning/tuning.cpp           | 1 -
- 5 files changed, 4 insertions(+), 15 deletions(-)
+On a thinkpad T540p, I see:
+  4.10 W      6.6 ms/s     196.3        Interrupt      PS/2 Touchpad / Keyb=
+oard / Mouse
 
-diff --git a/src/cpu/rapl/rapl_interface.cpp b/src/cpu/rapl/rapl_interface.=
-cpp
-index a19e0a9..ab8e8ce 100644
---- a/src/cpu/rapl/rapl_interface.cpp
-+++ b/src/cpu/rapl/rapl_interface.cpp
-@@ -647,9 +647,9 @@ void c_rapl_interface::rapl_measure_energy()
- 	double pp0_joules =3D 0;
- 	double pp1_joules =3D 0;
- =
+Even if the 4W figure is wrong, 200 wakeups for a touchpad and keyboard
+seems totally ridiculous.
 
--	ret =3D get_pkg_power_info(&thermal_spec_power, &max_power, &min_power, &=
-max_time_window);
-+	get_pkg_power_info(&thermal_spec_power, &max_power, &min_power, &max_time=
-_window);
- 	RAPL_DBG_PRINT("Pkg Power Info: Thermal spec %f watts, max %f watts, min =
-%f watts, max time window %f seconds\n", thermal_spec_power, max_power, min=
-_power, max_time_window);
--	ret =3D get_dram_power_info(&thermal_spec_power, &max_power, &min_power, =
-&max_time_window);
-+	get_dram_power_info(&thermal_spec_power, &max_power, &min_power, &max_tim=
-e_window);
- 	RAPL_DBG_PRINT("DRAM Power Info: Thermal spec %f watts, max %f watts, min=
- %f watts, max time window %f seconds\n", thermal_spec_power, max_power, mi=
-n_power, max_time_window);
- =
+What can be done to decrease those?
 
- 	for (;;) {
-diff --git a/src/devices/alsa.cpp b/src/devices/alsa.cpp
-index 5dee334..a1fca71 100644
---- a/src/devices/alsa.cpp
-+++ b/src/devices/alsa.cpp
-@@ -154,7 +154,6 @@ static void create_all_alsa_callback(const char *d_name)
- {
- 	char filename[4096];
- 	class alsa *bl;
--	ofstream file;
- =
-
- 	if (strncmp(d_name, "hwC", 3) !=3D 0)
- 		return;
-diff --git a/src/display.cpp b/src/display.cpp
-index c76ba27..123620a 100644
---- a/src/display.cpp
-+++ b/src/display.cpp
-@@ -267,13 +267,8 @@ void cursor_up(void)
- 	if (w) {
- 		w->cursor_up(); =
-
- 		if(w->ypad_pos > 0) {
--			if (tab_names[current_tab] =3D=3D "Tunables") {
--				prefresh(w->win, --w->ypad_pos, w->xpad_pos, =
-
--					1, 0, LINES - 3, COLS - 1);
--	                } else {
--				prefresh(w->win, --w->ypad_pos, w->xpad_pos, =
-
--					1, 0, LINES - 3, COLS - 1);
--			}
-+			prefresh(w->win, --w->ypad_pos, w->xpad_pos,
-+				 1, 0, LINES - 3, COLS - 1);
- 		}
- 	}
- 	=
-
-diff --git a/src/tuning/runtime.cpp b/src/tuning/runtime.cpp
-index b57d53e..3201fdd 100644
---- a/src/tuning/runtime.cpp
-+++ b/src/tuning/runtime.cpp
-@@ -139,10 +139,6 @@ void add_runtime_tunables(const char *bus)
- 		if (entry->d_name[0] =3D=3D '.')
- 			continue;
- =
-
--		sprintf(filename, "/sys/bus/%s/devices/%s", bus, entry->d_name);
--
--
--
- 		sprintf(filename, "/sys/bus/%s/devices/%s/power/control", bus, entry->d_=
-name);
- =
-
- 		if (access(filename, R_OK) !=3D 0)
-diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
-index 85b80ac..7d64cad 100644
---- a/src/tuning/tuning.cpp
-+++ b/src/tuning/tuning.cpp
-@@ -198,7 +198,6 @@ void report_show_tunables(void)
- 	unsigned int i;
- 	/* three tables; bad, unfixable, good */
- 	sort_tunables();
--	string srt_tmp;
- 	int idx, rows =3D 0, cols;
- =
-
- 	/* First Table */
+Thanks,
+Marc
 -- =
 
-2.0.3
+"A mouse is a device used to point at the xterm you want to type in" - A.S.=
+R.
+Microsoft is to operating systems ....
+                                      .... what McDonalds is to gourmet coo=
+king
+Home page: http://marc.merlins.org/                         | PGP 1024R/763=
+BE901
 
-
---===============6108770672311389678==--
+--===============8562722061438153829==--
 
