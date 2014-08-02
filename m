@@ -1,116 +1,84 @@
-Content-Type: multipart/mixed; boundary="===============5416376463444715474=="
+Content-Type: multipart/mixed; boundary="===============3917763069031964175=="
 MIME-Version: 1.0
-From: SF Markus Elfring <elfring at users.sourceforge.net>
-Subject: [Powertop] Deletion of unnecessary checks before specific function
- calls
-Date: Sun, 19 Oct 2014 00:50:29 +0200
-Message-ID: <5442EEB5.2030601@users.sourceforge.net>
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH 07/12] move options structure to function scope
+Date: Sat, 02 Aug 2014 12:54:12 +0100
+Message-ID: <1406980457-19077-8-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1406980457-19077-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5416376463444715474==
+--===============3917763069031964175==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ src/main.cpp | 35 ++++++++++++++++++-----------------
+ 1 file changed, 18 insertions(+), 17 deletions(-)
 
-I suggest to delete redundant checks for null pointers.
-Would you like to integrate the attached update suggestion into your source=
- code
-repository?
+diff --git a/src/main.cpp b/src/main.cpp
+index 99a985f..910fe5c 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -69,23 +69,6 @@ int debug_learning =3D 0;
+ unsigned time_out =3D 20;
+ int leave_powertop =3D 0;
+ =
 
-Regards,
-Markus
+-static const struct option long_options[] =3D
+-{
+-	/* These options set a flag. */
+-	{"debug", no_argument, &debug_learning, 'd'},
+-	{"version", no_argument, NULL, 'V'},
+-	{"help",no_argument, NULL, 'u'}, /* u for usage */
+-	{"calibrate",no_argument, NULL, 'c'},
+-	{"auto-tune",no_argument, NULL, 'a'},
+-	{"html", optional_argument, NULL, 'h'},
+-	{"csv", optional_argument, NULL, 'C'},
+-	{"extech", optional_argument, NULL, 'e'},
+-	{"time", optional_argument, NULL, 't'},
+-	{"iteration", optional_argument, NULL, 'i'},
+-	{"workload", optional_argument, NULL, 'w'},
+-	{"quiet", no_argument, NULL, 'q'},
+-	{NULL, 0, NULL, 0}
+-};
+ =
 
---===============5416376463444715474==
-Content-Type: text/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="0001-Deletion-of-unnecessary-checks-before-calls-of-the-f.patch"
+ static void print_version()
+ {
+@@ -370,6 +353,24 @@ int main(int argc, char **argv)
+ 	char workload[4096] =3D {0,};
+ 	int  iterations =3D 1, auto_tune =3D 0;
+ =
 
-PkZyb20gMWY3ODA5YWU4ZDFlNGExNGFkMGY3YTgxMmU0Zjc5N2Y2NTU5N2QxYSBNb24gU2VwIDE3
-IDAwOjAwOjAwIDIwMDEKRnJvbTogTWFya3VzIEVsZnJpbmcgPGVsZnJpbmdAdXNlcnMuc291cmNl
-Zm9yZ2UubmV0PgpEYXRlOiBTdW4sIDE5IE9jdCAyMDE0IDAwOjMwOjUzICswMjAwClN1YmplY3Q6
-IFtQQVRDSCAxLzJdIERlbGV0aW9uIG9mIHVubmVjZXNzYXJ5IGNoZWNrcyBiZWZvcmUgY2FsbHMg
-b2YgdGhlCiBmdW5jdGlvbiAiZnJlZSIKClRoZSBmdW5jdGlvbiAiZnJlZSIgaXMgZG9jdW1lbnRl
-ZCBpbiB0aGUgd2F5IHRoYXQgbm8gYWN0aW9uIHNoYWxsIG9jY3VyIGZvcgphIHBhc3NlZCBudWxs
-IHBvaW50ZXIuIEl0IGlzIHRoZXJlZm9yZSBub3QgbmVlZGVkIHRoYXQgYSBmdW5jdGlvbiBjYWxs
-ZXIKcmVwZWF0cyBhIGNvcnJlc3BvbmRpbmcgY2hlY2suCmh0dHA6Ly9zdGFja292ZXJmbG93LmNv
-bS9xdWVzdGlvbnMvMTg3NzU2MDgvZnJlZS1hLW51bGwtcG9pbnRlci1hbnl3YXktb3ItY2hlY2st
-Zmlyc3QKClNpZ25lZC1vZmYtYnk6IE1hcmt1cyBFbGZyaW5nIDxlbGZyaW5nQHVzZXJzLnNvdXJj
-ZWZvcmdlLm5ldD4KLS0tCiBzcmMvZGV2bGlzdC5jcHAgICAgICAgICAgfCA5ICsrKy0tLS0tLQog
-c3JjL3BlcmYvcGVyZi5jcHAgICAgICAgIHwgNiArKy0tLS0KIHRyYWNlZXZlbnQvZXZlbnQtcGFy
-c2UuYyB8IDMgKy0tCiAzIGZpbGVzIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKSwgMTIgZGVsZXRp
-b25zKC0pCgpkaWZmIC0tZ2l0IGEvc3JjL2Rldmxpc3QuY3BwIGIvc3JjL2Rldmxpc3QuY3BwCmlu
-ZGV4IDIwZmU1ZGEuLjdmNTk5YWMgMTAwNjQ0Ci0tLSBhL3NyYy9kZXZsaXN0LmNwcAorKysgYi9z
-cmMvZGV2bGlzdC5jcHAKQEAgLTc3LDE4ICs3NywxNSBAQCB2b2lkIGNsZWFuX29wZW5fZGV2aWNl
-cygpCiAJdW5zaWduZWQgaW50IGk9MDsKIAogCWZvciAoaSA9IDA7IGkgPCBvbmUuc2l6ZSgpOyBp
-KyspIHsKLQkJaWYob25lW2ldKQotCQkJZnJlZShvbmVbaV0pOworCQlmcmVlKG9uZVtpXSk7CiAJ
-fQogCiAJZm9yIChpID0gMDsgaSA8IHR3by5zaXplKCk7IGkrKykgewotCQlpZih0d29baV0pCi0J
-CQlmcmVlKHR3b1tpXSk7CisJCWZyZWUodHdvW2ldKTsKIAl9CiAKIAlmb3IgKGkgPSAwOyBpIDwg
-ZGV2cG93ZXIuc2l6ZSgpOyBpKyspewotCQlpZihkZXZwb3dlcltpXSkKLQkJCWZyZWUoZGV2cG93
-ZXJbaV0pOworCQlmcmVlKGRldnBvd2VyW2ldKTsKIAl9CiB9CiAKZGlmZiAtLWdpdCBhL3NyYy9w
-ZXJmL3BlcmYuY3BwIGIvc3JjL3BlcmYvcGVyZi5jcHAKaW5kZXggYjE3NjI1Ni4uYjExMDNhNyAx
-MDA2NDQKLS0tIGEvc3JjL3BlcmYvcGVyZi5jcHAKKysrIGIvc3JjL3BlcmYvcGVyZi5jcHAKQEAg
-LTE0OSw4ICsxNDksNyBAQCB2b2lkIHBlcmZfZXZlbnQ6OmNyZWF0ZV9wZXJmX2V2ZW50KGNoYXIg
-KmV2ZW50bmFtZSwgaW50IF9jcHUpCiAKIHZvaWQgcGVyZl9ldmVudDo6c2V0X2V2ZW50X25hbWUo
-Y29uc3QgY2hhciAqZXZlbnRfbmFtZSkKIHsKLQlpZiAobmFtZSkKLQkJZnJlZShuYW1lKTsKKwlm
-cmVlKG5hbWUpOwogCW5hbWUgPSBzdHJkdXAoZXZlbnRfbmFtZSk7CiAJaWYgKCFuYW1lKSB7CiAJ
-CWZwcmludGYoc3RkZXJyLCAiZmFpbGVkIHRvIGFsbG9jYXRlIGV2ZW50IG5hbWVcbiIpOwpAQCAt
-MTY4LDggKzE2Nyw3IEBAIHZvaWQgcGVyZl9ldmVudDo6c2V0X2V2ZW50X25hbWUoY29uc3QgY2hh
-ciAqZXZlbnRfbmFtZSkKIAogcGVyZl9ldmVudDo6fnBlcmZfZXZlbnQodm9pZCkKIHsKLQlpZiAo
-bmFtZSkKLQkJZnJlZShuYW1lKTsKKwlmcmVlKG5hbWUpOwogCiAJaWYgKHBlcmZfZXZlbnQ6OnBl
-dmVudC0+cmVmX2NvdW50ID09IDEpIHsKIAkJcGV2ZW50X2ZyZWUocGVyZl9ldmVudDo6cGV2ZW50
-KTsKZGlmZiAtLWdpdCBhL3RyYWNlZXZlbnQvZXZlbnQtcGFyc2UuYyBiL3RyYWNlZXZlbnQvZXZl
-bnQtcGFyc2UuYwppbmRleCA2MTk1ZjZmLi41YTcxN2EwIDEwMDY0NAotLS0gYS90cmFjZWV2ZW50
-L2V2ZW50LXBhcnNlLmMKKysrIGIvdHJhY2VldmVudC9ldmVudC1wYXJzZS5jCkBAIC0xMDIzLDgg
-KzEwMjMsNyBAQCBzdGF0aWMgZW51bSBldmVudF90eXBlIGZvcmNlX3Rva2VuKGNvbnN0IGNoYXIg
-KnN0ciwgY2hhciAqKnRvaykKIAogc3RhdGljIHZvaWQgZnJlZV90b2tlbihjaGFyICp0b2spCiB7
-Ci0JaWYgKHRvaykKLQkJZnJlZSh0b2spOworCWZyZWUodG9rKTsKIH0KIAogc3RhdGljIGVudW0g
-ZXZlbnRfdHlwZSByZWFkX3Rva2VuKGNoYXIgKip0b2spCi0tIAoyLjEuMgoK
++	static const struct option long_options[] =3D
++	{
++		/* These options set a flag. */
++		{"debug", no_argument, &debug_learning, 'd'},
++		{"version", no_argument, NULL, 'V'},
++		{"help",no_argument, NULL, 'u'}, /* u for usage */
++		{"calibrate",no_argument, NULL, 'c'},
++		{"auto-tune",no_argument, NULL, 'a'},
++		{"html", optional_argument, NULL, 'h'},
++		{"csv", optional_argument, NULL, 'C'},
++		{"extech", optional_argument, NULL, 'e'},
++		{"time", optional_argument, NULL, 't'},
++		{"iteration", optional_argument, NULL, 'i'},
++		{"workload", optional_argument, NULL, 'w'},
++		{"quiet", no_argument, NULL, 'q'},
++		{NULL, 0, NULL, 0}
++	};
++
+ 	set_new_handler(out_of_memory);
+ =
 
---===============5416376463444715474==
-Content-Type: text/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="0002-Removal-of-unnecessary-checks-before-a-few-calls-of-.patch"
+ 	setlocale (LC_ALL, "");
+-- =
 
-PkZyb20gNDIzNzA4NGFkNzRhMTM3MDYxN2Y2MGYxMTQ2ZmI5ZTU5MjIxZjk3MCBNb24gU2VwIDE3
-IDAwOjAwOjAwIDIwMDEKRnJvbTogTWFya3VzIEVsZnJpbmcgPGVsZnJpbmdAdXNlcnMuc291cmNl
-Zm9yZ2UubmV0PgpEYXRlOiBTdW4sIDE5IE9jdCAyMDE0IDAwOjQwOjIwICswMjAwClN1YmplY3Q6
-IFtQQVRDSCAyLzJdIFJlbW92YWwgb2YgdW5uZWNlc3NhcnkgY2hlY2tzIGJlZm9yZSBhIGZldyBj
-YWxscyBvZiB0aGUKIEMrKyBkZWxldGUgb3BlcmF0b3IKClRoZSBDKysgZGVsZXRlIG9wZXJhdG9y
-IGNhbiBhbHNvIGhhbmRsZSBwYXNzZWQgbnVsbCBwb2ludGVycyBvbiBpdHMgb3duCndpdGhvdXQg
-dW5leHBlY3RlZCBzaWRlIGVmZmVjdHMuCmh0dHA6Ly93d3cucGFyYXNoaWZ0LmNvbS9jKystZmFx
-L2RlbGV0ZS1oYW5kbGVzLW51bGwuaHRtbAoKSXQgaXMgdGhlcmVmb3JlIG5vdCBuZWVkZWQgdG8g
-a2VlcCBhZGRpdGlvbmFsIHNhZmV0eSBjaGVja3MgZGlyZWN0bHkgYmVmb3JlCnN1Y2ggZnVuY3Rp
-b24gY2FsbHMuCgpTaWduZWQtb2ZmLWJ5OiBNYXJrdXMgRWxmcmluZyA8ZWxmcmluZ0B1c2Vycy5z
-b3VyY2Vmb3JnZS5uZXQ+Ci0tLQogc3JjL2NwdS9hYnN0cmFjdF9jcHUuY3BwICAgIHwgNiArKy0t
-LS0KIHNyYy9yZXBvcnQvcmVwb3J0LW1ha2VyLmNwcCB8IDYgKystLS0tCiAyIGZpbGVzIGNoYW5n
-ZWQsIDQgaW5zZXJ0aW9ucygrKSwgOCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9zcmMvY3B1
-L2Fic3RyYWN0X2NwdS5jcHAgYi9zcmMvY3B1L2Fic3RyYWN0X2NwdS5jcHAKaW5kZXggM2I4NDFi
-Zi4uYTNhOWZmYSAxMDA2NDQKLS0tIGEvc3JjL2NwdS9hYnN0cmFjdF9jcHUuY3BwCisrKyBiL3Ny
-Yy9jcHUvYWJzdHJhY3RfY3B1LmNwcApAQCAtMzQsMTQgKzM0LDEyIEBAIGFic3RyYWN0X2NwdTo6
-fmFic3RyYWN0X2NwdSgpCiB7CiAJdW5zaWduZWQgaW50IGk9MDsKIAlmb3IgKGk9MDsgaSA8IGNz
-dGF0ZXMuc2l6ZSgpOyBpKyspewotCQlpZihjc3RhdGVzW2ldKQotCQkJZGVsZXRlIGNzdGF0ZXNb
-aV07CisJCWRlbGV0ZSBjc3RhdGVzW2ldOwogCX0KIAljc3RhdGVzLmNsZWFyKCk7CiAKIAlmb3Ig
-KGk9MDsgaSA8IHBzdGF0ZXMuc2l6ZSgpOyBpKyspewotCQlpZihwc3RhdGVzW2ldKQotCQkJZGVs
-ZXRlIHBzdGF0ZXNbaV07CisJCWRlbGV0ZSBwc3RhdGVzW2ldOwogCX0KIAlwc3RhdGVzLmNsZWFy
-KCk7CiB9CmRpZmYgLS1naXQgYS9zcmMvcmVwb3J0L3JlcG9ydC1tYWtlci5jcHAgYi9zcmMvcmVw
-b3J0L3JlcG9ydC1tYWtlci5jcHAKaW5kZXggZjJmZTUyMi4uNDA0OWE1NCAxMDA2NDQKLS0tIGEv
-c3JjL3JlcG9ydC9yZXBvcnQtbWFrZXIuY3BwCisrKyBiL3NyYy9yZXBvcnQvcmVwb3J0LW1ha2Vy
-LmNwcApAQCAtNDcsOCArNDcsNyBAQCByZXBvcnRfbWFrZXI6OnJlcG9ydF9tYWtlcihyZXBvcnRf
-dHlwZSB0KQogCiByZXBvcnRfbWFrZXI6On5yZXBvcnRfbWFrZXIoKQogewotCWlmIChmb3JtYXR0
-ZXIpCi0JCWRlbGV0ZSBmb3JtYXR0ZXI7CisJZGVsZXRlIGZvcm1hdHRlcjsKIH0KIAogLyogKioq
-KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioq
-KioqKioqKioqKioqICovCkBAIC05OCw4ICs5Nyw3IEBAIHJlcG9ydF9tYWtlcjo6c2V0X3R5cGUo
-cmVwb3J0X3R5cGUgdCkKIHZvaWQKIHJlcG9ydF9tYWtlcjo6c2V0dXBfcmVwb3J0X2Zvcm1hdHRl
-cigpCiB7Ci0JaWYgKGZvcm1hdHRlcikKLQkJZGVsZXRlIGZvcm1hdHRlcjsKKwlkZWxldGUgZm9y
-bWF0dGVyOwogCiAJaWYgKHR5cGUgPT0gUkVQT1JUX0hUTUwpCiAJCWZvcm1hdHRlciA9IG5ldyBy
-ZXBvcnRfZm9ybWF0dGVyX2h0bWwoKTsKLS0gCjIuMS4yCgo=
+2.0.3
 
---===============5416376463444715474==--
+
+--===============3917763069031964175==--
 
