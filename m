@@ -1,169 +1,151 @@
-Content-Type: multipart/mixed; boundary="===============1045820161229595187=="
+Content-Type: multipart/mixed; boundary="===============6404942367508870669=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH] powertop: fix various resource leaks
-Date: Wed, 06 Aug 2014 00:24:21 +0900
-Message-ID: <20140805152421.GA972@swordfish>
-In-Reply-To: CAHu9=sPS7tHGQVd4HORxLEDhw-yf_L7PPL0cD7OcW16FmG=C5g@mail.gmail.com
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH 12/12] clean up .gitignore file
+Date: Sat, 02 Aug 2014 12:54:17 +0100
+Message-ID: <1406980457-19077-13-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1406980457-19077-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1045820161229595187==
+--===============6404942367508870669==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (08/05/14 20:47), Mohammad Merajul Islam Molla wrote:
-> Hi Sergey,
-> =
+Keep the regular expressions, directories, and individual files separate
+understandable way.
 
-> Thanks for your review.
-> =
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ .gitignore | 111 +++++++++++++++++++++++++++------------------------------=
+----
+ 1 file changed, 49 insertions(+), 62 deletions(-)
 
-> For this portion of changes, is the below diff ok? I will resend the
-> full patch if it is.
-> =
+diff --git a/.gitignore b/.gitignore
+index d00973f..b9188a1 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,66 +1,53 @@
+-*~
+-*.o
++# regular expressions
+ *.a
+-*.html
+ *.csv
+-*.powertop
+-ChangeLog
+-Makefile.in
+-aclocal.m4
+-config.guess
+-config.h.in
+-config.rpath
+-config.sub
+-configure
+-depcomp
+-install-sh
+-ltmain.sh
+-missing
+-stamp-h1
+-Makefile
+-config.h
+-config.log
+-config.status
+-libtool
+-pevent/.deps/
+-pevent/Makefile
+-pevent/Makefile.in
+-po/Makefile
+-po/Makevars.template
+-po/POTFILES
+-po/Rules-quot
+-po/boldquot.sed
+-po/en(a)boldquot.header
+-po/en(a)quot.header
+-po/insert-header.sin
+-po/quot.sed
+-po/remove-potcdate.sin
+-po/*.gmo
+-po/stamp-po
+-src/powertop
+-src/css.h
+-src/Makefile.in
+-src/.deps/
+-src/Makefile
+-src/calibrate/.deps/
+-src/cpu/.deps/
+-src/cpu/rapl/.deps
+-src/devices/.deps/
+-src/measurement/.deps/
+-src/parameters/.deps/
+-src/perf/.deps/
+-src/process/.deps/
+-src/tuning/.deps/
+-src/report/.deps/
+-m4
+ *.dirstamp
+-*.lo
++*.html
+ *.la
+-autom4te.cache
+-remove-potcdate.sed
+-compile
+-stamp-po
+-ABOUT-NLS
+-ar-lib
+-traceevent/.deps/
+-traceevents/.libs/
++*.lo
++*.o
++*.powertop
++*~
++.deps
++/po/*.gmo
++Makefile
++Makefile.in
++
++# directories
++/m4/
++
++# individual files
++/ABOUT-NLS
++/ChangeLog
++/aclocal.m4
++/ar-lib
++/autom4te.cache
++/compile
++/config.guess
++/config.h
++/config.h.in
++/config.log
++/config.rpath
++/config.status
++/config.sub
++/configure
++/depcomp
++/install-sh
++/libtool
++/ltmain.sh
++/missing
++/po/Makevars.template
++/po/POTFILES
++/po/Rules-quot
++/po/boldquot.sed
++/po/en(a)boldquot.header
++/po/en(a)quot.header
++/po/insert-header.sin
++/po/quot.sed
++/po/remove-potcdate.sin
++/po/stamp-po
++/remove-potcdate.sed
++/src/css.h
++/src/powertop
++/stamp-h1
++/stamp-po
+-- =
+
+2.0.3
 
 
-looks good.
-
-	-ss
-
-> diff --git a/src/tuning/bluetooth.cpp b/src/tuning/bluetooth.cpp
-> index 2c1e283..9be327e 100644
-> --- a/src/tuning/bluetooth.cpp
-> +++ b/src/tuning/bluetooth.cpp
-> @@ -108,7 +108,7 @@ static int last_check_result;
->  int bt_tunable::good_bad(void)
->  {
->         struct hci_dev_info devinfo;
-> -       FILE *file;
-> +       FILE *file =3D 0;
->         int fd;
->         int thisbytes =3D 0;
->         int ret;
-> @@ -144,18 +144,14 @@ int bt_tunable::good_bad(void)
->                 if (file) {
->                         char line[2048];
->                         /* first line is standard header */
-> -                       if (fgets(line, 2047, file) =3D=3D NULL) {
-> -                               pclose(file);
-> +                       if (fgets(line, 2047, file) =3D=3D NULL)
->                                 goto out;
-> -                       }
->                         memset(line, 0, 2048);
->                         if (fgets(line, 2047, file) =3D=3D NULL) {
->                                 result =3D last_check_result =3D TUNE_GOO=
-D;
-> -                               pclose(file);
->                                 goto out;
->                         }
-> =
-
-> -                       pclose(file);
->                         if (strlen(line) > 0) {
->                                 result =3D last_check_result =3D TUNE_GOO=
-D;
->                                 goto out;
-> @@ -168,6 +164,8 @@ int bt_tunable::good_bad(void)
-> =
-
->  out:
->         previous_bytes =3D thisbytes;
-> +       if (file)
-> +               pclose(file);
->         close(fd);
->         return result;
->  }
-> =
-
-> =
-
-> --
-> Thanks,
-> -Meraj
-> =
-
-> =
-
-> =
-
-> On Tue, Aug 5, 2014 at 6:44 PM, Sergey Senozhatsky
-> <sergey.senozhatsky(a)gmail.com> wrote:
-> > On (08/04/14 19:50), Mohammad Merajul Islam Molla wrote:
-> >> Date: Mon,  4 Aug 2014 19:50:57 +0600
-> >> From: Mohammad Merajul Islam Molla <meraj.enigma(a)gmail.com>
-> >> To: powertop(a)lists.01.org
-> >> Subject: [Powertop] [PATCH] powertop: fix various resource leaks
-> >> X-Mailer: git-send-email 1.9.1
-> >>
-> >> fixes some resource leaks detected by valgrind and coverity scan.
-> >>
-> >> Signed-off-by: Mohammad Merajul Islam Molla <meraj.enigma(a)gmail.com>
-> >> ---
-> >>  src/devices/ahci.cpp     | 4 +++-
-> >>  src/perf/perf_bundle.cpp | 4 +++-
-> >>  src/tuning/bluetooth.cpp | 4 +++-
-> >>  3 files changed, 9 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/src/devices/ahci.cpp b/src/devices/ahci.cpp
-> >> index 3b4627a..a4d1345 100644
-> >> --- a/src/devices/ahci.cpp
-> >> +++ b/src/devices/ahci.cpp
-> >> @@ -67,8 +67,10 @@ static string disk_name(char *path, char *target, c=
-har *shortname)
-> >>               sprintf(line, "%s/%s/model", pathname, dirent->d_name);
-> >>               file =3D fopen(line, "r");
-> >>               if (file) {
-> >> -                     if (fgets(line, 4096, file) =3D=3D NULL)
-> >> +                     if (fgets(line, 4096, file) =3D=3D NULL) {
-> >> +                             fclose(file);
-> >>                               break;
-> >> +                     }
-> >>                       fclose(file);
-> >>                       c =3D strchr(line, '\n');
-> >>                       if (c)
-> >> diff --git a/src/perf/perf_bundle.cpp b/src/perf/perf_bundle.cpp
-> >> index b0e982b..cf1ae11 100644
-> >> --- a/src/perf/perf_bundle.cpp
-> >> +++ b/src/perf/perf_bundle.cpp
-> >> @@ -142,8 +142,10 @@ static void parse_event_format(const char *event_=
-name)
-> >>
-> >>       buf =3D read_file(file);
-> >>       free(file);
-> >> -     if (!buf)
-> >> +     if (!buf) {
-> >> +             free(name);
-> >>               return;
-> >> +     }
-> >>
-> >>       pevent_parse_event(perf_event::pevent, buf, strlen(buf), sys);
-> >>       free(name);
-> >> diff --git a/src/tuning/bluetooth.cpp b/src/tuning/bluetooth.cpp
-> >> index 92f5835..2c1e283 100644
-> >> --- a/src/tuning/bluetooth.cpp
-> >> +++ b/src/tuning/bluetooth.cpp
-> >> @@ -144,8 +144,10 @@ int bt_tunable::good_bad(void)
-> >>               if (file) {
-> >>                       char line[2048];
-> >>                       /* first line is standard header */
-> >> -                     if (fgets(line, 2047, file) =3D=3D NULL)
-> >> +                     if (fgets(line, 2047, file) =3D=3D NULL) {
-> >> +                             pclose(file);
-> >>                               goto out;
-> >> +                     }
-> >>                       memset(line, 0, 2048);
-> >>                       if (fgets(line, 2047, file) =3D=3D NULL) {
-> >>                               result =3D last_check_result =3D TUNE_GO=
-OD;
-> >>
-> >
-> > how about moving pclose(file) to `out:' label scope? 3 out of 11 lines
-> > are doing same work here: cleaning up resource before jump.
-> >
-> >         -ss
->=20
-
---===============1045820161229595187==--
+--===============6404942367508870669==--
 
