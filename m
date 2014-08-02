@@ -1,66 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============7098597476715146048=="
+Content-Type: multipart/mixed; boundary="===============3336595401726782498=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH v3 0/5] A series of patches towards limiting memory
- leaks
-Date: Fri, 17 Oct 2014 15:58:01 -0700
-Message-ID: <1413586686-28602-1-git-send-email-joe.konno@linux.intel.com>
-In-Reply-To: 4628F0C61321354285DF2950999754456DF926B0@ORSMSX114.amr.corp.intel.com
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: Re: [Powertop] [PATCH 00/12] various build system and static analysis
+ improvement
+Date: Sat, 02 Aug 2014 23:29:14 +0100
+Message-ID: <CAG27Bk3=X8z8MwcD0GDMnX=CpUm62hLN4DaSRNZM_hL0q2kpmw@mail.gmail.com>
+In-Reply-To: 20140802135806.GB1018@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7098597476715146048==
+--===============3336595401726782498==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Joe Konno <joe.konno(a)intel.com>
+On 2 August 2014 14:58, Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>=
+ wrote:
+> On (08/02/14 12:54), Sami Kerola wrote:
+>> Here is a set of various maintenance patches.  None very important, but I
+>> am hopeful they are seen as usefull enought to be merged to the project.
+>>
+>> While working with the patch set I noticed my  Arch linux kernel 3.15.8-1
+>> with powertop --auto-tune is printing
+>>
+>> $ ./src/powertop --auto
+>> Loaded 242 prior measurements
+>> RAPL device for cpu 0
+>> RAPL device for cpu 0
+>>   unknown op '{'
+>>
+>> An it seems the { is coming
+>
+> this is well a known warning, in short plugin support needs to be
+> backported to traceevent.
 
-Changes since v1:
-  * Rebased atop "41c54e8 allow none-ncurses messaging..."
-  * Removed double-free in original patch 3/8
+Good to hear, and thank you Sergey and Magnus for first round of
+review. As a result there are couple changes to few commits, biggest
+being the split to the first commit. To avoid sending nearly the same
+patches again to mail list I think it is better to fetch the latest
+from my github branch.
 
-Changes since v2:
-  * Modified cover letter subject to bring focus to memory leaks
-  * Removed buffer overflow protection patches, to be re-submitted
-    separately
 
-The three buffer overflow protection patches in the original series from
-Dan were removed in this submission, leaving only the five (mostly)
-memory leak patches.
+The following changes since commit a5465a282107da5205b7928fe4ce4f642d1fd770:
 
-The buffer overflow protection patches, which had been committed (and
-reverted) before the v2.6 release was tagged, replaced some calls to
-sprintf(), strcpy(), and friends with their 'n' functions.  That alone
-is insufficient and potentially harmful. Buffer overflow protection
-deserves consideration appropriate to the privilege level necessary to
-run PowerTOP.
+  Bug-fix: for html & csv value for CPU Information (2014-06-18 14:23:18 -0=
+700)
 
-The remaining five patches from the original series from Dan deal
-(mostly) with memory leaks.
+are available in the git repository at:
 
-Sergey and Arjan, thanks for your v2 reviews and discussion!
+  https://github.com/kerolasa/powertop sami
 
-Dan Kalowsky (5):
-  Properly cleaning up the display tabs
-  Removing a documented memory leak
-  Remove another memory leak
-  Mark pretty_print_init as initialized
-  Adding a clean_shutdown function
+for you to fetch changes up to 65b0eed332b515003dc1a38dbb51a43e563fb692:
 
- src/display.cpp               | 11 +++++++++++
- src/display.h                 |  1 +
- src/lib.cpp                   |  2 ++
- src/main.cpp                  | 15 ++++++++++++---
- src/parameters/parameters.h   |  1 +
- src/parameters/persistent.cpp | 15 +++++++++++++++
- src/tuning/tuning.cpp         |  7 +++++++
- 7 files changed, 49 insertions(+), 3 deletions(-)
+  clean up .gitignore file (2014-08-02 22:50:26 +0100)
+
+----------------------------------------------------------------
+Sami Kerola (13):
+      configure: use vertical lists
+      configure: prefer AS_IF macro rather than shell if statement
+      update .gitignore
+      clean up Makefile.am files
+      fix clang++ compilation errors
+      remove unnecessary assignments
+      remove unnecessary code reported by cppcheck
+      move options structure to function scope
+      do not use ncurses when --auto-tune is specified
+      improve manual groff syntax
+      fix couple typos
+      wrap lines in README.traceevent
+      clean up .gitignore file
 
 -- =
 
-2.1.2
+Sami Kerola
+http://www.iki.fi/kerolasa/
 
-
---===============7098597476715146048==--
+--===============3336595401726782498==--
 
