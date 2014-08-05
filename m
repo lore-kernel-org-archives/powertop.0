@@ -1,38 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============2267543616229722994=="
+Content-Type: multipart/mixed; boundary="===============3957154694211468814=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] [PATCH UPDATED] powertop: update build instructions
-Date: Sun, 13 Jul 2014 11:50:25 -0700
-Message-ID: <53C2D4F1.9060002@linux.intel.com>
-In-Reply-To: 20140713174100.GA15447@sara.bahnhof.se
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH 03/14] update .gitignore
+Date: Tue, 05 Aug 2014 22:31:27 +0100
+Message-ID: <1407274298-16404-3-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1407274298-16404-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2267543616229722994==
+--===============3957154694211468814==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 7/13/2014 10:41 AM, Magnus Fromreide wrote:
-> On Sun, Jul 13, 2014 at 02:07:54PM +0600, Mohammad Merajul Islam Molla wr=
-ote:
->> update powertop build instuctions in README file.
->
-> Should the README file reflect the repository code or the distributed
-> packages?
->
-> Is it not part of distribution package generation to run autogen so that
-> the old README file was fine, the only change one could imagine is adding
-> a README.hacking that states that you might need to run autogen.sh
-> before the commit.
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ .gitignore | 1 +
+ 1 file changed, 1 insertion(+)
 
-it is supposed to be part of distribution package generation, but we've had=
- a few slipups
-in that regard in recent releases unfortunately.
+diff --git a/.gitignore b/.gitignore
+index 35d41c2..d00973f 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -44,6 +44,7 @@ src/.deps/
+ src/Makefile
+ src/calibrate/.deps/
+ src/cpu/.deps/
++src/cpu/rapl/.deps
+ src/devices/.deps/
+ src/measurement/.deps/
+ src/parameters/.deps/
+-- =
 
-I more imagine a section in the readme than a second file, I mean, it's lik=
-e one extra paragraph
+2.0.4
 
 
---===============2267543616229722994==--
+--===============3957154694211468814==--
 
