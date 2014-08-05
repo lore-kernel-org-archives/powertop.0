@@ -1,111 +1,183 @@
-Content-Type: multipart/mixed; boundary="===============8699197111712218726=="
+Content-Type: multipart/mixed; boundary="===============1385872263626896929=="
 MIME-Version: 1.0
 From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH v3 14/15] add --auto-tune and --workload to manual
- page
-Date: Sun, 07 Sep 2014 22:27:17 +0100
-Message-ID: <1410125238-29600-15-git-send-email-kerolasa@iki.fi>
-In-Reply-To: 1410125238-29600-1-git-send-email-kerolasa@iki.fi
+Subject: [Powertop] [PATCH 01/14] configure: use vertical lists
+Date: Tue, 05 Aug 2014 22:31:25 +0100
+Message-ID: <1407274298-16404-1-git-send-email-kerolasa@iki.fi>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8699197111712218726==
+--===============1385872263626896929==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Options in manual page are now in same order as in usage output, and they
-include short options when aplicable.
+Horizontal lists has downside of being managed as a single entry in
+version control, which makes commits that add and remove items difficult
+to follow.  With vertical lists each entry is managed separately, which
+is much nicer.
+
+Additionally add project URL to autoconfig init, and pretty print macro
+expressions to have indentation, and bracing that follows more or less in
+K&R style.
 
 Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
 ---
- doc/powertop.8 | 30 +++++++++++++++++++-----------
- 1 file changed, 19 insertions(+), 11 deletions(-)
+ configure.ac | 82 +++++++++++++++++++++++++++++++++++++++++++++++++-------=
+----
+ 1 file changed, 67 insertions(+), 15 deletions(-)
 
-diff --git a/doc/powertop.8 b/doc/powertop.8
-index 31e7e6d..60e3c73 100644
---- a/doc/powertop.8
-+++ b/doc/powertop.8
-@@ -12,7 +12,10 @@ experiment with various power management settings.  When=
- invoking
- powertop without arguments powertop starts in interactive mode.
- .SH OPTIONS
- .TP
--.B \-\-calibrate
-+.B \-\-auto\-tune
-+Set all tunable options to their good setting without interaction.
-+.TP
-+.BR \-c ", " \-\-calibrate
- Runs powertop in calibration mode.  When running on battery, powertop can
- track power consumption as well as system activity.  When there are
- enough measurements, powertop can start to report power estimates.  One
-@@ -20,7 +23,7 @@ can get more accurate estimates by using this option to e=
-nable a
- calibration cycle.  This will cycle through various display levels and
- USB device activities and workloads.
- .TP
--\fB\-\-csv\fR[=3D\fIfilename\fR]
-+\fB\-C\fR, \fB\-\-csv\fR[=3D\fIfilename\fR]
- Generate a CSV report.  If a
- .I filename
- is not specified then the default name
-@@ -28,7 +31,7 @@ is not specified then the default name
- is used.  The CSV report can be used for reporting and data analysis.
- .TP
- .B \-\-debug
--Run in "debug" mode.
-+Run in debug mode.
- .TP
- \fB\-\-extech\fR=3D\fIdevnode\fR
- Use the Extech Power Analyzer for measurements.  This allows one to
-@@ -36,10 +39,7 @@ specify the serial device node of the serial to USB adap=
-tor connecting to
- the Extech Power Analyzer, for example
- .IR /dev/ttyUSB0 .
- .TP
--.B \-\-help
--Show the help message.
--.TP
--\fB\-\-html\fR[=3D\fIfilename\fR]
-+\fB\-r\fR, \fB\-\-html\fR[=3D\fIfilename\fR]
- Generate an HTML report.  If a
- .I filename
- is not specified then the default name
-@@ -47,18 +47,26 @@ is not specified then the default name
- is used.  The HTML report can be sent to others to help diagnose power
- issues.
- .TP
--\fB\-\-iteration\fR[=3D\fIiterations\fR]
-+\fB\-i\fR, \fB\-\-iteration\fR[=3D\fIiterations\fR]
- Number of times to run each test.
- .TP
--.B \-\-quiet
-+.BR \-q ", " \-\-quiet
- Suppress stderr output.
- .TP
--\fB\-\-time\fR[=3D\fIseconds\fR]
-+\fB\-t\fR, \fB\-\-time\fR[=3D\fIseconds\fR]
- Generate a report for a specified number of
- .IR seconds .
- .TP
--.B \-\-version
-+\fB\-w\fR, \fB\-\-workload\fR[=3D\fIworkload\fR]
-+Execute
-+.I workload
-+file as a part of calibration before making a report.
-+.TP
-+.BR \-V ", " \-\-version
- Print version information and exit.
-+.TP
-+.BR \-h ", " \-\-help
-+Show the help message and exit.
- .SH COMMANDS
- In interactive mode, the following key bindings are available:
- .IP
+diff --git a/configure.ac b/configure.ac
+index 0b02ad2..b41cfb3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2,15 +2,21 @@
+ # Process this file with autoconf to produce a configure script.
+ =
+
+ AC_PREREQ([2.68])
+-AC_INIT([powertop], [2.6.1], [powertop(a)lists.01.org])
+-AM_INIT_AUTOMAKE([-Wall foreign ])
++AC_INIT([powertop], [2.6.1], [powertop(a)lists.01.org], [], [https://01.or=
+g/powertop])
++AM_INIT_AUTOMAKE([-Wall foreign])
+ AC_LANG([C++])
+-AC_CONFIG_FILES([Makefile src/Makefile traceevent/Makefile po/Makefile.in =
+doc/Makefile])
++AC_CONFIG_FILES([
++	Makefile
++	src/Makefile
++	traceevent/Makefile
++	po/Makefile.in
++	doc/Makefile
++])
+ AC_CONFIG_SRCDIR([src/main.cpp])
+ AC_CONFIG_MACRO_DIR([m4])
+ AC_CONFIG_HEADERS([config.h])
+ GETTEXT_PACKAGE=3Dpowertop
+-AC_SUBST(GETTEXT_PACKAGE)
++AC_SUBST([GETTEXT_PACKAGE])
+ AM_SILENT_RULES([yes])
+ AM_GNU_GETTEXT([external])
+ AM_GNU_GETTEXT_VERSION([0.18])
+@@ -26,7 +32,23 @@ AM_PROG_CC_C_O
+ =
+
+ # Checks for libraries.
+ # Checks for header files.
+-AC_CHECK_HEADERS([fcntl.h libintl.h limits.h locale.h malloc.h stdint.h st=
+dlib.h string.h sys/ioctl.h sys/socket.h sys/statfs.h sys/time.h termios.h =
+unistd.h ncurses.h])
++AC_CHECK_HEADERS([ \
++	fcntl.h \
++	libintl.h \
++	limits.h \
++	locale.h \
++	malloc.h \
++	ncurses.h \
++	stdint.h \
++	stdlib.h \
++	string.h \
++	sys/ioctl.h \
++	sys/socket.h \
++	sys/statfs.h \
++	sys/time.h \
++	termios.h \
++	unistd.h \
++])
+ =
+
+ # Checks for typedefs, structures, and compiler characteristics.
+ AC_HEADER_STDBOOL
+@@ -44,20 +66,46 @@ AC_FUNC_MALLOC
+ AC_FUNC_MMAP
+ AC_FUNC_REALLOC
+ AC_FUNC_STRTOD
+-AC_CHECK_FUNCS([fdatasync getpagesize gettimeofday memmove memset mkdir mu=
+nmap pow realpath regcomp select setlocale socket sqrt strcasecmp strchr st=
+rdup strerror strncasecmp strstr strtoul strtoull])
++AC_CHECK_FUNCS([ \
++	fdatasync \
++	getpagesize \
++	gettimeofday \
++	memmove \
++	memset \
++	mkdir \
++	munmap \
++	pow \
++	realpath \
++	regcomp \
++	select \
++	setlocale \
++	socket \
++	sqrt \
++	strcasecmp \
++	strchr \
++	strdup \
++	strerror \
++	strncasecmp \
++	strstr \
++	strtoul \
++	strtoull \
++])
+ =
+
+-PKG_CHECK_MODULES([NCURSES], [ncursesw ncurses], [LIBS=3D"$LIBS $ncurses_L=
+IBS"],
+-	AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], AC_MSG_ERROR([ncurses is=
+ required but was not found]), []))
++PKG_CHECK_MODULES([NCURSES], [ncursesw ncurses], [LIBS=3D"$LIBS $ncurses_L=
+IBS"], [
++	AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], [
++		AC_MSG_ERROR([ncurses is required but was not found])
++	], [])
++])
+ =
+
+ has_libpci=3D0
+-PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=3D1],[
+-	AC_SEARCH_LIBS([pci_get_dev], [pci],[has_libpci=3D1], [has_libpci=3D0] )])
++PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=3D1], [
++	AC_SEARCH_LIBS([pci_get_dev], [pci],[has_libpci=3D1], [has_libpci=3D0])
++])
+  =
+
+ =
+
+ has_libnl_ver=3D0
+-# libnl-2 provides only libnl-2.0.pc file, so we check for separate libnl-=
+genl-3.0.pc
+-# pkg-config file just for libnl-3.0 case.
+-#
++dnl libnl-2 provides only libnl-2.0.pc file, so we check for separate
++dnl libnl-genl-3.0.pc pkg-config file just for libnl-3.0 case.
+ PKG_CHECK_MODULES([LIBNL], [libnl-3.0 >=3D 3.0 libnl-genl-3.0 >=3D 3.0], [=
+has_libnl_ver=3D3], [
+ 	PKG_CHECK_MODULES([LIBNL], [libnl-2.0 >=3D 2.0], [has_libnl_ver=3D2], [
+ 		PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [has_libnl_ve=
+r=3D0])])])
+@@ -78,7 +126,11 @@ if (test "$has_libpci" -eq 0); then
+ 	])
+ fi
+ =
+
+-AC_SEARCH_LIBS([pthread_create], [pthread], [], AC_MSG_ERROR([libpthread i=
+s required but was not found]), [])
+-AC_SEARCH_LIBS([inet_aton], [resolv], [], AC_MSG_ERROR([libresolv is requi=
+red but was not found]), [])
++AC_SEARCH_LIBS([pthread_create], [pthread], [], [
++	AC_MSG_ERROR([libpthread is required but was not found])
++], [])
++AC_SEARCH_LIBS([inet_aton], [resolv], [], [
++	AC_MSG_ERROR([libresolv is required but was not found])
++], [])
+ =
+
+ AC_OUTPUT
 -- =
 
-2.1.0
+2.0.4
 
 
---===============8699197111712218726==--
+--===============1385872263626896929==--
 
