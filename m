@@ -1,74 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============1578430586722436026=="
+Content-Type: multipart/mixed; boundary="===============3100594195299925110=="
 MIME-Version: 1.0
 From: Sami Kerola <kerolasa at iki.fi>
-Subject: Re: [Powertop] [PATCH 07/14] configure: use autoconf-archive
- ax_cxx_compile_stdcxx_11.m4
-Date: Mon, 27 Oct 2014 18:52:26 +0000
-Message-ID: <CAG27Bk2bp2jaJXxunnnfvF3JGvvxL_qYQbhT2GZ+xwc+415OfA@mail.gmail.com>
-In-Reply-To: 20141025230159.GA5140@bacon.lysator.liu.se
+Subject: [Powertop] [PATCH 11/14] fix couple typos
+Date: Tue, 05 Aug 2014 22:31:35 +0100
+Message-ID: <1407274298-16404-11-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1407274298-16404-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1578430586722436026==
+--===============3100594195299925110==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 26 October 2014 00:02, Magnus Fromreide <magfr(a)lysator.liu.se> wrote:
-> On Sat, Oct 25, 2014 at 06:33:54PM +0100, Sami Kerola wrote:
->> Ensure the C++11 is supported, and fail when it is not.
->
-> While I would love to be able to use features from C++11 in powertop I
-> was under the impression that only C++98 was required, what are the
-> facts regarding that?
+Found with misspell-check.
 
-Looking compiler warnings the C++11 is needed.
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ src/tuning/nl80211.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-./../traceevent/event-parse.h:468:18: warning: use of C++11 long long
-integer constant [-Wlong-long]
-./../traceevent/event-parse.h:469:13: warning: use of C++11 long long
-integer constant [-Wlong-long]
-./../traceevent/event-parse.h:482:18: warning: use of C++11 long long
-integer constant [-Wlong-long]
-./../traceevent/event-parse.h:483:13: warning: use of C++11 long long
-integer constant [-Wlong-long]
-./../traceevent/event-parse.h:484:13: warning: use of C++11 long long
-integer constant [-Wlong-long]
-./../traceevent/event-parse.h:485:13: warning: use of C++11 long long
-integer constant [-Wlong-long]
-./../traceevent/event-parse.h:498:18: warning: use of C++11 long long
-integer constant [-Wlong-long]
-./../traceevent/event-parse.h:499:13: warning: use of C++11 long long
-integer constant [-Wlong-long]
-./../traceevent/event-parse.h:500:13: warning: use of C++11 long long
-integer constant [-Wlong-long]
-./../traceevent/event-parse.h:501:13: warning: use of C++11 long long
-integer constant [-Wlong-long]
-./../traceevent/event-parse.h:502:13: warning: use of C++11 long long
-integer constant [-Wlong-long]
-./../traceevent/event-parse.h:503:13: warning: use of C++11 long long
-integer constant [-Wlong-long]
-./../traceevent/event-parse.h:504:13: warning: use of C++11 long long
-integer constant [-Wlong-long]
-./../traceevent/event-parse.h:505:13: warning: use of C++11 long long
-integer constant [-Wlong-long]
-process/do_process.cpp:482:13: warning: use of C++11 long long integer
-constant [-Wlong-long]
-process/do_process.cpp:528:13: warning: use of C++11 long long integer
-constant [-Wlong-long]
-process/do_process.cpp:575:13: warning: use of C++11 long long integer
-constant [-Wlong-long]
-process/do_process.cpp:680:17: warning: use of C++11 long long integer
-constant [-Wlong-long]
-process/timer.cpp:83:11: warning: use of C++11 long long integer
-constant [-Wlong-long]
-process/work.cpp:60:11: warning: use of C++11 long long integer
-constant [-Wlong-long]
+diff --git a/src/tuning/nl80211.h b/src/tuning/nl80211.h
+index e4a8839..83b0514 100644
+--- a/src/tuning/nl80211.h
++++ b/src/tuning/nl80211.h
+@@ -828,7 +828,7 @@ enum nl80211_commands {
+  *	bit. Depending on which antennas are selected in the bitmap, 802.11n
+  *	drivers can derive which chainmasks to use (if all antennas belonging to
+  *	a particular chain are disabled this chain should be disabled) and if
+- *	a chain has diversity antennas wether diversity should be used or not.
++ *	a chain has diversity antennas whether diversity should be used or not.
+  *	HT capabilities (STBC, TX Beamforming, Antenna selection) can be
+  *	derived from the available chains after applying the antenna mask.
+  *	Non-802.11n drivers can derive wether to use diversity or not.
+@@ -855,7 +855,7 @@ enum nl80211_commands {
+  * @__NL80211_ATTR_AFTER_LAST: internal use
+  */
+ enum nl80211_attrs {
+-/* don't change the order or add anything inbetween, this is ABI! */
++/* don't change the order or add anything between, this is ABI! */
+ 	NL80211_ATTR_UNSPEC,
+ =
 
+ 	NL80211_ATTR_WIPHY,
 -- =
 
-Sami Kerola
-http://www.iki.fi/kerolasa/
+2.0.4
 
---===============1578430586722436026==--
+
+--===============3100594195299925110==--
 
