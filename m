@@ -1,48 +1,81 @@
-Content-Type: multipart/mixed; boundary="===============7804045020534422961=="
+Content-Type: multipart/mixed; boundary="===============0349706527832543514=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] [PATCH v2 6/8] Stop buffer overflow
-Date: Wed, 15 Oct 2014 08:01:27 -0700
-Message-ID: <543E8C47.1050504@linux.intel.com>
-In-Reply-To: 20141015144639.GJ1189@swordfish
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH 12/14] wrap lines in README.traceevent
+Date: Tue, 05 Aug 2014 22:31:36 +0100
+Message-ID: <1407274298-16404-12-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1407274298-16404-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7804045020534422961==
+--===============0349706527832543514==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
->>> yes, this is the reason behind this proposal. these patches a) don't ch=
-eck for
->>> overrun; b) don't handle overrun. they just shut up the compiler.
->>
->>
->> that's never a good tradeoff.
->> -D_FORTIFY_SOURCE-2 is an essential compiler feature that has a defined =
-semantic/etc
->> patches that make behavior worse than that baseline, but shut up some wa=
-rning, are damage
->> not value.
->>
->
-> well, the macro handles overrun (should probably be snprintf(a, bsz - 1, =
-...) >=3D bsz)
-> and replaces small part of the buffer with '...\0'. which is, imho, a bit=
- better
-> than `backtrace(); abort();' (I don't think we can benefit from compile-t=
-ime checks
-> of -D_FORTIFY_SOURCE=3D2, only run time ones) for developers that behavio=
-ur makes
-> sense, for users it's just "seg fault/core dump/whatever"
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ README.traceevent | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
-well it's that or corruption....
-the data is still truncated and partial.. and you keep running with it.
+diff --git a/README.traceevent b/README.traceevent
+index 38563ab..0747766 100644
+--- a/README.traceevent
++++ b/README.traceevent
+@@ -1,15 +1,20 @@
+ traceevent: =
 
-(this is why many people first think strlcpy is a good idea, and then they =
-think more about it and realize it's not)
+ =
+
+-The traceevent library being built in PowerTOP is really a effort by Steve=
+n Rostedt. =
+
+-The long term intent is for Steven to push the trace event library to dist=
+ributions, and consume it externally. Right now the PowerTOP project is kee=
+ping in sync with his code posted in the Linux kernel git under tools/lib/t=
+raceevent. =
+
+-We will not take patches into the traceevent code directly, rather we will=
+ be re-basing =
+
+-against that code base. =
+
++The traceevent library being built in PowerTOP is really a effort by
++Steven Rostedt.  The long term intent is for Steven to push the trace
++event library to distributions, and consume it externally.  Right now the
++PowerTOP project is keeping in sync with his code posted in the Linux
++kernel git under tools/lib/traceevent.  We will not take patches into the
++traceevent code directly, rather we will be re-basing against that code
++base.
+ =
+
+ If you find a bug in the trace event code, you should to one of two things=
+. =
+
+ =
+
+-1. Send a patch to the PowerTOP mailing list, which will get forwared to S=
+teven if appropriate. =
+
+-2. Send a patch to the PowerTOP mailing list, cc <Steven Rostedt> rostedt(=
+a)goodmis.org
++1. Send a patch to the PowerTOP mailing list, which will get forwared to
++   Steven if appropriate.
+ =
+
++2. Send a patch to the PowerTOP mailing list, and
++   CC: Steven Rostedt <rostedt(a)goodmis.org>
+ =
+
+-Please do use the PowerTOP mailing list to discuss topics about traceevent=
+ as its used with PowerTOP.
+-
++Please do use the PowerTOP mailing list to discuss topics about
++traceevent as its used with PowerTOP.
+-- =
+
+2.0.4
 
 
-
---===============7804045020534422961==--
+--===============0349706527832543514==--
 
