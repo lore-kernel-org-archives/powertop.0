@@ -1,151 +1,110 @@
-Content-Type: multipart/mixed; boundary="===============5312482182694009483=="
+Content-Type: multipart/mixed; boundary="===============1822708637375702712=="
 MIME-Version: 1.0
 From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH 13/14] clean up .gitignore file
-Date: Tue, 05 Aug 2014 22:31:37 +0100
-Message-ID: <1407274298-16404-13-git-send-email-kerolasa@iki.fi>
+Subject: [Powertop] [PATCH 14/14] add --auto-tune and --workload to manual page
+Date: Tue, 05 Aug 2014 22:31:38 +0100
+Message-ID: <1407274298-16404-14-git-send-email-kerolasa@iki.fi>
 In-Reply-To: 1407274298-16404-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5312482182694009483==
+--===============1822708637375702712==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Keep the regular expressions, directories, and individual files separate
-understandable way.
+Options in manual page are now in same order as in usage output, and they
+include short options when aplicable.
 
 Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
 ---
- .gitignore | 111 +++++++++++++++++++++++++++------------------------------=
-----
- 1 file changed, 49 insertions(+), 62 deletions(-)
+ doc/powertop.8 | 30 +++++++++++++++++++-----------
+ 1 file changed, 19 insertions(+), 11 deletions(-)
 
-diff --git a/.gitignore b/.gitignore
-index d00973f..b9188a1 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -1,66 +1,53 @@
--*~
--*.o
-+# regular expressions
- *.a
--*.html
- *.csv
--*.powertop
--ChangeLog
--Makefile.in
--aclocal.m4
--config.guess
--config.h.in
--config.rpath
--config.sub
--configure
--depcomp
--install-sh
--ltmain.sh
--missing
--stamp-h1
--Makefile
--config.h
--config.log
--config.status
--libtool
--pevent/.deps/
--pevent/Makefile
--pevent/Makefile.in
--po/Makefile
--po/Makevars.template
--po/POTFILES
--po/Rules-quot
--po/boldquot.sed
--po/en(a)boldquot.header
--po/en(a)quot.header
--po/insert-header.sin
--po/quot.sed
--po/remove-potcdate.sin
--po/*.gmo
--po/stamp-po
--src/powertop
--src/css.h
--src/Makefile.in
--src/.deps/
--src/Makefile
--src/calibrate/.deps/
--src/cpu/.deps/
--src/cpu/rapl/.deps
--src/devices/.deps/
--src/measurement/.deps/
--src/parameters/.deps/
--src/perf/.deps/
--src/process/.deps/
--src/tuning/.deps/
--src/report/.deps/
--m4
- *.dirstamp
--*.lo
-+*.html
- *.la
--autom4te.cache
--remove-potcdate.sed
--compile
--stamp-po
--ABOUT-NLS
--ar-lib
--traceevent/.deps/
--traceevents/.libs/
-+*.lo
-+*.o
-+*.powertop
-+*~
-+.deps
-+/po/*.gmo
-+Makefile
-+Makefile.in
-+
-+# directories
-+/m4/
-+
-+# individual files
-+/ABOUT-NLS
-+/ChangeLog
-+/aclocal.m4
-+/ar-lib
-+/autom4te.cache
-+/compile
-+/config.guess
-+/config.h
-+/config.h.in
-+/config.log
-+/config.rpath
-+/config.status
-+/config.sub
-+/configure
-+/depcomp
-+/install-sh
-+/libtool
-+/ltmain.sh
-+/missing
-+/po/Makevars.template
-+/po/POTFILES
-+/po/Rules-quot
-+/po/boldquot.sed
-+/po/en(a)boldquot.header
-+/po/en(a)quot.header
-+/po/insert-header.sin
-+/po/quot.sed
-+/po/remove-potcdate.sin
-+/po/stamp-po
-+/remove-potcdate.sed
-+/src/css.h
-+/src/powertop
-+/stamp-h1
-+/stamp-po
+diff --git a/doc/powertop.8 b/doc/powertop.8
+index 31e7e6d..8f93c43 100644
+--- a/doc/powertop.8
++++ b/doc/powertop.8
+@@ -12,7 +12,10 @@ experiment with various power management settings.  When=
+ invoking
+ powertop without arguments powertop starts in interactive mode.
+ .SH OPTIONS
+ .TP
+-.B \-\-calibrate
++.B \-\-auto\-tune
++Set all tunable options to their good setting without interaction.
++.TP
++.BR \-c ", " \-\-calibrate
+ Runs powertop in calibration mode.  When running on battery, powertop can
+ track power consumption as well as system activity.  When there are
+ enough measurements, powertop can start to report power estimates.  One
+@@ -20,7 +23,7 @@ can get more accurate estimates by using this option to e=
+nable a
+ calibration cycle.  This will cycle through various display levels and
+ USB device activities and workloads.
+ .TP
+-\fB\-\-csv\fR[=3D\fIfilename\fR]
++\fB\-C\fR, \fB\-\-csv\fR[=3D\fIfilename\fR]
+ Generate a CSV report.  If a
+ .I filename
+ is not specified then the default name
+@@ -28,7 +31,7 @@ is not specified then the default name
+ is used.  The CSV report can be used for reporting and data analysis.
+ .TP
+ .B \-\-debug
+-Run in "debug" mode.
++Run in debug mode.
+ .TP
+ \fB\-\-extech\fR=3D\fIdevnode\fR
+ Use the Extech Power Analyzer for measurements.  This allows one to
+@@ -36,10 +39,7 @@ specify the serial device node of the serial to USB adap=
+tor connecting to
+ the Extech Power Analyzer, for example
+ .IR /dev/ttyUSB0 .
+ .TP
+-.B \-\-help
+-Show the help message.
+-.TP
+-\fB\-\-html\fR[=3D\fIfilename\fR]
++\fB\-h\fR, \fB\-\-html\fR[=3D\fIfilename\fR]
+ Generate an HTML report.  If a
+ .I filename
+ is not specified then the default name
+@@ -47,18 +47,26 @@ is not specified then the default name
+ is used.  The HTML report can be sent to others to help diagnose power
+ issues.
+ .TP
+-\fB\-\-iteration\fR[=3D\fIiterations\fR]
++\fB\-i\fR, \fB\-\-iteration\fR[=3D\fIiterations\fR]
+ Number of times to run each test.
+ .TP
+-.B \-\-quiet
++.BR \-q ", " \-\-quiet
+ Suppress stderr output.
+ .TP
+-\fB\-\-time\fR[=3D\fIseconds\fR]
++\fB\-t\fR, \fB\-\-time\fR[=3D\fIseconds\fR]
+ Generate a report for a specified number of
+ .IR seconds .
+ .TP
+-.B \-\-version
++\fB\-w\fR, \fB\-\-workload\fR[=3D\fIworkload\fR]
++Execute
++.I workload
++file as a part of calibration before making a report.
++.TP
++.BR \-V ", " \-\-version
+ Print version information and exit.
++.TP
++.BR \-u ", " \-\-help
++Show the help message and exit.
+ .SH COMMANDS
+ In interactive mode, the following key bindings are available:
+ .IP
 -- =
 
 2.0.4
 
 
---===============5312482182694009483==--
+--===============1822708637375702712==--
 
