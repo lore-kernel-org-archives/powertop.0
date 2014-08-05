@@ -1,74 +1,255 @@
-Content-Type: multipart/mixed; boundary="===============8235935038920811190=="
+Content-Type: multipart/mixed; boundary="===============9067644787343815737=="
 MIME-Version: 1.0
-From: Andreas Mohr <andi at lisas.de>
-Subject: Re: [Powertop] [PATCH v3 05/15] fix clang++ compilation errors
-Date: Sat, 04 Oct 2014 22:10:58 +0200
-Message-ID: <20141004201058.GA26114@rhlx01.hs-esslingen.de>
-In-Reply-To: alpine.LNX.2.03.1410041513550.3874@iki.fi
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH 08/14] add short options to usage,
+ and order the options data
+Date: Tue, 05 Aug 2014 22:31:32 +0100
+Message-ID: <1407274298-16404-8-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1407274298-16404-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8235935038920811190==
+--===============9067644787343815737==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Earlier user experience was pretty unintuitive.  For example -h is often
+help, and it generated an error, but had nothing in usage to tell what
+the -h does.
 
-On Sat, Oct 04, 2014 at 03:15:34PM +0100, Sami Kerola wrote:
-> On Sat, 4 Oct 2014, Andreas Mohr wrote:
-> >So, now that this is documented for other people to be helped,
-> >on to documenting README omissions and working on the scoped array handl=
-ing commit.
-> =
+The option data in struct option, print_usage(), getopt_long() optstring,
+and getopt_long switch() case, are made to be same order.  All options
+are in long-option alphabetical order, with exception of --version and
+--help that are the last in the list.
 
-> Hi Andreas,
-> =
+Some options where meant to be used as long-only options.  These are made
+unreachable by making the option character to be out side of range what
+user can type.
 
-> IMHO it would be better to require new enough automake as part of autotoo=
-ls
-> configuration, than add notes to README.  Something like this could do:
+Finally when unknown option is exiting the return value is changed from
+zero to one to indicate a failure.
 
-Not quite, people actually need to get to know that they need automake at a=
-ll
-(to achieve availability of ./configure) ;)
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ src/main.cpp | 154 ++++++++++++++++++++++++++++++-------------------------=
+----
+ 1 file changed, 78 insertions(+), 76 deletions(-)
 
-(was mentioned shortly further below, but that's not enough)
+diff --git a/src/main.cpp b/src/main.cpp
+index 99a985f..3b67ef0 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -69,21 +69,27 @@ int debug_learning =3D 0;
+ unsigned time_out =3D 20;
+ int leave_powertop =3D 0;
+ =
 
-> Apparently some Debian has rather old automake, version 1.7, which is
-> causing build from git to fail.
++enum {
++	OPT_AUTO_TUNE =3D CHAR_MAX + 1,
++	OPT_EXTECH,
++	OPT_DEBUG
++};
++
+ static const struct option long_options[] =3D
+ {
+ 	/* These options set a flag. */
+-	{"debug", no_argument, &debug_learning, 'd'},
+-	{"version", no_argument, NULL, 'V'},
+-	{"help",no_argument, NULL, 'u'}, /* u for usage */
+-	{"calibrate",no_argument, NULL, 'c'},
+-	{"auto-tune",no_argument, NULL, 'a'},
+-	{"html", optional_argument, NULL, 'h'},
++	{"auto-tune", no_argument, NULL, OPT_AUTO_TUNE},
++	{"calibrate", no_argument, NULL, 'c'},
+ 	{"csv", optional_argument, NULL, 'C'},
+-	{"extech", optional_argument, NULL, 'e'},
+-	{"time", optional_argument, NULL, 't'},
++	{"debug", no_argument, &debug_learning, OPT_DEBUG},
++	{"extech", optional_argument, NULL, OPT_EXTECH},
++	{"html", optional_argument, NULL, 'h'},
+ 	{"iteration", optional_argument, NULL, 'i'},
+-	{"workload", optional_argument, NULL, 'w'},
+ 	{"quiet", no_argument, NULL, 'q'},
++	{"time", optional_argument, NULL, 't'},
++	{"workload", optional_argument, NULL, 'w'},
++	{"version", no_argument, NULL, 'V'},
++	{"help", no_argument, NULL, 'u'},	/* u for usage */
+ 	{NULL, 0, NULL, 0}
+ };
+ =
 
-That's just my "historic" Debian installation (18 years and counting).
-(bo, woody, slink, hamm or some such?)
+@@ -108,21 +114,21 @@ static bool set_refresh_timeout()
+ =
 
-Oh crap, my 'puter just managed to get its driver's license ;)
-Another 3 years and it will be allowed to drink beer...
+ static void print_usage()
+ {
+-	printf("%s\n\n",_("Usage: powertop [OPTIONS]"));
+-	printf("--debug \t\t %s\n",_("run in \"debug\" mode"));
+-	printf("--version \t\t %s\n",_("print version information"));
+-	printf("--calibrate \t\t %s\n",_("runs powertop in calibration mode"));
+-	printf("--auto-tune \t\t %s\n",_("Sets all tunable options to their GOOD =
+setting"));
+-	printf("--extech%s \t %s\n",_("[=3Ddevnode]"),_("uses an Extech Power Ana=
+lyzer for measurements"));
+-	printf("--html%s \t %s\n",_("[=3DFILENAME]"),_("generate a html report"));
+-	printf("--csv%s \t %s\n",_("[=3DFILENAME]"),_("generate a csv report"));
+-	printf("--time%s \t %s\n",_("[=3Dseconds]"), _("generate a report for 'x'=
+ seconds"));
+-	printf("--iteration%s\n", _("[=3Diterations] number of times to run each =
+test"));
+-	printf("--workload%s \t %s\n", _("[=3Dworkload]"), _("file to execute for=
+ workload"));
+-	printf("--quiet \t\t %s\n", _("suppress stderr output"));
+-	printf("--help \t\t\t %s\n",_("print this help menu"));
++	printf("%s\n\n", _("Usage: powertop [OPTIONS]"));
++	printf("     --auto-tune\t %s\n", _("sets all tunable options to their GO=
+OD setting"));
++	printf(" -c, --calibrate\t %s\n", _("runs powertop in calibration mode"));
++	printf(" -C, --csv%s\t %s\n", _("[=3Dfilename]"), _("generate a csv repor=
+t"));
++	printf("     --debug\t\t %s\n", _("run in \"debug\" mode"));
++	printf("     --extech%s\t %s\n", _("[=3Ddevnode]"), _("uses an Extech Pow=
+er Analyzer for measurements"));
++	printf(" -h, --html%s\t %s\n", _("[=3Dfilename]"), _("generate a html rep=
+ort"));
++	printf(" -i, --iteration%s\n", _("[=3Diterations] number of times to run =
+each test"));
++	printf(" -q, --quiet\t\t %s\n", _("suppress stderr output"));
++	printf(" -t, --time%s\t %s\n", _("[=3Dseconds]"), _("generate a report fo=
+r 'x' seconds"));
++	printf(" -w, --workload%s %s\n", _("[=3Dworkload]"), _("file to execute f=
+or workload"));
++	printf(" -V, --version\t\t %s\n", _("print version information"));
++	printf(" -u, --help\t\t %s\n", _("print this help menu"));
+ 	printf("\n");
+-	printf("%s\n\n",_("For more help please refer to the README"));
++	printf("%s\n\n", _("For more help please refer to the 'man 8 powertop'"));
+ }
+ =
 
-> Set the requird automake version to be minimum of 1.11.1, that used to be
-> the version GNU coreutils requied before they introduced
-> AM_TESTS_ENVIRONMENT that works in 1.11.2 or later.  As powertop does not
-> have tests, the earlier GNU coreutils requirement an initial pick for
-> this project.
+ static void do_sleep(int seconds)
+@@ -380,63 +386,59 @@ int main(int argc, char **argv)
+ #endif
+ =
 
-Yup, since we *do* seem to use version-specific functionality,
-we likely *should* fend off version issues,
-by demanding specific version requirements
-in this AM_INIT_AUTOMAKE autoconf macro,
-otherwise our behaviour is "improper", "weak".
+ 	while (1) { /* parse commandline options */
+-		c =3D getopt_long (argc, argv, "ch:C:i:t:uVw:q", long_options, &option_i=
+ndex);
++		c =3D getopt_long(argc, argv, "cC:h:i:qt:w:Vu", long_options, &option_in=
+dex);
+ 		/* Detect the end of the options. */
+ 		if (c =3D=3D -1)
+ 			break;
+-
+ 		switch (c) {
+-			case 'V':
+-				print_version();
+-				exit(0);
+-				break;
+-
+-			case 'e': /* Extech power analyzer support */
+-				checkroot();
+-				extech_power_meter(optarg ? optarg : "/dev/ttyUSB0");
+-				break;
+-			case 'u':
+-				print_usage();
+-				exit(0);
+-				break;
+-			case 'a':
+-				auto_tune =3D 1;
+-				leave_powertop =3D 1;
+-				break;
+-			case 'c':
+-				powertop_init();
+-				calibrate();
+-				break;
+-
+-			case 'h': /* html report */
+-				reporttype =3D REPORT_HTML;
+-				sprintf(filename, "%s", optarg ? optarg : "powertop.html" );
+-				break;
+-
+-			case 't':
+-				time_out =3D (optarg ? atoi(optarg) : 20);
+-				break;
+-
+-			case 'i':
+-				iterations =3D (optarg ? atoi(optarg) : 1);
+-				break;
+-
+-			case 'w': /* measure workload */
+-				sprintf(workload, "%s", optarg ? optarg :'\0' );
+-				break;
+-			case 'q':
+-				if(freopen("/dev/null", "a", stderr))
+-					fprintf(stderr, _("Quite mode failed!\n"));
+-				break;
+-
+-			case 'C': /* csv report*/
+-				reporttype =3D REPORT_CSV;
+-				sprintf(filename, "%s", optarg ? optarg : "powertop.csv");
+-				break;
+-			case '?': /* Unknown option */
+-				/* getopt_long already printed an error message. */
+-				exit(0);
+-				break;
++		case OPT_AUTO_TUNE:
++			auto_tune =3D 1;
++			leave_powertop =3D 1;
++			break;
++		case 'c':
++			powertop_init();
++			calibrate();
++			break;
++		case 'C':		/* csv report */
++			reporttype =3D REPORT_CSV;
++			sprintf(filename, "%s", optarg ? optarg : "powertop.csv");
++			break;
++		case OPT_DEBUG:
++			/* implemented using getopt_long(3) flag */
++			break;
++		case OPT_EXTECH:	/* Extech power analyzer support */
++			checkroot();
++			extech_power_meter(optarg ? optarg : "/dev/ttyUSB0");
++			break;
++		case 'h':		/* html report */
++			reporttype =3D REPORT_HTML;
++			sprintf(filename, "%s", optarg ? optarg : "powertop.html");
++			break;
++		case 'i':
++			iterations =3D (optarg ? atoi(optarg) : 1);
++			break;
++		case 'q':
++			if (freopen("/dev/null", "a", stderr))
++				fprintf(stderr, _("Quite mode failed!\n"));
++			break;
++		case 't':
++			time_out =3D (optarg ? atoi(optarg) : 20);
++			break;
++		case 'w':		/* measure workload */
++			sprintf(workload, "%s", optarg ? optarg : '\0');
++			break;
++		case 'V':
++			print_version();
++			exit(0);
++			break;
++		case 'u':
++			print_usage();
++			exit(0);
++			break;
++		case '?':		/* Unknown option */
++			/* getopt_long already printed an error message. */
++			exit(1);
++			break;
+ 		}
+ 	}
+ =
 
-> p.s. The automake 1.11.1 has been a round since December 2009, so there
-> really shouldn't be need for support anything older, like 1.7.9 that was
-> released November 2003.
+-- =
 
-Ouch, that old?
+2.0.4
 
 
-In closing: patch seems fine to me (possibly except for the specific
-version number, that is).
-
-Thanks,
-
-Andreas Mohr
-
---===============8235935038920811190==--
+--===============9067644787343815737==--
 
