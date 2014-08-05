@@ -1,66 +1,103 @@
-Content-Type: multipart/mixed; boundary="===============2628258105947257241=="
+Content-Type: multipart/mixed; boundary="===============6112380761703872206=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] [PATCH 1/1] tunable: update sched_mc_power_savings
- target value
-Date: Fri, 22 Aug 2014 18:10:47 -0700
-Message-ID: <58681.10.7.198.163.1408756247.squirrel@linux.intel.com>
-In-Reply-To: CAJDL4uL73EeF5MJPApcEkHirSS69kioYzHfu+evGT8DNyU9_eA@mail.gmail.com
+From: Mohammad Merajul Islam Molla <meraj.enigma at gmail.com>
+Subject: [Powertop] [PATCH v2] powertop: fix various resource leaks
+Date: Tue, 05 Aug 2014 22:01:58 +0600
+Message-ID: <1407254518-6705-1-git-send-email-meraj.enigma@gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2628258105947257241==
+--===============6112380761703872206==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+fixes various resource leaks detected by valgrind and coverity scan.
 
-> On Tue, Aug 19, 2014 at 7:49 AM, Sergey Senozhatsky <
-> sergey.senozhatsky(a)gmail.com> wrote:
->
->> On (08/13/14 21:28), Nanley Chery wrote:
->> > Starting in kernel 2.6.29, the highest power savings level increased
->> to
->> "2".
->> > However, in kernel 3.5, the sched power savings feature was removed
->> altogether.
->>
->> hello,
->> thanks for reporting,
->>
->>
->> so, it's been removed 2 years ago (3.5 release date was 21 Jul 2012).
->>
->> do we need to support it at all?
->
->
-> Hello,
->
-> Good question. Our README file indicates linux-kernel >=3D 2.6.38 to be a
-> build requirement. Does this mean we support power management features
-> starting from that kernel? Or does it mean that this is only a build
-> requirement and we target the latest kernels? It is not clear from the
-> current documentation.
->
-> On a much smaller scope, supporting this feature is essentially free
-> (maintenance-wise) and would keep some of our end users on older kernels
-> happy. Btw, I submitted a simpler version 2 of this patch that does not
-> check for the kernel version.
->
-> Thanks,
-> Nanley
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->
+move pclose(file) in the scope of "out" label.
 
->From PowerTOP 2.0 and up the requirement is to run at least Linux kernel
-2.6.38. If it is not in the supported kernel then PowerTOP does not need
-it.
+Signed-off-by: Mohammad Merajul Islam Molla <meraj.enigma(a)gmail.com>
+---
+ src/devices/ahci.cpp     | 4 +++-
+ src/perf/perf_bundle.cpp | 4 +++-
+ src/tuning/bluetooth.cpp | 6 +++---
+ 3 files changed, 9 insertions(+), 5 deletions(-)
 
-Thank you,
-Alexandra.
+diff --git a/src/devices/ahci.cpp b/src/devices/ahci.cpp
+index 3b4627a..a4d1345 100644
+--- a/src/devices/ahci.cpp
++++ b/src/devices/ahci.cpp
+@@ -67,8 +67,10 @@ static string disk_name(char *path, char *target, char *=
+shortname)
+ 		sprintf(line, "%s/%s/model", pathname, dirent->d_name);
+ 		file =3D fopen(line, "r");
+ 		if (file) {
+-			if (fgets(line, 4096, file) =3D=3D NULL)
++			if (fgets(line, 4096, file) =3D=3D NULL) {
++				fclose(file);
+ 				break;
++			}
+ 			fclose(file);
+ 			c =3D strchr(line, '\n');
+ 			if (c)
+diff --git a/src/perf/perf_bundle.cpp b/src/perf/perf_bundle.cpp
+index b0e982b..cf1ae11 100644
+--- a/src/perf/perf_bundle.cpp
++++ b/src/perf/perf_bundle.cpp
+@@ -142,8 +142,10 @@ static void parse_event_format(const char *event_name)
+ =
 
---===============2628258105947257241==--
+ 	buf =3D read_file(file);
+ 	free(file);
+-	if (!buf)
++	if (!buf) {
++		free(name);
+ 		return;
++	}
+ =
+
+ 	pevent_parse_event(perf_event::pevent, buf, strlen(buf), sys);
+ 	free(name);
+diff --git a/src/tuning/bluetooth.cpp b/src/tuning/bluetooth.cpp
+index 92f5835..9be327e 100644
+--- a/src/tuning/bluetooth.cpp
++++ b/src/tuning/bluetooth.cpp
+@@ -108,7 +108,7 @@ static int last_check_result;
+ int bt_tunable::good_bad(void)
+ {
+ 	struct hci_dev_info devinfo;
+-	FILE *file;
++	FILE *file =3D 0;
+ 	int fd;
+ 	int thisbytes =3D 0;
+ 	int ret;
+@@ -149,11 +149,9 @@ int bt_tunable::good_bad(void)
+ 			memset(line, 0, 2048);
+ 			if (fgets(line, 2047, file) =3D=3D NULL) {
+ 				result =3D last_check_result =3D TUNE_GOOD;
+-				pclose(file);
+ 				goto out;
+ 			}
+ =
+
+-			pclose(file);
+ 			if (strlen(line) > 0) {
+ 				result =3D last_check_result =3D TUNE_GOOD;
+ 				goto out;
+@@ -166,6 +164,8 @@ int bt_tunable::good_bad(void)
+ =
+
+ out:
+ 	previous_bytes =3D thisbytes;
++	if (file)
++		pclose(file);
+ 	close(fd);
+ 	return result;
+ }
+-- =
+
+1.9.1
+
+
+--===============6112380761703872206==--
 
