@@ -1,48 +1,102 @@
-Content-Type: multipart/mixed; boundary="===============8291915021541448218=="
+Content-Type: multipart/mixed; boundary="===============7504729028503844929=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH v3 4/5] Mark pretty_print_init as initialized
-Date: Fri, 17 Oct 2014 15:58:05 -0700
-Message-ID: <1413586686-28602-5-git-send-email-joe.konno@linux.intel.com>
-In-Reply-To: 1413586686-28602-1-git-send-email-joe.konno@linux.intel.com
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH 06/14] remove unnecessary assignments
+Date: Tue, 05 Aug 2014 22:31:30 +0100
+Message-ID: <1407274298-16404-6-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1407274298-16404-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8291915021541448218==
+--===============7504729028503844929==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Dan Kalowsky <daniel.kalowsky(a)intel.com>
+Found using scan-build, Clang static analyzer.
 
-There is a check for it, but it's never actually set.  Now it's set.
-
-v2: rebased atop 41c54e8
-
-Signed-off-by: Joe Konno <joe.konno(a)intel.com>
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
 ---
- src/lib.cpp | 2 ++
- 1 file changed, 2 insertions(+)
+ src/lib.cpp                | 8 ++++----
+ src/main.cpp               | 6 ++++--
+ src/process/do_process.cpp | 2 +-
+ 3 files changed, 9 insertions(+), 7 deletions(-)
 
 diff --git a/src/lib.cpp b/src/lib.cpp
-index cce7973..437803b 100644
+index a8f3746..b482296 100644
 --- a/src/lib.cpp
 +++ b/src/lib.cpp
-@@ -408,6 +408,8 @@ static void init_pretty_print(void)
- 	pretty_prints["[12] i8042"] =3D _("PS/2 Touchpad / Keyboard / Mouse");
- 	pretty_prints["ahci"] =3D _("SATA controller");
- 	pretty_prints["usb-device-8087-0020"] =3D _("Intel built in USB hub");
-+
-+	pretty_print_init =3D 1;
- }
+@@ -472,10 +472,10 @@ int read_msr(int cpu, uint64_t offset, uint64_t *valu=
+e)
+ 	int fd;
+ 	char msr_path[256];
  =
 
+-	fd =3D sprintf(msr_path, "/dev/cpu/%d/msr", cpu);
++	sprintf(msr_path, "/dev/cpu/%d/msr", cpu);
  =
 
+ 	if (access(msr_path, R_OK) !=3D 0){
+-		fd =3D sprintf(msr_path, "/dev/msr%d", cpu);
++		sprintf(msr_path, "/dev/msr%d", cpu);
+ =
+
+ 		if (access(msr_path, R_OK) !=3D 0){
+ 			fprintf(stderr,
+@@ -504,10 +504,10 @@ int write_msr(int cpu, uint64_t offset, uint64_t valu=
+e)
+ 	int fd;
+ 	char msr_path[256];
+ =
+
+-	fd =3D sprintf(msr_path, "/dev/cpu/%d/msr", cpu);
++	sprintf(msr_path, "/dev/cpu/%d/msr", cpu);
+ =
+
+ 	if (access(msr_path, R_OK) !=3D 0){
+-		fd =3D sprintf(msr_path, "/dev/msr%d", cpu);
++		sprintf(msr_path, "/dev/msr%d", cpu);
+ =
+
+ 		if (access(msr_path, R_OK) !=3D 0){
+ 			fprintf(stderr,
+diff --git a/src/main.cpp b/src/main.cpp
+index cf4e547..99a985f 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -315,8 +315,10 @@ static void powertop_init(void)
+ 	rlmt.rlim_cur =3D rlmt.rlim_max =3D get_nr_open();
+ 	setrlimit (RLIMIT_NOFILE, &rlmt);
+ =
+
+-	ret =3D system("/sbin/modprobe cpufreq_stats > /dev/null 2>&1");
+-	ret =3D system("/sbin/modprobe msr > /dev/null 2>&1");
++	if (system("/sbin/modprobe cpufreq_stats > /dev/null 2>&1"))
++		fprintf(stderr, _("modprobe cpufreq_stats failed"));
++	if (system("/sbin/modprobe msr > /dev/null 2>&1"))
++		fprintf(stderr, _("modprobe msr failed"));
+ 	statfs("/sys/kernel/debug", &st_fs);
+ =
+
+ 	if (st_fs.f_type !=3D (long) DEBUGFS_MAGIC) {
+diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
+index 8d55507..dd7d982 100644
+--- a/src/process/do_process.cpp
++++ b/src/process/do_process.cpp
+@@ -579,7 +579,7 @@ void perf_process_bundle::handle_trace_point(void *trac=
+e, int cpu, uint64_t time
+ 		consumer_child_time(cpu, t);
+ 	}
+ 	else if (strcmp(event->name, "cpu_idle") =3D=3D 0) {
+-		ret =3D pevent_get_field_val(NULL, event, "state", &rec, &val, 0);
++		pevent_get_field_val(NULL, event, "state", &rec, &val, 0);
+ 		if (val =3D=3D (unsigned int)-1)
+ 			consume_blame(cpu);
+ 		else
 -- =
 
-2.1.2
+2.0.4
 
 
---===============8291915021541448218==--
+--===============7504729028503844929==--
 
