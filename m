@@ -1,84 +1,62 @@
-Content-Type: multipart/mixed; boundary="===============3917763069031964175=="
+Content-Type: multipart/mixed; boundary="===============7635865674581513986=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH 07/12] move options structure to function scope
-Date: Sat, 02 Aug 2014 12:54:12 +0100
-Message-ID: <1406980457-19077-8-git-send-email-kerolasa@iki.fi>
-In-Reply-To: 1406980457-19077-1-git-send-email-kerolasa@iki.fi
+From: Nanley Chery <nanleychery at gmail.com>
+Subject: [Powertop] [PATCH 1/1] tunable: update sched_mc_power_savings target
+ value
+Date: Wed, 13 Aug 2014 21:28:05 -0400
+Message-ID: <1407979685-1745-2-git-send-email-nanleychery@gmail.com>
+In-Reply-To: 1407979685-1745-1-git-send-email-nanleychery@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3917763069031964175==
+--===============7635865674581513986==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+Starting in kernel 2.6.29, the highest power savings level increased to "2".
+However, in kernel 3.5, the sched power savings feature was removed altoget=
+her.
+
+Signed-off-by: Nanley Chery <nanleychery(a)gmail.com>
 ---
- src/main.cpp | 35 ++++++++++++++++++-----------------
- 1 file changed, 18 insertions(+), 17 deletions(-)
+ src/tuning/tuning.cpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/src/main.cpp b/src/main.cpp
-index 99a985f..910fe5c 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -69,23 +69,6 @@ int debug_learning =3D 0;
- unsigned time_out =3D 20;
- int leave_powertop =3D 0;
+diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
+index 6367a20..ea1905b 100644
+--- a/src/tuning/tuning.cpp
++++ b/src/tuning/tuning.cpp
+@@ -28,6 +28,7 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <ncurses.h>
++#include <linux/version.h>
  =
 
--static const struct option long_options[] =3D
--{
--	/* These options set a flag. */
--	{"debug", no_argument, &debug_learning, 'd'},
--	{"version", no_argument, NULL, 'V'},
--	{"help",no_argument, NULL, 'u'}, /* u for usage */
--	{"calibrate",no_argument, NULL, 'c'},
--	{"auto-tune",no_argument, NULL, 'a'},
--	{"html", optional_argument, NULL, 'h'},
--	{"csv", optional_argument, NULL, 'C'},
--	{"extech", optional_argument, NULL, 'e'},
--	{"time", optional_argument, NULL, 't'},
--	{"iteration", optional_argument, NULL, 'i'},
--	{"workload", optional_argument, NULL, 'w'},
--	{"quiet", no_argument, NULL, 'q'},
--	{NULL, 0, NULL, 0}
--};
  =
 
- static void print_version()
+ #include "tuning.h"
+@@ -58,7 +59,9 @@ static void init_tuning(void)
  {
-@@ -370,6 +353,24 @@ int main(int argc, char **argv)
- 	char workload[4096] =3D {0,};
- 	int  iterations =3D 1, auto_tune =3D 0;
- =
-
-+	static const struct option long_options[] =3D
-+	{
-+		/* These options set a flag. */
-+		{"debug", no_argument, &debug_learning, 'd'},
-+		{"version", no_argument, NULL, 'V'},
-+		{"help",no_argument, NULL, 'u'}, /* u for usage */
-+		{"calibrate",no_argument, NULL, 'c'},
-+		{"auto-tune",no_argument, NULL, 'a'},
-+		{"html", optional_argument, NULL, 'h'},
-+		{"csv", optional_argument, NULL, 'C'},
-+		{"extech", optional_argument, NULL, 'e'},
-+		{"time", optional_argument, NULL, 't'},
-+		{"iteration", optional_argument, NULL, 'i'},
-+		{"workload", optional_argument, NULL, 'w'},
-+		{"quiet", no_argument, NULL, 'q'},
-+		{NULL, 0, NULL, 0}
-+	};
-+
- 	set_new_handler(out_of_memory);
- =
-
- 	setlocale (LC_ALL, "");
+ 	add_sysfs_tunable(_("Enable Audio codec power management"), "/sys/module/=
+snd_hda_intel/parameters/power_save", "1");
+ 	add_sysfs_tunable(_("NMI watchdog should be turned off"), "/proc/sys/kern=
+el/nmi_watchdog", "0");
+-	add_sysfs_tunable(_("Power Aware CPU scheduler"), "/sys/devices/system/cp=
+u/sched_mc_power_savings", "1");
++#if LINUX_VERSION_CODE <=3D KERNEL_VERSION(3,4,0)
++	add_sysfs_tunable(_("Power Aware CPU scheduler"), "/sys/devices/system/cp=
+u/sched_mc_power_savings", "2");
++#endif
+ 	add_sysfs_tunable(_("VM writeback timeout"), "/proc/sys/vm/dirty_writebac=
+k_centisecs", "1500");
+ 	add_sata_tunables();
+ 	add_usb_tunables();
 -- =
 
-2.0.3
+2.0.4
 
 
---===============3917763069031964175==--
+--===============7635865674581513986==--
 
