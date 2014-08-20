@@ -1,31 +1,62 @@
-Content-Type: multipart/mixed; boundary="===============7938545600342964205=="
+Content-Type: multipart/mixed; boundary="===============1875525235606973330=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: Re: [Powertop] [PATCH v2 8/8] Adding a clean_shutdown function
-Date: Fri, 17 Oct 2014 10:34:51 -0700
-Message-ID: <5441533B.1090405@linux.intel.com>
-In-Reply-To: 20141015125922.GD1189@swordfish
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: Re: [Powertop] [PATCH 09/14] do not use ncurses when --auto-tune is
+ specified
+Date: Wed, 20 Aug 2014 15:57:20 +0300
+Message-ID: <CAG27Bk3rJCRgpoJu8SYgzrsCWhvvs354mbYHMyVY4q2kd8krow@mail.gmail.com>
+In-Reply-To: 20140820122859.GA981@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7938545600342964205==
+--===============1875525235606973330==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 10/15/2014 05:59 AM, Sergey Senozhatsky wrote:
-> =
+On 20 August 2014 15:28, Sergey Senozhatsky
+<sergey.senozhatsky(a)gmail.com> wrote:
+> On (08/05/14 22:31), Sami Kerola wrote:
+>> Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+>> ---
+>>  src/main.cpp | 9 ++++++---
+>>  1 file changed, 6 insertions(+), 3 deletions(-)
+>>
+>
+> I think it makes sense to extend ui_notify_user() so it can cover
+> both cases: initialised ncurses -- calling mvprintw(), and
+> uninitialised ncurses -- printf (to stdout).
+>
+> this will change a bit 'powertop --auto-tune' behaviour, since by
+> default user will now see a 'list' of commands executed by powertop,
+> but it's really easy to silent powertop via stdout redirection.
+>
+>
+> what do you think?
 
-> I would agree on that refactoring if we would call this function
-> from several places. otherwise, I see no actual reason.
-> =
+Hi Sergey,
 
-> 	-ss
+I think this patch set will need to get ready eventually.  Would it be
+possible that the upstream maintainer will drop the patch 0007 aka 'do
+not use ncurses' and merge the rest (assuming they are not unmentioned
+way borken).
 
-I'm sympathetic to that argument. I haven't a strong feeling one way or
-the other in this instance, though.
+Since my primary goal when I started to do anything with powertop was
+to get rid of --auto-tune blinking I will craft another change that
+will do exactly that. But as mentioned, there is error reporting that
+must not break as side effect. Because a signal to do printing
+different way is command line option driven it is probably best to add
+a control structure that will allow to do that, and allow easy
+extensions in future when similar needs appear.
 
-Alex and maintainers?
+What comes to stdout redirection, you are likely right. Making ncurses
+not to blink screen may require poking code a little bit here and
+there. To me that is a another good reason to separate the change set.
 
---===============7938545600342964205==--
+-- =
+
+Sami Kerola
+http://www.iki.fi/kerolasa/
+
+--===============1875525235606973330==--
 
