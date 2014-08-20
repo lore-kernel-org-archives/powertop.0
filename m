@@ -1,81 +1,83 @@
-Content-Type: multipart/mixed; boundary="===============0349706527832543514=="
+Content-Type: multipart/mixed; boundary="===============1611801895305972527=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH 12/14] wrap lines in README.traceevent
-Date: Tue, 05 Aug 2014 22:31:36 +0100
-Message-ID: <1407274298-16404-12-git-send-email-kerolasa@iki.fi>
-In-Reply-To: 1407274298-16404-1-git-send-email-kerolasa@iki.fi
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH 09/14] do not use ncurses when --auto-tune is
+ specified
+Date: Wed, 20 Aug 2014 21:28:59 +0900
+Message-ID: <20140820122859.GA981@swordfish>
+In-Reply-To: 1407274298-16404-9-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0349706527832543514==
+--===============1611801895305972527==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
----
- README.traceevent | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
-
-diff --git a/README.traceevent b/README.traceevent
-index 38563ab..0747766 100644
---- a/README.traceevent
-+++ b/README.traceevent
-@@ -1,15 +1,20 @@
- traceevent: =
-
- =
-
--The traceevent library being built in PowerTOP is really a effort by Steve=
-n Rostedt. =
-
--The long term intent is for Steven to push the trace event library to dist=
-ributions, and consume it externally. Right now the PowerTOP project is kee=
-ping in sync with his code posted in the Linux kernel git under tools/lib/t=
-raceevent. =
-
--We will not take patches into the traceevent code directly, rather we will=
- be re-basing =
-
--against that code base. =
-
-+The traceevent library being built in PowerTOP is really a effort by
-+Steven Rostedt.  The long term intent is for Steven to push the trace
-+event library to distributions, and consume it externally.  Right now the
-+PowerTOP project is keeping in sync with his code posted in the Linux
-+kernel git under tools/lib/traceevent.  We will not take patches into the
-+traceevent code directly, rather we will be re-basing against that code
-+base.
- =
-
- If you find a bug in the trace event code, you should to one of two things=
-. =
-
- =
-
--1. Send a patch to the PowerTOP mailing list, which will get forwared to S=
-teven if appropriate. =
-
--2. Send a patch to the PowerTOP mailing list, cc <Steven Rostedt> rostedt(=
-a)goodmis.org
-+1. Send a patch to the PowerTOP mailing list, which will get forwared to
-+   Steven if appropriate.
- =
-
-+2. Send a patch to the PowerTOP mailing list, and
-+   CC: Steven Rostedt <rostedt(a)goodmis.org>
- =
-
--Please do use the PowerTOP mailing list to discuss topics about traceevent=
- as its used with PowerTOP.
--
-+Please do use the PowerTOP mailing list to discuss topics about
-+traceevent as its used with PowerTOP.
--- =
-
-2.0.4
+On (08/05/14 22:31), Sami Kerola wrote:
+> Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+> ---
+>  src/main.cpp | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+> =
 
 
---===============0349706527832543514==--
+I think it makes sense to extend ui_notify_user() so it can cover
+both cases: initialised ncurses -- calling mvprintw(), and
+uninitialised ncurses -- printf (to stdout).
+
+this will change a bit 'powertop --auto-tune' behaviour, since by
+default user will now see a 'list' of commands executed by powertop,
+but it's really easy to silent powertop via stdout redirection.
+
+
+what do you think?
+
+	-ss
+
+
+> diff --git a/src/main.cpp b/src/main.cpp
+> index 3b67ef0..4bfd038 100644
+> --- a/src/main.cpp
+> +++ b/src/main.cpp
+> @@ -460,7 +460,8 @@ int main(int argc, char **argv)
+>  		end_pci_access();
+>  		exit(0);
+>  	}
+> -	init_display();
+> +	if (!auto_tune)
+> +		init_display();
+>  	initialize_tuning();
+>  	/* first one is short to not let the user wait too long */
+>  	one_measurement(1, NULL);
+> @@ -473,11 +474,13 @@ int main(int argc, char **argv)
+>  	}
+>  =
+
+>  	while (!leave_powertop) {
+> -		show_cur_tab();
+> +		if (!auto_tune)
+> +			show_cur_tab();
+>  		one_measurement(time_out, NULL);
+>  		learn_parameters(15, 0);
+>  	}
+> -	endwin();
+> +	if (!auto_tune)
+> +		endwin();
+>  	printf("%s\n", _("Leaving PowerTOP"));
+>  =
+
+>  	end_process_data();
+> -- =
+
+> 2.0.4
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>=20
+
+--===============1611801895305972527==--
 
