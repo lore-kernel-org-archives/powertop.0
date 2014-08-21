@@ -1,72 +1,102 @@
-Content-Type: multipart/mixed; boundary="===============0907218311231443749=="
+Content-Type: multipart/mixed; boundary="===============5418092300657939496=="
 MIME-Version: 1.0
-From: Nanley Chery <nanleychery at gmail.com>
-Subject: [Powertop] [PATCH 1/1] tunables: check usb autosuspend support before
- add
-Date: Sat, 23 Aug 2014 23:22:13 -0400
-Message-ID: <1408850533-5008-2-git-send-email-nanleychery@gmail.com>
-In-Reply-To: 1408850533-5008-1-git-send-email-nanleychery@gmail.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH 09/14] do not use ncurses when --auto-tune is
+ specified
+Date: Thu, 21 Aug 2014 20:54:47 +0900
+Message-ID: <20140821115447.GA946@swordfish>
+In-Reply-To: 1408568193-31880-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0907218311231443749==
+--===============5418092300657939496==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Some usb devices do not have drivers that support autosuspend.
-These drivers should not be added to the list of tunables, because
-toggling their good/bad value does nothing.
+On (08/20/14 23:56), Sami Kerola wrote:
+> Hello Sergey and others,
+> =
 
-Signed-off-by: Nanley Chery <nanleychery(a)gmail.com>
----
- src/tuning/tuningusb.cpp | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+> I had a bit of spare time so I started to look what exactly is calling
+> mvprintw() via ui_notify_user().  My initial reaction was that I must
+> have made some error in search, because I could not find such call.  So I
+> added abort() to the code...
+> =
 
-diff --git a/src/tuning/tuningusb.cpp b/src/tuning/tuningusb.cpp
-index 27a6dca..ee86335 100644
---- a/src/tuning/tuningusb.cpp
-+++ b/src/tuning/tuningusb.cpp
-@@ -28,6 +28,7 @@
- #include "unistd.h"
- #include "tuningusb.h"
- #include <string.h>
-+#include <dirent.h>
- #include <utility>
- #include <iostream>
- #include <fstream>
-@@ -126,6 +127,25 @@ static void add_usb_callback(const char *d_name)
- 	if (access(filename, R_OK)!=3D0)
- 		return;
- =
+> index b482296..55c9603 100644
+> --- a/src/lib.cpp
+> +++ b/src/lib.cpp
+> @@ -546,5 +546,6 @@ void ui_notify_user(const char *frmt, ...)
+>         vsnprintf(notify, UI_NOTIFY_BUFF_SZ - 1, frmt, list);
+>         va_end(list);
+>         mvprintw(1, 0, notify);
+> +       abort();
+>         attroff(COLOR_PAIR(1));
+>  }
+> =
 
-+	/* every interface of this device should support autosuspend */
-+	sprintf(filename, "/sys/bus/usb/devices/%s", d_name);
-+	DIR *dir =3D opendir(filename);
-+	if (!dir)
-+		return;
-+	while (1) {
-+		struct dirent *entry =3D readdir(dir);
-+		if (!entry)
-+			break;
-+		if (entry->d_name[0] =3D=3D '.')
-+			continue;
-+		sprintf(filename, "/sys/bus/usb/devices/%s/%s/supports_autosuspend", d_n=
-ame, entry->d_name);
-+		bool intf_path_found;
-+		bool intf_supports_auto =3D read_sysfs(filename, &intf_path_found);
-+		if (intf_path_found && !intf_supports_auto)
-+			return;
-+	}
-+	closedir(dir);
-+
- 	sprintf(filename, "/sys/bus/usb/devices/%s", d_name);
- 	usb =3D new class usb_tunable(filename, d_name);
- 	all_tunables.push_back(usb);
--- =
-
-2.0.4
+> ...and found the --auto-tune does not entering to that function.  When
+> running in normal mode the call path is from main() -> one_measurement()
+> -> do_sleep() -> cursor_enter() -> tuning_window::cursor_enter ->
+> ui_notify_user() -> mvprintw().
+> =
 
 
---===============0907218311231443749==--
+oh, yes. my bad, I didn't double check.
+auto-tune calls all_tunables[i]->toggle() directly.
+
+ok. then everything should be fine.
+
+	-ss
+
+> I also realized the --auto-tune is setting leave_powertop =3D 1, which
+> means the patch 0009 can be simplified.  Here is better version of the
+> change that avoids running unnecessary if().
+> =
+
+> --->8----
+> From: Sami Kerola <kerolasa(a)iki.fi>
+> Date: Wed, 20 Aug 2014 23:31:52 +0300
+> Subject: [PATCH 09/14] do not use ncurses when --auto-tune is specified
+> =
+
+> Reviewed-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+> Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+> ---
+>  src/main.cpp | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> =
+
+> diff --git a/src/main.cpp b/src/main.cpp
+> index 3b67ef0..bd0fc88 100644
+> --- a/src/main.cpp
+> +++ b/src/main.cpp
+> @@ -460,7 +460,8 @@ int main(int argc, char **argv)
+>  		end_pci_access();
+>  		exit(0);
+>  	}
+> -	init_display();
+> +	if (!auto_tune)
+> +		init_display();
+>  	initialize_tuning();
+>  	/* first one is short to not let the user wait too long */
+>  	one_measurement(1, NULL);
+> @@ -477,7 +478,8 @@ int main(int argc, char **argv)
+>  		one_measurement(time_out, NULL);
+>  		learn_parameters(15, 0);
+>  	}
+> -	endwin();
+> +	if (!auto_tune)
+> +		endwin();
+>  	printf("%s\n", _("Leaving PowerTOP"));
+>  =
+
+>  	end_process_data();
+> -- =
+
+> 2.1.0
+>=20
+
+--===============5418092300657939496==--
 
