@@ -1,108 +1,89 @@
-Content-Type: multipart/mixed; boundary="===============0921095807600641781=="
+Content-Type: multipart/mixed; boundary="===============8865882056590177404=="
 MIME-Version: 1.0
-From: Andreas Mohr <andi at lisas.de>
-Subject: Re: [Powertop] [PATCH v3 05/15] fix clang++ compilation errors
-Date: Mon, 08 Sep 2014 21:49:42 +0200
-Message-ID: <20140908194942.GA26566@rhlx01.hs-esslingen.de>
-In-Reply-To: 1410125238-29600-6-git-send-email-kerolasa@iki.fi
+From: Marc MERLIN <marc_powertop at merlins.org>
+Subject: [Powertop] powertop 2.6 still reports incorrect device battery usage
+Date: Thu, 21 Aug 2014 13:49:45 -0700
+Message-ID: <20140821204945.GD3875@merlins.org>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0921095807600641781==
+--===============8865882056590177404==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On kernel 3.15.5, thinkpad T540p IDPS display, intel graphics
 
-On Sun, Sep 07, 2014 at 02:28:11PM -0700, powertop-request(a)lists.01.org w=
-rote:
-> Date: Sun,  7 Sep 2014 22:27:08 +0100
-> From: Sami Kerola <kerolasa(a)iki.fi>
+I'm still getting bogus numbers for devices.
+
+Snapshot #1: =
+
+- My wifi card is certainly not using 12.7W
+- Display backlight + wifi =3D 17.9W, which means the entire laptop
+  would be running on 2W? That's of course wrong
+- The 1117 wakeups are not accounted for and apps blamed correctly for
+  that use
+
+> The battery reports a discharge rate of 19.8 W
+> The estimated remaining time is 2 hours, 37 minutes
 > =
 
-> The same error was fixed in multiple files to made clang++ work.
+> Summary: 1117.0 wakeups/second,  182.7 GPU ops/seconds, 0.0 VFS ops/sec a=
+nd 9.0% CPU use
 > =
 
-> error: variable length array of non-POD element type 'string' (aka
-> 'basic_string<char>')
-> =
+> Power est.              Usage       Events/s    Category       Description
+>   12.7 W     36.3 pkts/s                Device         Network interface:=
+ wlan0 (iwlwifi)
+>   5.17 W      8.0%                      Device         Display backlight
+>   322 mW     25.0 ms/s     331.3        Process        /usr/bin/enlighten=
+ment
+>   179 mW     19.7 ms/s      60.7        Process        /usr/bin/X :0 vt7 =
+-br -nolisten tcp -auth
+>   178 mW      4.8 ms/s     246.2        Process        xmms
 
-> Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+I blew away my calibration, upgraded from powertop 2.4 to 2.6.1, and now
+I see:
+The battery reports a discharge rate of 17.6 W
+The estimated remaining time is 5 hours, 10 minutes
 
-> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-> index dbca20c..4e040c1 100644
-> --- a/src/cpu/cpu.cpp
-> +++ b/src/cpu/cpu.cpp
-> @@ -479,12 +479,12 @@ void report_display_cpu_cstates(void)
->  		/* Tables for PKG, CORE, CPU */
->  		pkg_tbl_size.cols=3D2;
->  		pkg_tbl_size.rows=3D ((cstates_num+1)-LEVEL_HEADER)+1;
-> -		string pkg_data[pkg_tbl_size.cols * pkg_tbl_size.rows];
-> +		string *pkg_data =3D new string[pkg_tbl_size.cols * pkg_tbl_size.rows];
->  =
+Summary: 893.0 wakeups/second,  26.4 GPU ops/seconds, 0.0 VFS ops/sec and 1=
+1.3% CPU use
 
->  		core_tbl_size.cols=3D2;
->  		core_tbl_size.rows=3D(cstates_num *_package->children.size())
->  				+ _package->children.size();
-> -		string core_data[core_tbl_size.cols * core_tbl_size.rows];
-> +		string *core_data =3D new string[core_tbl_size.cols * core_tbl_size.ro=
-ws];
->  		int num_cpus=3D0, num_cores=3D0;
->  =
-
->  		for (core =3D 0; core < _package->children.size(); core++) {
-> @@ -506,7 +506,7 @@ void report_display_cpu_cstates(void)
->  		cpu_tbl_size.cols=3D(2 * (num_cpus / num_cores)) + 1;
->  		cpu_tbl_size.rows =3D ((cstates_num+1-LEVEL_HEADER) * _package->childr=
-en.size())
->  				+ _package->children.size();
-> -		string cpu_data[cpu_tbl_size.cols * cpu_tbl_size.rows];
-> +		string *cpu_data =3D new string[cpu_tbl_size.cols * cpu_tbl_size.rows];
->  =
-
->  		for (core =3D 0; core < _package->children.size(); core++) {
->  			cpu_data[idx3]=3D"&nbsp;";
-> @@ -633,6 +633,9 @@ void report_display_cpu_cstates(void)
->  		init_cpu_table_attr(&std_table_css, title+1, cpu_tbl_size.rows,
->  				cpu_tbl_size.cols);
->  		report.add_table(cpu_data, &std_table_css);
-> +		delete [] pkg_data;
-> +		delete [] core_data;
-> +		delete [] cpu_data;
->  	}
->  	report.end_div();
->  }
-
-As a C++ developer with certain experience of sometimes (very) painful qual=
-ity(the last VERY PAINFUL one less than 6 weeks ago...),
-I really wouldn't want to see open-coded, error-prone new/delete (or, heave=
-n forbid, malloc/free used in C++ code) in new (pun not intended) code anyw=
-here -
-nor non-scoped (omission-prone, return-hampered, exception-unsafe) handling
-of any other, possibly more critical resources (think locks, files, ...).
-Therefore I'd strongly recommend changing this patch
-into using properly scoped resource handling such as std::vector
-(std::array should also work, but since that is C++11 only
-I'd prefer std::vector).
-And possibly plus handling of std::bad_alloc cases, in this or outer scope.=
-..
+Power est.              Usage       Events/s    Category       Description
+  18.7 W    216.8 pkts/s                Device         Network interface: w=
+lan0 (iwlwifi)
+  5.16 W     33.0%                      Device         Display backlight
+ 61.0 mW     35.8 ms/s      86.5        Process        dpkg
+ 39.4 mW      1.6 ms/s      24.9        Process        xfce4-terminal -T wi=
+ndow1.10 --role=3Dwindow1.10 --tab
+ 35.6 mW      8.2 ms/s     133.2        kWork          normal_work_helper
 
 
-Put differently, one could even say
-that given an automated commit review system
-any appearance of new/delete should automatically make the review fail,
-with subsequent manual white-listing needed for the few rare cases
-that do really want to have it (think class-internal handling of resources,
-or some such).
+How can powertop tell me that my wireless card is using more power than
+the entire laptop?
 
+Clearly the calibration didn't work right, but shouldn't the code have chec=
+ks
+for things that are clearly wrong and tell the user what to do to fix them/=
+recalibrate?
 
-That said, thank you very much for enabling clang++ compatibility,
-and for all the other fixes!
-I had wanted to venture into such areas myself, too
-(e.g. for C++ diagnosis reasons), but simply haven't found the time yet.
+Or better, shouldn't it retune the device usage on its own when it finds
+something clearly wrong like power use of the laptop being negative
+after removing devices, or inconsistent with the basic power usage
+calculated during calibration?
 
-Andreas Mohr
+Thanks,
+Marc
+-- =
 
---===============0921095807600641781==--
+"A mouse is a device used to point at the xterm you want to type in" - A.S.=
+R.
+Microsoft is to operating systems ....
+                                      .... what McDonalds is to gourmet coo=
+king
+Home page: http://marc.merlins.org/                         | PGP 1024R/763=
+BE901
+
+--===============8865882056590177404==--
 
