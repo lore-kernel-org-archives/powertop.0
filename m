@@ -1,103 +1,81 @@
-Content-Type: multipart/mixed; boundary="===============2297788170011265112=="
+Content-Type: multipart/mixed; boundary="===============4749601472108381560=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH 04/14] csstoh.sh: check every single return value
-Date: Sat, 25 Oct 2014 18:33:51 +0100
-Message-ID: <1414258441-30099-5-git-send-email-kerolasa@iki.fi>
-In-Reply-To: 1414258441-30099-1-git-send-email-kerolasa@iki.fi
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH 1/1] tunables: check usb autosuspend support
+ before add
+Date: Sun, 24 Aug 2014 13:30:39 +0900
+Message-ID: <20140824043039.GA935@swordfish>
+In-Reply-To: 1408850533-5008-2-git-send-email-nanleychery@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2297788170011265112==
+--===============4749601472108381560==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Earlier the script continued processing at errors.
+On (08/23/14 23:22), Nanley Chery wrote:
+> ---
+>  src/tuning/tuningusb.cpp | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
+> =
 
-$ ./csstoh.sh powertop.css /dev/full
-./csstoh.sh: line 36: echo: write error: No space left on device
-./csstoh.sh: line 37: echo: write error: No space left on device
-[...]
+> diff --git a/src/tuning/tuningusb.cpp b/src/tuning/tuningusb.cpp
+> index 27a6dca..ee86335 100644
+> --- a/src/tuning/tuningusb.cpp
+> +++ b/src/tuning/tuningusb.cpp
+> @@ -28,6 +28,7 @@
+>  #include "unistd.h"
+>  #include "tuningusb.h"
+>  #include <string.h>
+> +#include <dirent.h>
+>  #include <utility>
+>  #include <iostream>
+>  #include <fstream>
+> @@ -126,6 +127,25 @@ static void add_usb_callback(const char *d_name)
+>  	if (access(filename, R_OK)!=3D0)
+>  		return;
+>  =
 
-Now the script will fail immediately when an error occurs.
+> +	/* every interface of this device should support autosuspend */
+> +	sprintf(filename, "/sys/bus/usb/devices/%s", d_name);
+> +	DIR *dir =3D opendir(filename);
+> +	if (!dir)
+> +		return;
+> +	while (1) {
+> +		struct dirent *entry =3D readdir(dir);
+> +		if (!entry)
+> +			break;
+> +		if (entry->d_name[0] =3D=3D '.')
+> +			continue;
+> +		sprintf(filename, "/sys/bus/usb/devices/%s/%s/supports_autosuspend", d=
+_name, entry->d_name);
+> +		bool intf_path_found;
+> +		bool intf_supports_auto =3D read_sysfs(filename, &intf_path_found);
+> +		if (intf_path_found && !intf_supports_auto)
 
-$ ./csstoh.sh powertop.css /dev/full ; echo $?
-cat: write error: No space left on device
-1
+			return; with dir open?
 
-As a minor improvement the script now writes errors to stderr rather than
-stdout, that is more appropriate.
+please consider to use process_directory() from lib.cpp
 
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
----
- src/csstoh.sh | 40 +++++++++++++++++++++++-----------------
- 1 file changed, 23 insertions(+), 17 deletions(-)
+	-ss
 
-diff --git a/src/csstoh.sh b/src/csstoh.sh
-index 9d4100b..4ba70e2 100755
---- a/src/csstoh.sh
-+++ b/src/csstoh.sh
-@@ -18,27 +18,33 @@
- #
- # Written by Igor Zhbanov <i.zhbanov at samsung.com>
- =
+> +	}
+> +	closedir(dir);
+> +
+>  	sprintf(filename, "/sys/bus/usb/devices/%s", d_name);
+>  	usb =3D new class usb_tunable(filename, d_name);
+>  	all_tunables.push_back(usb);
+> -- =
 
--if [ $# -lt 2 ]; then
--	echo "Usage: csstoh.sh cssfile header.h"
-+if [ $# -ne 2 ]; then
-+	echo "Usage: csstoh.sh cssfile header.h" >&2
- 	exit 1
- fi
--
--if [ ! -r $1 ]; then
--	echo "Can't find file $1"
--	exit 1
--fi
--
--if ! echo -n >$2; then
--	echo "Can't open file $2 for writing."
-+if [ ! -f "$1" ]; then
-+	echo "$1: no such file or directory" >&2
- 	exit 1
- fi
-+# redirect stdout to a file
-+exec 1> "$2" || exit $?
- =
+> 2.0.4
+> =
 
--echo "#ifndef __INCLUDE_GUARD_CCS_H" >> $2
--echo "#define __INCLUDE_GUARD_CCS_H" >> $2
--echo >> $2
--echo "const char css[] =3D " >> $2
-+# header
-+cat <<HERE || exit $?
-+#ifndef __INCLUDE_GUARD_CCS_H
-+#define __INCLUDE_GUARD_CCS_H
- =
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>=20
 
--sed -r 's/^(.*)$/\t\"\1\\n\"/' $1 >> $2
-+const char css[] =3D =
-
-+HERE
-+# body
-+sed -r 's/^(.*)$/\t\"\1\\n\"/' "$1" || exit $?
-+# footer
-+cat <<HERE || exit $?
-+;
-+#endif
-+HERE
- =
-
--echo ";" >> $2
--echo "#endif" >> $2
-+# close output file
-+exec 1>&-
-+# return status of output file write
-+exit $?
--- =
-
-2.1.2
-
-
---===============2297788170011265112==--
+--===============4749601472108381560==--
 
