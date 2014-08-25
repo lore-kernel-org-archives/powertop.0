@@ -1,50 +1,84 @@
-Content-Type: multipart/mixed; boundary="===============0692055755861561971=="
+Content-Type: multipart/mixed; boundary="===============6093581437283139441=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: Re: [Powertop] [PATCH v3 04/15] clean up Makefile.am files
-Date: Wed, 15 Oct 2014 09:25:04 +0100
-Message-ID: <CAG27Bk0_nMryZ2CsF7d6q+y5v8guZwTH5dT1r4m_Gy4F3PX6Zw@mail.gmail.com>
-In-Reply-To: 543DB314.2060504@linux.intel.com
+From: Nanley Chery <nanleychery at gmail.com>
+Subject: [Powertop] [PATCH v2 1/1] tunables: check usb autosuspend support
+ before add
+Date: Mon, 25 Aug 2014 15:45:50 -0400
+Message-ID: <1408995950-1551-1-git-send-email-nanleychery@gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0692055755861561971==
+--===============6093581437283139441==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 15 October 2014 00:34, Joe Konno <joe.konno(a)linux.intel.com> wrote:
-> On 09/07/2014 02:27 PM, Sami Kerola wrote:
-[snip]
->> ---
->>  Makefile.am     |  14 +++-
-[snip]
->> +powertop_SOURCES =3D \
->> +     css.h \
->> +     devlist.cpp \
->> +     devlist.h \
->> +     display.cpp \
->> +     display.h \
->> +     lib.cpp \
->> +     lib.h \
->> +     main.cpp \
->> +     powertop.css \
->> +     \
->
-> Why the white line here?
+Some usb devices do not have drivers that support autosuspend.
+These drivers should not be added to the list of tunables, because
+toggling their good/bad value does nothing.
 
-To separate src/*.(cpp|h) file from files in sub-directory targets the
-way one very clearly see the difference. Sorting all the targets in
-simple alphabetical order would make the none-sub-directory objects to
-be here and there in middle of listing, so separating the lists seemed
-like clarity enhancement to me. If the empty line really annoys send a
-patch to remove it, I don't have too strong opinions either in favor
-or against it.
+Signed-off-by: Nanley Chery <nanleychery(a)gmail.com>
+---
 
+Fixed the issue in the previous patch that allowed returning between
+opendir and closedir (thanks Sergey). Also improve detection of interface =
+
+folders.
+
+ src/tuning/tuningusb.cpp | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/src/tuning/tuningusb.cpp b/src/tuning/tuningusb.cpp
+index 27a6dca..d2a0c11 100644
+--- a/src/tuning/tuningusb.cpp
++++ b/src/tuning/tuningusb.cpp
+@@ -28,6 +28,7 @@
+ #include "unistd.h"
+ #include "tuningusb.h"
+ #include <string.h>
++#include <dirent.h>
+ #include <utility>
+ #include <iostream>
+ #include <fstream>
+@@ -117,6 +118,7 @@ static void add_usb_callback(const char *d_name)
+ {
+ 	class usb_tunable *usb;
+ 	char filename[4096];
++	DIR *dir;
+ =
+
+ 	sprintf(filename, "/sys/bus/usb/devices/%s/power/control", d_name);
+ 	if (access(filename, R_OK) !=3D 0)
+@@ -126,6 +128,23 @@ static void add_usb_callback(const char *d_name)
+ 	if (access(filename, R_OK)!=3D0)
+ 		return;
+ =
+
++	/* every interface of this device should support autosuspend */
++	sprintf(filename, "/sys/bus/usb/devices/%s", d_name);
++	if ((dir =3D opendir(filename))) {
++		struct dirent *entry;
++		while ((entry =3D readdir(dir))) {
++			/* dirname: <busnum>-<devnum>...:<config num>-<interface num> */
++			if (!isdigit(entry->d_name[0]))
++				continue;
++			sprintf(filename, "/sys/bus/usb/devices/%s/%s/supports_autosuspend", d_=
+name, entry->d_name);
++			if (access(filename, R_OK) =3D=3D 0 && read_sysfs(filename) =3D=3D 0)
++				break;
++		}
++		closedir(dir);
++		if (entry)
++			return;
++	}
++
+ 	sprintf(filename, "/sys/bus/usb/devices/%s", d_name);
+ 	usb =3D new class usb_tunable(filename, d_name);
+ 	all_tunables.push_back(usb);
 -- =
 
-Sami Kerola
-http://www.iki.fi/kerolasa/
+2.0.4
 
---===============0692055755861561971==--
+
+--===============6093581437283139441==--
 
