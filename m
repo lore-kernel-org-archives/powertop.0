@@ -1,71 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============7180429218964106520=="
+Content-Type: multipart/mixed; boundary="===============7133103071075087470=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH v3 5/5] Adding a clean_shutdown function
-Date: Fri, 17 Oct 2014 15:58:06 -0700
-Message-ID: <1413586686-28602-6-git-send-email-joe.konno@linux.intel.com>
-In-Reply-To: 1413586686-28602-1-git-send-email-joe.konno@linux.intel.com
+From: Sanjay Singh Rawat <sanjay.rawat at linaro.org>
+Subject: Re: [Powertop] [PATCH] devfreq: add devfreq devices stats support
+Date: Mon, 25 Aug 2014 12:25:28 +0530
+Message-ID: <53FADDE0.7000908@linaro.org>
+In-Reply-To: 1408947867-21506-1-git-send-email-sanjay.rawat@linaro.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7180429218964106520==
+--===============7133103071075087470==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Dan Kalowsky <daniel.kalowsky(a)intel.com>
+Sorry, Rajagopal's id is not valid. Will resend the patch with correct id.
 
-Function is designed to be a on stop place to clean up the entire
-application at shutdown time.
+thanks,
 
-v2: rebased atop 41c54e8
+On Monday 25 August 2014 11:54 AM, Sanjay Singh Rawat wrote:
+> add window to show frequency stats for devfreq devices
+[...]
 
-Signed-off-by: Joe Konno <joe.konno(a)intel.com>
----
- src/main.cpp | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+--===============7133103071075087470==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
-diff --git a/src/main.cpp b/src/main.cpp
-index d3963ed..b6ce090 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -368,6 +368,17 @@ static void powertop_init(void)
- 	initialized =3D 1;
- }
- =
+PGh0bWw+CiAgPGhlYWQ+CiAgICA8bWV0YSBjb250ZW50PSJ0ZXh0L2h0bWw7IGNoYXJzZXQ9SVNP
+LTg4NTktMSIKICAgICAgaHR0cC1lcXVpdj0iQ29udGVudC1UeXBlIj4KICA8L2hlYWQ+CiAgPGJv
+ZHkgdGV4dD0iIzAwMDAwMCIgYmdjb2xvcj0iI0ZGRkZGRiI+CiAgICA8Zm9udCBzaXplPSItMSI+
+U29ycnksIFJhamFnb3BhbCdzIGlkIGlzIG5vdCB2YWxpZC48L2ZvbnQ+IFdpbGwKICAgIHJlc2Vu
+ZCB0aGUgcGF0Y2ggd2l0aCBjb3JyZWN0IGlkLjxicj4KICAgIDxicj4KICAgIHRoYW5rcyw8YnI+
+CiAgICA8YnI+CiAgICA8ZGl2IGNsYXNzPSJtb3otY2l0ZS1wcmVmaXgiPk9uIE1vbmRheSAyNSBB
+dWd1c3QgMjAxNCAxMTo1NCBBTSwKICAgICAgU2FuamF5IFNpbmdoIFJhd2F0IHdyb3RlOjxicj4K
+ICAgIDwvZGl2PgogICAgPGJsb2NrcXVvdGUKICAgICAgY2l0ZT0ibWlkOjE0MDg5NDc4NjctMjE1
+MDYtMS1naXQtc2VuZC1lbWFpbC1zYW5qYXkucmF3YXRAbGluYXJvLm9yZyIKICAgICAgdHlwZT0i
+Y2l0ZSI+CiAgICAgIDxwcmUgd3JhcD0iIj5hZGQgd2luZG93IHRvIHNob3cgZnJlcXVlbmN5IHN0
+YXRzIGZvciBkZXZmcmVxIGRldmljZXMKPC9wcmU+CiAgICA8L2Jsb2NrcXVvdGU+CiAgICBbLi4u
+XQogIDwvYm9keT4KPC9odG1sPgo=
 
-+void clean_shutdown()
-+{
-+	close_results();
-+	close_display();
-+	clean_open_devices();
-+	clear_all_devices();
-+	clear_all_cpus();
-+
-+	return;
-+}
-+
- =
-
- int main(int argc, char **argv)
- {
-@@ -498,9 +509,7 @@ int main(int argc, char **argv)
- 	clear_tuning();
- 	reset_display();
- =
-
--	clean_open_devices();
--	clear_all_devices();
--	clear_all_cpus();
-+	clean_shutdown();
- =
-
- 	return 0;
- }
--- =
-
-2.1.2
-
-
---===============7180429218964106520==--
+--===============7133103071075087470==--
 
