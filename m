@@ -1,44 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============7945379463413799579=="
+Content-Type: multipart/mixed; boundary="===============5644939999744660120=="
 MIME-Version: 1.0
-From: Mohammad Merajul Islam Molla <meraj.enigma at gmail.com>
-Subject: [Powertop] [PATCH] powertop: remove temporary file
-Date: Mon, 04 Aug 2014 19:52:04 +0600
-Message-ID: <1407160324-4924-1-git-send-email-meraj.enigma@gmail.com>
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH v3 03/15] add src/cpu/rapl/.deps to .gitignore
+Date: Sun, 07 Sep 2014 22:27:06 +0100
+Message-ID: <1410125238-29600-4-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1410125238-29600-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7945379463413799579==
+--===============5644939999744660120==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-powertop creates temporary file in /tmp directory during calibration. Simply
-closing the file does not remove it. Using unlink(), instead of close() to
-remove temporary file.
-
-Signed-off-by: Mohammad Merajul Islam Molla <meraj.enigma(a)gmail.com>
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
 ---
- src/calibrate/calibrate.cpp | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .gitignore | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/src/calibrate/calibrate.cpp b/src/calibrate/calibrate.cpp
-index a9a0a7c..98abfe9 100644
---- a/src/calibrate/calibrate.cpp
-+++ b/src/calibrate/calibrate.cpp
-@@ -244,7 +244,7 @@ static void *burn_disk(void *dummy)
- 			printf("Error: %s\n", strerror(errno));
- 		fdatasync(fd);
- 	}
--	close(fd);
-+	unlink(filename);
- 	return NULL;
- }
- =
-
+diff --git a/.gitignore b/.gitignore
+index 35d41c2..d00973f 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -44,6 +44,7 @@ src/.deps/
+ src/Makefile
+ src/calibrate/.deps/
+ src/cpu/.deps/
++src/cpu/rapl/.deps
+ src/devices/.deps/
+ src/measurement/.deps/
+ src/parameters/.deps/
 -- =
 
-1.9.1
+2.1.0
 
 
---===============7945379463413799579==--
+--===============5644939999744660120==--
 
