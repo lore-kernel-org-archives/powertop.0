@@ -1,70 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============7480905069249090297=="
+Content-Type: multipart/mixed; boundary="===============6968993124789454427=="
 MIME-Version: 1.0
 From: Sami Kerola <kerolasa at iki.fi>
-Subject: Re: [Powertop] Complete build options for Pthread API
-Date: Sat, 25 Oct 2014 11:18:24 +0100
-Message-ID: <CAG27Bk1t+2ZjJbrywNJYN+Hco+W+P-hGRsL9HsLcW7gyNXmVJA@mail.gmail.com>
-In-Reply-To: 20141025085840.GA1572@swordfish
+Subject: [Powertop] [PATCH v3 02/15] configure: prefer AS_IF macro rather than
+ shell if statement
+Date: Sun, 07 Sep 2014 22:27:05 +0100
+Message-ID: <1410125238-29600-3-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1410125238-29600-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7480905069249090297==
+--===============6968993124789454427==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 25 October 2014 09:58, Sergey Senozhatsky
-<sergey.senozhatsky(a)gmail.com> wrote:
-> On (10/22/14 15:33), Sami Kerola wrote:
->> On 22 October 2014 13:41, Sergey Senozhatsky
->> <sergey.senozhatsky(a)gmail.com> wrote:
->> > m4/* files are host-specific. they should never be part
->> > of the source code or a package.
->>
->> I would not say it so strongly. There are plenty of projects that have
->> files in m4 directory. Here's couple.
->>
->> http://git.savannah.gnu.org/gitweb/?p=3Dcoreutils.git;a=3Dtree;f=3Dm4
->> https://github.com/karelzak/util-linux/tree/master/m4
->
-> yes, but powertop does not use any optional m4 macros/libs that
-> are not basically available (afaik).
+Jumping in between shell and m4 syntaxes makes reading the code more
+difficult, so stick to m4 when ever possible.
 
-Proposal to use AX_PTHREAD means that will change.
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ configure.ac | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
-Looking autoconf release notes
+diff --git a/configure.ac b/configure.ac
+index b41cfb3..4991d97 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -108,23 +108,25 @@ dnl libnl-2 provides only libnl-2.0.pc file, so we ch=
+eck for separate
+ dnl libnl-genl-3.0.pc pkg-config file just for libnl-3.0 case.
+ PKG_CHECK_MODULES([LIBNL], [libnl-3.0 >=3D 3.0 libnl-genl-3.0 >=3D 3.0], [=
+has_libnl_ver=3D3], [
+ 	PKG_CHECK_MODULES([LIBNL], [libnl-2.0 >=3D 2.0], [has_libnl_ver=3D2], [
+-		PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [has_libnl_ve=
+r=3D0])])])
+-if (test "$has_libnl_ver" -eq 0); then
+-	AC_MSG_ERROR(libnl and libnl-genl are required but were not found)
+-fi
+-if (test "$has_libnl_ver" -gt 1); then
++		PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [has_libnl_ve=
+r=3D0])
++	])
++])
++AS_IF([test "$has_libnl_ver" -eq 0], [
++	AC_MSG_ERROR([libnl and libnl-genl are required but were not found])
++])
++AS_IF([test "$has_libnl_ver" -gt 1], [
+ 	AC_DEFINE([HAVE_LIBNL20], [1], [Define if you have libnl-2.0 or higher])
+-fi
++])
+ =
 
-http://lwn.net/Articles/531373/
+-if (test "$has_libpci" -eq 0); then =
 
-It might be possible to make m4 copies to go to AC_CONFIG_MACRO_DIR,
-while AC_CONFIG_MACRO_DIRS informs project specific m4 search patch.
-Assuming this sort of thing is tried it also looks like the autoconf
-version requirement will need to be pumped to 1.13 from 1.11.1. Please
-notice that I haven't ever tried to use multiple m4 directories, so
-this is reply is based on tons of assumptions without real experience
-or tests about topic. The minimum I need to make progress with
-separation is a decision what is the path for project local m4 files.
+-	AC_DEFINE([HAVE_NO_PCI],[1],[Define if pci is not supported])
++AS_IF([test "$has_libpci" -eq 0], [
++	AC_DEFINE([HAVE_NO_PCI], [1], [Define if pci is not supported])
+         AC_MSG_WARN([
+ 			************* LIBPCI SUPPORT NOT CONFIGURED**************
+ 			If you need or want pci support, please install libpci =
 
-That said autotools documentation
+ 			and re-configure PowerTOP. =
 
-http://www.gnu.org/software/automake/manual/html_node/Local-Macros.html
+ 			*********************************************************
+ 	])
+-fi
++])
+ =
 
-is telling use of m4 directory is fine, and 'there is no consensus on
-the distribution of third-party macros'.
-
-Considering the above I'm 87.5% sure using m4/ directory initially to
-introduce AX_PTHREAD is OK. If needed/wanted/etc later changes can
-move the data around, set autoconf requirement higher, and so on what
-ever might come as aside effect.
-
->  https://lists.01.org/pipermail/powertop/2013-June/000855.html
-
-I do not understand how that message relates to m4 directories.
-
+ AC_SEARCH_LIBS([pthread_create], [pthread], [], [
+ 	AC_MSG_ERROR([libpthread is required but was not found])
 -- =
 
-Sami Kerola
-http://www.iki.fi/kerolasa/
+2.1.0
 
---===============7480905069249090297==--
+
+--===============6968993124789454427==--
 
