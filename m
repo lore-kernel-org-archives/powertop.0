@@ -1,151 +1,81 @@
-Content-Type: multipart/mixed; boundary="===============6404942367508870669=="
+Content-Type: multipart/mixed; boundary="===============6407128417509391653=="
 MIME-Version: 1.0
 From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH 12/12] clean up .gitignore file
-Date: Sat, 02 Aug 2014 12:54:17 +0100
-Message-ID: <1406980457-19077-13-git-send-email-kerolasa@iki.fi>
-In-Reply-To: 1406980457-19077-1-git-send-email-kerolasa@iki.fi
+Subject: [Powertop] [PATCH v3 12/15] wrap lines in README.traceevent
+Date: Sun, 07 Sep 2014 22:27:15 +0100
+Message-ID: <1410125238-29600-13-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1410125238-29600-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6404942367508870669==
+--===============6407128417509391653==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Keep the regular expressions, directories, and individual files separate
-understandable way.
-
 Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
 ---
- .gitignore | 111 +++++++++++++++++++++++++++------------------------------=
-----
- 1 file changed, 49 insertions(+), 62 deletions(-)
+ README.traceevent | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/.gitignore b/.gitignore
-index d00973f..b9188a1 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -1,66 +1,53 @@
--*~
--*.o
-+# regular expressions
- *.a
--*.html
- *.csv
--*.powertop
--ChangeLog
--Makefile.in
--aclocal.m4
--config.guess
--config.h.in
--config.rpath
--config.sub
--configure
--depcomp
--install-sh
--ltmain.sh
--missing
--stamp-h1
--Makefile
--config.h
--config.log
--config.status
--libtool
--pevent/.deps/
--pevent/Makefile
--pevent/Makefile.in
--po/Makefile
--po/Makevars.template
--po/POTFILES
--po/Rules-quot
--po/boldquot.sed
--po/en(a)boldquot.header
--po/en(a)quot.header
--po/insert-header.sin
--po/quot.sed
--po/remove-potcdate.sin
--po/*.gmo
--po/stamp-po
--src/powertop
--src/css.h
--src/Makefile.in
--src/.deps/
--src/Makefile
--src/calibrate/.deps/
--src/cpu/.deps/
--src/cpu/rapl/.deps
--src/devices/.deps/
--src/measurement/.deps/
--src/parameters/.deps/
--src/perf/.deps/
--src/process/.deps/
--src/tuning/.deps/
--src/report/.deps/
--m4
- *.dirstamp
--*.lo
-+*.html
- *.la
--autom4te.cache
--remove-potcdate.sed
--compile
--stamp-po
--ABOUT-NLS
--ar-lib
--traceevent/.deps/
--traceevents/.libs/
-+*.lo
-+*.o
-+*.powertop
-+*~
-+.deps
-+/po/*.gmo
-+Makefile
-+Makefile.in
-+
-+# directories
-+/m4/
-+
-+# individual files
-+/ABOUT-NLS
-+/ChangeLog
-+/aclocal.m4
-+/ar-lib
-+/autom4te.cache
-+/compile
-+/config.guess
-+/config.h
-+/config.h.in
-+/config.log
-+/config.rpath
-+/config.status
-+/config.sub
-+/configure
-+/depcomp
-+/install-sh
-+/libtool
-+/ltmain.sh
-+/missing
-+/po/Makevars.template
-+/po/POTFILES
-+/po/Rules-quot
-+/po/boldquot.sed
-+/po/en(a)boldquot.header
-+/po/en(a)quot.header
-+/po/insert-header.sin
-+/po/quot.sed
-+/po/remove-potcdate.sin
-+/po/stamp-po
-+/remove-potcdate.sed
-+/src/css.h
-+/src/powertop
-+/stamp-h1
-+/stamp-po
+diff --git a/README.traceevent b/README.traceevent
+index 38563ab..0747766 100644
+--- a/README.traceevent
++++ b/README.traceevent
+@@ -1,15 +1,20 @@
+ traceevent: =
+
+ =
+
+-The traceevent library being built in PowerTOP is really a effort by Steve=
+n Rostedt. =
+
+-The long term intent is for Steven to push the trace event library to dist=
+ributions, and consume it externally. Right now the PowerTOP project is kee=
+ping in sync with his code posted in the Linux kernel git under tools/lib/t=
+raceevent. =
+
+-We will not take patches into the traceevent code directly, rather we will=
+ be re-basing =
+
+-against that code base. =
+
++The traceevent library being built in PowerTOP is really a effort by
++Steven Rostedt.  The long term intent is for Steven to push the trace
++event library to distributions, and consume it externally.  Right now the
++PowerTOP project is keeping in sync with his code posted in the Linux
++kernel git under tools/lib/traceevent.  We will not take patches into the
++traceevent code directly, rather we will be re-basing against that code
++base.
+ =
+
+ If you find a bug in the trace event code, you should to one of two things=
+. =
+
+ =
+
+-1. Send a patch to the PowerTOP mailing list, which will get forwared to S=
+teven if appropriate. =
+
+-2. Send a patch to the PowerTOP mailing list, cc <Steven Rostedt> rostedt(=
+a)goodmis.org
++1. Send a patch to the PowerTOP mailing list, which will get forwared to
++   Steven if appropriate.
+ =
+
++2. Send a patch to the PowerTOP mailing list, and
++   CC: Steven Rostedt <rostedt(a)goodmis.org>
+ =
+
+-Please do use the PowerTOP mailing list to discuss topics about traceevent=
+ as its used with PowerTOP.
+-
++Please do use the PowerTOP mailing list to discuss topics about
++traceevent as its used with PowerTOP.
 -- =
 
-2.0.3
+2.1.0
 
 
---===============6404942367508870669==--
+--===============6407128417509391653==--
 
