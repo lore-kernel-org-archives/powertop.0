@@ -1,57 +1,151 @@
-Content-Type: multipart/mixed; boundary="===============7362864774020279337=="
+Content-Type: multipart/mixed; boundary="===============8849043211313440078=="
 MIME-Version: 1.0
-From: Marc MERLIN <marc_powertop at merlins.org>
-Subject: Re: [Powertop] How to decrease PS/2 Touchpad / Mouse wakeups?
-Date: Sun, 20 Jul 2014 18:53:24 -0700
-Message-ID: <20140721015324.GE16031@merlins.org>
-In-Reply-To: 20140719165128.GB26881@merlins.org
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH v3 13/15] clean up .gitignore file
+Date: Sun, 07 Sep 2014 22:27:16 +0100
+Message-ID: <1410125238-29600-14-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1410125238-29600-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7362864774020279337==
+--===============8849043211313440078==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jul 19, 2014 at 09:51:28AM -0700, Marc MERLIN wrote:
-> On a thinkpad T540p, I see:
->   4.10 W      6.6 ms/s     196.3        Interrupt      PS/2 Touchpad / Ke=
-yboard / Mouse
-> =
+Keep the regular expressions, directories, and individual files separate
+understandable way.
 
-> Even if the 4W figure is wrong, 200 wakeups for a touchpad and keyboard
-> seems totally ridiculous.
-> =
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ .gitignore | 111 +++++++++++++++++++++++++++------------------------------=
+----
+ 1 file changed, 49 insertions(+), 62 deletions(-)
 
-> What can be done to decrease those?
-
-I did more tests, if I do not touch my trackpoint and touchpad, this
-doesn't register in powertop, as in I get no interrupts.
-I can actually use the keyboard all day long, and that's fine.
-
-The moment I touch the trackpoint, I get:
-  3.83 W      6.5 ms/s     169.9        Interrupt      PS/2 Touchpad / Keyb=
-oard / Mouse
-
-If I use the touchpad, I get:
-  4.46 W      7.2 ms/s     199.8        Interrupt      PS/2 Touchpad / Keyb=
-oard / Mouse
-
-Are the drivers really that bad?
-
-Is there any way around this?
-
-Thanks,
-Marc
+diff --git a/.gitignore b/.gitignore
+index d00973f..b9188a1 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,66 +1,53 @@
+-*~
+-*.o
++# regular expressions
+ *.a
+-*.html
+ *.csv
+-*.powertop
+-ChangeLog
+-Makefile.in
+-aclocal.m4
+-config.guess
+-config.h.in
+-config.rpath
+-config.sub
+-configure
+-depcomp
+-install-sh
+-ltmain.sh
+-missing
+-stamp-h1
+-Makefile
+-config.h
+-config.log
+-config.status
+-libtool
+-pevent/.deps/
+-pevent/Makefile
+-pevent/Makefile.in
+-po/Makefile
+-po/Makevars.template
+-po/POTFILES
+-po/Rules-quot
+-po/boldquot.sed
+-po/en(a)boldquot.header
+-po/en(a)quot.header
+-po/insert-header.sin
+-po/quot.sed
+-po/remove-potcdate.sin
+-po/*.gmo
+-po/stamp-po
+-src/powertop
+-src/css.h
+-src/Makefile.in
+-src/.deps/
+-src/Makefile
+-src/calibrate/.deps/
+-src/cpu/.deps/
+-src/cpu/rapl/.deps
+-src/devices/.deps/
+-src/measurement/.deps/
+-src/parameters/.deps/
+-src/perf/.deps/
+-src/process/.deps/
+-src/tuning/.deps/
+-src/report/.deps/
+-m4
+ *.dirstamp
+-*.lo
++*.html
+ *.la
+-autom4te.cache
+-remove-potcdate.sed
+-compile
+-stamp-po
+-ABOUT-NLS
+-ar-lib
+-traceevent/.deps/
+-traceevents/.libs/
++*.lo
++*.o
++*.powertop
++*~
++.deps
++/po/*.gmo
++Makefile
++Makefile.in
++
++# directories
++/m4/
++
++# individual files
++/ABOUT-NLS
++/ChangeLog
++/aclocal.m4
++/ar-lib
++/autom4te.cache
++/compile
++/config.guess
++/config.h
++/config.h.in
++/config.log
++/config.rpath
++/config.status
++/config.sub
++/configure
++/depcomp
++/install-sh
++/libtool
++/ltmain.sh
++/missing
++/po/Makevars.template
++/po/POTFILES
++/po/Rules-quot
++/po/boldquot.sed
++/po/en(a)boldquot.header
++/po/en(a)quot.header
++/po/insert-header.sin
++/po/quot.sed
++/po/remove-potcdate.sin
++/po/stamp-po
++/remove-potcdate.sed
++/src/css.h
++/src/powertop
++/stamp-h1
++/stamp-po
 -- =
 
-"A mouse is a device used to point at the xterm you want to type in" - A.S.=
-R.
-Microsoft is to operating systems ....
-                                      .... what McDonalds is to gourmet coo=
-king
-Home page: http://marc.merlins.org/                         | PGP 1024R/763=
-BE901
+2.1.0
 
---===============7362864774020279337==--
+
+--===============8849043211313440078==--
 
