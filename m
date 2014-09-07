@@ -1,79 +1,111 @@
-Content-Type: multipart/mixed; boundary="===============1558235108545027690=="
+Content-Type: multipart/mixed; boundary="===============6159900746028594364=="
 MIME-Version: 1.0
 From: Sami Kerola <kerolasa at iki.fi>
-Subject: Re: [Powertop] [PATCH 07/12] move options structure to function scope
-Date: Tue, 05 Aug 2014 22:30:47 +0100
-Message-ID: <CAG27Bk15huJVa+5Tw-psCiF2wsyfw4fnn__-jwdh05MThAY4ig@mail.gmail.com>
-In-Reply-To: 61169.10.24.6.146.1407195678.squirrel@linux.intel.com
+Subject: [Powertop] [PATCH v3 15/15] allow none-ncurses messaging with
+ ui_notify_user()
+Date: Sun, 07 Sep 2014 22:27:18 +0100
+Message-ID: <1410125238-29600-16-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1410125238-29600-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1558235108545027690==
+--===============6159900746028594364==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 5 August 2014 00:41, Alexandra Yates <alexandra.yates(a)linux.intel.com>=
- wrote:
+The ui_notify_user() is made to be a function pointer, and depending on
+need it will either send messages using ncurses functions or simply print
+to console.  At the moment the ui_notify_user_console() is not reachable,
+but that might change in future.
 
-Hi Alexandra,
+Proposed-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ src/lib.cpp  | 11 ++++++++++-
+ src/lib.h    |  4 +++-
+ src/main.cpp |  4 +++-
+ 3 files changed, 16 insertions(+), 3 deletions(-)
 
-> Welcome Sami to PowerTOP, and thank you very much for submitting your
-> patches, and everyone else for reviewing them.
+diff --git a/src/lib.cpp b/src/lib.cpp
+index b482296..cce7973 100644
+--- a/src/lib.cpp
++++ b/src/lib.cpp
+@@ -531,7 +531,7 @@ int write_msr(int cpu, uint64_t offset, uint64_t value)
+ =
 
-Thank you indeed. It's always nice feedback, and critical eyes looking
-my changes
-that I've found to be way too often to be less than perfect.
+ #define UI_NOTIFY_BUFF_SZ 2048
+ =
 
-> Sami, I would appreciate you make the changes people requested on the
-> list, and be prepared for further rounds of reviews/changes of your
-> patches.  This is the current process PowerTOP developers do code reviews.
+-void ui_notify_user(const char *frmt, ...)
++void ui_notify_user_ncurses(const char *frmt, ...)
+ {
+ 	char notify[UI_NOTIFY_BUFF_SZ];
+ 	va_list list;
+@@ -548,3 +548,12 @@ void ui_notify_user(const char *frmt, ...)
+ 	mvprintw(1, 0, notify);
+ 	attroff(COLOR_PAIR(1));
+ }
++
++void ui_notify_user_console(const char *frmt, ...)
++{
++	va_list list;
++
++	va_start(list, frmt);
++	vprintf(frmt, list);
++	va_end(list);
++}
+diff --git a/src/lib.h b/src/lib.h
+index 1d9fa8a..ec50946 100644
+--- a/src/lib.h
++++ b/src/lib.h
+@@ -83,5 +83,7 @@ extern int write_msr(int cpu, uint64_t offset, uint64_t v=
+alue);
+ =
 
-AFAIK all changes that were proposed, and work, are done. The backslash
-removal for instance did not happen, primarily because it would break build=
-s.
+ extern void align_string(char *buffer, size_t min_sz, size_t max_sz);
+ =
 
-> Here are few other things to consider before sending your patches for
-> PowerTOP:
->
-> As I mentioned on a previous thread PowerTOp uses the linux kernel coding
-> style, please change all your code to follow this guidelines.
-> https://www.kernel.org/doc/Documentation/CodingStyle.
+-extern void ui_notify_user(const char *frmt, ...);
++extern void ui_notify_user_ncurses(const char *frmt, ...);
++extern void ui_notify_user_console(const char *frmt, ...);
++extern void (*ui_notify_user) (const char *frmt, ...);
+ #endif
+diff --git a/src/main.cpp b/src/main.cpp
+index 0ae0b87..d3963ed 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -68,6 +68,7 @@
+ int debug_learning =3D 0;
+ unsigned time_out =3D 20;
+ int leave_powertop =3D 0;
++void (*ui_notify_user) (const char *frmt, ...);
+ =
 
-Ok.
-
-> Before creating a set of patches please check the code using
-> https://github.com/torvalds/linux/blob/master/scripts/checkpatch.pl
-
-Done. In total 0 errors, 0 warnings.
-
-> Lastly, when creating your new set of patches use the flag
-> --subject-prefix=3D"PATCH Vx" x being the revision version.  That will ma=
-ke
-> things easy on the mailing list.
-
-Are you sure? That makes the subject lines to look following.
-
-Subject: [PATCH Vx 01/14] configure: use vertical lists
-
-I think I need to break the rules and drop the ' Vx' when resubmitting
-the change set.
-
-> After your code gets an ok from the community I will go ahead and add it
-> to mainline.
-
-Ack.
-
-> Thank you very much again for sending all your changes,
-
-NP. All I initially wanted to do was to get rid of the ncurses
-blinking when --auto-tuning, but somehow the other changes just
-started to happen. Hopefully that was good thing.
-
+ enum {
+ 	OPT_AUTO_TUNE =3D CHAR_MAX + 1,
+@@ -384,7 +385,7 @@ int main(int argc, char **argv)
+ 	bindtextdomain (PACKAGE, LOCALEDIR);
+ 	textdomain (PACKAGE);
+ #endif
+-
++	ui_notify_user =3D ui_notify_user_ncurses;
+ 	while (1) { /* parse commandline options */
+ 		c =3D getopt_long(argc, argv, "cC:r:i:qt:w:Vh", long_options, &option_in=
+dex);
+ 		/* Detect the end of the options. */
+@@ -394,6 +395,7 @@ int main(int argc, char **argv)
+ 		case OPT_AUTO_TUNE:
+ 			auto_tune =3D 1;
+ 			leave_powertop =3D 1;
++			ui_notify_user =3D ui_notify_user_console;
+ 			break;
+ 		case 'c':
+ 			powertop_init();
 -- =
 
-Sami Kerola
-http://www.iki.fi/kerolasa/
+2.1.0
 
---===============1558235108545027690==--
+
+--===============6159900746028594364==--
 
