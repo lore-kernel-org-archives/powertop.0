@@ -1,60 +1,133 @@
-Content-Type: multipart/mixed; boundary="===============2839996385585921736=="
+Content-Type: multipart/mixed; boundary="===============8574758073898452168=="
 MIME-Version: 1.0
 From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH 08/12] do not use ncurses when --auto-tune is
- specified
-Date: Sat, 02 Aug 2014 12:54:13 +0100
-Message-ID: <1406980457-19077-9-git-send-email-kerolasa@iki.fi>
-In-Reply-To: 1406980457-19077-1-git-send-email-kerolasa@iki.fi
+Subject: [Powertop] [PATCH v3 07/15] remove unnecessary code reported by
+ cppcheck
+Date: Sun, 07 Sep 2014 22:27:10 +0100
+Message-ID: <1410125238-29600-8-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1410125238-29600-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2839996385585921736==
+--===============8574758073898452168==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Return values in c_rapl_interface::rapl_measure_energy() are set, but
+never read.  The create_all_alsa_callback() variable is not in use.  In
+cursor_up() if clause had same expression in both true and false cases.
+In add_runtime_tunables() filename variable was immediately overwrote.
+The report_show_tunables variable srt_tmp is not in use.
+
 Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
 ---
- src/main.cpp | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ src/cpu/rapl/rapl_interface.cpp | 4 ++--
+ src/devices/alsa.cpp            | 1 -
+ src/display.cpp                 | 9 ++-------
+ src/tuning/runtime.cpp          | 4 ----
+ src/tuning/tuning.cpp           | 1 -
+ 5 files changed, 4 insertions(+), 15 deletions(-)
 
-diff --git a/src/main.cpp b/src/main.cpp
-index 910fe5c..98fee0a 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -459,7 +459,8 @@ int main(int argc, char **argv)
- 		end_pci_access();
- 		exit(0);
- 	}
--	init_display();
-+	if (!auto_tune)
-+		init_display();
- 	initialize_tuning();
- 	/* first one is short to not let the user wait too long */
- 	one_measurement(1, NULL);
-@@ -472,11 +473,13 @@ int main(int argc, char **argv)
- 	}
+diff --git a/src/cpu/rapl/rapl_interface.cpp b/src/cpu/rapl/rapl_interface.=
+cpp
+index a19e0a9..ab8e8ce 100644
+--- a/src/cpu/rapl/rapl_interface.cpp
++++ b/src/cpu/rapl/rapl_interface.cpp
+@@ -647,9 +647,9 @@ void c_rapl_interface::rapl_measure_energy()
+ 	double pp0_joules =3D 0;
+ 	double pp1_joules =3D 0;
  =
 
- 	while (!leave_powertop) {
--		show_cur_tab();
-+		if (!auto_tune)
-+			show_cur_tab();
- 		one_measurement(time_out, NULL);
- 		learn_parameters(15, 0);
- 	}
--	endwin();
-+	if (!auto_tune)
-+		endwin();
- 	printf("%s\n", _("Leaving PowerTOP"));
+-	ret =3D get_pkg_power_info(&thermal_spec_power, &max_power, &min_power, &=
+max_time_window);
++	get_pkg_power_info(&thermal_spec_power, &max_power, &min_power, &max_time=
+_window);
+ 	RAPL_DBG_PRINT("Pkg Power Info: Thermal spec %f watts, max %f watts, min =
+%f watts, max time window %f seconds\n", thermal_spec_power, max_power, min=
+_power, max_time_window);
+-	ret =3D get_dram_power_info(&thermal_spec_power, &max_power, &min_power, =
+&max_time_window);
++	get_dram_power_info(&thermal_spec_power, &max_power, &min_power, &max_tim=
+e_window);
+ 	RAPL_DBG_PRINT("DRAM Power Info: Thermal spec %f watts, max %f watts, min=
+ %f watts, max time window %f seconds\n", thermal_spec_power, max_power, mi=
+n_power, max_time_window);
  =
 
- 	end_process_data();
+ 	for (;;) {
+diff --git a/src/devices/alsa.cpp b/src/devices/alsa.cpp
+index 5dee334..a1fca71 100644
+--- a/src/devices/alsa.cpp
++++ b/src/devices/alsa.cpp
+@@ -154,7 +154,6 @@ static void create_all_alsa_callback(const char *d_name)
+ {
+ 	char filename[4096];
+ 	class alsa *bl;
+-	ofstream file;
+ =
+
+ 	if (strncmp(d_name, "hwC", 3) !=3D 0)
+ 		return;
+diff --git a/src/display.cpp b/src/display.cpp
+index c76ba27..123620a 100644
+--- a/src/display.cpp
++++ b/src/display.cpp
+@@ -267,13 +267,8 @@ void cursor_up(void)
+ 	if (w) {
+ 		w->cursor_up(); =
+
+ 		if(w->ypad_pos > 0) {
+-			if (tab_names[current_tab] =3D=3D "Tunables") {
+-				prefresh(w->win, --w->ypad_pos, w->xpad_pos, =
+
+-					1, 0, LINES - 3, COLS - 1);
+-	                } else {
+-				prefresh(w->win, --w->ypad_pos, w->xpad_pos, =
+
+-					1, 0, LINES - 3, COLS - 1);
+-			}
++			prefresh(w->win, --w->ypad_pos, w->xpad_pos,
++				 1, 0, LINES - 3, COLS - 1);
+ 		}
+ 	}
+ 	=
+
+diff --git a/src/tuning/runtime.cpp b/src/tuning/runtime.cpp
+index b57d53e..3201fdd 100644
+--- a/src/tuning/runtime.cpp
++++ b/src/tuning/runtime.cpp
+@@ -139,10 +139,6 @@ void add_runtime_tunables(const char *bus)
+ 		if (entry->d_name[0] =3D=3D '.')
+ 			continue;
+ =
+
+-		sprintf(filename, "/sys/bus/%s/devices/%s", bus, entry->d_name);
+-
+-
+-
+ 		sprintf(filename, "/sys/bus/%s/devices/%s/power/control", bus, entry->d_=
+name);
+ =
+
+ 		if (access(filename, R_OK) !=3D 0)
+diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
+index 85b80ac..7d64cad 100644
+--- a/src/tuning/tuning.cpp
++++ b/src/tuning/tuning.cpp
+@@ -198,7 +198,6 @@ void report_show_tunables(void)
+ 	unsigned int i;
+ 	/* three tables; bad, unfixable, good */
+ 	sort_tunables();
+-	string srt_tmp;
+ 	int idx, rows =3D 0, cols;
+ =
+
+ 	/* First Table */
 -- =
 
-2.0.3
+2.1.0
 
 
---===============2839996385585921736==--
+--===============8574758073898452168==--
 
