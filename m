@@ -1,113 +1,94 @@
-Content-Type: multipart/mixed; boundary="===============0736860800396422405=="
+Content-Type: multipart/mixed; boundary="===============8467016018531145367=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: Re: [Powertop] [PATCH 09/14] do not use ncurses when --auto-tune is
- specified
-Date: Wed, 20 Aug 2014 23:56:33 +0300
-Message-ID: <1408568193-31880-1-git-send-email-kerolasa@iki.fi>
-In-Reply-To: CAG27Bk3rJCRgpoJu8SYgzrsCWhvvs354mbYHMyVY4q2kd8krow@mail.gmail.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] [PATCH 1/1] tunable: update sched_mc_power_savings
+ target value
+Date: Mon, 29 Sep 2014 10:43:46 -0700
+Message-ID: <50901.10.24.5.188.1412012626.squirrel@linux.intel.com>
+In-Reply-To: CAJDL4uLZo9A4a_jAXKNGuLuQ+voS3TaUbr8Ljr+QaKb0TESdgQ@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0736860800396422405==
+--===============8467016018531145367==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 
-On 20 August 2014 15:57, Sami Kerola <kerolasa(a)iki.fi> wrote:
-> On 20 August 2014 15:28, Sergey Senozhatsky <sergey.senozhatsky(a)gmail.c=
-om> wrote:
->> On (08/05/14 22:31), Sami Kerola wrote:
->>> Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
->>> ---
->>>  src/main.cpp | 9 ++++++---
->>>  1 file changed, 6 insertions(+), 3 deletions(-)
->>>
->>
->> I think it makes sense to extend ui_notify_user() so it can cover
->> both cases: initialised ncurses -- calling mvprintw(), and
->> uninitialised ncurses -- printf (to stdout).
->>
->> this will change a bit 'powertop --auto-tune' behaviour, since by
->> default user will now see a 'list' of commands executed by powertop,
->> but it's really easy to silent powertop via stdout redirection.
->>
->>
->> what do you think?
+> On Fri, Aug 22, 2014 at 9:10 PM, Alexandra Yates <
+> alexandra.yates(a)linux.intel.com> wrote:
 >
-> I think this patch set will need to get ready eventually.  Would it be
-> possible that the upstream maintainer will drop the patch 0007 aka 'do
-> not use ncurses' and merge the rest (assuming they are not unmentioned
-> way borken).
+>>
+>> > On Tue, Aug 19, 2014 at 7:49 AM, Sergey Senozhatsky <
+>> > sergey.senozhatsky(a)gmail.com> wrote:
+>> >
+>> >> On (08/13/14 21:28), Nanley Chery wrote:
+>> >> > Starting in kernel 2.6.29, the highest power savings level
+>> increased
+>> >> to
+>> >> "2".
+>> >> > However, in kernel 3.5, the sched power savings feature was removed
+>> >> altogether.
+>> >>
+>> >> hello,
+>> >> thanks for reporting,
+>> >>
+>> >>
+>> >> so, it's been removed 2 years ago (3.5 release date was 21 Jul 2012).
+>> >>
+>> >> do we need to support it at all?
+>> >
+>> >
+>> > Hello,
+>> >
+>> > Good question. Our README file indicates linux-kernel >=3D 2.6.38 to be
+>> a
+>> > build requirement. Does this mean we support power management features
+>> > starting from that kernel? Or does it mean that this is only a build
+>> > requirement and we target the latest kernels? It is not clear from the
+>> > current documentation.
+>> >
+>> > On a much smaller scope, supporting this feature is essentially free
+>> > (maintenance-wise) and would keep some of our end users on older
+>> kernels
+>> > happy. Btw, I submitted a simpler version 2 of this patch that does
+>> not
+>> > check for the kernel version.
+>> >
+>> > Thanks,
+>> > Nanley
+>> > _______________________________________________
+>> > PowerTop mailing list
+>> > PowerTop(a)lists.01.org
+>> > https://lists.01.org/mailman/listinfo/powertop
+>> >
+>>
+>> From PowerTOP 2.0 and up the requirement is to run at least Linux kernel
+>> 2.6.38. If it is not in the supported kernel then PowerTOP does not need
+>> it.
+>>
+>> Thank you,
+>> Alexandra.
+>>
+>
+> Since we're supporting kernels starting from 2.6.38 (which has this power
+> management feature itself), please consider this patch which produces the
+> correct behavior.
+>
+> Thanks,
+> Nanley
+>
 
-Hello Sergey and others,
+Hi Nanley,
 
-I had a bit of spare time so I started to look what exactly is calling
-mvprintw() via ui_notify_user().  My initial reaction was that I must
-have made some error in search, because I could not find such call.  So I
-added abort() to the code...
+Thank you for your patch.  However, since this feature was faced out the
+kernel over two years ago it doesn't make sense to add it now to PowerTOP.
+I will update the release notes to use a later kernel.  Please excuse the
+confusion.
 
-index b482296..55c9603 100644
---- a/src/lib.cpp
-+++ b/src/lib.cpp
-@@ -546,5 +546,6 @@ void ui_notify_user(const char *frmt, ...)
-        vsnprintf(notify, UI_NOTIFY_BUFF_SZ - 1, frmt, list);
-        va_end(list);
-        mvprintw(1, 0, notify);
-+       abort();
-        attroff(COLOR_PAIR(1));
- }
-
-...and found the --auto-tune does not entering to that function.  When
-running in normal mode the call path is from main() -> one_measurement()
--> do_sleep() -> cursor_enter() -> tuning_window::cursor_enter ->
-ui_notify_user() -> mvprintw().
-
-I also realized the --auto-tune is setting leave_powertop =3D 1, which
-means the patch 0009 can be simplified.  Here is better version of the
-change that avoids running unnecessary if().
-
---->8----
-From: Sami Kerola <kerolasa(a)iki.fi>
-Date: Wed, 20 Aug 2014 23:31:52 +0300
-Subject: [PATCH 09/14] do not use ncurses when --auto-tune is specified
-
-Reviewed-by: Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
----
- src/main.cpp | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/src/main.cpp b/src/main.cpp
-index 3b67ef0..bd0fc88 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -460,7 +460,8 @@ int main(int argc, char **argv)
- 		end_pci_access();
- 		exit(0);
- 	}
--	init_display();
-+	if (!auto_tune)
-+		init_display();
- 	initialize_tuning();
- 	/* first one is short to not let the user wait too long */
- 	one_measurement(1, NULL);
-@@ -477,7 +478,8 @@ int main(int argc, char **argv)
- 		one_measurement(time_out, NULL);
- 		learn_parameters(15, 0);
- 	}
--	endwin();
-+	if (!auto_tune)
-+		endwin();
- 	printf("%s\n", _("Leaving PowerTOP"));
- =
-
- 	end_process_data();
--- =
-
-2.1.0
+Thank you,
+Alexandra.
 
 
---===============0736860800396422405==--
+--===============8467016018531145367==--
 
