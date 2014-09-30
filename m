@@ -1,64 +1,129 @@
-Content-Type: multipart/mixed; boundary="===============1302807682118965011=="
+Content-Type: multipart/mixed; boundary="===============7350368854043434067=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH v3 3/5] Remove another memory leak
-Date: Fri, 17 Oct 2014 15:58:04 -0700
-Message-ID: <1413586686-28602-4-git-send-email-joe.konno@linux.intel.com>
-In-Reply-To: 1413586686-28602-1-git-send-email-joe.konno@linux.intel.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] [PATCH 1/1] tunable: update sched_mc_power_savings
+ target value
+Date: Tue, 30 Sep 2014 15:46:35 -0700
+Message-ID: <54150.10.24.2.106.1412117195.squirrel@linux.intel.com>
+In-Reply-To: CAJDL4u+By5Z76Z37g9uMVU4+U1a+ScOUf03VyW+0O17J3YMrBg@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1302807682118965011==
+--===============7350368854043434067==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Dan Kalowsky <daniel.kalowsky(a)intel.com>
 
-Pointer gets over written without ever being properly cleaned up.  This
-should solve that problem.
+> Hi Alexandra,
+>
+> Since we're going to require a later kernel, I think we should also remove
+> the line that adds the (currently broken) sysfs_tunable for this feature
+> as
+> well.
+>
+> Cheers,
+> Nanley
+>
+> On Mon, Sep 29, 2014 at 1:43 PM, Alexandra Yates <
+> alexandra.yates(a)linux.intel.com> wrote:
+>
+>>
+>> > On Fri, Aug 22, 2014 at 9:10 PM, Alexandra Yates <
+>> > alexandra.yates(a)linux.intel.com> wrote:
+>> >
+>> >>
+>> >> > On Tue, Aug 19, 2014 at 7:49 AM, Sergey Senozhatsky <
+>> >> > sergey.senozhatsky(a)gmail.com> wrote:
+>> >> >
+>> >> >> On (08/13/14 21:28), Nanley Chery wrote:
+>> >> >> > Starting in kernel 2.6.29, the highest power savings level
+>> >> increased
+>> >> >> to
+>> >> >> "2".
+>> >> >> > However, in kernel 3.5, the sched power savings feature was
+>> removed
+>> >> >> altogether.
+>> >> >>
+>> >> >> hello,
+>> >> >> thanks for reporting,
+>> >> >>
+>> >> >>
+>> >> >> so, it's been removed 2 years ago (3.5 release date was 21 Jul
+>> 2012).
+>> >> >>
+>> >> >> do we need to support it at all?
+>> >> >
+>> >> >
+>> >> > Hello,
+>> >> >
+>> >> > Good question. Our README file indicates linux-kernel >=3D 2.6.38 to
+>> be
+>> >> a
+>> >> > build requirement. Does this mean we support power management
+>> features
+>> >> > starting from that kernel? Or does it mean that this is only a
+>> build
+>> >> > requirement and we target the latest kernels? It is not clear from
+>> the
+>> >> > current documentation.
+>> >> >
+>> >> > On a much smaller scope, supporting this feature is essentially
+>> free
+>> >> > (maintenance-wise) and would keep some of our end users on older
+>> >> kernels
+>> >> > happy. Btw, I submitted a simpler version 2 of this patch that does
+>> >> not
+>> >> > check for the kernel version.
+>> >> >
+>> >> > Thanks,
+>> >> > Nanley
+>> >> > _______________________________________________
+>> >> > PowerTop mailing list
+>> >> > PowerTop(a)lists.01.org
+>> >> > https://lists.01.org/mailman/listinfo/powertop
+>> >> >
+>> >>
+>> >> From PowerTOP 2.0 and up the requirement is to run at least Linux
+>> kernel
+>> >> 2.6.38. If it is not in the supported kernel then PowerTOP does not
+>> need
+>> >> it.
+>> >>
+>> >> Thank you,
+>> >> Alexandra.
+>> >>
+>> >
+>> > Since we're supporting kernels starting from 2.6.38 (which has this
+>> power
+>> > management feature itself), please consider this patch which produces
+>> the
+>> > correct behavior.
+>> >
+>> > Thanks,
+>> > Nanley
+>> >
+>>
+>> Hi Nanley,
+>>
+>> Thank you for your patch.  However, since this feature was faced out the
+>> kernel over two years ago it doesn't make sense to add it now to
+>> PowerTOP.
+>> I will update the release notes to use a later kernel.  Please excuse
+>> the
+>> confusion.
+>>
+>> Thank you,
+>> Alexandra.
+>>
+>>
+>
 
-v2: rebased atop 41c54e8, do not delete window in clear_tunables() to
-prevent double-free in close_display().
+This makes sense Nanley.  Since you have been working on this already,  Do
+you want to send a patch with this change?
 
-Signed-off-by: Joe Konno <joe.konno(a)intel.com>
----
- src/tuning/tuning.cpp | 7 +++++++
- 1 file changed, 7 insertions(+)
+Thank you,
+Alexandra.
 
-diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
-index 7d64cad..5414022 100644
---- a/src/tuning/tuning.cpp
-+++ b/src/tuning/tuning.cpp
-@@ -46,6 +46,8 @@
- static void sort_tunables(void);
- static bool should_clear =3D false;
- =
-
-+class tuning_window *tune_window;
-+
- class tuning_window: public tab_window {
- public:
- 	virtual void repaint(void);
-@@ -80,6 +82,11 @@ void initialize_tuning(void)
- 	init_tuning();
- =
-
- 	w->cursor_max =3D all_tunables.size() - 1;
-+
-+	if (tune_window)
-+		delete tune_window;
-+
-+	tune_window =3D w;
- }
- =
-
- =
-
--- =
-
-2.1.2
-
-
---===============1302807682118965011==--
+--===============7350368854043434067==--
 
