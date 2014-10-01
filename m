@@ -1,28 +1,100 @@
-Content-Type: multipart/mixed; boundary="===============1530192920892279437=="
+Content-Type: multipart/mixed; boundary="===============2884169142238958995=="
 MIME-Version: 1.0
 From: Magnus Fromreide <magfr at lysator.liu.se>
-Subject: Re: [Powertop] [PATCH 04/12] fix clang++ compilation errors
-Date: Sat, 02 Aug 2014 14:19:42 +0200
-Message-ID: <20140802121942.GB20307@sara.bahnhof.se>
-In-Reply-To: 1406980457-19077-5-git-send-email-kerolasa@iki.fi
+Subject: Re: [Powertop] [PATCH] devfreq: add devfreq devices stats support
+Date: Wed, 01 Oct 2014 22:22:01 +0200
+Message-ID: <20141001202201.GA2236@sara.bahnhof.se>
+In-Reply-To: 1412058894-28830-1-git-send-email-sanjay.rawat@linaro.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1530192920892279437==
+--===============2884169142238958995==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Aug 02, 2014 at 12:54:09PM +0100, Sami Kerola wrote:
-> The same error was fixed in multiple files to made clang++ work.
+On Tue, Sep 30, 2014 at 12:04:54PM +0530, Sanjay Singh Rawat wrote:
+> add window to show frequency stats for devfreq devices
 > =
 
-> error: variable length array of non-POD element type 'string' (aka
-> 'basic_string<char>')
+> Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)gmail.com>
+> Signed-off-by: Sanjay Singh Rawat <sanjay.rawat(a)linaro.org>
+> ---
+> =
 
-Stupid question: Why not a vector<string> ?
+> v2 - Show devfreq window on support basis. Check for empty devfreq
+>      directory.
+>    - Free the open dirp while exiting.
+> ---
+>  src/Makefile.am           |   1 +
+>  src/devices/devfreq.cpp   | 367 ++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  src/devices/devfreq.h     |  75 ++++++++++
+>  src/main.cpp              |   9 ++
+>  src/report/report-maker.h |   1 +
+>  5 files changed, 453 insertions(+)
+>  create mode 100644 src/devices/devfreq.cpp
+>  create mode 100644 src/devices/devfreq.h
+> =
+
+> diff --git a/src/Makefile.am b/src/Makefile.am
+> index 311b75e..d2f1da7 100644
+> --- a/src/Makefile.am
+> +++ b/src/Makefile.am
+> @@ -39,6 +39,7 @@ powertop_SOURCES =3D \
+>  	devices/alsa.h \
+>  	devices/backlight.cpp \
+>  	devices/backlight.h \
+> +	devices/devfreq.cpp \
+>  	devices/device.cpp \
+>  	devices/device.h \
+>  	devices/gpu_rapl_device.cpp \
+> diff --git a/src/devices/devfreq.cpp b/src/devices/devfreq.cpp
+> new file mode 100644
+> index 0000000..3eb63e5
+> --- /dev/null
+> +++ b/src/devices/devfreq.cpp
+> @@ -0,0 +1,367 @@
+...
+> +/* todo: adapt to new report format */
+> +#if 0
+
+Do it, or at least do not commit big #if 0-blocks.
+
+> +	char buffer[512];
+> +	unsigned int i, j;
+> +
+> +	report.begin_section(SECTION_DEVFREQ);
+> +	report.add_header("Device Frequency Report");
+> +
+> +	report.begin_table(TABLE_WIDE);
+> +	if (!all_devfreq.size()) {
+> +		report.begin_row();
+> +		report.add(" No devfreq devices available");
+> +		return;
+> +	}
+> +
+> +	for (i =3D 0; i < all_devfreq.size(); i++) {
+> +		buffer[0] =3D 0;
+> +		class devfreq *df =3D all_devfreq[i];
+> +
+> +		report.begin_row();
+> +		report.begin_cell(CELL_CPU_PSTATE_HEADER);
+> +		report.addf("%s", df->device_name());
+> +
+> +		for (j =3D 0; j < df->dstates.size(); j++) {
+> +			report.begin_row();
+> +			report.begin_cell(CELL_CPU_STATE_VALUE);
+> +			df->fill_freq_name(j, buffer);
+> +			report.add(buffer);
+> +			report.begin_cell(CELL_CPU_STATE_VALUE);
+> +			df->fill_freq_utilization(j, buffer);
+> +			report.add(buffer);
+> +		}
+> +	}
+> +#endif
 
 /MF
 
---===============1530192920892279437==--
+--===============2884169142238958995==--
 
