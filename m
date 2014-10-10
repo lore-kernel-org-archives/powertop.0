@@ -1,101 +1,104 @@
-Content-Type: multipart/mixed; boundary="===============7853075441449772926=="
+Content-Type: multipart/mixed; boundary="===============8183205112919238406=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] [PATCH 07/12] move options structure to function scope
-Date: Mon, 04 Aug 2014 16:41:18 -0700
-Message-ID: <61169.10.24.6.146.1407195678.squirrel@linux.intel.com>
-In-Reply-To: 20140803114643.GA1150@swordfish
+From: Sanjay Singh Rawat <sanjay.rawat at linaro.org>
+Subject: Re: [Powertop] [PATCH] devfreq: add devfreq devices stats support
+Date: Fri, 10 Oct 2014 15:13:13 +0530
+Message-ID: <5437AA31.4050908@linaro.org>
+In-Reply-To: 20141001202201.GA2236@sara.bahnhof.se
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7853075441449772926==
+--===============8183205112919238406==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 
-> On (08/03/14 10:34), Sami Kerola wrote:
->> On 3 August 2014 04:52, Sergey Senozhatsky
->> <sergey.senozhatsky(a)gmail.com> wrote:
->> > On (08/02/14 23:20), Sami Kerola wrote:
->> >> On 2 August 2014 14:47, Sergey Senozhatsky
->> <sergey.senozhatsky(a)gmail.com> wrote:
->> >> >> Subject: [Powertop] [PATCH 07/12] move options structure to
->> function scope
->> >> >
->> >> > what for?
->> >>
->> >> They've told me keeping variables in as narrow scope as possible is a
->> >> virtue. Even if it would not be I don't see any harm of moving
->> >> everything out of global scope when ever possible.
->> >>
->> >> https://www.securecoding.cert.org/confluence/display/cplusplus/DCL07-=
-CPP.+Minimize+the+scope+of+variables+and+methods
->> >
->> > this is different. let's keep it as is.
+On Thursday 02 October 2014 01:52 AM, Magnus Fromreide wrote:
+> On Tue, Sep 30, 2014 at 12:04:54PM +0530, Sanjay Singh Rawat wrote:
+>> add window to show frequency stats for devfreq devices
 >>
->> Hi Sergey,
+>> Signed-off-by: Rajagopal Venkat <rajagopal.venkat(a)gmail.com>
+>> Signed-off-by: Sanjay Singh Rawat <sanjay.rawat(a)linaro.org>
+>> ---
 >>
->> That's alright the scope move is reverted. When I did that I started
->> to look the option structure, and later switch case segment. I started
->> to wonder why '-a' is marked as an option in structure but it is
->> missing from short options in optstring. That lead me to write two
->> small clean ups.
+>> v2 - Show devfreq window on support basis. Check for empty devfreq
+>>       directory.
+>>     - Free the open dirp while exiting.
+>> ---
+>>   src/Makefile.am           |   1 +
+>>   src/devices/devfreq.cpp   | 367 ++++++++++++++++++++++++++++++++++++++=
+++++++++
+>>   src/devices/devfreq.h     |  75 ++++++++++
+>>   src/main.cpp              |   9 ++
+>>   src/report/report-maker.h |   1 +
+>>   5 files changed, 453 insertions(+)
+>>   create mode 100644 src/devices/devfreq.cpp
+>>   create mode 100644 src/devices/devfreq.h
 >>
->> https://github.com/kerolasa/powertop/commit/09a3bb68d1f92c30675679b64d63=
-cddeafbfbce7
->> https://github.com/kerolasa/powertop/commit/8d81534bf55486b5230e18b21752=
-4a07694c5e9e
->>
->> Reminder. As mentioned yesterday, the patch series in maillist is
->> broken. Up to date versions of these changes are in my github branch,
->> which makes this a pull request.
->>
->>   https://github.com/kerolasa/powertop sami
->>
+>> diff --git a/src/Makefile.am b/src/Makefile.am
+>> index 311b75e..d2f1da7 100644
+>> --- a/src/Makefile.am
+>> +++ b/src/Makefile.am
+>> @@ -39,6 +39,7 @@ powertop_SOURCES =3D \
+>>   	devices/alsa.h \
+>>   	devices/backlight.cpp \
+>>   	devices/backlight.h \
+>> +	devices/devfreq.cpp \
+>>   	devices/device.cpp \
+>>   	devices/device.h \
+>>   	devices/gpu_rapl_device.cpp \
+>> diff --git a/src/devices/devfreq.cpp b/src/devices/devfreq.cpp
+>> new file mode 100644
+>> index 0000000..3eb63e5
+>> --- /dev/null
+>> +++ b/src/devices/devfreq.cpp
+>> @@ -0,0 +1,367 @@
+> ...
+>> +/* todo: adapt to new report format */
+>> +#if 0
+> Do it, or at least do not commit big #if 0-blocks.
+
+ack
 >
-> Hi,
->
-> powertop does not pull from outside repos. please resend
-> your patch series to the list. thanks for your contribution.
->
-> 	-ss
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->
+>> +	char buffer[512];
+>> +	unsigned int i, j;
+>> +
+>> +	report.begin_section(SECTION_DEVFREQ);
+>> +	report.add_header("Device Frequency Report");
+>> +
+>> +	report.begin_table(TABLE_WIDE);
+>> +	if (!all_devfreq.size()) {
+>> +		report.begin_row();
+>> +		report.add(" No devfreq devices available");
+>> +		return;
+>> +	}
+>> +
+>> +	for (i =3D 0; i < all_devfreq.size(); i++) {
+>> +		buffer[0] =3D 0;
+>> +		class devfreq *df =3D all_devfreq[i];
+>> +
+>> +		report.begin_row();
+>> +		report.begin_cell(CELL_CPU_PSTATE_HEADER);
+>> +		report.addf("%s", df->device_name());
+>> +
+>> +		for (j =3D 0; j < df->dstates.size(); j++) {
+>> +			report.begin_row();
+>> +			report.begin_cell(CELL_CPU_STATE_VALUE);
+>> +			df->fill_freq_name(j, buffer);
+>> +			report.add(buffer);
+>> +			report.begin_cell(CELL_CPU_STATE_VALUE);
+>> +			df->fill_freq_utilization(j, buffer);
+>> +			report.add(buffer);
+>> +		}
+>> +	}
+>> +#endif
+> /MF
 
-Hello All,
+-- =
 
-Welcome Sami to PowerTOP, and thank you very much for submitting your
-patches, and everyone else for reviewing them.
-
-Sami, I would appreciate you make the changes people requested on the
-list, and be prepared for further rounds of reviews/changes of your
-patches.  This is the current process PowerTOP developers do code reviews.
-
-Here are few other things to consider before sending your patches for
-PowerTOP:
-
-As I mentioned on a previous thread PowerTOp uses the linux kernel coding
-style, please change all your code to follow this guidelines.
-https://www.kernel.org/doc/Documentation/CodingStyle.
-
-Before creating a set of patches please check the code using =
-
-https://github.com/torvalds/linux/blob/master/scripts/checkpatch.pl
-
-Lastly, when creating your new set of patches use the flag
---subject-prefix=3D"PATCH Vx" x being the revision version.  That will make
-things easy on the mailing list.
-
-After your code gets an ok from the community I will go ahead and add it
-to mainline.
-
-Thank you very much again for sending all your changes,
-Alexandra.
+sanjay
 
 
---===============7853075441449772926==--
+--===============8183205112919238406==--
 
