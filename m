@@ -1,83 +1,81 @@
-Content-Type: multipart/mixed; boundary="===============7009096130529970685=="
+Content-Type: multipart/mixed; boundary="===============4773389293183613745=="
 MIME-Version: 1.0
-From: Mohammad Merajul Islam Molla <meraj.enigma at gmail.com>
-Subject: Re: [Powertop] [PATCH POWERTOP] Remove temporary file created during
- calibration
-Date: Mon, 04 Aug 2014 19:54:10 +0600
-Message-ID: <CAHu9=sN2XadgzysWQZCPR0vaWy41aXJ2G9jhznBCDqY__Z3ppQ@mail.gmail.com>
-In-Reply-To: 60129.10.24.2.137.1406571225.squirrel@linux.intel.com
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: [Powertop] [PATCH v2 6/8] Stop buffer overflow
+Date: Tue, 14 Oct 2014 11:09:17 -0700
+Message-ID: <1413310159-30577-7-git-send-email-joe.konno@linux.intel.com>
+In-Reply-To: 1413310159-30577-1-git-send-email-joe.konno@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7009096130529970685==
+--===============4773389293183613745==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Alexandra,
+From: Dan Kalowsky <daniel.kalowsky(a)intel.com>
 
-Sorry for late reply due to holidays. I have resent the patches. Please che=
-ck.
+On some builds of Android, we are seeing entries that overrun this
+buffer causing some ill-advised effects.  Limiting the buffer copies to
+the size of the allocated buffer solves this issue.
 
---
-Thanks,
--Meraj
+v2: rebased atop 41c54e8
 
-On Tue, Jul 29, 2014 at 12:13 AM, Alexandra Yates
-<alexandra.yates(a)linux.intel.com> wrote:
-> Hi Mohammad and Amit,
->
->> Mohammad,
->>
->> This fix should go upstream. cc'ing the powertop list.
->>
->> Regards,
->> Amit
->>
->> On Thu, Jun 26, 2014 at 12:27 PM, Mohammad Merajul Islam Molla
->> <meraj.enigma(a)gmail.com> wrote:
->>> powertop creates temporary file in /tmp folder during calibration.
->>> Simply closing does not remove these files.
->>> Instead use unlink to remove the file.
->>>
->>> diff --git a/src/calibrate/calibrate.cpp b/src/calibrate/calibrate.cpp
->>> index db368e0..1336c3f 100644
->>> --- a/src/calibrate/calibrate.cpp
->>> +++ b/src/calibrate/calibrate.cpp
->>> @@ -242,7 +242,7 @@ static void *burn_disk(void *dummy)
->>>                 write(fd, buffer, 64*1024);
->>>                 fdatasync(fd);
->>>         }
->>> -       close(fd);
->>> +       unlink(filename);
->>>         return NULL;
->>>  }
->>>
->>>
->>>
->>> --
->>> Thanks,
->>> -Meraj
->>>
->>> _______________________________________________
->>> linaro-dev mailing list
->>> linaro-dev(a)lists.linaro.org
->>> http://lists.linaro.org/mailman/listinfo/linaro-dev
->> _______________________________________________
->> PowerTop mailing list
->> PowerTop(a)lists.01.org
->> https://lists.01.org/mailman/listinfo/powertop
->>
->
-> Please send your patch against the tip of the tree.  I'm having
-> difficulties applying it.  Here is the error message:
->
-> Patch is empty.  Was it split wrong?
-> If you would prefer to skip this patch, instead run "git am --skip".
-> To restore the original branch and stop patching run "git am --abort".
->
-> Thank you,
-> Alexandra.
+Signed-off-by: Joe Konno <joe.konno(a)intel.com>
+---
+ src/process/do_process.cpp | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
---===============7009096130529970685==--
+diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
+index dd7d982..2b5a327 100644
+--- a/src/process/do_process.cpp
++++ b/src/process/do_process.cpp
+@@ -856,8 +856,8 @@ void process_update_display(void)
+ =
+
+ 		format_watts(all_power[i]->Witts(), power, 10);
+ 		if (!show_power)
+-			strcpy(power, "          ");
+-		sprintf(name, "%s", all_power[i]->type());
++			strncpy(power, "          ", 16);
++		snprintf(name, 20, "%s", all_power[i]->type());
+ =
+
+ 		align_string(name, 14, 20);
+ =
+
+@@ -867,9 +867,9 @@ void process_update_display(void)
+ 		usage[0] =3D 0;
+ 		if (all_power[i]->usage_units()) {
+ 			if (all_power[i]->usage() < 1000)
+-				sprintf(usage, "%5.1f%s", all_power[i]->usage(), all_power[i]->usage_u=
+nits());
++				snprintf(usage, 20, "%5.1f%s", all_power[i]->usage(), all_power[i]->us=
+age_units());
+ 			else
+-				sprintf(usage, "%5i%s", (int)all_power[i]->usage(), all_power[i]->usag=
+e_units());
++				snprintf(usage, 20, "%5i%s", (int)all_power[i]->usage(), all_power[i]-=
+>usage_units());
+ 		}
+ =
+
+ 		align_string(usage, 14, 20);
+@@ -878,7 +878,7 @@ void process_update_display(void)
+ 		if (!all_power[i]->show_events())
+ 			events[0] =3D 0;
+ 		else if (all_power[i]->events() <=3D 0.3)
+-			sprintf(events, "%5.2f", all_power[i]->events());
++			snprintf(events, 20, "%5.2f", all_power[i]->events());
+ =
+
+ 		align_string(events, 12, 20);
+ 		wprintw(win, "%s  %s %s %s %s\n", power, usage, events, name, pretty_pri=
+nt(all_power[i]->description(), descr, 128));
+-- =
+
+2.1.2
+
+
+--===============4773389293183613745==--
 
