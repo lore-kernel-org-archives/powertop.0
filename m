@@ -1,207 +1,305 @@
-Content-Type: multipart/mixed; boundary="===============2194574646789945495=="
+Content-Type: multipart/mixed; boundary="===============6278721781862088668=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH 01/14] configure: use vertical lists
-Date: Tue, 19 Aug 2014 20:51:54 +0900
-Message-ID: <20140819115154.GD2484@swordfish>
-In-Reply-To: 1407274298-16404-1-git-send-email-kerolasa@iki.fi
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: Re: [Powertop] [PATCH v3 04/15] clean up Makefile.am files
+Date: Tue, 14 Oct 2014 16:34:44 -0700
+Message-ID: <543DB314.2060504@linux.intel.com>
+In-Reply-To: 1410125238-29600-5-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2194574646789945495==
+--===============6278721781862088668==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (08/05/14 22:31), Sami Kerola wrote:
-> Horizontal lists has downside of being managed as a single entry in
-> version control, which makes commits that add and remove items difficult
-> to follow.  With vertical lists each entry is managed separately, which
-> is much nicer.
+Trivial nit, otherwise LGTM.
+
+Reviewed-By: Joe Konno <joe.konno(a)intel.com>
+
+On 09/07/2014 02:27 PM, Sami Kerola wrote:
+> Use vertical rather than horizontal lists, and get rid of deprecated
+> ACLOCAL_AMFLAGS instruction.  The src/Makefile.am source file list also
+> needed sorting, as the items order seemed more or less random.
 > =
-
-> Additionally add project URL to autoconfig init, and pretty print macro
-> expressions to have indentation, and bracing that follows more or less in
-> K&R style.
-> =
-
-
-hello,
-
-at a glance, looks good.
-though, I'm not really sure about "[PATCH 09/14] do not use ncurses
-when --auto-tune is specified".
-
-
-thank you,
-
-	-ss
 
 > Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
 > ---
->  configure.ac | 82 +++++++++++++++++++++++++++++++++++++++++++++++++-----=
+>  Makefile.am     |  14 +++-
+>  src/Makefile.am | 193 +++++++++++++++++++++++++++++++++++++++++++-------=
 ------
->  1 file changed, 67 insertions(+), 15 deletions(-)
+>  2 files changed, 161 insertions(+), 46 deletions(-)
 > =
 
-> diff --git a/configure.ac b/configure.ac
-> index 0b02ad2..b41cfb3 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -2,15 +2,21 @@
->  # Process this file with autoconf to produce a configure script.
+> diff --git a/Makefile.am b/Makefile.am
+> index f5e466b..c8d0ae2 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -1,6 +1,14 @@
+>  AUTOMAKE_OPTIONS =3D subdir-objects
+> -ACLOCAL_AMFLAGS =3D -I m4
 >  =
 
->  AC_PREREQ([2.68])
-> -AC_INIT([powertop], [2.6.1], [powertop(a)lists.01.org])
-> -AM_INIT_AUTOMAKE([-Wall foreign ])
-> +AC_INIT([powertop], [2.6.1], [powertop(a)lists.01.org], [], [https://01.=
-org/powertop])
-> +AM_INIT_AUTOMAKE([-Wall foreign])
->  AC_LANG([C++])
-> -AC_CONFIG_FILES([Makefile src/Makefile traceevent/Makefile po/Makefile.i=
-n doc/Makefile])
-> +AC_CONFIG_FILES([
-> +	Makefile
-> +	src/Makefile
-> +	traceevent/Makefile
-> +	po/Makefile.in
-> +	doc/Makefile
-> +])
->  AC_CONFIG_SRCDIR([src/main.cpp])
->  AC_CONFIG_MACRO_DIR([m4])
->  AC_CONFIG_HEADERS([config.h])
->  GETTEXT_PACKAGE=3Dpowertop
-> -AC_SUBST(GETTEXT_PACKAGE)
-> +AC_SUBST([GETTEXT_PACKAGE])
->  AM_SILENT_RULES([yes])
->  AM_GNU_GETTEXT([external])
->  AM_GNU_GETTEXT_VERSION([0.18])
-> @@ -26,7 +32,23 @@ AM_PROG_CC_C_O
+> -SUBDIRS =3D traceevent src po doc
+> +SUBDIRS =3D \
+> +	traceevent \
+> +	src \
+> +	po \
+> +	doc
 >  =
 
->  # Checks for libraries.
->  # Checks for header files.
-> -AC_CHECK_HEADERS([fcntl.h libintl.h limits.h locale.h malloc.h stdint.h =
-stdlib.h string.h sys/ioctl.h sys/socket.h sys/statfs.h sys/time.h termios.=
-h unistd.h ncurses.h])
-> +AC_CHECK_HEADERS([ \
-> +	fcntl.h \
-> +	libintl.h \
-> +	limits.h \
-> +	locale.h \
-> +	malloc.h \
-> +	ncurses.h \
-> +	stdint.h \
-> +	stdlib.h \
-> +	string.h \
-> +	sys/ioctl.h \
-> +	sys/socket.h \
-> +	sys/statfs.h \
-> +	sys/time.h \
-> +	termios.h \
-> +	unistd.h \
-> +])
->  =
+> -EXTRA_DIST =3D README TODO Android.mk COPYING autogen.sh =
 
->  # Checks for typedefs, structures, and compiler characteristics.
->  AC_HEADER_STDBOOL
-> @@ -44,20 +66,46 @@ AC_FUNC_MALLOC
->  AC_FUNC_MMAP
->  AC_FUNC_REALLOC
->  AC_FUNC_STRTOD
-> -AC_CHECK_FUNCS([fdatasync getpagesize gettimeofday memmove memset mkdir =
-munmap pow realpath regcomp select setlocale socket sqrt strcasecmp strchr =
-strdup strerror strncasecmp strstr strtoul strtoull])
-> +AC_CHECK_FUNCS([ \
-> +	fdatasync \
-> +	getpagesize \
-> +	gettimeofday \
-> +	memmove \
-> +	memset \
-> +	mkdir \
-> +	munmap \
-> +	pow \
-> +	realpath \
-> +	regcomp \
-> +	select \
-> +	setlocale \
-> +	socket \
-> +	sqrt \
-> +	strcasecmp \
-> +	strchr \
-> +	strdup \
-> +	strerror \
-> +	strncasecmp \
-> +	strstr \
-> +	strtoul \
-> +	strtoull \
-> +])
->  =
-
-> -PKG_CHECK_MODULES([NCURSES], [ncursesw ncurses], [LIBS=3D"$LIBS $ncurses=
-_LIBS"],
-> -	AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], AC_MSG_ERROR([ncurses =
-is required but was not found]), []))
-> +PKG_CHECK_MODULES([NCURSES], [ncursesw ncurses], [LIBS=3D"$LIBS $ncurses=
-_LIBS"], [
-> +	AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], [
-> +		AC_MSG_ERROR([ncurses is required but was not found])
-> +	], [])
-> +])
->  =
-
->  has_libpci=3D0
-> -PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=3D1],[
-> -	AC_SEARCH_LIBS([pci_get_dev], [pci],[has_libpci=3D1], [has_libpci=3D0] =
-)])
-> +PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=3D1], [
-> +	AC_SEARCH_LIBS([pci_get_dev], [pci],[has_libpci=3D1], [has_libpci=3D0])
-> +])
->   =
+> +EXTRA_DIST =3D \
+> +	README \
+> +	TODO \
+> +	Android.mk \
+> +	COPYING \
+> +	autogen.sh
+> diff --git a/src/Makefile.am b/src/Makefile.am
+> index 6886388..311b75e 100644
+> --- a/src/Makefile.am
+> +++ b/src/Makefile.am
+> @@ -1,54 +1,161 @@
+>  AUTOMAKE_OPTIONS =3D subdir-objects
+> -ACLOCAL_AMFLAGS =3D -I ../m4 =
 
 >  =
 
->  has_libnl_ver=3D0
-> -# libnl-2 provides only libnl-2.0.pc file, so we check for separate libn=
-l-genl-3.0.pc
-> -# pkg-config file just for libnl-3.0 case.
-> -#
-> +dnl libnl-2 provides only libnl-2.0.pc file, so we check for separate
-> +dnl libnl-genl-3.0.pc pkg-config file just for libnl-3.0 case.
->  PKG_CHECK_MODULES([LIBNL], [libnl-3.0 >=3D 3.0 libnl-genl-3.0 >=3D 3.0],=
- [has_libnl_ver=3D3], [
->  	PKG_CHECK_MODULES([LIBNL], [libnl-2.0 >=3D 2.0], [has_libnl_ver=3D2], [
->  		PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [has_libnl_=
-ver=3D0])])])
-> @@ -78,7 +126,11 @@ if (test "$has_libpci" -eq 0); then
->  	])
->  fi
+>  sbin_PROGRAMS =3D powertop
+>  nodist_powertop_SOURCES =3D css.h
 >  =
 
-> -AC_SEARCH_LIBS([pthread_create], [pthread], [], AC_MSG_ERROR([libpthread=
- is required but was not found]), [])
-> -AC_SEARCH_LIBS([inet_aton], [resolv], [], AC_MSG_ERROR([libresolv is req=
-uired but was not found]), [])
-> +AC_SEARCH_LIBS([pthread_create], [pthread], [], [
-> +	AC_MSG_ERROR([libpthread is required but was not found])
-> +], [])
-> +AC_SEARCH_LIBS([inet_aton], [resolv], [], [
-> +	AC_MSG_ERROR([libresolv is required but was not found])
-> +], [])
+> -powertop_SOURCES =3D parameters/persistent.cpp parameters/learn.cpp para=
+meters/parameters.cpp \
+> -		parameters/parameters.h display.cpp cpu/cpu_core.cpp cpu/cpudevice.cpp=
+  \
+> -		cpu/cpu.cpp cpu/cpu.h cpu/cpu_linux.cpp cpu/abstract_cpu.cpp cpu/intel=
+_cpus.h \
+> -		cpu/cpu_package.cpp cpu/cpudevice.h cpu/intel_cpus.cpp devlist.h devli=
+st.cpp \
+> -		lib.cpp report/report.cpp process/process.cpp process/interrupt.h proc=
+ess/timer.h  \
+> -		process/processdevice.cpp process/powerconsumer.cpp process/work.h \
+> -		process/timer.cpp process/process.h process/work.cpp process/do_proces=
+s.cpp \
+> -		process/processdevice.h process/interrupt.cpp process/powerconsumer.h =
+report/report.h \
+> -		perf/perf.cpp perf/perf_event.h perf/perf.h perf/perf_bundle.h perf/pe=
+rf_bundle.cpp \
+> -		display.h devices/rfkill.h devices/i915-gpu.cpp devices/device.cpp dev=
+ices/alsa.cpp \
+> -		devices/runtime_pm.cpp devices/thinkpad-fan.cpp devices/usb.cpp device=
+s/ahci.cpp \
+> -		devices/thinkpad-light.cpp devices/ahci.h devices/i915-gpu.h devices/n=
+etwork.h \
+> -		devices/rfkill.cpp devices/alsa.h devices/thinkpad-fan.h devices/devic=
+e.h \
+> -		devices/usb.h devices/backlight.h devices/backlight.cpp devices/runtim=
+e_pm.h \
+> -		devices/thinkpad-light.h devices/network.cpp lib.h \
+> -		tuning/bluetooth.cpp tuning/tuning.cpp tuning/tuningusb.cpp \
+> -		tuning/ethernet.cpp tuning/bluetooth.h tuning/tuning.h tuning/ethernet=
+.h \
+> -		tuning/tunable.cpp tuning/nl80211.h tuning/iw.c tuning/wifi.cpp tuning=
+/tuningsysfs.h \
+> -		tuning/tuningsysfs.cpp tuning/wifi.h tuning/runtime.cpp tuning/tunable=
+.h \
+> -		tuning/runtime.h tuning/tuningusb.h tuning/iw.h calibrate/calibrate.cp=
+p \
+> -		calibrate/calibrate.h measurement/measurement.cpp \
+> -		measurement/measurement.h measurement/acpi.cpp measurement/sysfs.h mea=
+surement/sysfs.cpp \
+> -		measurement/acpi.h measurement/extech.cpp measurement/extech.h \
+> -		report/report-maker.cpp report/report-maker.h report/report-formatter.=
+h \
+> -		report/report-formatter-base.cpp report/report-formatter-base.h \
+> -		report/report-formatter-csv.cpp report/report-formatter-csv.h \
+> -		report/report-formatter-html.cpp report/report-formatter-html.h \
+> -		report/report-data-html.cpp report/report-data-html.h \
+> -		main.cpp css.h powertop.css cpu/intel_gpu.cpp \
+> -		cpu/rapl/rapl_interface.cpp cpu/cpu_rapl_device.cpp cpu/rapl/rapl_inte=
+rface.h\
+> -		cpu/dram_rapl_device.cpp devices/gpu_rapl_device.cpp cpu/cpu_rapl_devi=
+ce.h \
+> -		cpu/dram_rapl_device.h devices/gpu_rapl_device.h
+> -
+> -
+> -powertop_CXXFLAGS =3D -fno-omit-frame-pointer -fstack-protector -Wall -W=
+shadow -Wformat $(NCURSES_CFLAGS) $(PCIUTILS_CFLAGS) $(LIBNL_CFLAGS) $(GLIB=
+2_CFLAGS)
+> -
+> -
+> -powertop_CPPFLAGS =3D -D_FORTIFY_SOURCE=3D2 $(NCURSES_CFLAGS) $(PCIUTILS=
+_CFLAGS) $(LIBNL_CFLAGS) $(GLIB2_CFLAGS) $(LIBZ_CFLAGS) -DLOCALEDIR=3D\"$(l=
+ocaledir)\"
+> -
+> -powertop_LDADD =3D ../traceevent/libtraceevnet.la
+> -
+> -AM_LDFLAGS =3D $(LIBS) $(NCURSES_LIBS) $(PCIUTILS_LIBS) $(LIBNL_LIBS) $(=
+LIBZ_LIBS) $(PTHREAD_LIBS)  $(RESOLV_LIBS)
+> +powertop_SOURCES =3D \
+> +	css.h \
+> +	devlist.cpp \
+> +	devlist.h \
+> +	display.cpp \
+> +	display.h \
+> +	lib.cpp \
+> +	lib.h \
+> +	main.cpp \
+> +	powertop.css \
+> +	\
+
+Why the white line here?
+
+> +	calibrate/calibrate.cpp \
+> +	calibrate/calibrate.h \
+> +	cpu/abstract_cpu.cpp \
+> +	cpu/cpu.cpp \
+> +	cpu/cpu.h \
+> +	cpu/cpu_core.cpp \
+> +	cpu/cpu_linux.cpp \
+> +	cpu/cpu_package.cpp \
+> +	cpu/cpu_rapl_device.cpp \
+> +	cpu/cpu_rapl_device.h \
+> +	cpu/cpudevice.cpp \
+> +	cpu/cpudevice.h \
+> +	cpu/dram_rapl_device.cpp \
+> +	cpu/dram_rapl_device.h \
+> +	cpu/intel_cpus.cpp \
+> +	cpu/intel_cpus.h \
+> +	cpu/intel_gpu.cpp \
+> +	cpu/rapl/rapl_interface.cpp \
+> +	cpu/rapl/rapl_interface.h \
+> +	devices/ahci.cpp \
+> +	devices/ahci.h \
+> +	devices/alsa.cpp \
+> +	devices/alsa.h \
+> +	devices/backlight.cpp \
+> +	devices/backlight.h \
+> +	devices/device.cpp \
+> +	devices/device.h \
+> +	devices/gpu_rapl_device.cpp \
+> +	devices/gpu_rapl_device.h \
+> +	devices/i915-gpu.cpp \
+> +	devices/i915-gpu.h \
+> +	devices/network.cpp \
+> +	devices/network.h \
+> +	devices/rfkill.cpp \
+> +	devices/rfkill.h \
+> +	devices/runtime_pm.cpp \
+> +	devices/runtime_pm.h \
+> +	devices/thinkpad-fan.cpp \
+> +	devices/thinkpad-fan.h \
+> +	devices/thinkpad-light.cpp \
+> +	devices/thinkpad-light.h \
+> +	devices/usb.cpp \
+> +	devices/usb.h \
+> +	measurement/acpi.cpp \
+> +	measurement/acpi.h \
+> +	measurement/extech.cpp \
+> +	measurement/extech.h \
+> +	measurement/measurement.cpp \
+> +	measurement/measurement.h \
+> +	measurement/sysfs.cpp \
+> +	measurement/sysfs.h \
+> +	parameters/learn.cpp \
+> +	parameters/parameters.cpp \
+> +	parameters/parameters.h \
+> +	parameters/persistent.cpp \
+> +	perf/perf.cpp \
+> +	perf/perf.h \
+> +	perf/perf_bundle.cpp \
+> +	perf/perf_bundle.h \
+> +	perf/perf_event.h \
+> +	process/do_process.cpp \
+> +	process/interrupt.cpp \
+> +	process/interrupt.h \
+> +	process/powerconsumer.cpp \
+> +	process/powerconsumer.h \
+> +	process/process.cpp \
+> +	process/process.h \
+> +	process/processdevice.cpp \
+> +	process/processdevice.h \
+> +	process/timer.cpp \
+> +	process/timer.h \
+> +	process/work.cpp \
+> +	process/work.h \
+> +	report/report-data-html.cpp \
+> +	report/report-data-html.h \
+> +	report/report-formatter-base.cpp \
+> +	report/report-formatter-base.h \
+> +	report/report-formatter-csv.cpp \
+> +	report/report-formatter-csv.h \
+> +	report/report-formatter-html.cpp \
+> +	report/report-formatter-html.h \
+> +	report/report-formatter.h \
+> +	report/report-maker.cpp \
+> +	report/report-maker.h \
+> +	report/report.cpp \
+> +	report/report.h \
+> +	tuning/bluetooth.cpp \
+> +	tuning/bluetooth.h \
+> +	tuning/ethernet.cpp \
+> +	tuning/ethernet.h \
+> +	tuning/iw.c \
+> +	tuning/iw.h \
+> +	tuning/nl80211.h \
+> +	tuning/runtime.cpp \
+> +	tuning/runtime.h \
+> +	tuning/tunable.cpp \
+> +	tuning/tunable.h \
+> +	tuning/tuning.cpp \
+> +	tuning/tuning.h \
+> +	tuning/tuningsysfs.cpp \
+> +	tuning/tuningsysfs.h \
+> +	tuning/tuningusb.cpp \
+> +	tuning/tuningusb.h \
+> +	tuning/wifi.cpp \
+> +	tuning/wifi.h
+> +
+> +powertop_CXXFLAGS =3D \
+> +	-Wall \
+> +	-Wformat \
+> +	-Wshadow \
+> +	-fno-omit-frame-pointer \
+> +	-fstack-protector \
+> +	$(GLIB2_CFLAGS) \
+> +	$(LIBNL_CFLAGS) \
+> +	$(NCURSES_CFLAGS) \
+> +	$(PCIUTILS_CFLAGS)
+> +
+> +
+> +powertop_CPPFLAGS =3D \
+> +	-DLOCALEDIR=3D\"$(localedir)\" \
+> +	-D_FORTIFY_SOURCE=3D2 \
+> +	$(GLIB2_CFLAGS) \
+> +	$(LIBNL_CFLAGS) \
+> +	$(LIBZ_CFLAGS) \
+> +	$(NCURSES_CFLAGS) \
+> +	$(PCIUTILS_CFLAGS)
+> +
+> +powertop_LDADD =3D \
+> +	../traceevent/libtraceevnet.la
+> +
+> +AM_LDFLAGS =3D \
+> +	$(LIBNL_LIBS) \
+> +	$(LIBS) \
+> +	$(LIBZ_LIBS) \
+> +	$(NCURSES_LIBS) \
+> +	$(PCIUTILS_LIBS) \
+> +	$(PTHREAD_LIBS) \
+> +	$(RESOLV_LIBS)
 >  =
 
->  AC_OUTPUT
-> -- =
+>  BUILT_SOURCES =3D css.h
+>  CLEANFILES =3D css.h
+> +
+>  css.h: powertop.css
+>  	$(SHELL) ${srcdir}/csstoh.sh ${srcdir}/powertop.css css.h
+>  =
 
-> 2.0.4
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
 >=20
 
---===============2194574646789945495==--
+--===============6278721781862088668==--
 
