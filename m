@@ -1,126 +1,83 @@
-Content-Type: multipart/mixed; boundary="===============1471820698838551997=="
+Content-Type: multipart/mixed; boundary="===============8541618680796719182=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH 07/14] remove unnecessary code reported by cppcheck
-Date: Tue, 05 Aug 2014 22:31:31 +0100
-Message-ID: <1407274298-16404-7-git-send-email-kerolasa@iki.fi>
-In-Reply-To: 1407274298-16404-1-git-send-email-kerolasa@iki.fi
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: [Powertop] [PATCH v2 7/8] Clean up potential buffer issues
+Date: Tue, 14 Oct 2014 11:09:18 -0700
+Message-ID: <1413310159-30577-8-git-send-email-joe.konno@linux.intel.com>
+In-Reply-To: 1413310159-30577-1-git-send-email-joe.konno@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1471820698838551997==
+--===============8541618680796719182==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+From: Dan Kalowsky <daniel.kalowsky(a)intel.com>
+
+While no issues have been seen in this section of code yet, it's likely
+the same issues that show on the active display will also show on the
+report process.
+
+v2: rebased atop 41c54e8
+
+Signed-off-by: Joe Konno <joe.konno(a)intel.com>
 ---
- src/cpu/rapl/rapl_interface.cpp | 4 ++--
- src/devices/alsa.cpp            | 1 -
- src/display.cpp                 | 9 ++-------
- src/tuning/runtime.cpp          | 4 ----
- src/tuning/tuning.cpp           | 1 -
- 5 files changed, 4 insertions(+), 15 deletions(-)
+ src/process/do_process.cpp | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/src/cpu/rapl/rapl_interface.cpp b/src/cpu/rapl/rapl_interface.=
-cpp
-index a19e0a9..ab8e8ce 100644
---- a/src/cpu/rapl/rapl_interface.cpp
-+++ b/src/cpu/rapl/rapl_interface.cpp
-@@ -647,9 +647,9 @@ void c_rapl_interface::rapl_measure_energy()
- 	double pp0_joules =3D 0;
- 	double pp1_joules =3D 0;
+diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
+index 2b5a327..ce34071 100644
+--- a/src/process/do_process.cpp
++++ b/src/process/do_process.cpp
+@@ -943,8 +943,8 @@ void report_process_update_display(void)
+ 		format_watts(all_power[i]->Witts(), power, 10);
  =
 
--	ret =3D get_pkg_power_info(&thermal_spec_power, &max_power, &min_power, &=
-max_time_window);
-+	get_pkg_power_info(&thermal_spec_power, &max_power, &min_power, &max_time=
-_window);
- 	RAPL_DBG_PRINT("Pkg Power Info: Thermal spec %f watts, max %f watts, min =
-%f watts, max time window %f seconds\n", thermal_spec_power, max_power, min=
-_power, max_time_window);
--	ret =3D get_dram_power_info(&thermal_spec_power, &max_power, &min_power, =
-&max_time_window);
-+	get_dram_power_info(&thermal_spec_power, &max_power, &min_power, &max_tim=
-e_window);
- 	RAPL_DBG_PRINT("DRAM Power Info: Thermal spec %f watts, max %f watts, min=
- %f watts, max time window %f seconds\n", thermal_spec_power, max_power, mi=
-n_power, max_time_window);
+ 		if (!show_power)
+-			strcpy(power, "          ");
+-		sprintf(name, "%s", all_power[i]->type());
++			strncpy(power, "          ", 16);
++		snprintf(name, 20, "%s", all_power[i]->type());
  =
 
- 	for (;;) {
-diff --git a/src/devices/alsa.cpp b/src/devices/alsa.cpp
-index 5dee334..a1fca71 100644
---- a/src/devices/alsa.cpp
-+++ b/src/devices/alsa.cpp
-@@ -154,7 +154,6 @@ static void create_all_alsa_callback(const char *d_name)
- {
- 	char filename[4096];
- 	class alsa *bl;
--	ofstream file;
- =
-
- 	if (strncmp(d_name, "hwC", 3) !=3D 0)
- 		return;
-diff --git a/src/display.cpp b/src/display.cpp
-index c76ba27..123620a 100644
---- a/src/display.cpp
-+++ b/src/display.cpp
-@@ -267,13 +267,8 @@ void cursor_up(void)
- 	if (w) {
- 		w->cursor_up(); =
-
- 		if(w->ypad_pos > 0) {
--			if (tab_names[current_tab] =3D=3D "Tunables") {
--				prefresh(w->win, --w->ypad_pos, w->xpad_pos, =
-
--					1, 0, LINES - 3, COLS - 1);
--	                } else {
--				prefresh(w->win, --w->ypad_pos, w->xpad_pos, =
-
--					1, 0, LINES - 3, COLS - 1);
--			}
-+			prefresh(w->win, --w->ypad_pos, w->xpad_pos,
-+				 1, 0, LINES - 3, COLS - 1);
- 		}
- 	}
- 	=
-
-diff --git a/src/tuning/runtime.cpp b/src/tuning/runtime.cpp
-index b57d53e..3201fdd 100644
---- a/src/tuning/runtime.cpp
-+++ b/src/tuning/runtime.cpp
-@@ -139,10 +139,6 @@ void add_runtime_tunables(const char *bus)
- 		if (entry->d_name[0] =3D=3D '.')
+ 		if (strcmp(name, "Device") =3D=3D 0)
  			continue;
- =
-
--		sprintf(filename, "/sys/bus/%s/devices/%s", bus, entry->d_name);
--
--
--
- 		sprintf(filename, "/sys/bus/%s/devices/%s/power/control", bus, entry->d_=
-name);
- =
-
- 		if (access(filename, R_OK) !=3D 0)
-diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
-index 85b80ac..7d64cad 100644
---- a/src/tuning/tuning.cpp
-+++ b/src/tuning/tuning.cpp
-@@ -198,7 +198,6 @@ void report_show_tunables(void)
- 	unsigned int i;
- 	/* three tables; bad, unfixable, good */
- 	sort_tunables();
--	string srt_tmp;
- 	int idx, rows =3D 0, cols;
- =
-
- 	/* First Table */
+@@ -956,17 +956,17 @@ void report_process_update_display(void)
+ 		usage[0] =3D 0;
+ 		if (all_power[i]->usage_units()) {
+ 			if (all_power[i]->usage() < 1000)
+-				sprintf(usage, "%5.1f%s", all_power[i]->usage(), all_power[i]->usage_u=
+nits());
++				snprintf(usage, 20, "%5.1f%s", all_power[i]->usage(), all_power[i]->us=
+age_units());
+ 			else
+-				sprintf(usage, "%5i%s", (int)all_power[i]->usage(), all_power[i]->usag=
+e_units());
++				snprintf(usage, 20, "%5i%s", (int)all_power[i]->usage(), all_power[i]-=
+>usage_units());
+ 		}
+-		sprintf(wakes, "%5.1f", all_power[i]->wake_ups / measurement_time);
++		snprintf(wakes, 20, "%5.1f", all_power[i]->wake_ups / measurement_time);
+ 		if (all_power[i]->wake_ups / measurement_time <=3D 0.3)
+-			sprintf(wakes, "%5.2f", all_power[i]->wake_ups / measurement_time);
+-		sprintf(gpus, "%5.1f", all_power[i]->gpu_ops / measurement_time);
+-		sprintf(disks, "%5.1f (%5.1f)", all_power[i]->hard_disk_hits / measureme=
+nt_time,
++			snprintf(wakes, 20, "%5.2f", all_power[i]->wake_ups / measurement_time);
++		snprintf(gpus, 20, "%5.1f", all_power[i]->gpu_ops / measurement_time);
++		snprintf(disks, 20, "%5.1f (%5.1f)", all_power[i]->hard_disk_hits / meas=
+urement_time,
+ 				all_power[i]->disk_hits / measurement_time);
+-		sprintf(xwakes, "%5.1f", all_power[i]->xwakes / measurement_time);
++		snprintf(xwakes, 20, "%5.1f", all_power[i]->xwakes / measurement_time);
+ 		if (!all_power[i]->show_events()) {
+ 			wakes[0] =3D 0;
+ 			gpus[0] =3D 0;
 -- =
 
-2.0.4
+2.1.2
 
 
---===============1471820698838551997==--
+--===============8541618680796719182==--
 
