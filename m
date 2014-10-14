@@ -1,44 +1,71 @@
-Content-Type: multipart/mixed; boundary="===============1227188593354024531=="
+Content-Type: multipart/mixed; boundary="===============2471156027935869250=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH 03/14] add missing space to --version print out
-Date: Sat, 25 Oct 2014 18:33:50 +0100
-Message-ID: <1414258441-30099-4-git-send-email-kerolasa@iki.fi>
-In-Reply-To: 1414258441-30099-1-git-send-email-kerolasa@iki.fi
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: [Powertop] [PATCH v2 8/8] Adding a clean_shutdown function
+Date: Tue, 14 Oct 2014 11:09:19 -0700
+Message-ID: <1413310159-30577-9-git-send-email-joe.konno@linux.intel.com>
+In-Reply-To: 1413310159-30577-1-git-send-email-joe.konno@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1227188593354024531==
+--===============2471156027935869250==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+From: Dan Kalowsky <daniel.kalowsky(a)intel.com>
+
+Function is designed to be a on stop place to clean up the entire
+application at shutdown time.
+
+v2: rebased atop 41c54e8
+
+Signed-off-by: Joe Konno <joe.konno(a)intel.com>
 ---
- src/main.cpp | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/main.cpp | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
 diff --git a/src/main.cpp b/src/main.cpp
-index d3963ed..6e56d8e 100644
+index d3963ed..b6ce090 100644
 --- a/src/main.cpp
 +++ b/src/main.cpp
-@@ -96,7 +96,7 @@ static const struct option long_options[] =3D
- =
-
- static void print_version()
- {
--	printf(_("PowerTOP version" POWERTOP_VERSION ", compiled on " __DATE__ "\=
-n"));
-+	printf(_("PowerTOP version " POWERTOP_VERSION ", compiled on " __DATE__ "=
-\n"));
+@@ -368,6 +368,17 @@ static void powertop_init(void)
+ 	initialized =3D 1;
  }
  =
 
- static bool set_refresh_timeout()
++void clean_shutdown()
++{
++	close_results();
++	close_display();
++	clean_open_devices();
++	clear_all_devices();
++	clear_all_cpus();
++
++	return;
++}
++
+ =
+
+ int main(int argc, char **argv)
+ {
+@@ -498,9 +509,7 @@ int main(int argc, char **argv)
+ 	clear_tuning();
+ 	reset_display();
+ =
+
+-	clean_open_devices();
+-	clear_all_devices();
+-	clear_all_cpus();
++	clean_shutdown();
+ =
+
+ 	return 0;
+ }
 -- =
 
 2.1.2
 
 
---===============1227188593354024531==--
+--===============2471156027935869250==--
 
