@@ -1,62 +1,64 @@
-Content-Type: multipart/mixed; boundary="===============1875525235606973330=="
+Content-Type: multipart/mixed; boundary="===============3936349772605998392=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: Re: [Powertop] [PATCH 09/14] do not use ncurses when --auto-tune is
- specified
-Date: Wed, 20 Aug 2014 15:57:20 +0300
-Message-ID: <CAG27Bk3rJCRgpoJu8SYgzrsCWhvvs354mbYHMyVY4q2kd8krow@mail.gmail.com>
-In-Reply-To: 20140820122859.GA981@swordfish
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH v2 6/8] Stop buffer overflow
+Date: Thu, 16 Oct 2014 00:19:41 +0900
+Message-ID: <20141015151941.GL1189@swordfish>
+In-Reply-To: 543E8C47.1050504@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1875525235606973330==
+--===============3936349772605998392==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 20 August 2014 15:28, Sergey Senozhatsky
-<sergey.senozhatsky(a)gmail.com> wrote:
-> On (08/05/14 22:31), Sami Kerola wrote:
->> Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
->> ---
->>  src/main.cpp | 9 ++++++---
->>  1 file changed, 6 insertions(+), 3 deletions(-)
->>
->
-> I think it makes sense to extend ui_notify_user() so it can cover
-> both cases: initialised ncurses -- calling mvprintw(), and
-> uninitialised ncurses -- printf (to stdout).
->
-> this will change a bit 'powertop --auto-tune' behaviour, since by
-> default user will now see a 'list' of commands executed by powertop,
-> but it's really easy to silent powertop via stdout redirection.
->
->
-> what do you think?
+On (10/15/14 08:01), Arjan van de Ven wrote:
+> >>>yes, this is the reason behind this proposal. these patches a) don't c=
+heck for
+> >>>overrun; b) don't handle overrun. they just shut up the compiler.
+> >>
+> >>
+> >>that's never a good tradeoff.
+> >>-D_FORTIFY_SOURCE-2 is an essential compiler feature that has a defined=
+ semantic/etc
+> >>patches that make behavior worse than that baseline, but shut up some w=
+arning, are damage
+> >>not value.
+> >>
+> >
+> >well, the macro handles overrun (should probably be snprintf(a, bsz - 1,=
+ ...) >=3D bsz)
+> >and replaces small part of the buffer with '...\0'. which is, imho, a bi=
+t better
+> >than `backtrace(); abort();' (I don't think we can benefit from compile-=
+time checks
+> >of -D_FORTIFY_SOURCE=3D2, only run time ones) for developers that behavi=
+our makes
+> >sense, for users it's just "seg fault/core dump/whatever"
+> =
 
-Hi Sergey,
+> well it's that or corruption....
 
-I think this patch set will need to get ready eventually.  Would it be
-possible that the upstream maintainer will drop the patch 0007 aka 'do
-not use ncurses' and merge the rest (assuming they are not unmentioned
-way borken).
+well '...' is just for example. we usually don't see processes
+with '...' or devices with '...' in their names. could be any
+error indication. e.g. 'ERROR', 'E2BIG', etc.
 
-Since my primary goal when I started to do anything with powertop was
-to get rid of --auto-tune blinking I will craft another change that
-will do exactly that. But as mentioned, there is error reporting that
-must not break as side effect. Because a signal to do printing
-different way is command line option driven it is probably best to add
-a control structure that will allow to do that, and allow easy
-extensions in future when similar needs appear.
+> the data is still truncated and partial.. and you keep running with it.
 
-What comes to stdout redirection, you are likely right. Making ncurses
-not to blink screen may require poking code a little bit here and
-there. To me that is a another good reason to separate the change set.
+which is not that big deal. I agree, that this is not 100% handy.
+but suppose there is a process with very long name. long enough to cause
+overrun and powertop abort(). and that process is part of a runtime and
+it must be alive, etc... and that automatically leaves only one option --
+either that process or powertop. and never together.
 
--- =
+	-ss
 
-Sami Kerola
-http://www.iki.fi/kerolasa/
+> (this is why many people first think strlcpy is a good idea, and then the=
+y think more about it and realize it's not)
+> =
 
---===============1875525235606973330==--
+>=20
+
+--===============3936349772605998392==--
 
