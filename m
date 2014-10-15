@@ -1,74 +1,84 @@
-Content-Type: multipart/mixed; boundary="===============1348278532330647028=="
+Content-Type: multipart/mixed; boundary="===============0116360813220211812=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH v2 1/8] Properly cleaning up the display tabs
-Date: Tue, 14 Oct 2014 11:09:12 -0700
-Message-ID: <1413310159-30577-2-git-send-email-joe.konno@linux.intel.com>
-In-Reply-To: 1413310159-30577-1-git-send-email-joe.konno@linux.intel.com
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH v2 5/8] Limit sprintf to buffer size length.
+Date: Wed, 15 Oct 2014 21:15:57 +0900
+Message-ID: <20141015121557.GA1189@swordfish>
+In-Reply-To: 1413310159-30577-6-git-send-email-joe.konno@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1348278532330647028==
+--===============0116360813220211812==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Dan Kalowsky <daniel.kalowsky(a)intel.com>
+On (10/14/14 11:09), Joe Konno wrote:
+> Not completely needed, but good practice.  Limiting sprintf to the
+> length of the buffer size.  This patch not completely necessary as it's
+> unlikely to be an issue here.
+> =
 
-This patch properly cleans up the display tabs so that none of the tab
-data is being leaked between refresh changes
+> v2: rebase atop 41c54e8; adaptated to newer context
+> =
 
-Signed-off-by: Dan Kalowsky <daniel.kalowsky(a)intel.com>
+> Signed-off-by: Joe Konno <joe.konno(a)intel.com>
+> ---
+>  src/lib.cpp | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> =
 
-v2: rebased atop 41c54e8; there's a bug here
+> diff --git a/src/lib.cpp b/src/lib.cpp
+> index 437803b..9cbf78d 100644
+> --- a/src/lib.cpp
+> +++ b/src/lib.cpp
+> @@ -474,10 +474,10 @@ int read_msr(int cpu, uint64_t offset, uint64_t *va=
+lue)
+>  	int fd;
+>  	char msr_path[256];
+>  =
 
-Signed-off-by: Joe Konno <joe.konno(a)intel.com>
----
- src/display.cpp | 11 +++++++++++
- src/display.h   |  1 +
- 2 files changed, 12 insertions(+)
+> -	sprintf(msr_path, "/dev/cpu/%d/msr", cpu);
+> +	fd =3D snprintf(msr_path, 256, "/dev/cpu/%d/msr", cpu);
 
-diff --git a/src/display.cpp b/src/display.cpp
-index 123620a..e227e74 100644
---- a/src/display.cpp
-+++ b/src/display.cpp
-@@ -87,6 +87,17 @@ void reset_display(void)
- 	resetterm();
- }
- =
+iirc, this `fd =3D' has been removed. it's useless per se.
 
-+void close_display(void)
-+{
-+	for (unsigned int i =3D 0; i < tab_windows.size(); i++) {
-+		if (tab_windows[tab_names[i]])
-+			delete tab_windows[tab_names[i]];
-+		tab_windows[tab_names[i]] =3D NULL;
-+	}
-+
-+	tab_names.clear();
-+}
-+
- =
+	-ss
 
- WINDOW *tab_bar =3D NULL;
- WINDOW *bottom_line =3D NULL;
-diff --git a/src/display.h b/src/display.h
-index 9af3ec0..c3e8d61 100644
---- a/src/display.h
-+++ b/src/display.h
-@@ -34,6 +34,7 @@ using namespace std;
- =
+>  	if (access(msr_path, R_OK) !=3D 0){
+> -		sprintf(msr_path, "/dev/msr%d", cpu);
+> +		fd =3D snprintf(msr_path, 256, "/dev/msr%d", cpu);
+>  =
 
- extern void init_display(void);
- extern void reset_display(void);
-+extern void close_display(void);
- extern int ncurses_initialized(void);
- extern void show_tab(unsigned int tab);
- extern void show_next_tab(void);
--- =
+>  		if (access(msr_path, R_OK) !=3D 0){
+>  			fprintf(stderr,
+> @@ -506,10 +506,10 @@ int write_msr(int cpu, uint64_t offset, uint64_t va=
+lue)
+>  	int fd;
+>  	char msr_path[256];
+>  =
 
-2.1.2
+> -	sprintf(msr_path, "/dev/cpu/%d/msr", cpu);
+> +	fd =3D snprintf(msr_path, 256, "/dev/cpu/%d/msr", cpu);
+>  =
 
+>  	if (access(msr_path, R_OK) !=3D 0){
+> -		sprintf(msr_path, "/dev/msr%d", cpu);
+> +		fd =3D snprintf(msr_path, 256, "/dev/msr%d", cpu);
+>  =
 
---===============1348278532330647028==--
+>  		if (access(msr_path, R_OK) !=3D 0){
+>  			fprintf(stderr,
+> -- =
+
+> 2.1.2
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>=20
+
+--===============0116360813220211812==--
 
