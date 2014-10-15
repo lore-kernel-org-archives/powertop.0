@@ -1,53 +1,53 @@
-Content-Type: multipart/mixed; boundary="===============1766446081896991755=="
+Content-Type: multipart/mixed; boundary="===============6559273929132663940=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH v3 04/15] clean up Makefile.am files
-Date: Wed, 15 Oct 2014 22:03:00 +0900
-Message-ID: <20141015130300.GE1189@swordfish>
-In-Reply-To: CAG27Bk0_nMryZ2CsF7d6q+y5v8guZwTH5dT1r4m_Gy4F3PX6Zw@mail.gmail.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [PATCH v2 6/8] Stop buffer overflow
+Date: Wed, 15 Oct 2014 07:34:21 -0700
+Message-ID: <543E85ED.5000408@linux.intel.com>
+In-Reply-To: 20141015142130.GI1189@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1766446081896991755==
+--===============6559273929132663940==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/15/14 09:25), Sami Kerola wrote:
-> >> ---
-> >>  Makefile.am     |  14 +++-
-> [snip]
-> >> +powertop_SOURCES =3D \
-> >> +     css.h \
-> >> +     devlist.cpp \
-> >> +     devlist.h \
-> >> +     display.cpp \
-> >> +     display.h \
-> >> +     lib.cpp \
-> >> +     lib.h \
-> >> +     main.cpp \
-> >> +     powertop.css \
-> >> +     \
-> >
-> > Why the white line here?
-> =
-
-> To separate src/*.(cpp|h) file from files in sub-directory targets the
-> way one very clearly see the difference. Sorting all the targets in
-> simple alphabetical order would make the none-sub-directory objects to
-> be here and there in middle of listing, so separating the lists seemed
-> like clarity enhancement to me. If the empty line really annoys send a
-> patch to remove it, I don't have too strong opinions either in favor
-> or against it.
-> =
+>>>
+>>> well... I think, this should work for both compile time known buffers a=
+nd
+>>> heap-alloced buffers.
+>>>
+>>
+>> this is what __builtin_object_size() is for
+>> (and sprintf already uses that due to -D_FORTIFY_SOURCE=3D2)
+>>
+>
+> yes, but I didn't want to use GCC C extensions (e.g. __builtin_foo). thou=
+gh,
+> clang/llvm probably support them.
+>
+>> btw all these "n" usages in these patches are buggy, they do not leave s=
+pace for a trailing 0
+>> making the problem worse, not better...
+>> esp since with -D_FORTIFY_SOURCE=3D2 the compiler will abort the program=
+ if there's an overflow,
+>> and now you make it silently keep running but corrupt.
+>
+> yes, this is the reason behind this proposal. these patches a) don't chec=
+k for
+> overrun; b) don't handle overrun. they just shut up the compiler.
 
 
- :-)
+that's never a good tradeoff.
+-D_FORTIFY_SOURCE-2 is an essential compiler feature that has a defined sem=
+antic/etc
+patches that make behavior worse than that baseline, but shut up some warni=
+ng, are damage
+not value.
 
-guys, this is Makefile.am
-nobody goes there.
 
-	-ss
 
---===============1766446081896991755==--
+
+--===============6559273929132663940==--
 
