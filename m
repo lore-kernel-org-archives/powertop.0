@@ -1,59 +1,73 @@
-Content-Type: multipart/mixed; boundary="===============3422146192027850688=="
+Content-Type: multipart/mixed; boundary="===============8049262987134355952=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH UPDATED] powertop: update build instructions
-Date: Sun, 13 Jul 2014 17:55:58 +0900
-Message-ID: <20140713085558.GB947@swordfish>
-In-Reply-To: 1405238874-16384-1-git-send-email-meraj.enigma@gmail.com
+Subject: Re: [Powertop] [PATCH v2 1/8] Properly cleaning up the display tabs
+Date: Wed, 15 Oct 2014 21:58:10 +0900
+Message-ID: <20141015125810.GC1189@swordfish>
+In-Reply-To: 1413310159-30577-2-git-send-email-joe.konno@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3422146192027850688==
+--===============8049262987134355952==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (07/13/14 14:07), Mohammad Merajul Islam Molla wrote:
-> update powertop build instuctions in README file.
+On (10/14/14 11:09), Joe Konno wrote:
+>  src/display.h   |  1 +
+>  2 files changed, 12 insertions(+)
 > =
 
+> diff --git a/src/display.cpp b/src/display.cpp
+> index 123620a..e227e74 100644
+> --- a/src/display.cpp
+> +++ b/src/display.cpp
+> @@ -87,6 +87,17 @@ void reset_display(void)
+>  	resetterm();
+>  }
+>  =
 
-thanks.
+> +void close_display(void)
+> +{
+> +	for (unsigned int i =3D 0; i < tab_windows.size(); i++) {
+> +		if (tab_windows[tab_names[i]])
+> +			delete tab_windows[tab_names[i]];
+> +		tab_windows[tab_names[i]] =3D NULL;
+> +	}
+> +
+> +	tab_names.clear();
+> +}
+
+here and in other patch -- why does it matter? we are exiting,
+memory will be freed anyway, etc. why take that extra effort?
 
 	-ss
 
-> Signed-off-by: Mohammad Merajul Islam Molla <meraj.enigma(a)gmail.com>
-> ---
->  README | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> =
-
-> diff --git a/README b/README
-> index cd38cc5..bc48d3d 100644
-> --- a/README
-> +++ b/README
-> @@ -2,9 +2,10 @@
->  ------------------------------
+>  WINDOW *tab_bar =3D NULL;
+>  WINDOW *bottom_line =3D NULL;
+> diff --git a/src/display.h b/src/display.h
+> index 9af3ec0..c3e8d61 100644
+> --- a/src/display.h
+> +++ b/src/display.h
+> @@ -34,6 +34,7 @@ using namespace std;
 >  =
 
->  To build and install PowerTOP type the following commands, =
-
-> +	./autogen.sh
->  	./configure =
-
-> -	./make
-> -	./make install
-> +	make
-> +	sudo make install
->  =
-
->  Note: For Android (running Intel Architecture ) there is a Android.mk =
-
->  that was provided by community members, and at this time is supported
+>  extern void init_display(void);
+>  extern void reset_display(void);
+> +extern void close_display(void);
+>  extern int ncurses_initialized(void);
+>  extern void show_tab(unsigned int tab);
+>  extern void show_next_tab(void);
 > -- =
 
-> 1.9.1
+> 2.1.2
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
 >=20
 
---===============3422146192027850688==--
+--===============8049262987134355952==--
 
