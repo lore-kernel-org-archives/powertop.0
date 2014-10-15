@@ -1,39 +1,74 @@
-Content-Type: multipart/mixed; boundary="===============5757459930843559684=="
+Content-Type: multipart/mixed; boundary="===============6490646094511857112=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH 02/12] update .gitignore
-Date: Sat, 02 Aug 2014 12:54:07 +0100
-Message-ID: <1406980457-19077-3-git-send-email-kerolasa@iki.fi>
-In-Reply-To: 1406980457-19077-1-git-send-email-kerolasa@iki.fi
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] [PATCH v2 8/8] Adding a clean_shutdown function
+Date: Wed, 15 Oct 2014 21:59:22 +0900
+Message-ID: <20141015125922.GD1189@swordfish>
+In-Reply-To: 1413310159-30577-9-git-send-email-joe.konno@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5757459930843559684==
+--===============6490646094511857112==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
----
- .gitignore | 1 +
- 1 file changed, 1 insertion(+)
+On (10/14/14 11:09), Joe Konno wrote:
+>  src/main.cpp | 15 ++++++++++++---
+>  1 file changed, 12 insertions(+), 3 deletions(-)
+> =
 
-diff --git a/.gitignore b/.gitignore
-index 35d41c2..d00973f 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -44,6 +44,7 @@ src/.deps/
- src/Makefile
- src/calibrate/.deps/
- src/cpu/.deps/
-+src/cpu/rapl/.deps
- src/devices/.deps/
- src/measurement/.deps/
- src/parameters/.deps/
--- =
+> diff --git a/src/main.cpp b/src/main.cpp
+> index d3963ed..b6ce090 100644
+> --- a/src/main.cpp
+> +++ b/src/main.cpp
+> @@ -368,6 +368,17 @@ static void powertop_init(void)
+>  	initialized =3D 1;
+>  }
+>  =
 
-2.0.3
+> +void clean_shutdown()
+> +{
+> +	close_results();
+> +	close_display();
+> +	clean_open_devices();
+> +	clear_all_devices();
+> +	clear_all_cpus();
+> +
+> +	return;
+> +}
+> +
 
+I would agree on that refactoring if we would call this function
+from several places. otherwise, I see no actual reason.
 
---===============5757459930843559684==--
+	-ss
+
+>  int main(int argc, char **argv)
+>  {
+> @@ -498,9 +509,7 @@ int main(int argc, char **argv)
+>  	clear_tuning();
+>  	reset_display();
+>  =
+
+> -	clean_open_devices();
+> -	clear_all_devices();
+> -	clear_all_cpus();
+> +	clean_shutdown();
+>  =
+
+>  	return 0;
+>  }
+> -- =
+
+> 2.1.2
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>=20
+
+--===============6490646094511857112==--
 
