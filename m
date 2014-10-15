@@ -1,69 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============8295285299304393590=="
+Content-Type: multipart/mixed; boundary="===============5917249640477373030=="
 MIME-Version: 1.0
-From: Magnus Fromreide <magfr at lysator.liu.se>
-Subject: Re: [Powertop] [PATCH UPDATED] powertop: update build instructions
-Date: Sun, 13 Jul 2014 19:41:00 +0200
-Message-ID: <20140713174100.GA15447@sara.bahnhof.se>
-In-Reply-To: 1405238874-16384-1-git-send-email-meraj.enigma@gmail.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [PATCH v2 6/8] Stop buffer overflow
+Date: Wed, 15 Oct 2014 08:24:26 -0700
+Message-ID: <543E91AA.7070703@linux.intel.com>
+In-Reply-To: 20141015151941.GL1189@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8295285299304393590==
+--===============5917249640477373030==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jul 13, 2014 at 02:07:54PM +0600, Mohammad Merajul Islam Molla wrot=
-e:
-> update powertop build instuctions in README file.
+>
+>> the data is still truncated and partial.. and you keep running with it.
+>
+> which is not that big deal. I agree, that this is not 100% handy.
+> but suppose there is a process with very long name. long enough to cause
+> overrun and powertop abort(). and that process is part of a runtime and
+> it must be alive, etc... and that automatically leaves only one option --
+> either that process or powertop. and never together.
+>
 
-Should the README file reflect the repository code or the distributed
-packages?
+for cases where you know you can truncate correctly, making a "truncate_str=
+ing_to(str, n, trailing_pattern)" helper that you
+call explicitly is likely a better answer than hiding it inside a sprintf-l=
+ike makro.
+(and you then truncate the source string/content)
 
-Is it not part of distribution package generation to run autogen so that
-the old README file was fine, the only change one could imagine is adding
-a README.hacking that states that you might need to run autogen.sh
-before the commit.
+but maybe I'm just getting old and grumpy ;-)
 
-/MF
 
-> Signed-off-by: Mohammad Merajul Islam Molla <meraj.enigma(a)gmail.com>
-> ---
->  README | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> =
+also asprintf() for cases where you don't know how long it will be is not a=
+ bad idea
 
-> diff --git a/README b/README
-> index cd38cc5..bc48d3d 100644
-> --- a/README
-> +++ b/README
-> @@ -2,9 +2,10 @@
->  ------------------------------
->  =
 
->  To build and install PowerTOP type the following commands, =
-
-> +	./autogen.sh
->  	./configure =
-
-> -	./make
-> -	./make install
-> +	make
-> +	sudo make install
->  =
-
->  Note: For Android (running Intel Architecture ) there is a Android.mk =
-
->  that was provided by community members, and at this time is supported
-> -- =
-
-> 1.9.1
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
-
---===============8295285299304393590==--
+--===============5917249640477373030==--
 
