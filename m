@@ -1,83 +1,110 @@
-Content-Type: multipart/mixed; boundary="===============3135430629384416736=="
+Content-Type: multipart/mixed; boundary="===============5083127374394628295=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: Re: [Powertop] [PATCH v3 02/15] configure: prefer AS_IF macro rather
- than shell if statement
-Date: Tue, 14 Oct 2014 16:29:17 -0700
-Message-ID: <543DB1CD.1080701@linux.intel.com>
-In-Reply-To: 1410125238-29600-3-git-send-email-kerolasa@iki.fi
+From: hong zhang <henryzhang62 at yahoo.com>
+Subject: [Powertop] powertop interval time
+Date: Fri, 17 Oct 2014 16:55:48 -0700
+Message-ID: <1413590148.31000.YahooMailNeo@web120903.mail.ne1.yahoo.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3135430629384416736==
+--===============5083127374394628295==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-LGTM.
+List,
 
-Reviewed-By: Joe Konno <joe.konno(a)intel.com>
+Try to collect wakeup on Android phone when phone is in suspend mode.
+run daemonize powertop > /data/powertop.log &
 
-On 09/07/2014 02:27 PM, Sami Kerola wrote:
-> Jumping in between shell and m4 syntaxes makes reading the code more
-> difficult, so stick to m4 when ever possible.
-> =
+There are some wakeups when phone is in suspend mode.
 
-> Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
-> ---
->  configure.ac | 20 +++++++++++---------
->  1 file changed, 11 insertions(+), 9 deletions(-)
-> =
+The question is how fast the background process will be resumed after CPU i=
+s up?
+ =
 
-> diff --git a/configure.ac b/configure.ac
-> index b41cfb3..4991d97 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -108,23 +108,25 @@ dnl libnl-2 provides only libnl-2.0.pc file, so we =
-check for separate
->  dnl libnl-genl-3.0.pc pkg-config file just for libnl-3.0 case.
->  PKG_CHECK_MODULES([LIBNL], [libnl-3.0 >=3D 3.0 libnl-genl-3.0 >=3D 3.0],=
- [has_libnl_ver=3D3], [
->  	PKG_CHECK_MODULES([LIBNL], [libnl-2.0 >=3D 2.0], [has_libnl_ver=3D2], [
-> -		PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [has_libnl_=
-ver=3D0])])])
-> -if (test "$has_libnl_ver" -eq 0); then
-> -	AC_MSG_ERROR(libnl and libnl-genl are required but were not found)
-> -fi
-> -if (test "$has_libnl_ver" -gt 1); then
-> +		PKG_CHECK_MODULES([LIBNL], [libnl-1], [has_libnl_ver=3D1], [has_libnl_=
-ver=3D0])
-> +	])
-> +])
-> +AS_IF([test "$has_libnl_ver" -eq 0], [
-> +	AC_MSG_ERROR([libnl and libnl-genl are required but were not found])
-> +])
-> +AS_IF([test "$has_libnl_ver" -gt 1], [
->  	AC_DEFINE([HAVE_LIBNL20], [1], [Define if you have libnl-2.0 or higher])
-> -fi
-> +])
->  =
+What I see is CPU wakeup is too short and my powertop& does
+Not have enough time to run and suspend again.
 
-> -if (test "$has_libpci" -eq 0); then =
+Any idea to collect wakeups in my situation?
 
-> -	AC_DEFINE([HAVE_NO_PCI],[1],[Define if pci is not supported])
-> +AS_IF([test "$has_libpci" -eq 0], [
-> +	AC_DEFINE([HAVE_NO_PCI], [1], [Define if pci is not supported])
->          AC_MSG_WARN([
->  			************* LIBPCI SUPPORT NOT CONFIGURED**************
->  			If you need or want pci support, please install libpci =
+Thanks.
 
->  			and re-configure PowerTOP. =
+---henry
 
->  			*********************************************************
->  	])
-> -fi
-> +])
->  =
+--===============5083127374394628295==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
->  AC_SEARCH_LIBS([pthread_create], [pthread], [], [
->  	AC_MSG_ERROR([libpthread is required but was not found])
->=20
-
---===============3135430629384416736==--
+PGh0bWw+PGJvZHk+PGRpdiBzdHlsZT0iY29sb3I6IzAwMDsgYmFja2dyb3VuZC1jb2xvcjojZmZm
+OyBmb250LWZhbWlseTpIZWx2ZXRpY2FOZXVlLCBIZWx2ZXRpY2EgTmV1ZSwgSGVsdmV0aWNhLCBB
+cmlhbCwgTHVjaWRhIEdyYW5kZSwgc2Fucy1zZXJpZjtmb250LXNpemU6MTZweCI+PGRpdiBzdHls
+ZT0iIiBjbGFzcz0iIj5MaXN0LDwvZGl2PjxkaXYgc3R5bGU9IiIgY2xhc3M9IiI+PGJyIHN0eWxl
+PSIiIGNsYXNzPSIiPjwvZGl2PjxkaXYgY2xhc3M9IiIgc3R5bGU9ImNvbG9yOiByZ2IoMCwgMCwg
+MCk7IGZvbnQtc2l6ZTogMTZweDsgZm9udC1mYW1pbHk6IEhlbHZldGljYU5ldWUsSGVsdmV0aWNh
+IE5ldWUsSGVsdmV0aWNhLEFyaWFsLEx1Y2lkYSBHcmFuZGUsc2Fucy1zZXJpZjsgYmFja2dyb3Vu
+ZC1jb2xvcjogdHJhbnNwYXJlbnQ7IGZvbnQtc3R5bGU6IG5vcm1hbDsiPlRyeSB0byBjb2xsZWN0
+IHdha2V1cCBvbiBBbmRyb2lkIHBob25lIHdoZW4gcGhvbmUgaXMgaW4gc3VzcGVuZCBtb2RlLjwv
+ZGl2PjxkaXYgY2xhc3M9IiIgc3R5bGU9ImNvbG9yOiByZ2IoMCwgMCwgMCk7IGZvbnQtc2l6ZTog
+MTZweDsgZm9udC1mYW1pbHk6IEhlbHZldGljYU5ldWUsSGVsdmV0aWNhIE5ldWUsSGVsdmV0aWNh
+LEFyaWFsLEx1Y2lkYSBHcmFuZGUsc2Fucy1zZXJpZjsgYmFja2dyb3VuZC1jb2xvcjogdHJhbnNw
+YXJlbnQ7IGZvbnQtc3R5bGU6IG5vcm1hbDsiPnJ1biBkYWVtb25pemUgcG93ZXJ0b3AgJmd0OyAv
+ZGF0YS9wb3dlcnRvcC5sb2cgJmFtcDs8L2Rpdj48ZGl2IGNsYXNzPSIiIHN0eWxlPSJjb2xvcjog
+cmdiKDAsIDAsIDApOyBmb250LXNpemU6IDE2cHg7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2FOZXVl
+LEhlbHZldGljYSBOZXVlLEhlbHZldGljYSxBcmlhbCxMdWNpZGEgR3JhbmRlLHNhbnMtc2VyaWY7
+IGJhY2tncm91bmQtY29sb3I6IHRyYW5zcGFyZW50OyBmb250LXN0eWxlOiBub3JtYWw7Ij48YnIK
+IHN0eWxlPSIiIGNsYXNzPSIiPjwvZGl2PjxkaXYgY2xhc3M9IiIgc3R5bGU9ImNvbG9yOiByZ2Io
+MCwgMCwgMCk7IGZvbnQtc2l6ZTogMTZweDsgZm9udC1mYW1pbHk6IEhlbHZldGljYU5ldWUsSGVs
+dmV0aWNhIE5ldWUsSGVsdmV0aWNhLEFyaWFsLEx1Y2lkYSBHcmFuZGUsc2Fucy1zZXJpZjsgYmFj
+a2dyb3VuZC1jb2xvcjogdHJhbnNwYXJlbnQ7IGZvbnQtc3R5bGU6IG5vcm1hbDsiPlRoZXJlIGFy
+ZSBzb21lIHdha2V1cHMgd2hlbiBwaG9uZSBpcyBpbiBzdXNwZW5kIG1vZGUuPC9kaXY+PGRpdiBj
+bGFzcz0iIiBzdHlsZT0iY29sb3I6IHJnYigwLCAwLCAwKTsgZm9udC1zaXplOiAxNnB4OyBmb250
+LWZhbWlseTogSGVsdmV0aWNhTmV1ZSxIZWx2ZXRpY2EgTmV1ZSxIZWx2ZXRpY2EsQXJpYWwsTHVj
+aWRhIEdyYW5kZSxzYW5zLXNlcmlmOyBiYWNrZ3JvdW5kLWNvbG9yOiB0cmFuc3BhcmVudDsgZm9u
+dC1zdHlsZTogbm9ybWFsOyI+PGJyIHN0eWxlPSIiIGNsYXNzPSIiPjwvZGl2PjxkaXYgc3R5bGU9
+IiIgY2xhc3M9IiI+PHNwYW4gY2xhc3M9IiIgc3R5bGU9ImNvbG9yOiMxRjQ5N0QiPlRoZSBxdWVz
+dGlvbiBpcyBob3cgZmFzdCB0aGUgYmFja2dyb3VuZCBwcm9jZXNzIHdpbGwgYmUgcmVzdW1lZCBh
+ZnRlciBDUFUgaXMgdXA/PC9zcGFuPjwvZGl2Pgo8ZGl2IHN0eWxlPSIiIGNsYXNzPSIiPjxzcGFu
+IGNsYXNzPSIiIHN0eWxlPSJjb2xvcjojMUY0OTdEIj4mbmJzcDs8L3NwYW4+PC9kaXY+CjxkaXYg
+c3R5bGU9IiIgY2xhc3M9IiI+PHNwYW4gY2xhc3M9IiIgc3R5bGU9ImNvbG9yOiMxRjQ5N0QiPldo
+YXQgSSBzZWUgaXMgQ1BVIHdha2V1cCBpcyB0b28gc2hvcnQgYW5kIG15IHBvd2VydG9wJmFtcDsg
+ZG9lczwvc3Bhbj48L2Rpdj4KPGRpdiBzdHlsZT0iIiBjbGFzcz0iIj48c3BhbiBjbGFzcz0iIiBz
+dHlsZT0iY29sb3I6IzFGNDk3RCI+Tm90IGhhdmUgZW5vdWdoIHRpbWUgdG8gcnVuIGFuZCBzdXNw
+ZW5kIGFnYWluLjwvc3Bhbj48L2Rpdj48ZGl2IHN0eWxlPSJjb2xvcjogcmdiKDMxLCA3MywgMTI1
+KTsgZm9udC1zaXplOiAxNnB4OyBmb250LWZhbWlseTogSGVsdmV0aWNhTmV1ZSxIZWx2ZXRpY2Eg
+TmV1ZSxIZWx2ZXRpY2EsQXJpYWwsTHVjaWRhIEdyYW5kZSxzYW5zLXNlcmlmOyBiYWNrZ3JvdW5k
+LWNvbG9yOiB0cmFuc3BhcmVudDsgZm9udC1zdHlsZTogbm9ybWFsOyIgY2xhc3M9IiI+PGJyPjxz
+cGFuIGNsYXNzPSIiIHN0eWxlPSJjb2xvcjojMUY0OTdEIj48L3NwYW4+PC9kaXY+PGRpdiBzdHls
+ZT0iY29sb3I6IHJnYigzMSwgNzMsIDEyNSk7IGZvbnQtc2l6ZTogMTZweDsgZm9udC1mYW1pbHk6
+IEhlbHZldGljYU5ldWUsSGVsdmV0aWNhIE5ldWUsSGVsdmV0aWNhLEFyaWFsLEx1Y2lkYSBHcmFu
+ZGUsc2Fucy1zZXJpZjsgYmFja2dyb3VuZC1jb2xvcjogdHJhbnNwYXJlbnQ7IGZvbnQtc3R5bGU6
+IG5vcm1hbDsiIGNsYXNzPSIiPjxzcGFuIGNsYXNzPSIiIHN0eWxlPSJjb2xvcjojMUY0OTdEIj5B
+bnkgaWRlYSB0byBjb2xsZWN0IHdha2V1cHMgaW4gbXkgc2l0dWF0aW9uPzwvc3Bhbj48L2Rpdj48
+ZGl2IHN0eWxlPSJjb2xvcjogcmdiKDMxLCA3MywgMTI1KTsgZm9udC1zaXplOiAxNnB4OyBmb250
+LWZhbWlseTogSGVsdmV0aWNhTmV1ZSxIZWx2ZXRpY2EgTmV1ZSxIZWx2ZXRpY2EsQXJpYWwsTHVj
+aWRhIEdyYW5kZSxzYW5zLXNlcmlmOyBiYWNrZ3JvdW5kLWNvbG9yOiB0cmFuc3BhcmVudDsgZm9u
+dC1zdHlsZTogbm9ybWFsOyIgY2xhc3M9IiI+PGJyPjxzcGFuIGNsYXNzPSIiIHN0eWxlPSJjb2xv
+cjojMUY0OTdEIj48L3NwYW4+PC9kaXY+PGRpdiBzdHlsZT0iY29sb3I6IHJnYigzMSwgNzMsIDEy
+NSk7IGZvbnQtc2l6ZToKIDE2cHg7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2FOZXVlLEhlbHZldGlj
+YSBOZXVlLEhlbHZldGljYSxBcmlhbCxMdWNpZGEgR3JhbmRlLHNhbnMtc2VyaWY7IGJhY2tncm91
+bmQtY29sb3I6IHRyYW5zcGFyZW50OyBmb250LXN0eWxlOiBub3JtYWw7IiBjbGFzcz0iIj48c3Bh
+biBjbGFzcz0iIiBzdHlsZT0iY29sb3I6IzFGNDk3RCI+VGhhbmtzLjwvc3Bhbj48L2Rpdj48ZGl2
+IHN0eWxlPSJjb2xvcjogcmdiKDMxLCA3MywgMTI1KTsgZm9udC1zaXplOiAxNnB4OyBmb250LWZh
+bWlseTogSGVsdmV0aWNhTmV1ZSxIZWx2ZXRpY2EgTmV1ZSxIZWx2ZXRpY2EsQXJpYWwsTHVjaWRh
+IEdyYW5kZSxzYW5zLXNlcmlmOyBiYWNrZ3JvdW5kLWNvbG9yOiB0cmFuc3BhcmVudDsgZm9udC1z
+dHlsZTogbm9ybWFsOyIgY2xhc3M9IiI+PGJyPjxzcGFuIGNsYXNzPSIiIHN0eWxlPSJjb2xvcjoj
+MUY0OTdEIj48L3NwYW4+PC9kaXY+PGRpdiBzdHlsZT0iY29sb3I6IHJnYigzMSwgNzMsIDEyNSk7
+IGZvbnQtc2l6ZTogMTZweDsgZm9udC1mYW1pbHk6IEhlbHZldGljYU5ldWUsSGVsdmV0aWNhIE5l
+dWUsSGVsdmV0aWNhLEFyaWFsLEx1Y2lkYSBHcmFuZGUsc2Fucy1zZXJpZjsgYmFja2dyb3VuZC1j
+b2xvcjogdHJhbnNwYXJlbnQ7IGZvbnQtc3R5bGU6IG5vcm1hbDsiIGNsYXNzPSIiPjxzcGFuIGNs
+YXNzPSIiIHN0eWxlPSJjb2xvcjojMUY0OTdEIj4tLS1oZW5yeTxicj48L3NwYW4+PC9kaXY+Cjxk
+aXYgc3R5bGU9IiIgY2xhc3M9IiI+PHNwYW4gY2xhc3M9IiIgc3R5bGU9ImNvbG9yOiMxRjQ5N0Qi
+PiZuYnNwOzwvc3Bhbj48L2Rpdj48ZGl2IGNsYXNzPSIiIHN0eWxlPSJjb2xvcjogcmdiKDAsIDAs
+IDApOyBmb250LXNpemU6IDE2cHg7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2FOZXVlLEhlbHZldGlj
+YSBOZXVlLEhlbHZldGljYSxBcmlhbCxMdWNpZGEgR3JhbmRlLHNhbnMtc2VyaWY7IGJhY2tncm91
+bmQtY29sb3I6IHRyYW5zcGFyZW50OyBmb250LXN0eWxlOiBub3JtYWw7Ij48YnIgc3R5bGU9IiIg
+Y2xhc3M9IiI+PC9kaXY+PC9kaXY+PC9ib2R5PjwvaHRtbD4=
+--===============5083127374394628295==--
 
