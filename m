@@ -1,36 +1,30 @@
-Content-Type: multipart/mixed; boundary="===============8970550545654643560=="
+Content-Type: multipart/mixed; boundary="===============6054673354927922855=="
 MIME-Version: 1.0
-From: SF Markus Elfring <elfring at users.sourceforge.net>
-Subject: [Powertop] reserved identifier violation
-Date: Sat, 18 Oct 2014 21:37:05 +0200
-Message-ID: <5442C161.4020107@users.sourceforge.net>
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: Re: [Powertop] [PATCH v2 1/8] Properly cleaning up the display tabs
+Date: Fri, 17 Oct 2014 11:12:12 -0700
+Message-ID: <54415BFC.5080207@linux.intel.com>
+In-Reply-To: 20141015125810.GC1189@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8970550545654643560==
+--===============6054673354927922855==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On 10/15/2014 05:58 AM, Sergey Senozhatsky wrote:
+> =
 
-I would like to point out that identifiers like "__INCLUDE_GUARD_DISPLAY_H_=
-" and
-"_INCLUDE_GUARD_AHCI_H" do not fit to the expected naming convention of the=
- C++
-language standard.
-Would you like to adjust your selection for unique names?
-https://www.securecoding.cert.org/confluence/display/cplusplus/DCL32-CPP.+D=
-o+not+declare+or+define+a+reserved+identifier#DCL32-CPP.Donotdeclareordefin=
-eareservedidentifier-NoncompliantCodeExample%28HeaderGuard%29
+> here and in other patch -- why does it matter? we are exiting,
+> memory will be freed anyway, etc. why take that extra effort?
+> =
 
-https://github.com/fenrus75/powertop/blob/54956f7407c0e369665cd9712a189f601=
-c6ab545/src/display.h#L25
-https://github.com/fenrus75/powertop/blob/d7455ba1d0125efed4780a2114ef66165=
-d0cadc1/src/devices/ahci.h#L25
+> 	-ss
 
-Regards,
-Markus
+Adhering to the "for every new/malloc there is a delete/free" principle
+as we are not using any garbage collection facilities (memory pools,
+smart pointers, etc) in this project.
 
---===============8970550545654643560==--
+--===============6054673354927922855==--
 
