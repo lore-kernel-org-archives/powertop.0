@@ -1,55 +1,31 @@
-Content-Type: multipart/mixed; boundary="===============4479230213356341223=="
+Content-Type: multipart/mixed; boundary="===============7938545600342964205=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH 14/14] add missing include
-Date: Sat, 25 Oct 2014 18:34:01 +0100
-Message-ID: <1414258441-30099-15-git-send-email-kerolasa@iki.fi>
-In-Reply-To: 1414258441-30099-1-git-send-email-kerolasa@iki.fi
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: Re: [Powertop] [PATCH v2 8/8] Adding a clean_shutdown function
+Date: Fri, 17 Oct 2014 10:34:51 -0700
+Message-ID: <5441533B.1090405@linux.intel.com>
+In-Reply-To: 20141015125922.GD1189@swordfish
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4479230213356341223==
+--===============7938545600342964205==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-In file included from measurement/sysfs.cpp:27:
-In file included from measurement/../lib.h:59:
-In file included from /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/=
-../../../../include/c++/4.9.1/string:52:
-In file included from /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/=
-../../../../include/c++/4.9.1/bits/basic_string.h:2850:
-In file included from /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/=
-../../../../include/c++/4.9.1/ext/string_conversions.h:41:
-/usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/../../../../include/c+=
-+/4.9.1/cstdlib:153:11: error:
-      no member named 'realloc' in the global namespace
-  using ::realloc;
-        ~~^
+On 10/15/2014 05:59 AM, Sergey Senozhatsky wrote:
+> =
 
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
----
- src/lib.h | 1 +
- 1 file changed, 1 insertion(+)
+> I would agree on that refactoring if we would call this function
+> from several places. otherwise, I see no actual reason.
+> =
 
-diff --git a/src/lib.h b/src/lib.h
-index ec50946..5c94271 100644
---- a/src/lib.h
-+++ b/src/lib.h
-@@ -27,6 +27,7 @@
- =
+> 	-ss
 
- #include <libintl.h>
- #include <stdint.h>
-+#include <stdlib.h>
- =
+I'm sympathetic to that argument. I haven't a strong feeling one way or
+the other in this instance, though.
 
- /* Include only for Automake builds */
- #ifdef HAVE_CONFIG_H
--- =
+Alex and maintainers?
 
-2.1.2
-
-
---===============4479230213356341223==--
+--===============7938545600342964205==--
 
