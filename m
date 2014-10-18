@@ -1,72 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============9191213866869957026=="
+Content-Type: multipart/mixed; boundary="===============2252238700739596691=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] [PATCH POWERTOP] Remove temporary file created during
- calibration
-Date: Mon, 28 Jul 2014 11:13:45 -0700
-Message-ID: <60129.10.24.2.137.1406571225.squirrel@linux.intel.com>
-In-Reply-To: CAP245DWNT1zu8=0ryAN1k2RAbaxfUEsgU24G6pLQ8hv3pmN6wg@mail.gmail.com
+From: SF Markus Elfring <elfring at users.sourceforge.net>
+Subject: [Powertop] Completion of error handling
+Date: Sat, 18 Oct 2014 22:10:30 +0200
+Message-ID: <5442C936.3000303@users.sourceforge.net>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============9191213866869957026==
+--===============2252238700739596691==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Mohammad and Amit,
+Hello,
 
-> Mohammad,
->
-> This fix should go upstream. cc'ing the powertop list.
->
-> Regards,
-> Amit
->
-> On Thu, Jun 26, 2014 at 12:27 PM, Mohammad Merajul Islam Molla
-> <meraj.enigma(a)gmail.com> wrote:
->> powertop creates temporary file in /tmp folder during calibration.
->> Simply closing does not remove these files.
->> Instead use unlink to remove the file.
->>
->> diff --git a/src/calibrate/calibrate.cpp b/src/calibrate/calibrate.cpp
->> index db368e0..1336c3f 100644
->> --- a/src/calibrate/calibrate.cpp
->> +++ b/src/calibrate/calibrate.cpp
->> @@ -242,7 +242,7 @@ static void *burn_disk(void *dummy)
->>                 write(fd, buffer, 64*1024);
->>                 fdatasync(fd);
->>         }
->> -       close(fd);
->> +       unlink(filename);
->>         return NULL;
->>  }
->>
->>
->>
->> --
->> Thanks,
->> -Meraj
->>
->> _______________________________________________
->> linaro-dev mailing list
->> linaro-dev(a)lists.linaro.org
->> http://lists.linaro.org/mailman/listinfo/linaro-dev
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->
+I have looked at a few source files for your current software. I have notic=
+ed
+that some checks for return codes are missing.
 
-Please send your patch against the tip of the tree.  I'm having
-difficulties applying it.  Here is the error message:
+Would you like to add more error handling for return values from functions =
+like
+the following?
+- fputs =E2=87=92 finish_report_output
 
-Patch is empty.  Was it split wrong?
-If you would prefer to skip this patch, instead run "git am --skip".
-To restore the original branch and stop patching run "git am --abort".
+https://github.com/fenrus75/powertop/blob/79123b34cf2cac2edeb918087dfc73f7b=
+219cf54/src/report/report.cpp#L200
 
-Thank you,
-Alexandra.
+- pthread_create =E2=87=92 cpu_calibration
 
---===============9191213866869957026==--
+https://github.com/fenrus75/powertop/blob/cdff23d6e40e31a68286a51e3c94c8a90=
+1a74091/src/calibrate/calibrate.cpp#L252
+
+- pthread_join =E2=87=92 extech_power_meter::end_measurement
+
+https://github.com/fenrus75/powertop/blob/a5465a282107da5205b7928fe4ce4f642=
+d1fd770/src/measurement/extech.cpp#L328
+
+Regards,
+Markus
+
+--===============2252238700739596691==--
 
