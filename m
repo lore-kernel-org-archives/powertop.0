@@ -1,94 +1,116 @@
-Content-Type: multipart/mixed; boundary="===============8467016018531145367=="
+Content-Type: multipart/mixed; boundary="===============5416376463444715474=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] [PATCH 1/1] tunable: update sched_mc_power_savings
- target value
-Date: Mon, 29 Sep 2014 10:43:46 -0700
-Message-ID: <50901.10.24.5.188.1412012626.squirrel@linux.intel.com>
-In-Reply-To: CAJDL4uLZo9A4a_jAXKNGuLuQ+voS3TaUbr8Ljr+QaKb0TESdgQ@mail.gmail.com
+From: SF Markus Elfring <elfring at users.sourceforge.net>
+Subject: [Powertop] Deletion of unnecessary checks before specific function
+ calls
+Date: Sun, 19 Oct 2014 00:50:29 +0200
+Message-ID: <5442EEB5.2030601@users.sourceforge.net>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8467016018531145367==
+--===============5416376463444715474==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Hello,
 
-> On Fri, Aug 22, 2014 at 9:10 PM, Alexandra Yates <
-> alexandra.yates(a)linux.intel.com> wrote:
->
->>
->> > On Tue, Aug 19, 2014 at 7:49 AM, Sergey Senozhatsky <
->> > sergey.senozhatsky(a)gmail.com> wrote:
->> >
->> >> On (08/13/14 21:28), Nanley Chery wrote:
->> >> > Starting in kernel 2.6.29, the highest power savings level
->> increased
->> >> to
->> >> "2".
->> >> > However, in kernel 3.5, the sched power savings feature was removed
->> >> altogether.
->> >>
->> >> hello,
->> >> thanks for reporting,
->> >>
->> >>
->> >> so, it's been removed 2 years ago (3.5 release date was 21 Jul 2012).
->> >>
->> >> do we need to support it at all?
->> >
->> >
->> > Hello,
->> >
->> > Good question. Our README file indicates linux-kernel >=3D 2.6.38 to be
->> a
->> > build requirement. Does this mean we support power management features
->> > starting from that kernel? Or does it mean that this is only a build
->> > requirement and we target the latest kernels? It is not clear from the
->> > current documentation.
->> >
->> > On a much smaller scope, supporting this feature is essentially free
->> > (maintenance-wise) and would keep some of our end users on older
->> kernels
->> > happy. Btw, I submitted a simpler version 2 of this patch that does
->> not
->> > check for the kernel version.
->> >
->> > Thanks,
->> > Nanley
->> > _______________________________________________
->> > PowerTop mailing list
->> > PowerTop(a)lists.01.org
->> > https://lists.01.org/mailman/listinfo/powertop
->> >
->>
->> From PowerTOP 2.0 and up the requirement is to run at least Linux kernel
->> 2.6.38. If it is not in the supported kernel then PowerTOP does not need
->> it.
->>
->> Thank you,
->> Alexandra.
->>
->
-> Since we're supporting kernels starting from 2.6.38 (which has this power
-> management feature itself), please consider this patch which produces the
-> correct behavior.
->
-> Thanks,
-> Nanley
->
+I suggest to delete redundant checks for null pointers.
+Would you like to integrate the attached update suggestion into your source=
+ code
+repository?
 
-Hi Nanley,
+Regards,
+Markus
 
-Thank you for your patch.  However, since this feature was faced out the
-kernel over two years ago it doesn't make sense to add it now to PowerTOP.
-I will update the release notes to use a later kernel.  Please excuse the
-confusion.
+--===============5416376463444715474==
+Content-Type: text/x-patch
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="0001-Deletion-of-unnecessary-checks-before-calls-of-the-f.patch"
 
-Thank you,
-Alexandra.
+PkZyb20gMWY3ODA5YWU4ZDFlNGExNGFkMGY3YTgxMmU0Zjc5N2Y2NTU5N2QxYSBNb24gU2VwIDE3
+IDAwOjAwOjAwIDIwMDEKRnJvbTogTWFya3VzIEVsZnJpbmcgPGVsZnJpbmdAdXNlcnMuc291cmNl
+Zm9yZ2UubmV0PgpEYXRlOiBTdW4sIDE5IE9jdCAyMDE0IDAwOjMwOjUzICswMjAwClN1YmplY3Q6
+IFtQQVRDSCAxLzJdIERlbGV0aW9uIG9mIHVubmVjZXNzYXJ5IGNoZWNrcyBiZWZvcmUgY2FsbHMg
+b2YgdGhlCiBmdW5jdGlvbiAiZnJlZSIKClRoZSBmdW5jdGlvbiAiZnJlZSIgaXMgZG9jdW1lbnRl
+ZCBpbiB0aGUgd2F5IHRoYXQgbm8gYWN0aW9uIHNoYWxsIG9jY3VyIGZvcgphIHBhc3NlZCBudWxs
+IHBvaW50ZXIuIEl0IGlzIHRoZXJlZm9yZSBub3QgbmVlZGVkIHRoYXQgYSBmdW5jdGlvbiBjYWxs
+ZXIKcmVwZWF0cyBhIGNvcnJlc3BvbmRpbmcgY2hlY2suCmh0dHA6Ly9zdGFja292ZXJmbG93LmNv
+bS9xdWVzdGlvbnMvMTg3NzU2MDgvZnJlZS1hLW51bGwtcG9pbnRlci1hbnl3YXktb3ItY2hlY2st
+Zmlyc3QKClNpZ25lZC1vZmYtYnk6IE1hcmt1cyBFbGZyaW5nIDxlbGZyaW5nQHVzZXJzLnNvdXJj
+ZWZvcmdlLm5ldD4KLS0tCiBzcmMvZGV2bGlzdC5jcHAgICAgICAgICAgfCA5ICsrKy0tLS0tLQog
+c3JjL3BlcmYvcGVyZi5jcHAgICAgICAgIHwgNiArKy0tLS0KIHRyYWNlZXZlbnQvZXZlbnQtcGFy
+c2UuYyB8IDMgKy0tCiAzIGZpbGVzIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKSwgMTIgZGVsZXRp
+b25zKC0pCgpkaWZmIC0tZ2l0IGEvc3JjL2Rldmxpc3QuY3BwIGIvc3JjL2Rldmxpc3QuY3BwCmlu
+ZGV4IDIwZmU1ZGEuLjdmNTk5YWMgMTAwNjQ0Ci0tLSBhL3NyYy9kZXZsaXN0LmNwcAorKysgYi9z
+cmMvZGV2bGlzdC5jcHAKQEAgLTc3LDE4ICs3NywxNSBAQCB2b2lkIGNsZWFuX29wZW5fZGV2aWNl
+cygpCiAJdW5zaWduZWQgaW50IGk9MDsKIAogCWZvciAoaSA9IDA7IGkgPCBvbmUuc2l6ZSgpOyBp
+KyspIHsKLQkJaWYob25lW2ldKQotCQkJZnJlZShvbmVbaV0pOworCQlmcmVlKG9uZVtpXSk7CiAJ
+fQogCiAJZm9yIChpID0gMDsgaSA8IHR3by5zaXplKCk7IGkrKykgewotCQlpZih0d29baV0pCi0J
+CQlmcmVlKHR3b1tpXSk7CisJCWZyZWUodHdvW2ldKTsKIAl9CiAKIAlmb3IgKGkgPSAwOyBpIDwg
+ZGV2cG93ZXIuc2l6ZSgpOyBpKyspewotCQlpZihkZXZwb3dlcltpXSkKLQkJCWZyZWUoZGV2cG93
+ZXJbaV0pOworCQlmcmVlKGRldnBvd2VyW2ldKTsKIAl9CiB9CiAKZGlmZiAtLWdpdCBhL3NyYy9w
+ZXJmL3BlcmYuY3BwIGIvc3JjL3BlcmYvcGVyZi5jcHAKaW5kZXggYjE3NjI1Ni4uYjExMDNhNyAx
+MDA2NDQKLS0tIGEvc3JjL3BlcmYvcGVyZi5jcHAKKysrIGIvc3JjL3BlcmYvcGVyZi5jcHAKQEAg
+LTE0OSw4ICsxNDksNyBAQCB2b2lkIHBlcmZfZXZlbnQ6OmNyZWF0ZV9wZXJmX2V2ZW50KGNoYXIg
+KmV2ZW50bmFtZSwgaW50IF9jcHUpCiAKIHZvaWQgcGVyZl9ldmVudDo6c2V0X2V2ZW50X25hbWUo
+Y29uc3QgY2hhciAqZXZlbnRfbmFtZSkKIHsKLQlpZiAobmFtZSkKLQkJZnJlZShuYW1lKTsKKwlm
+cmVlKG5hbWUpOwogCW5hbWUgPSBzdHJkdXAoZXZlbnRfbmFtZSk7CiAJaWYgKCFuYW1lKSB7CiAJ
+CWZwcmludGYoc3RkZXJyLCAiZmFpbGVkIHRvIGFsbG9jYXRlIGV2ZW50IG5hbWVcbiIpOwpAQCAt
+MTY4LDggKzE2Nyw3IEBAIHZvaWQgcGVyZl9ldmVudDo6c2V0X2V2ZW50X25hbWUoY29uc3QgY2hh
+ciAqZXZlbnRfbmFtZSkKIAogcGVyZl9ldmVudDo6fnBlcmZfZXZlbnQodm9pZCkKIHsKLQlpZiAo
+bmFtZSkKLQkJZnJlZShuYW1lKTsKKwlmcmVlKG5hbWUpOwogCiAJaWYgKHBlcmZfZXZlbnQ6OnBl
+dmVudC0+cmVmX2NvdW50ID09IDEpIHsKIAkJcGV2ZW50X2ZyZWUocGVyZl9ldmVudDo6cGV2ZW50
+KTsKZGlmZiAtLWdpdCBhL3RyYWNlZXZlbnQvZXZlbnQtcGFyc2UuYyBiL3RyYWNlZXZlbnQvZXZl
+bnQtcGFyc2UuYwppbmRleCA2MTk1ZjZmLi41YTcxN2EwIDEwMDY0NAotLS0gYS90cmFjZWV2ZW50
+L2V2ZW50LXBhcnNlLmMKKysrIGIvdHJhY2VldmVudC9ldmVudC1wYXJzZS5jCkBAIC0xMDIzLDgg
+KzEwMjMsNyBAQCBzdGF0aWMgZW51bSBldmVudF90eXBlIGZvcmNlX3Rva2VuKGNvbnN0IGNoYXIg
+KnN0ciwgY2hhciAqKnRvaykKIAogc3RhdGljIHZvaWQgZnJlZV90b2tlbihjaGFyICp0b2spCiB7
+Ci0JaWYgKHRvaykKLQkJZnJlZSh0b2spOworCWZyZWUodG9rKTsKIH0KIAogc3RhdGljIGVudW0g
+ZXZlbnRfdHlwZSByZWFkX3Rva2VuKGNoYXIgKip0b2spCi0tIAoyLjEuMgoK
 
+--===============5416376463444715474==
+Content-Type: text/x-patch
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="0002-Removal-of-unnecessary-checks-before-a-few-calls-of-.patch"
 
---===============8467016018531145367==--
+PkZyb20gNDIzNzA4NGFkNzRhMTM3MDYxN2Y2MGYxMTQ2ZmI5ZTU5MjIxZjk3MCBNb24gU2VwIDE3
+IDAwOjAwOjAwIDIwMDEKRnJvbTogTWFya3VzIEVsZnJpbmcgPGVsZnJpbmdAdXNlcnMuc291cmNl
+Zm9yZ2UubmV0PgpEYXRlOiBTdW4sIDE5IE9jdCAyMDE0IDAwOjQwOjIwICswMjAwClN1YmplY3Q6
+IFtQQVRDSCAyLzJdIFJlbW92YWwgb2YgdW5uZWNlc3NhcnkgY2hlY2tzIGJlZm9yZSBhIGZldyBj
+YWxscyBvZiB0aGUKIEMrKyBkZWxldGUgb3BlcmF0b3IKClRoZSBDKysgZGVsZXRlIG9wZXJhdG9y
+IGNhbiBhbHNvIGhhbmRsZSBwYXNzZWQgbnVsbCBwb2ludGVycyBvbiBpdHMgb3duCndpdGhvdXQg
+dW5leHBlY3RlZCBzaWRlIGVmZmVjdHMuCmh0dHA6Ly93d3cucGFyYXNoaWZ0LmNvbS9jKystZmFx
+L2RlbGV0ZS1oYW5kbGVzLW51bGwuaHRtbAoKSXQgaXMgdGhlcmVmb3JlIG5vdCBuZWVkZWQgdG8g
+a2VlcCBhZGRpdGlvbmFsIHNhZmV0eSBjaGVja3MgZGlyZWN0bHkgYmVmb3JlCnN1Y2ggZnVuY3Rp
+b24gY2FsbHMuCgpTaWduZWQtb2ZmLWJ5OiBNYXJrdXMgRWxmcmluZyA8ZWxmcmluZ0B1c2Vycy5z
+b3VyY2Vmb3JnZS5uZXQ+Ci0tLQogc3JjL2NwdS9hYnN0cmFjdF9jcHUuY3BwICAgIHwgNiArKy0t
+LS0KIHNyYy9yZXBvcnQvcmVwb3J0LW1ha2VyLmNwcCB8IDYgKystLS0tCiAyIGZpbGVzIGNoYW5n
+ZWQsIDQgaW5zZXJ0aW9ucygrKSwgOCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9zcmMvY3B1
+L2Fic3RyYWN0X2NwdS5jcHAgYi9zcmMvY3B1L2Fic3RyYWN0X2NwdS5jcHAKaW5kZXggM2I4NDFi
+Zi4uYTNhOWZmYSAxMDA2NDQKLS0tIGEvc3JjL2NwdS9hYnN0cmFjdF9jcHUuY3BwCisrKyBiL3Ny
+Yy9jcHUvYWJzdHJhY3RfY3B1LmNwcApAQCAtMzQsMTQgKzM0LDEyIEBAIGFic3RyYWN0X2NwdTo6
+fmFic3RyYWN0X2NwdSgpCiB7CiAJdW5zaWduZWQgaW50IGk9MDsKIAlmb3IgKGk9MDsgaSA8IGNz
+dGF0ZXMuc2l6ZSgpOyBpKyspewotCQlpZihjc3RhdGVzW2ldKQotCQkJZGVsZXRlIGNzdGF0ZXNb
+aV07CisJCWRlbGV0ZSBjc3RhdGVzW2ldOwogCX0KIAljc3RhdGVzLmNsZWFyKCk7CiAKIAlmb3Ig
+KGk9MDsgaSA8IHBzdGF0ZXMuc2l6ZSgpOyBpKyspewotCQlpZihwc3RhdGVzW2ldKQotCQkJZGVs
+ZXRlIHBzdGF0ZXNbaV07CisJCWRlbGV0ZSBwc3RhdGVzW2ldOwogCX0KIAlwc3RhdGVzLmNsZWFy
+KCk7CiB9CmRpZmYgLS1naXQgYS9zcmMvcmVwb3J0L3JlcG9ydC1tYWtlci5jcHAgYi9zcmMvcmVw
+b3J0L3JlcG9ydC1tYWtlci5jcHAKaW5kZXggZjJmZTUyMi4uNDA0OWE1NCAxMDA2NDQKLS0tIGEv
+c3JjL3JlcG9ydC9yZXBvcnQtbWFrZXIuY3BwCisrKyBiL3NyYy9yZXBvcnQvcmVwb3J0LW1ha2Vy
+LmNwcApAQCAtNDcsOCArNDcsNyBAQCByZXBvcnRfbWFrZXI6OnJlcG9ydF9tYWtlcihyZXBvcnRf
+dHlwZSB0KQogCiByZXBvcnRfbWFrZXI6On5yZXBvcnRfbWFrZXIoKQogewotCWlmIChmb3JtYXR0
+ZXIpCi0JCWRlbGV0ZSBmb3JtYXR0ZXI7CisJZGVsZXRlIGZvcm1hdHRlcjsKIH0KIAogLyogKioq
+KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioq
+KioqKioqKioqKioqICovCkBAIC05OCw4ICs5Nyw3IEBAIHJlcG9ydF9tYWtlcjo6c2V0X3R5cGUo
+cmVwb3J0X3R5cGUgdCkKIHZvaWQKIHJlcG9ydF9tYWtlcjo6c2V0dXBfcmVwb3J0X2Zvcm1hdHRl
+cigpCiB7Ci0JaWYgKGZvcm1hdHRlcikKLQkJZGVsZXRlIGZvcm1hdHRlcjsKKwlkZWxldGUgZm9y
+bWF0dGVyOwogCiAJaWYgKHR5cGUgPT0gUkVQT1JUX0hUTUwpCiAJCWZvcm1hdHRlciA9IG5ldyBy
+ZXBvcnRfZm9ybWF0dGVyX2h0bWwoKTsKLS0gCjIuMS4yCgo=
+
+--===============5416376463444715474==--
 
