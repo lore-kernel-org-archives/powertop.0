@@ -1,119 +1,237 @@
-Content-Type: multipart/mixed; boundary="===============0313402558119563911=="
+Content-Type: multipart/mixed; boundary="===============0883720277131585905=="
 MIME-Version: 1.0
 From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH v2 6/8] Stop buffer overflow
-Date: Wed, 15 Oct 2014 21:54:49 +0900
-Message-ID: <20141015125449.GB1189@swordfish>
-In-Reply-To: 1413310159-30577-7-git-send-email-joe.konno@linux.intel.com
+Subject: Re: [Powertop] Deletion of unnecessary checks before specific
+ function calls
+Date: Wed, 22 Oct 2014 21:27:54 +0900
+Message-ID: <20141022122754.GB950@swordfish>
+In-Reply-To: 5442EEB5.2030601@users.sourceforge.net
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0313402558119563911==
+--===============0883720277131585905==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/14/14 11:09), Joe Konno wrote:
+On (10/19/14 00:50), SF Markus Elfring wrote:
+> Date: Sun, 19 Oct 2014 00:50:29 +0200
+> From: SF Markus Elfring <elfring(a)users.sourceforge.net>
+> To: powertop(a)lists.01.org
+> Subject: [Powertop] Deletion of unnecessary checks before specific functi=
+on
+>  calls
+> User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101
+>  Thunderbird/31.2.0
+> =
 
-I believe Marc MERLIN has reported a crash due to sprint() buffer overrun
-some (long) time ago. back then my idea (which I never submitted... or
-did I?...) was to add our own lib.cpp::_sprint() [or whatever the name]
-and replace all snprintf/sprint at least for buffers with compile time
-known sizes (aka stack buffers) -- this let us:
+> Hello,
+> =
 
- a) calculate buffer sizeof() within this function and never hit any
-errors when someone change the buffer size from buf[32] to buf[23]
-and forget to update all snprint()s
+> I suggest to delete redundant checks for null pointers.
+> Would you like to integrate the attached update suggestion into your sour=
+ce code
+> repository?
+> =
 
- b) handle buffer overruns and append too-small buffers with some
-meaningfull 'watermark' that will give us a hint that that buffer
-probably needs to be extended. (my choise was '...'). e.g.
+> Regards,
+> Markus
 
-show
-	10	device_name_too_lo...
-
-instead of
-	10	device_name_too_lo
-
-
-and we remove a great pile of "numbers, numbers, numbers" from the code
-- snprintf(name, 20, "%s", all_power[i]->type());
-+ _sprintf(name, "%s", all_power[i]->type());
-
-
- c) review can be easier, because we can make a rule to forbid
-direct sprint()/snprintf() usage (for compile time known buffers).
-
- d) I forgot what was my d) point...
-
-
-I still think this is not that bad.
-any ideas/objections?
+makes sense.
 
 	-ss
 
-> Signed-off-by: Joe Konno <joe.konno(a)intel.com>
-> ---
->  src/process/do_process.cpp | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+> From 1f7809ae8d1e4a14ad0f7a812e4f797f65597d1a Mon Sep 17 00:00:00 2001
+> From: Markus Elfring <elfring(a)users.sourceforge.net>
+> Date: Sun, 19 Oct 2014 00:30:53 +0200
+> Subject: [PATCH 1/2] Deletion of unnecessary checks before calls of the
+>  function "free"
 > =
 
-> diff --git a/src/process/do_process.cpp b/src/process/do_process.cpp
-> index dd7d982..2b5a327 100644
-> --- a/src/process/do_process.cpp
-> +++ b/src/process/do_process.cpp
-> @@ -856,8 +856,8 @@ void process_update_display(void)
+> The function "free" is documented in the way that no action shall occur f=
+or
+> a passed null pointer. It is therefore not needed that a function caller
+> repeats a corresponding check.
+> http://stackoverflow.com/questions/18775608/free-a-null-pointer-anyway-or=
+-check-first
+> =
+
+> Signed-off-by: Markus Elfring <elfring(a)users.sourceforge.net>
+> ---
+>  src/devlist.cpp          | 9 +++------
+>  src/perf/perf.cpp        | 6 ++----
+>  traceevent/event-parse.c | 3 +--
+>  3 files changed, 6 insertions(+), 12 deletions(-)
+> =
+
+> diff --git a/src/devlist.cpp b/src/devlist.cpp
+> index 20fe5da..7f599ac 100644
+> --- a/src/devlist.cpp
+> +++ b/src/devlist.cpp
+> @@ -77,18 +77,15 @@ void clean_open_devices()
+>  	unsigned int i=3D0;
 >  =
 
->  		format_watts(all_power[i]->Witts(), power, 10);
->  		if (!show_power)
-> -			strcpy(power, "          ");
-> -		sprintf(name, "%s", all_power[i]->type());
-> +			strncpy(power, "          ", 16);
-> +		snprintf(name, 20, "%s", all_power[i]->type());
+>  	for (i =3D 0; i < one.size(); i++) {
+> -		if(one[i])
+> -			free(one[i]);
+> +		free(one[i]);
+>  	}
 >  =
 
->  		align_string(name, 14, 20);
+>  	for (i =3D 0; i < two.size(); i++) {
+> -		if(two[i])
+> -			free(two[i]);
+> +		free(two[i]);
+>  	}
 >  =
 
-> @@ -867,9 +867,9 @@ void process_update_display(void)
->  		usage[0] =3D 0;
->  		if (all_power[i]->usage_units()) {
->  			if (all_power[i]->usage() < 1000)
-> -				sprintf(usage, "%5.1f%s", all_power[i]->usage(), all_power[i]->usage=
-_units());
-> +				snprintf(usage, 20, "%5.1f%s", all_power[i]->usage(), all_power[i]->=
-usage_units());
->  			else
-> -				sprintf(usage, "%5i%s", (int)all_power[i]->usage(), all_power[i]->us=
-age_units());
-> +				snprintf(usage, 20, "%5i%s", (int)all_power[i]->usage(), all_power[i=
-]->usage_units());
->  		}
+>  	for (i =3D 0; i < devpower.size(); i++){
+> -		if(devpower[i])
+> -			free(devpower[i]);
+> +		free(devpower[i]);
+>  	}
+>  }
 >  =
 
->  		align_string(usage, 14, 20);
-> @@ -878,7 +878,7 @@ void process_update_display(void)
->  		if (!all_power[i]->show_events())
->  			events[0] =3D 0;
->  		else if (all_power[i]->events() <=3D 0.3)
-> -			sprintf(events, "%5.2f", all_power[i]->events());
-> +			snprintf(events, 20, "%5.2f", all_power[i]->events());
+> diff --git a/src/perf/perf.cpp b/src/perf/perf.cpp
+> index b176256..b1103a7 100644
+> --- a/src/perf/perf.cpp
+> +++ b/src/perf/perf.cpp
+> @@ -149,8 +149,7 @@ void perf_event::create_perf_event(char *eventname, i=
+nt _cpu)
 >  =
 
->  		align_string(events, 12, 20);
->  		wprintw(win, "%s  %s %s %s %s\n", power, usage, events, name, pretty_p=
-rint(all_power[i]->description(), descr, 128));
+>  void perf_event::set_event_name(const char *event_name)
+>  {
+> -	if (name)
+> -		free(name);
+> +	free(name);
+>  	name =3D strdup(event_name);
+>  	if (!name) {
+>  		fprintf(stderr, "failed to allocate event name\n");
+> @@ -168,8 +167,7 @@ void perf_event::set_event_name(const char *event_nam=
+e)
+>  =
+
+>  perf_event::~perf_event(void)
+>  {
+> -	if (name)
+> -		free(name);
+> +	free(name);
+>  =
+
+>  	if (perf_event::pevent->ref_count =3D=3D 1) {
+>  		pevent_free(perf_event::pevent);
+> diff --git a/traceevent/event-parse.c b/traceevent/event-parse.c
+> index 6195f6f..5a717a0 100644
+> --- a/traceevent/event-parse.c
+> +++ b/traceevent/event-parse.c
+> @@ -1023,8 +1023,7 @@ static enum event_type force_token(const char *str,=
+ char **tok)
+>  =
+
+>  static void free_token(char *tok)
+>  {
+> -	if (tok)
+> -		free(tok);
+> +	free(tok);
+>  }
+>  =
+
+>  static enum event_type read_token(char **tok)
 > -- =
 
 > 2.1.2
 > =
 
+
+> From 4237084ad74a1370617f60f1146fb9e59221f970 Mon Sep 17 00:00:00 2001
+> From: Markus Elfring <elfring(a)users.sourceforge.net>
+> Date: Sun, 19 Oct 2014 00:40:20 +0200
+> Subject: [PATCH 2/2] Removal of unnecessary checks before a few calls of =
+the
+>  C++ delete operator
+> =
+
+> The C++ delete operator can also handle passed null pointers on its own
+> without unexpected side effects.
+> http://www.parashift.com/c++-faq/delete-handles-null.html
+> =
+
+> It is therefore not needed to keep additional safety checks directly befo=
+re
+> such function calls.
+> =
+
+> Signed-off-by: Markus Elfring <elfring(a)users.sourceforge.net>
+> ---
+>  src/cpu/abstract_cpu.cpp    | 6 ++----
+>  src/report/report-maker.cpp | 6 ++----
+>  2 files changed, 4 insertions(+), 8 deletions(-)
+> =
+
+> diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
+> index 3b841bf..a3a9ffa 100644
+> --- a/src/cpu/abstract_cpu.cpp
+> +++ b/src/cpu/abstract_cpu.cpp
+> @@ -34,14 +34,12 @@ abstract_cpu::~abstract_cpu()
+>  {
+>  	unsigned int i=3D0;
+>  	for (i=3D0; i < cstates.size(); i++){
+> -		if(cstates[i])
+> -			delete cstates[i];
+> +		delete cstates[i];
+>  	}
+>  	cstates.clear();
+>  =
+
+>  	for (i=3D0; i < pstates.size(); i++){
+> -		if(pstates[i])
+> -			delete pstates[i];
+> +		delete pstates[i];
+>  	}
+>  	pstates.clear();
+>  }
+> diff --git a/src/report/report-maker.cpp b/src/report/report-maker.cpp
+> index f2fe522..4049a54 100644
+> --- a/src/report/report-maker.cpp
+> +++ b/src/report/report-maker.cpp
+> @@ -47,8 +47,7 @@ report_maker::report_maker(report_type t)
+>  =
+
+>  report_maker::~report_maker()
+>  {
+> -	if (formatter)
+> -		delete formatter;
+> +	delete formatter;
+>  }
+>  =
+
+>  /* *********************************************************************=
+*** */
+> @@ -98,8 +97,7 @@ report_maker::set_type(report_type t)
+>  void
+>  report_maker::setup_report_formatter()
+>  {
+> -	if (formatter)
+> -		delete formatter;
+> +	delete formatter;
+>  =
+
+>  	if (type =3D=3D REPORT_HTML)
+>  		formatter =3D new report_formatter_html();
+> -- =
+
+> 2.1.2
+> =
+
+
 > _______________________________________________
 > PowerTop mailing list
 > PowerTop(a)lists.01.org
 > https://lists.01.org/mailman/listinfo/powertop
->=20
 
---===============0313402558119563911==--
+
+--===============0883720277131585905==--
 
