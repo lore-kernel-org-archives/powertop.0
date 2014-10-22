@@ -1,149 +1,117 @@
-Content-Type: multipart/mixed; boundary="===============4030655522003251381=="
+Content-Type: multipart/mixed; boundary="===============7700820355718381405=="
 MIME-Version: 1.0
 From: Sami Kerola <kerolasa at iki.fi>
-Subject: Re: [Powertop] [PATCH v3 05/15] fix clang++ compilation errors
-Date: Sat, 04 Oct 2014 15:15:34 +0100
-Message-ID: <alpine.LNX.2.03.1410041513550.3874@iki.fi>
-In-Reply-To: 20141004113550.GA9242@rhlx01.hs-esslingen.de
+Subject: Re: [Powertop] Complete build options for Pthread API
+Date: Wed, 22 Oct 2014 10:41:35 +0100
+Message-ID: <CAG27Bk2OTe7upn7-FoAy2zCPz7OopfDgj+rJSe35kJdzgqeOEA@mail.gmail.com>
+In-Reply-To: 54449349.2000400@users.sourceforge.net
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4030655522003251381==
+--===============7700820355718381405==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, 4 Oct 2014, Andreas Mohr wrote:
+On 20 October 2014 05:44, SF Markus Elfring
+<elfring(a)users.sourceforge.net> wrote:
+>> I don't know what sort of adjustments you have in mind.
+>
+> I suggest a bit more fine-tuning for the explanation.
+>
+>
+>> The variables are in commit body, so I am assuming people who read code
+>> can see them without explicit note about them.
+>
+> I would prefer a commit message that will also be useful to some degree w=
+ithout
+> reading the affected source code.
+>
+>
+>> But if you insist improvement with the message could you write what you
+>> would like to see so that I can include it without confusions.
+>
+> You can see from a few contributions for other software that I used a wor=
+ding
+> like the following:
+>
+> The configuration script "AX_PTHREAD" was added to the build specification
+> so that corresponding special parameters will be taken into account.
+> http://www.gnu.org/software/autoconf-archive/ax_pthread.html
+>
+>
+>
+> You might be still interested to stress other details for your PowerTop t=
+esters
+> and reviewers.
 
-> On Mon, Sep 29, 2014 at 07:42:28PM -0700, Alexandra Yates wrote:
->>> any appearance of new/delete should automatically make the review fail,
->>> with subsequent manual white-listing needed for the few rare cases
->>> that do really want to have it (think class-internal handling of
->>> resources,
->>> or some such).
+Thanks Markus.  I will add your text to commit message & Reviewed-by
+line.
+
+>>>> +AX_PTHREAD([], [AC_MSG_ERROR([Could not configure pthreads support])])
 >>>
->>>
->>> That said, thank you very much for enabling clang++ compatibility,
->>> and for all the other fixes!
->>> I had wanted to venture into such areas myself, too
->>> (e.g. for C++ diagnosis reasons), but simply haven't found the time yet.
->>>
->>> Andreas Mohr
->>> _______________________________________________
->>> PowerTop mailing list
->>> PowerTop(a)lists.01.org
->>> https://lists.01.org/mailman/listinfo/powertop
->>>
+>>> 2. You chose to pass an empty "ACTION-IF-FOUND". Would it make sense to
+>>> restructure this place a bit in the configuration script so that the
+>>> following statements will be directly used by the first macro parameter?
 >>
->> Andreas, feel free to submit a patch with this fix.
+>> That would make powertop m4 code copy to drift from version provided by
+>> autotools-archive, making the upstream fixes to incompatible. I strongly
+>> recommend against adding additional maintenance cost to this sort of stu=
+ff.
 >
-> Right, that seems like a good idea
-> (although it's quite a bit of effort,
-> and all these areas have been committed now unfortunately).
+> I do not really understand the intention in this feedback.
+
+And when I see your message below I understand why.  We were talking
+about totally different things.  Please ignore my previous message.
+
+> How do you think about the following statement layout at the discussed sc=
+ript place?
 >
-> I started to dive into it (did git pull of my existing
-> https://github.com/fenrus75/powertop ), but immediately hit a snag:
+> diff --git a/configure.ac b/configure.ac
+> index 4991d97..0ebe69d 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -128,11 +128,12 @@ AS_IF([test "$has_libpci" -eq 0], [
+>         ])
+>  ])
 >
-> README said that I should apply the usual UNIX prayer of
->
->    ./configure
->    make
->    make install
->
-> which obviously wasn't possible since in this repo-only content
-> the automake step was not done (likely rightfully, I think,
-> since these things should nicely fit the local environment,
-> but then it should still have been explained in the README).
->
-> Running automake then failed (again!! Somehow I knew it, since these thin=
-gs
-> magically have a tendency to fail almost always...):
->
-> # ./autogen.sh
-> autoreconf: Entering directory `.'
-> autoreconf: running: autopoint
-> autoreconf: running: aclocal  --output=3Daclocal.m4t
-> aclocal: configure.ac: 20: macro `AM_SILENT_RULES' not found in library
-> aclocal: macro `AM_PROG_MKDIR_P' required but not defined
-> aclocal: macro `AM_PROG_MKDIR_P' required but not defined
-> aclocal: macro `_LT_DECL_SED' required but not defined
-> aclocal: macro `_LT_FUNC_STRIPNAME_CNF' required but not defined
-> autoreconf: aclocal failed with exit status: 1
->
-> to which https://forum.videolan.org/viewtopic.php?f=3D13&t=3D84261
-> had the following wise words to say: "Use automake 1.11".
->
-> Fortunately there's an automake1.11 package on Debian, however there's al=
-so of course
-> the "standard", "canonical version" "automake" package (oh darnit - which=
- I currently
-> don't even have installed, oops... can you tell that I'm a CMake guy alre=
-ady? ;)).
-> So, since I only had older specific-version automake packages installed
-> (a  sufficiently medieval automake1.7),,
-> I installed the generic, version-progressing one.
-> But it still used the old version prior to an
->    update-alternatives --config automake
-> , at which point it worked.
->
-> So, now that this is documented for other people to be helped,
-> on to documenting README omissions and working on the scoped array handli=
-ng commit.
+> -AC_SEARCH_LIBS([pthread_create], [pthread], [], [
+> -       AC_MSG_ERROR([libpthread is required but was not found])
+> -], [])
+> -AC_SEARCH_LIBS([inet_aton], [resolv], [], [
+> -       AC_MSG_ERROR([libresolv is required but was not found])
+> -], [])
+> -
+> -AC_OUTPUT
+> +AX_PTHREAD([LIBS=3D"$PTHREAD_LIBS $LIBS"
+> +CFLAGS=3D"$CFLAGS $PTHREAD_CFLAGS"
+> +CC=3D"$PTHREAD_CC"
+> +AC_SEARCH_LIBS([inet_aton],
+> +               [resolv],
+> +               [AC_OUTPUT],
+> +               [AC_MSG_ERROR([libresolv is required but was not found])],
+> +               [])],
+> +           [AC_MSG_ERROR([Could not configure pthreads support])])
 
-Hi Andreas,
+Indentation seems a bit funky in the proposed change, but that could be
+fixed.  The bigger problem I have with nesting AC_SEARCH_LIBS to
+AX_PTHREAD is that it does not seem to add clarity.  Secondly the
+threading seems to be used in calibrate & measure/extech code.  If I am
+not wrong that code do not require resolv library.
 
-IMHO it would be better to require new enough automake as part of =
+Perhaps the LIBS etc variable assignments should be in true case of
+AX_PTHREAD, but surely not the resolv library search.  I'll run
+./autogen.sh to that variation to see how the Makefile will look with
+this variant to see it has change working as one might expect.
 
-autotools configuration, than add notes to README.  Something like this =
+This and few other patches will be resubmitted about at the end of the
+Sunday (I'm just hobbyist, so I can use only my free time to things
+like powertop hacking).
 
-could do:
-
---->8----
-From: Sami Kerola <kerolasa(a)iki.fi>
-Date: Sat, 4 Oct 2014 14:54:23 +0100
-Subject: [PATCH] configure: require the least automake version 1.11.1
-
-Apparently some Debian has rather old automake, version 1.7, which is
-causing build from git to fail.
-
-Set the requird automake version to be minimum of 1.11.1, that used to be
-the version GNU coreutils requied before they introduced
-AM_TESTS_ENVIRONMENT that works in 1.11.2 or later.  As powertop does not
-have tests, the earlier GNU coreutils requirement an initial pick for
-this project.
-
-p.s. The automake 1.11.1 has been a round since December 2009, so there
-really shouldn't be need for support anything older, like 1.7.9 that was
-released November 2003.
-
-Reported-by: Andreas Mohr <andi(a)lisas.de>
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
----
-  configure.ac | 6 +++++-
-  1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/configure.ac b/configure.ac
-index 4991d97..a1dbfb8 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -3,7 +3,11 @@
-
-  AC_PREREQ([2.68])
-  AC_INIT([powertop], [2.6.1], [powertop(a)lists.01.org], [], [https://01.o=
-rg/powertop])
--AM_INIT_AUTOMAKE([-Wall foreign])
-+AM_INIT_AUTOMAKE([
-+	-Wall
-+	1.11.2
-+	foreign
-+])
-  AC_LANG([C++])
-  AC_CONFIG_FILES([
-  	Makefile
 -- =
 
-2.1.2
+Sami Kerola
+http://www.iki.fi/kerolasa/
 
-
---===============4030655522003251381==--
+--===============7700820355718381405==--
 
