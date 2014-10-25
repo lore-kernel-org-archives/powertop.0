@@ -1,71 +1,103 @@
-Content-Type: multipart/mixed; boundary="===============5327414676200365276=="
+Content-Type: multipart/mixed; boundary="===============2297788170011265112=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH v2 6/8] Stop buffer overflow
-Date: Wed, 15 Oct 2014 23:46:39 +0900
-Message-ID: <20141015144639.GJ1189@swordfish>
-In-Reply-To: 543E85ED.5000408@linux.intel.com
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH 04/14] csstoh.sh: check every single return value
+Date: Sat, 25 Oct 2014 18:33:51 +0100
+Message-ID: <1414258441-30099-5-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1414258441-30099-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5327414676200365276==
+--===============2297788170011265112==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/15/14 07:34), Arjan van de Ven wrote:
-> >>>
-> >>>well... I think, this should work for both compile time known buffers =
-and
-> >>>heap-alloced buffers.
-> >>>
-> >>
-> >>this is what __builtin_object_size() is for
-> >>(and sprintf already uses that due to -D_FORTIFY_SOURCE=3D2)
-> >>
-> >
-> >yes, but I didn't want to use GCC C extensions (e.g. __builtin_foo). tho=
-ugh,
-> >clang/llvm probably support them.
-> >
-> >>btw all these "n" usages in these patches are buggy, they do not leave =
-space for a trailing 0
-> >>making the problem worse, not better...
-> >>esp since with -D_FORTIFY_SOURCE=3D2 the compiler will abort the progra=
-m if there's an overflow,
-> >>and now you make it silently keep running but corrupt.
-> >
-> >yes, this is the reason behind this proposal. these patches a) don't che=
-ck for
-> >overrun; b) don't handle overrun. they just shut up the compiler.
-> =
+Earlier the script continued processing at errors.
 
-> =
+$ ./csstoh.sh powertop.css /dev/full
+./csstoh.sh: line 36: echo: write error: No space left on device
+./csstoh.sh: line 37: echo: write error: No space left on device
+[...]
 
-> that's never a good tradeoff.
-> -D_FORTIFY_SOURCE-2 is an essential compiler feature that has a defined s=
-emantic/etc
-> patches that make behavior worse than that baseline, but shut up some war=
-ning, are damage
-> not value.
-> =
+Now the script will fail immediately when an error occurs.
+
+$ ./csstoh.sh powertop.css /dev/full ; echo $?
+cat: write error: No space left on device
+1
+
+As a minor improvement the script now writes errors to stderr rather than
+stdout, that is more appropriate.
+
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ src/csstoh.sh | 40 +++++++++++++++++++++++-----------------
+ 1 file changed, 23 insertions(+), 17 deletions(-)
+
+diff --git a/src/csstoh.sh b/src/csstoh.sh
+index 9d4100b..4ba70e2 100755
+--- a/src/csstoh.sh
++++ b/src/csstoh.sh
+@@ -18,27 +18,33 @@
+ #
+ # Written by Igor Zhbanov <i.zhbanov at samsung.com>
+ =
+
+-if [ $# -lt 2 ]; then
+-	echo "Usage: csstoh.sh cssfile header.h"
++if [ $# -ne 2 ]; then
++	echo "Usage: csstoh.sh cssfile header.h" >&2
+ 	exit 1
+ fi
+-
+-if [ ! -r $1 ]; then
+-	echo "Can't find file $1"
+-	exit 1
+-fi
+-
+-if ! echo -n >$2; then
+-	echo "Can't open file $2 for writing."
++if [ ! -f "$1" ]; then
++	echo "$1: no such file or directory" >&2
+ 	exit 1
+ fi
++# redirect stdout to a file
++exec 1> "$2" || exit $?
+ =
+
+-echo "#ifndef __INCLUDE_GUARD_CCS_H" >> $2
+-echo "#define __INCLUDE_GUARD_CCS_H" >> $2
+-echo >> $2
+-echo "const char css[] =3D " >> $2
++# header
++cat <<HERE || exit $?
++#ifndef __INCLUDE_GUARD_CCS_H
++#define __INCLUDE_GUARD_CCS_H
+ =
+
+-sed -r 's/^(.*)$/\t\"\1\\n\"/' $1 >> $2
++const char css[] =3D =
+
++HERE
++# body
++sed -r 's/^(.*)$/\t\"\1\\n\"/' "$1" || exit $?
++# footer
++cat <<HERE || exit $?
++;
++#endif
++HERE
+ =
+
+-echo ";" >> $2
+-echo "#endif" >> $2
++# close output file
++exec 1>&-
++# return status of output file write
++exit $?
+-- =
+
+2.1.2
 
 
-well, the macro handles overrun (should probably be snprintf(a, bsz - 1, ..=
-.) >=3D bsz)
-and replaces small part of the buffer with '...\0'. which is, imho, a bit b=
-etter
-than `backtrace(); abort();' (I don't think we can benefit from compile-tim=
-e checks
-of -D_FORTIFY_SOURCE=3D2, only run time ones) for developers that behaviour=
- makes
-sense, for users it's just "seg fault/core dump/whatever". so I don't think=
- that
-that _sprintf() macro makes the situation even worse. though, I'm not marri=
-ed to that
-macro.
-
-	-ss
-
---===============5327414676200365276==--
+--===============2297788170011265112==--
 
