@@ -1,83 +1,99 @@
-Content-Type: multipart/mixed; boundary="===============1611801895305972527=="
+Content-Type: multipart/mixed; boundary="===============5413820333562836848=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [PATCH 09/14] do not use ncurses when --auto-tune is
- specified
-Date: Wed, 20 Aug 2014 21:28:59 +0900
-Message-ID: <20140820122859.GA981@swordfish>
-In-Reply-To: 1407274298-16404-9-git-send-email-kerolasa@iki.fi
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH 05/14] configure: use AC_USE_SYSTEM_EXTENSIONS to
+ determine features
+Date: Sat, 25 Oct 2014 18:33:52 +0100
+Message-ID: <1414258441-30099-6-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1414258441-30099-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1611801895305972527==
+--===============5413820333562836848==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (08/05/14 22:31), Sami Kerola wrote:
-> Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
-> ---
->  src/main.cpp | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
-> =
+The AC_USE_SYSTEM_EXTENSIONS will enable everything that a system allows
+to be enabled, so there is no longer need for a source file specific
+*_SOURCE definitions.  Secondly the uses of _BSD_SOURCE that are removed
+in this change are part of deprecated API.  See reference link for
+details.
+
+Reference: https://sourceware.org/git/gitweb.cgi?p=3Dglibc.git;a=3Dcommit;h=
+=3Dc941736c92fa3a319221f65f6755659b2a5e0a20
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ configure.ac                         | 1 +
+ src/report/report-formatter-base.cpp | 2 --
+ src/report/report-formatter-csv.cpp  | 2 --
+ src/report/report-formatter-html.cpp | 2 --
+ 4 files changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 27e52ad..dc376ce 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -18,6 +18,7 @@ AC_CONFIG_FILES([
+ ])
+ AC_CONFIG_SRCDIR([src/main.cpp])
+ AC_CONFIG_MACRO_DIR([m4])
++AC_USE_SYSTEM_EXTENSIONS
+ AC_CONFIG_HEADERS([config.h])
+ GETTEXT_PACKAGE=3Dpowertop
+ AC_SUBST([GETTEXT_PACKAGE])
+diff --git a/src/report/report-formatter-base.cpp b/src/report/report-forma=
+tter-base.cpp
+index 7c5159e..4e10603 100644
+--- a/src/report/report-formatter-base.cpp
++++ b/src/report/report-formatter-base.cpp
+@@ -23,8 +23,6 @@
+  * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
+  * 2012.10 */
+ =
+
+-#define _BSD_SOURCE
+-
+ /* Uncomment to disable asserts */
+ /*#define NDEBUG*/
+ =
+
+diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-format=
+ter-csv.cpp
+index 523e79b..0360fd8 100644
+--- a/src/report/report-formatter-csv.cpp
++++ b/src/report/report-formatter-csv.cpp
+@@ -23,8 +23,6 @@
+  * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
+  * 2012.10 */
+ =
+
+-#define _BSD_SOURCE
+-
+ /* Uncomment to disable asserts */
+ /*#define NDEBUG*/
+ =
+
+diff --git a/src/report/report-formatter-html.cpp b/src/report/report-forma=
+tter-html.cpp
+index 3803962..41440f9 100644
+--- a/src/report/report-formatter-html.cpp
++++ b/src/report/report-formatter-html.cpp
+@@ -23,8 +23,6 @@
+  * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
+  * 2012.10 */
+ =
+
+-#define _BSD_SOURCE
+-
+ /* Uncomment to disable asserts */
+ /*#define NDEBUG*/
+ =
+
+-- =
+
+2.1.2
 
 
-I think it makes sense to extend ui_notify_user() so it can cover
-both cases: initialised ncurses -- calling mvprintw(), and
-uninitialised ncurses -- printf (to stdout).
-
-this will change a bit 'powertop --auto-tune' behaviour, since by
-default user will now see a 'list' of commands executed by powertop,
-but it's really easy to silent powertop via stdout redirection.
-
-
-what do you think?
-
-	-ss
-
-
-> diff --git a/src/main.cpp b/src/main.cpp
-> index 3b67ef0..4bfd038 100644
-> --- a/src/main.cpp
-> +++ b/src/main.cpp
-> @@ -460,7 +460,8 @@ int main(int argc, char **argv)
->  		end_pci_access();
->  		exit(0);
->  	}
-> -	init_display();
-> +	if (!auto_tune)
-> +		init_display();
->  	initialize_tuning();
->  	/* first one is short to not let the user wait too long */
->  	one_measurement(1, NULL);
-> @@ -473,11 +474,13 @@ int main(int argc, char **argv)
->  	}
->  =
-
->  	while (!leave_powertop) {
-> -		show_cur_tab();
-> +		if (!auto_tune)
-> +			show_cur_tab();
->  		one_measurement(time_out, NULL);
->  		learn_parameters(15, 0);
->  	}
-> -	endwin();
-> +	if (!auto_tune)
-> +		endwin();
->  	printf("%s\n", _("Leaving PowerTOP"));
->  =
-
->  	end_process_data();
-> -- =
-
-> 2.0.4
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->=20
-
---===============1611801895305972527==--
+--===============5413820333562836848==--
 
