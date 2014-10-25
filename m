@@ -1,36 +1,43 @@
-Content-Type: multipart/mixed; boundary="===============4841761449847939338=="
+Content-Type: multipart/mixed; boundary="===============7242447195940516294=="
 MIME-Version: 1.0
 From: Sami Kerola <kerolasa at iki.fi>
-Subject: Re: [Powertop] [PATCH 07/12] move options structure to function scope
-Date: Sat, 02 Aug 2014 23:20:41 +0100
-Message-ID: <CAG27Bk3YC1TNt=OLOQE_jO7q6izjB3iLAjWeC3xhnXBZth9Bjg@mail.gmail.com>
-In-Reply-To: 20140802134718.GA1018@swordfish
+Subject: [Powertop] [PATCH 08/14] main: fix incompatible operand type
+Date: Sat, 25 Oct 2014 18:33:55 +0100
+Message-ID: <1414258441-30099-9-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1414258441-30099-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4841761449847939338==
+--===============7242447195940516294==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 2 August 2014 14:47, Sergey Senozhatsky <sergey.senozhatsky(a)gmail.com>=
- wrote:
->> Subject: [Powertop] [PATCH 07/12] move options structure to function sco=
-pe
->
-> what for?
+main.cpp:430:35: error: incompatible operand types ('char *' and 'char')
+                        sprintf(workload, "%s", optarg ? optarg : '\0');
 
-They've told me keeping variables in as narrow scope as possible is a
-virtue. Even if it would not be I don't see any harm of moving
-everything out of global scope when ever possible.
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ src/main.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-https://www.securecoding.cert.org/confluence/display/cplusplus/DCL07-CPP.+M=
-inimize+the+scope+of+variables+and+methods
-
+diff --git a/src/main.cpp b/src/main.cpp
+index 6e56d8e..9471bcc 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -427,7 +427,7 @@ int main(int argc, char **argv)
+ 			time_out =3D (optarg ? atoi(optarg) : 20);
+ 			break;
+ 		case 'w':		/* measure workload */
+-			sprintf(workload, "%s", optarg ? optarg : '\0');
++			sprintf(workload, "%s", optarg ? optarg : "");
+ 			break;
+ 		case 'V':
+ 			print_version();
 -- =
 
-Sami Kerola
-http://www.iki.fi/kerolasa/
+2.1.2
 
---===============4841761449847939338==--
+
+--===============7242447195940516294==--
 
