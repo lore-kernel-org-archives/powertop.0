@@ -1,103 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============6112380761703872206=="
+Content-Type: multipart/mixed; boundary="===============5008323309342044866=="
 MIME-Version: 1.0
-From: Mohammad Merajul Islam Molla <meraj.enigma at gmail.com>
-Subject: [Powertop] [PATCH v2] powertop: fix various resource leaks
-Date: Tue, 05 Aug 2014 22:01:58 +0600
-Message-ID: <1407254518-6705-1-git-send-email-meraj.enigma@gmail.com>
+From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
+Subject: Re: [Powertop] Complete build options for Pthread API
+Date: Sat, 25 Oct 2014 17:58:40 +0900
+Message-ID: <20141025085840.GA1572@swordfish>
+In-Reply-To: CAG27Bk2jDUn-1SoWqFQhb2ac22vdrpTBax8VU_Gv+e02Dw2_rw@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6112380761703872206==
+--===============5008323309342044866==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-fixes various resource leaks detected by valgrind and coverity scan.
+On (10/22/14 15:33), Sami Kerola wrote:
+> On 22 October 2014 13:41, Sergey Senozhatsky
+> <sergey.senozhatsky(a)gmail.com> wrote:
+> > m4/* files are host-specific. they should never be part
+> > of the source code or a package.
+> =
 
-move pclose(file) in the scope of "out" label.
+> I would not say it so strongly. There are plenty of projects that have
+> files in m4 directory. Here's couple.
+> =
 
-Signed-off-by: Mohammad Merajul Islam Molla <meraj.enigma(a)gmail.com>
----
- src/devices/ahci.cpp     | 4 +++-
- src/perf/perf_bundle.cpp | 4 +++-
- src/tuning/bluetooth.cpp | 6 +++---
- 3 files changed, 9 insertions(+), 5 deletions(-)
+> http://git.savannah.gnu.org/gitweb/?p=3Dcoreutils.git;a=3Dtree;f=3Dm4
+> https://github.com/karelzak/util-linux/tree/master/m4
 
-diff --git a/src/devices/ahci.cpp b/src/devices/ahci.cpp
-index 3b4627a..a4d1345 100644
---- a/src/devices/ahci.cpp
-+++ b/src/devices/ahci.cpp
-@@ -67,8 +67,10 @@ static string disk_name(char *path, char *target, char *=
-shortname)
- 		sprintf(line, "%s/%s/model", pathname, dirent->d_name);
- 		file =3D fopen(line, "r");
- 		if (file) {
--			if (fgets(line, 4096, file) =3D=3D NULL)
-+			if (fgets(line, 4096, file) =3D=3D NULL) {
-+				fclose(file);
- 				break;
-+			}
- 			fclose(file);
- 			c =3D strchr(line, '\n');
- 			if (c)
-diff --git a/src/perf/perf_bundle.cpp b/src/perf/perf_bundle.cpp
-index b0e982b..cf1ae11 100644
---- a/src/perf/perf_bundle.cpp
-+++ b/src/perf/perf_bundle.cpp
-@@ -142,8 +142,10 @@ static void parse_event_format(const char *event_name)
- =
+yes, but powertop does not use any optional m4 macros/libs that
+are not basically available (afaik).
 
- 	buf =3D read_file(file);
- 	free(file);
--	if (!buf)
-+	if (!buf) {
-+		free(name);
- 		return;
-+	}
- =
+ https://lists.01.org/pipermail/powertop/2013-June/000855.html
 
- 	pevent_parse_event(perf_event::pevent, buf, strlen(buf), sys);
- 	free(name);
-diff --git a/src/tuning/bluetooth.cpp b/src/tuning/bluetooth.cpp
-index 92f5835..9be327e 100644
---- a/src/tuning/bluetooth.cpp
-+++ b/src/tuning/bluetooth.cpp
-@@ -108,7 +108,7 @@ static int last_check_result;
- int bt_tunable::good_bad(void)
- {
- 	struct hci_dev_info devinfo;
--	FILE *file;
-+	FILE *file =3D 0;
- 	int fd;
- 	int thisbytes =3D 0;
- 	int ret;
-@@ -149,11 +149,9 @@ int bt_tunable::good_bad(void)
- 			memset(line, 0, 2048);
- 			if (fgets(line, 2047, file) =3D=3D NULL) {
- 				result =3D last_check_result =3D TUNE_GOOD;
--				pclose(file);
- 				goto out;
- 			}
- =
+	-ss
 
--			pclose(file);
- 			if (strlen(line) > 0) {
- 				result =3D last_check_result =3D TUNE_GOOD;
- 				goto out;
-@@ -166,6 +164,8 @@ int bt_tunable::good_bad(void)
- =
+> But if powertop does not want to mix files autotools generate with own
+> files then an alternative path is needed. Perhaps powertop/m4/ could
+> be used. That would leave door open to various other project local
+> purposes as well files. What ever is done a maintainer decision is
+> needed. In best case the decision should be documented to
+> powertop/readmes/project_files.txt or something like that.
+> =
 
- out:
- 	previous_bytes =3D thisbytes;
-+	if (file)
-+		pclose(file);
- 	close(fd);
- 	return result;
- }
--- =
+> -- =
 
-1.9.1
+> Sami Kerola
+> http://www.iki.fi/kerolasa/
+>=20
 
-
---===============6112380761703872206==--
+--===============5008323309342044866==--
 
