@@ -1,73 +1,207 @@
-Content-Type: multipart/mixed; boundary="===============1876868545034979018=="
+Content-Type: multipart/mixed; boundary="===============3425752929715098176=="
 MIME-Version: 1.0
 From: Sami Kerola <kerolasa at iki.fi>
-Subject: Re: [Powertop] [PATCH 01/12] configure: use vertical lists and AS_IF
- macro
-Date: Sat, 02 Aug 2014 23:02:57 +0100
-Message-ID: <CAG27Bk0bQMdwTrue34-t-tYmpzdBHzEp7Da6b=+PJ3798K=KgA@mail.gmail.com>
-In-Reply-To: 20140802121723.GA20307@sara.bahnhof.se
+Subject: [Powertop] [PATCH 07/14] configure: use autoconf-archive
+ ax_cxx_compile_stdcxx_11.m4
+Date: Sat, 25 Oct 2014 18:33:54 +0100
+Message-ID: <1414258441-30099-8-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1414258441-30099-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1876868545034979018==
+--===============3425752929715098176==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 2 August 2014 13:17, Magnus Fromreide <magfr(a)lysator.liu.se> wrote:
-> On Sat, Aug 02, 2014 at 12:54:06PM +0100, Sami Kerola wrote:
->> Horizontal lists has downside of being managed as a single entry in
->> version control, which makes commits that add and remove items difficult
->> to follow.  With vertical lists each entry is managed separately, which
->> is much nicer.
->
-> I agree with this but there is a small issue - in autoconf you don't need=
- to
-> have \'s at the end of the lines.
+Ensure the C++11 is supported, and fail when it is not.
 
-I am afraid backslashes are not optional. When they are removed the
-./autogen.sh will produce ./configure file that fails with following
-error:
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ configure.ac                   |   1 +
+ m4/ax_cxx_compile_stdcxx_11.m4 | 142 +++++++++++++++++++++++++++++++++++++=
+++++
+ 2 files changed, 143 insertions(+)
+ create mode 100644 m4/ax_cxx_compile_stdcxx_11.m4
 
-checking how to hardcode library paths into programs... immediate
-./configure: line 19421: syntax error near unexpected token `fcntl.h'
-./configure: line 19421: `      fcntl.h'
+diff --git a/configure.ac b/configure.ac
+index e56a451..b4460fb 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -35,6 +35,7 @@ AC_PROG_CC
+ AC_PROG_INSTALL
+ AM_PROG_CC_C_O
+ GCC_FORTIFY_SOURCE_CC
++AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
+ =
 
-I have not tried would backslash removing work with old autoconf
-versions. Mine is from autoconf upstream, and compiled about month
-ago, so it should be more or less up to date.
-
->> Additionally make the 'if' statements to use AS_IF() macro, add project
->> URL to autoconfig init
->
-> It is always better to separate patches :-)
-
-The commit is split, here is the AS_IF update.
-
-https://github.com/kerolasa/powertop/commit/cc5cb0f2b16414449c123738a7bf0da=
-08bf1b042
-
->> and pretty print macro expressions to have
->> indentation, and bracing that follows more or less in K&R style.
->
-> This is pretty much a style issue and I ain't certain about which style I
-> prefer. I am also unsure about the messages - have you adde newlines to a=
-ny
-> message?
-
-No. The messaging to users should stay exactly as they've always been.
-
-The point why I like K&R bracing when writing m4 is that at least I
-find it easier to validate visually when brace opens & close's follow
-indentation level in which they are effective. That said style changes
-are matters of taste, and I could very well be wrong^W against common
-consensus what is according good taste in this project. If so I can
-drop the change from final merge request.
-
+ # Checks for libraries.
+ AX_PTHREAD([
+diff --git a/m4/ax_cxx_compile_stdcxx_11.m4 b/m4/ax_cxx_compile_stdcxx_11.m4
+new file mode 100644
+index 0000000..163a4c6
+--- /dev/null
++++ b/m4/ax_cxx_compile_stdcxx_11.m4
+@@ -0,0 +1,142 @@
++# =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
++#  http://www.gnu.org/software/autoconf-archive/ax_cxx_compile_stdcxx_11.h=
+tml
++# =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
++#
++# SYNOPSIS
++#
++#   AX_CXX_COMPILE_STDCXX_11([ext|noext],[mandatory|optional])
++#
++# DESCRIPTION
++#
++#   Check for baseline language coverage in the compiler for the C++11
++#   standard; if necessary, add switches to CXXFLAGS to enable support.
++#
++#   The first argument, if specified, indicates whether you insist on an
++#   extended mode (e.g. -std=3Dgnu++11) or a strict conformance mode (e.g.
++#   -std=3Dc++11).  If neither is specified, you get whatever works, with
++#   preference for an extended mode.
++#
++#   The second argument, if specified 'mandatory' or if left unspecified,
++#   indicates that baseline C++11 support is required and that the macro
++#   should error out if no mode with that support is found.  If specified
++#   'optional', then configuration proceeds regardless, after defining
++#   HAVE_CXX11 if and only if a supporting mode is found.
++#
++# LICENSE
++#
++#   Copyright (c) 2008 Benjamin Kosnik <bkoz(a)redhat.com>
++#   Copyright (c) 2012 Zack Weinberg <zackw(a)panix.com>
++#   Copyright (c) 2013 Roy Stogner <roystgnr(a)ices.utexas.edu>
++#   Copyright (c) 2014 Alexey Sokolov <sokolov(a)google.com>
++#
++#   Copying and distribution of this file, with or without modification, a=
+re
++#   permitted in any medium without royalty provided the copyright notice
++#   and this notice are preserved. This file is offered as-is, without any
++#   warranty.
++
++#serial 4
++
++m4_define([_AX_CXX_COMPILE_STDCXX_11_testbody], [[
++  template <typename T>
++    struct check
++    {
++      static_assert(sizeof(int) <=3D sizeof(T), "not big enough");
++    };
++
++    struct Base {
++    virtual void f() {}
++    };
++    struct Child : public Base {
++    virtual void f() override {}
++    };
++
++    typedef check<check<bool>> right_angle_brackets;
++
++    int a;
++    decltype(a) b;
++
++    typedef check<int> check_type;
++    check_type c;
++    check_type&& cr =3D static_cast<check_type&&>(c);
++
++    auto d =3D a;
++    auto l =3D [](){};
++]])
++
++AC_DEFUN([AX_CXX_COMPILE_STDCXX_11], [dnl
++  m4_if([$1], [], [],
++        [$1], [ext], [],
++        [$1], [noext], [],
++        [m4_fatal([invalid argument `$1' to AX_CXX_COMPILE_STDCXX_11])])dnl
++  m4_if([$2], [], [ax_cxx_compile_cxx11_required=3Dtrue],
++        [$2], [mandatory], [ax_cxx_compile_cxx11_required=3Dtrue],
++        [$2], [optional], [ax_cxx_compile_cxx11_required=3Dfalse],
++        [m4_fatal([invalid second argument `$2' to AX_CXX_COMPILE_STDCXX_1=
+1])])
++  AC_LANG_PUSH([C++])dnl
++  ac_success=3Dno
++  AC_CACHE_CHECK(whether $CXX supports C++11 features by default,
++  ax_cv_cxx_compile_cxx11,
++  [AC_COMPILE_IFELSE([AC_LANG_SOURCE([_AX_CXX_COMPILE_STDCXX_11_testbody])=
+],
++    [ax_cv_cxx_compile_cxx11=3Dyes],
++    [ax_cv_cxx_compile_cxx11=3Dno])])
++  if test x$ax_cv_cxx_compile_cxx11 =3D xyes; then
++    ac_success=3Dyes
++  fi
++
++  m4_if([$1], [noext], [], [dnl
++  if test x$ac_success =3D xno; then
++    for switch in -std=3Dgnu++11 -std=3Dgnu++0x; do
++      cachevar=3DAS_TR_SH([ax_cv_cxx_compile_cxx11_$switch])
++      AC_CACHE_CHECK(whether $CXX supports C++11 features with $switch,
++                     $cachevar,
++        [ac_save_CXXFLAGS=3D"$CXXFLAGS"
++         CXXFLAGS=3D"$CXXFLAGS $switch"
++         AC_COMPILE_IFELSE([AC_LANG_SOURCE([_AX_CXX_COMPILE_STDCXX_11_test=
+body])],
++          [eval $cachevar=3Dyes],
++          [eval $cachevar=3Dno])
++         CXXFLAGS=3D"$ac_save_CXXFLAGS"])
++      if eval test x\$$cachevar =3D xyes; then
++        CXXFLAGS=3D"$CXXFLAGS $switch"
++        ac_success=3Dyes
++        break
++      fi
++    done
++  fi])
++
++  m4_if([$1], [ext], [], [dnl
++  if test x$ac_success =3D xno; then
++    for switch in -std=3Dc++11 -std=3Dc++0x; do
++      cachevar=3DAS_TR_SH([ax_cv_cxx_compile_cxx11_$switch])
++      AC_CACHE_CHECK(whether $CXX supports C++11 features with $switch,
++                     $cachevar,
++        [ac_save_CXXFLAGS=3D"$CXXFLAGS"
++         CXXFLAGS=3D"$CXXFLAGS $switch"
++         AC_COMPILE_IFELSE([AC_LANG_SOURCE([_AX_CXX_COMPILE_STDCXX_11_test=
+body])],
++          [eval $cachevar=3Dyes],
++          [eval $cachevar=3Dno])
++         CXXFLAGS=3D"$ac_save_CXXFLAGS"])
++      if eval test x\$$cachevar =3D xyes; then
++        CXXFLAGS=3D"$CXXFLAGS $switch"
++        ac_success=3Dyes
++        break
++      fi
++    done
++  fi])
++  AC_LANG_POP([C++])
++  if test x$ax_cxx_compile_cxx11_required =3D xtrue; then
++    if test x$ac_success =3D xno; then
++      AC_MSG_ERROR([*** A compiler with support for C++11 language feature=
+s is required.])
++    fi
++  else
++    if test x$ac_success =3D xno; then
++      HAVE_CXX11=3D0
++      AC_MSG_NOTICE([No compiler with C++11 support was found])
++    else
++      HAVE_CXX11=3D1
++      AC_DEFINE(HAVE_CXX11,1,
++                [define if the compiler supports basic C++11 syntax])
++    fi
++
++    AC_SUBST(HAVE_CXX11)
++  fi
++])
 -- =
 
-Sami Kerola
-http://www.iki.fi/kerolasa/
+2.1.2
 
---===============1876868545034979018==--
+
+--===============3425752929715098176==--
 
