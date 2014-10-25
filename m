@@ -1,53 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============8742453320881513188=="
+Content-Type: multipart/mixed; boundary="===============1227188593354024531=="
 MIME-Version: 1.0
 From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH 12/14] add timestamp to html report
-Date: Sat, 25 Oct 2014 18:33:59 +0100
-Message-ID: <1414258441-30099-13-git-send-email-kerolasa@iki.fi>
+Subject: [Powertop] [PATCH 03/14] add missing space to --version print out
+Date: Sat, 25 Oct 2014 18:33:50 +0100
+Message-ID: <1414258441-30099-4-git-send-email-kerolasa@iki.fi>
 In-Reply-To: 1414258441-30099-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8742453320881513188==
+--===============1227188593354024531==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
 ---
- src/report/report.cpp | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ src/main.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/report/report.cpp b/src/report/report.cpp
-index 981e984..cd3c961 100644
---- a/src/report/report.cpp
-+++ b/src/report/report.cpp
-@@ -101,6 +101,8 @@ static string read_os_release(const string &filename)
- static void system_info(void)
+diff --git a/src/main.cpp b/src/main.cpp
+index d3963ed..6e56d8e 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -96,7 +96,7 @@ static const struct option long_options[] =3D
+ =
+
+ static void print_version()
  {
- 	string str;
-+	char version_date[64];
-+	time_t now =3D time(NULL);
+-	printf(_("PowerTOP version" POWERTOP_VERSION ", compiled on " __DATE__ "\=
+n"));
++	printf(_("PowerTOP version " POWERTOP_VERSION ", compiled on " __DATE__ "=
+\n"));
+ }
  =
 
- 	/* div attr css_class and css_id */
- 	tag_attr div_attr;
-@@ -117,7 +119,8 @@ static void system_info(void)
- 	/* Set array of data in row Major order */
- 	string *system_data =3D new string[sys_table.rows * sys_table.cols];
- 	system_data[0]=3D__("PowerTOP Version");
--	system_data[1]=3DPOWERTOP_VERSION;
-+	snprintf(version_date, sizeof(version_date), "%s ran at %s", POWERTOP_VER=
-SION, ctime(&now));
-+	system_data[1]=3Dversion_date;
- =
-
- 	str =3D read_sysfs_string("/proc/version");
- 	size_t  found =3D str.find(" ");
+ static bool set_refresh_timeout()
 -- =
 
 2.1.2
 
 
---===============8742453320881513188==--
+--===============1227188593354024531==--
 
