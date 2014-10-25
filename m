@@ -1,93 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============2326563858840263479=="
+Content-Type: multipart/mixed; boundary="===============4479230213356341223=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] [PATCH v2 1/1] tunables: check usb autosuspend support
- before add
-Date: Mon, 29 Sep 2014 17:52:47 -0700
-Message-ID: <55425.10.24.5.188.1412038367.squirrel@linux.intel.com>
-In-Reply-To: 1408995950-1551-1-git-send-email-nanleychery@gmail.com
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH 14/14] add missing include
+Date: Sat, 25 Oct 2014 18:34:01 +0100
+Message-ID: <1414258441-30099-15-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1414258441-30099-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2326563858840263479==
+--===============4479230213356341223==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+In file included from measurement/sysfs.cpp:27:
+In file included from measurement/../lib.h:59:
+In file included from /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/=
+../../../../include/c++/4.9.1/string:52:
+In file included from /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/=
+../../../../include/c++/4.9.1/bits/basic_string.h:2850:
+In file included from /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/=
+../../../../include/c++/4.9.1/ext/string_conversions.h:41:
+/usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/../../../../include/c+=
++/4.9.1/cstdlib:153:11: error:
+      no member named 'realloc' in the global namespace
+  using ::realloc;
+        ~~^
 
-> Some usb devices do not have drivers that support autosuspend.
-> These drivers should not be added to the list of tunables, because
-> toggling their good/bad value does nothing.
->
-> Signed-off-by: Nanley Chery <nanleychery(a)gmail.com>
-> ---
->
-> Fixed the issue in the previous patch that allowed returning between
-> opendir and closedir (thanks Sergey). Also improve detection of interface
-> folders.
->
->  src/tuning/tuningusb.cpp | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
->
-> diff --git a/src/tuning/tuningusb.cpp b/src/tuning/tuningusb.cpp
-> index 27a6dca..d2a0c11 100644
-> --- a/src/tuning/tuningusb.cpp
-> +++ b/src/tuning/tuningusb.cpp
-> @@ -28,6 +28,7 @@
->  #include "unistd.h"
->  #include "tuningusb.h"
->  #include <string.h>
-> +#include <dirent.h>
->  #include <utility>
->  #include <iostream>
->  #include <fstream>
-> @@ -117,6 +118,7 @@ static void add_usb_callback(const char *d_name)
->  {
->  	class usb_tunable *usb;
->  	char filename[4096];
-> +	DIR *dir;
->
->  	sprintf(filename, "/sys/bus/usb/devices/%s/power/control", d_name);
->  	if (access(filename, R_OK) !=3D 0)
-> @@ -126,6 +128,23 @@ static void add_usb_callback(const char *d_name)
->  	if (access(filename, R_OK)!=3D0)
->  		return;
->
-> +	/* every interface of this device should support autosuspend */
-> +	sprintf(filename, "/sys/bus/usb/devices/%s", d_name);
-> +	if ((dir =3D opendir(filename))) {
-> +		struct dirent *entry;
-> +		while ((entry =3D readdir(dir))) {
-> +			/* dirname: <busnum>-<devnum>...:<config num>-<interface num> */
-> +			if (!isdigit(entry->d_name[0]))
-> +				continue;
-> +			sprintf(filename, "/sys/bus/usb/devices/%s/%s/supports_autosuspend",
-> d_name, entry->d_name);
-> +			if (access(filename, R_OK) =3D=3D 0 && read_sysfs(filename) =3D=3D 0)
-> +				break;
-> +		}
-> +		closedir(dir);
-> +		if (entry)
-> +			return;
-> +	}
-> +
->  	sprintf(filename, "/sys/bus/usb/devices/%s", d_name);
->  	usb =3D new class usb_tunable(filename, d_name);
->  	all_tunables.push_back(usb);
-> --
-> 2.0.4
->
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ src/lib.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-Nanley,
+diff --git a/src/lib.h b/src/lib.h
+index ec50946..5c94271 100644
+--- a/src/lib.h
++++ b/src/lib.h
+@@ -27,6 +27,7 @@
+ =
 
-Thank you very much for sending you patch. It was up-streamed today.
+ #include <libintl.h>
+ #include <stdint.h>
++#include <stdlib.h>
+ =
 
-Alexandra.
+ /* Include only for Automake builds */
+ #ifdef HAVE_CONFIG_H
+-- =
 
---===============2326563858840263479==--
+2.1.2
+
+
+--===============4479230213356341223==--
 
