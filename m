@@ -1,26 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============7318982578767252198=="
+Content-Type: multipart/mixed; boundary="===============3403647059457900500=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: Re: [Powertop] [PATCH v2 6/8] Stop buffer overflow
-Date: Wed, 15 Oct 2014 08:55:00 -0700
-Message-ID: <543E98D4.9050308@linux.intel.com>
-In-Reply-To: 20141015154218.GM1189@swordfish
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH 01/14] configure: require the least automake
+ version 1.11.1
+Date: Sat, 25 Oct 2014 18:33:48 +0100
+Message-ID: <1414258441-30099-2-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1414258441-30099-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7318982578767252198==
+--===============3403647059457900500==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 10/15/2014 08:42 AM, Sergey Senozhatsky wrote:
-> Joe, care to take a second look at those buffer overruns?
+Reported-by: Andreas Mohr <andi(a)lisas.de>
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ configure.ac | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-All review feedback for this series will be addressed over the next few
-days.
+diff --git a/configure.ac b/configure.ac
+index 4991d97..c3f5666 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3,7 +3,11 @@
+ =
 
-This is a "spare time" effort for me, so I can't promise
-grease-lightning turn-around.
+ AC_PREREQ([2.68])
+ AC_INIT([powertop], [2.6.1], [powertop(a)lists.01.org], [], [https://01.or=
+g/powertop])
+-AM_INIT_AUTOMAKE([-Wall foreign])
++AM_INIT_AUTOMAKE([
++	-Wall
++	1.11.1
++	foreign
++])
+ AC_LANG([C++])
+ AC_CONFIG_FILES([
+ 	Makefile
+-- =
 
---===============7318982578767252198==--
+2.1.2
+
+
+--===============3403647059457900500==--
 
