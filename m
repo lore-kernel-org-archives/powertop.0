@@ -1,96 +1,126 @@
-Content-Type: multipart/mixed; boundary="===============1450483272271208059=="
+Content-Type: multipart/mixed; boundary="===============0500430795972552429=="
 MIME-Version: 1.0
-From: Lorenzo Pieralisi <lorenzo.pieralisi at arm.com>
-Subject: Re: [Powertop] [RESEND PATCH] powertop: fix erroneous C state
- detection on ARM
-Date: Tue, 07 Jul 2015 16:04:33 +0100
-Message-ID: <20150707150433.GA4935@red-moon>
-In-Reply-To: 1434362249-21007-1-git-send-email-lorenzo.pieralisi@arm.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] Package C states over Haswell platform
+Date: Tue, 28 Oct 2014 20:37:34 -0700
+Message-ID: <58472.10.255.85.192.1414553854.squirrel@linux.intel.com>
+In-Reply-To: 002401cff2cb$1aeaebc0$50c0c340$@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1450483272271208059==
+--===============0500430795972552429==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 15, 2015 at 10:57:29AM +0100, Lorenzo Pieralisi wrote:
-> When the kernel is configured with CONFIG_CPU_IDLE_MULTIPLE_DRIVERS,
-> the cpuidle directory contains a "driver" subdirectory that confuses
-> the current code parsing the C states on ARM platforms, ending up
-> with a C state entry corresponding to the actual driver name instead
-> of a proper C state entry.
-> =
 
-> This patch fixes the code by stopping the parsing if the files that
-> characterise the C states (ie usage) are not found in the respective:
-> =
+> Hi,
+>
+> I'm working on DELL E7440 platform (Haswell based) with dual OS: Windows
+> 8.1
+> and Ubuntu 14.04.1 (based on 3.13).
+> When I use Win 8.1, using BLA I get ~90% PC7 when idle. However, when I
+> use
+> the Ubuntu, using powertop I get only as high as PC3.
+> Since it's the same platform, it seems to rule out a HW issue. Any idea
+> what
+> can be the problem? Is Haswell fully supported by powertop?
+>
+>           Package   |             Core    |            CPU 0       CPU 2
+>                     |                     | C0 active   0.2%        0.1%
+>                     |                     | POLL        0.0%    0.0 ms
+> 0.0%
+> 0.0 ms
+>                     |                     | C1E-HSW     0.0%    0.1 ms
+> 0.0%
+> 0.0 ms
+> C2 (pc2)    0.1%    |                     |
+> C3 (pc3)    3.7%    | C3 (cc3)    0.0%    | C3-HSW      0.0%    0.4 ms
+> 0.0%
+> 0.4 ms
+> C6 (pc6)    0.0%    | C6 (cc6)    0.0%    | C6-HSW      0.0%    0.0 ms
+> 0.0%
+> 0.2 ms
+> C7 (pc7)    0.0%    | C7 (cc7)   99.0%    | C7s-HSW     0.1%    0.9 ms
+> 0.1%
+> 1.8 ms
+> C8 (pc8)    0.0%    |                     | C8-HSW      0.1%    1.4 ms
+> 0.2%
+> 2.5 ms
+> C9 (pc9)    0.0%    |                     | C9-HSW      0.4%    4.0 ms
+> 2.3%
+> 8.0 ms
+> C10 (pc10)  0.0%    |                     | C10-HSW    98.9%   44.5 ms
+> 97.0%
+> 36.5 ms
+>
+>                     |             Core    |            CPU 1       CPU 3
+>                     |                     | C0 active   0.2%        0.1%
+>                     |                     | POLL        0.0%    0.0 ms
+> 0.0%
+> 0.0 ms
+>                     |                     | C1E-HSW     0.0%    0.0 ms
+> 1.0%
+> 50.1 ms
+>                     |                     |
+>                     | C3 (cc3)    0.0%    | C3-HSW      0.0%    0.7 ms
+> 0.0%
+> 0.6 ms
+>                     | C6 (cc6)    0.0%    | C6-HSW      0.0%    0.5 ms
+> 0.0%
+> 0.0 ms
+>                     | C7 (cc7)   98.0%    | C7s-HSW     0.1%    0.7 ms
+> 0.4%
+> 25.7 ms
+>                     |                     | C8-HSW      0.0%    4.9 ms
+> 0.0%
+> 1.5 ms
+>                     |                     | C9-HSW      0.6%    4.7 ms
+> 0.7%
+> 19.5 ms
+>                     |                     | C10-HSW    98.5%   93.5 ms
+> 97.8%
+> 78.0 ms
+>
+>                     |             GPU     |
+>                     |                     |
+>                     | Powered On 12.1%    |
+>                     | RC6        87.9%    |
+>                     | RC6p        0.0%    |
+>                     | RC6pp       0.0%    |
+>
+> Thanks
+>
+>
+>
+> Rony
+>
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>
 
-> /sys/devices/system/cpu/cpuX/cpuidle
-> =
+Hi Rony,
 
-> subdirectory containing C states information.
-> =
+Interesting you ask this since I presented at the Open source bridge
+conference how to optimize your computer in terms of power using power
+top, as an example I used a Haswell box with Ubuntu.  I also presented on
+the Debian conference a similar talk using Debian distro.
 
-> Signed-off-by: Lorenzo Pieralisi <lorenzo.pieralisi(a)arm.com>
-> Tested-by: Kevin Hilman <khilman(a)linaro.org>
-> ---
-> Alexandra, Arjan,
-> =
 
-> previous posting here:
-> =
+There are few things that may be happening.
 
-> https://lists.01.org/pipermail/powertop/2014-December/001724.html
-> =
+1- I would suggest to update to the latest kernel 3.17.  From 3.13 to 3.17
+there have been few bug fixes that help linux in terms of power
+management.
 
-> Please consider pulling this patch.
+2-At the boot command line of your kernel add the following settings:
 
-Gentle ping.
 
-Thanks,
-Lorenzo
 
-> Thanks,
-> Lorenzo
-> =
+Thank you,
+Alexandra.
 
->  src/cpu/cpu_linux.cpp | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> =
-
-> diff --git a/src/cpu/cpu_linux.cpp b/src/cpu/cpu_linux.cpp
-> index e1ff165..78fd2d3 100644
-> --- a/src/cpu/cpu_linux.cpp
-> +++ b/src/cpu/cpu_linux.cpp
-> @@ -83,7 +83,8 @@ void cpu_linux::parse_cstates_start(void)
->  		if (file) {
->  			file >> usage;
->  			file.close();
-> -		}
-> +		} else
-> +			continue;
->  =
-
->  		sprintf(filename + len, "/%s/time", entry->d_name);
->  =
-
-> @@ -172,7 +173,8 @@ void cpu_linux::parse_cstates_end(void)
->  		if (file) {
->  			file >> usage;
->  			file.close();
-> -		}
-> +		} else
-> +			continue;
->  =
-
->  		sprintf(filename + len, "/%s/time", entry->d_name);
->  =
-
-> -- =
-
-> 1.9.1
->=20
-
---===============1450483272271208059==--
+--===============0500430795972552429==--
 
