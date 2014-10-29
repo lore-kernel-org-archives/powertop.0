@@ -1,300 +1,147 @@
-Content-Type: multipart/mixed; boundary="===============5174616893034399291=="
+Content-Type: multipart/mixed; boundary="===============2049469434091920582=="
 MIME-Version: 1.0
-From: Nanley Chery <nanleychery at gmail.com>
-Subject: [Powertop] [RFC 5/9] runtime_tunable: use udev
-Date: Mon, 01 Jun 2015 09:09:11 -0700
-Message-ID: <1433174955-17349-6-git-send-email-nanleychery@gmail.com>
-In-Reply-To: 1433174955-17349-1-git-send-email-nanleychery@gmail.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] Package C states over Haswell platform
+Date: Tue, 28 Oct 2014 20:57:48 -0700
+Message-ID: <58642.10.255.85.192.1414555068.squirrel@linux.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5174616893034399291==
+--===============2049469434091920582==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Nanley Chery <nanley.g.chery(a)intel.com>
----
- src/devices/runtime_pm.cpp |   7 +++
- src/devices/runtime_pm.h   |   1 +
- src/tuning/runtime.cpp     | 140 ++++++++++++++---------------------------=
-----
- src/tuning/runtime.h       |   6 +-
- 4 files changed, 56 insertions(+), 98 deletions(-)
 
-diff --git a/src/devices/runtime_pm.cpp b/src/devices/runtime_pm.cpp
-index eede027..3dfebf4 100644
---- a/src/devices/runtime_pm.cpp
-+++ b/src/devices/runtime_pm.cpp
-@@ -143,6 +143,13 @@ void runtime_pmdevice::set_human_name(char *_name)
- 	strcpy(humanname, _name);
- }
- =
+>
+>> Hi,
+>>
+>> I'm working on DELL E7440 platform (Haswell based) with dual OS: Windows
+>> 8.1
+>> and Ubuntu 14.04.1 (based on 3.13).
+>> When I use Win 8.1, using BLA I get ~90% PC7 when idle. However, when I
+>> use
+>> the Ubuntu, using powertop I get only as high as PC3.
+>> Since it's the same platform, it seems to rule out a HW issue. Any idea
+>> what
+>> can be the problem? Is Haswell fully supported by powertop?
+>>
+>>           Package   |             Core    |            CPU 0       CPU 2
+>>                     |                     | C0 active   0.2%        0.1%
+>>                     |                     | POLL        0.0%    0.0 ms
+>> 0.0%
+>> 0.0 ms
+>>                     |                     | C1E-HSW     0.0%    0.1 ms
+>> 0.0%
+>> 0.0 ms
+>> C2 (pc2)    0.1%    |                     |
+>> C3 (pc3)    3.7%    | C3 (cc3)    0.0%    | C3-HSW      0.0%    0.4 ms
+>> 0.0%
+>> 0.4 ms
+>> C6 (pc6)    0.0%    | C6 (cc6)    0.0%    | C6-HSW      0.0%    0.0 ms
+>> 0.0%
+>> 0.2 ms
+>> C7 (pc7)    0.0%    | C7 (cc7)   99.0%    | C7s-HSW     0.1%    0.9 ms
+>> 0.1%
+>> 1.8 ms
+>> C8 (pc8)    0.0%    |                     | C8-HSW      0.1%    1.4 ms
+>> 0.2%
+>> 2.5 ms
+>> C9 (pc9)    0.0%    |                     | C9-HSW      0.4%    4.0 ms
+>> 2.3%
+>> 8.0 ms
+>> C10 (pc10)  0.0%    |                     | C10-HSW    98.9%   44.5 ms
+>> 97.0%
+>> 36.5 ms
+>>
+>>                     |             Core    |            CPU 1       CPU 3
+>>                     |                     | C0 active   0.2%        0.1%
+>>                     |                     | POLL        0.0%    0.0 ms
+>> 0.0%
+>> 0.0 ms
+>>                     |                     | C1E-HSW     0.0%    0.0 ms
+>> 1.0%
+>> 50.1 ms
+>>                     |                     |
+>>                     | C3 (cc3)    0.0%    | C3-HSW      0.0%    0.7 ms
+>> 0.0%
+>> 0.6 ms
+>>                     | C6 (cc6)    0.0%    | C6-HSW      0.0%    0.5 ms
+>> 0.0%
+>> 0.0 ms
+>>                     | C7 (cc7)   98.0%    | C7s-HSW     0.1%    0.7 ms
+>> 0.4%
+>> 25.7 ms
+>>                     |                     | C8-HSW      0.0%    4.9 ms
+>> 0.0%
+>> 1.5 ms
+>>                     |                     | C9-HSW      0.6%    4.7 ms
+>> 0.7%
+>> 19.5 ms
+>>                     |                     | C10-HSW    98.5%   93.5 ms
+>> 97.8%
+>> 78.0 ms
+>>
+>>                     |             GPU     |
+>>                     |                     |
+>>                     | Powered On 12.1%    |
+>>                     | RC6        87.9%    |
+>>                     | RC6p        0.0%    |
+>>                     | RC6pp       0.0%    |
+>>
+>> Thanks
+>>
+>>
+>>
+>> Rony
+>>
+>> _______________________________________________
+>> PowerTop mailing list
+>> PowerTop(a)lists.01.org
+>> https://lists.01.org/mailman/listinfo/powertop
+>>
 
-+int udevice_has_runtime_pm(struct udev_device* udevice)
-+{
-+	const char *sus_t =3D udev_device_get_sysattr_value(udevice, "power/runti=
-me_suspended_time");
-+	const char *act_t =3D udev_device_get_sysattr_value(udevice, "power/runti=
-me_active_time");
-+	return (sus_t !=3D NULL &&
-+			(atoi(sus_t) || (act_t !=3D NULL && atoi(act_t))));
-+}
- =
+Hi Rony,
 
- int device_has_runtime_pm(const char *sysfs_path)
- {
-diff --git a/src/devices/runtime_pm.h b/src/devices/runtime_pm.h
-index ea09dac..0676ca3 100644
---- a/src/devices/runtime_pm.h
-+++ b/src/devices/runtime_pm.h
-@@ -60,6 +60,7 @@ public:
- extern void create_all_runtime_pm_devices(void);
- =
+Interesting you ask this since I presented at the Open source bridge =
 
- extern int device_has_runtime_pm(const char *sysfs_path);
-+extern int udevice_has_runtime_pm(struct udev_device* udevice);
- =
-
- =
-
- #endif
-\ No newline at end of file
-diff --git a/src/tuning/runtime.cpp b/src/tuning/runtime.cpp
-index 3201fdd..463372d 100644
---- a/src/tuning/runtime.cpp
-+++ b/src/tuning/runtime.cpp
-@@ -25,135 +25,83 @@
- =
-
- #include "tuning.h"
- #include "tunable.h"
--#include "unistd.h"
- #include "runtime.h"
- #include <string.h>
- #include <utility>
--#include <iostream>
--#include <fstream>
- #include <unistd.h>
- #include <sys/types.h>
--#include <dirent.h>
- =
-
- #include "../lib.h"
- #include "../devices/runtime_pm.h"
- =
-
--runtime_tunable::runtime_tunable(const char *path, const char *bus, const =
-char *dev) : tunable("", 0.4, _("Good"), _("Bad"), _("Unknown"))
-+runtime_tunable::runtime_tunable(struct udev_device* udev_device) :
-+	tunable("", 0.4, _("Good"), _("Bad"), _("Unknown")), tun_dev(udev_device)
- {
--	ifstream file;
--	sprintf(runtime_path, "%s/power/control", path);
--
--
--	sprintf(desc, _("Runtime PM for %s device %s"), bus, dev);
--	if (!device_has_runtime_pm(path))
--		sprintf(desc, _("%s device %s has no runtime power management"), bus, de=
-v);
-+	udev_device_ref(tun_dev);
-+	const char *bus =3D udev_device_get_subsystem(udev_device);
-+	const char *dev =3D udev_device_get_sysname(udev_device);
- =
-
-+	/* Give more accurate descriptions for PCI devices */
- 	if (strcmp(bus, "pci") =3D=3D 0) {
--		char filename[4096];
--		uint16_t vendor =3D 0, device =3D 0;
--
--		sprintf(filename, "/sys/bus/%s/devices/%s/vendor", bus, dev);
--
--		file.open(filename, ios::in);
--		if (file) {
--			file >> hex >> vendor;
--			file.close();
--		}
--
--
--		sprintf(filename, "/sys/bus/%s/devices/%s/device", bus, dev);
--		file.open(filename, ios::in);
--		if (file) {
--			file >> hex >> device;
--			file.close();
--		}
--
-+		const char *uvendor =3D udev_device_get_sysattr_value(udev_device, "vend=
-or");
-+		const char *udevice =3D udev_device_get_sysattr_value(udev_device, "devi=
-ce");
-+		uint16_t vendor =3D stoul(string(uvendor), NULL, 16);
-+		uint16_t device =3D stoul(string(udevice), NULL, 16);
-+		bus =3D "PCI";
- 		if (vendor && device) {
--			if (!device_has_runtime_pm(path))
--				sprintf(desc, _("PCI Device %s has no runtime power management"), pci_=
-id_to_name(vendor, device, filename, 4095));
--			else
--				sprintf(desc, _("Runtime PM for PCI Device %s"), pci_id_to_name(vendor=
-, device, filename, 4095));
-+			char filename[4096];
-+			dev =3D pci_id_to_name(vendor, device, filename, 4095);
- 		}
-+	}
- =
-
-+	if (!udevice_has_runtime_pm(udev_device))
-+		sprintf(desc, _("%s device %s has no runtime power management"), bus, de=
-v);
-+	else
-+		sprintf(desc, _("Runtime PM for %s device %s"), bus, dev);
- =
-
--	}
--	sprintf(toggle_good, "echo 'auto' > '%s';", runtime_path);
--	sprintf(toggle_bad, "echo 'on' > '%s';", runtime_path);
-+	const char *path =3D udev_device_get_syspath(udev_device);
-+	sprintf(toggle_good, "echo 'auto' > '%s/power/control';", path);
-+	sprintf(toggle_bad, "echo 'on' > '%s/power/control';", path);
- }
- =
-
--int runtime_tunable::good_bad(void)
-+runtime_tunable::~runtime_tunable()
- {
--	string content;
--
--	content =3D read_sysfs_string(runtime_path);
-+	udev_device_unref(tun_dev);
-+}
- =
-
--	if (strcmp(content.c_str(), "auto") =3D=3D 0)
--		return TUNE_GOOD;
- =
-
--	return TUNE_BAD;
-+int runtime_tunable::good_bad(void)
-+{
-+	const char * str1 =3D udev_device_get_sysattr_value(tun_dev, "power/contr=
-ol");
-+	return strcmp(str1, "auto") =3D=3D 0 ? TUNE_GOOD : TUNE_BAD;
- }
- =
-
- void runtime_tunable::toggle(void)
- {
--	int good;
--	good =3D good_bad();
--
--	if (good =3D=3D TUNE_GOOD) {
--		write_sysfs(runtime_path, "on");
--		return;
--	}
--
--	write_sysfs(runtime_path, "auto");
-+	std::string str =3D good_bad() =3D=3D TUNE_GOOD ? "on" : "auto";
-+	udev_device_set_sysattr_value(tun_dev, "power/control", &str[0]);
- }
- =
-
- const char *runtime_tunable::toggle_script(void)
- {
--	int good;
--	good =3D good_bad();
--
--	if (good =3D=3D TUNE_GOOD) {
--		return toggle_bad;
--	}
--
--	return toggle_good;
-+	return good_bad() =3D=3D TUNE_GOOD ? toggle_bad : toggle_good;
- }
- =
-
--
--void add_runtime_tunables(const char *bus)
-+static void add_runtime_callback(const char *path)
- {
--	struct dirent *entry;
--	DIR *dir;
--	char filename[4096];
--
--	sprintf(filename, "/sys/bus/%s/devices/", bus);
--	dir =3D opendir(filename);
--	if (!dir)
--		return;
--	while (1) {
--		class runtime_tunable *runtime;
--
--		entry =3D readdir(dir);
-+	struct udev_device *dev =3D udev_device_new_from_syspath(get_udev(), path=
-);
-+	runtime_tunable *runtime =3D new runtime_tunable(dev);
- =
-
--		if (!entry)
--			break;
--		if (entry->d_name[0] =3D=3D '.')
--			continue;
-+	if (!udevice_has_runtime_pm(dev))
-+		all_untunables.push_back(runtime);
-+	else
-+		all_tunables.push_back(runtime);
- =
-
--		sprintf(filename, "/sys/bus/%s/devices/%s/power/control", bus, entry->d_=
-name);
--
--		if (access(filename, R_OK) !=3D 0)
--			continue;
--
--
--		sprintf(filename, "/sys/bus/%s/devices/%s", bus, entry->d_name);
--
--		runtime =3D new class runtime_tunable(filename, bus, entry->d_name);
--
--		if (!device_has_runtime_pm(filename))
--			all_untunables.push_back(runtime);
--		else
--			all_tunables.push_back(runtime);
-+	/* Cleanup */
-+	udev_device_unref(dev);
-+}
- =
-
--	}
--	closedir(dir);
-+void add_runtime_tunables(const char *bus)
-+{
-+	process_subsystem(bus, add_runtime_callback, 1, "+power/control", NULL);
- }
-diff --git a/src/tuning/runtime.h b/src/tuning/runtime.h
-index a3c3e20..29307dd 100644
---- a/src/tuning/runtime.h
-+++ b/src/tuning/runtime.h
-@@ -31,9 +31,11 @@
- using namespace std;
- =
-
- class runtime_tunable : public tunable {
--	char runtime_path[4096];
-+	struct udev_device *tun_dev;
- public:
--	runtime_tunable(const char *runtime_path, const char *bus, const char *de=
-v);
-+	runtime_tunable(struct udev_device* udev);
-+
-+	~runtime_tunable(void);
- =
-
- 	virtual int good_bad(void);
- =
-
--- =
-
-2.4.1
+conference a case study on how to optimize your computer in terms of power
+using PowerTOP, as an example I used a Haswell box with Ubuntu.  I also
+presented on the Debian conference a similar talk using Debian distro.
+Both talks happened this year.
 
 
---===============5174616893034399291==--
+There are few things that may be happening.
+
+ 1- Update to the latest kernel 3.17.  From 3.13 to 3.17
+there have been few bug fixes that help linux in terms of power
+ management.
+
+ 2-At the boot command line of your kernel add the following settings:
+       i915.enable_psr=3D1
+       i915.enable_fbc=3D1
+       pcie_aspm=3Dforce
+
+The first command enables the graphics card use panel self refresh, the
+second  enables frame buffer compression. The third command helps the
+network card enter D3 state.
+http://wireless.kernel.org/en/users/Documentation/ASPM#Enabling_ASPM_with_s=
+etpci
+
+ 3- Use PowerTOP/tunables to tune power management for all your devices. =
+
+If none of the settings disrupt the proper usability of the computer add =
+
+then to a script file and run this each time you restart your computer. =
+
+Alternatively you can use powertop --auto_tune
+
+
+Run PowerTOP at this point you should see your system reaching a deep
+power state.
+
+Thank you,
+Alexandra.
+
+--===============2049469434091920582==--
 
