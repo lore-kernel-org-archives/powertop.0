@@ -1,99 +1,86 @@
-Content-Type: multipart/mixed; boundary="===============0500430795972552429=="
+Content-Type: multipart/mixed; boundary="===============8052949494440864286=="
 MIME-Version: 1.0
 From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] Package C states over Haswell platform
-Date: Tue, 28 Oct 2014 20:37:34 -0700
-Message-ID: <58472.10.255.85.192.1414553854.squirrel@linux.intel.com>
-In-Reply-To: 002401cff2cb$1aeaebc0$50c0c340$@gmail.com
+Subject: Re: [Powertop] [PATCH 00/14] pull: various changes,
+ mostly build system related
+Date: Fri, 31 Oct 2014 16:07:49 -0700
+Message-ID: <53905.10.24.5.246.1414796869.squirrel@linux.intel.com>
+In-Reply-To: 1414258441-30099-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0500430795972552429==
+--===============8052949494440864286==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Hi Sami,
 
-> Hi,
+> Hello,
 >
-> I'm working on DELL E7440 platform (Haswell based) with dual OS: Windows
-> 8.1
-> and Ubuntu 14.04.1 (based on 3.13).
-> When I use Win 8.1, using BLA I get ~90% PC7 when idle. However, when I
-> use
-> the Ubuntu, using powertop I get only as high as PC3.
-> Since it's the same platform, it seems to rule out a HW issue. Any idea
-> what
-> can be the problem? Is Haswell fully supported by powertop?
->
->           Package   |             Core    |            CPU 0       CPU 2
->                     |                     | C0 active   0.2%        0.1%
->                     |                     | POLL        0.0%    0.0 ms
-> 0.0%
-> 0.0 ms
->                     |                     | C1E-HSW     0.0%    0.1 ms
-> 0.0%
-> 0.0 ms
-> C2 (pc2)    0.1%    |                     |
-> C3 (pc3)    3.7%    | C3 (cc3)    0.0%    | C3-HSW      0.0%    0.4 ms
-> 0.0%
-> 0.4 ms
-> C6 (pc6)    0.0%    | C6 (cc6)    0.0%    | C6-HSW      0.0%    0.0 ms
-> 0.0%
-> 0.2 ms
-> C7 (pc7)    0.0%    | C7 (cc7)   99.0%    | C7s-HSW     0.1%    0.9 ms
-> 0.1%
-> 1.8 ms
-> C8 (pc8)    0.0%    |                     | C8-HSW      0.1%    1.4 ms
-> 0.2%
-> 2.5 ms
-> C9 (pc9)    0.0%    |                     | C9-HSW      0.4%    4.0 ms
-> 2.3%
-> 8.0 ms
-> C10 (pc10)  0.0%    |                     | C10-HSW    98.9%   44.5 ms
-> 97.0%
-> 36.5 ms
->
->                     |             Core    |            CPU 1       CPU 3
->                     |                     | C0 active   0.2%        0.1%
->                     |                     | POLL        0.0%    0.0 ms
-> 0.0%
-> 0.0 ms
->                     |                     | C1E-HSW     0.0%    0.0 ms
-> 1.0%
-> 50.1 ms
->                     |                     |
->                     | C3 (cc3)    0.0%    | C3-HSW      0.0%    0.7 ms
-> 0.0%
-> 0.6 ms
->                     | C6 (cc6)    0.0%    | C6-HSW      0.0%    0.5 ms
-> 0.0%
-> 0.0 ms
->                     | C7 (cc7)   98.0%    | C7s-HSW     0.1%    0.7 ms
-> 0.4%
-> 25.7 ms
->                     |                     | C8-HSW      0.0%    4.9 ms
-> 0.0%
-> 1.5 ms
->                     |                     | C9-HSW      0.6%    4.7 ms
-> 0.7%
-> 19.5 ms
->                     |                     | C10-HSW    98.5%   93.5 ms
-> 97.8%
-> 78.0 ms
->
->                     |             GPU     |
->                     |                     |
->                     | Powered On 12.1%    |
->                     | RC6        87.9%    |
->                     | RC6p        0.0%    |
->                     | RC6pp       0.0%    |
->
-> Thanks
+> Here is my next random collection of various small changes here and there
+> in source tree.  Many of the changes has relation to build system, and
+> the remainign one are reactions to compiler complaints found after build
+> system teaks.  I hope these changes are reviewed before next release, and
+> in best case they might even be part of it.
 >
 >
+> ----------------------------------------------------------------
+> The following changes since commit
+> 41c54e81145a0f35c2bd576a0ee57c3844dee710:
 >
-> Rony
+>   allow none-ncurses messaging with ui_notify_user() (2014-09-29 11:34:25
+> -0700)
+>
+> are available in the git repository at:
+>
+>   git://github.com/kerolasa/powertop.git various
+>
+> for you to fetch changes up to e6663e420abb526523fa1a7fda42661801480155:
+>
+>   add missing include (2014-10-25 11:16:36 +0100)
+> ----------------------------------------------------------------
+> Sami Kerola (14):
+>   configure: require the least automake version 1.11.1
+>   configure: use autoconf-archive ax_pthread.m4
+>   add missing space to --version print out
+>   csstoh.sh: check every single return value
+>   configure: use AC_USE_SYSTEM_EXTENSIONS to determine features
+>   powertop.m4: GCC_FORTIFY_SOURCE_CC copy idea of macro from Archlinux
+>     pacman
+>   configure: use autoconf-archive ax_cxx_compile_stdcxx_11.m4
+>   main: fix incompatible operand type
+>   move variables to protected scope
+>   make --quiet option to suppress various info messages
+>   squeeze all extra bits from size of binary and html report
+>   add timestamp to html report
+>   fix typo in message
+>   add missing include
+>
+>  .gitignore                           |  39 +++-
+>  PowerTop.png                         | Bin 6975 -> 5542 bytes
+>  configure.ac                         |  21 ++-
+>  m4/ax_cxx_compile_stdcxx_11.m4       | 142 +++++++++++++++
+>  m4/ax_pthread.m4                     | 332
+> +++++++++++++++++++++++++++++++++++
+>  m4/gcc_fortify_source_cc.m4          |  29 +++
+>  src/Makefile.am                      |   1 -
+>  src/cpu/rapl/rapl_interface.cpp      |   7 +-
+>  src/cpu/rapl/rapl_interface.h        |   9 +-
+>  src/csstoh.sh                        |  40 +++--
+>  src/lib.h                            |   1 +
+>  src/main.cpp                         |   8 +-
+>  src/report/report-formatter-base.cpp |   2 -
+>  src/report/report-formatter-csv.cpp  |   2 -
+>  src/report/report-formatter-html.cpp | 248 +++++++++++++-------------
+>  src/report/report.cpp                |   5 +-
+>  16 files changed, 719 insertions(+), 167 deletions(-)
+>  create mode 100644 m4/ax_cxx_compile_stdcxx_11.m4
+>  create mode 100644 m4/ax_pthread.m4
+>  create mode 100644 m4/gcc_fortify_source_cc.m4
+>
+> --
+> 2.1.2
 >
 > _______________________________________________
 > PowerTop mailing list
@@ -101,26 +88,31 @@ Content-Transfer-Encoding: quoted-printable
 > https://lists.01.org/mailman/listinfo/powertop
 >
 
-Hi Rony,
 
-Interesting you ask this since I presented at the Open source bridge
-conference how to optimize your computer in terms of power using power
-top, as an example I used a Haswell box with Ubuntu.  I also presented on
-the Debian conference a similar talk using Debian distro.
+Keep in mind that for PowerTOP patches there is a turnaround cycle of
+about two weeks give and take.  This gives the maintainer and the
+community time to check your work.
 
+Here is my first pass for your patches:
 
-There are few things that may be happening.
+3, 4, 5, 6, 8, 10, 11, 12, 13, 14: At glance look good. They need testing.
 
-1- I would suggest to update to the latest kernel 3.17.  From 3.13 to 3.17
-there have been few bug fixes that help linux in terms of power
-management.
+1: Require at least automake 1.12.2 to avoid exploitable issues with
+earlier versions.
 
-2-At the boot command line of your kernel add the following settings:
+9: Looks good. However, what is the object of moving
+measurment_interval(def_sampling_interval) to be after first_cpu(cpu)?
 
+2: Please explain what is the difference from what we have to what you
+propose?
 
+7: This one makes no sense as-is. Please update the commit message
+explaining why the patch is necessary. As far as I can tell from the
+PowerTOP source code, it doesn't use C++11, so I don't understand why it
+would be necessary to fail.
 
 Thank you,
 Alexandra.
 
---===============0500430795972552429==--
+--===============8052949494440864286==--
 
