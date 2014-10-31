@@ -1,43 +1,84 @@
-Content-Type: multipart/mixed; boundary="===============1985503468525266610=="
+Content-Type: multipart/mixed; boundary="===============2162342601568962191=="
 MIME-Version: 1.0
-From: Andreas Mohr <andi at lisas.de>
-Subject: Re: [Powertop] powertop hci tools bug report
-Date: Sat, 19 Mar 2016 11:13:44 +0100
-Message-ID: <20160319101344.GA28156@rhlx01.hs-esslingen.de>
-In-Reply-To: CA+z5DszTAPK48juHex0kxgMcjQu4upfKO9yKFK1oU7T0hmR2=Q@mail.gmail.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] Complete build options for Pthread API
+Date: Thu, 30 Oct 2014 20:35:27 -0700
+Message-ID: <50509.10.252.141.137.1414726527.squirrel@linux.intel.com>
+In-Reply-To: CAG27Bk1t+2ZjJbrywNJYN+Hco+W+P-hGRsL9HsLcW7gyNXmVJA@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1985503468525266610==
+--===============2162342601568962191==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
 
-On Fri, Mar 18, 2016 at 12:00:02PM -0700, powertop-request(a)lists.01.org w=
-rote:
-> Date: Fri, 18 Mar 2016 10:42:26 +1100
-> From: Blair Bethwaite <blair.bethwaite(a)gmail.com>
+> On 25 October 2014 09:58, Sergey Senozhatsky
+> <sergey.senozhatsky(a)gmail.com> wrote:
+>> On (10/22/14 15:33), Sami Kerola wrote:
+>>> On 22 October 2014 13:41, Sergey Senozhatsky
+>>> <sergey.senozhatsky(a)gmail.com> wrote:
+>>> > m4/* files are host-specific. they should never be part
+>>> > of the source code or a package.
+>>>
+>>> I would not say it so strongly. There are plenty of projects that have
+>>> files in m4 directory. Here's couple.
+>>>
+>>> http://git.savannah.gnu.org/gitweb/?p=3Dcoreutils.git;a=3Dtree;f=3Dm4
+>>> https://github.com/karelzak/util-linux/tree/master/m4
+>>
+>> yes, but powertop does not use any optional m4 macros/libs that
+>> are not basically available (afaik).
+>
+> Proposal to use AX_PTHREAD means that will change.
+>
+> Looking autoconf release notes
+>
+> http://lwn.net/Articles/531373/
+>
+> It might be possible to make m4 copies to go to AC_CONFIG_MACRO_DIR,
+> while AC_CONFIG_MACRO_DIRS informs project specific m4 search patch.
+> Assuming this sort of thing is tried it also looks like the autoconf
+> version requirement will need to be pumped to 1.13 from 1.11.1. Please
+> notice that I haven't ever tried to use multiple m4 directories, so
+> this is reply is based on tons of assumptions without real experience
+> or tests about topic. The minimum I need to make progress with
+> separation is a decision what is the path for project local m4 files.
+>
+> That said autotools documentation
+>
+> http://www.gnu.org/software/automake/manual/html_node/Local-Macros.html
+>
+> is telling use of m4 directory is fine, and 'there is no consensus on
+> the distribution of third-party macros'.
+>
+> Considering the above I'm 87.5% sure using m4/ directory initially to
+> introduce AX_PTHREAD is OK. If needed/wanted/etc later changes can
+> move the data around, set autoconf requirement higher, and so on what
+> ever might come as aside effect.
+>
+>>  https://lists.01.org/pipermail/powertop/2013-June/000855.html
+>
+> I do not understand how that message relates to m4 directories.
+>
+> --
+> Sami Kerola
+> http://www.iki.fi/kerolasa/
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>
 
+What is the the return on investment for this feature in terms of
+performance?
 
-> Anyhoo, bug report here from an Ubuntu Wily machine. Powertop is
-> currently hard-coding the location of hciconfig and friends in
-> src/tuning/bluetooth.cpp to /usr/sbin/hciconfig. On my platform
-> hciconfig lives in /bin.
-> =
+At the moment PowerTOP builds with in 40 seconds from source and building
+the package takes ~15 seconds.
 
-> This should probably be discovered via configure. Only other
-> questionable hard-coding seems to be for xset.
+Thank you,
+Alexandra.
 
-Or, possibly better (or maybe not?), try using
-"/usr/bin/env hciconfig",
-since that is what scripts often use in their shebang line
-to be a lot more universal about location of the required interpreter.
-
-https://en.wikipedia.org/wiki/Shebang_%28Unix%29
-
-Andreas Mohr
-
---===============1985503468525266610==--
+--===============2162342601568962191==--
 
