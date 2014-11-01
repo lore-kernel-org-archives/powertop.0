@@ -1,38 +1,63 @@
-Content-Type: multipart/mixed; boundary="===============4724197073707590310=="
+Content-Type: multipart/mixed; boundary="===============2934837100682736358=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] Addition of two include guards?
-Date: Thu, 13 Nov 2014 20:42:06 -0800
-Message-ID: <62409.10.254.178.169.1415940126.squirrel@linux.intel.com>
-In-Reply-To: 54552091.4010609@users.sourceforge.net
+From: SF Markus Elfring <elfring at users.sourceforge.net>
+Subject: [Powertop] Addition of two include guards?
+Date: Sat, 01 Nov 2014 19:04:01 +0100
+Message-ID: <54552091.4010609@users.sourceforge.net>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4724197073707590310==
+--===============2934837100682736358==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Hello,
 
-> Hello,
->
-> I suggest to add include guards to two header files so that their reuse
-> might
-> become a bit safer.
-> https://www.securecoding.cert.org/confluence/display/cplusplus/PRE06-CPP.=
-+Enclose+header+files+in+an+inclusion+guard
->
-> Regards,
-> Markus
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->
-Patch was added.
+I suggest to add include guards to two header files so that their reuse mig=
+ht
+become a bit safer.
+https://www.securecoding.cert.org/confluence/display/cplusplus/PRE06-CPP.+E=
+nclose+header+files+in+an+inclusion+guard
 
-Thank you,
-Alexandra.
+Regards,
+Markus
 
---===============4724197073707590310==--
+--===============2934837100682736358==
+Content-Type: text/x-patch
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="0001-Addition-of-two-include-guards.patch"
+
+PkZyb20gZmQ3ZDNjNTkyN2FhYzhjNDc0YWM0NGY1YjBlMDBmNTc2OGE4Y2IyNCBNb24gU2VwIDE3
+IDAwOjAwOjAwIDIwMDEKRnJvbTogTWFya3VzIEVsZnJpbmcgPGVsZnJpbmdAdXNlcnMuc291cmNl
+Zm9yZ2UubmV0PgpEYXRlOiBTYXQsIDEgTm92IDIwMTQgMTg6NTg6MzggKzAxMDAKU3ViamVjdDog
+W1BBVENIXSBBZGRpdGlvbiBvZiB0d28gaW5jbHVkZSBndWFyZHMKClVuaXF1ZSBpbmNsdWRlIGd1
+YXJkcyB3ZXJlIGFkZGVkIHRvIHR3byBoZWFkZXIgZmlsZXMgdG8gbWFrZSB0aGVpciByZXVzZQph
+IGJpdCBzYWZlci4KaHR0cHM6Ly93d3cuc2VjdXJlY29kaW5nLmNlcnQub3JnL2NvbmZsdWVuY2Uv
+ZGlzcGxheS9jcGx1c3BsdXMvUFJFMDYtQ1BQLitFbmNsb3NlK2hlYWRlcitmaWxlcytpbithbitp
+bmNsdXNpb24rZ3VhcmQKClNpZ25lZC1vZmYtYnk6IE1hcmt1cyBFbGZyaW5nIDxlbGZyaW5nQHVz
+ZXJzLnNvdXJjZWZvcmdlLm5ldD4KLS0tCiBzcmMvY3B1L2ludGVsX2NwdXMuaCAgICAgICAgICB8
+IDQgKysrKwogc3JjL3JlcG9ydC9yZXBvcnQtZGF0YS1odG1sLmggfCA0ICsrKysKIDIgZmlsZXMg
+Y2hhbmdlZCwgOCBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvc3JjL2NwdS9pbnRlbF9jcHVz
+LmggYi9zcmMvY3B1L2ludGVsX2NwdXMuaAppbmRleCBjZGU0YTJkLi44MTBhMjQzIDEwMDY0NAot
+LS0gYS9zcmMvY3B1L2ludGVsX2NwdXMuaAorKysgYi9zcmMvY3B1L2ludGVsX2NwdXMuaApAQCAt
+MSwzICsxLDUgQEAKKyNpZm5kZWYgUG93ZXJUb3BfSU5URUxfQ1BVU19IXzg0RjA5RkI0RjUxOTQ3
+MEZBOTE0QUE5QjAyNDUzMjIxCisjZGVmaW5lIFBvd2VyVG9wX0lOVEVMX0NQVVNfSF84NEYwOUZC
+NEY1MTk0NzBGQTkxNEFBOUIwMjQ1MzIyMQogLyoKICAqIENvcHlyaWdodCAyMDEwLCBJbnRlbCBD
+b3Jwb3JhdGlvbgogICoKQEAgLTE3MSwzICsxNzMsNSBAQCBwdWJsaWM6CiAKIGludCBpc19zdXBw
+b3J0ZWRfaW50ZWxfY3B1KGludCBtb2RlbCk7CiBpbnQgYnl0X2hhc19haGNpKCk7CisKKyNlbmRp
+ZgpkaWZmIC0tZ2l0IGEvc3JjL3JlcG9ydC9yZXBvcnQtZGF0YS1odG1sLmggYi9zcmMvcmVwb3J0
+L3JlcG9ydC1kYXRhLWh0bWwuaAppbmRleCA2MTZiMjk0Li5mYTc5NmU5IDEwMDY0NAotLS0gYS9z
+cmMvcmVwb3J0L3JlcG9ydC1kYXRhLWh0bWwuaAorKysgYi9zcmMvcmVwb3J0L3JlcG9ydC1kYXRh
+LWh0bWwuaApAQCAtMSwzICsxLDYgQEAKKyNpZm5kZWYgUG93ZXJUb3BfUkVQT1JUX0RBVEFfSFRN
+TF9IX0M1OEMxMTY0MTEyMzRBMzRBQzJFRkI4RDIzQTY5NzEzCisjZGVmaW5lIFBvd2VyVG9wX1JF
+UE9SVF9EQVRBX0hUTUxfSF9DNThDMTE2NDExMjM0QTM0QUMyRUZCOEQyM0E2OTcxMworCiAjaW5j
+bHVkZSA8c3RyaW5nPgogI2luY2x1ZGUgPHNzdHJlYW0+CiAKQEAgLTY3LDMgKzcwLDQgQEAgaW5p
+dF90dW5lX3RhYmxlX2F0dHIoc3RydWN0IHRhYmxlX2F0dHJpYnV0ZXMgKnRhYmxlX2NzcywgaW50
+IHJvd3MsIGludCBjb2xzKTsKIHN0cmluZwogZG91YmxlX3RvX3N0cmluZyhkb3VibGUgZHZhbCk7
+CiAKKyNlbmRpZgotLSAKMi4xLjMKCg==
+
+--===============2934837100682736358==--
 
