@@ -1,47 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============5326189806380919366=="
+Content-Type: multipart/mixed; boundary="===============6847153111695537803=="
 MIME-Version: 1.0
-From: Stewart Smith <stewart at linux.vnet.ibm.com>
-Subject: [Powertop] [PATCH 0/2] powerpc powernv platform support
-Date: Fri, 27 Nov 2015 11:07:27 +1100
-Message-ID: <1448582849-1707-1-git-send-email-stewart@linux.vnet.ibm.com>
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] Addition of two include guards?
+Date: Sun, 02 Nov 2014 11:17:01 -0800
+Message-ID: <57550.10.254.189.210.1414955821.squirrel@linux.intel.com>
+In-Reply-To: 54552091.4010609@users.sourceforge.net
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5326189806380919366==
+--===============6847153111695537803==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi!
 
-These two patches get powertop to work on current powernv machines.
+> Hello,
+>
+> I suggest to add include guards to two header files so that their reuse
+> might
+> become a bit safer.
+> https://www.securecoding.cert.org/confluence/display/cplusplus/PRE06-CPP.=
++Enclose+header+files+in+an+inclusion+guard
+>
+> Regards,
+> Markus
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>
 
-These are POWER8 based systems from IBM (and others) running OPAL firmware.
+the link is not available.
 
-The first patch correctly parses /proc/cpuinfo so information about
-processors and pstates is displayed (at all).
+Thank you,
+Alexandra.
 
-The second uses the existing userspace interface for getting power consumpt=
-ion.
-
-Stewart Smith (2):
-  cpu: support powerpc /proc/cpuinfo
-  Add support for power consumption sensors through opal-sensors sysfs
-
- src/Makefile.am                  |  2 ++
- src/cpu/cpu.cpp                  | 20 ++++++----------
- src/measurement/measurement.cpp  | 14 +++++++++++
- src/measurement/opal-sensors.cpp | 50 ++++++++++++++++++++++++++++++++++++=
-++++
- src/measurement/opal-sensors.h   | 41 ++++++++++++++++++++++++++++++++
- 5 files changed, 114 insertions(+), 13 deletions(-)
- create mode 100644 src/measurement/opal-sensors.cpp
- create mode 100644 src/measurement/opal-sensors.h
-
--- =
-
-2.1.4
-
-
---===============5326189806380919366==--
+--===============6847153111695537803==--
 
