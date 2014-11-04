@@ -1,63 +1,29 @@
-Content-Type: multipart/mixed; boundary="===============1926319236561696642=="
+Content-Type: multipart/mixed; boundary="===============3102788338478031379=="
 MIME-Version: 1.0
-From: Stewart Smith <stewart at linux.vnet.ibm.com>
-Subject: [Powertop] [PATCH 1/2] cpu: support powerpc /proc/cpuinfo
-Date: Fri, 27 Nov 2015 11:07:28 +1100
-Message-ID: <1448582849-1707-2-git-send-email-stewart@linux.vnet.ibm.com>
-In-Reply-To: 1448582849-1707-1-git-send-email-stewart@linux.vnet.ibm.com
+From: Chris Samuel <chris at csamuel.org>
+Subject: Re: [Powertop] Testing CERT links
+Date: Tue, 04 Nov 2014 22:02:25 +1100
+Message-ID: <3295408.YIOQ8Ivq3Q@quad>
+In-Reply-To: 63125.10.24.4.135.1415036127.squirrel@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1926319236561696642==
+--===============3102788338478031379==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Clean up duplicate code added for ARM and add support for what
-seems to be a good deliminator on ppc64.
+On Mon, 3 Nov 2014 09:35:27 AM Alexandra Yates wrote:
 
-This patch makes powertop pick up CPUs on powernv platform.
+> Still not available. See attached.
 
-Signed-off-by: Stewart Smith <stewart(a)linux.vnet.ibm.com>
----
- src/cpu/cpu.cpp | 20 +++++++-------------
- 1 file changed, 7 insertions(+), 13 deletions(-)
+Both CERT links work for me here, it's a CNAME for meadow.red.cert.org.
 
-diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-index 9ca320f50449..64e1d3d9feab 100644
---- a/src/cpu/cpu.cpp
-+++ b/src/cpu/cpu.cpp
-@@ -285,19 +285,13 @@ void enumerate_cpus(void)
- 				model =3D strtoull(c, NULL, 10);
- 			}
- 		}
--		if (strncasecmp(line, "bogomips\t", 9) =3D=3D 0) {
--			if (number =3D=3D -1) {
--				/* Not all /proc/cpuinfo include "processor\t". */
--				number =3D 0;
--			}
--			if (number >=3D 0) {
--				handle_one_cpu(number, vendor, family, model);
--				set_max_cpu(number);
--				number =3D -2;
--			}
--		}
--		/* bogomips is removed in ARM, using CPU revision to enumerate */
--		if (strncasecmp(line, "CPU revision\t", 13) =3D=3D 0) {
-+		/* on x86 and others 'bogomips' is last
-+		 * on ARM it *can* be bogomips, or 'CPU revision'
-+		 * on POWER, it's revision
-+		 */
-+		if (strncasecmp(line, "bogomips\t", 9) =3D=3D 0
-+		    || strncasecmp(line, "CPU revision\t", 13) =3D=3D 0
-+		    || strncmp(line, "revision", 7) =3D=3D 0) {
- 			if (number =3D=3D -1) {
- 				/* Not all /proc/cpuinfo include "processor\t". */
- 				number =3D 0;
 -- =
 
-2.1.4
+ Chris Samuel  :  http://www.csamuel.org/  :  Melbourne, VIC
 
 
---===============1926319236561696642==--
+
+--===============3102788338478031379==--
 
