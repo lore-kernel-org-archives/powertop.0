@@ -1,74 +1,75 @@
-Content-Type: multipart/mixed; boundary="===============9091742124858989385=="
+Content-Type: multipart/mixed; boundary="===============5832194634152670202=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] Too much memory consumption by powertop
-Date: Tue, 28 Apr 2015 10:14:17 -0700
-Message-ID: <55290.10.24.5.14.1430241257.squirrel@linux.intel.com>
-In-Reply-To: 1765755.qjI46OxpdT@skinner
+From: Ivan Shapovalov <intelfx100 at gmail.com>
+Subject: =?utf-8?q?Re=3A_=5BPowertop=5D_Fwd=5B5=5D=3A_=28=D0=BF=D1=80=D0=BE=D0=BD?=
+ =?utf-8?q?=D1=83=D0=BC=D0=B5=D1=80=D0=BE=D0=B2=D0=B0=D0=BD=D0=BD=D1=8B?=
+ =?utf-8?q?=D0=B9=29?=
+Date: Sun, 09 Nov 2014 15:55:53 +0300
+Message-ID: <2298726.G6TlAy8635@intelfx-laptop>
+In-Reply-To: 1415202879.194539635@f302.i.mail.ru
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============9091742124858989385==
+--===============5832194634152670202==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+On Wednesday 05 November 2014 at 18:54:39, Natalia Tinkoul wrote:	=
 
-> As powertop list is for subscribers only, here Takashi's
-> findings concerning a big memory waste fowarded:
->
-> ----------  Forwarded Message  ----------
->
-> Subject: Too much memory consumption by powertop
-> Date: Tuesday, April 28, 2015, 05:32:41 PM
-> From: Takashi Iwai <tiwai(a)suse.de>
-> To: powertop(a)lists.01.org
-> CC: trenn(a)suse.de
->
-> Hi,
->
-> I noticed that powertop consumes way too much memory than needed.  It
-> constantly takes over 170MB RES, sometimes over 200MB.
->
-> Then I looked at profile, and it showed that most of memory is
-> allocated for newpad_sp().  Indeed, the current code allocates a pad
-> of the fixed size of 1000x1000 (!) for each tab, and we have five
-> tabs, so five times of that.  No wonder that such a small neat CUI
-> program is so hungry.
->
-> For example, a hack like below already reduces the memory footprint
-> to around 20MB, 90% cut.  Not bad.
->
-> --- a/src/display.cpp
-> +++ b/src/display.cpp
-> @@ -48,7 +48,7 @@ void create_tab(const string &name, cons
->         if (!w)
->                 w =3D new(class tab_window);
->
-> -       w->win =3D newpad(1000,1000);
-> +       w->win =3D newpad(80,160); // XXX FIXME XXX
->         tab_names.push_back(name);
->         tab_windows[name] =3D w;
->         tab_translations[name] =3D translation;
->
-> Can anyone look into this and give a better / smarter solution?
->
->
-> thanks,
->
-> Takashi
-> -----------------------------------------
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->
+>  =D0=98=D0=B2=D0=B0=D0=BD, =D0=BF=D1=80=D0=B8=D0=B2=D0=B5=D1=82.
+> =D0=9E=D0=BF=D1=8F=D1=82=D1=8C =D0=BA =D1=82=D0=B5=D0=B1=D0=B5 =D0=BE=D0=
+=B1=D1=80=D0=B0=D1=89=D0=B0=D1=8E=D1=81=D1=8C =D0=BF=D0=BE =D0=BF=D0=BE=D0=
+=B2=D0=BE=D0=B4=D1=83 =D0=BA=D0=BE=D0=BB=D0=BE=D0=BD=D1=82=D0=B8=D1=82=D1=
+=83=D0=BB=D0=BE=D0=B2.
+> =D0=AF =D0=B4=D0=B5=D0=BB=D0=B0=D1=8E =D0=BA=D0=B0=D0=BA =D1=82=D1=8B =D0=
+=B3=D0=BE=D0=B2=D0=BE=D1=80=D0=B8=D1=88=D1=8C, =D0=BD=D0=BE =D1=82=D0=B5=D0=
+=BF=D0=B5=D1=80=D1=8C =D1=83 =D0=BC=D0=B5=D0=BD=D1=8F =D0=BF=D1=80=D0=BE=D1=
+=81=D1=82=D0=B0=D0=B2=D0=BB=D1=8F=D0=B5=D1=82=D1=81=D1=8F =D0=B8 =D1=82=D0=
+=B8=D1=82=D1=83=D0=BB=D1=8C=D0=BD=D1=8B=D0=B9 =D0=BB=D0=B8=D1=81=D1=82, =D0=
+=B8 =D0=B1=D0=BB=D0=B0=D0=BD=D0=BA =D0=B7=D0=B0=D0=B4=D0=B0=D0=BD=D0=B8=D1=
+=8F =D0=B2 =D0=BC=D0=B8=D0=BD=D1=83=D1=81=D0=BE=D0=B2=D0=BE=D0=B9 =D0=BD=D0=
+=BE=D0=BC=D0=B5=D1=80.
+> =D0=AF =D1=81=D1=82=D0=B0=D0=B2=D0=BB=D1=8E =D0=BD=D0=B0 5 =D1=81=D1=82=
+=D1=80 (=D0=B2=D0=B2=D0=B5=D0=B4=D0=B5=D0=BD=D0=B8=D0=B5) =D0=B8 =D0=B4=D0=
+=B5=D0=BB=D0=B0=D1=8E  { IF { PAGE < 5} "" "{ =3D { PAGE } - 2 }" }
+> =D0=A7=D1=82=D0=BE =D0=BD=D0=B5=D0=BF=D1=80=D0=B0=D0=B2=D0=B8=D0=BB=D1=8C=
+=D0=BD=D0=BE? =D0=9C=D0=BD=D0=B5 =D0=BD=D0=B5=D1=83=D0=B4=D0=BE=D0=B1=D0=BD=
+=D0=BE =D0=BA=D0=B0=D0=B6=D0=B4=D1=8B=D0=B9 =D0=B3=D0=BE=D0=B4 =D0=BA =D1=
+=82=D0=B5=D0=B1=D0=B5 =D0=BE=D0=B1=D1=80=D0=B0=D1=89=D0=B0=D1=82=D1=8C=D1=
+=81=D1=8F.
+> =D0=91=D1=83=D0=B4=D0=B5=D1=82 2 =D1=80=D0=B0=D0=B1=D0=BE=D1=82=D1=8B =D0=
+=B2 =D1=86=D0=B5=D0=BB=D0=BE=D0=BC. =D0=9F=D0=BE=D0=BA=D0=B0 =D1=82=D0=BE=
+=D0=BB=D1=8C=D0=BA=D0=BE =D0=BE=D0=B4=D0=BD=D1=83 =D1=81=D0=B4=D0=B5=D0=BB=
+=D0=B0=D0=BB=D0=B0.
+>  =D0=92=D0=B2=D0=B5=D0=B4=D0=B5=D0=BD=D0=B8=D0=B5 =D0=B4=D0=BE=D0=BB=D0=
+=B6=D0=BD=D0=BE =D0=BD=D0=B0=D1=87=D0=B8=D0=BD=D0=B0=D1=82=D1=8C=D1=81=D1=
+=8F =D1=81 3-=D0=B5=D0=B9 =D1=81=D1=82=D1=80. =D0=A2.=D0=B5. =D0=B2 =D0=BE=
+=D0=B3=D0=BB=D0=B0=D0=B2=D0=BB=D0=B5=D0=BD=D0=B8=D0=B8 =D1=81=D0=BE=D0=B2=
+=D0=BF=D0=B0=D0=B4=D0=B0=D1=82=D1=8C =D0=BD=D0=BE=D0=BC=D0=B5=D1=80=D0=B0 =
+=D1=81=D1=82=D1=80=D0=B0=D0=BD=D0=B8=D1=86 =D1=81 =D0=BD=D0=BE=D0=BC=D0=B5=
+=D1=80=D0=B0=D0=BC=D0=B8 =D0=B3=D0=BB=D0=B0=D0=B2.
 
-To avoid the high memory consumption on testing run it on HTML mode so
-that the powertop.html report is generated in the background.
+=D0=9F=D1=80=D0=B8=D0=B2=D0=B5=D1=82. =D0=98=D0=B7=D0=B2=D0=B8=D0=BD=D0=B8,=
+ =D0=BD=D0=B5 =D0=B7=D0=B0=D0=BC=D0=B5=D1=82=D0=B8=D0=BB =D1=8D=D1=82=D0=BE=
+ =D1=82=D0=B2=D0=BE=D1=91 =D1=81=D0=BE=D0=BE=D0=B1=D1=89=D0=B5=D0=BD=D0=B8=
+=D0=B5. =D0=A1=D0=B5=D0=B9=D1=87=D0=B0=D1=81 =D0=BF=D0=BE=D1=81=D0=BC=D0=BE=
+=D1=82=D1=80=D1=8E.
 
-Thank you,
-Alexandra.
+-- =
 
---===============9091742124858989385==--
+Ivan Shapovalov / intelfx /
+
+--===============5832194634152670202==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="signature.asc"
+
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjIKCmlGNEVBQkVJ
+QUFZRkFsUmZaR0FBQ2drUXhVS2xqU0lNQW5BODFBRCtLZEpVc0ljdTdCaWRFSytNNDYrZjBTcnMK
+UjlxY2pDRzZDNG9FZ0UvMjg2c0JBTnRCejRmOUN1Vy8rRGh2ZXJYanpjOFUwTnMwN1ZJWElmUEwy
+NmtHeHdJUAo9T084QgotLS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
+
+--===============5832194634152670202==--
 
