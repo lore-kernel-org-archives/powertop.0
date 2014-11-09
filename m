@@ -1,55 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============1262121436464640047=="
+Content-Type: multipart/mixed; boundary="===============4769399827228420428=="
 MIME-Version: 1.0
-From: Ciprian Tomoiaga <ciprian.tomoiaga at gmail.com>
-Subject: [Powertop] [Bug] Unknown op {
-Date: Wed, 30 Mar 2016 04:04:40 +0100
-Message-ID: <CAH1MQxy0W88qVkh3zfqmrJbYaBAphZq3SDGoi5Wkcb8uNKdKrQ@mail.gmail.com>
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH v2 14/14] add missing include
+Date: Sun, 09 Nov 2014 13:14:31 +0000
+Message-ID: <1415538871-11411-15-git-send-email-sami.kerola@lastminute.com>
+In-Reply-To: 1415538871-11411-1-git-send-email-sami.kerola@lastminute.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1262121436464640047==
+--===============4769399827228420428==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+From: Sami Kerola <kerolasa(a)iki.fi>
 
-When running powertop --configure for the first time, I saw this error on
-the output:
-Calibrating idle
-System is not available
-  unknown op '{'
-System is not available
-Calibrating: disk usage
+In file included from measurement/sysfs.cpp:27:
+In file included from measurement/../lib.h:59:
+In file included from /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/=
+../../../../include/c++/4.9.1/string:52:
+In file included from /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/=
+../../../../include/c++/4.9.1/bits/basic_string.h:2850:
+In file included from /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/=
+../../../../include/c++/4.9.1/ext/string_conversions.h:41:
+/usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/../../../../include/c+=
++/4.9.1/cstdlib:153:11: error:
+      no member named 'realloc' in the global namespace
+  using ::realloc;
+        ~~^
 
-The configuration continued though until completion.
-Did I miss anything?
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ src/lib.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-Regards,
-Ciprian
+diff --git a/src/lib.h b/src/lib.h
+index ec50946..5c94271 100644
+--- a/src/lib.h
++++ b/src/lib.h
+@@ -27,6 +27,7 @@
+ =
 
---===============1262121436464640047==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+ #include <libintl.h>
+ #include <stdint.h>
++#include <stdlib.h>
+ =
 
-PGRpdiBkaXI9Imx0ciI+PGRpdiBjbGFzcz0iZ21haWxfZGVmYXVsdCIgc3R5bGU9ImZvbnQtZmFt
-aWx5Omdlb3JnaWEsc2VyaWY7Zm9udC1zaXplOnNtYWxsIj5IaSw8YnI+PGJyPjwvZGl2PjxkaXYg
-Y2xhc3M9ImdtYWlsX2RlZmF1bHQiIHN0eWxlPSJmb250LWZhbWlseTpnZW9yZ2lhLHNlcmlmO2Zv
-bnQtc2l6ZTpzbWFsbCI+V2hlbiBydW5uaW5nIHBvd2VydG9wIC0tY29uZmlndXJlIGZvciB0aGUg
-Zmlyc3QgdGltZSwgSSBzYXcgdGhpcyBlcnJvciBvbiB0aGUgb3V0cHV0Ojxicj5DYWxpYnJhdGlu
-ZyBpZGxlPGJyPlN5c3RlbSBpcyBub3QgYXZhaWxhYmxlPGJyPsKgIHVua25vd24gb3AgJiMzOTt7
-JiMzOTs8YnI+U3lzdGVtIGlzIG5vdCBhdmFpbGFibGU8YnI+Q2FsaWJyYXRpbmc6IGRpc2sgdXNh
-Z2U8YnI+PGJyPjwvZGl2PjxkaXYgY2xhc3M9ImdtYWlsX2RlZmF1bHQiIHN0eWxlPSJmb250LWZh
-bWlseTpnZW9yZ2lhLHNlcmlmO2ZvbnQtc2l6ZTpzbWFsbCI+VGhlIGNvbmZpZ3VyYXRpb24gY29u
-dGludWVkIHRob3VnaCB1bnRpbCBjb21wbGV0aW9uLjxicj48L2Rpdj48ZGl2IGNsYXNzPSJnbWFp
-bF9kZWZhdWx0IiBzdHlsZT0iZm9udC1mYW1pbHk6Z2VvcmdpYSxzZXJpZjtmb250LXNpemU6c21h
-bGwiPkRpZCBJIG1pc3MgYW55dGhpbmc/PGJyPjxicj48L2Rpdj48ZGl2IGNsYXNzPSJnbWFpbF9k
-ZWZhdWx0IiBzdHlsZT0iZm9udC1mYW1pbHk6Z2VvcmdpYSxzZXJpZjtmb250LXNpemU6c21hbGwi
-PlJlZ2FyZHMsPGJyPjwvZGl2PjxkaXYgY2xhc3M9ImdtYWlsX2RlZmF1bHQiIHN0eWxlPSJmb250
-LWZhbWlseTpnZW9yZ2lhLHNlcmlmO2ZvbnQtc2l6ZTpzbWFsbCI+Q2lwcmlhbjxicj48L2Rpdj48
-L2Rpdj4K
+ /* Include only for Automake builds */
+ #ifdef HAVE_CONFIG_H
+-- =
 
---===============1262121436464640047==--
+2.1.3
+
+
+--===============4769399827228420428==--
 
