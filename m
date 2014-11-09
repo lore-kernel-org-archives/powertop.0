@@ -1,147 +1,97 @@
-Content-Type: multipart/mixed; boundary="===============2049469434091920582=="
+Content-Type: multipart/mixed; boundary="===============7681116778610311043=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] Package C states over Haswell platform
-Date: Tue, 28 Oct 2014 20:57:48 -0700
-Message-ID: <58642.10.255.85.192.1414555068.squirrel@linux.intel.com>
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH v2 09/14] move variables to protected scope
+Date: Sun, 09 Nov 2014 13:14:26 +0000
+Message-ID: <1415538871-11411-10-git-send-email-sami.kerola@lastminute.com>
+In-Reply-To: 1415538871-11411-1-git-send-email-sami.kerola@lastminute.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2049469434091920582==
+--===============7681116778610311043==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+From: Sami Kerola <kerolasa(a)iki.fi>
 
->
->> Hi,
->>
->> I'm working on DELL E7440 platform (Haswell based) with dual OS: Windows
->> 8.1
->> and Ubuntu 14.04.1 (based on 3.13).
->> When I use Win 8.1, using BLA I get ~90% PC7 when idle. However, when I
->> use
->> the Ubuntu, using powertop I get only as high as PC3.
->> Since it's the same platform, it seems to rule out a HW issue. Any idea
->> what
->> can be the problem? Is Haswell fully supported by powertop?
->>
->>           Package   |             Core    |            CPU 0       CPU 2
->>                     |                     | C0 active   0.2%        0.1%
->>                     |                     | POLL        0.0%    0.0 ms
->> 0.0%
->> 0.0 ms
->>                     |                     | C1E-HSW     0.0%    0.1 ms
->> 0.0%
->> 0.0 ms
->> C2 (pc2)    0.1%    |                     |
->> C3 (pc3)    3.7%    | C3 (cc3)    0.0%    | C3-HSW      0.0%    0.4 ms
->> 0.0%
->> 0.4 ms
->> C6 (pc6)    0.0%    | C6 (cc6)    0.0%    | C6-HSW      0.0%    0.0 ms
->> 0.0%
->> 0.2 ms
->> C7 (pc7)    0.0%    | C7 (cc7)   99.0%    | C7s-HSW     0.1%    0.9 ms
->> 0.1%
->> 1.8 ms
->> C8 (pc8)    0.0%    |                     | C8-HSW      0.1%    1.4 ms
->> 0.2%
->> 2.5 ms
->> C9 (pc9)    0.0%    |                     | C9-HSW      0.4%    4.0 ms
->> 2.3%
->> 8.0 ms
->> C10 (pc10)  0.0%    |                     | C10-HSW    98.9%   44.5 ms
->> 97.0%
->> 36.5 ms
->>
->>                     |             Core    |            CPU 1       CPU 3
->>                     |                     | C0 active   0.2%        0.1%
->>                     |                     | POLL        0.0%    0.0 ms
->> 0.0%
->> 0.0 ms
->>                     |                     | C1E-HSW     0.0%    0.0 ms
->> 1.0%
->> 50.1 ms
->>                     |                     |
->>                     | C3 (cc3)    0.0%    | C3-HSW      0.0%    0.7 ms
->> 0.0%
->> 0.6 ms
->>                     | C6 (cc6)    0.0%    | C6-HSW      0.0%    0.5 ms
->> 0.0%
->> 0.0 ms
->>                     | C7 (cc7)   98.0%    | C7s-HSW     0.1%    0.7 ms
->> 0.4%
->> 25.7 ms
->>                     |                     | C8-HSW      0.0%    4.9 ms
->> 0.0%
->> 1.5 ms
->>                     |                     | C9-HSW      0.6%    4.7 ms
->> 0.7%
->> 19.5 ms
->>                     |                     | C10-HSW    98.5%   93.5 ms
->> 97.8%
->> 78.0 ms
->>
->>                     |             GPU     |
->>                     |                     |
->>                     | Powered On 12.1%    |
->>                     | RC6        87.9%    |
->>                     | RC6p        0.0%    |
->>                     | RC6pp       0.0%    |
->>
->> Thanks
->>
->>
->>
->> Rony
->>
->> _______________________________________________
->> PowerTop mailing list
->> PowerTop(a)lists.01.org
->> https://lists.01.org/mailman/listinfo/powertop
->>
+This fixes series of issues reported by clang++ compiler the same way.
 
-Hi Rony,
+cpu/rapl/rapl_interface.h:37:6: error: private field
+'measurment_interval' is not used [-Werror,-Wunused-private-field]
+        int measurment_interval;
 
-Interesting you ask this since I presented at the Open source bridge =
+The measurment_interval() in relation to first_cpu() is moved to avoid
+following compiler warning.
 
-conference a case study on how to optimize your computer in terms of power
-using PowerTOP, as an example I used a Haswell box with Ubuntu.  I also
-presented on the Debian conference a similar talk using Debian distro.
-Both talks happened this year.
+make[3]: Entering directory '/home/src/powertop/src'
+  CXX      cpu/rapl/powertop-rapl_interface.o
+cpu/rapl/rapl_interface.cpp:78:2: warning: field 'measurment_interval' will=
+ be initialized after field 'first_cpu' [-Wreorder]
+        measurment_interval(def_sampling_interval),
+
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ src/cpu/rapl/rapl_interface.cpp | 2 +-
+ src/cpu/rapl/rapl_interface.h   | 9 +++++----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/src/cpu/rapl/rapl_interface.cpp b/src/cpu/rapl/rapl_interface.=
+cpp
+index ab8e8ce..2fc55b1 100644
+--- a/src/cpu/rapl/rapl_interface.cpp
++++ b/src/cpu/rapl/rapl_interface.cpp
+@@ -75,8 +75,8 @@ c_rapl_interface::c_rapl_interface(const char *dev_name, =
+int cpu) :
+ 	powercap_core_path(),
+ 	powercap_uncore_path(),
+ 	powercap_dram_path(),
+-	measurment_interval(def_sampling_interval),
+ 	first_cpu(cpu),
++	measurment_interval(def_sampling_interval),
+ 	last_pkg_energy_status(0.0),
+ 	last_dram_energy_status(0.0),
+ 	last_pp0_energy_status(0.0),
+diff --git a/src/cpu/rapl/rapl_interface.h b/src/cpu/rapl/rapl_interface.h
+index 744f595..c8e9683 100644
+--- a/src/cpu/rapl/rapl_interface.h
++++ b/src/cpu/rapl/rapl_interface.h
+@@ -34,21 +34,22 @@ private:
+ 	string powercap_dram_path;
+ =
+
+ 	unsigned char rapl_domains;
+-	int measurment_interval;
+ 	int first_cpu;
+ =
+
+ 	double power_units;
+ 	double energy_status_units;
+ 	double time_units;
+ =
+
++	int read_msr(int cpu, unsigned int idx, uint64_t *val);
++	int write_msr(int cpu, unsigned int idx, uint64_t val);
++
++protected:
++	int measurment_interval;
+ 	double last_pkg_energy_status;
+ 	double last_dram_energy_status;
+ 	double last_pp0_energy_status;
+ 	double last_pp1_energy_status;
+ =
+
+-	int read_msr(int cpu, unsigned int idx, uint64_t *val);
+-	int write_msr(int cpu, unsigned int idx, uint64_t val);
+-
+ public:
+ 	c_rapl_interface(const char *dev_name =3D "package-0", int cpu =3D 0);
+ =
+
+-- =
+
+2.1.3
 
 
-There are few things that may be happening.
-
- 1- Update to the latest kernel 3.17.  From 3.13 to 3.17
-there have been few bug fixes that help linux in terms of power
- management.
-
- 2-At the boot command line of your kernel add the following settings:
-       i915.enable_psr=3D1
-       i915.enable_fbc=3D1
-       pcie_aspm=3Dforce
-
-The first command enables the graphics card use panel self refresh, the
-second  enables frame buffer compression. The third command helps the
-network card enter D3 state.
-http://wireless.kernel.org/en/users/Documentation/ASPM#Enabling_ASPM_with_s=
-etpci
-
- 3- Use PowerTOP/tunables to tune power management for all your devices. =
-
-If none of the settings disrupt the proper usability of the computer add =
-
-then to a script file and run this each time you restart your computer. =
-
-Alternatively you can use powertop --auto_tune
-
-
-Run PowerTOP at this point you should see your system reaching a deep
-power state.
-
-Thank you,
-Alexandra.
-
---===============2049469434091920582==--
+--===============7681116778610311043==--
 
