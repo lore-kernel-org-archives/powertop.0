@@ -1,41 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============2060177315571486752=="
+Content-Type: multipart/mixed; boundary="===============4792431870746508027=="
 MIME-Version: 1.0
-From: Chris Samuel <chris at csamuel.org>
-Subject: Re: [Powertop] [Announcement] Updated Users Guide Released
-Date: Thu, 18 Dec 2014 19:53:16 +1100
-Message-ID: <16895790.u6kEdQy9oK@quad>
-In-Reply-To: 1418748976.740.223.camel@spandruv-desktop.jf.intel.com
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH v2 13/14] fix typo in message
+Date: Sun, 09 Nov 2014 13:14:30 +0000
+Message-ID: <1415538871-11411-14-git-send-email-sami.kerola@lastminute.com>
+In-Reply-To: 1415538871-11411-1-git-send-email-sami.kerola@lastminute.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2060177315571486752==
+--===============4792431870746508027==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hiya,
+From: Sami Kerola <kerolasa(a)iki.fi>
 
-On Tue, 16 Dec 2014 04:56:42 PM Pandruvada, Srinivas wrote:
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ src/main.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Check your kernel command line. It may be disabling there
-> "intel_pstate=3Ddisable".
-
-Thanks for the idea, but it doesn't look like it..
-
-$ cat /proc/cmdline
-BOOT_IMAGE=3D/@/boot/vmlinuz-3.13.0-43-generic root=3DUUID=3D3b13f4db-6ba3-=
-47c9-aa78-2b52ae5c4807 ro rootflags=3Dsubvol=3D@ quiet splash nomdmonddf no=
-mdmonisw nomdmonddf nomdmonisw vt.handoff=3D7
-
-I don't see any mention of pstate in dmesg. :-(
-
-All the best,
-Chris
+diff --git a/src/main.cpp b/src/main.cpp
+index 9028acc..d2b7b31 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -439,7 +439,7 @@ int main(int argc, char **argv)
+ 			break;
+ 		case 'q':
+ 			if (freopen("/dev/null", "a", stderr))
+-				fprintf(stderr, _("Quite mode failed!\n"));
++				fprintf(stderr, _("Quiet mode failed!\n"));
+ 			break;
+ 		case 't':
+ 			time_out =3D (optarg ? atoi(optarg) : 20);
 -- =
 
- Chris Samuel  :  http://www.csamuel.org/  :  Melbourne, VIC
+2.1.3
 
 
-
---===============2060177315571486752==--
+--===============4792431870746508027==--
 
