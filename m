@@ -1,40 +1,101 @@
-Content-Type: multipart/mixed; boundary="===============7948452699772759131=="
+Content-Type: multipart/mixed; boundary="===============3842177135581659493=="
 MIME-Version: 1.0
-From: SF Markus Elfring <elfring at users.sourceforge.net>
-Subject: Re: [Powertop] reserved identifier violation
-Date: Sat, 01 Nov 2014 09:58:14 +0100
-Message-ID: <5454A0A6.2080500@users.sourceforge.net>
-In-Reply-To: 54037.10.24.5.246.1414797755.squirrel@linux.intel.com
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH v2 05/14] configure: use AC_USE_SYSTEM_EXTENSIONS
+ to determine features
+Date: Sun, 09 Nov 2014 13:14:22 +0000
+Message-ID: <1415538871-11411-6-git-send-email-sami.kerola@lastminute.com>
+In-Reply-To: 1415538871-11411-1-git-send-email-sami.kerola@lastminute.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7948452699772759131==
+--===============3842177135581659493==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-> Have you come across any name clashes with PowerTOP?
+From: Sami Kerola <kerolasa(a)iki.fi>
 
-I try to clean-up source files generally which tamper with the reserved name
-space in the programming languages "C" and "C++".
+The AC_USE_SYSTEM_EXTENSIONS will enable everything that a system allows
+to be enabled, so there is no longer need for a source file specific
+*_SOURCE definitions.  Secondly the uses of _BSD_SOURCE that are removed
+in this change are part of deprecated API.  See reference link for
+details.
+
+Reference: https://sourceware.org/git/gitweb.cgi?p=3Dglibc.git;a=3Dcommit;h=
+=3Dc941736c92fa3a319221f65f6755659b2a5e0a20
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ configure.ac                         | 1 +
+ src/report/report-formatter-base.cpp | 2 --
+ src/report/report-formatter-csv.cpp  | 2 --
+ src/report/report-formatter-html.cpp | 2 --
+ 4 files changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index e5732fd..94ec789 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -18,6 +18,7 @@ AC_CONFIG_FILES([
+ ])
+ AC_CONFIG_SRCDIR([src/main.cpp])
+ AC_CONFIG_MACRO_DIR([m4])
++AC_USE_SYSTEM_EXTENSIONS
+ AC_CONFIG_HEADERS([config.h])
+ GETTEXT_PACKAGE=3Dpowertop
+ AC_SUBST([GETTEXT_PACKAGE])
+diff --git a/src/report/report-formatter-base.cpp b/src/report/report-forma=
+tter-base.cpp
+index 7c5159e..4e10603 100644
+--- a/src/report/report-formatter-base.cpp
++++ b/src/report/report-formatter-base.cpp
+@@ -23,8 +23,6 @@
+  * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
+  * 2012.10 */
+ =
+
+-#define _BSD_SOURCE
+-
+ /* Uncomment to disable asserts */
+ /*#define NDEBUG*/
+ =
+
+diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-format=
+ter-csv.cpp
+index 523e79b..0360fd8 100644
+--- a/src/report/report-formatter-csv.cpp
++++ b/src/report/report-formatter-csv.cpp
+@@ -23,8 +23,6 @@
+  * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
+  * 2012.10 */
+ =
+
+-#define _BSD_SOURCE
+-
+ /* Uncomment to disable asserts */
+ /*#define NDEBUG*/
+ =
+
+diff --git a/src/report/report-formatter-html.cpp b/src/report/report-forma=
+tter-html.cpp
+index 3803962..41440f9 100644
+--- a/src/report/report-formatter-html.cpp
++++ b/src/report/report-formatter-html.cpp
+@@ -23,8 +23,6 @@
+  * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
+  * 2012.10 */
+ =
+
+-#define _BSD_SOURCE
+-
+ /* Uncomment to disable asserts */
+ /*#define NDEBUG*/
+ =
+
+-- =
+
+2.1.3
 
 
-> Can you reproduce the error?
-
-I suggest to reconsider an other technical aspect.
-
-Are you aware of an interpretation of the corresponding standard specificat=
-ions
-that a questionable name selection could result in undefined behaviour?
-https://www.securecoding.cert.org/confluence/display/seccode/CC.+Undefined+=
-Behavior#CC.UndefinedBehavior-ub_106
-
-How would you try to reproduce anything when a detail was marked as potenti=
-ally
-undefined?
-
-Regards,
-Markus
-
---===============7948452699772759131==--
+--===============3842177135581659493==--
 
