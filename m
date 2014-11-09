@@ -1,47 +1,105 @@
-Content-Type: multipart/mixed; boundary="===============2380373488836080249=="
+Content-Type: multipart/mixed; boundary="===============1039476289777544925=="
 MIME-Version: 1.0
-From: Yaroslav Isakov <yaroslav.isakov at gmail.com>
-Subject: [Powertop] [PATCH 0/2] Few fixes
-Date: Mon, 22 Feb 2016 17:24:40 +0300
-Message-ID: <CADS+iDU4_6EEgwCXehcfssbgDX8OAgO_gLaDnSt7KKZ51RdFsA@mail.gmail.com>
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH v2 04/14] csstoh.sh: check every single return value
+Date: Sun, 09 Nov 2014 13:14:21 +0000
+Message-ID: <1415538871-11411-5-git-send-email-sami.kerola@lastminute.com>
+In-Reply-To: 1415538871-11411-1-git-send-email-sami.kerola@lastminute.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2380373488836080249==
+--===============1039476289777544925==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello! I've found two bugs in powertop. First one is that only first audio
-card will be shown in Devices stats tab. Second one is that all PCI devices
-shows usage as 00% in the same tab. Here are the patches against commit
-180ac4fd196d169cd788ab13ccadf365d75d986b:
+From: Sami Kerola <kerolasa(a)iki.fi>
 
-Yaroslav Isakov (2):
-  Detect all audio cards in the system (not only card0)
-  Fixed bug when all PCI devices usage is shown as 00%
+Earlier the script continued processing at errors.
 
- src/devices/alsa.cpp       | 6 +++---
- src/devices/runtime_pm.cpp | 1 +
- 2 files changed, 4 insertions(+), 3 deletions(-)
+$ ./csstoh.sh powertop.css /dev/full
+./csstoh.sh: line 36: echo: write error: No space left on device
+./csstoh.sh: line 37: echo: write error: No space left on device
+[...]
 
---===============2380373488836080249==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+Now the script will fail immediately when an error occurs.
 
-PGRpdiBkaXI9Imx0ciI+SGVsbG8hIEkmIzM5O3ZlIGZvdW5kIHR3byBidWdzIGluIHBvd2VydG9w
-LiBGaXJzdCBvbmUgaXMgdGhhdCBvbmx5IGZpcnN0IGF1ZGlvIGNhcmQgd2lsbCBiZSBzaG93biBp
-biBEZXZpY2VzIHN0YXRzIHRhYi4gU2Vjb25kIG9uZSBpcyB0aGF0IGFsbCBQQ0kgZGV2aWNlcyBz
-aG93cyB1c2FnZSBhcyAwMCUgaW4gdGhlIHNhbWUgdGFiLiBIZXJlIGFyZSB0aGUgcGF0Y2hlcyBh
-Z2FpbnN0IGNvbW1pdCA8YnI+MTgwYWM0ZmQxOTZkMTY5Y2Q3ODhhYjEzY2NhZGYzNjVkNzVkOTg2
-Yjo8YnI+PGJyPllhcm9zbGF2IElzYWtvdiAoMik6PGJyPsKgIERldGVjdCBhbGwgYXVkaW8gY2Fy
-ZHMgaW4gdGhlIHN5c3RlbSAobm90IG9ubHkgY2FyZDApPGJyPsKgIEZpeGVkIGJ1ZyB3aGVuIGFs
-bCBQQ0kgZGV2aWNlcyB1c2FnZSBpcyBzaG93biBhcyAwMCU8YnI+PGJyPsKgc3JjL2RldmljZXMv
-YWxzYS5jcHDCoMKgwqDCoMKgwqAgfCA2ICsrKy0tLTxicj7CoHNyYy9kZXZpY2VzL3J1bnRpbWVf
-cG0uY3BwIHwgMSArPGJyPsKgMiBmaWxlcyBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKyksIDMgZGVs
-ZXRpb25zKC0pPGJyPjxicj48L2Rpdj4K
+$ ./csstoh.sh powertop.css /dev/full ; echo $?
+cat: write error: No space left on device
+1
 
---===============2380373488836080249==--
+As a minor improvement the script now writes errors to stderr rather than
+stdout, that is more appropriate.
+
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ src/csstoh.sh | 40 +++++++++++++++++++++++-----------------
+ 1 file changed, 23 insertions(+), 17 deletions(-)
+
+diff --git a/src/csstoh.sh b/src/csstoh.sh
+index 9d4100b..4ba70e2 100755
+--- a/src/csstoh.sh
++++ b/src/csstoh.sh
+@@ -18,27 +18,33 @@
+ #
+ # Written by Igor Zhbanov <i.zhbanov at samsung.com>
+ =
+
+-if [ $# -lt 2 ]; then
+-	echo "Usage: csstoh.sh cssfile header.h"
++if [ $# -ne 2 ]; then
++	echo "Usage: csstoh.sh cssfile header.h" >&2
+ 	exit 1
+ fi
+-
+-if [ ! -r $1 ]; then
+-	echo "Can't find file $1"
+-	exit 1
+-fi
+-
+-if ! echo -n >$2; then
+-	echo "Can't open file $2 for writing."
++if [ ! -f "$1" ]; then
++	echo "$1: no such file or directory" >&2
+ 	exit 1
+ fi
++# redirect stdout to a file
++exec 1> "$2" || exit $?
+ =
+
+-echo "#ifndef __INCLUDE_GUARD_CCS_H" >> $2
+-echo "#define __INCLUDE_GUARD_CCS_H" >> $2
+-echo >> $2
+-echo "const char css[] =3D " >> $2
++# header
++cat <<HERE || exit $?
++#ifndef __INCLUDE_GUARD_CCS_H
++#define __INCLUDE_GUARD_CCS_H
+ =
+
+-sed -r 's/^(.*)$/\t\"\1\\n\"/' $1 >> $2
++const char css[] =3D =
+
++HERE
++# body
++sed -r 's/^(.*)$/\t\"\1\\n\"/' "$1" || exit $?
++# footer
++cat <<HERE || exit $?
++;
++#endif
++HERE
+ =
+
+-echo ";" >> $2
+-echo "#endif" >> $2
++# close output file
++exec 1>&-
++# return status of output file write
++exit $?
+-- =
+
+2.1.3
+
+
+--===============1039476289777544925==--
 
