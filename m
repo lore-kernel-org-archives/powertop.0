@@ -1,51 +1,44 @@
-Content-Type: multipart/mixed; boundary="===============2772612243276396361=="
+Content-Type: multipart/mixed; boundary="===============1948071754621839927=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] Active power measurements (AC power)
-Date: Wed, 15 Apr 2015 10:33:56 -0700
-Message-ID: <63394.10.7.198.99.1429119236.squirrel@linux.intel.com>
-In-Reply-To: 60711d197a29b7d10d7c293d4ef3e5a8@ibest.com.br
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [PATCH v2 07/14] configure: use autoconf-archive
+ ax_cxx_compile_stdcxx_11.m4
+Date: Mon, 10 Nov 2014 17:53:54 -0800
+Message-ID: <54616C32.9080805@linux.intel.com>
+In-Reply-To: 20141110215340.GA24890@sara.bahnhof.se
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2772612243276396361==
+--===============1948071754621839927==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+On 11/10/2014 1:53 PM, Magnus Fromreide wrote:
+> On Sun, Nov 09, 2014 at 01:14:24PM +0000, Sami Kerola wrote:
+>> From: Sami Kerola <kerolasa(a)iki.fi>
+>>
+>> Ensure the powertop is compiled C++11 compliant compiler.  That allows
+>> project contributors to use features from the latest standard without
+>> hesitation are they allowed in this project.  The idea is to grant
+>> greater liberties to upstream in cost of a dependency to downstream.
+>
+> If this is the point, should we go for C++14?
+> The latest standard part is also obviously wrong :^)
 
->
->
-> Hi folks,
->
-> This is my first post in the list. Please, apologize if this topic was
-> already discussed here.
->
-> I am intending to build a mathematical model of power consumption for a
-> PC and I have already used some devices to measure active power (AC).
->
-> However, I would like to know if this community could suggest me any
-> portable power meter that is able to collect the power measurements in a
-> certain sample rate ( between 1.0Hz up to 60Hz)?
->
-> I would like to try other portable device which could stand on a desk
-> while I do my experiments. I would like, also, be able to collect the
-> power measurements in real-time to plot some graphs in an monitoring PC.
->
->
-> Thanks in advance,
->
-> Tiago Fonseca
->  _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->
+I will draw a line in sand on this (and you can tell me which side of the l=
+ine this is)
 
-In the past I've used extech and watts up pro power meters.
+requiring new technology is fine AS LONG AS the current *released* popular =
+client distros
+(say, two out of three of Fedora, openSuSE & Ubuntu) are shipping with that=
+ supported.
 
-Thank you,
-Alexandra.
+If those guys don't have a release with it yet, it's too cutting edge and l=
+eads to too many issues
+for our users.
 
---===============2772612243276396361==--
+
+
+--===============1948071754621839927==--
 
