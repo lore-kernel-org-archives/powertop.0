@@ -1,78 +1,91 @@
-Content-Type: multipart/mixed; boundary="===============0323947651089626882=="
+Content-Type: multipart/mixed; boundary="===============8777409740265972177=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: Re: [Powertop] close_display() sigsegv
-Date: Tue, 18 Nov 2014 17:43:10 -0800
-Message-ID: <546BF5AE.3020705@linux.intel.com>
-In-Reply-To: CAG27Bk39ET-Ccz0ahfufUwHgxQiWKj=MCioVx+3ztomLtwXxng@mail.gmail.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] [PATCH v2 00/14] pull: various changes,
+ mostly build system related
+Date: Thu, 13 Nov 2014 20:30:26 -0800
+Message-ID: <62192.10.254.178.169.1415939426.squirrel@linux.intel.com>
+In-Reply-To: 1415538871-11411-1-git-send-email-sami.kerola@lastminute.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0323947651089626882==
+--===============8777409740265972177==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The game of whack-a-mole continues. Good find, Sami.
+Hi Sami,
 
-Alex, suggest we revert the errant patch. Memory management as a whole
-within the tool deserves (much) more time and focus than a few
-band-aids, so I wouldn't be opposed to reverting the entire series (of 5).
 
-On 11/18/2014 02:29 PM, Sami Kerola wrote:
 > Hello,
-> =
+>
+> This change set is related to previous submission, that is discussed in
+> thread below:
+>
+> https://lists.01.org/pipermail/powertop/2014-November/001664.html
+>
+> My assumption is that these changes may not be completely in acceptable
+> to be part of upstream just before release.  See the link for details.
+>
+> Sami Kerola (14):
+>   configure: require new enough automake version
+>   configure: use autoconf-archive ax_pthread.m4
+>   add missing space to --version print out
+>   csstoh.sh: check every single return value
+>   configure: use AC_USE_SYSTEM_EXTENSIONS to determine features
+>   powertop.m4: GCC_FORTIFY_SOURCE_CC copy idea of macro from Archlinux
+>     pacman
+>   configure: use autoconf-archive ax_cxx_compile_stdcxx_11.m4
+>   main: fix incompatible operand type
+>   move variables to protected scope
+>   make --quiet option to suppress various info messages
+>   squeeze all extra bits from size of binary and html report
+>   add timestamp to html report
+>   fix typo in message
+>   add missing include
+>
+>  .gitignore                           |  39 +++-
+>  PowerTop.png                         | Bin 6975 -> 5542 bytes
+>  configure.ac                         |  21 ++-
+>  m4/ax_cxx_compile_stdcxx_11.m4       | 142 +++++++++++++++
+>  m4/ax_pthread.m4                     | 332
+> +++++++++++++++++++++++++++++++++++
+>  m4/gcc_fortify_source_cc.m4          |  29 +++
+>  src/Makefile.am                      |   1 -
+>  src/cpu/rapl/rapl_interface.cpp      |   7 +-
+>  src/cpu/rapl/rapl_interface.h        |   9 +-
+>  src/csstoh.sh                        |  40 +++--
+>  src/lib.h                            |   1 +
+>  src/main.cpp                         |   8 +-
+>  src/report/report-formatter-base.cpp |   2 -
+>  src/report/report-formatter-csv.cpp  |   2 -
+>  src/report/report-formatter-html.cpp | 248 +++++++++++++-------------
+>  src/report/report.cpp                |   5 +-
+>  16 files changed, 719 insertions(+), 167 deletions(-)
+>  create mode 100644 m4/ax_cxx_compile_stdcxx_11.m4
+>  create mode 100644 m4/ax_pthread.m4
+>  create mode 100644 m4/gcc_fortify_source_cc.m4
+>
+> --
+> 2.1.3
+>
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>
 
-> It might be good idea to check before final release if the issue
-> reported in this email can be reproduced.
-> =
+Patches look good.  Two things:
 
-> $ echo $CC
-> clang
-> $ echo $CFLAGS
-> -O0 -g -ggdb -Wall -Wextra -pedantic -fno-omit-frame-pointer
-> $ echo $LD
-> ld.gold
-> =
+1- I could not get this patch to apply
+"configure: require new enough automake version"
+Patch is empty.  Was it split wrong?
 
-> After compiling the version above I always get crash.
-> =
+2- Please get the latest checkpatch.pl from the linux kernel scripts and
+run it over your files before creating the patches.
 
-> $ git describe
-> v2.7-rc1-1-g959227c
-> =
+Thank you,
+Alexandra.
 
-> $ ./src/powertop
-> ....
-> Leaving PowerTOPtimates do 21 measurement(s) connected to battery only
-> Segmentation fault (core dumped)
-> =
-
-> It looks like commit 706bc28ff536f4f53fdf6e24178b9e3bac67d53f might
-> have something to do with the issue.
-
-
---===============0323947651089626882==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEKCmlRSWNCQUVC
-QWdBR0JRSlVhL1cyQUFvSkVJMklSOVV2U3FwbWJMNFFBTFVKVXpVbHQ3R3pVNkk2T2dBUFFXZ04K
-MHF6RHhPRHpGSitEL0lpbWc3RS9vS0pseitNMFFoN3lsNy9oT2QvaWdWQVp0YzVxSityL3hOZEgw
-RDk5dFRFQwo0MUpsMS9oYitoVE1UYlBJTHl2cUZFS0xGU1hCbTZTaHhsZy9jWDBvdTBHNnQ1SGE5
-NERkalZOTERmOVFLOTdJCnV4Rm5TQjQvL2hxRGNnOXBVSEpqSGpqbU8zUS9YSWQzSXd3ajJVdGZ5
-eUZQc3FQaUNlOGN4NnZES3pmY3NLenAKT1hvTjU3MTJWUnZtRFNSa0VXbjBKQWJFazEyQS8vQVFS
-aW5nSGxNTkN3cHk4LzZkWU4zc3Q1M3FIK2JtNktJTAo0dm56Wko4QjJPaFp5WFZBUUdtQndZUHZr
-ZlU2NENQR2lWNjM0VFVWMENzRVlHWEh3ZitBbndoTkR2dEFSQU85CjBSWWo5Y1FsVkNsZFpQdmR2
-d0JZV3ZZQ2lsSkhUT2w0cHNkTzBQM2RXeW1kYnE0aVgzaCtDcmQ0MmZQRVY2bC8KcDRzam5DU2Nz
-NC9USUR5a2dUbEhkMnlqUlVOOGdYNlNrcTRTRi9ZNjMvNnVGUGN2N3EyRWdkRFgybTdVNUJWdwpQ
-ZGRwQmxrbWZ0dmtSWldhWmZ4L0FHeExJM0g0ZkRzc1pHQWtsOExJdW5xVlg3bFlmUnlBQndvVCtN
-T3lybjNlClM5UmVhSjR0djVoVFJOc294REZkd0QwaWpUaVdQN29lWWI4bUJuc2tML3h5UEZMUnhu
-VFJIMEFPYkFIV1BpVGMKa2drcnJrWlVJOFhRcHIwYzlXRlNmMVkwMlYxdEtDcDJhMVgxaFZCTjYw
-OXBRS2FHb2FxWDYralpvV3ZQdGxhNwp0a09TY2lYeEZLdllrZ0Fwc0Q5dAo9dk9vRAotLS0tLUVO
-RCBQR1AgU0lHTkFUVVJFLS0tLS0K
-
---===============0323947651089626882==--
+--===============8777409740265972177==--
 
