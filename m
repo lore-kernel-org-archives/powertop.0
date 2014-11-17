@@ -1,76 +1,77 @@
-Content-Type: multipart/mixed; boundary="===============8380822332573641083=="
+Content-Type: multipart/mixed; boundary="===============7445698654427378120=="
 MIME-Version: 1.0
-From: Nanley Chery <nanleychery at gmail.com>
-Subject: [Powertop] [RFC 4/9] syfs_tunable: use udev
-Date: Mon, 01 Jun 2015 09:09:10 -0700
-Message-ID: <1433174955-17349-5-git-send-email-nanleychery@gmail.com>
-In-Reply-To: 1433174955-17349-1-git-send-email-nanleychery@gmail.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] [PATCH v2 00/14] pull: various changes,
+ mostly build system related
+Date: Sun, 16 Nov 2014 20:45:02 -0800
+Message-ID: <56432.10.252.139.164.1416199502.squirrel@linux.intel.com>
+In-Reply-To: CAG27Bk1cPR7vZYODhUx4K-Q6YinbjxkLSobBR0BK2+SZbn_FOA@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8380822332573641083==
+--===============7445698654427378120==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Nanley Chery <nanley.g.chery(a)intel.com>
----
- src/tuning/tuningsysfs.cpp | 12 +++++++++---
- src/tuning/tuningsysfs.h   |  1 +
- 2 files changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/src/tuning/tuningsysfs.cpp b/src/tuning/tuningsysfs.cpp
-index 0859a0c..fb486bd 100644
---- a/src/tuning/tuningsysfs.cpp
-+++ b/src/tuning/tuningsysfs.cpp
-@@ -115,15 +115,21 @@ void add_sysfs_tunable(const char *str, const char *_=
-sysfs_path, const char *_ta
- =
+> On 14 November 2014 04:30, Alexandra Yates
+> <alexandra.yates(a)linux.intel.com> wrote:
+>
+> Hi Alexandra, and all,
+>
+>> Patches look good.
+>
+> Nice to hear.
+>
+>> Two things:
+>>
+>> 1- I could not get this patch to apply
+>> "configure: require new enough automake version"
+>> Patch is empty.  Was it split wrong?
+>
+> Empty? I don't understand, I can see the change in mail archive.
+>
+> https://lists.01.org/pipermail/powertop/2014-November/001666.html
+>
+> Instead of sending the same 14 patches without any changes to them
+> could you consider merging from my repo to avoid weird mail content
+> issue(s).
+>
+> cd powertop
+> git remote add sami https://github.com/kerolasa/powertop.git
+> git fetch sami
+> git checkout master
+> git merge sami/various
+> git remote remove sami
+>
+> If all OK git push to what ever you call upstream repo, often origin,
+> but there is no way I could be sure.
+>
+>> 2- Please get the latest checkpatch.pl from the linux kernel scripts and
+>> run it over your files before creating the patches.
+>
+> The script reported few of the following, but I don't think they are
+> meaningful in this case.
+>
+> If any of these errors are false positives, please report
+> them to the maintainer, see CHECKPATCH in MAINTAINERS.
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+>
+> The checkpatch.pl did not report any other errors.
+>
+> --
+> Sami Kerola
+> http://www.iki.fi/kerolasa/
+>
 
- static void add_sata_tunables_callback(const char *d_name)
- {
-+	struct udev_device *dev =3D udev_device_new_from_syspath(get_udev(), d_na=
-me);
-+	const char *dev_name =3D udev_device_get_sysname(dev);
- 	char filename[4096];
- 	char msg[4096];
- =
+Sami,
 
--	sprintf(filename, "/sys/class/scsi_host/%s/link_power_management_policy",=
- d_name);
--	sprintf(msg, _("Enable SATA link power management for %s"), d_name);
-+	sprintf(filename, "%s/link_power_management_policy", d_name);
-+	sprintf(msg, _("Enable SATA link power management for %s"), dev_name);
- 	add_sysfs_tunable(msg, filename,"min_power");
-+
-+	/* Cleanup */
-+	udev_device_unref(dev);
- }
- =
+When I run checkpatch.pl I get white spaces and over 80 char line errors
+on your patches.
 
- void add_sata_tunables(void)
- {
--	process_directory("/sys/class/scsi_host", add_sata_tunables_callback);
-+	process_subsystem("scsi_host", add_sata_tunables_callback, 1,
-+					  "+link_power_management_policy", NULL);
- }
-diff --git a/src/tuning/tuningsysfs.h b/src/tuning/tuningsysfs.h
-index ad89717..71586ab 100644
---- a/src/tuning/tuningsysfs.h
-+++ b/src/tuning/tuningsysfs.h
-@@ -32,6 +32,7 @@
- using namespace std;
- =
+Thank you,
+Alexandra.
 
- class sysfs_tunable : public tunable {
-+	struct udev_device *tun_dev;
- 	char sysfs_path[4096];
- 	char target_value[4096];
- 	char bad_value[4096];
--- =
-
-2.4.1
-
-
---===============8380822332573641083==--
+--===============7445698654427378120==--
 
