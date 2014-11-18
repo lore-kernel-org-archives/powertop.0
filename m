@@ -1,101 +1,117 @@
-Content-Type: multipart/mixed; boundary="===============3842177135581659493=="
+Content-Type: multipart/mixed; boundary="===============3722378688730776695=="
 MIME-Version: 1.0
 From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH v2 05/14] configure: use AC_USE_SYSTEM_EXTENSIONS
- to determine features
-Date: Sun, 09 Nov 2014 13:14:22 +0000
-Message-ID: <1415538871-11411-6-git-send-email-sami.kerola@lastminute.com>
-In-Reply-To: 1415538871-11411-1-git-send-email-sami.kerola@lastminute.com
+Subject: [Powertop] close_display() sigsegv
+Date: Tue, 18 Nov 2014 22:29:38 +0000
+Message-ID: <CAG27Bk39ET-Ccz0ahfufUwHgxQiWKj=MCioVx+3ztomLtwXxng@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3842177135581659493==
+--===============3722378688730776695==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Sami Kerola <kerolasa(a)iki.fi>
+Hello,
 
-The AC_USE_SYSTEM_EXTENSIONS will enable everything that a system allows
-to be enabled, so there is no longer need for a source file specific
-*_SOURCE definitions.  Secondly the uses of _BSD_SOURCE that are removed
-in this change are part of deprecated API.  See reference link for
-details.
+It might be good idea to check before final release if the issue
+reported in this email can be reproduced.
 
-Reference: https://sourceware.org/git/gitweb.cgi?p=3Dglibc.git;a=3Dcommit;h=
-=3Dc941736c92fa3a319221f65f6755659b2a5e0a20
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
----
- configure.ac                         | 1 +
- src/report/report-formatter-base.cpp | 2 --
- src/report/report-formatter-csv.cpp  | 2 --
- src/report/report-formatter-html.cpp | 2 --
- 4 files changed, 1 insertion(+), 6 deletions(-)
+$ echo $CC
+clang
+$ echo $CFLAGS
+-O0 -g -ggdb -Wall -Wextra -pedantic -fno-omit-frame-pointer
+$ echo $LD
+ld.gold
 
-diff --git a/configure.ac b/configure.ac
-index e5732fd..94ec789 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -18,6 +18,7 @@ AC_CONFIG_FILES([
- ])
- AC_CONFIG_SRCDIR([src/main.cpp])
- AC_CONFIG_MACRO_DIR([m4])
-+AC_USE_SYSTEM_EXTENSIONS
- AC_CONFIG_HEADERS([config.h])
- GETTEXT_PACKAGE=3Dpowertop
- AC_SUBST([GETTEXT_PACKAGE])
-diff --git a/src/report/report-formatter-base.cpp b/src/report/report-forma=
-tter-base.cpp
-index 7c5159e..4e10603 100644
---- a/src/report/report-formatter-base.cpp
-+++ b/src/report/report-formatter-base.cpp
-@@ -23,8 +23,6 @@
-  * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
-  * 2012.10 */
- =
+After compiling the version above I always get crash.
 
--#define _BSD_SOURCE
--
- /* Uncomment to disable asserts */
- /*#define NDEBUG*/
- =
+$ git describe
+v2.7-rc1-1-g959227c
 
-diff --git a/src/report/report-formatter-csv.cpp b/src/report/report-format=
-ter-csv.cpp
-index 523e79b..0360fd8 100644
---- a/src/report/report-formatter-csv.cpp
-+++ b/src/report/report-formatter-csv.cpp
-@@ -23,8 +23,6 @@
-  * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
-  * 2012.10 */
- =
+$ ./src/powertop
+....
+Leaving PowerTOPtimates do 21 measurement(s) connected to battery only
+Segmentation fault (core dumped)
 
--#define _BSD_SOURCE
--
- /* Uncomment to disable asserts */
- /*#define NDEBUG*/
- =
+It looks like commit 706bc28ff536f4f53fdf6e24178b9e3bac67d53f might
+have something to do with the issue.
 
-diff --git a/src/report/report-formatter-html.cpp b/src/report/report-forma=
-tter-html.cpp
-index 3803962..41440f9 100644
---- a/src/report/report-formatter-html.cpp
-+++ b/src/report/report-formatter-html.cpp
-@@ -23,8 +23,6 @@
-  * Written by Igor Zhbanov <i.zhbanov(a)samsung.com>
-  * 2012.10 */
- =
-
--#define _BSD_SOURCE
--
- /* Uncomment to disable asserts */
- /*#define NDEBUG*/
- =
+(gdb) bt full
+#0  0x00007f59287ed200 in std::string::compare(std::string const&)
+const () from /usr/lib/libstdc++.so.6
+No symbol table info available.
+Python Exception <class 'gdb.error'> There is no member named _M_dataplus.:
+Python Exception <class 'gdb.error'> There is no member named _M_dataplus.:
+#1  0x000000000041066d in std::operator< <char,
+std::char_traits<char>, std::allocator<char> > (__lhs=3D, __rhs=3D)
+    at /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.2/../../../../inc=
+lude/c++/4.9.2/bits/basic_string.h:2590
+No locals.
+Python Exception <class 'gdb.error'> There is no member named _M_dataplus.:
+Python Exception <class 'gdb.error'> There is no member named _M_dataplus.:
+#2  0x000000000040f681 in std::less<std::string>::operator()
+(this=3D0x6c3268 <tab_windows>, __x=3D, __y=3D)
+    at /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.2/../../../../inc=
+lude/c++/4.9.2/bits/stl_function.h:371
+No locals.
+#3  0x0000000000411817 in std::_Rb_tree<std::string,
+std::pair<std::string const, tab_window*>,
+std::_Select1st<std::pair<std::string const, tab_window*> >,
+std::less<std::string>, std::allocator<std::pair<std::string const,
+tab_window*> > >::_M_lower_bound (
+Python Exception <class 'gdb.error'> There is no member named _M_dataplus.:
+    this=3D0x6c3268 <tab_windows>, __x=3D0x5828990, __y=3D0x6c3270
+<tab_windows+8>, __k=3D)
+    at /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.2/../../../../inc=
+lude/c++/4.9.2/bits/stl_tree.h:1261
+No locals.
+#4  0x00000000004117c1 in std::_Rb_tree<std::string,
+std::pair<std::string const, tab_window*>,
+std::_Select1st<std::pair<std::string const, tab_window*> >,
+std::less<std::string>, std::allocator<std::pair<std::string const,
+tab_window*> > >::lower_bound (
+Python Exception <class 'gdb.error'> There is no member named _M_dataplus.:
+    this=3D0x6c3268 <tab_windows>, __k=3D)
+    at /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.2/../../../../inc=
+lude/c++/4.9.2/bits/stl_tree.h:927
+No locals.
+Python Exception <class 'gdb.error'> There is no member named _M_dataplus.:
+#5  0x00000000004107ed in std::map<std::string, tab_window*,
+std::less<std::string>, std::allocator<std::pair<std::string const,
+tab_window*> > >::lower_bound (this=3D0x6c3268 <tab_windows>, __x=3D)
+    at /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.2/../../../../inc=
+lude/c++/4.9.2/bits/stl_map.h:902
+No locals.
+Python Exception <class 'gdb.error'> There is no member named _M_dataplus.:
+#6  0x000000000040f0a2 in std::map<std::string, tab_window*,
+std::less<std::string>, std::allocator<std::pair<std::string const,
+tab_window*> > >::operator[] (this=3D0x6c3268 <tab_windows>, __k=3D)
+    at /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.2/../../../../inc=
+lude/c++/4.9.2/bits/stl_map.h:496
+        __i =3D {first =3D <error reading variable>
+#7  0x000000000040e03a in close_display () at display.cpp:93
+        i =3D 5
+#8  0x0000000000416c2e in clean_shutdown () at main.cpp:378
+No locals.
+#9  0x0000000000417477 in main (argc=3D1, argv=3D0x7fff77810778) at main.cp=
+p:519
+        option_index =3D 0
+        c =3D -1
+        filename =3D
+"\210\a\201w\377\177\000\000\b-.)Y\177\000\000\000\000\000\000\000\000\000\=
+000\303Z\355'Y\177\000\000\020\220i\002\000\000\000\000\320\366\200w\377\17=
+7\000\000x\a\201w\377\177\000\000e\356\f)Y\177\000\000\350\003\000\000@\000=
+\000\000(a)B\017\000\000\312\232;/proc/net/psched",
+'\000' <repeats 2680 times>...
+        workload =3D '\000' <repeats 4095 times>
+        iterations =3D 1
+        auto_tune =3D 0
 
 -- =
 
-2.1.3
+Sami Kerola
+http://www.iki.fi/kerolasa/
 
-
---===============3842177135581659493==--
+--===============3722378688730776695==--
 
