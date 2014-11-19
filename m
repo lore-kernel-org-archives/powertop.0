@@ -1,78 +1,78 @@
-Content-Type: multipart/mixed; boundary="===============7739468437420159655=="
+Content-Type: multipart/mixed; boundary="===============0323947651089626882=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] [PATCH v2 00/14] pull: various changes,
- mostly build system related
-Date: Tue, 25 Nov 2014 11:22:50 -0800
-Message-ID: <50846.10.24.1.128.1416943370.squirrel@linux.intel.com>
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: Re: [Powertop] close_display() sigsegv
+Date: Tue, 18 Nov 2014 17:43:10 -0800
+Message-ID: <546BF5AE.3020705@linux.intel.com>
+In-Reply-To: CAG27Bk39ET-Ccz0ahfufUwHgxQiWKj=MCioVx+3ztomLtwXxng@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7739468437420159655==
+--===============0323947651089626882==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+The game of whack-a-mole continues. Good find, Sami.
 
-> On 18 November 2014 at 18:08, Alexandra Yates
-> <alexandra.yates(a)linux.intel.com> wrote:
->>> <alexandra.yates(a)linux.intel.com> wrote:
->>>> When I run checkpatch.pl I get white spaces and over 80 char line
->>>> errors
->>>> on your patches.
->>>
->>> Hi Alexandra,
->>>
->>> You are right, I missed in the change 0004 'csstoh.sh: check every
->>> single return value' a white space error. That is now fixed in:
->>>
->>> https://github.com/kerolasa/powertop/commit/6d7e331488db1e1428925579431=
-242b8fb1c6007
->>>
->>> 80 char line errors are strange. I do not see them. Are we using the
->>> same version of the checkpatch.pl?
->>>
->>> $ git describe
->>> v3.18-rc5
->>> $ shasum scripts/checkpatch.pl
->>> a13cad76323e71c97ba279838feef9730509fc59  scripts/checkpatch.pl
->>
->> I'm using the tip of the branch from
->>
->> git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
->
-> Hii Alexandra,
->
-> Congratulations on the new release.
->
-> I suppose now after the release my patch set can be put back on track.
-> Since I do not see the same errors as you could you run the
-> checkpatch.pl against the 14 changes and send me the output. That
-> would help me a lot.
->
-> --
-> Sami Kerola
-> http://www.iki.fi/kerolasa/
->
+Alex, suggest we revert the errant patch. Memory management as a whole
+within the tool deserves (much) more time and focus than a few
+band-aids, so I wouldn't be opposed to reverting the entire series (of 5).
 
- Hi Sami,
+On 11/18/2014 02:29 PM, Sami Kerola wrote:
+> Hello,
+> =
 
-Here is the output from checkpatch.pl
+> It might be good idea to check before final release if the issue
+> reported in this email can be reproduced.
+> =
 
-   ERROR: trailing whitespace
-   14 #139: FILE: src/csstoh.sh:37:
-   15 +const char css[] =3D $
+> $ echo $CC
+> clang
+> $ echo $CFLAGS
+> -O0 -g -ggdb -Wall -Wextra -pedantic -fno-omit-frame-pointer
+> $ echo $LD
+> ld.gold
+> =
 
-And The other error is that I can't get patch 0002 to commit.
+> After compiling the version above I always get crash.
+> =
 
-I will be out of the office from tomorrow until Dec 10th visiting family =
+> $ git describe
+> v2.7-rc1-1-g959227c
+> =
 
-in Ireland.
+> $ ./src/powertop
+> ....
+> Leaving PowerTOPtimates do 21 measurement(s) connected to battery only
+> Segmentation fault (core dumped)
+> =
 
-If we don't get these patches today we will as soon as I get back to work.
+> It looks like commit 706bc28ff536f4f53fdf6e24178b9e3bac67d53f might
+> have something to do with the issue.
 
-Thank you,
-Alexandra.
 
---===============7739468437420159655==--
+--===============0323947651089626882==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="signature.asc"
+
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEKCmlRSWNCQUVC
+QWdBR0JRSlVhL1cyQUFvSkVJMklSOVV2U3FwbWJMNFFBTFVKVXpVbHQ3R3pVNkk2T2dBUFFXZ04K
+MHF6RHhPRHpGSitEL0lpbWc3RS9vS0pseitNMFFoN3lsNy9oT2QvaWdWQVp0YzVxSityL3hOZEgw
+RDk5dFRFQwo0MUpsMS9oYitoVE1UYlBJTHl2cUZFS0xGU1hCbTZTaHhsZy9jWDBvdTBHNnQ1SGE5
+NERkalZOTERmOVFLOTdJCnV4Rm5TQjQvL2hxRGNnOXBVSEpqSGpqbU8zUS9YSWQzSXd3ajJVdGZ5
+eUZQc3FQaUNlOGN4NnZES3pmY3NLenAKT1hvTjU3MTJWUnZtRFNSa0VXbjBKQWJFazEyQS8vQVFS
+aW5nSGxNTkN3cHk4LzZkWU4zc3Q1M3FIK2JtNktJTAo0dm56Wko4QjJPaFp5WFZBUUdtQndZUHZr
+ZlU2NENQR2lWNjM0VFVWMENzRVlHWEh3ZitBbndoTkR2dEFSQU85CjBSWWo5Y1FsVkNsZFpQdmR2
+d0JZV3ZZQ2lsSkhUT2w0cHNkTzBQM2RXeW1kYnE0aVgzaCtDcmQ0MmZQRVY2bC8KcDRzam5DU2Nz
+NC9USUR5a2dUbEhkMnlqUlVOOGdYNlNrcTRTRi9ZNjMvNnVGUGN2N3EyRWdkRFgybTdVNUJWdwpQ
+ZGRwQmxrbWZ0dmtSWldhWmZ4L0FHeExJM0g0ZkRzc1pHQWtsOExJdW5xVlg3bFlmUnlBQndvVCtN
+T3lybjNlClM5UmVhSjR0djVoVFJOc294REZkd0QwaWpUaVdQN29lWWI4bUJuc2tML3h5UEZMUnhu
+VFJIMEFPYkFIV1BpVGMKa2drcnJrWlVJOFhRcHIwYzlXRlNmMVkwMlYxdEtDcDJhMVgxaFZCTjYw
+OXBRS2FHb2FxWDYralpvV3ZQdGxhNwp0a09TY2lYeEZLdllrZ0Fwc0Q5dAo9dk9vRAotLS0tLUVO
+RCBQR1AgU0lHTkFUVVJFLS0tLS0K
+
+--===============0323947651089626882==--
 
