@@ -1,52 +1,78 @@
-Content-Type: multipart/mixed; boundary="===============7126305950073457974=="
+Content-Type: multipart/mixed; boundary="===============5188182784757963626=="
 MIME-Version: 1.0
 From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH v3 15/15] textual: add new line to a message
-Date: Tue, 25 Nov 2014 21:16:28 +0000
-Message-ID: <1416950188-16616-16-git-send-email-kerolasa@iki.fi>
-In-Reply-To: 1416950188-16616-1-git-send-email-kerolasa@iki.fi
+Subject: Re: [Powertop] close_display() sigsegv
+Date: Thu, 20 Nov 2014 21:51:46 +0000
+Message-ID: <CAG27Bk0_Aur0GxHEC=T6zD+o9zLHigiNvwajUB-yJtXOupRcaA@mail.gmail.com>
+In-Reply-To: 49456.10.24.1.226.1416512862.squirrel@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7126305950073457974==
+--===============5188182784757963626==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Earlier message was not quite right as seen below.
+On 20 November 2014 19:47, Alexandra Yates
+<alexandra.yates(a)linux.intel.com> wrote:
 
-$ sudo ./src/powertop --auto
-Loaded 244 prior measurements
-[...]
-To show power estimates do 20 measurement(s) connected to battery onlyLeavi=
-ng PowerTOP
+Hi Alexandra,
 
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
----
- src/parameters/parameters.cpp | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> Followed all steps, in two platforms still cant reproduce.  (Difference)
+> I'm running Ubuntu.
 
-diff --git a/src/parameters/parameters.cpp b/src/parameters/parameters.cpp
-index 1843342..ec119b6 100644
---- a/src/parameters/parameters.cpp
-+++ b/src/parameters/parameters.cpp
-@@ -439,7 +439,7 @@ int global_power_valid(void)
- 		return 1;
- =
+I just reproduced the issue with g++, without CFLAGS, or anything in
+environment that I could tell would effect to compilation. Backtrace
+is pretty similar.
 
- 	if (past_results.size() > 0 && global_run_times < 1){
--		printf("To show power estimates do %ld measurement(s) connected to batte=
-ry only",
-+		printf("To show power estimates do %ld measurement(s) connected to batte=
-ry only\n",
- 			(3 * all_parameters.parameters.size()) - past_results.size());
- 		global_run_times +=3D 1; =
+(gdb) bt full
+#0  0x000000000040a14e in _M_lower_bound (this=3D<optimized out>,
+__k=3D<error reading variable: Cannot access memory at address
+0xffffffffffffffe8>, __y=3D0x477368 <tab_windows+8>, __x=3D0x363e930)
+    at /usr/include/c++/4.9.2/bits/stl_tree.h:1260
+No locals.
+#1  lower_bound (__k=3D<error reading variable: Cannot access memory at
+address 0xffffffffffffffe8>, this=3D0x477360 <tab_windows>) at
+/usr/include/c++/4.9.2/bits/stl_tree.h:927
+No locals.
+#2  lower_bound (__x=3D<error reading variable: Cannot access memory at
+address 0xffffffffffffffe8>, this=3D0x477360 <tab_windows>) at
+/usr/include/c++/4.9.2/bits/stl_map.h:902
+No locals.
+#3  operator[] (__k=3D<error reading variable: Cannot access memory at
+address 0xffffffffffffffe8>, this=3D0x477360 <tab_windows>) at
+/usr/include/c++/4.9.2/bits/stl_map.h:496
+        __i =3D <optimized out>
+#4  close_display () at display.cpp:93
+        i =3D 5
+#5  0x0000000000411e5e in clean_shutdown () at main.cpp:378
+No locals.
+#6  0x0000000000406d6d in main (argc=3D1, argv=3D0x7fff51015798) at main.cp=
+p:519
+        option_index =3D 0
+        c =3D <optimized out>
+        iterations =3D 1
+        filename =3D '\000' <repeats 2928 times>...
+        workload =3D '\000' <repeats 4095 times>
+        auto_tune =3D 0
 
- 	}
+Maybe comparing my config.log with your will give a hint what could be goin=
+g on.
+
+http://ut3.org/~kerolasa/config.log.gz
+
+> I will revert the culprit commit.  I would appreciate you testing again.
+
+I think the line below should be removed as well.
+
+main.cpp: In function 'void clean_shutdown()':
+main.cpp:378:16: error: 'close_display' was not declared in this scope
+  close_display();
+
 -- =
 
-2.1.3
+Sami Kerola
+http://www.iki.fi/kerolasa/
 
-
---===============7126305950073457974==--
+--===============5188182784757963626==--
 
