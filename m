@@ -1,41 +1,82 @@
-Content-Type: multipart/mixed; boundary="===============2962364685825976523=="
+Content-Type: multipart/mixed; boundary="===============3472231353003576156=="
 MIME-Version: 1.0
-From: Kok, Auke-jan H <auke-jan.h.kok at intel.com>
-Subject: Re: [Powertop] how does powertop estimate the watt of laptop
- computers?
-Date: Tue, 29 Mar 2016 10:41:59 -0700
-Message-ID: <CABsxX9K6i0YLcYHF4yrG=hr90cyGoKwCYyUcw9VamSkC7Z2fFg@mail.gmail.com>
-In-Reply-To: tencent_611127A954D980684BF72795@qq.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] close_display() sigsegv
+Date: Thu, 20 Nov 2014 11:47:42 -0800
+Message-ID: <49456.10.24.1.226.1416512862.squirrel@linux.intel.com>
+In-Reply-To: CAG27Bk3hHpWcMu7sEJwjk8asPPUOq+cm9HDUEkSWHo5nefi_HQ@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2962364685825976523==
+--===============3472231353003576156==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 28, 2016 at 11:20 PM, haoyu Wang <864290826(a)qq.com> wrote:
-> hi,powertop's  developers .I am a student which recently studing  power
-> consumption of pc.I have known windows power monitor software Joulemeter.
-> there are some papers introduce how it works . but i can't find the same
-> documents that introduce the powertop.
+Hi Sami,
+
+> On 20 November 2014 04:13, Alexandra Yates
+> <alexandra.yates(a)linux.intel.com> wrote:
+>> Thank you for sending this bug report.  Yes I want to get this workout
+>> before the release.
+>>
+>> I'm trying to reproduce this error but I cant get it to show me the seg
+>> fault.
 >
-> so  i want to know the  process of calculating the  watts of those
-> components .for example, how to calculate  the cpu's power ? i  have
-> following  questions :
-> 1. does powertop  use power model to calculate the  power ?
-> 2. does powertop use the utilization of cpu and combine some cpu's  power
-> model to calculate power ?
-> 3.how to get  those utilization ?use linux kernal function  or directly r=
-ead
-> some data from cpu  registers which likes  intel power gadget ?
+> Strange.
 >
-> thanks for you reading this email and hope you can reply soon .
+>> Please help me review the steps to compile powertop using clang.
+>
+> I did not do anything special.
+>
+> export CC=3Dclang
+> export CXX=3Dclang++
+> export CFLAGS=3D'-O0 -g -ggdb -Wall -Wextra -pedantic
+> -fno-omit-frame-pointer'
+> export LD=3Dld.gold
+>
+> I don't think the gold linker has much to do with the bug, but then
+> again I did not test with the traditional linker so I cannot say it
+> has no effect.
+>
+> cd powertop
+> git checkout master
+> git clean -xdf
+> git reset --hard
+> ./autogen.sh && ./configure && make -j3
+> sudo ./src/powertop
+> [press  esc quit] -> core
+>
+> I am archlinux testing repos user, so all packages are pretty fresh
+> from open source bakers.
+>
+> $ clang --version
+> clang version 3.5.0 (tags/RELEASE_350/final)
+> Target: i386-pc-linux-gnu
+> Thread model: posix
+>
+> Just in case you have systemd 'core dropped' message might not appear
+> after running the command. The easy thing to check is have a look of
+> journal
+>
+> journalctl --boot --output=3Djson-pretty SYSLOG_IDENTIFIER=3Dsystemd-core=
+dump
+>
+> The '--boot' option limits the search to the current boot, that is
+> what everyone usually needs.
+>
+> --
+> Sami Kerola
+> http://www.iki.fi/kerolasa/
+>
 
-Everything you're asking for documented in source code. You'll have to
-read that and find the answers from there yourself.
+Followed all steps, in two platforms still cant reproduce.  (Difference)
+I'm running Ubuntu.
 
-Auke
+I will revert the culprit commit.  I would appreciate you testing again.
 
---===============2962364685825976523==--
+Thank you,
+Alexandra.
+
+--===============3472231353003576156==--
 
