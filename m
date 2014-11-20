@@ -1,60 +1,72 @@
-Content-Type: multipart/mixed; boundary="===============2892314790563262784=="
+Content-Type: multipart/mixed; boundary="===============2543726784676742651=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Do not exit on MSR read errors
-Date: Mon, 11 May 2015 09:54:23 -0700
-Message-ID: <5550DEBF.6000207@linux.intel.com>
-In-Reply-To: 1009270194.15661933.1431362984315.JavaMail.zimbra@redhat.com
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: Re: [Powertop] close_display() sigsegv
+Date: Thu, 20 Nov 2014 15:02:55 +0000
+Message-ID: <CAG27Bk3hHpWcMu7sEJwjk8asPPUOq+cm9HDUEkSWHo5nefi_HQ@mail.gmail.com>
+In-Reply-To: 58593.10.24.5.197.1416456814.squirrel@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2892314790563262784==
+--===============2543726784676742651==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 5/11/2015 9:49 AM, Jaroslav Skarvada wrote:
-> Hi,
+On 20 November 2014 04:13, Alexandra Yates
+<alexandra.yates(a)linux.intel.com> wrote:
+> Thank you for sending this bug report.  Yes I want to get this workout
+> before the release.
 >
-> it seems there are virtual environments not correctly implementing the MSR
-> (e.g. VirtualBox bug: https://www.virtualbox.org/ticket/14099) or not imp=
-lementing
-> it at all (e.g. KVM). PowerTOP just exits in such environments and cannot=
- run.
->
-> The proposed patch makes PowerTOP not to exit on MSR read errors, but sti=
-ll
-> report them.
->
-> Resending as attachment, because the previous e-mail has been probably bl=
-ocked
-> somewhere
->
+> I'm trying to reproduce this error but I cant get it to show me the seg
+> fault.
 
-Hi,
+Strange.
 
+> Please help me review the steps to compile powertop using clang.
 
-I have a slightly different patch in a local repo, but it needed a command =
-line option
-so I didn't sent it upstream yet.
+I did not do anything special.
 
-the solution you have makes the app not crash, but it's really not the righ=
-t thing.
-the reason is that the statistics code still uses the "native intel msr" mo=
-del,
-so it gets all zeroes... it should use "just trust the kernel" model instea=
-d.
+export CC=3Dclang
+export CXX=3Dclang++
+export CFLAGS=3D'-O0 -g -ggdb -Wall -Wextra -pedantic -fno-omit-frame-point=
+er'
+export LD=3Dld.gold
 
--       if (strcmp(vendor, "GenuineIntel") =3D=3D 0)
-+       if (strcmp(vendor, "GenuineIntel") =3D=3D 0 && !broken_msrs)
+I don't think the gold linker has much to do with the bug, but then
+again I did not test with the traditional linker so I cannot say it
+has no effect.
 
+cd powertop
+git checkout master
+git clean -xdf
+git reset --hard
+./autogen.sh && ./configure && make -j3
+sudo ./src/powertop
+[press  esc quit] -> core
 
-something like that in src/cpu/cpu.cpp (3x) is needed instead....
-but today the msr logic runs after this code, not before, so I have not yet=
- found
-a good way to set the broken_msrs variable for the case in question
+I am archlinux testing repos user, so all packages are pretty fresh
+from open source bakers.
 
+$ clang --version
+clang version 3.5.0 (tags/RELEASE_350/final)
+Target: i386-pc-linux-gnu
+Thread model: posix
 
+Just in case you have systemd 'core dropped' message might not appear
+after running the command. The easy thing to check is have a look of
+journal
 
---===============2892314790563262784==--
+journalctl --boot --output=3Djson-pretty SYSLOG_IDENTIFIER=3Dsystemd-coredu=
+mp
+
+The '--boot' option limits the search to the current boot, that is
+what everyone usually needs.
+
+-- =
+
+Sami Kerola
+http://www.iki.fi/kerolasa/
+
+--===============2543726784676742651==--
 
