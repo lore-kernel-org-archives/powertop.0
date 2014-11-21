@@ -1,33 +1,33 @@
-Content-Type: multipart/mixed; boundary="===============2930382953054191403=="
+Content-Type: multipart/mixed; boundary="===============4974516312845779138=="
 MIME-Version: 1.0
-From: SF Markus Elfring <elfring at users.sourceforge.net>
-Subject: Re: [Powertop] Testing CERT links
-Date: Mon, 03 Nov 2014 08:58:42 +0100
-Message-ID: <545735B2.8090001@users.sourceforge.net>
-In-Reply-To: 57550.10.254.189.210.1414955821.squirrel@linux.intel.com
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: Re: [Powertop] close_display() sigsegv
+Date: Fri, 21 Nov 2014 06:26:34 +0000
+Message-ID: <CAG27Bk1bvYLotxa79DrTAdrHZnxhGjD2_B9Ve_p-gsF01YrpzQ@mail.gmail.com>
+In-Reply-To: 51714.10.24.1.226.1416531992.squirrel@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2930382953054191403==
+--===============4974516312845779138==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
->> https://www.securecoding.cert.org/confluence/display/cplusplus/PRE06-CPP=
-.+Enclose+header+files+in+an+inclusion+guard
-[...]
-> the link is not available.
+On 21 November 2014 01:06, Alexandra Yates
+<alexandra.yates(a)linux.intel.com> wrote:
+>>> I will revert the culprit commit.  I would appreciate you testing again.
+>>
+>> I think the line below should be removed as well.
+>
+> Where you able to test that you issue is resolved without these lines?
 
-The example above worked for me again a moment ago.
-Would you like to try a shorter link out?
-https://www.securecoding.cert.org/confluence/pages/viewpage.action?pageId=
-=3D637
+Sorry, I should have told immediately all works when references to
+close_display() are removed.
 
-Regards,
-Markus
+-- =
 
+Sami Kerola
+http://www.iki.fi/kerolasa/
 
-
-
---===============2930382953054191403==--
+--===============4974516312845779138==--
 
