@@ -1,26 +1,53 @@
-Content-Type: multipart/mixed; boundary="===============7490787620065319695=="
+Content-Type: multipart/mixed; boundary="===============1089251297389673707=="
 MIME-Version: 1.0
-From: Antonio <a.prota3 at studenti.unisa.it>
-Subject: [Powertop] [Installation] Powertop on Nexus 7 Problem
-Date: Tue, 20 Oct 2015 12:58:32 +0200
-Message-ID: <922199469.2773004.1445338712104.JavaMail.root@studenti.unisa.it>
-In-Reply-To: 123040584.2550983.1445264380096.JavaMail.root@studenti.unisa.it
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH v3 12/15] add timestamp to html report
+Date: Tue, 25 Nov 2014 21:16:25 +0000
+Message-ID: <1416950188-16616-13-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1416950188-16616-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7490787620065319695==
+--===============1089251297389673707==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-I've compiled with ndk-build the ncurses and pciutils libraries. Then i've =
-put these files in powertop/external folder. When i try to compile the powe=
-rtop project the terminal reply "Missing LOCAL_MODULE before including BUIL=
-D_EXECUTABLE in C:/android-ndk-r10e/project/jni/Android.mk.  Stop.". Can an=
-yone explain me this problem?
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ src/report/report.cpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Thank you,
-Antonio.=20
+diff --git a/src/report/report.cpp b/src/report/report.cpp
+index 981e984..cd3c961 100644
+--- a/src/report/report.cpp
++++ b/src/report/report.cpp
+@@ -101,6 +101,8 @@ static string read_os_release(const string &filename)
+ static void system_info(void)
+ {
+ 	string str;
++	char version_date[64];
++	time_t now =3D time(NULL);
+ =
 
---===============7490787620065319695==--
+ 	/* div attr css_class and css_id */
+ 	tag_attr div_attr;
+@@ -117,7 +119,8 @@ static void system_info(void)
+ 	/* Set array of data in row Major order */
+ 	string *system_data =3D new string[sys_table.rows * sys_table.cols];
+ 	system_data[0]=3D__("PowerTOP Version");
+-	system_data[1]=3DPOWERTOP_VERSION;
++	snprintf(version_date, sizeof(version_date), "%s ran at %s", POWERTOP_VER=
+SION, ctime(&now));
++	system_data[1]=3Dversion_date;
+ =
+
+ 	str =3D read_sysfs_string("/proc/version");
+ 	size_t  found =3D str.find(" ");
+-- =
+
+2.1.3
+
+
+--===============1089251297389673707==--
 
