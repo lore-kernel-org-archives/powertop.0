@@ -1,44 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============1948071754621839927=="
+Content-Type: multipart/mixed; boundary="===============7126305950073457974=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] [PATCH v2 07/14] configure: use autoconf-archive
- ax_cxx_compile_stdcxx_11.m4
-Date: Mon, 10 Nov 2014 17:53:54 -0800
-Message-ID: <54616C32.9080805@linux.intel.com>
-In-Reply-To: 20141110215340.GA24890@sara.bahnhof.se
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH v3 15/15] textual: add new line to a message
+Date: Tue, 25 Nov 2014 21:16:28 +0000
+Message-ID: <1416950188-16616-16-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1416950188-16616-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1948071754621839927==
+--===============7126305950073457974==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 11/10/2014 1:53 PM, Magnus Fromreide wrote:
-> On Sun, Nov 09, 2014 at 01:14:24PM +0000, Sami Kerola wrote:
->> From: Sami Kerola <kerolasa(a)iki.fi>
->>
->> Ensure the powertop is compiled C++11 compliant compiler.  That allows
->> project contributors to use features from the latest standard without
->> hesitation are they allowed in this project.  The idea is to grant
->> greater liberties to upstream in cost of a dependency to downstream.
->
-> If this is the point, should we go for C++14?
-> The latest standard part is also obviously wrong :^)
+Earlier message was not quite right as seen below.
 
-I will draw a line in sand on this (and you can tell me which side of the l=
-ine this is)
+$ sudo ./src/powertop --auto
+Loaded 244 prior measurements
+[...]
+To show power estimates do 20 measurement(s) connected to battery onlyLeavi=
+ng PowerTOP
 
-requiring new technology is fine AS LONG AS the current *released* popular =
-client distros
-(say, two out of three of Fedora, openSuSE & Ubuntu) are shipping with that=
- supported.
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ src/parameters/parameters.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-If those guys don't have a release with it yet, it's too cutting edge and l=
-eads to too many issues
-for our users.
+diff --git a/src/parameters/parameters.cpp b/src/parameters/parameters.cpp
+index 1843342..ec119b6 100644
+--- a/src/parameters/parameters.cpp
++++ b/src/parameters/parameters.cpp
+@@ -439,7 +439,7 @@ int global_power_valid(void)
+ 		return 1;
+ =
+
+ 	if (past_results.size() > 0 && global_run_times < 1){
+-		printf("To show power estimates do %ld measurement(s) connected to batte=
+ry only",
++		printf("To show power estimates do %ld measurement(s) connected to batte=
+ry only\n",
+ 			(3 * all_parameters.parameters.size()) - past_results.size());
+ 		global_run_times +=3D 1; =
+
+ 	}
+-- =
+
+2.1.3
 
 
-
---===============1948071754621839927==--
+--===============7126305950073457974==--
 
