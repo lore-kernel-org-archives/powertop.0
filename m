@@ -1,76 +1,78 @@
-Content-Type: multipart/mixed; boundary="===============2395259867913435396=="
+Content-Type: multipart/mixed; boundary="===============7739468437420159655=="
 MIME-Version: 1.0
-From: Stefanos Georgiou <stefanos1316 at gmail.com>
-Subject: [Powertop] PowerTop pread cpu0 0xe8 : Input/output error
-Date: Mon, 20 Apr 2015 11:59:27 +0300
-Message-ID: <CAEBRvAfTcVahmVk_GcfEPWw-Jw4cOGh6gFUd_xHyvyT3YBGibg@mail.gmail.com>
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] [PATCH v2 00/14] pull: various changes,
+ mostly build system related
+Date: Tue, 25 Nov 2014 11:22:50 -0800
+Message-ID: <50846.10.24.1.128.1416943370.squirrel@linux.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2395259867913435396==
+--===============7739468437420159655==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
 
-I am trying to execute power top on my Virtual Machine with specification
-OS 6.5 Scientific Linux and I get the following message : pread cpu0 0xe8 :
-input/output error. The powertop version i am using is 2.3. I have tried
-running older versions like 1.11 which was running properly but as I red
-1.11 measures cpu wake ups and not energy consumption as the 2.3. Any idea
-what the problem may be and how can I solve it ?
+> On 18 November 2014 at 18:08, Alexandra Yates
+> <alexandra.yates(a)linux.intel.com> wrote:
+>>> <alexandra.yates(a)linux.intel.com> wrote:
+>>>> When I run checkpatch.pl I get white spaces and over 80 char line
+>>>> errors
+>>>> on your patches.
+>>>
+>>> Hi Alexandra,
+>>>
+>>> You are right, I missed in the change 0004 'csstoh.sh: check every
+>>> single return value' a white space error. That is now fixed in:
+>>>
+>>> https://github.com/kerolasa/powertop/commit/6d7e331488db1e1428925579431=
+242b8fb1c6007
+>>>
+>>> 80 char line errors are strange. I do not see them. Are we using the
+>>> same version of the checkpatch.pl?
+>>>
+>>> $ git describe
+>>> v3.18-rc5
+>>> $ shasum scripts/checkpatch.pl
+>>> a13cad76323e71c97ba279838feef9730509fc59  scripts/checkpatch.pl
+>>
+>> I'm using the tip of the branch from
+>>
+>> git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+>
+> Hii Alexandra,
+>
+> Congratulations on the new release.
+>
+> I suppose now after the release my patch set can be put back on track.
+> Since I do not see the same errors as you could you run the
+> checkpatch.pl against the 14 changes and send me the output. That
+> would help me a lot.
+>
+> --
+> Sami Kerola
+> http://www.iki.fi/kerolasa/
+>
 
+ Hi Sami,
 
+Here is the output from checkpatch.pl
 
-*Best Regards,*
+   ERROR: trailing whitespace
+   14 #139: FILE: src/csstoh.sh:37:
+   15 +const char css[] =3D $
 
-*Stefanos Georgiou*
+And The other error is that I can't get patch 0002 to commit.
 
-*BSc in Network and System Programming*
-*Computer Science Department*
-*University of Cyprus*
+I will be out of the office from tomorrow until Dec 10th visiting family =
 
-*MSc in Pervasive Computing and Communications *
-*for Sustainable Development (PERCCOM)*
-*Joint Master Degree*
-*University of Lorraine, Lappeenranta, Lulea, ITMO Saint-Petersburg*
+in Ireland.
 
---===============2395259867913435396==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+If we don't get these patches today we will as soon as I get back to work.
 
-PGRpdiBkaXI9Imx0ciI+PGRpdj5IZWxsbyw8L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2PkkgYW0g
-dHJ5aW5nIHRvIGV4ZWN1dGUgcG93ZXIgdG9wIG9uIG15IFZpcnR1YWwgTWFjaGluZSB3aXRoIHNw
-ZWNpZmljYXRpb24gT1MgNi41IFNjaWVudGlmaWMgTGludXggYW5kIEkgZ2V0IHRoZSBmb2xsb3dp
-bmcgbWVzc2FnZSA6IHByZWFkIGNwdTAgMHhlOCA6IGlucHV0L291dHB1dCBlcnJvci4gVGhlIHBv
-d2VydG9wIHZlcnNpb24gaSBhbSB1c2luZyBpcyAyLjMuIEkgaGF2ZSB0cmllZCBydW5uaW5nIG9s
-ZGVyIHZlcnNpb25zIGxpa2UgMS4xMSB3aGljaCB3YXMgcnVubmluZyBwcm9wZXJseSBidXQgYXMg
-SSByZWQgMS4xMSBtZWFzdXJlcyBjcHUgd2FrZSB1cHMgYW5kIG5vdCBlbmVyZ3kgY29uc3VtcHRp
-b24gYXMgdGhlIDIuMy4gQW55IGlkZWEgd2hhdCB0aGUgcHJvYmxlbSBtYXkgYmUgYW5kIGhvdyBj
-YW4gSSBzb2x2ZSBpdCA/IMKgPC9kaXY+PGRpdj48YnI+PC9kaXY+PGJyIGNsZWFyPSJhbGwiPjxk
-aXY+PGRpdiBjbGFzcz0iZ21haWxfc2lnbmF0dXJlIj48ZGl2IGRpcj0ibHRyIj48ZGl2PjxkaXYg
-ZGlyPSJsdHIiPjxkaXY+PGRpdiBkaXI9Imx0ciI+PGI+PGZvbnQgY29sb3I9IiM3NDFiNDciIHNp
-emU9IjIiPkJlc3QgUmVnYXJkcyw8YnI+PC9mb250PjwvYj48ZGl2PjxiPjxmb250IGNvbG9yPSIj
-NzQxYjQ3IiBzaXplPSIyIj48YnI+U3RlZmFub3MgR2Vvcmdpb3U8L2ZvbnQ+PC9iPjxkaXY+PGZv
-bnQgY29sb3I9IiM3NDFiNDciIHNpemU9IjIiPjxiPjxicj48L2I+PC9mb250PjxkaXY+PGI+PGZv
-bnQgY29sb3I9IiM3NDFiNDciIHNpemU9IjIiPkJTYyBpbiBOZXR3b3JrIGFuZCBTeXN0ZW0gUHJv
-Z3JhbW1pbmc8L2ZvbnQ+PC9iPjwvZGl2PjxkaXY+PGI+PGZvbnQgY29sb3I9IiM3NDFiNDciIHNp
-emU9IjIiPkNvbXB1dGVyIFNjaWVuY2UgRGVwYXJ0bWVudDwvZm9udD48L2I+PC9kaXY+PGRpdj48
-Yj48Zm9udCBjb2xvcj0iIzc0MWI0NyIgc2l6ZT0iMiI+VW5pdmVyc2l0eSBvZiBDeXBydXM8L2Zv
-bnQ+PC9iPjwvZGl2PjwvZGl2PjxkaXY+PGI+PGZvbnQgY29sb3I9IiM3NDFiNDciIHNpemU9IjIi
-Pjxicj48L2ZvbnQ+PC9iPjwvZGl2PjxkaXY+PGI+PGZvbnQgY29sb3I9IiM3NDFiNDciIHNpemU9
-IjIiPk1TYyBpbiBQZXJ2YXNpdmUgQ29tcHV0aW5nIGFuZCBDb21tdW5pY2F0aW9uc8KgPC9mb250
-PjwvYj48L2Rpdj48ZGl2PjxiPjxmb250IGNvbG9yPSIjNzQxYjQ3IiBzaXplPSIyIj5mb3IgU3Vz
-dGFpbmFibGUgRGV2ZWxvcG1lbnQgKFBFUkNDT00pPC9mb250PjwvYj48L2Rpdj48ZGl2PjxiPjxm
-b250IGNvbG9yPSIjNzQxYjQ3IiBzaXplPSIyIj5Kb2ludCBNYXN0ZXIgRGVncmVlPC9mb250Pjwv
-Yj48L2Rpdj48ZGl2PjxiPjxmb250IGNvbG9yPSIjNzQxYjQ3IiBzaXplPSIyIj5Vbml2ZXJzaXR5
-IG9mIExvcnJhaW5lLCBMYXBwZWVucmFudGEsIEx1bGVhLCBJVE1PIFNhaW50LVBldGVyc2J1cmc8
-L2ZvbnQ+PC9iPjwvZGl2PjxkaXY+PGI+PGZvbnQgY29sb3I9IiM3NDFiNDciIHNpemU9IjIiPjxi
-cj48L2ZvbnQ+PC9iPjwvZGl2PjwvZGl2PjwvZGl2PjwvZGl2PjwvZGl2PjwvZGl2PjwvZGl2Pjwv
-ZGl2PjwvZGl2Pgo8L2Rpdj4K
+Thank you,
+Alexandra.
 
---===============2395259867913435396==--
+--===============7739468437420159655==--
 
