@@ -1,28 +1,40 @@
-Content-Type: multipart/mixed; boundary="===============5358201869482051341=="
+Content-Type: multipart/mixed; boundary="===============1941452513234491286=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] [RFC 6/9] replace pciutils usage with udevhwdb
-Date: Mon, 01 Jun 2015 09:15:21 -0700
-Message-ID: <556C8519.6050009@linux.intel.com>
-In-Reply-To: 1433174955-17349-7-git-send-email-nanleychery@gmail.com
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH v3 13/15] fix typo in message
+Date: Tue, 25 Nov 2014 21:16:26 +0000
+Message-ID: <1416950188-16616-14-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1416950188-16616-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5358201869482051341==
+--===============1941452513234491286==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 6/1/2015 9:09 AM, Nanley Chery wrote:
-> Signed-off-by: Nanley Chery <nanley.g.chery(a)intel.com>
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ src/main.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-no commit message?
+diff --git a/src/main.cpp b/src/main.cpp
+index b6679f2..dc69fca 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -436,7 +436,7 @@ int main(int argc, char **argv)
+ 			break;
+ 		case 'q':
+ 			if (freopen("/dev/null", "a", stderr))
+-				fprintf(stderr, _("Quite mode failed!\n"));
++				fprintf(stderr, _("Quiet mode failed!\n"));
+ 			break;
+ 		case 't':
+ 			time_out =3D (optarg ? atoi(optarg) : 20);
+-- =
+
+2.1.3
 
 
-
-also on some OSes the udevhwdb for PCI names is empty and the pciutils expl=
-icit file is needed
-
-
---===============5358201869482051341==--
+--===============1941452513234491286==--
 
