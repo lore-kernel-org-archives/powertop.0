@@ -1,34 +1,55 @@
-Content-Type: multipart/mixed; boundary="===============2856941827632893542=="
+Content-Type: multipart/mixed; boundary="===============8604334683141352507=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] [RFC 0/9] Use udev for accessing sysfs
-Date: Wed, 03 Jun 2015 13:25:46 -0700
-Message-ID: <556F62CA.3070208@linux.intel.com>
-In-Reply-To: CAJDL4uLsyFK5DJsbC1b4yKyJEqKxUKrUmGk-QZUriiz4af8QvQ@mail.gmail.com
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: [Powertop] [PATCH v3 14/15] add missing include
+Date: Tue, 25 Nov 2014 21:16:27 +0000
+Message-ID: <1416950188-16616-15-git-send-email-kerolasa@iki.fi>
+In-Reply-To: 1416950188-16616-1-git-send-email-kerolasa@iki.fi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2856941827632893542==
+--===============8604334683141352507==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 6/3/2015 1:23 PM, Nanley Chery wrote:
+In file included from measurement/sysfs.cpp:27:
+In file included from measurement/../lib.h:59:
+In file included from /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/=
+../../../../include/c++/4.9.1/string:52:
+In file included from /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/=
+../../../../include/c++/4.9.1/bits/basic_string.h:2850:
+In file included from /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/=
+../../../../include/c++/4.9.1/ext/string_conversions.h:41:
+/usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/../../../../include/c+=
++/4.9.1/cstdlib:153:11: error:
+      no member named 'realloc' in the global namespace
+  using ::realloc;
+        ~~^
 
->>
->> .... how does this work on Android ?
->
-> That's a good question. I actually hadn't considered the affects on
-> that platform. It seems like there is no udev-like abstraction layer
-> on Android. It looks like the way forward would be to either keep a
-> separate folder for android specific code or to create more helper
-> functions to abstract how we access sysfs. The latter method seems
-> preferable because it wouldn't increase the complexity of the project
-> as a whole. Thoughts?
+Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+---
+ src/lib.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-but if we keep the code anyway, what's the benefit of going through one
-more layer of indirection????
-Am I missing something here?
+diff --git a/src/lib.h b/src/lib.h
+index ec50946..5c94271 100644
+--- a/src/lib.h
++++ b/src/lib.h
+@@ -27,6 +27,7 @@
+ =
 
---===============2856941827632893542==--
+ #include <libintl.h>
+ #include <stdint.h>
++#include <stdlib.h>
+ =
+
+ /* Include only for Automake builds */
+ #ifdef HAVE_CONFIG_H
+-- =
+
+2.1.3
+
+
+--===============8604334683141352507==--
 
