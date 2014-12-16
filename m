@@ -1,41 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============8528299668604434027=="
+Content-Type: multipart/mixed; boundary="===============0871865989746296538=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] Complete build options for Pthread API
-Date: Fri, 31 Oct 2014 11:01:47 -0700
-Message-ID: <50675.10.24.5.246.1414778507.squirrel@linux.intel.com>
-In-Reply-To: 54536282.1050708@users.sourceforge.net
+From: Chris Samuel <chris at csamuel.org>
+Subject: Re: [Powertop] [Announcement] Updated Users Guide Released
+Date: Tue, 16 Dec 2014 21:40:32 +1100
+Message-ID: <9995241.6PyfrQ3JKN@quad>
+In-Reply-To: 57889.10.254.17.184.1418351950.squirrel@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8528299668604434027==
+--===============0871865989746296538==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+On Thu, 11 Dec 2014 06:39:10 PM Alexandra Yates wrote:
 
->> What is the the return on investment for this feature in terms of
->> performance?
->
-> I did not suggest a change for this issue to increase the build speed
-> here. I do
-> not really know how often a different run time behaviour will be noticed
-> on the
-> build systems.
->
-> I proposed the reuse of the AX_PTHREAD configuration script as a general
-> approach if you are interested to improve software portability around the
-> POSIX
-> threads programming interface.
->
-> Regards,
-> Markus
->
+> An updated version of the PowerTOP User's Guide was released today!!
+> =
 
-How is this different from what we currently have?
+> Visit https://01.org/powertop to get the latest copy.
 
-Thank you,
-Alexandra.
+It would also be useful to explain how to select the intel_pstate driver as =
 
---===============8528299668604434027==--
+whilst the Kubuntu 14.04 kernel has it compiled in it does not select it by =
+
+default.
+
+root(a)quad:~# cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_driver
+acpi-cpufreq
+
+root(a)quad:~# grep -i pstate /boot/config-3.13.0-43-generic =
+
+CONFIG_X86_INTEL_PSTATE=3Dy
+
+CPU is IVB.
+
+Intel(R) Core(TM) i7-3770K CPU @ 3.50GHz (fam: 06, model: 3a, stepping: 09)
+
+All the best,
+Chris
+-- =
+
+ Chris Samuel  :  http://www.csamuel.org/  :  Melbourne, VIC
+
+
+
+--===============0871865989746296538==--
 
