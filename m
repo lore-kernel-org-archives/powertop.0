@@ -1,38 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============2906572876335070570=="
+Content-Type: multipart/mixed; boundary="===============6828649681972102252=="
 MIME-Version: 1.0
-From: Dhanraj Peela <dhanrajpeela at gmail.com>
-Subject: [Powertop] Fwd: Urgent.
-Date: Fri, 08 May 2015 12:17:22 +0530
-Message-ID: <CAO6NHbx-Gw4ZHwX8qWk8ndcr--Myi46ewyv=8imuzRmCZ=Xwsw@mail.gmail.com>
-In-Reply-To: mailman.1341.1431067389.2227.powertop@lists.01.org
+From: Sami Kerola <kerolasa at iki.fi>
+Subject: Re: [Powertop] Powertop crashes with 'powertop --auto-tune'
+Date: Sun, 21 Dec 2014 21:25:40 +0000
+Message-ID: <CAG27Bk1Y+S=yakWkiResNsrSeJf=g9HfsqEP5E---tamhnqH-A@mail.gmail.com>
+In-Reply-To: 54971B20.6020708@gmx.de
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2906572876335070570==
+--===============6828649681972102252==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Sir,
-This id Dhanraj,Im working on a power optimization program and would like
-to know how to only check the power consumed by a single application and
-how to change its C State in Linux.
-I'm using CentOs and powertop ver 2.7.
-Thank You..
+On 21 December 2014 at 19:10, Harvey <harv(a)gmx.de> wrote:
+> Hope I am right here:
+>
+> On Archlinux 64bit as well as 32bit systems powertop 2.7 crashes
+> reproducible like this when called with the parameter --auto-tune:
 
---===============2906572876335070570==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+Hi Harvey,
 
-PGRpdiBkaXI9Imx0ciI+PGRpdiBjbGFzcz0iZ21haWxfcXVvdGUiPjxkaXYgZGlyPSJsdHIiPkhp
-IFNpciw8ZGl2PlRoaXMgaWQgRGhhbnJhaixJbSB3b3JraW5nIG9uIGEgcG93ZXIgb3B0aW1pemF0
-aW9uIHByb2dyYW0gYW5kIHdvdWxkIGxpa2UgdG8ga25vdyBob3cgdG8gb25seSBjaGVjayB0aGUg
-cG93ZXIgY29uc3VtZWQgYnkgYSBzaW5nbGUgYXBwbGljYXRpb24gYW5kIGhvdyB0byBjaGFuZ2Ug
-aXRzIEMgU3RhdGUgaW4gTGludXguPC9kaXY+PGRpdj5JJiMzOTttIHVzaW5nIENlbnRPcyBhbmQg
-cG93ZXJ0b3AgdmVyIDIuNy48L2Rpdj48ZGl2PlRoYW5rIFlvdS4uPC9kaXY+PC9kaXY+Cjxicj48
-L2Rpdj48YnI+PC9kaXY+Cg==
+Rather strange. I have up to date archlinux and the same does not
+happen when I run --auto-tune.
 
---===============2906572876335070570==--
+I'm just a hobbyist contributor and I haven't cracked out how to know
+where in code 'double free or corruption (!prev): 0x0975bc20' issue
+happen. Could you compile the tool with debugging symbols, and
+recreate issue the way we could see backtrace? That would make fixing
+a lot easier.
+
+cd /tmp
+wget https://01.org/sites/default/files/downloads/powertop/powertop-2.7.tar=
+.gz
+tar xzf powertop-2.7.tar.gz
+cd powertop-2.7
+CXXLAGS=3D"-O0 -g -ggdb -fno-omit-frame-pointer" ./configure
+make -j3
+sudo -i
+cd /tmp/powertop-2.7
+./src/powertop --auto-tune
+[crash]
+coredumpctl gdb
+(gdb) bt full
+<copy paste this output to reply>
+
+-- =
+
+Sami Kerola
+http://www.iki.fi/kerolasa/
+
+--===============6828649681972102252==--
 
