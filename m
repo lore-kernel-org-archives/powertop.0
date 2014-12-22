@@ -1,37 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============4415987830429456358=="
+Content-Type: multipart/mixed; boundary="===============8989372329308572069=="
 MIME-Version: 1.0
-From: Jaroslav Skarvada <jskarvad at redhat.com>
-Subject: Re: [Powertop] [Announcement] Release v2.7
-Date: Tue, 25 Nov 2014 06:01:22 -0500
-Message-ID: <1164047004.17765646.1416913282529.JavaMail.zimbra@redhat.com>
-In-Reply-To: 60844.10.24.1.142.1416853531.squirrel@linux.intel.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] Powertop crashes with 'powertop --auto-tune'
+Date: Sun, 21 Dec 2014 16:15:48 -0800
+Message-ID: <549762B4.3090108@linux.intel.com>
+In-Reply-To: CAG27Bk1Y+S=yakWkiResNsrSeJf=g9HfsqEP5E---tamhnqH-A@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4415987830429456358==
+--===============8989372329308572069==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
------ Original Message -----
-> We are pleased to announce the release of PowerTOP v2.7.
-> =
+> I'm just a hobbyist contributor and I haven't cracked out how to know
+> where in code 'double free or corruption (!prev): 0x0975bc20' issue
+> happen. Could you compile the tool with debugging symbols, and
+> recreate issue the way we could see backtrace? That would make fixing
+> a lot easier.
+>
+> cd /tmp
+> wget https://01.org/sites/default/files/downloads/powertop/powertop-2.7.t=
+ar.gz
+> tar xzf powertop-2.7.tar.gz
+> cd powertop-2.7
+> CXXLAGS=3D"-O0 -g -ggdb -fno-omit-frame-pointer" ./configure
+> make -j3
+> sudo -i
+> cd /tmp/powertop-2.7
+> ./src/powertop --auto-tune
+> [crash]
+> coredumpctl gdb
+> (gdb) bt full
+> <copy paste this output to reply>
 
-> https://01.org/powertop/
-> =
+this would indeed be very helpful
 
-> Thank you,
-> Alexandra.
+another helpful thing could be to run "strace" on powertop, and c-n-p the l=
+ast 20 lines or so
 
-Thanks for the release.
 
-The archive is called powertop-2.7.tar_1.gz. Notice the _1 suffix.
-Is it intentional? On the download page, there is written
-powertop-2.7.tar.gz. This confuses my download scripts a bit
 
-thanks & regards
-
-Jaroslav
-
---===============4415987830429456358==--
+--===============8989372329308572069==--
 
