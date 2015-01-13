@@ -1,149 +1,99 @@
-Content-Type: multipart/mixed; boundary="===============0502942021494193803=="
+Content-Type: multipart/mixed; boundary="===============0825338577274968146=="
 MIME-Version: 1.0
-From: Daniel Leung <daniel.leung at linux.intel.com>
-Subject: [Powertop] [PATCH 1/1] Android: Use syscall to write to sysfs nodes
-Date: Mon, 02 Mar 2015 11:09:38 -0800
-Message-ID: <1425323378-5225-1-git-send-email-daniel.leung@linux.intel.com>
+From: Wang, Xiaolong <xiaolong.wang at intel.com>
+Subject: [Powertop] Frequency stats show only 100% idle on servers in
+ "performance" profile
+Date: Tue, 13 Jan 2015 07:07:23 +0000
+Message-ID: <3D803AC0BEBB604B9799C45D4E4A14B70129A666@SHSMSX103.ccr.corp.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0502942021494193803==
+--===============0825338577274968146==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-For some reason, ofstream fails to write to sysfs nodes
-on Android. So use old-fashion open()/write()/close().
+Hi Powertop developers,
 
-Signed-off-by: Daniel Leung <daniel.leung(a)linux.intel.com>
----
- .../0001-Android-disable-C-exceptions.patch        | 34 +++++-------------=
-----
- src/lib.cpp                                        | 14 +++++++++
- 2 files changed, 22 insertions(+), 26 deletions(-)
+Please help to evaluate if this is a bug:
 
-diff --git a/patches/Android/0001-Android-disable-C-exceptions.patch b/patc=
-hes/Android/0001-Android-disable-C-exceptions.patch
-index 435cd95..b11bdc7 100644
---- a/patches/Android/0001-Android-disable-C-exceptions.patch
-+++ b/patches/Android/0001-Android-disable-C-exceptions.patch
-@@ -1,4 +1,4 @@
--From 604d8f6da54524f0f7bfdd7aea91d353b4f1b612 Mon Sep 17 00:00:00 2001
-+From 4570b7d6559047b384c50b4766e168fd5e11db8e Mon Sep 17 00:00:00 2001
- From: Daniel Leung <daniel.leung(a)intel.com>
- Date: Wed, 25 Feb 2015 13:24:14 -0800
- Subject: [PATCH 1/1] Android: disable C++ exceptions
-@@ -11,11 +11,11 @@ Signed-off-by: Daniel Leung <daniel.leung(a)intel.com>
-  Android.mk           |  2 +-
-  src/devices/ahci.cpp |  8 ++++++++
-  src/devices/alsa.cpp |  8 ++++++++
-- src/lib.cpp          | 19 +++++++++++++++++++
-- 4 files changed, 36 insertions(+), 1 deletion(-)
-+ src/lib.cpp          | 15 +++++++++++++++
-+ 4 files changed, 32 insertions(+), 1 deletion(-)
- =
+I was using Powertop 2.6.1 on RHEL7.1beta and some servers including Ivybri=
+dge-EP/EX and Haswell-1S/EP/EX.
+And found Frequency stats show only 100% idle and no other frequency percen=
+tage, like the following:
 
- diff --git a/Android.mk b/Android.mk
--index dd98d0f..f6b8689 100644
-+index 0c95e3a..ff1040a 100644
- --- a/Android.mk
- +++ b/Android.mk
- @@ -14,7 +14,7 @@ LOCAL_MODULE :=3D powertop
-@@ -128,28 +128,10 @@ index a1fca71..ba3c0b6 100644
-  	p =3D (end_active - start_active) / (0.001 + end_active + end_inactive -=
- start_active - start_inactive) * 100.0;
-  	report_utilization(name, p);
- diff --git a/src/lib.cpp b/src/lib.cpp
--index 0dec0b7..91dac7a 100644
-+index 24d6d07..4812ff1 100644
- --- a/src/lib.cpp
- +++ b/src/lib.cpp
--@@ -176,13 +176,17 @@ void write_sysfs(const string &filename, const strin=
-g &value)
-- 	file.open(filename.c_str(), ios::out);
-- 	if (!file)
-- 		return;
--+#ifndef DISABLE_TRYCATCH
-- 	try
-- 	{
--+#endif
-- 		file << value;
-- 		file.close();
--+#ifndef DISABLE_TRYCATCH
-- 	} catch (std::exception &exc) {
-- 		return;
-- 	}
--+#endif
-- }
-- =
-
-- int read_sysfs(const string &filename, bool *ok)
--@@ -196,16 +200,23 @@ int read_sysfs(const string &filename, bool *ok)
-+@@ -210,16 +210,23 @@ int read_sysfs(const string &filename, bool *ok)
-  			*ok =3D false;
-  		return 0;
-  	}
-@@ -173,7 +155,7 @@ index 0dec0b7..91dac7a 100644
-  	file.close();
-  	return i;
-  }
--@@ -219,17 +230,21 @@ string read_sysfs_string(const string &filename)
-+@@ -233,17 +240,21 @@ string read_sysfs_string(const string &filename)
-  	file.open(filename.c_str(), ios::in);
-  	if (!file)
-  		return "";
-@@ -195,7 +177,7 @@ index 0dec0b7..91dac7a 100644
-  	return content;
-  }
-  =
-
--@@ -246,17 +261,21 @@ string read_sysfs_string(const char *format, const c=
-har *param)
-+@@ -260,17 +271,21 @@ string read_sysfs_string(const char *format, const c=
-har *param)
-  	file.open(filename, ios::in);
-  	if (!file)
-  		return "";
-diff --git a/src/lib.cpp b/src/lib.cpp
-index 6b1bc0a..24d6d07 100644
---- a/src/lib.cpp
-+++ b/src/lib.cpp
-@@ -171,6 +171,7 @@ void set_max_cpu(int cpu)
- =
-
- void write_sysfs(const string &filename, const string &value)
- {
-+#ifndef ANDROID
- 	ofstream file;
- =
-
- 	file.open(filename.c_str(), ios::out);
-@@ -183,6 +184,19 @@ void write_sysfs(const string &filename, const string =
-&value)
- 	} catch (std::exception &exc) {
- 		return;
- 	}
-+#else
-+	int fd;
-+
-+	fd =3D ::open(filename.c_str(), O_WRONLY);
-+	if (fd < 0)
-+		return;
-+
-+	::write(fd, value.c_str(), value.length());
-+
-+	close(fd);
-+
-+	return;
-+#endif
- }
- =
-
- int read_sysfs(const string &filename, bool *ok)
--- =
-
-1.8.3.2
+PowerTOP 2.6.1    Overview   Idle stats   Frequency stats   Device stats   =
+Tunab
 
 
---===============0502942021494193803==--
+            Package |             Core    |            CPU 0       CPU 4
+                    |                     | Actual    3.9 GHz     3.8 GHz
+Idle       100.0%   | Idle       100.0%   | Idle       100.0%      100.0%
+
+                    |             Core    |            CPU 1       CPU 5
+                    |                     | Actual    3.9 GHz     3.9 GHz
+                    | Idle       100.0%   | Idle       100.0%      100.0%
+
+                    |             Core    |            CPU 2       CPU 6
+                    |                     | Actual    3.8 GHz     3.8 GHz
+                    | Idle       100.0%   | Idle       100.0%      100.0%
+
+                    |             Core    |            CPU 3       CPU 7
+                    |                     | Actual    3.8 GHz     3.7 GHz
+                    | Idle       100.0%   | Idle       100.0%      100.0%
+
+When I add workloads, the Idle percentage drops, but still no other frequen=
+cy percentage.
+For servers, RHEL7 would use "throughput-performance" profile, which would =
+keep processor at its top frequency.
+
+I just think PowerTop should not display idle percentage only, in my point =
+of view,
+when no workload, 90%+ idle and a few percentage at max frequency is reason=
+able.
+when high workload, a few percentage idle and high percentage at max freque=
+ncy is reasonable.
+
+The following is the result of "balanced" profile,
+at least not all 100% idle.
+
+PowerTOP 2.6.1    Overview   Idle stats   Frequency stats   Device stats   =
+Tunab
+
+            Package |             Core    |            CPU 0       CPU 4
+                    |                     | Actual    3.6 GHz     3.3 GHz
+Idle        99.8%   | Idle       100.0%   | Idle       100.0%      100.0%
+4.00 GHz     0.1%   | 4.00 GHz     0.0%   | 4.00 GHz     0.0%        0.0%
+3.31 GHz     0.0%   |                     |
+1400 MHz     0.0%   |                     |
+2.10 GHz     0.1%   |                     |
+
+                    |             Core    |            CPU 1       CPU 5
+                    |                     | Actual    3.6 GHz     3.5 GHz
+                    | Idle        99.8%   | Idle       100.0%       99.9%
+                    | 4.00 GHz     0.1%   | 3.31 GHz     0.0%        0.1%
+                    | 3.31 GHz     0.0%   | 1400 MHz     0.0%        0.1%
+                    | 1400 MHz     0.0%   | 4.00 GHz     0.0%
+                    | 2.10 GHz     0.1%   |
+
+                    |             Core    |            CPU 2       CPU 6
+                    |                     | Actual    3.4 GHz     3.2 GHz
+                    | Idle       100.0%   | Idle       100.0%      100.0%
+                    | 4.00 GHz     0.0%   | 4.00 GHz     0.0%        0.0%
+                    | 2.10 GHz     0.0%   | 2.10 GHz     0.0%
+                    |                     |
+                    |                     |
+
+                    |             Core    |            CPU 3       CPU 7
+                    |                     | Actual    3.4 GHz     2.9 GHz
+                    | Idle       100.0%   | Idle       100.0%      100.0%
+                    | 3.31 GHz     0.0%   | 3.31 GHz     0.0%        0.0%
+                    | 4.00 GHz     0.0%   | 4.00 GHz     0.0%
+                    | 2.10 GHz     0.0%   | 2.10 GHz     0.0%
+
+Thanks,
+
+-Wang, Xiaolong from Intel OTC OSV-Enabling
+
+--===============0825338577274968146==--
 
