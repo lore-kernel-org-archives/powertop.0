@@ -1,46 +1,64 @@
-Content-Type: multipart/mixed; boundary="===============4046232970716234843=="
+Content-Type: multipart/mixed; boundary="===============4957614408955113035=="
 MIME-Version: 1.0
-From: Sripada, Radhakrishna <radhakrishna.sripada at intel.com>
-Subject: Re: [Powertop] [PATCH] Assign line level based on linux name
-Date: Mon, 21 Sep 2015 21:26:53 +0000
-Message-ID: <8C2593290C2B3E488D763E819AF1F02E0AF8A2CE@ORSMSX101.amr.corp.intel.com>
-In-Reply-To: 56005F46.5050703@linux.intel.com
+From: Alex <axfelix at gmail.com>
+Subject: Re: [Powertop] corrupted double-linked list error on exit
+Date: Sat, 31 Jan 2015 20:21:36 -0800
+Message-ID: <1422764496.824.0@smtp.gmail.com>
+In-Reply-To: 1422385274.16232.1@smtp.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4046232970716234843==
+--===============4957614408955113035==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-intel_idle driver exposes the sates C1-SKL and C1E-SKL. Powertop Idle Stats=
- only show the statistics of C1E-SKL and not C1-SKL. By parsing the human n=
-ame for the two states, the same line level '1' gets assigned to both C1-SK=
-L and C1E-SKL. Hence the statistics of C1-SKL are always overwritten by the=
- statistics of C1E-SKL. To eliminate this parsing linux name would assign d=
-ifferent line levels to different cstates irrespective of their human names.
+Nevermind -- the issue appears to have gone away after updating kernel =
 
------Original Message-----
-From: Arjan van de Ven [mailto:arjan(a)linux.intel.com] =
+point versions (from 3.18.2 to 3.18.4, I believe).
 
-Sent: Monday, September 21, 2015 12:49 PM
-To: Sripada, Radhakrishna; powertop(a)lists.01.org
-Subject: Re: [Powertop] [PATCH] Assign line level based on linux name
+-alex
 
-On 9/21/2015 11:34 AM, Radhakrishna Sripada wrote:
-> C-states having the same number in their human names have the same =
+On Tue, 27 Jan, 2015 at 11:01 AM, Alex <axfelix(a)gmail.com> wrote:
+> Hi folks,
+> =
 
-> line levels. Switching to linux names assigns seperate levels to each C-s=
-tate.
->
-> Signed-off-by: Radhakrishna Sripada <radhakrishna.sripada(a)intel.com>
+> Wanted to alert you to this github issue which I and another user are =
 
-hmm do you have a before/after kind of thing?
-(your description is a bit cryptic in that sense)
+> experiencing running Powertop on fairly bleeding edge environments =
 
-also of course this code isn't used for Intel cpus normally...
+> (Gnome 3.14, Linux 3.18). Receiving a "corrupted double-linked list" =
 
+> error citing a memory address on trying to exit which prevents me =
 
+> from saving calibrations.
+> =
 
---===============4046232970716234843==--
+> https://github.com/NixOS/nixpkgs/issues/5424
+> =
+
+> Best,
+> -alex
+
+--===============4957614408955113035==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+TmV2ZXJtaW5kIC0tIHRoZSBpc3N1ZSBhcHBlYXJzIHRvIGhhdmUgZ29uZSBhd2F5IGFmdGVyIHVw
+ZGF0aW5nIGtlcm5lbCBwb2ludCB2ZXJzaW9ucyAoZnJvbSAzLjE4LjIgdG8gMy4xOC40LCBJIGJl
+bGlldmUpLjxicj48YnI+LWFsZXgKCjxicj48YnI+T24gVHVlLCAyNyBKYW4sIDIwMTUgYXQgMTE6
+MDEgQU0sIEFsZXggJmx0O2F4ZmVsaXhAZ21haWwuY29tJmd0OyB3cm90ZTo8YnI+CjxibG9ja3F1
+b3RlIHR5cGU9ImNpdGUiPkhpIGZvbGtzLDxkaXY+PGJyPjwvZGl2PjxkaXY+V2FudGVkIHRvIGFs
+ZXJ0IHlvdSB0byB0aGlzIGdpdGh1YiBpc3N1ZSB3aGljaCBJIGFuZCBhbm90aGVyIHVzZXIgYXJl
+IGV4cGVyaWVuY2luZyBydW5uaW5nIFBvd2VydG9wIG9uIGZhaXJseSBibGVlZGluZyBlZGdlIGVu
+dmlyb25tZW50cyAoR25vbWUgMy4xNCwgTGludXggMy4xOCkuIFJlY2VpdmluZyBhICJjb3JydXB0
+ZWQgZG91YmxlLWxpbmtlZCBsaXN0IiBlcnJvciBjaXRpbmcgYSBtZW1vcnkgYWRkcmVzcyBvbiB0
+cnlpbmcgdG8gZXhpdCB3aGljaCBwcmV2ZW50cyBtZSBmcm9tIHNhdmluZyBjYWxpYnJhdGlvbnMu
+PC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj48YSBocmVmPSJodHRwczovL2dpdGh1Yi5jb20vTml4
+T1Mvbml4cGtncy9pc3N1ZXMvNTQyNCI+aHR0cHM6Ly9naXRodWIuY29tL05peE9TL25peHBrZ3Mv
+aXNzdWVzLzU0MjQ8L2E+PC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj5CZXN0LDxicj4tYWxleDwv
+ZGl2PjwvYmxvY2txdW90ZT4=
+--===============4957614408955113035==--
 
