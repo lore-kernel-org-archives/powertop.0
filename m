@@ -1,62 +1,133 @@
-Content-Type: multipart/mixed; boundary="===============5566131038627512497=="
+Content-Type: multipart/mixed; boundary="===============3149863283001847723=="
 MIME-Version: 1.0
-From: Thomas Renninger <trenn at suse.de>
-Subject: [Powertop] Too much memory consumption by powertop
-Date: Tue, 28 Apr 2015 17:58:05 +0200
-Message-ID: <1765755.qjI46OxpdT@skinner>
+From: Eoff, Ullysses A <ullysses.a.eoff at intel.com>
+Subject: Re: [Powertop] Regression: read_msr cpu0 0x3fe : Input/output error
+Date: Wed, 18 Feb 2015 22:52:05 +0000
+Message-ID: <8B5BDC21C48FAF4CA5D7E3FE1A63A90870A0143E@ORSMSX111.amr.corp.intel.com>
+In-Reply-To: 8B5BDC21C48FAF4CA5D7E3FE1A63A908709FFEDE@ORSMSX111.amr.corp.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5566131038627512497==
+--===============3149863283001847723==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-As powertop list is for subscribers only, here Takashi's
-findings concerning a big memory waste fowarded:
+This also happens on BYT-M N2830 CPU... and likely all other BYT-M SKUs.
 
-----------  Forwarded Message  ----------
+----
+U. Artie
 
-Subject: Too much memory consumption by powertop
-Date: Tuesday, April 28, 2015, 05:32:41 PM
-From: Takashi Iwai <tiwai(a)suse.de>
+From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of Eoff, =
+Ullysses A
+Sent: Wednesday, February 18, 2015 12:27 PM
 To: powertop(a)lists.01.org
-CC: trenn(a)suse.de
+Subject: [Powertop] Regression: read_msr cpu0 0x3fe : Input/output error
 
-Hi,
+Powertop fails with error: "read_msr cpu0 0x3fe : Input/output error" on BY=
+T-M N3540 CPU (model 0x37).
 
-I noticed that powertop consumes way too much memory than needed.  It
-constantly takes over 170MB RES, sometimes over 200MB.
+>From the sourcecode, it appears c7 support depends on the presence of "/sy=
+s/bus/pci/devices/0000:00:13.0" for model 0x37.  Directory "/sys/bus/pci/de=
+vices/0000:00:13.0" does not exist on my system.
 
-Then I looked at profile, and it showed that most of memory is
-allocated for newpad_sp().  Indeed, the current code allocates a pad
-of the fixed size of 1000x1000 (!) for each tab, and we have five
-tabs, so five times of that.  No wonder that such a small neat CUI
-program is so hungry.
+The commit that introduced this problem is:
 
-For example, a hack like below already reduces the memory footprint
-to around 20MB, 90% cut.  Not bad.
+commit e01a025bc37f730379edc001e7f12fa269b68fbd
+Author: alexandra.yates(a)linux.intel.com<mailto:alexandra.yates(a)linux.in=
+tel.com> <alexandra.yates(a)linux.intel.com<mailto:alexandra.yates(a)linux.=
+intel.com>>
+Date:   Fri Aug 22 02:52:19 2014 -0700
 
---- a/src/display.cpp
-+++ b/src/display.cpp
-@@ -48,7 +48,7 @@ void create_tab(const string &name, cons
-        if (!w)
-                w =3D new(class tab_window);
- =
-
--       w->win =3D newpad(1000,1000);
-+       w->win =3D newpad(80,160); // XXX FIXME XXX
-        tab_names.push_back(name);
-        tab_windows[name] =3D w;
-        tab_translations[name] =3D translation;
-
-Can anyone look into this and give a better / smarter solution?
+    bug fix intel bdw: package c-state support
 
 
-thanks,
+----
+U. Artie
 
-Takashi
------------------------------------------
 
---===============5566131038627512497==--
+--===============3149863283001847723==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
+bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
+YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
+cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
+VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
+bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
+ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTUgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
+PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseToiQ2Ft
+YnJpYSBNYXRoIjsKCXBhbm9zZS0xOjIgNCA1IDMgNSA0IDYgMyAyIDQ7fQpAZm9udC1mYWNlCgl7
+Zm9udC1mYW1pbHk6Q2FsaWJyaTsKCXBhbm9zZS0xOjIgMTUgNSAyIDIgMiA0IDMgMiA0O30KLyog
+U3R5bGUgRGVmaW5pdGlvbnMgKi8KcC5Nc29Ob3JtYWwsIGxpLk1zb05vcm1hbCwgZGl2Lk1zb05v
+cm1hbAoJe21hcmdpbjowaW47CgltYXJnaW4tYm90dG9tOi4wMDAxcHQ7Cglmb250LXNpemU6MTEu
+MHB0OwoJZm9udC1mYW1pbHk6IkNhbGlicmkiLCJzYW5zLXNlcmlmIjt9CmE6bGluaywgc3Bhbi5N
+c29IeXBlcmxpbmsKCXttc28tc3R5bGUtcHJpb3JpdHk6OTk7Cgljb2xvcjojMDU2M0MxOwoJdGV4
+dC1kZWNvcmF0aW9uOnVuZGVybGluZTt9CmE6dmlzaXRlZCwgc3Bhbi5Nc29IeXBlcmxpbmtGb2xs
+b3dlZAoJe21zby1zdHlsZS1wcmlvcml0eTo5OTsKCWNvbG9yOiM5NTRGNzI7Cgl0ZXh0LWRlY29y
+YXRpb246dW5kZXJsaW5lO30Kc3Bhbi5FbWFpbFN0eWxlMTcKCXttc28tc3R5bGUtdHlwZTpwZXJz
+b25hbDsKCWZvbnQtZmFtaWx5OiJDYWxpYnJpIiwic2Fucy1zZXJpZiI7Cgljb2xvcjp3aW5kb3d0
+ZXh0O30Kc3Bhbi5FbWFpbFN0eWxlMTgKCXttc28tc3R5bGUtdHlwZTpwZXJzb25hbC1yZXBseTsK
+CWZvbnQtZmFtaWx5OiJDYWxpYnJpIiwic2Fucy1zZXJpZiI7Cgljb2xvcjojMUY0OTdEO30KLk1z
+b0NocERlZmF1bHQKCXttc28tc3R5bGUtdHlwZTpleHBvcnQtb25seTsKCWZvbnQtc2l6ZToxMC4w
+cHQ7fQpAcGFnZSBXb3JkU2VjdGlvbjEKCXtzaXplOjguNWluIDExLjBpbjsKCW1hcmdpbjoxLjBp
+biAxLjBpbiAxLjBpbiAxLjBpbjt9CmRpdi5Xb3JkU2VjdGlvbjEKCXtwYWdlOldvcmRTZWN0aW9u
+MTt9Ci0tPjwvc3R5bGU+PCEtLVtpZiBndGUgbXNvIDldPjx4bWw+CjxvOnNoYXBlZGVmYXVsdHMg
+djpleHQ9ImVkaXQiIHNwaWRtYXg9IjEwMjYiIC8+CjwveG1sPjwhW2VuZGlmXS0tPjwhLS1baWYg
+Z3RlIG1zbyA5XT48eG1sPgo8bzpzaGFwZWxheW91dCB2OmV4dD0iZWRpdCI+CjxvOmlkbWFwIHY6
+ZXh0PSJlZGl0IiBkYXRhPSIxIiAvPgo8L286c2hhcGVsYXlvdXQ+PC94bWw+PCFbZW5kaWZdLS0+
+CjwvaGVhZD4KPGJvZHkgbGFuZz0iRU4tVVMiIGxpbms9IiMwNTYzQzEiIHZsaW5rPSIjOTU0Rjcy
+Ij4KPGRpdiBjbGFzcz0iV29yZFNlY3Rpb24xIj4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4g
+c3R5bGU9ImNvbG9yOiMxRjQ5N0QiPlRoaXMgYWxzbyBoYXBwZW5zIG9uIEJZVC1NIE4yODMwIENQ
+VSYjODIzMDsgYW5kIGxpa2VseSBhbGwgb3RoZXIgQllULU0gU0tVcy48bzpwPjwvbzpwPjwvc3Bh
+bj48L3A+CjxkaXY+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJjb2xvcjojMUY0
+OTdEO21zby1mYXJlYXN0LWxhbmd1YWdlOlpILUNOIj48bzpwPiZuYnNwOzwvbzpwPjwvc3Bhbj48
+L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJjb2xvcjojMUY0OTdEO21zby1m
+YXJlYXN0LWxhbmd1YWdlOlpILUNOIj4tLS0tPG86cD48L286cD48L3NwYW4+PC9wPgo8cCBjbGFz
+cz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iY29sb3I6IzFGNDk3RDttc28tZmFyZWFzdC1sYW5n
+dWFnZTpaSC1DTiI+VS4gQXJ0aWUKPG86cD48L286cD48L3NwYW4+PC9wPgo8L2Rpdj4KPHAgY2xh
+c3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImNvbG9yOiMxRjQ5N0QiPjxvOnA+Jm5ic3A7PC9v
+OnA+PC9zcGFuPjwvcD4KPGRpdiBzdHlsZT0iYm9yZGVyOm5vbmU7Ym9yZGVyLWxlZnQ6c29saWQg
+Ymx1ZSAxLjVwdDtwYWRkaW5nOjBpbiAwaW4gMGluIDQuMHB0Ij4KPGRpdj4KPGRpdiBzdHlsZT0i
+Ym9yZGVyOm5vbmU7Ym9yZGVyLXRvcDpzb2xpZCAjRTFFMUUxIDEuMHB0O3BhZGRpbmc6My4wcHQg
+MGluIDBpbiAwaW4iPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48Yj5Gcm9tOjwvYj4gUG93ZXJUb3Ag
+W21haWx0bzpwb3dlcnRvcC1ib3VuY2VzQGxpc3RzLjAxLm9yZ10KPGI+T24gQmVoYWxmIE9mIDwv
+Yj5Fb2ZmLCBVbGx5c3NlcyBBPGJyPgo8Yj5TZW50OjwvYj4gV2VkbmVzZGF5LCBGZWJydWFyeSAx
+OCwgMjAxNSAxMjoyNyBQTTxicj4KPGI+VG86PC9iPiBwb3dlcnRvcEBsaXN0cy4wMS5vcmc8YnI+
+CjxiPlN1YmplY3Q6PC9iPiBbUG93ZXJ0b3BdIFJlZ3Jlc3Npb246IHJlYWRfbXNyIGNwdTAgMHgz
+ZmUgOiBJbnB1dC9vdXRwdXQgZXJyb3I8bzpwPjwvbzpwPjwvcD4KPC9kaXY+CjwvZGl2Pgo8cCBj
+bGFzcz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1h
+bCI+UG93ZXJ0b3AgZmFpbHMgd2l0aCBlcnJvcjogJiM4MjIwO3JlYWRfbXNyIGNwdTAgMHgzZmUg
+OiBJbnB1dC9vdXRwdXQgZXJyb3ImIzgyMjE7IG9uIEJZVC1NIE4zNTQwIENQVSAobW9kZWwgMHgz
+NykuPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+
+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5Gcm9tIHRoZSBzb3VyY2Vjb2RlLCBpdCBhcHBlYXJz
+IGM3IHN1cHBvcnQgZGVwZW5kcyBvbiB0aGUgcHJlc2VuY2Ugb2YgJnF1b3Q7L3N5cy9idXMvcGNp
+L2RldmljZXMvMDAwMDowMDoxMy4wJnF1b3Q7IGZvciBtb2RlbCAweDM3LiZuYnNwOyBEaXJlY3Rv
+cnkgJnF1b3Q7L3N5cy9idXMvcGNpL2RldmljZXMvMDAwMDowMDoxMy4wJnF1b3Q7IGRvZXMgbm90
+IGV4aXN0IG9uIG15IHN5c3RlbS48bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+
+PG86cD4mbmJzcDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPlRoZSBjb21taXQgdGhh
+dCBpbnRyb2R1Y2VkIHRoaXMgcHJvYmxlbSBpczo8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1z
+b05vcm1hbCI+PG86cD4mbmJzcDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPmNvbW1p
+dCBlMDFhMDI1YmMzN2Y3MzAzNzllZGMwMDFlN2YxMmZhMjY5YjY4ZmJkPG86cD48L286cD48L3A+
+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPkF1dGhvcjogPGEgaHJlZj0ibWFpbHRvOmFsZXhhbmRyYS55
+YXRlc0BsaW51eC5pbnRlbC5jb20iPmFsZXhhbmRyYS55YXRlc0BsaW51eC5pbnRlbC5jb208L2E+
+ICZsdDs8YSBocmVmPSJtYWlsdG86YWxleGFuZHJhLnlhdGVzQGxpbnV4LmludGVsLmNvbSI+YWxl
+eGFuZHJhLnlhdGVzQGxpbnV4LmludGVsLmNvbTwvYT4mZ3Q7PG86cD48L286cD48L3A+CjxwIGNs
+YXNzPSJNc29Ob3JtYWwiPkRhdGU6Jm5ic3A7Jm5ic3A7IEZyaSBBdWcgMjIgMDI6NTI6MTkgMjAx
+NCAtMDcwMDxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwv
+bzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+Jm5ic3A7Jm5ic3A7Jm5ic3A7IGJ1ZyBmaXgg
+aW50ZWwgYmR3OiBwYWNrYWdlIGMtc3RhdGUgc3VwcG9ydDxvOnA+PC9vOnA+PC9wPgo8cCBjbGFz
+cz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+
+PG86cD4mbmJzcDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJj
+b2xvcjojMUY0OTdEO21zby1mYXJlYXN0LWxhbmd1YWdlOlpILUNOIj4tLS0tPG86cD48L286cD48
+L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iY29sb3I6IzFGNDk3
+RDttc28tZmFyZWFzdC1sYW5ndWFnZTpaSC1DTiI+VS4gQXJ0aWU8L3NwYW4+PHNwYW4gc3R5bGU9
+Im1zby1mYXJlYXN0LWxhbmd1YWdlOlpILUNOIj48bzpwPjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNs
+YXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8L2Rpdj4KPC9kaXY+CjwvYm9k
+eT4KPC9odG1sPgo=
+
+--===============3149863283001847723==--
 
