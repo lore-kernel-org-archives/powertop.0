@@ -1,56 +1,97 @@
-Content-Type: multipart/mixed; boundary="===============3682940782231420845=="
+Content-Type: multipart/mixed; boundary="===============6329835066098027704=="
 MIME-Version: 1.0
-From: Tyler Hall <tylerwhall at gmail.com>
-Subject: [Powertop] [PATCH] cpu: prevent buffer overflow in cstate name
-Date: Tue, 21 Apr 2015 18:03:51 -0400
-Message-ID: <1429653831-6491-1-git-send-email-tylerwhall@gmail.com>
+From: Eoff, Ullysses A <ullysses.a.eoff at intel.com>
+Subject: [Powertop] Regression: read_msr cpu0 0x3fe : Input/output error
+Date: Wed, 18 Feb 2015 20:27:05 +0000
+Message-ID: <8B5BDC21C48FAF4CA5D7E3FE1A63A908709FFEDE@ORSMSX111.amr.corp.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3682940782231420845==
+--===============6329835066098027704==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-strcpy to a fixed-length field should have bounds checking. ARM
-platforms may have longer names for these states than the 16 byte
-buffer. Currently powertop crashes on the Marvell MVEBU platform with
-cpuidle enabled.
+Powertop fails with error: "read_msr cpu0 0x3fe : Input/output error" on BY=
+T-M N3540 CPU (model 0x37).
 
-On this platform, the "linux_name" is
-"MV CPU DEEP IDLECPU and L2 Fabric power down"
+>From the sourcecode, it appears c7 support depends on the presence of "/sy=
+s/bus/pci/devices/0000:00:13.0" for model 0x37.  Directory "/sys/bus/pci/de=
+vices/0000:00:13.0" does not exist on my system.
 
-Use snprintf instead of strncpy so the buffer is always null-terminated.
+The commit that introduced this problem is:
 
-Signed-off-by: Tyler Hall <tylerwhall(a)gmail.com>
----
- src/cpu/abstract_cpu.cpp | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+commit e01a025bc37f730379edc001e7f12fa269b68fbd
+Author: alexandra.yates(a)linux.intel.com <alexandra.yates(a)linux.intel.co=
+m>
+Date:   Fri Aug 22 02:52:19 2014 -0700
 
-diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
-index a3a9ffa..18d3ec1 100644
---- a/src/cpu/abstract_cpu.cpp
-+++ b/src/cpu/abstract_cpu.cpp
-@@ -204,8 +204,8 @@ void abstract_cpu::insert_cstate(const char *linux_name=
-, const char *human_name,
- =
-
- 	cstates.push_back(state);
- =
-
--	strcpy(state->linux_name, linux_name);
--	strcpy(state->human_name, human_name);
-+	snprintf(state->linux_name, sizeof(state->linux_name), "%s", linux_name);
-+	snprintf(state->human_name, sizeof(state->human_name), "%s", human_name);
- =
-
- 	state->line_level =3D -1;
- =
-
--- =
-
-2.3.5
+    bug fix intel bdw: package c-state support
 
 
---===============3682940782231420845==--
+----
+U. Artie
+
+
+--===============6329835066098027704==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
+bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
+YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
+cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
+VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
+bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
+ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTUgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
+PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseToiQ2Ft
+YnJpYSBNYXRoIjsKCXBhbm9zZS0xOjIgNCA1IDMgNSA0IDYgMyAyIDQ7fQpAZm9udC1mYWNlCgl7
+Zm9udC1mYW1pbHk6Q2FsaWJyaTsKCXBhbm9zZS0xOjIgMTUgNSAyIDIgMiA0IDMgMiA0O30KLyog
+U3R5bGUgRGVmaW5pdGlvbnMgKi8KcC5Nc29Ob3JtYWwsIGxpLk1zb05vcm1hbCwgZGl2Lk1zb05v
+cm1hbAoJe21hcmdpbjowaW47CgltYXJnaW4tYm90dG9tOi4wMDAxcHQ7Cglmb250LXNpemU6MTEu
+MHB0OwoJZm9udC1mYW1pbHk6IkNhbGlicmkiLCJzYW5zLXNlcmlmIjt9CmE6bGluaywgc3Bhbi5N
+c29IeXBlcmxpbmsKCXttc28tc3R5bGUtcHJpb3JpdHk6OTk7Cgljb2xvcjojMDU2M0MxOwoJdGV4
+dC1kZWNvcmF0aW9uOnVuZGVybGluZTt9CmE6dmlzaXRlZCwgc3Bhbi5Nc29IeXBlcmxpbmtGb2xs
+b3dlZAoJe21zby1zdHlsZS1wcmlvcml0eTo5OTsKCWNvbG9yOiM5NTRGNzI7Cgl0ZXh0LWRlY29y
+YXRpb246dW5kZXJsaW5lO30Kc3Bhbi5FbWFpbFN0eWxlMTcKCXttc28tc3R5bGUtdHlwZTpwZXJz
+b25hbC1jb21wb3NlOwoJZm9udC1mYW1pbHk6IkNhbGlicmkiLCJzYW5zLXNlcmlmIjsKCWNvbG9y
+OndpbmRvd3RleHQ7fQouTXNvQ2hwRGVmYXVsdAoJe21zby1zdHlsZS10eXBlOmV4cG9ydC1vbmx5
+O30KQHBhZ2UgV29yZFNlY3Rpb24xCgl7c2l6ZTo4LjVpbiAxMS4waW47CgltYXJnaW46MS4waW4g
+MS4waW4gMS4waW4gMS4waW47fQpkaXYuV29yZFNlY3Rpb24xCgl7cGFnZTpXb3JkU2VjdGlvbjE7
+fQotLT48L3N0eWxlPjwhLS1baWYgZ3RlIG1zbyA5XT48eG1sPgo8bzpzaGFwZWRlZmF1bHRzIHY6
+ZXh0PSJlZGl0IiBzcGlkbWF4PSIxMDI2IiAvPgo8L3htbD48IVtlbmRpZl0tLT48IS0tW2lmIGd0
+ZSBtc28gOV0+PHhtbD4KPG86c2hhcGVsYXlvdXQgdjpleHQ9ImVkaXQiPgo8bzppZG1hcCB2OmV4
+dD0iZWRpdCIgZGF0YT0iMSIgLz4KPC9vOnNoYXBlbGF5b3V0PjwveG1sPjwhW2VuZGlmXS0tPgo8
+L2hlYWQ+Cjxib2R5IGxhbmc9IkVOLVVTIiBsaW5rPSIjMDU2M0MxIiB2bGluaz0iIzk1NEY3MiI+
+CjxkaXYgY2xhc3M9IldvcmRTZWN0aW9uMSI+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPlBvd2VydG9w
+IGZhaWxzIHdpdGggZXJyb3I6ICYjODIyMDtyZWFkX21zciBjcHUwIDB4M2ZlIDogSW5wdXQvb3V0
+cHV0IGVycm9yJiM4MjIxOyBvbiBCWVQtTSBOMzU0MCBDUFUgKG1vZGVsIDB4MzcpLjxvOnA+PC9v
+OnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPHAgY2xh
+c3M9Ik1zb05vcm1hbCI+RnJvbSB0aGUgc291cmNlY29kZSwgaXQgYXBwZWFycyBjNyBzdXBwb3J0
+IGRlcGVuZHMgb24gdGhlIHByZXNlbmNlIG9mICZxdW90Oy9zeXMvYnVzL3BjaS9kZXZpY2VzLzAw
+MDA6MDA6MTMuMCZxdW90OyBmb3IgbW9kZWwgMHgzNy4mbmJzcDsgRGlyZWN0b3J5ICZxdW90Oy9z
+eXMvYnVzL3BjaS9kZXZpY2VzLzAwMDA6MDA6MTMuMCZxdW90OyBkb2VzIG5vdCBleGlzdCBvbiBt
+eSBzeXN0ZW0uPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7
+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5UaGUgY29tbWl0IHRoYXQgaW50cm9kdWNl
+ZCB0aGlzIHByb2JsZW0gaXM6PG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxv
+OnA+Jm5ic3A7PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5jb21taXQgZTAxYTAyNWJj
+MzdmNzMwMzc5ZWRjMDAxZTdmMTJmYTI2OWI2OGZiZDxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0i
+TXNvTm9ybWFsIj5BdXRob3I6IGFsZXhhbmRyYS55YXRlc0BsaW51eC5pbnRlbC5jb20gJmx0O2Fs
+ZXhhbmRyYS55YXRlc0BsaW51eC5pbnRlbC5jb20mZ3Q7PG86cD48L286cD48L3A+CjxwIGNsYXNz
+PSJNc29Ob3JtYWwiPkRhdGU6Jm5ic3A7Jm5ic3A7IEZyaSBBdWcgMjIgMDI6NTI6MTkgMjAxNCAt
+MDcwMDxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpw
+PjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+Jm5ic3A7Jm5ic3A7Jm5ic3A7IGJ1ZyBmaXggaW50
+ZWwgYmR3OiBwYWNrYWdlIGMtc3RhdGUgc3VwcG9ydDxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0i
+TXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PG86
+cD4mbmJzcDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJjb2xv
+cjojMUY0OTdEO21zby1mYXJlYXN0LWxhbmd1YWdlOlpILUNOIj4tLS0tPG86cD48L286cD48L3Nw
+YW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iY29sb3I6IzFGNDk3RDtt
+c28tZmFyZWFzdC1sYW5ndWFnZTpaSC1DTiI+VS4gQXJ0aWU8L3NwYW4+PHNwYW4gc3R5bGU9Im1z
+by1mYXJlYXN0LWxhbmd1YWdlOlpILUNOIj48bzpwPjwvbzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNz
+PSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8L2Rpdj4KPC9ib2R5Pgo8L2h0bWw+
+Cg==
+
+--===============6329835066098027704==--
 
