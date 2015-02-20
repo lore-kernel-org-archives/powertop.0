@@ -1,43 +1,60 @@
-Content-Type: multipart/mixed; boundary="===============8399686564541597017=="
+Content-Type: multipart/mixed; boundary="===============7820044568364752120=="
 MIME-Version: 1.0
-From: Zhaoyang Huang <zhaoyang.huang at linaro.org>
-Subject: [Powertop] [PATCH 1/2] prevent segment fault for android built 2
-Date: Wed, 01 Jul 2015 19:52:24 +0800
-Message-ID: <1435751544-9622-1-git-send-email-zhaoyang.huang@linaro.org>
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] corrupted double-linked list error on exit
+Date: Fri, 20 Feb 2015 15:47:38 -0800
+Message-ID: <39535.10.7.198.102.1424476058.squirrel@linux.intel.com>
+In-Reply-To: 39524.10.7.198.102.1424475781.squirrel@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8399686564541597017==
+--===============7820044568364752120==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-the buffer will be turn into NULL after invoking the mbsrtowcs function
-of bionic libc. Add a condition judgement for that
 
-Signed-off-by: Zhaoyang Huang <zhaoyang.huang(a)linaro.org>
----
- src/lib.cpp |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>
+>> I'm seeing the same issue on 3.18.6-1-ARCH.
+>>
+>> [samer(a)archbox ~]$ sudo powertop --auto-tune
+>> Loaded 34 prior measurements
+>> Cannot load from file /var/cache/powertop/saved_parameters.powertop
+>> RAPL device for cpu 0
+>> RAPL Using PowerCap Sysfs : Domain Mask f
+>> RAPL device for cpu 0
+>> RAPL Using PowerCap Sysfs : Domain Mask f
+>> RAPL device for cpu 0
+>> RAPL Using PowerCap Sysfs : Domain Mask f
+>> Devfreq not enabled
+>> Cannot load from file /var/cache/powertop/saved_parameters.powertop
+>>    unknown op '{'
+>> To show power estimates do 263 measurement(s) connected to battery
+>> onlyLeaving PowerTOP
+>> *** Error in `powertop': corrupted double-linked list:
+>> 0x0000000000fbceb0 ***
+>>
+>> Any idea what's causing this?
+>>
+>> _______________________________________________
+>> PowerTop mailing list
+>> PowerTop(a)lists.01.org
+>> https://lists.01.org/mailman/listinfo/powertop
+>>
 
-diff --git a/src/lib.cpp b/src/lib.cpp
-index 88fe5f3..8d1ca9f 100644
---- a/src/lib.cpp
-+++ b/src/lib.cpp
-@@ -285,7 +285,7 @@ void align_string(char *buffer, size_t min_sz, size_t m=
-ax_sz)
- 	/* start with mbsrtowcs() local mbstate_t * and
- 	 * NULL dst pointer*/
- 	sz =3D mbsrtowcs(NULL, (const char **)&buffer, max_sz, NULL);
--	if (sz =3D=3D (size_t)-1) {
-+	if ((sz =3D=3D (size_t)-1) && (NULL !=3D buffer)) {
- 		buffer[min_sz] =3D 0x00;
- 		return;
- 	}
--- =
 
-1.7.9.5
+ Hi Samer,
+
+Thank you for reporting this issue.  I'm not sure what is causing it.  But
+I'm investigating, meanwhile. Can you give me more details on the platform
+you are running?
+
+Thank you,
+ Alexandra.
 
 
---===============8399686564541597017==--
+Thank you,
+Alexandra.
+
+--===============7820044568364752120==--
 
