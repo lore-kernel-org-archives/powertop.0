@@ -1,79 +1,324 @@
-Content-Type: multipart/mixed; boundary="===============8058072072436862865=="
+Content-Type: multipart/mixed; boundary="===============0067208204242947020=="
 MIME-Version: 1.0
-From: Jan Engelhardt <jengelh at inai.de>
-Subject: [Powertop] Fix crash due to unbounded string copies
-Date: Fri, 13 Nov 2015 16:50:19 +0100
-Message-ID: <1447429821-1631-1-git-send-email-jengelh@inai.de>
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] [PATCH 1/1] Add I2C runtime PM tunables
+Date: Thu, 26 Feb 2015 11:14:17 -0800
+Message-ID: <56114.10.24.2.110.1424978057.squirrel@linux.intel.com>
+In-Reply-To: 1424911084-10027-1-git-send-email-daniel.leung@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8058072072436862865==
+--===============0067208204242947020==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Hi Daniel,
 
-The following changes since commit 35057dc9d707076a9fe5fee17e2c8357a942e167:
+> Adds I2C adapters and devices into "Tunables" tab
+> for runtime PM.
+>
+> Signed-off-by: Daniel Leung <daniel.leung(a)linux.intel.com>
+> ---
+>  Android.mk                 |   1 +
+>  src/Makefile.am            |   2 +
+>  src/devices/runtime_pm.cpp |  12 +++--
+>  src/tuning/tuning.cpp      |   2 +
+>  src/tuning/tuningi2c.cpp   | 129
+> +++++++++++++++++++++++++++++++++++++++++++++
+>  src/tuning/tuningi2c.h     |  45 ++++++++++++++++
+>  6 files changed, 188 insertions(+), 3 deletions(-)
+>  create mode 100644 src/tuning/tuningi2c.cpp
+>  create mode 100644 src/tuning/tuningi2c.h
+>
+> diff --git a/Android.mk b/Android.mk
+> index cf13fe8..2461233 100644
+> --- a/Android.mk
+> +++ b/Android.mk
+> @@ -42,6 +42,7 @@ LOCAL_SRC_FILES +=3D \
+>  	src/report.cpp \
+>  	src/main.cpp \
+>  	src/tuning/tuning.cpp \
+> +	src/tuning/tuningi2c.cpp \
+>  	src/tuning/usb.cpp \
+>  	src/tuning/bluetooth.cpp \
+>  	src/tuning/ethernet.cpp \
+> diff --git a/src/Makefile.am b/src/Makefile.am
+> index d2f1da7..820b6e1 100644
+> --- a/src/Makefile.am
+> +++ b/src/Makefile.am
+> @@ -118,6 +118,8 @@ powertop_SOURCES =3D \
+>  	tuning/tuningsysfs.h \
+>  	tuning/tuningusb.cpp \
+>  	tuning/tuningusb.h \
+> +	tuning/tuningi2c.cpp \
+> +	tuning/tuningi2c.h \
+>  	tuning/wifi.cpp \
+>  	tuning/wifi.h
+>
+> diff --git a/src/devices/runtime_pm.cpp b/src/devices/runtime_pm.cpp
+> index cba34fc..eede027 100644
+> --- a/src/devices/runtime_pm.cpp
+> +++ b/src/devices/runtime_pm.cpp
+> @@ -196,16 +196,22 @@ static void do_bus(const char *bus)
+>  		dev =3D new class runtime_pmdevice(entry->d_name, filename);
+>
+>  		if (strcmp(bus, "i2c") =3D=3D 0) {
+> -			char devname[4096];
+> +			string devname;
+>  			char dev_name[4096];
+> +			bool is_adapter =3D false;
+> +
+> +			sprintf(filename, "/sys/bus/%s/devices/%s/new_device", bus,
+> entry->d_name);
+> +			if (access(filename, W_OK) =3D=3D 0)
+> +				is_adapter =3D true;
+> +
+>  			sprintf(filename, "/sys/bus/%s/devices/%s/name", bus, entry->d_name);
+>  			file.open(filename, ios::in);
+>  			if (file) {
+> -				file >> devname;
+> +				getline(file, devname);
+>  				file.close();
+>  			}
+>
+> -			sprintf(dev_name, _("I2C Device: %s"), devname);
+> +			sprintf(dev_name, _("I2C %s (%s): %s"), (is_adapter ? _("Adapter") :
+> _("Device")), entry->d_name, devname.c_str());
+>  			dev->set_human_name(dev_name);
+>  		}
+>
+> diff --git a/src/tuning/tuning.cpp b/src/tuning/tuning.cpp
+> index 5414022..a701cdb 100644
+> --- a/src/tuning/tuning.cpp
+> +++ b/src/tuning/tuning.cpp
+> @@ -31,6 +31,7 @@
+>
+>
+>  #include "tuning.h"
+> +#include "tuningi2c.h"
+>  #include "tuningsysfs.h"
+>  #include "tuningusb.h"
+>  #include "runtime.h"
+> @@ -68,6 +69,7 @@ static void init_tuning(void)
+>  	add_ethernet_tunable();
+>  	add_bt_tunable();
+>  	add_wifi_tunables();
+> +	add_i2c_tunables();
+>
+>  	sort_tunables();
+>  }
+> diff --git a/src/tuning/tuningi2c.cpp b/src/tuning/tuningi2c.cpp
+> new file mode 100644
+> index 0000000..2a272a4
+> --- /dev/null
+> +++ b/src/tuning/tuningi2c.cpp
+> @@ -0,0 +1,129 @@
+> +/*
+> + * Copyright 2015, Intel Corporation
+> + *
+> + * This file is part of PowerTOP
+> + *
+> + * This program file is free software; you can redistribute it and/or
+> modify it
+> + * under the terms of the GNU General Public License as published by the
+> + * Free Software Foundation; version 2 of the License.
+> + *
+> + * This program is distributed in the hope that it will be useful, but
+> WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+> + * for more details.
+> + *
+> + * Authors:
+> + *	Arjan van de Ven <arjan(a)linux.intel.com>
+> + *	Daniel Leung <daniel.leung(a)linux.intel.com>
+> + */
+> +
+> +#include "tuning.h"
+> +#include "tunable.h"
+> +#include "unistd.h"
+> +#include "tuningi2c.h"
+> +#include <string.h>
+> +#include <dirent.h>
+> +#include <utility>
+> +#include <iostream>
+> +#include <fstream>
+> +#include <ctype.h>
+> +
+> +#include "../lib.h"
+> +#include "../devices/runtime_pm.h"
+> +
+> +i2c_tunable::i2c_tunable(const char *path, const char *name, bool
+> is_adapter) : tunable("", 0.9, _("Good"), _("Bad"), _("Unknown"))
+> +{
+> +	ifstream file;
+> +	char filename[4096];
+> +	string devname;
+> +
+> +	sprintf(filename, "%s/name", path);
+> +	file.open(filename, ios::in);
+> +	if (file) {
+> +		getline(file, devname);
+> +		file.close();
+> +	}
+> +
+> +	if (is_adapter) {
+> +		sprintf(i2c_path, "%s/device/power/control", path);
+> +		sprintf(filename, "%s/device", path);
+> +	} else {
+> +		sprintf(i2c_path, "%s/power/control", path);
+> +		sprintf(filename, "%s/device", path);
+> +	}
+> +
+> +	if (device_has_runtime_pm(filename))
+> +		sprintf(desc, _("Runtime PM for I2C %s %s (%s)"), (is_adapter ?
+> _("Adapter") : _("Device")), name, (devname.empty() ? "" :
+> devname.c_str()));
+> +	else
+> +		sprintf(desc, _("I2C %s %s has no runtime power management"),
+> (is_adapter ? _("Adapter") : _("Device")), name);
+> +
+> +	sprintf(toggle_good, "echo 'auto' > '%s';", i2c_path);
+> +	sprintf(toggle_bad, "echo 'on' > '%s';", i2c_path);
+> +}
+> +
+> +int i2c_tunable::good_bad(void)
+> +{
+> +	string content;
+> +
+> +	content =3D read_sysfs_string(i2c_path);
+> +
+> +	if (strcmp(content.c_str(), "auto") =3D=3D 0)
+> +		return TUNE_GOOD;
+> +
+> +	return TUNE_BAD;
+> +}
+> +
+> +void i2c_tunable::toggle(void)
+> +{
+> +	int good;
+> +	good =3D good_bad();
+> +
+> +	if (good =3D=3D TUNE_GOOD) {
+> +		write_sysfs(i2c_path, "on");
+> +		return;
+> +	}
+> +
+> +	write_sysfs(i2c_path, "auto");
+> +}
+> +
+> +const char *i2c_tunable::toggle_script(void)
+> +{
+> +	int good;
+> +	good =3D good_bad();
+> +
+> +	if (good =3D=3D TUNE_GOOD) {
+> +		return toggle_bad;
+> +	}
+> +
+> +	return toggle_good;
+> +}
+> +
+> +static void add_i2c_callback(const char *d_name)
+> +{
+> +	class i2c_tunable *i2c;
+> +	char filename[4096];
+> +	DIR *dir;
+> +	bool is_adapter =3D false;
+> +
+> +	sprintf(filename, "/sys/bus/i2c/devices/%s/new_device", d_name);
+> +	if (access(filename, W_OK) =3D=3D 0)
+> +		is_adapter =3D true;
+> +
+> +	sprintf(filename, "/sys/bus/i2c/devices/%s", d_name);
+> +	i2c =3D new class i2c_tunable(filename, d_name, is_adapter);
+> +
+> +	if (is_adapter)
+> +		sprintf(filename, "/sys/bus/i2c/devices/%s/device", d_name);
+> +	else
+> +		sprintf(filename, "/sys/bus/i2c/devices/%s", d_name);
+> +
+> +	if (device_has_runtime_pm(filename))
+> +		all_tunables.push_back(i2c);
+> +	else
+> +		all_untunables.push_back(i2c);
+> +}
+> +
+> +void add_i2c_tunables(void)
+> +{
+> +	process_directory("/sys/bus/i2c/devices/", add_i2c_callback);
+> +}
+> diff --git a/src/tuning/tuningi2c.h b/src/tuning/tuningi2c.h
+> new file mode 100644
+> index 0000000..a970faf
+> --- /dev/null
+> +++ b/src/tuning/tuningi2c.h
+> @@ -0,0 +1,45 @@
+> +/*
+> + * Copyright 2015, Intel Corporation
+> + *
+> + * This file is part of PowerTOP
+> + *
+> + * This program file is free software; you can redistribute it and/or
+> modify it
+> + * under the terms of the GNU General Public License as published by the
+> + * Free Software Foundation; version 2 of the License.
+> + *
+> + * This program is distributed in the hope that it will be useful, but
+> WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+> + * for more details.
+> + *
+> + * Authors:
+> + *	Arjan van de Ven <arjan(a)linux.intel.com>
+> + *	Daniel Leung <daniel.leung(a)linux.intel.com>
+> + */
+> +
+> +#ifndef _INCLUDE_GUARD_I2C_TUNE_H
+> +#define _INCLUDE_GUARD_I2C_TUNE_H
+> +
+> +#include <vector>
+> +
+> +#include "tunable.h"
+> +
+> +using namespace std;
+> +
+> +class i2c_tunable : public tunable {
+> +	char i2c_path[4096];
+> +public:
+> +	i2c_tunable(const char *path, const char *name, bool is_adapter);
+> +
+> +	virtual int good_bad(void);
+> +
+> +	virtual void toggle(void);
+> +
+> +	virtual const char *toggle_script(void);
+> +
+> +};
+> +
+> +extern void add_i2c_tunables(void);
+> +
+> +
+> +#endif
+> --
+> 1.8.3.2
+>
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>
 
-  PowerTOP v2.8 (2015-11-05 15:47:37 -0800)
+Thank you for sending your patches.  Can you fix this warning:
+tuning/tuningi2c.cpp:105:7: warning: unused variable =C2=91dir=C2=92
+[-Wunused-variable]
 
-are available in the git repository at:
+I tested the first two patches and they are looking good.
 
-  git://github.com/jengelh/powertop master
+Thank you,
+Alexandra.
 
-for you to fetch changes up to f212625d0acbc6340e6b61b1538f318302c8cb90:
-
-  Avoid hardcoding magic values when sizeof can be used (2015-11-13 15:07:5=
-6 +0100)
-
-----------------------------------------------------------------
-Jan Engelhardt (2):
-      Fix crash due to buffer overruns
-      Avoid hardcoding magic values when sizeof can be used
-
- src/calibrate/calibrate.cpp    | 16 ++++++------
- src/cpu/abstract_cpu.cpp       | 18 ++++++-------
- src/cpu/cpu.cpp                | 18 ++++++-------
- src/cpu/cpu_linux.cpp          | 36 +++++++++++++-------------
- src/cpu/cpudevice.cpp          |  5 ++--
- src/cpu/intel_cpus.cpp         |  6 ++---
- src/devices/ahci.cpp           | 58 +++++++++++++++++++++-----------------=
-----
- src/devices/alsa.cpp           | 34 ++++++++++++-------------
- src/devices/backlight.cpp      | 18 ++++++-------
- src/devices/devfreq.cpp        |  2 +-
- src/devices/device.cpp         |  4 +--
- src/devices/i915-gpu.cpp       |  6 ++---
- src/devices/network.cpp        | 35 ++++++++++++-------------
- src/devices/rfkill.cpp         | 30 +++++++++++-----------
- src/devices/runtime_pm.cpp     | 34 ++++++++++++-------------
- src/devices/thinkpad-fan.cpp   |  2 +-
- src/devices/thinkpad-light.cpp |  2 +-
- src/devices/usb.cpp            | 40 ++++++++++++++---------------
- src/devlist.cpp                | 14 +++++-----
- src/lib.cpp                    | 10 ++++----
- src/lib.h                      |  7 +++++
- src/main.cpp                   |  6 ++---
- src/measurement/acpi.cpp       | 11 ++++----
- src/measurement/sysfs.cpp      |  2 +-
- src/parameters/parameters.cpp  |  4 +--
- src/process/do_process.cpp     | 36 +++++++++++++-------------
- src/process/interrupt.cpp      |  4 +--
- src/process/process.cpp        |  7 ++---
- src/process/processdevice.cpp  |  2 +-
- src/process/timer.cpp          |  2 +-
- src/process/work.cpp           |  2 +-
- src/report/report.cpp          |  4 +--
- src/tuning/bluetooth.cpp       |  4 +--
- src/tuning/ethernet.cpp        |  6 ++---
- src/tuning/runtime.cpp         | 14 +++++-----
- src/tuning/tunable.cpp         | 15 ++++++-----
- src/tuning/tuning.cpp          |  4 +--
- src/tuning/tuningi2c.cpp       | 18 ++++++-------
- src/tuning/tuningsysfs.cpp     | 14 +++++-----
- src/tuning/tuningusb.cpp       | 28 ++++++++++----------
- src/tuning/wifi.cpp            |  6 ++---
- 41 files changed, 298 insertions(+), 286 deletions(-)
-
---===============8058072072436862865==--
+--===============0067208204242947020==--
 
