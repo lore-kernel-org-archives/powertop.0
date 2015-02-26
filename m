@@ -1,68 +1,158 @@
-Content-Type: multipart/mixed; boundary="===============6021597622790095575=="
+Content-Type: multipart/mixed; boundary="===============0386141068225078114=="
 MIME-Version: 1.0
-From: Jan Engelhardt <jengelh at inai.de>
-Subject: Re: [Powertop] Incorrect reporting for Intel 3930K model and others
-Date: Sat, 14 Nov 2015 00:52:22 +0100
-Message-ID: <alpine.LSU.2.20.1511140046020.19260@nerf40.vanv.qr>
+From: sheepdestroyer <sheepdestroyer at gmail.com>
+Subject: [Powertop] building powertop from github fails on fedora 21
+Date: Thu, 26 Feb 2015 14:18:54 +0900
+Message-ID: <CAPU6dhD9BZxgVhboCuMwGBKuFWzJTv_Cx3hYgv3T5y_gF7=QjA@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6021597622790095575==
+--===============0386141068225078114==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+On last git from github on my fedora system:
 
-On Thursday 2015-03-26 19:39, Jan Engelhardt wrote:
->Using powertop v2.7-28-g3f5bccb, combined with the following CPU/system:
-[some intel i7-3930K]
->
-># powertop
-><Frequency Stats tab>:
->            Package |             Core    |            CPU 0       CPU 1
->                    |                     | Actual    3.4 GHz     3.4 GHz
->Idle       100.0%   | Idle       100.0%   | Idle       100.0%      100.0%
->
->                    |             Core    |            CPU 2       CPU 3
->                    |                     | Actual    3.4 GHz     3.4 GHz
->                    | Idle       100.0%   | Idle       100.0%      100.0%
->
->                    |             Core    |            CPU 4       CPU 5
->                    |                     | Actual    3.4 GHz     3.4 GHz
->                    | Idle       100.0%   | Idle       100.0%      100.0%
->
->                    |             Core    |            CPU 6       CPU 7
->                    |                     | Actual    3.4 GHz     3.4 GHz
->                    | Idle       100.0%   | Idle       100.0%      100.0%
->
->                    |             Core    |            CPU 8       CPU 9
->                    |                     | Actual    3.4 GHz     3.4 GHz
->                    | Idle       100.0%   | Idle       100.0%      100.0%
+1- README says runing ./configure but this file does not exist
+2- runing ./autogen.sh gives :
 
-This appears fixed when using Linux 4.3.
-Both powertop 2.6 and 2.8 show useful info then.
+[sheepdestroyer(a)sheepora powertop-PowerTOP2.0]$ ./autogen.sh
+autoreconf: Entering directory `.'
+autoreconf: running: autopoint
+Copying file config.rpath
+Creating directory m4
+Copying file m4/codeset.m4
+Copying file m4/fcntl-o.m4
+Copying file m4/gettext.m4
+Copying file m4/glibc2.m4
+Copying file m4/glibc21.m4
+Copying file m4/iconv.m4
+Copying file m4/intdiv0.m4
+Copying file m4/intl.m4
+Copying file m4/intldir.m4
+Copying file m4/intlmacosx.m4
+Copying file m4/intmax.m4
+Copying file m4/inttypes-pri.m4
+Copying file m4/inttypes_h.m4
+Copying file m4/lcmessage.m4
+Copying file m4/lib-ld.m4
+Copying file m4/lib-link.m4
+Copying file m4/lib-prefix.m4
+Copying file m4/lock.m4
+Copying file m4/longlong.m4
+Copying file m4/nls.m4
+Copying file m4/po.m4
+Copying file m4/printf-posix.m4
+Copying file m4/progtest.m4
+Copying file m4/size_max.m4
+Copying file m4/stdint_h.m4
+Copying file m4/threadlib.m4
+Copying file m4/uintmax_t.m4
+Copying file m4/visibility.m4
+Copying file m4/wchar_t.m4
+Copying file m4/wint_t.m4
+Copying file m4/xsize.m4
+autoreconf: running: aclocal -I m4
+autoreconf: configure.ac: tracing
+autoreconf: running: libtoolize --copy
+libtoolize: putting auxiliary files in `.'.
+libtoolize: copying file `./ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIR, `m4'.
+libtoolize: copying file `m4/libtool.m4'
+libtoolize: copying file `m4/ltoptions.m4'
+libtoolize: copying file `m4/ltsugar.m4'
+libtoolize: copying file `m4/ltversion.m4'
+libtoolize: copying file `m4/lt~obsolete.m4'
+autoreconf: running: /usr/bin/autoconf
+autoreconf: running: /usr/bin/autoheader
+autoreconf: running: automake --add-missing --copy --no-force
+automake: warnings are treated as errors
+configure.ac:14: warning: The 'AM_PROG_MKDIR_P' macro is deprecated, and
+its use is discouraged.
+configure.ac:14: You should use the Autoconf-provided 'AC_PROG_MKDIR_P'
+macro instead,
+configure.ac:14: and use '$(MKDIR_P)' instead of '$(mkdir_p)'in your
+Makefile.am files.
+configure.ac:17: installing './ar-lib'
+configure.ac:14: installing './compile'
+configure.ac:14: installing './config.guess'
+configure.ac:14: installing './config.sub'
+configure.ac:7: installing './install-sh'
+configure.ac:7: installing './missing'
+pevent/Makefile.am: installing './depcomp'
+autoreconf: automake failed with exit status: 1
 
+--===============0386141068225078114==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
-            Package |             Core    |            CPU 0       CPU 1
-                    |                     | Actual      1325 MHz    1331 MHz
-Idle         0.3%   | Idle         9.5%   | Idle        27.1%       28.7%
-3.81 GHz     1.2%   | 3.81 GHz     0.9%   | 3.81 GHz     0.9%        1.5%
-3.50 GHz     0.1%   | 3.50 GHz     0.1%   | 3.50 GHz     0.1%        0.8%
-3.60 GHz     0.0%   | 3.60 GHz     0.0%   | 3.60 GHz     0.0%       10.0%
-3.31 GHz     0.0%   | 3.31 GHz     0.0%   | 3.31 GHz     0.0%       25.9%
-3.00 GHz     0.0%   | 3.00 GHz     0.0%   | 3.00 GHz     0.0%        2.4%
-1200 MHz     3.1%   | 1200 MHz     1.9%   | 1200 MHz     1.0%        1.1%
-1.71 GHz     2.8%   | 1.71 GHz     2.5%   | 1.71 GHz     1.5%        8.4%
-1400 MHz    16.8%   | 1400 MHz    16.6%   | 1400 MHz    14.6%       13.1%
-2.31 GHz     1.0%   | 2.31 GHz     0.9%   | 2.31 GHz     0.7%        7.6%
-2.21 GHz     0.0%   | 2.21 GHz     0.0%   | 2.21 GHz     0.0%        0.5%
-1.91 GHz    10.0%   | 1.91 GHz    10.0%   | 1.91 GHz     5.9%
-1300 MHz    36.4%   | 1300 MHz    33.2%   | 1300 MHz    29.2%
-1.80 GHz     1.2%   | 1.80 GHz     1.1%   | 1.60 GHz     7.8%
-1500 MHz    15.6%   | 1500 MHz    12.8%   | 1500 MHz    10.1%
-1.60 GHz    10.9%   | 1.60 GHz     9.9%   | 1.80 GHz     0.6%
-2.00 GHz     0.5%   | 2.00 GHz     0.5%   | 2.00 GHz     0.5%
-                                            [...]
+PGRpdiBkaXI9Imx0ciI+PGRpdj5PbiBsYXN0IGdpdCBmcm9tIGdpdGh1YiBvbiBteSBmZWRvcmEg
+c3lzdGVtOjwvZGl2PjxkaXY+PGJyPjwvZGl2PjEtIFJFQURNRSBzYXlzIHJ1bmluZyAuL2NvbmZp
+Z3VyZSBidXQgdGhpcyBmaWxlIGRvZXMgbm90IGV4aXN0PGRpdj4yLSBydW5pbmcgLi9hdXRvZ2Vu
+LnNoIGdpdmVzIDo8L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2PjxkaXY+W3NoZWVwZGVzdHJveWVy
+QHNoZWVwb3JhIHBvd2VydG9wLVBvd2VyVE9QMi4wXSQgLi9hdXRvZ2VuLnNoPC9kaXY+PGRpdj5h
+dXRvcmVjb25mOiBFbnRlcmluZyBkaXJlY3RvcnkgYC4mIzM5OzwvZGl2PjxkaXY+YXV0b3JlY29u
+ZjogcnVubmluZzogYXV0b3BvaW50PC9kaXY+PGRpdj5Db3B5aW5nIGZpbGUgY29uZmlnLnJwYXRo
+PC9kaXY+PGRpdj5DcmVhdGluZyBkaXJlY3RvcnkgbTQ8L2Rpdj48ZGl2PkNvcHlpbmcgZmlsZSBt
+NC9jb2Rlc2V0Lm00PC9kaXY+PGRpdj5Db3B5aW5nIGZpbGUgbTQvZmNudGwtby5tNDwvZGl2Pjxk
+aXY+Q29weWluZyBmaWxlIG00L2dldHRleHQubTQ8L2Rpdj48ZGl2PkNvcHlpbmcgZmlsZSBtNC9n
+bGliYzIubTQ8L2Rpdj48ZGl2PkNvcHlpbmcgZmlsZSBtNC9nbGliYzIxLm00PC9kaXY+PGRpdj5D
+b3B5aW5nIGZpbGUgbTQvaWNvbnYubTQ8L2Rpdj48ZGl2PkNvcHlpbmcgZmlsZSBtNC9pbnRkaXYw
+Lm00PC9kaXY+PGRpdj5Db3B5aW5nIGZpbGUgbTQvaW50bC5tNDwvZGl2PjxkaXY+Q29weWluZyBm
+aWxlIG00L2ludGxkaXIubTQ8L2Rpdj48ZGl2PkNvcHlpbmcgZmlsZSBtNC9pbnRsbWFjb3N4Lm00
+PC9kaXY+PGRpdj5Db3B5aW5nIGZpbGUgbTQvaW50bWF4Lm00PC9kaXY+PGRpdj5Db3B5aW5nIGZp
+bGUgbTQvaW50dHlwZXMtcHJpLm00PC9kaXY+PGRpdj5Db3B5aW5nIGZpbGUgbTQvaW50dHlwZXNf
+aC5tNDwvZGl2PjxkaXY+Q29weWluZyBmaWxlIG00L2xjbWVzc2FnZS5tNDwvZGl2PjxkaXY+Q29w
+eWluZyBmaWxlIG00L2xpYi1sZC5tNDwvZGl2PjxkaXY+Q29weWluZyBmaWxlIG00L2xpYi1saW5r
+Lm00PC9kaXY+PGRpdj5Db3B5aW5nIGZpbGUgbTQvbGliLXByZWZpeC5tNDwvZGl2PjxkaXY+Q29w
+eWluZyBmaWxlIG00L2xvY2subTQ8L2Rpdj48ZGl2PkNvcHlpbmcgZmlsZSBtNC9sb25nbG9uZy5t
+NDwvZGl2PjxkaXY+Q29weWluZyBmaWxlIG00L25scy5tNDwvZGl2PjxkaXY+Q29weWluZyBmaWxl
+IG00L3BvLm00PC9kaXY+PGRpdj5Db3B5aW5nIGZpbGUgbTQvcHJpbnRmLXBvc2l4Lm00PC9kaXY+
+PGRpdj5Db3B5aW5nIGZpbGUgbTQvcHJvZ3Rlc3QubTQ8L2Rpdj48ZGl2PkNvcHlpbmcgZmlsZSBt
+NC9zaXplX21heC5tNDwvZGl2PjxkaXY+Q29weWluZyBmaWxlIG00L3N0ZGludF9oLm00PC9kaXY+
+PGRpdj5Db3B5aW5nIGZpbGUgbTQvdGhyZWFkbGliLm00PC9kaXY+PGRpdj5Db3B5aW5nIGZpbGUg
+bTQvdWludG1heF90Lm00PC9kaXY+PGRpdj5Db3B5aW5nIGZpbGUgbTQvdmlzaWJpbGl0eS5tNDwv
+ZGl2PjxkaXY+Q29weWluZyBmaWxlIG00L3djaGFyX3QubTQ8L2Rpdj48ZGl2PkNvcHlpbmcgZmls
+ZSBtNC93aW50X3QubTQ8L2Rpdj48ZGl2PkNvcHlpbmcgZmlsZSBtNC94c2l6ZS5tNDwvZGl2Pjxk
+aXY+YXV0b3JlY29uZjogcnVubmluZzogYWNsb2NhbCAtSSBtNDwvZGl2PjxkaXY+YXV0b3JlY29u
+ZjogPGEgaHJlZj0iaHR0cDovL2NvbmZpZ3VyZS5hYyI+Y29uZmlndXJlLmFjPC9hPjogdHJhY2lu
+ZzwvZGl2PjxkaXY+YXV0b3JlY29uZjogcnVubmluZzogbGlidG9vbGl6ZSAtLWNvcHk8L2Rpdj48
+ZGl2PmxpYnRvb2xpemU6IHB1dHRpbmcgYXV4aWxpYXJ5IGZpbGVzIGluIGAuJiMzOTsuPC9kaXY+
+PGRpdj5saWJ0b29saXplOiBjb3B5aW5nIGZpbGUgYC4vbHRtYWluLnNoJiMzOTs8L2Rpdj48ZGl2
+PmxpYnRvb2xpemU6IHB1dHRpbmcgbWFjcm9zIGluIEFDX0NPTkZJR19NQUNST19ESVIsIGBtNCYj
+Mzk7LjwvZGl2PjxkaXY+bGlidG9vbGl6ZTogY29weWluZyBmaWxlIGBtNC9saWJ0b29sLm00JiMz
+OTs8L2Rpdj48ZGl2PmxpYnRvb2xpemU6IGNvcHlpbmcgZmlsZSBgbTQvbHRvcHRpb25zLm00JiMz
+OTs8L2Rpdj48ZGl2PmxpYnRvb2xpemU6IGNvcHlpbmcgZmlsZSBgbTQvbHRzdWdhci5tNCYjMzk7
+PC9kaXY+PGRpdj5saWJ0b29saXplOiBjb3B5aW5nIGZpbGUgYG00L2x0dmVyc2lvbi5tNCYjMzk7
+PC9kaXY+PGRpdj5saWJ0b29saXplOiBjb3B5aW5nIGZpbGUgYG00L2x0fm9ic29sZXRlLm00JiMz
+OTs8L2Rpdj48ZGl2PmF1dG9yZWNvbmY6IHJ1bm5pbmc6IC91c3IvYmluL2F1dG9jb25mPC9kaXY+
+PGRpdj5hdXRvcmVjb25mOiBydW5uaW5nOiAvdXNyL2Jpbi9hdXRvaGVhZGVyPC9kaXY+PGRpdj5h
+dXRvcmVjb25mOiBydW5uaW5nOiBhdXRvbWFrZSAtLWFkZC1taXNzaW5nIC0tY29weSAtLW5vLWZv
+cmNlPC9kaXY+PGRpdj5hdXRvbWFrZTogd2FybmluZ3MgYXJlIHRyZWF0ZWQgYXMgZXJyb3JzPC9k
+aXY+PGRpdj48YSBocmVmPSJodHRwOi8vY29uZmlndXJlLmFjOjE0Ij5jb25maWd1cmUuYWM6MTQ8
+L2E+OiB3YXJuaW5nOiBUaGUgJiMzOTtBTV9QUk9HX01LRElSX1AmIzM5OyBtYWNybyBpcyBkZXBy
+ZWNhdGVkLCBhbmQgaXRzIHVzZSBpcyBkaXNjb3VyYWdlZC48L2Rpdj48ZGl2PjxhIGhyZWY9Imh0
+dHA6Ly9jb25maWd1cmUuYWM6MTQiPmNvbmZpZ3VyZS5hYzoxNDwvYT46IFlvdSBzaG91bGQgdXNl
+IHRoZSBBdXRvY29uZi1wcm92aWRlZCAmIzM5O0FDX1BST0dfTUtESVJfUCYjMzk7IG1hY3JvIGlu
+c3RlYWQsPC9kaXY+PGRpdj48YSBocmVmPSJodHRwOi8vY29uZmlndXJlLmFjOjE0Ij5jb25maWd1
+cmUuYWM6MTQ8L2E+OiBhbmQgdXNlICYjMzk7JChNS0RJUl9QKSYjMzk7IGluc3RlYWQgb2YgJiMz
+OTskKG1rZGlyX3ApJiMzOTtpbiB5b3VyIE1ha2VmaWxlLmFtIGZpbGVzLjwvZGl2PjxkaXY+PGEg
+aHJlZj0iaHR0cDovL2NvbmZpZ3VyZS5hYzoxNyI+Y29uZmlndXJlLmFjOjE3PC9hPjogaW5zdGFs
+bGluZyAmIzM5Oy4vYXItbGliJiMzOTs8L2Rpdj48ZGl2PjxhIGhyZWY9Imh0dHA6Ly9jb25maWd1
+cmUuYWM6MTQiPmNvbmZpZ3VyZS5hYzoxNDwvYT46IGluc3RhbGxpbmcgJiMzOTsuL2NvbXBpbGUm
+IzM5OzwvZGl2PjxkaXY+PGEgaHJlZj0iaHR0cDovL2NvbmZpZ3VyZS5hYzoxNCI+Y29uZmlndXJl
+LmFjOjE0PC9hPjogaW5zdGFsbGluZyAmIzM5Oy4vY29uZmlnLmd1ZXNzJiMzOTs8L2Rpdj48ZGl2
+PjxhIGhyZWY9Imh0dHA6Ly9jb25maWd1cmUuYWM6MTQiPmNvbmZpZ3VyZS5hYzoxNDwvYT46IGlu
+c3RhbGxpbmcgJiMzOTsuL2NvbmZpZy5zdWImIzM5OzwvZGl2PjxkaXY+PGEgaHJlZj0iaHR0cDov
+L2NvbmZpZ3VyZS5hYzo3Ij5jb25maWd1cmUuYWM6NzwvYT46IGluc3RhbGxpbmcgJiMzOTsuL2lu
+c3RhbGwtc2gmIzM5OzwvZGl2PjxkaXY+PGEgaHJlZj0iaHR0cDovL2NvbmZpZ3VyZS5hYzo3Ij5j
+b25maWd1cmUuYWM6NzwvYT46IGluc3RhbGxpbmcgJiMzOTsuL21pc3NpbmcmIzM5OzwvZGl2Pjxk
+aXY+cGV2ZW50L01ha2VmaWxlLmFtOiBpbnN0YWxsaW5nICYjMzk7Li9kZXBjb21wJiMzOTs8L2Rp
+dj48ZGl2PmF1dG9yZWNvbmY6IGF1dG9tYWtlIGZhaWxlZCB3aXRoIGV4aXQgc3RhdHVzOiAxPC9k
+aXY+PC9kaXY+PGRpdj48YnI+PC9kaXY+PC9kaXY+Cg==
 
---===============6021597622790095575==--
+--===============0386141068225078114==--
 
