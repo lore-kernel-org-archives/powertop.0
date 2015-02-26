@@ -1,156 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============2451606040350349565=="
+Content-Type: multipart/mixed; boundary="===============8015004851858732149=="
 MIME-Version: 1.0
-From: Nanley Chery <nanleychery at gmail.com>
-Subject: [Powertop] [RFC 2/9] add udev helper functions
-Date: Mon, 01 Jun 2015 09:09:08 -0700
-Message-ID: <1433174955-17349-3-git-send-email-nanleychery@gmail.com>
-In-Reply-To: 1433174955-17349-1-git-send-email-nanleychery@gmail.com
+From: Daniel Leung <daniel.leung at linux.intel.com>
+Subject: [Powertop] [PATCH 2/2] Fix segfault for Android
+Date: Wed, 25 Feb 2015 16:38:25 -0800
+Message-ID: <1424911105-10079-2-git-send-email-daniel.leung@linux.intel.com>
+In-Reply-To: 1424911105-10079-1-git-send-email-daniel.leung@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2451606040350349565==
+--===============8015004851858732149==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Nanley Chery <nanley.g.chery(a)intel.com>
+The mbsrtowcs() in Android seems to change the content of
+source pointer to 0x00. So save a copy of the source
+string so we can manipulate it later, preventing segfaults.
+
+Signed-off-by: Daniel Leung <daniel.leung(a)linux.intel.com>
 ---
- src/lib.cpp  | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/lib.h    |  4 ++++
- src/main.cpp |  1 +
- 3 files changed, 59 insertions(+)
+ src/lib.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/src/lib.cpp b/src/lib.cpp
-index 437803b..5a9c6be 100644
+index 0dec0b7..6b1bc0a 100644
 --- a/src/lib.cpp
 +++ b/src/lib.cpp
-@@ -291,6 +291,29 @@ void format_watts(double W, char *buffer, unsigned int=
- len)
- 	align_string(buffer, len, len);
- }
- =
-
-+static struct udev *udev_cxt =3D NULL;
-+
-+struct udev * get_udev()
-+{
-+	if (udev_cxt =3D=3D NULL) {
-+		udev_cxt =3D udev_new();
-+		if (udev_cxt =3D=3D NULL) {
-+			printf("Couldn't create udev\n");
-+			exit(EXIT_FAILURE);
-+		}
-+	}
-+
-+	return udev_cxt;
-+}
-+
-+void cleanup_udev()
-+{
-+	if (udev_cxt !=3D NULL) {
-+		udev_unref(udev_cxt);
-+		udev_cxt =3D NULL;
-+	}
-+}
-+
- #ifndef HAVE_NO_PCI
- static struct pci_access *pci_access;
- =
-
-@@ -437,6 +460,37 @@ int equals(double a, double b)
- 	return fabs(a - b) <=3D std::numeric_limits<double>::epsilon();
- }
- =
-
-+void process_subsystem(const char *subsystem, callback fn, int num_attr, .=
-..)
-+{
-+	/* Find devices in subsystem with given attributes */
-+	struct udev_enumerate *enumerate =3D udev_enumerate_new(get_udev());
-+	udev_enumerate_add_match_subsystem(enumerate, subsystem);
-+	va_list args;
-+	va_start (args, num_attr);
-+	while (num_attr--) {
-+		const char *attr =3D va_arg(args, const char*);
-+		const char *attr_val =3D va_arg(args, const char*);
-+		if (*attr =3D=3D '+')
-+			udev_enumerate_add_match_sysattr(enumerate, &attr[1], attr_val);
-+		else if (*attr =3D=3D '-')
-+			udev_enumerate_add_nomatch_sysattr(enumerate, &attr[1], attr_val);
-+		else {
-+			fprintf (stderr, "Bad format of attribute\n");
-+			exit(1);
-+		}
-+	}
-+	va_end (args);
-+	udev_enumerate_scan_devices(enumerate);
-+
-+	/* Run callback on each device */
-+	struct udev_list_entry *dev_entry;
-+	udev_list_entry_foreach(dev_entry, udev_enumerate_get_list_entry(enumerat=
-e))
-+		fn(udev_list_entry_get_name(dev_entry));
-+
-+	/* Cleanup */
-+	udev_enumerate_unref(enumerate);
-+}
-+
- void process_directory(const char *d_name, callback fn)
+@@ -263,6 +263,7 @@ string read_sysfs_string(const char *format, const char=
+ *param)
+ void align_string(char *buffer, size_t min_sz, size_t max_sz)
  {
- 	struct dirent *entry;
-diff --git a/src/lib.h b/src/lib.h
-index 5c94271..ae0421f 100644
---- a/src/lib.h
-+++ b/src/lib.h
-@@ -28,6 +28,7 @@
- #include <libintl.h>
- #include <stdint.h>
- #include <stdlib.h>
-+#include <libudev.h>
+ 	size_t sz;
++	char *buf =3D buffer;
  =
 
- /* Include only for Automake builds */
- #ifdef HAVE_CONFIG_H
-@@ -70,6 +71,8 @@ extern void format_watts(double W, char *buffer, unsigned=
- int len);
- extern char *pci_id_to_name(uint16_t vendor, uint16_t device, char *buffer=
-, int len);
- extern void end_pci_access(void);
- =
-
-+extern struct udev * get_udev();
-+extern void cleanup_udev();
- =
-
- extern char *fmt_prefix(double n, char *buf);
- extern char *pretty_print(const char *str, char *buf, int len);
-@@ -77,6 +80,7 @@ extern int equals(double a, double b);
- =
-
- typedef void (*callback)(const char*);
- extern void process_directory(const char *d_name, callback fn);
-+extern void process_subsystem(const char *subsystem, callback fn, int num_=
-attr, ...);
- extern int utf_ok;
- extern int get_user_input(char *buf, unsigned sz);
- extern int read_msr(int cpu, uint64_t offset, uint64_t *value);
-diff --git a/src/main.cpp b/src/main.cpp
-index dc69fca..65e54ac 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -379,6 +379,7 @@ void clean_shutdown()
- 	clear_all_devices();
- 	clear_all_devfreq();
- 	clear_all_cpus();
-+	cleanup_udev();
- =
-
- 	return;
+ 	/** mbsrtowcs() allows NULL dst and zero sz,
+ 	 * comparing to mbstowcs(), which causes undefined
+@@ -275,8 +276,9 @@ void align_string(char *buffer, size_t min_sz, size_t m=
+ax_sz)
+ 		buffer[min_sz] =3D 0x00;
+ 		return;
+ 	}
++
+ 	while (sz < min_sz) {
+-		strcat(buffer, " ");
++		strcat(buf, " ");
+ 		sz++;
+ 	}
  }
 -- =
 
-2.4.1
+1.8.3.2
 
 
---===============2451606040350349565==--
+--===============8015004851858732149==--
 
