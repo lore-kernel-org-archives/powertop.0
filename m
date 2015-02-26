@@ -1,53 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============0763366828859236588=="
+Content-Type: multipart/mixed; boundary="===============1424894954197970164=="
 MIME-Version: 1.0
 From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] Complete build options for Pthread API
-Date: Thu, 30 Oct 2014 19:34:56 -0700
-Message-ID: <63912.10.255.85.192.1414722896.squirrel@linux.intel.com>
-In-Reply-To: CAG27Bk2jDUn-1SoWqFQhb2ac22vdrpTBax8VU_Gv+e02Dw2_rw@mail.gmail.com
+Subject: Re: [Powertop] [powertop] Indicate that the <tab> key is to use to
+ navigate in the application (#19)
+Date: Thu, 26 Feb 2015 11:46:11 -0800
+Message-ID: <56320.10.24.2.110.1424979971.squirrel@linux.intel.com>
+In-Reply-To: fenrus75/powertop/pull/19/c76245739@github.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0763366828859236588==
+--===============1424894954197970164==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Pierre,
 
-All,
+> @magnoliatitanium Hi Alexandra,
+>
+> Sorry about the error, a one-too-many bracket. It is removed now.
+>
+> I saw the instruction about the mailing list but I am not subscribed there
+> thus my asking to the Fedora maintainer (in the bugzilla ticket) to bring
+> this change to upstream/you.
+> I hope this is fine with you.
+>
+> Note: I can merge all the commits into one if you prefer.
+>
+> ---
+> Reply to this email directly or view it on GitHub:
+> https://github.com/fenrus75/powertop/pull/19#issuecomment-76245739
 
-> On 22 October 2014 13:41, Sergey Senozhatsky
-> <sergey.senozhatsky(a)gmail.com> wrote:
->> m4/* files are host-specific. they should never be part
->> of the source code or a package.
->
-> I would not say it so strongly. There are plenty of projects that have
-> files in m4 directory. Here's couple.
->
-> http://git.savannah.gnu.org/gitweb/?p=3Dcoreutils.git;a=3Dtree;f=3Dm4
-> https://github.com/karelzak/util-linux/tree/master/m4
->
-> But if powertop does not want to mix files autotools generate with own
-> files then an alternative path is needed. Perhaps powertop/m4/ could
-> be used. That would leave door open to various other project local
-> purposes as well files. What ever is done a maintainer decision is
-> needed. In best case the decision should be documented to
-> powertop/readmes/project_files.txt or something like that.
->
-> --
-> Sami Kerola
-> http://www.iki.fi/kerolasa/
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->
+Unfortunately, I can't go around the process that is already in place. I
+can't go around accepting patches without the mailing list's established
+curating process.
 
-I agree with Sergei, we use m4/* for generating our configuration files onl=
-y.
+Please be considerate with your fellow contributors and send the patches
+following the standard process.
 
 Thank you,
 Alexandra.
 
---===============0763366828859236588==--
+--===============1424894954197970164==--
 
