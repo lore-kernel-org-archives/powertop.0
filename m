@@ -1,50 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============7385996249351752624=="
+Content-Type: multipart/mixed; boundary="===============1918160746434602943=="
 MIME-Version: 1.0
-From: Romain Naour <romain.naour at openwide.fr>
-Subject: [Powertop] [PATCH 2/2] add missing stdio.h header
-Date: Sun, 20 Sep 2015 12:31:59 +0200
-Message-ID: <1442745119-680-2-git-send-email-romain.naour@openwide.fr>
-In-Reply-To: 1442745119-680-1-git-send-email-romain.naour@openwide.fr
+From: Daniel Leung <daniel.leung at linux.intel.com>
+Subject: [Powertop] [PATCH 1/1] Baytrail does not have core C7 MSR to read
+Date: Wed, 25 Feb 2015 16:36:45 -0800
+Message-ID: <1424911005-9961-1-git-send-email-daniel.leung@linux.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7385996249351752624==
+--===============1918160746434602943==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-snprinf is defined in stdio.h.
+So do not acquire core C7 from MSR, or else it fails
+and stops the program.
 
-Fixes:
-perf/perf_bundle.cpp: In function =E2=80=98void parse_event_format(const ch=
-ar*)=E2=80=99:
-perf/perf_bundle.cpp:141:75: error: =E2=80=98sprintf=E2=80=99 was not decla=
-red in this scope
-  sprintf(file, "/sys/kernel/debug/tracing/events/%s/%s/format", sys, event=
-);
-
-Signed-off-by: Romain Naour <romain.naour(a)openwide.fr>
+Reported-by: Eoff, Ullysses A <ullysses.a.eoff(a)intel.com>
+Signed-off-by: Daniel Leung <daniel.leung(a)linux.intel.com>
 ---
- src/perf/perf_bundle.cpp | 1 +
- 1 file changed, 1 insertion(+)
+ src/cpu/intel_cpus.cpp | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/src/perf/perf_bundle.cpp b/src/perf/perf_bundle.cpp
-index cf1ae11..3d216ff 100644
---- a/src/perf/perf_bundle.cpp
-+++ b/src/perf/perf_bundle.cpp
-@@ -31,6 +31,7 @@
- #include <sys/stat.h>
- #include <fcntl.h>
- #include <unistd.h>
-+#include <stdio.h>
- =
-
- #include "perf_bundle.h"
- #include "perf_event.h"
+diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
+index 167f1a7..e019484 100644
+--- a/src/cpu/intel_cpus.cpp
++++ b/src/cpu/intel_cpus.cpp
+@@ -131,11 +131,6 @@ nhm_core::nhm_core(int model)
+ 	if (model =3D=3D 0x37) {
+ 		has_c3_res =3D 0;
+ 		has_c1_res =3D 1;
+-		this->byt_has_ahci();
+-                if ((this->get_byt_ahci_support()) =3D=3D 0)
+-                        has_c7_res =3D 1;/*BYT-T PC7 <- S0iX*/
+-                else
+-                        has_c7_res =3D 0;
+ 	} else {
+ 		has_c3_res =3D 1;
+ 		has_c1_res =3D 0;
 -- =
 
-2.4.3
+1.8.3.2
 
 
---===============7385996249351752624==--
+--===============1918160746434602943==--
 
