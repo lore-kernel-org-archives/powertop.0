@@ -1,52 +1,42 @@
-Content-Type: multipart/mixed; boundary="===============8239856754752602866=="
+Content-Type: multipart/mixed; boundary="===============8018543674431199596=="
 MIME-Version: 1.0
-From: Swaminathan, Nivedita <nivedita.swaminathan at intel.com>
-Subject: Re: [Powertop] powertop-2.8 Fedora compile fix
-Date: Tue, 17 Nov 2015 23:46:50 +0000
-Message-ID: <203C9A218350B94EAF34403F81F162AE1974E6AA@ORSMSX116.amr.corp.intel.com>
-In-Reply-To: 1583929279.7774917.1447167703465.JavaMail.zimbra@redhat.com
+From: Jaroslav Skarvada <jskarvad at redhat.com>
+Subject: [Powertop] Patch: Add navigation hint
+Date: Fri, 27 Feb 2015 04:14:44 -0500
+Message-ID: <639638411.19600776.1425028484475.JavaMail.zimbra@redhat.com>
+In-Reply-To: 1507826410.19599054.1425028309035.JavaMail.zimbra@redhat.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8239856754752602866==
+--===============8018543674431199596==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Thank you for sending your patch. Your patch has been added to the github r=
-epository.
-
-Regards,
-Nivedita =
-
-
------Original Message-----
-From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of Jarosl=
-av Skarvada
-Sent: Tuesday, November 10, 2015 7:02 AM
-To: powertop(a)lists.01.org
-Subject: [Powertop] powertop-2.8 Fedora compile fix
-
 Hi,
 
-thanks for the powertop-2.8 release. In Fedora we have ImplicitDSOLinking [=
-1], so for pthreads usage it needs to link with the -lpthread. But the incl=
-uded ax_pthread.m4 macro find -pthreads CFLAGS, not LDFLAGS. From the GCC m=
-anual page:
-
-> -pthreads
-> Add support for multithreading using the POSIX threads library.
-> This option sets flags for both the preprocessor and linker.
-
-This means that you need to add the PTHREAD_CFLAGS in order to compile powe=
-rtop on systems with ImplicitDSOLinking and recent GCC. The attached patch =
-do it and fixed the problem for me in Fedora
+I am forwarding patch from Pierre-Yves Chibon <pingou(a)pingoured.fr> which
+adds navigation hint to the status bar, downstream bugzilla:
+http://bugzilla.redhat.com/show_bug.cgi?id=3D1191112
 
 thanks & regards
 
 Jaroslav
 
-[1] https://fedoraproject.org/wiki/Features/ChangeInImplicitDSOLinking
+--===============8018543674431199596==
+Content-Type: text/x-patch
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="powertop-2.7-navigate-hint.patch"
 
---===============8239856754752602866==--
+ZGlmZiAtLWdpdCBhL3NyYy9kaXNwbGF5LmNwcCBiL3NyYy9kaXNwbGF5LmNwcAppbmRleCBiNmM5
+MjAwLi5jMDUxNTIwIDEwMDY0NAotLS0gYS9zcmMvZGlzcGxheS5jcHAKKysrIGIvc3JjL2Rpc3Bs
+YXkuY3BwCkBAIC0xMjcsNyArMTI3LDkgQEAgdm9pZCBzaG93X3RhYih1bnNpZ25lZCBpbnQgdGFi
+KQogCWlmIChjICYmIHN0cmxlbihjKSA+IDApCiAJCW12d3ByaW50dyhib3R0b21fbGluZSwgMCww
+LCBjKTsKIAllbHNlCi0JCW12d3ByaW50dyhib3R0b21fbGluZSwgMCwwLCI8RVNDPiAlcyB8ICIs
+XygiRXhpdCIpKTsKKwkJbXZ3cHJpbnR3KGJvdHRvbV9saW5lLCAwLCAwLAorCQkJIjxFU0M+ICVz
+IHwgPFRBQj4gLyA8U2hpZnQgKyBUQUI+ICVzIHwgIiwgXygiRXhpdCIpLAorCQkJXygiTmF2aWdh
+dGUiKSk7CiAKIAogCWN1cnJlbnRfdGFiID0gdGFiOwo=
+
+--===============8018543674431199596==--
 
