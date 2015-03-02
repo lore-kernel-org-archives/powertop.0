@@ -1,30 +1,149 @@
-Content-Type: multipart/mixed; boundary="===============8941986690531421369=="
+Content-Type: multipart/mixed; boundary="===============0502942021494193803=="
 MIME-Version: 1.0
-From: SF Markus Elfring <elfring at users.sourceforge.net>
-Subject: Re: [Powertop] Complete build options for Pthread API
-Date: Sat, 01 Nov 2014 09:15:01 +0100
-Message-ID: <54549685.7090406@users.sourceforge.net>
-In-Reply-To: 50675.10.24.5.246.1414778507.squirrel@linux.intel.com
+From: Daniel Leung <daniel.leung at linux.intel.com>
+Subject: [Powertop] [PATCH 1/1] Android: Use syscall to write to sysfs nodes
+Date: Mon, 02 Mar 2015 11:09:38 -0800
+Message-ID: <1425323378-5225-1-git-send-email-daniel.leung@linux.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8941986690531421369==
+--===============0502942021494193803==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
->> I proposed the reuse of the AX_PTHREAD configuration script as a general
->> approach if you are interested to improve software portability around
->> the POSIX threads programming interface.
+For some reason, ofstream fails to write to sysfs nodes
+on Android. So use old-fashion open()/write()/close().
 
-> How is this different from what we currently have?
+Signed-off-by: Daniel Leung <daniel.leung(a)linux.intel.com>
+---
+ .../0001-Android-disable-C-exceptions.patch        | 34 +++++-------------=
+----
+ src/lib.cpp                                        | 14 +++++++++
+ 2 files changed, 22 insertions(+), 26 deletions(-)
 
-The AX_PTHREAD macro provides more configuration checks. How much will it m=
-atter
-to reuse such safety checks in various software build systems?
+diff --git a/patches/Android/0001-Android-disable-C-exceptions.patch b/patc=
+hes/Android/0001-Android-disable-C-exceptions.patch
+index 435cd95..b11bdc7 100644
+--- a/patches/Android/0001-Android-disable-C-exceptions.patch
++++ b/patches/Android/0001-Android-disable-C-exceptions.patch
+@@ -1,4 +1,4 @@
+-From 604d8f6da54524f0f7bfdd7aea91d353b4f1b612 Mon Sep 17 00:00:00 2001
++From 4570b7d6559047b384c50b4766e168fd5e11db8e Mon Sep 17 00:00:00 2001
+ From: Daniel Leung <daniel.leung(a)intel.com>
+ Date: Wed, 25 Feb 2015 13:24:14 -0800
+ Subject: [PATCH 1/1] Android: disable C++ exceptions
+@@ -11,11 +11,11 @@ Signed-off-by: Daniel Leung <daniel.leung(a)intel.com>
+  Android.mk           |  2 +-
+  src/devices/ahci.cpp |  8 ++++++++
+  src/devices/alsa.cpp |  8 ++++++++
+- src/lib.cpp          | 19 +++++++++++++++++++
+- 4 files changed, 36 insertions(+), 1 deletion(-)
++ src/lib.cpp          | 15 +++++++++++++++
++ 4 files changed, 32 insertions(+), 1 deletion(-)
+ =
 
-Regards,
-Markus
+ diff --git a/Android.mk b/Android.mk
+-index dd98d0f..f6b8689 100644
++index 0c95e3a..ff1040a 100644
+ --- a/Android.mk
+ +++ b/Android.mk
+ @@ -14,7 +14,7 @@ LOCAL_MODULE :=3D powertop
+@@ -128,28 +128,10 @@ index a1fca71..ba3c0b6 100644
+  	p =3D (end_active - start_active) / (0.001 + end_active + end_inactive -=
+ start_active - start_inactive) * 100.0;
+  	report_utilization(name, p);
+ diff --git a/src/lib.cpp b/src/lib.cpp
+-index 0dec0b7..91dac7a 100644
++index 24d6d07..4812ff1 100644
+ --- a/src/lib.cpp
+ +++ b/src/lib.cpp
+-@@ -176,13 +176,17 @@ void write_sysfs(const string &filename, const strin=
+g &value)
+- 	file.open(filename.c_str(), ios::out);
+- 	if (!file)
+- 		return;
+-+#ifndef DISABLE_TRYCATCH
+- 	try
+- 	{
+-+#endif
+- 		file << value;
+- 		file.close();
+-+#ifndef DISABLE_TRYCATCH
+- 	} catch (std::exception &exc) {
+- 		return;
+- 	}
+-+#endif
+- }
+- =
 
---===============8941986690531421369==--
+- int read_sysfs(const string &filename, bool *ok)
+-@@ -196,16 +200,23 @@ int read_sysfs(const string &filename, bool *ok)
++@@ -210,16 +210,23 @@ int read_sysfs(const string &filename, bool *ok)
+  			*ok =3D false;
+  		return 0;
+  	}
+@@ -173,7 +155,7 @@ index 0dec0b7..91dac7a 100644
+  	file.close();
+  	return i;
+  }
+-@@ -219,17 +230,21 @@ string read_sysfs_string(const string &filename)
++@@ -233,17 +240,21 @@ string read_sysfs_string(const string &filename)
+  	file.open(filename.c_str(), ios::in);
+  	if (!file)
+  		return "";
+@@ -195,7 +177,7 @@ index 0dec0b7..91dac7a 100644
+  	return content;
+  }
+  =
+
+-@@ -246,17 +261,21 @@ string read_sysfs_string(const char *format, const c=
+har *param)
++@@ -260,17 +271,21 @@ string read_sysfs_string(const char *format, const c=
+har *param)
+  	file.open(filename, ios::in);
+  	if (!file)
+  		return "";
+diff --git a/src/lib.cpp b/src/lib.cpp
+index 6b1bc0a..24d6d07 100644
+--- a/src/lib.cpp
++++ b/src/lib.cpp
+@@ -171,6 +171,7 @@ void set_max_cpu(int cpu)
+ =
+
+ void write_sysfs(const string &filename, const string &value)
+ {
++#ifndef ANDROID
+ 	ofstream file;
+ =
+
+ 	file.open(filename.c_str(), ios::out);
+@@ -183,6 +184,19 @@ void write_sysfs(const string &filename, const string =
+&value)
+ 	} catch (std::exception &exc) {
+ 		return;
+ 	}
++#else
++	int fd;
++
++	fd =3D ::open(filename.c_str(), O_WRONLY);
++	if (fd < 0)
++		return;
++
++	::write(fd, value.c_str(), value.length());
++
++	close(fd);
++
++	return;
++#endif
+ }
+ =
+
+ int read_sysfs(const string &filename, bool *ok)
+-- =
+
+1.8.3.2
+
+
+--===============0502942021494193803==--
 
