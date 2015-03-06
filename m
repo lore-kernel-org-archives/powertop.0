@@ -1,91 +1,98 @@
-Content-Type: multipart/mixed; boundary="===============8777409740265972177=="
+Content-Type: multipart/mixed; boundary="===============5254273909368048735=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] [PATCH v2 00/14] pull: various changes,
- mostly build system related
-Date: Thu, 13 Nov 2014 20:30:26 -0800
-Message-ID: <62192.10.254.178.169.1415939426.squirrel@linux.intel.com>
-In-Reply-To: 1415538871-11411-1-git-send-email-sami.kerola@lastminute.com
+From: David E. Box <david.e.box at linux.intel.com>
+Subject: [Powertop] [PATCH] Fix Powertop support for Intel Braswell SOC
+Date: Fri, 06 Mar 2015 09:46:15 -0800
+Message-ID: <1425663975-7522-1-git-send-email-david.e.box@linux.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8777409740265972177==
+--===============5254273909368048735==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Sami,
+Correct Braswell MSR used to determine PC6 residency.
+
+Signed-off-by: David E. Box <david.e.box(a)linux.intel.com>
+---
+ src/cpu/intel_cpus.cpp | 21 +++++++++++++++++++--
+ src/cpu/intel_cpus.h   |  1 +
+ 2 files changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
+index 72ecd50..baea8fc 100644
+--- a/src/cpu/intel_cpus.cpp
++++ b/src/cpu/intel_cpus.cpp
+@@ -289,6 +289,7 @@ nhm_package::nhm_package(int model)
+ 	has_c8c9c10_res =3D 0;
+ 	has_c2c6_res =3D 0;
+ 	has_c7_res =3D 0;
++	has_c6c_res =3D 0;
+ =
+
+ 	switch(model) {
+ 		case 0x2A:	/* SNB */
+@@ -314,6 +315,9 @@ nhm_package::nhm_package(int model)
+ 		else
+ 			has_c7_res =3D 0;
+ 	}
++	/* BSW only exposes package C6 */
++	else if (model =3D=3D 0x4C)
++		has_c6c_res=3D1;
+ 	else
+ 		has_c3_res =3D 1;
+ =
+
+@@ -360,7 +364,15 @@ void nhm_package::measurement_start(void)
+ =
+
+ 	if (this->has_c3_res)
+ 		c3_before    =3D get_msr(number, MSR_PKG_C3_RESIDENCY);
+-	c6_before    =3D get_msr(number, MSR_PKG_C6_RESIDENCY);
++
++	/*
++	 * Hack for Braswell where C7 MSR is actually BSW C6
++	 */
++	if (this->has_c6c_res)
++		c6_before    =3D get_msr(number, MSR_PKG_C7_RESIDENCY);
++	else
++		c6_before    =3D get_msr(number, MSR_PKG_C6_RESIDENCY);
++
+ 	if (this->has_c7_res)
+ 		c7_before    =3D get_msr(number, MSR_PKG_C7_RESIDENCY);
+ 	if (this->has_c8c9c10_res) {
+@@ -401,7 +413,12 @@ void nhm_package::measurement_end(void)
+ =
+
+ 	if (this->has_c3_res)
+ 		c3_after    =3D get_msr(number, MSR_PKG_C3_RESIDENCY);
+-	c6_after    =3D get_msr(number, MSR_PKG_C6_RESIDENCY);
++
++	if (this->has_c6c_res)
++		c6_after    =3D get_msr(number, MSR_PKG_C7_RESIDENCY);
++	else
++		c6_after    =3D get_msr(number, MSR_PKG_C6_RESIDENCY);
++
+ 	if (this->has_c7_res)
+ 		c7_after    =3D get_msr(number, MSR_PKG_C7_RESIDENCY);
+ 	if (has_c8c9c10_res) {
+diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
+index 810a243..0331069 100644
+--- a/src/cpu/intel_cpus.h
++++ b/src/cpu/intel_cpus.h
+@@ -77,6 +77,7 @@ public:
+ 	int		has_c7_res;
+ 	int		has_c2c6_res;
+ 	int		has_c3_res;
++	int		has_c6c_res;		/* BSW */
+ 	int		has_c8c9c10_res;
+ 	nhm_package(int model);
+ 	virtual void	measurement_start(void);
+-- =
+
+1.9.1
 
 
-> Hello,
->
-> This change set is related to previous submission, that is discussed in
-> thread below:
->
-> https://lists.01.org/pipermail/powertop/2014-November/001664.html
->
-> My assumption is that these changes may not be completely in acceptable
-> to be part of upstream just before release.  See the link for details.
->
-> Sami Kerola (14):
->   configure: require new enough automake version
->   configure: use autoconf-archive ax_pthread.m4
->   add missing space to --version print out
->   csstoh.sh: check every single return value
->   configure: use AC_USE_SYSTEM_EXTENSIONS to determine features
->   powertop.m4: GCC_FORTIFY_SOURCE_CC copy idea of macro from Archlinux
->     pacman
->   configure: use autoconf-archive ax_cxx_compile_stdcxx_11.m4
->   main: fix incompatible operand type
->   move variables to protected scope
->   make --quiet option to suppress various info messages
->   squeeze all extra bits from size of binary and html report
->   add timestamp to html report
->   fix typo in message
->   add missing include
->
->  .gitignore                           |  39 +++-
->  PowerTop.png                         | Bin 6975 -> 5542 bytes
->  configure.ac                         |  21 ++-
->  m4/ax_cxx_compile_stdcxx_11.m4       | 142 +++++++++++++++
->  m4/ax_pthread.m4                     | 332
-> +++++++++++++++++++++++++++++++++++
->  m4/gcc_fortify_source_cc.m4          |  29 +++
->  src/Makefile.am                      |   1 -
->  src/cpu/rapl/rapl_interface.cpp      |   7 +-
->  src/cpu/rapl/rapl_interface.h        |   9 +-
->  src/csstoh.sh                        |  40 +++--
->  src/lib.h                            |   1 +
->  src/main.cpp                         |   8 +-
->  src/report/report-formatter-base.cpp |   2 -
->  src/report/report-formatter-csv.cpp  |   2 -
->  src/report/report-formatter-html.cpp | 248 +++++++++++++-------------
->  src/report/report.cpp                |   5 +-
->  16 files changed, 719 insertions(+), 167 deletions(-)
->  create mode 100644 m4/ax_cxx_compile_stdcxx_11.m4
->  create mode 100644 m4/ax_pthread.m4
->  create mode 100644 m4/gcc_fortify_source_cc.m4
->
-> --
-> 2.1.3
->
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->
-
-Patches look good.  Two things:
-
-1- I could not get this patch to apply
-"configure: require new enough automake version"
-Patch is empty.  Was it split wrong?
-
-2- Please get the latest checkpatch.pl from the linux kernel scripts and
-run it over your files before creating the patches.
-
-Thank you,
-Alexandra.
-
---===============8777409740265972177==--
+--===============5254273909368048735==--
 
