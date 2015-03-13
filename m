@@ -1,90 +1,106 @@
-Content-Type: multipart/mixed; boundary="===============4280099233297956666=="
+Content-Type: multipart/mixed; boundary="===============0486112583917394769=="
 MIME-Version: 1.0
-From: Harvey <harv at gmx.de>
-Subject: Re: [Powertop] Powertop crashes with 'powertop --auto-tune'
-Date: Mon, 22 Dec 2014 15:26:46 +0100
-Message-ID: <54982A26.5010506@gmx.de>
-In-Reply-To: CAG27Bk1Y+S=yakWkiResNsrSeJf=g9HfsqEP5E---tamhnqH-A@mail.gmail.com
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Fix Powertop support for Intel Braswell SOC
+Date: Fri, 13 Mar 2015 13:18:31 -0700
+Message-ID: <55034617.5040507@linux.intel.com>
+In-Reply-To: 1425663975-7522-1-git-send-email-david.e.box@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4280099233297956666==
+--===============0486112583917394769==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+One minor nit. Otherwise,
 
+Tested-by: Joe Konno <joe.konno(a)intel.com>
 
-
-Hi Sami.
-
-thank you for your answer.
-
->> On Archlinux 64bit as well as 32bit systems powertop 2.7 crashes =
-
->> reproducible like this when called with the parameter =
-
->> --auto-tune:
+On 03/06/2015 09:46 AM, David E. Box wrote:
+> Correct Braswell MSR used to determine PC6 residency.
 > =
 
-> Rather strange. I have up to date archlinux and the same does not =
-
-> happen when I run --auto-tune.
-
-As of today the crash is gone on my x86_64 system (all testing repos
-enabled). I guess you tried on x86_64, but not i686? Don't know why
-its gone in x86_64, but anyway, i686 still crashes. And the headless
-server I use powertop on to elegantly optimize power settings still
-crashes when using powertop --auto-tune. The funny thing is that the
-settings get optimized nevertheless as a call of powertop wihout
-- --auto-tune parameter shows me.
-
-> I'm just a hobbyist contributor and I haven't cracked out how to =
-
-> know where in code 'double free or corruption (!prev): 0x0975bc20' =
-
-> issue happen. Could you compile the tool with debugging symbols, =
-
-> and recreate issue the way we could see backtrace? That would make =
-
-> fixing a lot easier.
+> Signed-off-by: David E. Box <david.e.box(a)linux.intel.com>
+> ---
+>  src/cpu/intel_cpus.cpp | 21 +++++++++++++++++++--
+>  src/cpu/intel_cpus.h   |  1 +
+>  2 files changed, 20 insertions(+), 2 deletions(-)
 > =
 
-> cd /tmp wget
-> =
+> diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
+> index 72ecd50..baea8fc 100644
+> --- a/src/cpu/intel_cpus.cpp
+> +++ b/src/cpu/intel_cpus.cpp
+> @@ -289,6 +289,7 @@ nhm_package::nhm_package(int model)
+>  	has_c8c9c10_res =3D 0;
+>  	has_c2c6_res =3D 0;
+>  	has_c7_res =3D 0;
+> +	has_c6c_res =3D 0;
+>  =
 
-https://01.org/sites/default/files/downloads/powertop/powertop-2.7.tar.gz
-> =
+>  	switch(model) {
+>  		case 0x2A:	/* SNB */
+> @@ -314,6 +315,9 @@ nhm_package::nhm_package(int model)
+>  		else
+>  			has_c7_res =3D 0;
+>  	}
+> +	/* BSW only exposes package C6 */
+> +	else if (model =3D=3D 0x4C)
+> +		has_c6c_res=3D1;
 
-> =
+Nit: whitespace around '=3D' inconsistent with surrounding code.
 
-tar xzf powertop-2.7.tar.gz
-> cd powertop-2.7 CXXLAGS=3D"-O0 -g -ggdb -fno-omit-frame-pointer" =
+>  	else
+>  		has_c3_res =3D 1;
+>  =
 
-> ./configure make -j3 sudo -i cd /tmp/powertop-2.7 ./src/powertop =
+> @@ -360,7 +364,15 @@ void nhm_package::measurement_start(void)
+>  =
 
-> --auto-tune [crash] coredumpctl gdb (gdb) bt full <copy paste this =
+>  	if (this->has_c3_res)
+>  		c3_before    =3D get_msr(number, MSR_PKG_C3_RESIDENCY);
+> -	c6_before    =3D get_msr(number, MSR_PKG_C6_RESIDENCY);
+> +
+> +	/*
+> +	 * Hack for Braswell where C7 MSR is actually BSW C6
+> +	 */
+> +	if (this->has_c6c_res)
+> +		c6_before    =3D get_msr(number, MSR_PKG_C7_RESIDENCY);
+> +	else
+> +		c6_before    =3D get_msr(number, MSR_PKG_C6_RESIDENCY);
+> +
+>  	if (this->has_c7_res)
+>  		c7_before    =3D get_msr(number, MSR_PKG_C7_RESIDENCY);
+>  	if (this->has_c8c9c10_res) {
+> @@ -401,7 +413,12 @@ void nhm_package::measurement_end(void)
+>  =
 
-> output to reply>
+>  	if (this->has_c3_res)
+>  		c3_after    =3D get_msr(number, MSR_PKG_C3_RESIDENCY);
+> -	c6_after    =3D get_msr(number, MSR_PKG_C6_RESIDENCY);
+> +
+> +	if (this->has_c6c_res)
+> +		c6_after    =3D get_msr(number, MSR_PKG_C7_RESIDENCY);
+> +	else
+> +		c6_after    =3D get_msr(number, MSR_PKG_C6_RESIDENCY);
+> +
+>  	if (this->has_c7_res)
+>  		c7_after    =3D get_msr(number, MSR_PKG_C7_RESIDENCY);
+>  	if (has_c8c9c10_res) {
+> diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
+> index 810a243..0331069 100644
+> --- a/src/cpu/intel_cpus.h
+> +++ b/src/cpu/intel_cpus.h
+> @@ -77,6 +77,7 @@ public:
+>  	int		has_c7_res;
+>  	int		has_c2c6_res;
+>  	int		has_c3_res;
+> +	int		has_c6c_res;		/* BSW */
+>  	int		has_c8c9c10_res;
+>  	nhm_package(int model);
+>  	virtual void	measurement_start(void);
+>=20
 
-I tried this but there was no useful output due to missing debugging
-symbols, I guess what do I have to do to enable those?
-
-Thank you
-Harvey
-
-
-- -- I am root. If you see me laughing, you'd better have a backup!
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlSYKiYACgkQi5aqmLBUSgmtzwCfXHzmcyZuES5OlqR4oq4eF6TZ
-QJQAn32UAso83cAUch03mNW1xWpIE7hc
-=3DdV+X
------END PGP SIGNATURE-----
-
---===============4280099233297956666==--
+--===============0486112583917394769==--
 
