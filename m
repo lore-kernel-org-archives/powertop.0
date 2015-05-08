@@ -1,57 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============4769399827228420428=="
+Content-Type: multipart/mixed; boundary="===============2906572876335070570=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH v2 14/14] add missing include
-Date: Sun, 09 Nov 2014 13:14:31 +0000
-Message-ID: <1415538871-11411-15-git-send-email-sami.kerola@lastminute.com>
-In-Reply-To: 1415538871-11411-1-git-send-email-sami.kerola@lastminute.com
+From: Dhanraj Peela <dhanrajpeela at gmail.com>
+Subject: [Powertop] Fwd: Urgent.
+Date: Fri, 08 May 2015 12:17:22 +0530
+Message-ID: <CAO6NHbx-Gw4ZHwX8qWk8ndcr--Myi46ewyv=8imuzRmCZ=Xwsw@mail.gmail.com>
+In-Reply-To: mailman.1341.1431067389.2227.powertop@lists.01.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4769399827228420428==
+--===============2906572876335070570==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Sami Kerola <kerolasa(a)iki.fi>
+Hi Sir,
+This id Dhanraj,Im working on a power optimization program and would like
+to know how to only check the power consumed by a single application and
+how to change its C State in Linux.
+I'm using CentOs and powertop ver 2.7.
+Thank You..
 
-In file included from measurement/sysfs.cpp:27:
-In file included from measurement/../lib.h:59:
-In file included from /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/=
-../../../../include/c++/4.9.1/string:52:
-In file included from /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/=
-../../../../include/c++/4.9.1/bits/basic_string.h:2850:
-In file included from /usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/=
-../../../../include/c++/4.9.1/ext/string_conversions.h:41:
-/usr/bin/../lib64/gcc/x86_64-unknown-linux-gnu/4.9.1/../../../../include/c+=
-+/4.9.1/cstdlib:153:11: error:
-      no member named 'realloc' in the global namespace
-  using ::realloc;
-        ~~^
+--===============2906572876335070570==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
----
- src/lib.h | 1 +
- 1 file changed, 1 insertion(+)
+PGRpdiBkaXI9Imx0ciI+PGRpdiBjbGFzcz0iZ21haWxfcXVvdGUiPjxkaXYgZGlyPSJsdHIiPkhp
+IFNpciw8ZGl2PlRoaXMgaWQgRGhhbnJhaixJbSB3b3JraW5nIG9uIGEgcG93ZXIgb3B0aW1pemF0
+aW9uIHByb2dyYW0gYW5kIHdvdWxkIGxpa2UgdG8ga25vdyBob3cgdG8gb25seSBjaGVjayB0aGUg
+cG93ZXIgY29uc3VtZWQgYnkgYSBzaW5nbGUgYXBwbGljYXRpb24gYW5kIGhvdyB0byBjaGFuZ2Ug
+aXRzIEMgU3RhdGUgaW4gTGludXguPC9kaXY+PGRpdj5JJiMzOTttIHVzaW5nIENlbnRPcyBhbmQg
+cG93ZXJ0b3AgdmVyIDIuNy48L2Rpdj48ZGl2PlRoYW5rIFlvdS4uPC9kaXY+PC9kaXY+Cjxicj48
+L2Rpdj48YnI+PC9kaXY+Cg==
 
-diff --git a/src/lib.h b/src/lib.h
-index ec50946..5c94271 100644
---- a/src/lib.h
-+++ b/src/lib.h
-@@ -27,6 +27,7 @@
- =
-
- #include <libintl.h>
- #include <stdint.h>
-+#include <stdlib.h>
- =
-
- /* Include only for Automake builds */
- #ifdef HAVE_CONFIG_H
--- =
-
-2.1.3
-
-
---===============4769399827228420428==--
+--===============2906572876335070570==--
 
