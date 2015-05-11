@@ -1,84 +1,73 @@
-Content-Type: multipart/mixed; boundary="===============0623161508587648983=="
+Content-Type: multipart/mixed; boundary="===============8332822483370847718=="
 MIME-Version: 1.0
-From: Nanley Chery <nanleychery at gmail.com>
-Subject: [Powertop] [RFC 1/9] build with udev library
-Date: Mon, 01 Jun 2015 09:09:07 -0700
-Message-ID: <1433174955-17349-2-git-send-email-nanleychery@gmail.com>
-In-Reply-To: 1433174955-17349-1-git-send-email-nanleychery@gmail.com
+From: Jaroslav Skarvada <jskarvad at redhat.com>
+Subject: Re: [Powertop] PowerTop pread cpu0 0xe8 : Input/output error
+Date: Mon, 11 May 2015 10:40:59 -0400
+Message-ID: <224014853.15553752.1431355259007.JavaMail.zimbra@redhat.com>
+In-Reply-To: CAEBRvAfTcVahmVk_GcfEPWw-Jw4cOGh6gFUd_xHyvyT3YBGibg@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0623161508587648983==
+--===============8332822483370847718==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Nanley Chery <nanley.g.chery(a)intel.com>
----
- configure.ac    | 5 +++++
- src/Makefile.am | 3 +++
- 2 files changed, 8 insertions(+)
+----- Original Message -----
+> Hello,
+> =
 
-diff --git a/configure.ac b/configure.ac
-index 79ea055..9af9604 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -54,6 +54,7 @@ AC_CHECK_HEADERS([ \
- 	locale.h \
- 	malloc.h \
- 	ncurses.h \
-+	libudev.h \
- 	stdint.h \
- 	stdlib.h \
- 	string.h \
-@@ -106,6 +107,10 @@ AC_CHECK_FUNCS([ \
- 	strtoull \
- ])
- =
+> I am trying to execute power top on my Virtual Machine with specification=
+ OS
+> 6.5 Scientific Linux and I get the following message : pread cpu0 0xe8 :
+> input/output error. The powertop version i am using is 2.3. I have tried
+> running older versions like 1.11 which was running properly but as I red
+> 1.11 measures cpu wake ups and not energy consumption as the 2.3. Any idea
+> what the problem may be and how can I solve it ?
+> =
 
-+PKG_CHECK_MODULES([UDEV], [libudev], [LIBS=3D"$LIBS $udev_LIBS"], [
-+		AC_MSG_ERROR([libudev is required but was not found])
-+])
-+
- PKG_CHECK_MODULES([NCURSES], [ncursesw ncurses], [LIBS=3D"$LIBS $ncurses_L=
-IBS"], [
- 	AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], [
- 		AC_MSG_ERROR([ncurses is required but was not found])
-diff --git a/src/Makefile.am b/src/Makefile.am
-index d7132c0..ac2259c 100644
---- a/src/Makefile.am
-+++ b/src/Makefile.am
-@@ -133,6 +133,7 @@ powertop_CXXFLAGS =3D \
- 	$(GLIB2_CFLAGS) \
- 	$(LIBNL_CFLAGS) \
- 	$(NCURSES_CFLAGS) \
-+	$(UDEV_CFLAGS) \
- 	$(PCIUTILS_CFLAGS)
- =
+> =
 
- =
+> Best Regards,
+> =
 
-@@ -142,6 +143,7 @@ powertop_CPPFLAGS =3D \
- 	$(LIBNL_CFLAGS) \
- 	$(LIBZ_CFLAGS) \
- 	$(NCURSES_CFLAGS) \
-+	$(UDEV_CFLAGS) \
- 	$(PCIUTILS_CFLAGS)
- =
+> Stefanos Georgiou
+> =
 
- powertop_LDADD =3D \
-@@ -152,6 +154,7 @@ AM_LDFLAGS =3D \
- 	$(LIBS) \
- 	$(LIBZ_LIBS) \
- 	$(NCURSES_LIBS) \
-+	$(UDEV_LIBS) \
- 	$(PCIUTILS_LIBS) \
- 	$(PTHREAD_LIBS) \
- 	$(RESOLV_LIBS)
--- =
+> BSc in Network and System Programming
+> Computer Science Department
+> University of Cyprus
+> =
 
-2.4.1
+> MSc in Pervasive Computing and Communications
+> for Sustainable Development (PERCCOM)
+> Joint Master Degree
+> University of Lorraine, Lappeenranta, Lulea, ITMO Saint-Petersburg
+> =
+
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+> =
 
 
---===============0623161508587648983==--
+Hi,
+
+AFAIK the problem is that virtual machines don't correctly implement
+Machine State Registers (MSRs) or don't implement them at all.
+I tried to address the problem by patch sent earlier allowing PowerTOP
+to continue running in virtualized environments.
+
+It will probably not resolve your problem with energy consumption
+measurement, because there is usually no usable ACPI battery in the
+virtual environments
+
+thanks & regards
+
+Jaroslav
+
+--===============8332822483370847718==--
 
