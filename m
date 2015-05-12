@@ -1,45 +1,30 @@
-Content-Type: multipart/mixed; boundary="===============3330790372319966704=="
+Content-Type: multipart/mixed; boundary="===============4782249885670344632=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH v2 08/14] main: fix incompatible operand type
-Date: Sun, 09 Nov 2014 13:14:25 +0000
-Message-ID: <1415538871-11411-9-git-send-email-sami.kerola@lastminute.com>
-In-Reply-To: 1415538871-11411-1-git-send-email-sami.kerola@lastminute.com
+From: Nimmagadda, Pawan Kumar (pawan) <pawan at quicinc.com>
+Subject: [Powertop] Powertop V1.x code base
+Date: Tue, 12 May 2015 22:48:11 +0000
+Message-ID: <6484390a787248df947a79b7f13c8387@NASANEXM01H.na.qualcomm.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3330790372319966704==
+--===============4782249885670344632==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Sami Kerola <kerolasa(a)iki.fi>
+Hi ,
 
-main.cpp:430:35: error: incompatible operand types ('char *' and 'char')
-                        sprintf(workload, "%s", optarg ? optarg : '\0');
+I am looking for powertop V1.x code. =
 
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
----
- src/main.cpp | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Is there any GIT repository or Website where I can get this. =
 
-diff --git a/src/main.cpp b/src/main.cpp
-index 817a14a..23725d1 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -445,7 +445,7 @@ int main(int argc, char **argv)
- 			time_out =3D (optarg ? atoi(optarg) : 20);
- 			break;
- 		case 'w':		/* measure workload */
--			sprintf(workload, "%s", optarg ? optarg : '\0');
-+			sprintf(workload, "%s", optarg ? optarg : "");
- 			break;
- 		case 'V':
- 			print_version();
--- =
-
-2.1.3
+I googled for this and I could only find   http://www.lesswatts.org/project=
+s/powertop but this seems to be deprecated or invalid now.
 
 
---===============3330790372319966704==--
+Thanks in advance
+Pawan Kumar
+
+
+--===============4782249885670344632==--
 
