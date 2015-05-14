@@ -1,44 +1,152 @@
-Content-Type: multipart/mixed; boundary="===============5615988744754885239=="
+Content-Type: multipart/mixed; boundary="===============6116073786770578161=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: Re: [Powertop] Complete build options for Pthread API
-Date: Fri, 31 Oct 2014 10:01:12 +0000
-Message-ID: <CAG27Bk3-HDQ3od-ULKP7RZSP0buyN0yCEuKaOfXkog2j9HStbg@mail.gmail.com>
-In-Reply-To: 50509.10.252.141.137.1414726527.squirrel@linux.intel.com
+From: Nimmagadda, Pawan Kumar (pawan) <pawan at quicinc.com>
+Subject: Re: [Powertop] Powertop V1.x code base
+Date: Thu, 14 May 2015 17:45:10 +0000
+Message-ID: <e52e84a0d0504e01a1fa81017280953d@NASANEXM01H.na.qualcomm.com>
+In-Reply-To: CABsxX9KUk70BEYeszW4R=vGOB=pbociw3AKN7J=AFC6L-q2dDg@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5615988744754885239==
+--===============6116073786770578161==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 31 October 2014 03:35, Alexandra Yates
-<alexandra.yates(a)linux.intel.com> wrote:
-> What is the the return on investment for this feature in terms of
-> performance?
+Thanks Auke !!
 
-Markus, fancy answering to why you proposed AX_PTHREAD to be added to proje=
-ct?
+Regards,
+Pawan
 
-> At the moment PowerTOP builds with in 40 seconds from source and building
-> the package takes ~15 seconds.
+From: Kok, Auke-jan H [mailto:auke-jan.h.kok(a)intel.com]
+Sent: Thursday, May 14, 2015 10:08 AM
+To: Nimmagadda, Pawan Kumar (pawan)
+Cc: powertop(a)lists.01.org
+Subject: Re: [Powertop] Powertop V1.x code base
 
-If you want performance making the build system to be none-recursive
-could be a good improvement.
 
-http://evbergen.home.xs4all.nl/nonrecursive-make.html
 
-Notice that traceevent should still be built using separate Makefile
-even if rest of the project would use single file. I can write change
-making the none-recursive build to work, but be aware it will cause
-built program binary to be wrote to project top-level directory, e.g.,
-not in src/ where it ends up now.
+On Wed, May 13, 2015 at 1:06 PM, Nimmagadda, Pawan Kumar (pawan) <pawan(a)q=
+uicinc.com<mailto:pawan(a)quicinc.com>> wrote:
 
--- =
+The Github and Gerrit contain powertop 2.x code.
 
-Sami Kerola
-http://www.iki.fi/kerolasa/
+I am looking for deprecated powertop 1.x code base.
 
---===============5615988744754885239==--
+=E2=80=8BThis used to be hosted on google code (code.google.com<http://code=
+.google.com>) but that service is getting shut down. Since I was still the =
+official maintainer for that SVN tree, I've imported it to github where you=
+ can get it from now on:
+
+=E2=80=8B    https://github.com/sofar/powertop
+
+Note, I do not intend to maintain this tree. If people wish to send pull re=
+quests, I'll be happy to merge them, but it won't be developed anymore, for=
+ obvious reasons.
+
+Auke
+
+
+--===============6116073786770578161==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
+bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
+YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
+cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
+VFIvUkVDLWh0bWw0MCI+DQo8aGVhZD4NCjxtZXRhIGh0dHAtZXF1aXY9IkNvbnRlbnQtVHlwZSIg
+Y29udGVudD0idGV4dC9odG1sOyBjaGFyc2V0PXV0Zi04Ij4NCjxtZXRhIG5hbWU9IkdlbmVyYXRv
+ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTUgKGZpbHRlcmVkIG1lZGl1bSkiPg0KPHN0eWxl
+PjwhLS0NCi8qIEZvbnQgRGVmaW5pdGlvbnMgKi8NCkBmb250LWZhY2UNCgl7Zm9udC1mYW1pbHk6
+IkNhbWJyaWEgTWF0aCI7DQoJcGFub3NlLTE6MiA0IDUgMyA1IDQgNiAzIDIgNDt9DQpAZm9udC1m
+YWNlDQoJe2ZvbnQtZmFtaWx5OkNhbGlicmk7DQoJcGFub3NlLTE6MiAxNSA1IDIgMiAyIDQgMyAy
+IDQ7fQ0KLyogU3R5bGUgRGVmaW5pdGlvbnMgKi8NCnAuTXNvTm9ybWFsLCBsaS5Nc29Ob3JtYWws
+IGRpdi5Nc29Ob3JtYWwNCgl7bWFyZ2luOjBpbjsNCgltYXJnaW4tYm90dG9tOi4wMDAxcHQ7DQoJ
+Zm9udC1zaXplOjEyLjBwdDsNCglmb250LWZhbWlseToiVGltZXMgTmV3IFJvbWFuIixzZXJpZjt9
+DQphOmxpbmssIHNwYW4uTXNvSHlwZXJsaW5rDQoJe21zby1zdHlsZS1wcmlvcml0eTo5OTsNCglj
+b2xvcjpibHVlOw0KCXRleHQtZGVjb3JhdGlvbjp1bmRlcmxpbmU7fQ0KYTp2aXNpdGVkLCBzcGFu
+Lk1zb0h5cGVybGlua0ZvbGxvd2VkDQoJe21zby1zdHlsZS1wcmlvcml0eTo5OTsNCgljb2xvcjpw
+dXJwbGU7DQoJdGV4dC1kZWNvcmF0aW9uOnVuZGVybGluZTt9DQpwDQoJe21zby1zdHlsZS1wcmlv
+cml0eTo5OTsNCgltc28tbWFyZ2luLXRvcC1hbHQ6YXV0bzsNCgltYXJnaW4tcmlnaHQ6MGluOw0K
+CW1zby1tYXJnaW4tYm90dG9tLWFsdDphdXRvOw0KCW1hcmdpbi1sZWZ0OjBpbjsNCglmb250LXNp
+emU6MTIuMHB0Ow0KCWZvbnQtZmFtaWx5OiJUaW1lcyBOZXcgUm9tYW4iLHNlcmlmO30NCnNwYW4u
+RW1haWxTdHlsZTE4DQoJe21zby1zdHlsZS10eXBlOnBlcnNvbmFsLXJlcGx5Ow0KCWZvbnQtZmFt
+aWx5OiJDYWxpYnJpIixzYW5zLXNlcmlmOw0KCWNvbG9yOiMxRjQ5N0Q7fQ0KLk1zb0NocERlZmF1
+bHQNCgl7bXNvLXN0eWxlLXR5cGU6ZXhwb3J0LW9ubHk7DQoJZm9udC1mYW1pbHk6IkNhbGlicmki
+LHNhbnMtc2VyaWY7fQ0KQHBhZ2UgV29yZFNlY3Rpb24xDQoJe3NpemU6OC41aW4gMTEuMGluOw0K
+CW1hcmdpbjoxLjBpbiAxLjBpbiAxLjBpbiAxLjBpbjt9DQpkaXYuV29yZFNlY3Rpb24xDQoJe3Bh
+Z2U6V29yZFNlY3Rpb24xO30NCi0tPjwvc3R5bGU+PCEtLVtpZiBndGUgbXNvIDldPjx4bWw+DQo8
+bzpzaGFwZWRlZmF1bHRzIHY6ZXh0PSJlZGl0IiBzcGlkbWF4PSIxMDI2IiAvPg0KPC94bWw+PCFb
+ZW5kaWZdLS0+PCEtLVtpZiBndGUgbXNvIDldPjx4bWw+DQo8bzpzaGFwZWxheW91dCB2OmV4dD0i
+ZWRpdCI+DQo8bzppZG1hcCB2OmV4dD0iZWRpdCIgZGF0YT0iMSIgLz4NCjwvbzpzaGFwZWxheW91
+dD48L3htbD48IVtlbmRpZl0tLT4NCjwvaGVhZD4NCjxib2R5IGxhbmc9IkVOLVVTIiBsaW5rPSJi
+bHVlIiB2bGluaz0icHVycGxlIj4NCjxkaXYgY2xhc3M9IldvcmRTZWN0aW9uMSI+DQo8cCBjbGFz
+cz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iZm9udC1zaXplOjExLjBwdDtmb250LWZhbWlseTom
+cXVvdDtDYWxpYnJpJnF1b3Q7LHNhbnMtc2VyaWY7Y29sb3I6IzFGNDk3RCI+VGhhbmtzIEF1a2Ug
+ISE8bzpwPjwvbzpwPjwvc3Bhbj48L3A+DQo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHls
+ZT0iZm9udC1zaXplOjExLjBwdDtmb250LWZhbWlseTomcXVvdDtDYWxpYnJpJnF1b3Q7LHNhbnMt
+c2VyaWY7Y29sb3I6IzFGNDk3RCI+PG86cD4mbmJzcDs8L286cD48L3NwYW4+PC9wPg0KPHAgY2xh
+c3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMS4wcHQ7Zm9udC1mYW1pbHk6
+JnF1b3Q7Q2FsaWJyaSZxdW90OyxzYW5zLXNlcmlmO2NvbG9yOiMxRjQ5N0QiPlJlZ2FyZHMsPG86
+cD48L286cD48L3NwYW4+PC9wPg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImZv
+bnQtc2l6ZToxMS4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7Q2FsaWJyaSZxdW90OyxzYW5zLXNlcmlm
+O2NvbG9yOiMxRjQ5N0QiPlBhd2FuPG86cD48L286cD48L3NwYW4+PC9wPg0KPHAgY2xhc3M9Ik1z
+b05vcm1hbCI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMS4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7
+Q2FsaWJyaSZxdW90OyxzYW5zLXNlcmlmO2NvbG9yOiMxRjQ5N0QiPjxvOnA+Jm5ic3A7PC9vOnA+
+PC9zcGFuPjwvcD4NCjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxiPjxzcGFuIHN0eWxlPSJmb250LXNp
+emU6MTEuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0NhbGlicmkmcXVvdDssc2Fucy1zZXJpZiI+RnJv
+bTo8L3NwYW4+PC9iPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTEuMHB0O2ZvbnQtZmFtaWx5OiZx
+dW90O0NhbGlicmkmcXVvdDssc2Fucy1zZXJpZiI+IEtvaywgQXVrZS1qYW4gSCBbbWFpbHRvOmF1
+a2UtamFuLmgua29rQGludGVsLmNvbV0NCjxicj4NCjxiPlNlbnQ6PC9iPiBUaHVyc2RheSwgTWF5
+IDE0LCAyMDE1IDEwOjA4IEFNPGJyPg0KPGI+VG86PC9iPiBOaW1tYWdhZGRhLCBQYXdhbiBLdW1h
+ciAocGF3YW4pPGJyPg0KPGI+Q2M6PC9iPiBwb3dlcnRvcEBsaXN0cy4wMS5vcmc8YnI+DQo8Yj5T
+dWJqZWN0OjwvYj4gUmU6IFtQb3dlcnRvcF0gUG93ZXJ0b3AgVjEueCBjb2RlIGJhc2U8bzpwPjwv
+bzpwPjwvc3Bhbj48L3A+DQo8cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwv
+cD4NCjxkaXY+DQo8ZGl2Pg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImZvbnQt
+ZmFtaWx5OiZxdW90O0NvdXJpZXIgTmV3JnF1b3Q7Ij48bzpwPiZuYnNwOzwvbzpwPjwvc3Bhbj48
+L3A+DQo8L2Rpdj4NCjxkaXY+DQo8cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpw
+PjwvcD4NCjxkaXY+DQo8cCBjbGFzcz0iTXNvTm9ybWFsIj5PbiBXZWQsIE1heSAxMywgMjAxNSBh
+dCAxOjA2IFBNLCBOaW1tYWdhZGRhLCBQYXdhbiBLdW1hciAocGF3YW4pICZsdDs8YSBocmVmPSJt
+YWlsdG86cGF3YW5AcXVpY2luYy5jb20iIHRhcmdldD0iX2JsYW5rIj5wYXdhbkBxdWljaW5jLmNv
+bTwvYT4mZ3Q7IHdyb3RlOjxvOnA+PC9vOnA+PC9wPg0KPGJsb2NrcXVvdGUgc3R5bGU9ImJvcmRl
+cjpub25lO2JvcmRlci1sZWZ0OnNvbGlkICNDQ0NDQ0MgMS4wcHQ7cGFkZGluZzowaW4gMGluIDBp
+biA2LjBwdDttYXJnaW4tbGVmdDo0LjhwdDttYXJnaW4tcmlnaHQ6MGluIj4NCjxkaXY+DQo8ZGl2
+Pg0KPHA+VGhlIEdpdGh1YiBhbmQgR2Vycml0IGNvbnRhaW4gcG93ZXJ0b3AgMi54IGNvZGUuIDxv
+OnA+PC9vOnA+PC9wPg0KPHA+SSBhbSBsb29raW5nIGZvciBkZXByZWNhdGVkIHBvd2VydG9wIDEu
+eCBjb2RlIGJhc2UuPG86cD48L286cD48L3A+DQo8L2Rpdj4NCjwvZGl2Pg0KPC9ibG9ja3F1b3Rl
+Pg0KPGRpdj4NCjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPg0KPC9k
+aXY+DQo8ZGl2Pg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImZvbnQtZmFtaWx5
+OiZxdW90O0NhbWJyaWEgTWF0aCZxdW90OyxzZXJpZiI+4oCLPC9zcGFuPjxzcGFuIHN0eWxlPSJm
+b250LWZhbWlseTomcXVvdDtDb3VyaWVyIE5ldyZxdW90OyI+VGhpcyB1c2VkIHRvIGJlIGhvc3Rl
+ZCBvbiBnb29nbGUgY29kZSAoPGEgaHJlZj0iaHR0cDovL2NvZGUuZ29vZ2xlLmNvbSI+Y29kZS5n
+b29nbGUuY29tPC9hPikgYnV0IHRoYXQgc2VydmljZSBpcyBnZXR0aW5nIHNodXQgZG93bi4gU2lu
+Y2UgSSB3YXMNCiBzdGlsbCB0aGUgb2ZmaWNpYWwgbWFpbnRhaW5lciBmb3IgdGhhdCBTVk4gdHJl
+ZSwgSSd2ZSBpbXBvcnRlZCBpdCB0byBnaXRodWIgd2hlcmUgeW91IGNhbiBnZXQgaXQgZnJvbSBu
+b3cgb246PG86cD48L286cD48L3NwYW4+PC9wPg0KPC9kaXY+DQo8ZGl2Pg0KPHAgY2xhc3M9Ik1z
+b05vcm1hbCI+PHNwYW4gc3R5bGU9ImZvbnQtZmFtaWx5OiZxdW90O0NvdXJpZXIgTmV3JnF1b3Q7
+Ij48bzpwPiZuYnNwOzwvbzpwPjwvc3Bhbj48L3A+DQo8L2Rpdj4NCjxkaXY+DQo8cCBjbGFzcz0i
+TXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iZm9udC1mYW1pbHk6JnF1b3Q7Q2FtYnJpYSBNYXRoJnF1
+b3Q7LHNlcmlmIj7igIs8L3NwYW4+PHNwYW4gc3R5bGU9ImZvbnQtZmFtaWx5OiZxdW90O0NvdXJp
+ZXIgTmV3JnF1b3Q7Ij4gJm5ic3A7ICZuYnNwOzxhIGhyZWY9Imh0dHBzOi8vZ2l0aHViLmNvbS9z
+b2Zhci9wb3dlcnRvcCI+aHR0cHM6Ly9naXRodWIuY29tL3NvZmFyL3Bvd2VydG9wPC9hPjxvOnA+
+PC9vOnA+PC9zcGFuPjwvcD4NCjwvZGl2Pg0KPGRpdj4NCjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxz
+cGFuIHN0eWxlPSJmb250LWZhbWlseTomcXVvdDtDb3VyaWVyIE5ldyZxdW90OyI+PG86cD4mbmJz
+cDs8L286cD48L3NwYW4+PC9wPg0KPC9kaXY+DQo8ZGl2Pg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+
+PHNwYW4gc3R5bGU9ImZvbnQtZmFtaWx5OiZxdW90O0NvdXJpZXIgTmV3JnF1b3Q7Ij5Ob3RlLCBJ
+IGRvIG5vdCBpbnRlbmQgdG8gbWFpbnRhaW4gdGhpcyB0cmVlLiBJZiBwZW9wbGUgd2lzaCB0byBz
+ZW5kIHB1bGwgcmVxdWVzdHMsIEknbGwgYmUgaGFwcHkgdG8gbWVyZ2UgdGhlbSwgYnV0IGl0IHdv
+bid0IGJlIGRldmVsb3BlZCBhbnltb3JlLCBmb3Igb2J2aW91cyByZWFzb25zLjxvOnA+PC9vOnA+
+PC9zcGFuPjwvcD4NCjwvZGl2Pg0KPGRpdj4NCjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0
+eWxlPSJmb250LWZhbWlseTomcXVvdDtDb3VyaWVyIE5ldyZxdW90OyI+PG86cD4mbmJzcDs8L286
+cD48L3NwYW4+PC9wPg0KPC9kaXY+DQo8ZGl2Pg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4g
+c3R5bGU9ImZvbnQtZmFtaWx5OiZxdW90O0NvdXJpZXIgTmV3JnF1b3Q7Ij5BdWtlPG86cD48L286
+cD48L3NwYW4+PC9wPg0KPC9kaXY+DQo8ZGl2Pg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4g
+c3R5bGU9ImZvbnQtZmFtaWx5OiZxdW90O0NvdXJpZXIgTmV3JnF1b3Q7Ij48bzpwPiZuYnNwOzwv
+bzpwPjwvc3Bhbj48L3A+DQo8L2Rpdj4NCjwvZGl2Pg0KPC9kaXY+DQo8L2Rpdj4NCjwvZGl2Pg0K
+PC9ib2R5Pg0KPC9odG1sPg0K
+
+--===============6116073786770578161==--
 
