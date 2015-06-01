@@ -1,73 +1,76 @@
-Content-Type: multipart/mixed; boundary="===============0615486066084556190=="
+Content-Type: multipart/mixed; boundary="===============8380822332573641083=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] [Patches] snprintf,
- PATH_MAX + improvement of handling reporting filenames
-Date: Thu, 17 Sep 2015 17:30:10 -0700
-Message-ID: <55FB5B12.8050709@linux.intel.com>
-In-Reply-To: 1581639328.16307870.1431448558175.JavaMail.zimbra@redhat.com
+From: Nanley Chery <nanleychery at gmail.com>
+Subject: [Powertop] [RFC 4/9] syfs_tunable: use udev
+Date: Mon, 01 Jun 2015 09:09:10 -0700
+Message-ID: <1433174955-17349-5-git-send-email-nanleychery@gmail.com>
+In-Reply-To: 1433174955-17349-1-git-send-email-nanleychery@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0615486066084556190==
+--===============8380822332573641083==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Your patch was added.
+Signed-off-by: Nanley Chery <nanley.g.chery(a)intel.com>
+---
+ src/tuning/tuningsysfs.cpp | 12 +++++++++---
+ src/tuning/tuningsysfs.h   |  1 +
+ 2 files changed, 10 insertions(+), 3 deletions(-)
 
-On 05/12/2015 09:35 AM, Jaroslav Skarvada wrote:
-> Hi,
->
-> I have noticed there are some sprintf that may lead to buffer
-> overflows, e.g. the following can crash powertop:
->
-> # powertop --csv=3D`printf 'a%.0s' {1..5000}`
->
-> I attempted to fix hopefully most of them by converting
-> the code to snprintf. For data returned by kernel
-> it's probably unlikely to cause overflows, but why
-> not cover it all. I also tried to unify buffer
-> sizes for paths/filenames to PATH_MAX.
->
-> The second patch tries to improve handling of reporting
-> filenames. It works the following way:
->
-> powertop --html
-> generates 'powertop.html' file
->
-> powertop --html=3Dmyfile.suffix
-> generates 'myfile.suffix' file
->
-> powertop -i 2 --html
-> generates 'powertop-TIMESTAMPS.html' files
->
-> powertop -i 2 --html=3Dmyfile.suffix
-> generates 'myfile-TIMESTAMPS.suffix' files
->
-> powertop -i 2 --html=3Dmyfile
-> generates 'myfile-TIMESTAMPS' files
->
-> Similarly for CSV.
->
-> I think this is more logical behavior
->
-> regards
->
-> Jaroslav
->
->
->
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->
+diff --git a/src/tuning/tuningsysfs.cpp b/src/tuning/tuningsysfs.cpp
+index 0859a0c..fb486bd 100644
+--- a/src/tuning/tuningsysfs.cpp
++++ b/src/tuning/tuningsysfs.cpp
+@@ -115,15 +115,21 @@ void add_sysfs_tunable(const char *str, const char *_=
+sysfs_path, const char *_ta
+ =
 
+ static void add_sata_tunables_callback(const char *d_name)
+ {
++	struct udev_device *dev =3D udev_device_new_from_syspath(get_udev(), d_na=
+me);
++	const char *dev_name =3D udev_device_get_sysname(dev);
+ 	char filename[4096];
+ 	char msg[4096];
+ =
+
+-	sprintf(filename, "/sys/class/scsi_host/%s/link_power_management_policy",=
+ d_name);
+-	sprintf(msg, _("Enable SATA link power management for %s"), d_name);
++	sprintf(filename, "%s/link_power_management_policy", d_name);
++	sprintf(msg, _("Enable SATA link power management for %s"), dev_name);
+ 	add_sysfs_tunable(msg, filename,"min_power");
++
++	/* Cleanup */
++	udev_device_unref(dev);
+ }
+ =
+
+ void add_sata_tunables(void)
+ {
+-	process_directory("/sys/class/scsi_host", add_sata_tunables_callback);
++	process_subsystem("scsi_host", add_sata_tunables_callback, 1,
++					  "+link_power_management_policy", NULL);
+ }
+diff --git a/src/tuning/tuningsysfs.h b/src/tuning/tuningsysfs.h
+index ad89717..71586ab 100644
+--- a/src/tuning/tuningsysfs.h
++++ b/src/tuning/tuningsysfs.h
+@@ -32,6 +32,7 @@
+ using namespace std;
+ =
+
+ class sysfs_tunable : public tunable {
++	struct udev_device *tun_dev;
+ 	char sysfs_path[4096];
+ 	char target_value[4096];
+ 	char bad_value[4096];
 -- =
 
-Thank you,
-<Alexandra>
+2.4.1
 
---===============0615486066084556190==--
+
+--===============8380822332573641083==--
 
