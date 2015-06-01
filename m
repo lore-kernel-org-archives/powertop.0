@@ -1,78 +1,116 @@
-Content-Type: multipart/mixed; boundary="===============6217303949771425499=="
+Content-Type: multipart/mixed; boundary="===============8785234355098921409=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH v3 10/15] make --quiet option to suppress various
- info messages
-Date: Tue, 25 Nov 2014 21:16:23 +0000
-Message-ID: <1416950188-16616-11-git-send-email-kerolasa@iki.fi>
-In-Reply-To: 1416950188-16616-1-git-send-email-kerolasa@iki.fi
+From: Nanley Chery <nanleychery at gmail.com>
+Subject: [Powertop] [RFC 6/9] replace pciutils usage with udevhwdb
+Date: Mon, 01 Jun 2015 09:09:12 -0700
+Message-ID: <1433174955-17349-7-git-send-email-nanleychery@gmail.com>
+In-Reply-To: 1433174955-17349-1-git-send-email-nanleychery@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6217303949771425499==
+--===============8785234355098921409==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-When --quiet is defined messages such as'RAPL device for cpu 0' and
-'Leaving PowerTOP' are not expected to be printed.  This change makes
-them to be printed to stderr, that the --quiet is redirecting to
-/dev/null.
-
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+Signed-off-by: Nanley Chery <nanley.g.chery(a)intel.com>
 ---
- src/cpu/rapl/rapl_interface.cpp | 5 ++---
- src/main.cpp                    | 2 +-
- 2 files changed, 3 insertions(+), 4 deletions(-)
+ src/lib.cpp            | 27 +++++++++++++++++++++++++++
+ src/lib.h              |  1 +
+ src/tuning/runtime.cpp | 11 +++--------
+ 3 files changed, 31 insertions(+), 8 deletions(-)
 
-diff --git a/src/cpu/rapl/rapl_interface.cpp b/src/cpu/rapl/rapl_interface.=
-cpp
-index 2fc55b1..d6bd4c8 100644
---- a/src/cpu/rapl/rapl_interface.cpp
-+++ b/src/cpu/rapl/rapl_interface.cpp
-@@ -39,7 +39,7 @@
- #define RAPL_DBG_PRINT(...)	((void) 0)
- #define RAPL_ERROR_PRINT(...) ((void) 0)
- #endif
--#define RAPL_INFO_PRINT printf
-+#define RAPL_INFO_PRINT(format, m) fprintf(stderr, format, m)
+diff --git a/src/lib.cpp b/src/lib.cpp
+index 5a9c6be..399d2bc 100644
+--- a/src/lib.cpp
++++ b/src/lib.cpp
+@@ -314,6 +314,33 @@ void cleanup_udev()
+ 	}
+ }
  =
 
- #define MAX_TEMP_STR_SIZE	20
++const char *upci_id_to_name(struct udev_device* dev, char* buffer)
++{
++	const char *uvendor =3D udev_device_get_sysattr_value(dev, "vendor");
++	const char *udevice =3D udev_device_get_sysattr_value(dev, "device");
++	uint16_t vendor =3D stoul(string(uvendor), NULL, 16);
++	uint16_t device =3D stoul(string(udevice), NULL, 16);
++	char modalias[64];
++	sprintf(modalias, "pci:v%08Xd%08X*", vendor, device);
++	const char *key1 =3D "ID_VENDOR_FROM_DATABASE";
++	const char *key2 =3D "ID_MODEL_FROM_DATABASE";
++
++	struct udev_hwdb *hwdb =3D udev_hwdb_new(udev_device_get_udev(dev));
++	struct udev_list_entry *entry;
++	udev_list_entry_foreach(entry, udev_hwdb_get_properties_list_entry(hwdb, =
+modalias, 0))
++		if (strcmp(udev_list_entry_get_name(entry), key1) =3D=3D 0)
++			uvendor =3D  udev_list_entry_get_value(entry);
++		else if (strcmp(udev_list_entry_get_name(entry), key2) =3D=3D 0)
++			udevice =3D  udev_list_entry_get_value(entry);
++
++	if (uvendor && udevice) {
++		sprintf(buffer, "%s %s", uvendor, udevice);
++		return buffer;
++	}
++
++	return NULL;
++}
++
+ #ifndef HAVE_NO_PCI
+ static struct pci_access *pci_access;
  =
 
-@@ -134,8 +134,7 @@ c_rapl_interface::c_rapl_interface(const char *dev_name=
-, int cpu) :
- 			closedir(dir);
- 		}
+diff --git a/src/lib.h b/src/lib.h
+index ae0421f..464ce71 100644
+--- a/src/lib.h
++++ b/src/lib.h
+@@ -68,6 +68,7 @@ extern string read_sysfs_string(const char *format, const=
+ char *param);
  =
 
--		RAPL_INFO_PRINT("RAPL Using PowerCap Sysfs : Domain Mask %x\n",
--														rapl_domains);
-+		RAPL_INFO_PRINT("RAPL Using PowerCap Sysfs : Domain Mask %x\n", rapl_dom=
-ains);
- 		return;
+ extern void format_watts(double W, char *buffer, unsigned int len);
+ =
+
++extern const char *upci_id_to_name(struct udev_device* dev, char* buffer);
+ extern char *pci_id_to_name(uint16_t vendor, uint16_t device, char *buffer=
+, int len);
+ extern void end_pci_access(void);
+ =
+
+diff --git a/src/tuning/runtime.cpp b/src/tuning/runtime.cpp
+index 463372d..ac65522 100644
+--- a/src/tuning/runtime.cpp
++++ b/src/tuning/runtime.cpp
+@@ -42,16 +42,11 @@ runtime_tunable::runtime_tunable(struct udev_device* ud=
+ev_device) :
+ 	const char *dev =3D udev_device_get_sysname(udev_device);
+ =
+
+ 	/* Give more accurate descriptions for PCI devices */
++	char devname[4096];
+ 	if (strcmp(bus, "pci") =3D=3D 0) {
+-		const char *uvendor =3D udev_device_get_sysattr_value(udev_device, "vend=
+or");
+-		const char *udevice =3D udev_device_get_sysattr_value(udev_device, "devi=
+ce");
+-		uint16_t vendor =3D stoul(string(uvendor), NULL, 16);
+-		uint16_t device =3D stoul(string(udevice), NULL, 16);
++		if (upci_id_to_name(udev_device, devname))
++			dev =3D devname;
+ 		bus =3D "PCI";
+-		if (vendor && device) {
+-			char filename[4096];
+-			dev =3D pci_id_to_name(vendor, device, filename, 4095);
+-		}
  	}
  =
 
-diff --git a/src/main.cpp b/src/main.cpp
-index 6fdfd54..b6679f2 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -500,7 +500,7 @@ int main(int argc, char **argv)
- 	}
- 	if (!auto_tune)
- 		endwin();
--	printf("%s\n", _("Leaving PowerTOP"));
-+	fprintf(stderr, "%s\n", _("Leaving PowerTOP"));
- =
-
- 	end_process_data();
- 	clear_process_data();
+ 	if (!udevice_has_runtime_pm(udev_device))
 -- =
 
-2.1.3
+2.4.1
 
 
---===============6217303949771425499==--
+--===============8785234355098921409==--
 
