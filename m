@@ -1,263 +1,205 @@
-Content-Type: multipart/mixed; boundary="===============3675380938711069970=="
+Content-Type: multipart/mixed; boundary="===============4892102620658315022=="
 MIME-Version: 1.0
-From: Nanley Chery <nanleychery at gmail.com>
-Subject: [Powertop] [RFC 8/9] remove libpci and most dead code
-Date: Mon, 01 Jun 2015 09:09:14 -0700
-Message-ID: <1433174955-17349-9-git-send-email-nanleychery@gmail.com>
-In-Reply-To: 1433174955-17349-1-git-send-email-nanleychery@gmail.com
+From: Wang, Xiaolong <xiaolong.wang at intel.com>
+Subject: [Powertop]  Why on some platform or OS,
+ Powertop show only "idle 100%"s in the frequency page?
+Date: Tue, 02 Jun 2015 08:52:17 +0000
+Message-ID: <3D803AC0BEBB604B9799C45D4E4A14B70134CCD3@SHSMSX103.ccr.corp.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3675380938711069970==
+--===============4892102620658315022==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Leave device_has_runtime_pm for now.
+Hi PowerTop developers,
+I've been testing PowerTop on various OS and platforms, and found on some p=
+latforms or OS, Powertop show only "idle 100%"s in the frequency page, no o=
+ther frequencies and their percentage.
+For example, currently I'm test RHEL6,
+        on some new client platforms, which intel_pstate is not supported y=
+et, the frequencies and their percentage could be listed below idle percent=
+age.
+        but on the mature platforms, where intel_pstate is governing, I cou=
+ld only get "idle 100%" under each Package/Core/CPU.
+        (well, the "Actual" frequency under each "CPU" looks normal)
+I tried Powertop 2.3 and 2.7, and had guessed it should be intel_pstate not=
+ providing some necessary info to Powertop.
+But it's not the case on my i5-5300U machine, it is governed by intel_pstat=
+e, but shows frequencies well.
+        I tried this with Powertop 2.6.1 and 2.7.
+Could you help to explain, why Powertop show only "idle 100%"s in the frequ=
+ency page?
+Thanks~
 
-Signed-off-by: Nanley Chery <nanley.g.chery(a)intel.com>
----
- Android.mk      |  1 -
- README          |  1 -
- configure.ac    | 15 ---------------
- src/Makefile.am |  7 ++-----
- src/lib.cpp     | 45 ---------------------------------------------
- src/lib.h       |  2 --
- src/main.cpp    |  3 ---
- 7 files changed, 2 insertions(+), 72 deletions(-)
-
-diff --git a/Android.mk b/Android.mk
-index 2461233..2ebd8f1 100644
---- a/Android.mk
-+++ b/Android.mk
-@@ -4,7 +4,6 @@ include $(CLEAR_VARS)
- LOCAL_MODULE_TAGS :=3D debug
- LOCAL_SHARED_LIBRARIES :=3D libstlport \
- 			  libnl \
--			  libpci \
- 			  libtraceevnet \
- LOCAL_MODULE :=3D powertop  =
-
- =
-
-diff --git a/README b/README
-index 6e76842..803bc6d 100644
---- a/README
-+++ b/README
-@@ -20,7 +20,6 @@ development environment.
- =
-
- in addition to that, PowerTOP requires the following components:
- =
-
--pciutils-devel (is only required if you have PCI) =
-
- ncurses-devel  (required) =
-
- libnl-devel    (required)
- kernel version =3D> 2.6.38
-diff --git a/configure.ac b/configure.ac
-index 9af9604..bc16e23 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -117,11 +117,6 @@ PKG_CHECK_MODULES([NCURSES], [ncursesw ncurses], [LIBS=
-=3D"$LIBS $ncurses_LIBS"], [
- 	], [])
- ])
- =
-
--has_libpci=3D0
--PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=3D1], [
--	AC_SEARCH_LIBS([pci_get_dev], [pci],[has_libpci=3D1], [has_libpci=3D0])
--])
-- =
-
- =
-
- has_libnl_ver=3D0
- dnl libnl-2 provides only libnl-2.0.pc file, so we check for separate
-@@ -138,16 +133,6 @@ AS_IF([test "$has_libnl_ver" -gt 1], [
- 	AC_DEFINE([HAVE_LIBNL20], [1], [Define if you have libnl-2.0 or higher])
- ])
- =
-
--AS_IF([test "$has_libpci" -eq 0], [
--	AC_DEFINE([HAVE_NO_PCI], [1], [Define if pci is not supported])
--        AC_MSG_WARN([
--			************* LIBPCI SUPPORT NOT CONFIGURED**************
--			If you need or want pci support, please install libpci =
-
--			and re-configure PowerTOP. =
-
--			*********************************************************
--	])
--])
--
- AC_SEARCH_LIBS([inet_aton], [resolv], [], [
- 	AC_MSG_ERROR([libresolv is required but was not found])
- ], [])
-diff --git a/src/Makefile.am b/src/Makefile.am
-index ac2259c..c4326ec 100644
---- a/src/Makefile.am
-+++ b/src/Makefile.am
-@@ -133,8 +133,7 @@ powertop_CXXFLAGS =3D \
- 	$(GLIB2_CFLAGS) \
- 	$(LIBNL_CFLAGS) \
- 	$(NCURSES_CFLAGS) \
--	$(UDEV_CFLAGS) \
--	$(PCIUTILS_CFLAGS)
-+	$(UDEV_CFLAGS)
- =
-
- =
-
- powertop_CPPFLAGS =3D \
-@@ -143,8 +142,7 @@ powertop_CPPFLAGS =3D \
- 	$(LIBNL_CFLAGS) \
- 	$(LIBZ_CFLAGS) \
- 	$(NCURSES_CFLAGS) \
--	$(UDEV_CFLAGS) \
--	$(PCIUTILS_CFLAGS)
-+	$(UDEV_CFLAGS)
- =
-
- powertop_LDADD =3D \
- 	../traceevent/libtraceevnet.la
-@@ -155,7 +153,6 @@ AM_LDFLAGS =3D \
- 	$(LIBZ_LIBS) \
- 	$(NCURSES_LIBS) \
- 	$(UDEV_LIBS) \
--	$(PCIUTILS_LIBS) \
- 	$(PTHREAD_LIBS) \
- 	$(RESOLV_LIBS)
- =
-
-diff --git a/src/lib.cpp b/src/lib.cpp
-index 399d2bc..d1ea35a 100644
---- a/src/lib.cpp
-+++ b/src/lib.cpp
-@@ -37,15 +37,8 @@
- =
-
- #include "lib.h"
- =
-
--#ifndef HAVE_NO_PCI
--extern "C" {
--#include <pci/pci.h>
--}
--#endif
--
- #include <stdio.h>
- #include <stdint.h>
--#include <stdlib.h>
- #include <unistd.h>
- #include <sys/types.h>
- #include <sys/types.h>
-@@ -341,44 +334,6 @@ const char *upci_id_to_name(struct udev_device* dev, c=
-har* buffer)
- 	return NULL;
- }
- =
-
--#ifndef HAVE_NO_PCI
--static struct pci_access *pci_access;
--
--char *pci_id_to_name(uint16_t vendor, uint16_t device, char *buffer, int l=
-en)
--{
--	char *ret;
--
--	buffer[0] =3D 0;
--
--	if (!pci_access) {
--		pci_access =3D pci_alloc();
--		pci_init(pci_access);
--	}
--
--	ret =3D pci_lookup_name(pci_access, buffer, len, PCI_LOOKUP_VENDOR | PCI_=
-LOOKUP_DEVICE, vendor, device);
--
--	return ret;
--}
--
--void end_pci_access(void)
--{
--	if (pci_access)
--		pci_free_name_list(pci_access);
--}
--
--#else
--
--char *pci_id_to_name(uint16_t vendor, uint16_t device, char *buffer, int l=
-en)
--{
--	return NULL;
--}
--
--void end_pci_access(void)
--{
--}
--
--#endif /* HAVE_NO_PCI */
--
- int utf_ok =3D -1;
- =
-
- =
-
-diff --git a/src/lib.h b/src/lib.h
-index 464ce71..a577e3f 100644
---- a/src/lib.h
-+++ b/src/lib.h
-@@ -69,8 +69,6 @@ extern string read_sysfs_string(const char *format, const=
- char *param);
- extern void format_watts(double W, char *buffer, unsigned int len);
- =
-
- extern const char *upci_id_to_name(struct udev_device* dev, char* buffer);
--extern char *pci_id_to_name(uint16_t vendor, uint16_t device, char *buffer=
-, int len);
--extern void end_pci_access(void);
- =
-
- extern struct udev * get_udev();
- extern void cleanup_udev();
-diff --git a/src/main.cpp b/src/main.cpp
-index 65e54ac..1082f0e 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -282,7 +282,6 @@ void make_report(int time, char *workload, int iteratio=
-ns, char *file)
- 	learn_parameters(50, 0);
- 	save_all_results("saved_results.powertop");
- 	save_parameters("saved_parameters.powertop");
--	end_pci_access();
- 	exit(0);
- }
- =
-
-@@ -475,7 +474,6 @@ int main(int argc, char **argv)
- 	if (debug_learning) {
- 	        learn_parameters(1000, 1);
- 		dump_parameter_bundle();
--		end_pci_access();
- 		exit(0);
- 	}
- 	if (!auto_tune)
-@@ -512,7 +510,6 @@ int main(int argc, char **argv)
- 	save_parameters("saved_parameters.powertop");
- 	learn_parameters(500, 0);
- 	save_parameters("saved_parameters.powertop");
--	end_pci_access();
- 	clear_tuning();
- 	reset_display();
- =
-
--- =
-
-2.4.1
+The following is an example, captured from a Haswell-EP server:
+PowerTOP 2.7      Overview   Idle stats   Frequency stats   Device stats   =
+Tunables
 
 
---===============3675380938711069970==--
+            Package |             Core    |            CPU 0       CPU 4
+                     |                     | Actual    3.2 GHz     1.9 GHz
+Idle       100.0%  | Idle       100.0%   | Idle       100.0%      100.0%
+
+                    | s         9 Core    |            CPU 1       CPU 5
+                    |                     | Actual    3.4 GHz     2.3 GHz
+                    | Idle       100.0%   | Idle       100.0%      100.0%
+
+                    |             Core    |            CPU 2       CPU 6
+                    |                     | Actual    2.0 GHz     2.3 GHz
+                    | Idle       100.0%   | Idle       100.0%      100.0%
+
+                    | s           Core    |            CPU 3       CPU 7
+                    | s                   | Actual    2.3 GHz     2.6 GHz
+                    | Idle       100.0%   | Idle       100.0%      100.0%
+
+-Wang, Xiaolong
+
+
+--===============4892102620658315022==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+PGh0bWw+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNvbnRlbnQ9InRl
+eHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRvciIgY29udGVu
+dD0iTWljcm9zb2Z0IEV4Y2hhbmdlIFNlcnZlciI+CjwhLS0gY29udmVydGVkIGZyb20gcnRmIC0t
+Pgo8c3R5bGU+PCEtLSAuRW1haWxRdW90ZSB7IG1hcmdpbi1sZWZ0OiAxcHQ7IHBhZGRpbmctbGVm
+dDogNHB0OyBib3JkZXItbGVmdDogIzgwMDAwMCAycHggc29saWQ7IH0gLS0+PC9zdHlsZT4KPC9o
+ZWFkPgo8Ym9keT4KPGZvbnQgZmFjZT0iQ29uc29sYXMiIHNpemU9IjIiPjxzcGFuIHN0eWxlPSJm
+b250LXNpemU6MTAuNXB0OyI+CjxkaXYgYWxpZ249ImxlZnQiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1
+c3RpZnk7Ij5IaSBQb3dlclRvcCBkZXZlbG9wZXJzLDwvZGl2Pgo8ZGl2IGFsaWduPSJsZWZ0IiBz
+dHlsZT0idGV4dC1hbGlnbjpqdXN0aWZ5OyI+SSYjODIxNzt2ZSBiZWVuIHRlc3RpbmcgUG93ZXJU
+b3Agb24gdmFyaW91cyBPUyBhbmQgcGxhdGZvcm1zLCBhbmQgZm91bmQgb24gc29tZSBwbGF0Zm9y
+bXMgb3IgT1MsIFBvd2VydG9wIHNob3cgb25seSAmcXVvdDtpZGxlIDEwMCUmcXVvdDtzIGluIHRo
+ZSBmcmVxdWVuY3kgcGFnZSwgbm8gb3RoZXIgZnJlcXVlbmNpZXMgYW5kIHRoZWlyIHBlcmNlbnRh
+Z2UuPC9kaXY+CjxkaXYgYWxpZ249ImxlZnQiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnk7Ij5G
+b3IgZXhhbXBsZSwgY3VycmVudGx5IEkmIzgyMTc7bSB0ZXN0IFJIRUw2LDwvZGl2Pgo8ZGl2IGFs
+aWduPSJsZWZ0IiBzdHlsZT0idGV4dC1hbGlnbjpqdXN0aWZ5OyI+PGZvbnQgZmFjZT0iVGltZXMg
+TmV3IFJvbWFuIj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgPGZv
+bnQgZmFjZT0iQ29uc29sYXMiPm9uIHNvbWUgbmV3IGNsaWVudCBwbGF0Zm9ybXMsIDwvZm9udD48
+Zm9udCBmYWNlPSJDb25zb2xhcyI+d2hpY2ggaW50ZWxfcHN0YXRlIGlzIG5vdCBzdXBwb3J0ZWQg
+eWV0LCB0aGUgZnJlcXVlbmNpZXMgYW5kIHRoZWlyIHBlcmNlbnRhZ2UgY291bGQgYmUgbGlzdGVk
+CmJlbG93IGlkbGUgcGVyY2VudGFnZS48L2ZvbnQ+PC9mb250PjwvZGl2Pgo8ZGl2IGFsaWduPSJs
+ZWZ0IiBzdHlsZT0idGV4dC1hbGlnbjpqdXN0aWZ5OyI+PGZvbnQgZmFjZT0iVGltZXMgTmV3IFJv
+bWFuIj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgPGZvbnQgZmFj
+ZT0iQ29uc29sYXMiPmJ1dCBvbiA8L2ZvbnQ+PGZvbnQgZmFjZT0iQ29uc29sYXMiPnRoZSA8L2Zv
+bnQ+PGZvbnQgZmFjZT0iQ29uc29sYXMiPm1hdHVyZSBwbGF0Zm9ybXMsIHdoZXJlIGludGVsX3Bz
+dGF0ZSBpcyBnb3Zlcm5pbmcsIEkgY291bGQgb25seSBnZXQgJiM4MjIwO2lkbGUgMTAwJSYjODIy
+MTsgPC9mb250Pjxmb250IGZhY2U9IkNvbnNvbGFzIj51bmRlcjwvZm9udD48Zm9udCBmYWNlPSJD
+b25zb2xhcyI+CmVhY2ggUGFja2FnZS9Db3JlL0NQVS48L2ZvbnQ+PC9mb250PjwvZGl2Pgo8ZGl2
+IGFsaWduPSJsZWZ0IiBzdHlsZT0idGV4dC1hbGlnbjpqdXN0aWZ5OyI+PGZvbnQgZmFjZT0iVGlt
+ZXMgTmV3IFJvbWFuIj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsg
+PGZvbnQgZmFjZT0iQ29uc29sYXMiPih3ZWxsLCB0aGUgJiM4MjIwO0FjdHVhbCYjODIyMTsgZnJl
+cXVlbmN5IHVuZGVyIGVhY2ggJiM4MjIwO0NQVSYjODIyMTsgbG9va3Mgbm9ybWFsKTwvZm9udD48
+L2ZvbnQ+PC9kaXY+CjxkaXYgYWxpZ249ImxlZnQiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnk7
+Ij5JIHRyaWVkIFBvd2VydG9wIDIuMyBhbmQgMi43LCBhbmQgaGFkIGd1ZXNzZWQgaXQgc2hvdWxk
+IGJlIGludGVsX3BzdGF0ZSBub3QgcHJvdmlkaW5nIHNvbWUgbmVjZXNzYXJ5IGluZm8gdG8gUG93
+ZXJ0b3AuPC9kaXY+CjxkaXYgYWxpZ249ImxlZnQiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnk7
+Ij5CdXQgaXQmIzgyMTc7cyBub3QgdGhlIGNhc2Ugb24gbXkgaTUtNTMwMFUgbWFjaGluZSwgaXQg
+aXMgZ292ZXJuZWQgYnkgaW50ZWxfcHN0YXRlLCBidXQgc2hvd3MgZnJlcXVlbmNpZXMgd2VsbC48
+L2Rpdj4KPGRpdiBhbGlnbj0ibGVmdCIgc3R5bGU9InRleHQtYWxpZ246anVzdGlmeTsiPjxmb250
+IGZhY2U9IlRpbWVzIE5ldyBSb21hbiI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7IDxmb250IGZhY2U9IkNvbnNvbGFzIj5JIHRyaWVkIHRoaXMgd2l0aCBQb3dlcnRv
+cCAyLjYuMSBhbmQgMi43LjwvZm9udD48L2ZvbnQ+PC9kaXY+CjxkaXYgYWxpZ249ImxlZnQiIHN0
+eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnk7Ij5Db3VsZCB5b3UgaGVscCB0byBleHBsYWluLCB3aHkg
+UG93ZXJ0b3Agc2hvdyBvbmx5ICZxdW90O2lkbGUgMTAwJSZxdW90O3MgaW4gdGhlIGZyZXF1ZW5j
+eSBwYWdlPzwvZGl2Pgo8ZGl2IGFsaWduPSJsZWZ0IiBzdHlsZT0idGV4dC1hbGlnbjpqdXN0aWZ5
+OyI+VGhhbmtzfjwvZGl2Pgo8ZGl2IGFsaWduPSJsZWZ0IiBzdHlsZT0idGV4dC1hbGlnbjpqdXN0
+aWZ5OyI+Jm5ic3A7PC9kaXY+CjxkaXYgYWxpZ249ImxlZnQiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1
+c3RpZnk7Ij5UaGUgZm9sbG93aW5nIGlzIGFuIGV4YW1wbGUsIGNhcHR1cmVkIGZyb20gYSBIYXN3
+ZWxsLUVQIHNlcnZlcjo8L2Rpdj4KPGRpdiBhbGlnbj0ibGVmdCIgc3R5bGU9InRleHQtYWxpZ246
+anVzdGlmeTsiPlBvd2VyVE9QIDIuNyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBPdmVy
+dmlldyZuYnNwOyZuYnNwOyBJZGxlIHN0YXRzJm5ic3A7Jm5ic3A7IEZyZXF1ZW5jeSBzdGF0cyZu
+YnNwOyZuYnNwOyBEZXZpY2Ugc3RhdHMmbmJzcDsmbmJzcDsgVHVuYWJsZXMmbmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgPC9kaXY+CjxkaXYgYWxpZ249ImxlZnQi
+IHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnk7Ij4mbmJzcDs8L2Rpdj4KPGRpdiBhbGlnbj0ibGVm
+dCIgc3R5bGU9InRleHQtYWxpZ246anVzdGlmeTsiPiZuYnNwOzwvZGl2Pgo8ZGl2IGFsaWduPSJs
+ZWZ0IiBzdHlsZT0idGV4dC1hbGlnbjpqdXN0aWZ5OyI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IFBhY2thZ2UgfCZuYnNw
+OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
+YnNwOyZuYnNwOyBDb3JlJm5ic3A7Jm5ic3A7Jm5ic3A7IHwmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgQ1BVIDAmbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgQ1BVIDQ8L2Rpdj4KPGRpdiBhbGlnbj0ibGVm
+dCIgc3R5bGU9InRleHQtYWxpZ246anVzdGlmeTsiPiAgJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHwmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgfCBBY3R1YWwmbmJzcDsmbmJzcDsm
+bmJzcDsgMy4yIEdIeiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAxLjkgR0h6PC9kaXY+CjxkaXYg
+YWxpZ249ImxlZnQiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnk7Ij5JZGxlJm5ic3A7Jm5ic3A7
+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IDEwMC4wJSZuYnNwOyB8IElkbGUmbmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgMTAwLjAlJm5ic3A7Jm5ic3A7IHwgSWRsZSZuYnNwOyZu
+YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAxMDAuMCUmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsgMTAwLjAlPC9kaXY+CjxkaXYgYWxpZ249ImxlZnQiIHN0eWxlPSJ0ZXh0LWFsaWdu
+Omp1c3RpZnk7Ij4mbmJzcDs8L2Rpdj4KPGRpdiBhbGlnbj0ibGVmdCIgc3R5bGU9InRleHQtYWxp
+Z246anVzdGlmeTsiPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
+YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
+OyZuYnNwOyZuYnNwOyB8IHMmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsgOSBDb3JlJm5ic3A7Jm5ic3A7Jm5ic3A7IHwmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgQ1BVIDEmbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgQ1BVIDU8L2Rpdj4KPGRpdiBhbGlnbj0ibGVm
+dCIgc3R5bGU9InRleHQtYWxpZ246anVzdGlmeTsiPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
+YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
+OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyB8Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHwgQWN0dWFsJm5ic3A7Jm5i
+c3A7Jm5ic3A7IDMuNCBHSHombmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgMi4zIEdIejwvZGl2Pgo8
+ZGl2IGFsaWduPSJsZWZ0IiBzdHlsZT0idGV4dC1hbGlnbjpqdXN0aWZ5OyI+Jm5ic3A7Jm5ic3A7
+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHwgSWRsZSZuYnNw
+OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAxMDAuMCUmbmJzcDsmbmJzcDsgfCBJZGxl
+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IDEwMC4wJSZuYnNwOyZuYnNwOyZu
+YnNwOyZuYnNwOyZuYnNwOyAxMDAuMCU8L2Rpdj4KPGRpdiBhbGlnbj0ibGVmdCIgc3R5bGU9InRl
+eHQtYWxpZ246anVzdGlmeTsiPiZuYnNwOzwvZGl2Pgo8ZGl2IGFsaWduPSJsZWZ0IiBzdHlsZT0i
+dGV4dC1hbGlnbjpqdXN0aWZ5OyI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHwmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgQ29yZSZuYnNwOyZuYnNwOyZu
+YnNwOyB8Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7IENQVSAyJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+IENQVSA2PC9kaXY+CjxkaXYgYWxpZ249ImxlZnQiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnk7
+Ij4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsgfCZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
+OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
+YnNwOyZuYnNwOyB8IEFjdHVhbCZuYnNwOyZuYnNwOyZuYnNwOyAyLjAgR0h6Jm5ic3A7Jm5ic3A7
+Jm5ic3A7Jm5ic3A7IDIuMyBHSHo8L2Rpdj4KPGRpdiBhbGlnbj0ibGVmdCIgc3R5bGU9InRleHQt
+YWxpZ246anVzdGlmeTsiPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
+OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
+YnNwOyZuYnNwOyZuYnNwOyB8IElkbGUmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsgMTAwLjAlJm5ic3A7Jm5ic3A7IHwgSWRsZSZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
+OyZuYnNwOyAxMDAuMCUmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgMTAwLjAlPC9kaXY+
+CjxkaXYgYWxpZ249ImxlZnQiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnk7Ij4mbmJzcDs8L2Rp
+dj4KPGRpdiBhbGlnbj0ibGVmdCIgc3R5bGU9InRleHQtYWxpZ246anVzdGlmeTsiPiZuYnNwOyZu
+YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
+OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyB8IHMmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsg
+Q29yZSZuYnNwOyZuYnNwOyZuYnNwOyB8Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IENQVSAzJm5ic3A7Jm5ic3A7Jm5ic3A7
+Jm5ic3A7Jm5ic3A7Jm5ic3A7IENQVSA3PC9kaXY+CjxkaXYgYWxpZ249ImxlZnQiIHN0eWxlPSJ0
+ZXh0LWFsaWduOmp1c3RpZnk7Ij4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsgfCBzJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+Jm5ic3A7Jm5ic3A7Jm5ic3A7IHwgQWN0dWFsJm5ic3A7Jm5ic3A7Jm5ic3A7IDIuMyBHSHombmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsgMi42IEdIejwvZGl2Pgo8ZGl2IGFsaWduPSJsZWZ0IiBzdHls
+ZT0idGV4dC1hbGlnbjpqdXN0aWZ5OyI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHwgSWRsZSZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
+YnNwOyZuYnNwOyAxMDAuMCUmbmJzcDsmbmJzcDsgfCBJZGxlJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7IDEwMC4wJSZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAxMDAu
+MCU8L2Rpdj4KPGRpdiBhbGlnbj0ibGVmdCIgc3R5bGU9InRleHQtYWxpZ246anVzdGlmeTsiPjxm
+b250IGZhY2U9IlRpbWVzIE5ldyBSb21hbiI+Jm5ic3A7PC9mb250PjwvZGl2Pgo8ZGl2IGFsaWdu
+PSJsZWZ0IiBzdHlsZT0idGV4dC1hbGlnbjpqdXN0aWZ5OyI+LVdhbmcsIFhpYW9sb25nPC9kaXY+
+CjxkaXYgYWxpZ249ImxlZnQiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnk7Ij48Zm9udCBmYWNl
+PSJUaW1lcyBOZXcgUm9tYW4iPiZuYnNwOzwvZm9udD48L2Rpdj4KPC9zcGFuPjwvZm9udD4KPC9i
+b2R5Pgo8L2h0bWw+Cg==
+
+--===============4892102620658315022==--
 
