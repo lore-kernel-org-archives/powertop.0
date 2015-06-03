@@ -1,35 +1,35 @@
-Content-Type: multipart/mixed; boundary="===============4267801412928550905=="
+Content-Type: multipart/mixed; boundary="===============1221271348808413751=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] Too much memory consumption by powertop
-Date: Tue, 28 Apr 2015 14:54:53 -0700
-Message-ID: <554001AD.8020701@linux.intel.com>
-In-Reply-To: CABsxX9KpabXDAds_1ZOs5BRnAyVb6bLv-k+QOGaAzUAJh28nHQ@mail.gmail.com
+From: Nanley Chery <nanleychery at gmail.com>
+Subject: Re: [Powertop] [RFC 6/9] replace pciutils usage with udevhwdb
+Date: Wed, 03 Jun 2015 13:33:40 -0700
+Message-ID: <CAJDL4uKfRA=171fktrMiaS=YzcL-mgOCMSfj-BYvRNG=ksqvVw@mail.gmail.com>
+In-Reply-To: 556C8519.6050009@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4267801412928550905==
+--===============1221271348808413751==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-> Maybe a more sensible 250x250 size would be a good default, as I seem to =
-be able to fill a 1080p screen with just under 250 columns, and it would gi=
-ve some scrolling overhead?
+On Mon, Jun 1, 2015 at 9:15 AM, Arjan van de Ven <arjan(a)linux.intel.com> =
+wrote:
+> On 6/1/2015 9:09 AM, Nanley Chery wrote:
+>>
+>> Signed-off-by: Nanley Chery <nanley.g.chery(a)intel.com>
 >
-> that's at least a 16x reduction already compared to 1000x1000.
 >
-> You could dynamically calculate the number based on the terminal properti=
-es, but that would likely break on terminal resizes.
+> no commit message?
+I've been sitting on these patches for a while and just wanted to get
+them out into the open. Most of my comments are in the cover letter.
+I'll try to be better about commit messages in the future however.
 
-it;s a bit more subtle
+>
+> also on some OSes the udevhwdb for PCI names is empty and the pciutils
+> explicit file is needed
+I can't think of any work-around to this issue. pciutils will have to
+stick around.
 
-this is the canvas on which the text gets put,
-your terminal is just a viewport into that canvas.
-
-the number of cpus etc determines how big that canvas needs to be, not the =
-width of our terminal
-
-
---===============4267801412928550905==--
+--===============1221271348808413751==--
 
