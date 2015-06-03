@@ -1,54 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============6260076950279778734=="
+Content-Type: multipart/mixed; boundary="===============5354296494591523311=="
 MIME-Version: 1.0
-From: Yaroslav Isakov <yaroslav.isakov at gmail.com>
-Subject: [Powertop] [PATCH 2/2] Fixed bug when all PCI devices usage is shown
- as 00%
-Date: Mon, 22 Feb 2016 17:27:42 +0300
-Message-ID: <CADS+iDVzfppVyeV=SN8H4NfyLV48wxx53SoHneKc+YNc7OUeZA@mail.gmail.com>
+From: Nanley Chery <nanleychery at gmail.com>
+Subject: Re: [Powertop] [RFC 0/9] Use udev for accessing sysfs
+Date: Wed, 03 Jun 2015 14:10:13 -0700
+Message-ID: <CAJDL4uLOoY=dpLPbg44NJvKpYERV0Mwi-KchQMXk0pQqjvDyxg@mail.gmail.com>
+In-Reply-To: 556F62CA.3070208@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6260076950279778734==
+--===============5354296494591523311==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
- src/devices/runtime_pm.cpp | 1 +
- 1 file changed, 1 insertion(+)
+On Wed, Jun 3, 2015 at 1:25 PM, Arjan van de Ven <arjan(a)linux.intel.com> =
+wrote:
+> On 6/3/2015 1:23 PM, Nanley Chery wrote:
+>
+>>>
+>>> .... how does this work on Android ?
+>>
+>>
+>> That's a good question. I actually hadn't considered the affects on
+>> that platform. It seems like there is no udev-like abstraction layer
+>> on Android. It looks like the way forward would be to either keep a
+>> separate folder for android specific code or to create more helper
+>> functions to abstract how we access sysfs. The latter method seems
+>> preferable because it wouldn't increase the complexity of the project
+>> as a whole. Thoughts?
+>
+>
+> but if we keep the code anyway, what's the benefit of going through one
+> more layer of indirection????
+> Am I missing something here?
 
-diff --git a/src/devices/runtime_pm.cpp b/src/devices/runtime_pm.cpp
-index ccfd945..f387b21 100644
---- a/src/devices/runtime_pm.cpp
-+++ b/src/devices/runtime_pm.cpp
-@@ -194,6 +194,7 @@ static void do_bus(const char *bus)
-         if (entry->d_name[0] =3D=3D '.')
-             continue;
+The main benefit would be increased protection from sysfs
+reorganizations with progressive kernel releases. If this is actually
+something we should be proactive about, I am not sure.
+Udev should provide faster reading of sysfs files due to caching, but
+I do not have any hard numbers to back this claim up.
+Lastly there are some general wins in the realm of software
+readability and maintainability (in my opinion). This should make the
+process of adding more features and fixing bugs easier.
 
-+        snprintf(filename, PATH_MAX, "/sys/bus/%s/devices/%s", bus,
-entry->d_name);
-         dev =3D new class runtime_pmdevice(entry->d_name, filename);
+- Nanley
 
-         if (strcmp(bus, "i2c") =3D=3D 0) {
-
---===============6260076950279778734==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
-
-PGRpdiBkaXI9Imx0ciI+wqBzcmMvZGV2aWNlcy9ydW50aW1lX3BtLmNwcCB8IDEgKzxicj7CoDEg
-ZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKTxicj48YnI+ZGlmZiAtLWdpdCBhL3NyYy9kZXZp
-Y2VzL3J1bnRpbWVfcG0uY3BwIGIvc3JjL2RldmljZXMvcnVudGltZV9wbS5jcHA8YnI+aW5kZXgg
-Y2NmZDk0NS4uZjM4N2IyMSAxMDA2NDQ8YnI+LS0tIGEvc3JjL2RldmljZXMvcnVudGltZV9wbS5j
-cHA8YnI+KysrIGIvc3JjL2RldmljZXMvcnVudGltZV9wbS5jcHA8YnI+QEAgLTE5NCw2ICsxOTQs
-NyBAQCBzdGF0aWMgdm9pZCBkb19idXMoY29uc3QgY2hhciAqYnVzKTxicj7CoMKgwqDCoCDCoMKg
-wqAgaWYgKGVudHJ5LSZndDtkX25hbWVbMF0gPT0gJiMzOTsuJiMzOTspPGJyPsKgwqDCoMKgIMKg
-wqDCoCDCoMKgwqAgY29udGludWU7PGJyPsKgPGJyPivCoMKgwqAgwqDCoMKgIHNucHJpbnRmKGZp
-bGVuYW1lLCBQQVRIX01BWCwgJnF1b3Q7L3N5cy9idXMvJXMvZGV2aWNlcy8lcyZxdW90OywgYnVz
-LCBlbnRyeS0mZ3Q7ZF9uYW1lKTs8YnI+wqDCoMKgwqAgwqDCoMKgIGRldiA9IG5ldyBjbGFzcyBy
-dW50aW1lX3BtZGV2aWNlKGVudHJ5LSZndDtkX25hbWUsIGZpbGVuYW1lKTs8YnI+wqA8YnI+wqDC
-oMKgwqAgwqDCoMKgIGlmIChzdHJjbXAoYnVzLCAmcXVvdDtpMmMmcXVvdDspID09IDApIHs8YnI+
-PGJyPjwvZGl2Pgo=
-
---===============6260076950279778734==--
+--===============5354296494591523311==--
 
