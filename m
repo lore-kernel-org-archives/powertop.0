@@ -1,48 +1,80 @@
-Content-Type: multipart/mixed; boundary="===============7143710178574008796=="
+Content-Type: multipart/mixed; boundary="===============0521803154602140874=="
 MIME-Version: 1.0
-From: Alex <axfelix at gmail.com>
-Subject: [Powertop] corrupted double-linked list error on exit
-Date: Tue, 27 Jan 2015 11:01:14 -0800
-Message-ID: <1422385274.16232.1@smtp.gmail.com>
+From: Lorenzo Pieralisi <lorenzo.pieralisi at arm.com>
+Subject: [Powertop] [RESEND PATCH] powertop: fix erroneous C state detection
+ on ARM
+Date: Mon, 15 Jun 2015 10:57:29 +0100
+Message-ID: <1434362249-21007-1-git-send-email-lorenzo.pieralisi@arm.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7143710178574008796==
+--===============0521803154602140874==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi folks,
+When the kernel is configured with CONFIG_CPU_IDLE_MULTIPLE_DRIVERS,
+the cpuidle directory contains a "driver" subdirectory that confuses
+the current code parsing the C states on ARM platforms, ending up
+with a C state entry corresponding to the actual driver name instead
+of a proper C state entry.
 
-Wanted to alert you to this github issue which I and another user are =
+This patch fixes the code by stopping the parsing if the files that
+characterise the C states (ie usage) are not found in the respective:
 
-experiencing running Powertop on fairly bleeding edge environments =
+/sys/devices/system/cpu/cpuX/cpuidle
 
-(Gnome 3.14, Linux 3.18). Receiving a "corrupted double-linked list" =
+subdirectory containing C states information.
 
-error citing a memory address on trying to exit which prevents me from =
+Signed-off-by: Lorenzo Pieralisi <lorenzo.pieralisi(a)arm.com>
+Tested-by: Kevin Hilman <khilman(a)linaro.org>
+---
+Alexandra, Arjan,
 
-saving calibrations.
+previous posting here:
 
-https://github.com/NixOS/nixpkgs/issues/5424
+https://lists.01.org/pipermail/powertop/2014-December/001724.html
 
-Best,
--alex
+Please consider pulling this patch.
 
---===============7143710178574008796==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+Thanks,
+Lorenzo
 
-SGkgZm9sa3MsPGRpdj48YnI+PC9kaXY+PGRpdj5XYW50ZWQgdG8gYWxlcnQgeW91IHRvIHRoaXMg
-Z2l0aHViIGlzc3VlIHdoaWNoIEkgYW5kIGFub3RoZXIgdXNlciBhcmUgZXhwZXJpZW5jaW5nIHJ1
-bm5pbmcgUG93ZXJ0b3Agb24gZmFpcmx5IGJsZWVkaW5nIGVkZ2UgZW52aXJvbm1lbnRzIChHbm9t
-ZSAzLjE0LCBMaW51eCAzLjE4KS4gUmVjZWl2aW5nIGEgImNvcnJ1cHRlZCBkb3VibGUtbGlua2Vk
-IGxpc3QiIGVycm9yIGNpdGluZyBhIG1lbW9yeSBhZGRyZXNzIG9uIHRyeWluZyB0byBleGl0IHdo
-aWNoIHByZXZlbnRzIG1lIGZyb20gc2F2aW5nIGNhbGlicmF0aW9ucy48L2Rpdj48ZGl2Pjxicj48
-L2Rpdj48ZGl2PjxhIGhyZWY9Imh0dHBzOi8vZ2l0aHViLmNvbS9OaXhPUy9uaXhwa2dzL2lzc3Vl
-cy81NDI0Ij5odHRwczovL2dpdGh1Yi5jb20vTml4T1Mvbml4cGtncy9pc3N1ZXMvNTQyNDwvYT48
-L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2PkJlc3QsPGJyPi1hbGV4PC9kaXY+
---===============7143710178574008796==--
+ src/cpu/cpu_linux.cpp | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/cpu/cpu_linux.cpp b/src/cpu/cpu_linux.cpp
+index e1ff165..78fd2d3 100644
+--- a/src/cpu/cpu_linux.cpp
++++ b/src/cpu/cpu_linux.cpp
+@@ -83,7 +83,8 @@ void cpu_linux::parse_cstates_start(void)
+ 		if (file) {
+ 			file >> usage;
+ 			file.close();
+-		}
++		} else
++			continue;
+ =
+
+ 		sprintf(filename + len, "/%s/time", entry->d_name);
+ =
+
+@@ -172,7 +173,8 @@ void cpu_linux::parse_cstates_end(void)
+ 		if (file) {
+ 			file >> usage;
+ 			file.close();
+-		}
++		} else
++			continue;
+ =
+
+ 		sprintf(filename + len, "/%s/time", entry->d_name);
+ =
+
+-- =
+
+1.9.1
+
+
+--===============0521803154602140874==--
 
