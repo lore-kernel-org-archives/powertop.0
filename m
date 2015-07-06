@@ -1,97 +1,57 @@
-Content-Type: multipart/mixed; boundary="===============7681116778610311043=="
+Content-Type: multipart/mixed; boundary="===============4184608641365278065=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH v2 09/14] move variables to protected scope
-Date: Sun, 09 Nov 2014 13:14:26 +0000
-Message-ID: <1415538871-11411-10-git-send-email-sami.kerola@lastminute.com>
-In-Reply-To: 1415538871-11411-1-git-send-email-sami.kerola@lastminute.com
+From: Daniel Leung <daniel.leung at linux.intel.com>
+Subject: Re: [Powertop] [PATCH 1/2] prevent segment fault for android built 2
+Date: Mon, 06 Jul 2015 14:44:05 -0700
+Message-ID: <20150706144405.0eb51c6a9bb96c3835f60a84@linux.intel.com>
+In-Reply-To: 1435751544-9622-1-git-send-email-zhaoyang.huang@linaro.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7681116778610311043==
+--===============4184608641365278065==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Sami Kerola <kerolasa(a)iki.fi>
+On Wed,  1 Jul 2015 19:52:24 +0800
+Zhaoyang Huang <zhaoyang.huang(a)linaro.org> wrote:
 
-This fixes series of issues reported by clang++ compiler the same way.
+> the buffer will be turn into NULL after invoking the mbsrtowcs function
+> of bionic libc. Add a condition judgement for that
+> =
 
-cpu/rapl/rapl_interface.h:37:6: error: private field
-'measurment_interval' is not used [-Werror,-Wunused-private-field]
-        int measurment_interval;
+> Signed-off-by: Zhaoyang Huang <zhaoyang.huang(a)linaro.org>
+> ---
+>  src/lib.cpp |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> =
 
-The measurment_interval() in relation to first_cpu() is moved to avoid
-following compiler warning.
+> diff --git a/src/lib.cpp b/src/lib.cpp
+> index 88fe5f3..8d1ca9f 100644
+> --- a/src/lib.cpp
+> +++ b/src/lib.cpp
+> @@ -285,7 +285,7 @@ void align_string(char *buffer, size_t min_sz, size_t=
+ max_sz)
+>  	/* start with mbsrtowcs() local mbstate_t * and
+>  	 * NULL dst pointer*/
+>  	sz =3D mbsrtowcs(NULL, (const char **)&buffer, max_sz, NULL);
+> -	if (sz =3D=3D (size_t)-1) {
+> +	if ((sz =3D=3D (size_t)-1) && (NULL !=3D buffer)) {
+>  		buffer[min_sz] =3D 0x00;
+>  		return;
+>  	}
+> -- =
 
-make[3]: Entering directory '/home/src/powertop/src'
-  CXX      cpu/rapl/powertop-rapl_interface.o
-cpu/rapl/rapl_interface.cpp:78:2: warning: field 'measurment_interval' will=
- be initialized after field 'first_cpu' [-Wreorder]
-        measurment_interval(def_sampling_interval),
+> 1.7.9.5
+> =
 
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
----
- src/cpu/rapl/rapl_interface.cpp | 2 +-
- src/cpu/rapl/rapl_interface.h   | 9 +++++----
- 2 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/src/cpu/rapl/rapl_interface.cpp b/src/cpu/rapl/rapl_interface.=
-cpp
-index ab8e8ce..2fc55b1 100644
---- a/src/cpu/rapl/rapl_interface.cpp
-+++ b/src/cpu/rapl/rapl_interface.cpp
-@@ -75,8 +75,8 @@ c_rapl_interface::c_rapl_interface(const char *dev_name, =
-int cpu) :
- 	powercap_core_path(),
- 	powercap_uncore_path(),
- 	powercap_dram_path(),
--	measurment_interval(def_sampling_interval),
- 	first_cpu(cpu),
-+	measurment_interval(def_sampling_interval),
- 	last_pkg_energy_status(0.0),
- 	last_dram_energy_status(0.0),
- 	last_pp0_energy_status(0.0),
-diff --git a/src/cpu/rapl/rapl_interface.h b/src/cpu/rapl/rapl_interface.h
-index 744f595..c8e9683 100644
---- a/src/cpu/rapl/rapl_interface.h
-+++ b/src/cpu/rapl/rapl_interface.h
-@@ -34,21 +34,22 @@ private:
- 	string powercap_dram_path;
- =
-
- 	unsigned char rapl_domains;
--	int measurment_interval;
- 	int first_cpu;
- =
-
- 	double power_units;
- 	double energy_status_units;
- 	double time_units;
- =
-
-+	int read_msr(int cpu, unsigned int idx, uint64_t *val);
-+	int write_msr(int cpu, unsigned int idx, uint64_t val);
-+
-+protected:
-+	int measurment_interval;
- 	double last_pkg_energy_status;
- 	double last_dram_energy_status;
- 	double last_pp0_energy_status;
- 	double last_pp1_energy_status;
- =
-
--	int read_msr(int cpu, unsigned int idx, uint64_t *val);
--	int write_msr(int cpu, unsigned int idx, uint64_t val);
--
- public:
- 	c_rapl_interface(const char *dev_name =3D "package-0", int cpu =3D 0);
- =
+If you are on master branch, there is a patch (patches/android/prevent_segf=
+aults.patch) to workaround the NULL pointer.
 
 -- =
 
-2.1.3
+Daniel Leung <daniel.leung(a)linux.intel.com>
 
-
---===============7681116778610311043==--
+--===============4184608641365278065==--
 
