@@ -1,32 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============2498719804416228342=="
+Content-Type: multipart/mixed; boundary="===============8680205809086944092=="
 MIME-Version: 1.0
-From: SF Markus Elfring <elfring at users.sourceforge.net>
-Subject: Re: [Powertop] Deletion of unnecessary checks before specific
- function calls
-Date: Sat, 01 Nov 2014 11:31:06 +0100
-Message-ID: <5454B66A.80208@users.sourceforge.net>
-In-Reply-To: 51488.10.24.5.246.1414780768.squirrel@linux.intel.com
+From: Daniel Leung <daniel.leung at linux.intel.com>
+Subject: Re: [Powertop] [PATCH 2/2] comment process_cpu_data in the
+ one_measurement() for it clears all pstat data
+Date: Mon, 06 Jul 2015 14:46:33 -0700
+Message-ID: <20150706144633.449afe72d66e578d91e85a0d@linux.intel.com>
+In-Reply-To: 1435750481-9543-1-git-send-email-zhaoyang.huang@linaro.org
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2498719804416228342==
+--===============8680205809086944092==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-> Thank you for sending your patch, it was added last night.
+On Wed,  1 Jul 2015 19:34:40 +0800
+Zhaoyang Huang <zhaoyang.huang(a)linaro.org> wrote:
 
-Thanks for your change acceptance.
+> all children cpu's pstat data will be cleared in process_cpu_data,which
+> cause the pstat shows abnormal, we have to comment this line of code. How=
+ever,
+> it looks too rough.
+> =
 
-https://github.com/fenrus75/powertop/commit/fb6f65a01eca950e2e12a87492268e7=
-d2105aa0b
+> Signed-off-by: Zhaoyang Huang <zhaoyang.huang(a)linaro.org>
+> ---
+>  src/main.cpp |    7 +++++++
+>  1 file changed, 7 insertions(+)
+> =
 
-But I wonder why this software update was put into a single commit after I
-offered separate patches. Did the commit message become partly inappropriate
-because source code adjustments were squashed together?
+> diff --git a/src/main.cpp b/src/main.cpp
+> index 1e56af1..9526084 100644
+> --- a/src/main.cpp
+> +++ b/src/main.cpp
+> @@ -221,7 +221,14 @@ void one_measurement(int seconds, char *workload)
+>  	devices_end_measurement();
+>  	end_power_measurement();
+>  =
 
-Regards,
-Markus
+> +	/*
+> +	FIX ME:all children cpu's pstat data will be cleared in process_cpu_dat=
+a,which
+> +	cause the pstat shows abnormal, we have to comment this line of code. H=
+owever,
+> +	it looks to rough
+> +	*/
+> +	/*
+>  	process_cpu_data();
+> +	*/
+>  	process_process_data();
+>  =
 
---===============2498719804416228342==--
+>  	/* output stats */
+> -- =
+
+> 1.7.9.5
+> =
+
+
+Did you see the issue on Android? Could you give me more details? Maybe I c=
+an try to re-produce it on my end.
+
+-- =
+
+Daniel Leung <daniel.leung(a)linux.intel.com>
+
+--===============8680205809086944092==--
 
