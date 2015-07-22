@@ -1,219 +1,140 @@
-Content-Type: multipart/mixed; boundary="===============1772388968670938801=="
+Content-Type: multipart/mixed; boundary="===============8580027061116730212=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH v2 07/14] configure: use autoconf-archive
- ax_cxx_compile_stdcxx_11.m4
-Date: Sun, 09 Nov 2014 13:14:24 +0000
-Message-ID: <1415538871-11411-8-git-send-email-sami.kerola@lastminute.com>
-In-Reply-To: 1415538871-11411-1-git-send-email-sami.kerola@lastminute.com
+From: Chetan Patil <chtpatil at gmail.com>
+Subject: [Powertop] PowerTop On ARM
+Date: Wed, 22 Jul 2015 18:22:40 -0500
+Message-ID: <CAF0dY_tujkOi2fukNid81-YBNUS8+AueKgfBU2hWFpztsp7ivQ@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1772388968670938801==
+--===============8580027061116730212==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Sami Kerola <kerolasa(a)iki.fi>
+Hi,
 
-Ensure the powertop is compiled C++11 compliant compiler.  That allows
-project contributors to use features from the latest standard without
-hesitation are they allowed in this project.  The idea is to grant
-greater liberties to upstream in cost of a dependency to downstream.
+I successfully compiled PowerTop 2.7 for CyanogenMod 11.0 (Android KitKat)
+on Nexus 4 which has ARM running kernel version is 3.4. Perf support is
+enabled with perf tool accessible via adb.
 
-Notice that adding a downstream dependency to C++11 compliant compiler is
-not outrageously unreasonable.  Many of the C++11 features has been
-supported quite a while.  That said use of some features, such as
-attributes (N2761), may still make maintainers to be unhappy if the case
-is not justified well enough.
+If I am correct, powertop now supports ARM, and following error tells me
+that it's trying to run profiling as per x86. Also, the perf error doesn't
+make sense, as I do have proper support enabled. I would appreciate any
+help with this.
 
-Reference: http://en.cppreference.com/w/cpp/compiler_support
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
----
- configure.ac                   |   1 +
- m4/ax_cxx_compile_stdcxx_11.m4 | 142 +++++++++++++++++++++++++++++++++++++=
-++++
- 2 files changed, 143 insertions(+)
- create mode 100644 m4/ax_cxx_compile_stdcxx_11.m4
+Also, there is a small error in patch file *update_androidmk.patch*, after
+line number 417, there should be *#include <stdlib.h>, *without this the
+patch doesn't work correctly.
 
-diff --git a/configure.ac b/configure.ac
-index c723347..e3950ba 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -35,6 +35,7 @@ AC_PROG_CC
- AC_PROG_INSTALL
- AM_PROG_CC_C_O
- GCC_FORTIFY_SOURCE_CC
-+AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
- =
+127|root(a)mako:/ # powertop
+powertop
+modprobe cpufreq_stats failedmodprobe msr failedCannot load from file
+/data/local/powertop/saved_results.powertop
+RAPL device for cpu 0
+Model-specific registers (MSR)                   not found (try enabling
+CONFIG_X86_MSR).
+Model-specific registers (MSR)                   not found (try enabling
+CONFIG_X86_MSR).
+Model-specific registers (MSR)                   not found (try enabling
+CONFIG_X86_MSR).
+Model-specific registers (MSR)                   not found (try enabling
+CONFIG_X86_MSR).
+Model-specific registers (MSR)                   not found (try enabling
+CONFIG_X86_MSR).
+Model-specific registers (MSR)                   not found (try enabling
+CONFIG_X86_MSR).
+Model-specific registers (MSR)                   not found (try enabling
+CONFIG_X86_MSR).
+RAPL device for cpu 0
+Model-specific registers (MSR)                   not found (try enabling
+CONFIG_X86_MSR).
+Model-specific registers (MSR)                   not found (try enabling
+CONFIG_X86_MSR).
+Model-specific registers (MSR)                   not found (try enabling
+CONFIG_X86_MSR).
+Model-specific registers (MSR)                   not found (try enabling
+CONFIG_X86_MSR).
+Model-specific registers (MSR)                   not found (try enabling
+CONFIG_X86_MSR).
+Model-specific registers (MSR)                   not found (try enabling
+CONFIG_X86_MSR).
+Model-specific registers (MSR)                   not found (try enabling
+CONFIG_X86_MSR).
+Devfreq not enabled
+trace-cmd: Not a directory
+  unknown op '{'
+PowerTOP v2.7 needs the kernel to support the 'perf' subsystem
+as well as support for trace points in the kernel:
+CONFIG_PERF_EVENTS=3Dy
+CONFIG_PERF_COUNTERS=3Dy failedmodprobe msr failedCannot load from file
+/data/local/powertop/sCONFIG_TRACEPOINTS=3Dyp
+CONFIG_TRACING=3Dycpu 0
 
- # Checks for libraries.
- AX_PTHREAD([
-diff --git a/m4/ax_cxx_compile_stdcxx_11.m4 b/m4/ax_cxx_compile_stdcxx_11.m4
-new file mode 100644
-index 0000000..163a4c6
---- /dev/null
-+++ b/m4/ax_cxx_compile_stdcxx_11.m4
-@@ -0,0 +1,142 @@
-+# =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-+#  http://www.gnu.org/software/autoconf-archive/ax_cxx_compile_stdcxx_11.h=
-tml
-+# =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-+#
-+# SYNOPSIS
-+#
-+#   AX_CXX_COMPILE_STDCXX_11([ext|noext],[mandatory|optional])
-+#
-+# DESCRIPTION
-+#
-+#   Check for baseline language coverage in the compiler for the C++11
-+#   standard; if necessary, add switches to CXXFLAGS to enable support.
-+#
-+#   The first argument, if specified, indicates whether you insist on an
-+#   extended mode (e.g. -std=3Dgnu++11) or a strict conformance mode (e.g.
-+#   -std=3Dc++11).  If neither is specified, you get whatever works, with
-+#   preference for an extended mode.
-+#
-+#   The second argument, if specified 'mandatory' or if left unspecified,
-+#   indicates that baseline C++11 support is required and that the macro
-+#   should error out if no mode with that support is found.  If specified
-+#   'optional', then configuration proceeds regardless, after defining
-+#   HAVE_CXX11 if and only if a supporting mode is found.
-+#
-+# LICENSE
-+#
-+#   Copyright (c) 2008 Benjamin Kosnik <bkoz(a)redhat.com>
-+#   Copyright (c) 2012 Zack Weinberg <zackw(a)panix.com>
-+#   Copyright (c) 2013 Roy Stogner <roystgnr(a)ices.utexas.edu>
-+#   Copyright (c) 2014 Alexey Sokolov <sokolov(a)google.com>
-+#
-+#   Copying and distribution of this file, with or without modification, a=
-re
-+#   permitted in any medium without royalty provided the copyright notice
-+#   and this notice are preserved. This file is offered as-is, without any
-+#   warranty.
-+
-+#serial 4
-+
-+m4_define([_AX_CXX_COMPILE_STDCXX_11_testbody], [[
-+  template <typename T>
-+    struct check
-+    {
-+      static_assert(sizeof(int) <=3D sizeof(T), "not big enough");
-+    };
-+
-+    struct Base {
-+    virtual void f() {}
-+    };
-+    struct Child : public Base {
-+    virtual void f() override {}
-+    };
-+
-+    typedef check<check<bool>> right_angle_brackets;
-+
-+    int a;
-+    decltype(a) b;
-+
-+    typedef check<int> check_type;
-+    check_type c;
-+    check_type&& cr =3D static_cast<check_type&&>(c);
-+
-+    auto d =3D a;
-+    auto l =3D [](){};
-+]])
-+
-+AC_DEFUN([AX_CXX_COMPILE_STDCXX_11], [dnl
-+  m4_if([$1], [], [],
-+        [$1], [ext], [],
-+        [$1], [noext], [],
-+        [m4_fatal([invalid argument `$1' to AX_CXX_COMPILE_STDCXX_11])])dnl
-+  m4_if([$2], [], [ax_cxx_compile_cxx11_required=3Dtrue],
-+        [$2], [mandatory], [ax_cxx_compile_cxx11_required=3Dtrue],
-+        [$2], [optional], [ax_cxx_compile_cxx11_required=3Dfalse],
-+        [m4_fatal([invalid second argument `$2' to AX_CXX_COMPILE_STDCXX_1=
-1])])
-+  AC_LANG_PUSH([C++])dnl
-+  ac_success=3Dno
-+  AC_CACHE_CHECK(whether $CXX supports C++11 features by default,
-+  ax_cv_cxx_compile_cxx11,
-+  [AC_COMPILE_IFELSE([AC_LANG_SOURCE([_AX_CXX_COMPILE_STDCXX_11_testbody])=
-],
-+    [ax_cv_cxx_compile_cxx11=3Dyes],
-+    [ax_cv_cxx_compile_cxx11=3Dno])])
-+  if test x$ax_cv_cxx_compile_cxx11 =3D xyes; then
-+    ac_success=3Dyes
-+  fi
-+
-+  m4_if([$1], [noext], [], [dnl
-+  if test x$ac_success =3D xno; then
-+    for switch in -std=3Dgnu++11 -std=3Dgnu++0x; do
-+      cachevar=3DAS_TR_SH([ax_cv_cxx_compile_cxx11_$switch])
-+      AC_CACHE_CHECK(whether $CXX supports C++11 features with $switch,
-+                     $cachevar,
-+        [ac_save_CXXFLAGS=3D"$CXXFLAGS"
-+         CXXFLAGS=3D"$CXXFLAGS $switch"
-+         AC_COMPILE_IFELSE([AC_LANG_SOURCE([_AX_CXX_COMPILE_STDCXX_11_test=
-body])],
-+          [eval $cachevar=3Dyes],
-+          [eval $cachevar=3Dno])
-+         CXXFLAGS=3D"$ac_save_CXXFLAGS"])
-+      if eval test x\$$cachevar =3D xyes; then
-+        CXXFLAGS=3D"$CXXFLAGS $switch"
-+        ac_success=3Dyes
-+        break
-+      fi
-+    done
-+  fi])
-+
-+  m4_if([$1], [ext], [], [dnl
-+  if test x$ac_success =3D xno; then
-+    for switch in -std=3Dc++11 -std=3Dc++0x; do
-+      cachevar=3DAS_TR_SH([ax_cv_cxx_compile_cxx11_$switch])
-+      AC_CACHE_CHECK(whether $CXX supports C++11 features with $switch,
-+                     $cachevar,
-+        [ac_save_CXXFLAGS=3D"$CXXFLAGS"
-+         CXXFLAGS=3D"$CXXFLAGS $switch"
-+         AC_COMPILE_IFELSE([AC_LANG_SOURCE([_AX_CXX_COMPILE_STDCXX_11_test=
-body])],
-+          [eval $cachevar=3Dyes],
-+          [eval $cachevar=3Dno])
-+         CXXFLAGS=3D"$ac_save_CXXFLAGS"])
-+      if eval test x\$$cachevar =3D xyes; then
-+        CXXFLAGS=3D"$CXXFLAGS $switch"
-+        ac_success=3Dyes
-+        break
-+      fi
-+    done
-+  fi])
-+  AC_LANG_POP([C++])
-+  if test x$ax_cxx_compile_cxx11_required =3D xtrue; then
-+    if test x$ac_success =3D xno; then
-+      AC_MSG_ERROR([*** A compiler with support for C++11 language feature=
-s is required.])
-+    fi
-+  else
-+    if test x$ac_success =3D xno; then
-+      HAVE_CXX11=3D0
-+      AC_MSG_NOTICE([No compiler with C++11 support was found])
-+    else
-+      HAVE_CXX11=3D1
-+      AC_DEFINE(HAVE_CXX11,1,
-+                [define if the compiler supports basic C++11 syntax])
-+    fi
-+
-+    AC_SUBST(HAVE_CXX11)
-+  fi
-+])
--- =
+Thanks,
+Chetan Patil
 
-2.1.3
+--===============8580027061116730212==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
+PGRpdiBkaXI9Imx0ciI+SGksPGRpdj48YnI+PC9kaXY+PGRpdj5JIHN1Y2Nlc3NmdWxseSBjb21w
+aWxlZCBQb3dlclRvcCAyLjcgZm9yIEN5YW5vZ2VuTW9kIDExLjAgKEFuZHJvaWQgS2l0S2F0KSBv
+biBOZXh1cyA0IHdoaWNoIGhhcyBBUk0gcnVubmluZyBrZXJuZWwgdmVyc2lvbiBpcyAzLjQuIFBl
+cmYgc3VwcG9ydCBpcyBlbmFibGVkIHdpdGggcGVyZiB0b29sIGFjY2Vzc2libGUgdmlhIGFkYi48
+L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2PklmIEkgYW0gY29ycmVjdCwgcG93ZXJ0b3Agbm93IHN1
+cHBvcnRzIEFSTSwgYW5kIGZvbGxvd2luZyBlcnJvciB0ZWxscyBtZSB0aGF0IGl0JiMzOTtzIHRy
+eWluZyB0byBydW4gcHJvZmlsaW5nIGFzIHBlciB4ODYuIEFsc28sIHRoZSBwZXJmIGVycm9yIGRv
+ZXNuJiMzOTt0IG1ha2Ugc2Vuc2UsIGFzIEkgZG8gaGF2ZSBwcm9wZXIgc3VwcG9ydCBlbmFibGVk
+LiBJIHdvdWxkIGFwcHJlY2lhdGUgYW55IGhlbHAgd2l0aCB0aGlzLjwvZGl2PjxkaXY+PGJyPjwv
+ZGl2PjxkaXY+QWxzbywgdGhlcmUgaXMgYSBzbWFsbCBlcnJvciBpbiBwYXRjaCBmaWxlIDxiPnVw
+ZGF0ZV9hbmRyb2lkbWsucGF0Y2g8L2I+LCBhZnRlciBsaW5lIG51bWJlciA0MTcsIHRoZXJlIHNo
+b3VsZCBiZcKgPGI+I2luY2x1ZGUgJmx0O3N0ZGxpYi5oJmd0OywgPC9iPndpdGhvdXQgdGhpcyB0
+aGUgcGF0Y2ggZG9lc24mIzM5O3Qgd29yayBjb3JyZWN0bHkuPC9kaXY+PGRpdj48YnI+PC9kaXY+
+PGRpdj48ZGl2PjxkaXY+MTI3fHJvb3RAbWFrbzovICMgcG93ZXJ0b3A8L2Rpdj48ZGl2PnBvd2Vy
+dG9wPC9kaXY+PGRpdj5tb2Rwcm9iZSBjcHVmcmVxX3N0YXRzIGZhaWxlZG1vZHByb2JlIG1zciBm
+YWlsZWRDYW5ub3QgbG9hZCBmcm9tIGZpbGUgL2RhdGEvbG9jYWwvcG93ZXJ0b3Avc2F2ZWRfcmVz
+dWx0cy5wb3dlcnRvcDwvZGl2PjxkaXY+UkFQTCBkZXZpY2UgZm9yIGNwdSAwPC9kaXY+PGRpdj5N
+b2RlbC1zcGVjaWZpYyByZWdpc3RlcnMgKE1TUikgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+bm90IGZvdW5kICh0cnkgZW5hYmxpbmcgQ09ORklHX1g4Nl9NU1IpLjwvZGl2PjxkaXY+TW9kZWwt
+c3BlY2lmaWMgcmVnaXN0ZXJzIChNU1IpIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIG5vdCBm
+b3VuZCAodHJ5IGVuYWJsaW5nIENPTkZJR19YODZfTVNSKS48L2Rpdj48ZGl2Pk1vZGVsLXNwZWNp
+ZmljIHJlZ2lzdGVycyAoTVNSKSDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBub3QgZm91bmQg
+KHRyeSBlbmFibGluZyBDT05GSUdfWDg2X01TUikuPC9kaXY+PGRpdj5Nb2RlbC1zcGVjaWZpYyBy
+ZWdpc3RlcnMgKE1TUikgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgbm90IGZvdW5kICh0cnkg
+ZW5hYmxpbmcgQ09ORklHX1g4Nl9NU1IpLjwvZGl2PjxkaXY+TW9kZWwtc3BlY2lmaWMgcmVnaXN0
+ZXJzIChNU1IpIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIG5vdCBmb3VuZCAodHJ5IGVuYWJs
+aW5nIENPTkZJR19YODZfTVNSKS48L2Rpdj48ZGl2Pk1vZGVsLXNwZWNpZmljIHJlZ2lzdGVycyAo
+TVNSKSDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBub3QgZm91bmQgKHRyeSBlbmFibGluZyBD
+T05GSUdfWDg2X01TUikuPC9kaXY+PGRpdj5Nb2RlbC1zcGVjaWZpYyByZWdpc3RlcnMgKE1TUikg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgbm90IGZvdW5kICh0cnkgZW5hYmxpbmcgQ09ORklH
+X1g4Nl9NU1IpLjwvZGl2PjxkaXY+UkFQTCBkZXZpY2UgZm9yIGNwdSAwPC9kaXY+PGRpdj5Nb2Rl
+bC1zcGVjaWZpYyByZWdpc3RlcnMgKE1TUikgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgbm90
+IGZvdW5kICh0cnkgZW5hYmxpbmcgQ09ORklHX1g4Nl9NU1IpLjwvZGl2PjxkaXY+TW9kZWwtc3Bl
+Y2lmaWMgcmVnaXN0ZXJzIChNU1IpIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIG5vdCBmb3Vu
+ZCAodHJ5IGVuYWJsaW5nIENPTkZJR19YODZfTVNSKS48L2Rpdj48ZGl2Pk1vZGVsLXNwZWNpZmlj
+IHJlZ2lzdGVycyAoTVNSKSDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBub3QgZm91bmQgKHRy
+eSBlbmFibGluZyBDT05GSUdfWDg2X01TUikuPC9kaXY+PGRpdj5Nb2RlbC1zcGVjaWZpYyByZWdp
+c3RlcnMgKE1TUikgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgbm90IGZvdW5kICh0cnkgZW5h
+YmxpbmcgQ09ORklHX1g4Nl9NU1IpLjwvZGl2PjxkaXY+TW9kZWwtc3BlY2lmaWMgcmVnaXN0ZXJz
+IChNU1IpIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIG5vdCBmb3VuZCAodHJ5IGVuYWJsaW5n
+IENPTkZJR19YODZfTVNSKS48L2Rpdj48ZGl2Pk1vZGVsLXNwZWNpZmljIHJlZ2lzdGVycyAoTVNS
+KSDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBub3QgZm91bmQgKHRyeSBlbmFibGluZyBDT05G
+SUdfWDg2X01TUikuPC9kaXY+PGRpdj5Nb2RlbC1zcGVjaWZpYyByZWdpc3RlcnMgKE1TUikgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgbm90IGZvdW5kICh0cnkgZW5hYmxpbmcgQ09ORklHX1g4
+Nl9NU1IpLjwvZGl2PjxkaXY+RGV2ZnJlcSBub3QgZW5hYmxlZDwvZGl2PjxkaXY+dHJhY2UtY21k
+OiBOb3QgYSBkaXJlY3Rvcnk8L2Rpdj48ZGl2PsKgIHVua25vd24gb3AgJiMzOTt7JiMzOTs8L2Rp
+dj48L2Rpdj48L2Rpdj48ZGl2PjxkaXY+UG93ZXJUT1AgdjIuNyBuZWVkcyB0aGUga2VybmVsIHRv
+IHN1cHBvcnQgdGhlICYjMzk7cGVyZiYjMzk7IHN1YnN5c3RlbTwvZGl2PjxkaXY+YXMgd2VsbCBh
+cyBzdXBwb3J0IGZvciB0cmFjZSBwb2ludHMgaW4gdGhlIGtlcm5lbDo8L2Rpdj48ZGl2PkNPTkZJ
+R19QRVJGX0VWRU5UUz15PC9kaXY+PGRpdj5DT05GSUdfUEVSRl9DT1VOVEVSUz15IGZhaWxlZG1v
+ZHByb2JlIG1zciBmYWlsZWRDYW5ub3QgbG9hZCBmcm9tIGZpbGUgL2RhdGEvbG9jYWwvcG93ZXJ0
+b3Avc0NPTkZJR19UUkFDRVBPSU5UUz15cDwvZGl2PjxkaXY+Q09ORklHX1RSQUNJTkc9eWNwdSAw
+PC9kaXY+PC9kaXY+PGRpdj48YnIgY2xlYXI9ImFsbCI+PGRpdj48ZGl2IGNsYXNzPSJnbWFpbF9z
+aWduYXR1cmUiPjxkaXYgZGlyPSJsdHIiPjxkaXY+VGhhbmtzLDwvZGl2PjxkaXY+Q2hldGFuIFBh
+dGlsPC9kaXY+PC9kaXY+PC9kaXY+PC9kaXY+CjwvZGl2PjwvZGl2Pgo=
 
---===============1772388968670938801==--
+--===============8580027061116730212==--
 
