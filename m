@@ -1,39 +1,36 @@
-Content-Type: multipart/mixed; boundary="===============6847153111695537803=="
+Content-Type: multipart/mixed; boundary="===============0586724071770365191=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] Addition of two include guards?
-Date: Sun, 02 Nov 2014 11:17:01 -0800
-Message-ID: <57550.10.254.189.210.1414955821.squirrel@linux.intel.com>
-In-Reply-To: 54552091.4010609@users.sourceforge.net
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Do not exit on MSR read errors
+Date: Wed, 16 Sep 2015 12:31:08 -0700
+Message-ID: <55F9C37C.9060403@linux.intel.com>
+In-Reply-To: 55F9C0C0.1020606@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6847153111695537803==
+--===============0586724071770365191==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-
-> Hello,
+On 9/16/2015 12:19 PM, Alexandra Yates wrote:
+> Hi Jaroslav,
 >
-> I suggest to add include guards to two header files so that their reuse
-> might
-> become a bit safer.
-> https://www.securecoding.cert.org/confluence/display/cplusplus/PRE06-CPP.=
-+Enclose+header+files+in+an+inclusion+guard
->
-> Regards,
-> Markus
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->
+> On 05/11/2015 09:54 AM, Arjan van de Ven wrote:
+>> but it's really not the right thing.
+>> the reason is that the statistics code still uses the "native intel msr"=
+ model,
+>> so it gets all zeroes... it should use "just trust the kernel" model in
+> Based on Arjan's feedback do you have a change for this patch? Otherwise =
+I would have to reject it.
 
-the link is not available.
+we do need to solve this problem... it's real.
+just we need to really solve it, not just a workaround.
 
-Thank you,
-Alexandra.
+is not insane hard (we'd need to do a test read msr, if that fails because =
+of broken virtualization, fall back to the degraded mode automatically)
 
---===============6847153111695537803==--
+
+
+--===============0586724071770365191==--
 
