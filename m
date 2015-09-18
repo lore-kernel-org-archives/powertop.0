@@ -1,30 +1,41 @@
-Content-Type: multipart/mixed; boundary="===============4782249885670344632=="
+Content-Type: multipart/mixed; boundary="===============2383356611829328289=="
 MIME-Version: 1.0
-From: Nimmagadda, Pawan Kumar (pawan) <pawan at quicinc.com>
-Subject: [Powertop] Powertop V1.x code base
-Date: Tue, 12 May 2015 22:48:11 +0000
-Message-ID: <6484390a787248df947a79b7f13c8387@NASANEXM01H.na.qualcomm.com>
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] [Patches] snprintf,
+ PATH_MAX + improvement of handling reporting filenames
+Date: Thu, 17 Sep 2015 17:27:57 -0700
+Message-ID: <55FB5A8D.3090602@linux.intel.com>
+In-Reply-To: 317253301.16323854.1431450908882.JavaMail.zimbra@redhat.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4782249885670344632==
+--===============2383356611829328289==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi ,
+Your patch was added
 
-I am looking for powertop V1.x code. =
+On 05/12/2015 10:15 AM, Jaroslav Skarvada wrote:
+>
+> Patch adding more buffer limits
+>
+> regards
+>
+> Jaroslav
+>
+>
+>
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>
 
-Is there any GIT repository or Website where I can get this. =
+-- =
 
-I googled for this and I could only find   http://www.lesswatts.org/project=
-s/powertop but this seems to be deprecated or invalid now.
+Thank you,
+<Alexandra>
 
-
-Thanks in advance
-Pawan Kumar
-
-
---===============4782249885670344632==--
+--===============2383356611829328289==--
 
