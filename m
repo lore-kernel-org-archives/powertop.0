@@ -1,140 +1,108 @@
-Content-Type: multipart/mixed; boundary="===============6362248331646210028=="
+Content-Type: multipart/mixed; boundary="===============2481504715944184873=="
 MIME-Version: 1.0
-From: Nanley Chery <nanleychery at gmail.com>
-Subject: [Powertop] [RFC 9/9] calibrate: use udev
-Date: Mon, 01 Jun 2015 09:09:15 -0700
-Message-ID: <1433174955-17349-10-git-send-email-nanleychery@gmail.com>
-In-Reply-To: 1433174955-17349-1-git-send-email-nanleychery@gmail.com
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] [PATCH 1/2] prevent segment fault for android built 2
+Date: Thu, 17 Sep 2015 17:21:18 -0700
+Message-ID: <55FB58FE.3070800@linux.intel.com>
+In-Reply-To: CAN2waFs38gP+34_0hnidXW0TPA29hDT=jropbkZO+NHrVYq5bw@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6362248331646210028==
+--===============2481504715944184873==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Nanley Chery <nanley.g.chery(a)intel.com>
----
- src/calibrate/calibrate.cpp | 44 ++++++++++++-----------------------------=
----
- 1 file changed, 12 insertions(+), 32 deletions(-)
+Rejecting this patch.  This is already handled on the Android patches.
 
-diff --git a/src/calibrate/calibrate.cpp b/src/calibrate/calibrate.cpp
-index 98abfe9..107d8d9 100644
---- a/src/calibrate/calibrate.cpp
-+++ b/src/calibrate/calibrate.cpp
-@@ -88,29 +88,16 @@ static void restore_all_sysfs(void)
- static void find_all_usb_callback(const char *d_name)
- {
- 	char filename[4096];
--	ifstream file;
--
--	sprintf(filename, "/sys/bus/usb/devices/%s/power/active_duration", d_name=
-);
--	if (access(filename, R_OK) !=3D 0)
--		return;
--
--	sprintf(filename, "/sys/bus/usb/devices/%s/power/idVendor", d_name);
--	file.open(filename, ios::in);
--	if (file) {
--		file.getline(filename, 4096);
--		file.close();
--		if (strcmp(filename, "1d6b") =3D=3D 0)
--			return;
--	}
--
--	sprintf(filename, "/sys/bus/usb/devices/%s/power/control", d_name);
-+	sprintf(filename, "%s/power/control", d_name);
- 	save_sysfs(filename);
- 	usb_devices.push_back(filename);
- }
- =
+On 07/06/2015 07:16 PM, Zhaoyang Huang wrote:
+> Hi Daniel,
+> Thank you for your feedback.
+> I have noticed the patch you mentioned. However, under the android(use =
 
- static void find_all_usb(void)
- {
--	process_directory("/sys/bus/usb/devices/", find_all_usb_callback);
-+	process_subsystem("usb", find_all_usb_callback, 2,
-+					  "+power/active_duration", NULL,
-+					  "-power/idVendor", "1d6b");
- }
- =
+> bionic libc) environment, the bellowing condition maybe true which =
 
- static void suspend_all_usb_devices(void)
-@@ -124,16 +111,14 @@ static void suspend_all_usb_devices(void)
- static void find_all_rfkill_callback(const char *d_name)
- {
- 	char filename[4096];
--	sprintf(filename, "/sys/class/rfkill/%s/soft", d_name);
--	if (access(filename, R_OK) !=3D 0)
--		return;
-+	sprintf(filename, "%s/soft", d_name);
- 	save_sysfs(filename);
- 	rfkill_devices.push_back(filename);
- }
- =
+> will cause a NULL pointer access to buffer. I add another one more =
 
- static void find_all_rfkill(void)
- {
--	process_directory("/sys/class/rfkill/", find_all_rfkill_callback);
-+	process_subsystem("rfkill", find_all_rfkill_callback, 1, "+soft", NULL);
- }
- =
+> condition to prevent it. This problem can also be reproduced by android.
+>
+> diff --git a/src/lib.cpp b/src/lib.cpp
+> index 88fe5f3..8d1ca9f 100644
+> --- a/src/lib.cpp
+> +++ b/src/lib.cpp
+> @@ -285,7 +285,7 @@ void align_string(char *buffer, size_t min_sz, =
 
- static void rfkill_all_radios(void)
-@@ -154,19 +139,16 @@ static void unrfkill_all_radios(void)
- static void find_backlight_callback(const char *d_name)
- {
- 	char filename[4096];
--	sprintf(filename, "/sys/class/backlight/%s/brightness", d_name);
--	if (access(filename, R_OK) !=3D 0)
--		return;
--
-+	sprintf(filename, "%s/brightness", d_name);
- 	save_sysfs(filename);
- 	backlight_devices.push_back(filename);
--	sprintf(filename, "/sys/class/backlight/%s/max_brightness", d_name);
-+	sprintf(filename, "%s/max_brightness", d_name);
- 	blmax =3D read_sysfs(filename);
- }
- =
+> size_t max_sz)
+>         /* start with mbsrtowcs() local mbstate_t * and
+>          * NULL dst pointer*/
+>         sz =3D mbsrtowcs(NULL, (const char **)&buffer, max_sz, NULL);
+> -       if (sz =3D=3D (size_t)-1) {
+> +       if ((sz =3D=3D (size_t)-1) && (NULL !=3D buffer)) {
+>                 buffer[min_sz] =3D 0x00;
+>                 return;
+>         }
+> -- =
 
- static void find_backlight(void)
- {
--	process_directory("/sys/class/backlight/", find_backlight_callback);
-+	process_subsystem("backlight", find_backlight_callback, 1, "+brightness",=
- NULL);
- }
- =
+> 1.7.9.5
+>
+>
+> On 7 July 2015 at 05:44, Daniel Leung <daniel.leung(a)linux.intel.com =
 
- static void lower_backlight(void)
-@@ -180,17 +162,15 @@ static void lower_backlight(void)
- static void find_scsi_link_callback(const char *d_name)
- {
- 	char filename[4096];
--	sprintf(filename, "/sys/class/scsi_host/%s/link_power_management_policy",=
- d_name);
--	if (access(filename, R_OK)!=3D0)
--		return;
--
-+	sprintf(filename, "%s/link_power_management_policy", d_name);
- 	save_sysfs(filename);
- 	scsi_link_devices.push_back(filename);
- }
- =
+> <mailto:daniel.leung(a)linux.intel.com>> wrote:
+>
+>     On Wed,  1 Jul 2015 19:52:24 +0800
+>     Zhaoyang Huang <zhaoyang.huang(a)linaro.org
+>     <mailto:zhaoyang.huang(a)linaro.org>> wrote:
+>
+>     > the buffer will be turn into NULL after invoking the mbsrtowcs
+>     function
+>     > of bionic libc. Add a condition judgement for that
+>     >
+>     > Signed-off-by: Zhaoyang Huang <zhaoyang.huang(a)linaro.org
+>     <mailto:zhaoyang.huang(a)linaro.org>>
+>     > ---
+>     >  src/lib.cpp |    2 +-
+>     >  1 file changed, 1 insertion(+), 1 deletion(-)
+>     >
+>     > diff --git a/src/lib.cpp b/src/lib.cpp
+>     > index 88fe5f3..8d1ca9f 100644
+>     > --- a/src/lib.cpp
+>     > +++ b/src/lib.cpp
+>     > @@ -285,7 +285,7 @@ void align_string(char *buffer, size_t
+>     min_sz, size_t max_sz)
+>     >       /* start with mbsrtowcs() local mbstate_t * and
+>     >        * NULL dst pointer*/
+>     >       sz =3D mbsrtowcs(NULL, (const char **)&buffer, max_sz, NULL);
+>     > -     if (sz =3D=3D (size_t)-1) {
+>     > +     if ((sz =3D=3D (size_t)-1) && (NULL !=3D buffer)) {
+>     >               buffer[min_sz] =3D 0x00;
+>     >               return;
+>     >       }
+>     > --
+>     > 1.7.9.5
+>     >
+>
+>     If you are on master branch, there is a patch
+>     (patches/android/prevent_segfaults.patch) to workaround the NULL
+>     pointer.
+>
+>     --
+>     Daniel Leung <daniel.leung(a)linux.intel.com
+>     <mailto:daniel.leung(a)linux.intel.com>>
+>
+>
+>
+>
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
 
- static void find_scsi_link(void)
- {
--	process_directory("/sys/class/scsi_host/", find_scsi_link_callback);
-+	process_subsystem("scsi_host", find_scsi_link_callback, 1,
-+			"+link_power_management_policy", NULL);
- }
- =
-
- static void set_scsi_link(const char *state)
 -- =
 
-2.4.1
+Thank you,
+<Alexandra>
 
 
---===============6362248331646210028==--
+--===============2481504715944184873==--
 
