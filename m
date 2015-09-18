@@ -1,51 +1,96 @@
-Content-Type: multipart/mixed; boundary="===============7110053801299823618=="
+Content-Type: multipart/mixed; boundary="===============2859743881113850024=="
 MIME-Version: 1.0
 From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] [PATCH v2 00/14] pull: various changes,
- mostly build system related
-Date: Tue, 18 Nov 2014 10:08:47 -0800
-Message-ID: <50055.10.24.5.249.1416334127.squirrel@linux.intel.com>
-In-Reply-To: CAG27Bk06CL1bLu+gze-t96xRTq3ZE+Hdguc7i3ZO3PeDZfc8mQ@mail.gmail.com
+Subject: Re: [Powertop] [RESEND PATCH] powertop: fix erroneous C state
+ detection on ARM
+Date: Thu, 17 Sep 2015 17:22:10 -0700
+Message-ID: <55FB5932.6040603@linux.intel.com>
+In-Reply-To: 20150707150433.GA4935@red-moon
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7110053801299823618==
+--===============2859743881113850024==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+This patch was added to the current powertop.rc1
+AY
 
-> On 17 November 2014 04:45, Alexandra Yates
-> <alexandra.yates(a)linux.intel.com> wrote:
->> When I run checkpatch.pl I get white spaces and over 80 char line errors
->> on your patches.
+On 07/07/2015 08:04 AM, Lorenzo Pieralisi wrote:
+> On Mon, Jun 15, 2015 at 10:57:29AM +0100, Lorenzo Pieralisi wrote:
+>> When the kernel is configured with CONFIG_CPU_IDLE_MULTIPLE_DRIVERS,
+>> the cpuidle directory contains a "driver" subdirectory that confuses
+>> the current code parsing the C states on ARM platforms, ending up
+>> with a C state entry corresponding to the actual driver name instead
+>> of a proper C state entry.
+>>
+>> This patch fixes the code by stopping the parsing if the files that
+>> characterise the C states (ie usage) are not found in the respective:
+>>
+>> /sys/devices/system/cpu/cpuX/cpuidle
+>>
+>> subdirectory containing C states information.
+>>
+>> Signed-off-by: Lorenzo Pieralisi <lorenzo.pieralisi(a)arm.com>
+>> Tested-by: Kevin Hilman <khilman(a)linaro.org>
+>> ---
+>> Alexandra, Arjan,
+>>
+>> previous posting here:
+>>
+>> https://lists.01.org/pipermail/powertop/2014-December/001724.html
+>>
+>> Please consider pulling this patch.
+> Gentle ping.
 >
-> Hi Alexandra,
+> Thanks,
+> Lorenzo
 >
-> You are right, I missed in the change 0004 'csstoh.sh: check every
-> single return value' a white space error. That is now fixed in:
->
-> https://github.com/kerolasa/powertop/commit/6d7e331488db1e142892557943124=
-2b8fb1c6007
->
-> 80 char line errors are strange. I do not see them. Are we using the
-> same version of the checkpatch.pl?
->
-> $ git describe
-> v3.18-rc5
-> $ shasum scripts/checkpatch.pl
-> a13cad76323e71c97ba279838feef9730509fc59  scripts/checkpatch.pl
->
-> --
-> Sami Kerola
-> http://www.iki.fi/kerolasa/
->
-I'm using the tip of the branch from
+>> Thanks,
+>> Lorenzo
+>>
+>>   src/cpu/cpu_linux.cpp | 6 ++++--
+>>   1 file changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/src/cpu/cpu_linux.cpp b/src/cpu/cpu_linux.cpp
+>> index e1ff165..78fd2d3 100644
+>> --- a/src/cpu/cpu_linux.cpp
+>> +++ b/src/cpu/cpu_linux.cpp
+>> @@ -83,7 +83,8 @@ void cpu_linux::parse_cstates_start(void)
+>>   		if (file) {
+>>   			file >> usage;
+>>   			file.close();
+>> -		}
+>> +		} else
+>> +			continue;
+>>   =
 
-git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+>>   		sprintf(filename + len, "/%s/time", entry->d_name);
+>>   =
+
+>> @@ -172,7 +173,8 @@ void cpu_linux::parse_cstates_end(void)
+>>   		if (file) {
+>>   			file >> usage;
+>>   			file.close();
+>> -		}
+>> +		} else
+>> +			continue;
+>>   =
+
+>>   		sprintf(filename + len, "/%s/time", entry->d_name);
+>>   =
+
+>> -- =
+
+>> 1.9.1
+>>
+
+-- =
 
 Thank you,
-Alexandra.
+<Alexandra>
 
---===============7110053801299823618==--
+
+--===============2859743881113850024==--
 
