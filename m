@@ -1,105 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============1039476289777544925=="
+Content-Type: multipart/mixed; boundary="===============7385996249351752624=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH v2 04/14] csstoh.sh: check every single return value
-Date: Sun, 09 Nov 2014 13:14:21 +0000
-Message-ID: <1415538871-11411-5-git-send-email-sami.kerola@lastminute.com>
-In-Reply-To: 1415538871-11411-1-git-send-email-sami.kerola@lastminute.com
+From: Romain Naour <romain.naour at openwide.fr>
+Subject: [Powertop] [PATCH 2/2] add missing stdio.h header
+Date: Sun, 20 Sep 2015 12:31:59 +0200
+Message-ID: <1442745119-680-2-git-send-email-romain.naour@openwide.fr>
+In-Reply-To: 1442745119-680-1-git-send-email-romain.naour@openwide.fr
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1039476289777544925==
+--===============7385996249351752624==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Sami Kerola <kerolasa(a)iki.fi>
+snprinf is defined in stdio.h.
 
-Earlier the script continued processing at errors.
+Fixes:
+perf/perf_bundle.cpp: In function =E2=80=98void parse_event_format(const ch=
+ar*)=E2=80=99:
+perf/perf_bundle.cpp:141:75: error: =E2=80=98sprintf=E2=80=99 was not decla=
+red in this scope
+  sprintf(file, "/sys/kernel/debug/tracing/events/%s/%s/format", sys, event=
+);
 
-$ ./csstoh.sh powertop.css /dev/full
-./csstoh.sh: line 36: echo: write error: No space left on device
-./csstoh.sh: line 37: echo: write error: No space left on device
-[...]
-
-Now the script will fail immediately when an error occurs.
-
-$ ./csstoh.sh powertop.css /dev/full ; echo $?
-cat: write error: No space left on device
-1
-
-As a minor improvement the script now writes errors to stderr rather than
-stdout, that is more appropriate.
-
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
+Signed-off-by: Romain Naour <romain.naour(a)openwide.fr>
 ---
- src/csstoh.sh | 40 +++++++++++++++++++++++-----------------
- 1 file changed, 23 insertions(+), 17 deletions(-)
+ src/perf/perf_bundle.cpp | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/src/csstoh.sh b/src/csstoh.sh
-index 9d4100b..4ba70e2 100755
---- a/src/csstoh.sh
-+++ b/src/csstoh.sh
-@@ -18,27 +18,33 @@
- #
- # Written by Igor Zhbanov <i.zhbanov at samsung.com>
+diff --git a/src/perf/perf_bundle.cpp b/src/perf/perf_bundle.cpp
+index cf1ae11..3d216ff 100644
+--- a/src/perf/perf_bundle.cpp
++++ b/src/perf/perf_bundle.cpp
+@@ -31,6 +31,7 @@
+ #include <sys/stat.h>
+ #include <fcntl.h>
+ #include <unistd.h>
++#include <stdio.h>
  =
 
--if [ $# -lt 2 ]; then
--	echo "Usage: csstoh.sh cssfile header.h"
-+if [ $# -ne 2 ]; then
-+	echo "Usage: csstoh.sh cssfile header.h" >&2
- 	exit 1
- fi
--
--if [ ! -r $1 ]; then
--	echo "Can't find file $1"
--	exit 1
--fi
--
--if ! echo -n >$2; then
--	echo "Can't open file $2 for writing."
-+if [ ! -f "$1" ]; then
-+	echo "$1: no such file or directory" >&2
- 	exit 1
- fi
-+# redirect stdout to a file
-+exec 1> "$2" || exit $?
- =
-
--echo "#ifndef __INCLUDE_GUARD_CCS_H" >> $2
--echo "#define __INCLUDE_GUARD_CCS_H" >> $2
--echo >> $2
--echo "const char css[] =3D " >> $2
-+# header
-+cat <<HERE || exit $?
-+#ifndef __INCLUDE_GUARD_CCS_H
-+#define __INCLUDE_GUARD_CCS_H
- =
-
--sed -r 's/^(.*)$/\t\"\1\\n\"/' $1 >> $2
-+const char css[] =3D =
-
-+HERE
-+# body
-+sed -r 's/^(.*)$/\t\"\1\\n\"/' "$1" || exit $?
-+# footer
-+cat <<HERE || exit $?
-+;
-+#endif
-+HERE
- =
-
--echo ";" >> $2
--echo "#endif" >> $2
-+# close output file
-+exec 1>&-
-+# return status of output file write
-+exit $?
+ #include "perf_bundle.h"
+ #include "perf_event.h"
 -- =
 
-2.1.3
+2.4.3
 
 
---===============1039476289777544925==--
+--===============7385996249351752624==--
 
