@@ -1,80 +1,65 @@
-Content-Type: multipart/mixed; boundary="===============0521803154602140874=="
+Content-Type: multipart/mixed; boundary="===============6935318282971041828=="
 MIME-Version: 1.0
-From: Lorenzo Pieralisi <lorenzo.pieralisi at arm.com>
-Subject: [Powertop] [RESEND PATCH] powertop: fix erroneous C state detection
- on ARM
-Date: Mon, 15 Jun 2015 10:57:29 +0100
-Message-ID: <1434362249-21007-1-git-send-email-lorenzo.pieralisi@arm.com>
+From: Radhakrishna Sripada <radhakrishna.sripada at intel.com>
+Subject: [Powertop] [PATCH] Assign line level based on linux name
+Date: Mon, 21 Sep 2015 11:34:19 -0700
+Message-ID: <1442860459-10138-1-git-send-email-radhakrishna.sripada@intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0521803154602140874==
+--===============6935318282971041828==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-When the kernel is configured with CONFIG_CPU_IDLE_MULTIPLE_DRIVERS,
-the cpuidle directory contains a "driver" subdirectory that confuses
-the current code parsing the C states on ARM platforms, ending up
-with a C state entry corresponding to the actual driver name instead
-of a proper C state entry.
+C-states having the same number in their human names have the same line
+levels. Switching to linux names assigns seperate levels to each C-state.
 
-This patch fixes the code by stopping the parsing if the files that
-characterise the C states (ie usage) are not found in the respective:
-
-/sys/devices/system/cpu/cpuX/cpuidle
-
-subdirectory containing C states information.
-
-Signed-off-by: Lorenzo Pieralisi <lorenzo.pieralisi(a)arm.com>
-Tested-by: Kevin Hilman <khilman(a)linaro.org>
+Signed-off-by: Radhakrishna Sripada <radhakrishna.sripada(a)intel.com>
 ---
-Alexandra, Arjan,
+ src/cpu/abstract_cpu.cpp | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
 
-previous posting here:
+diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
+index 17acb71..12dcb7d 100644
+--- a/src/cpu/abstract_cpu.cpp
++++ b/src/cpu/abstract_cpu.cpp
+@@ -210,7 +210,7 @@ void abstract_cpu::insert_cstate(const char *linux_name=
+, const char *human_name,
+ =
 
-https://lists.01.org/pipermail/powertop/2014-December/001724.html
+ 	state->line_level =3D -1;
+ =
 
-Please consider pulling this patch.
+-	c =3D human_name;
++	c =3D linux_name;
+ 	while (*c) {
+ 		if (strcmp(linux_name, "active")=3D=3D0) {
+ 			state->line_level =3D LEVEL_C0;
+@@ -223,15 +223,6 @@ void abstract_cpu::insert_cstate(const char *linux_nam=
+e, const char *human_name,
+ 		c++;
+ 	}
+ =
 
-Thanks,
-Lorenzo
-
- src/cpu/cpu_linux.cpp | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/src/cpu/cpu_linux.cpp b/src/cpu/cpu_linux.cpp
-index e1ff165..78fd2d3 100644
---- a/src/cpu/cpu_linux.cpp
-+++ b/src/cpu/cpu_linux.cpp
-@@ -83,7 +83,8 @@ void cpu_linux::parse_cstates_start(void)
- 		if (file) {
- 			file >> usage;
- 			file.close();
+-	/* some architectures (ARM) don't have good numbers in their human name..=
+ fall back to the linux name for those */
+-	c =3D linux_name;
+-	while (*c && state->line_level < 0) {
+-		if (*c >=3D '0' && *c <=3D'9') {
+-			state->line_level =3D strtoull(c, NULL, 10);
+-			break;
 -		}
-+		} else
-+			continue;
+-		c++;
+-	}
  =
 
- 		sprintf(filename + len, "/%s/time", entry->d_name);
- =
-
-@@ -172,7 +173,8 @@ void cpu_linux::parse_cstates_end(void)
- 		if (file) {
- 			file >> usage;
- 			file.close();
--		}
-+		} else
-+			continue;
- =
-
- 		sprintf(filename + len, "/%s/time", entry->d_name);
- =
-
+ 	if (level >=3D 0)
+ 		state->line_level =3D level;
 -- =
 
 1.9.1
 
 
---===============0521803154602140874==--
+--===============6935318282971041828==--
 
