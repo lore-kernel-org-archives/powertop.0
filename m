@@ -1,49 +1,71 @@
-Content-Type: multipart/mixed; boundary="===============5354296494591523311=="
+Content-Type: multipart/mixed; boundary="===============2710055013110119489=="
 MIME-Version: 1.0
-From: Nanley Chery <nanleychery at gmail.com>
-Subject: Re: [Powertop] [RFC 0/9] Use udev for accessing sysfs
-Date: Wed, 03 Jun 2015 14:10:13 -0700
-Message-ID: <CAJDL4uLOoY=dpLPbg44NJvKpYERV0Mwi-KchQMXk0pQqjvDyxg@mail.gmail.com>
-In-Reply-To: 556F62CA.3070208@linux.intel.com
+From: Radhakrishna Sripada <radhakrishna.sripada at intel.com>
+Subject: [Powertop] [PATCH] Assign line level based on linux name
+Date: Wed, 23 Sep 2015 17:13:09 -0700
+Message-ID: <1443053589-1036-1-git-send-email-radhakrishna.sripada@intel.com>
+In-Reply-To: 56031610.8080304@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5354296494591523311==
+--===============2710055013110119489==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 3, 2015 at 1:25 PM, Arjan van de Ven <arjan(a)linux.intel.com> =
-wrote:
-> On 6/3/2015 1:23 PM, Nanley Chery wrote:
->
->>>
->>> .... how does this work on Android ?
->>
->>
->> That's a good question. I actually hadn't considered the affects on
->> that platform. It seems like there is no udev-like abstraction layer
->> on Android. It looks like the way forward would be to either keep a
->> separate folder for android specific code or to create more helper
->> functions to abstract how we access sysfs. The latter method seems
->> preferable because it wouldn't increase the complexity of the project
->> as a whole. Thoughts?
->
->
-> but if we keep the code anyway, what's the benefit of going through one
-> more layer of indirection????
-> Am I missing something here?
+Powertop Idle Stats only show the statistics of C1E-SKL and not C1-SKL while
+intel_idle driver exposes both the states. Parsing the human names of the
+states, the same line level '1' gets assigned to both C1-SKL and C1E-SKL. T=
+he
+statistics of C1-SKL are always overwritten by the statistics of C1E-SKL. To
+eliminate this parsing linux name would assign different line levels to
+different cstates irrespective of their human names.
 
-The main benefit would be increased protection from sysfs
-reorganizations with progressive kernel releases. If this is actually
-something we should be proactive about, I am not sure.
-Udev should provide faster reading of sysfs files due to caching, but
-I do not have any hard numbers to back this claim up.
-Lastly there are some general wins in the realm of software
-readability and maintainability (in my opinion). This should make the
-process of adding more features and fixing bugs easier.
+Signed-off-by: Radhakrishna Sripada <radhakrishna.sripada(a)intel.com>
+---
+ src/cpu/abstract_cpu.cpp | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
 
-- Nanley
+diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
+index 17acb71..12dcb7d 100644
+--- a/src/cpu/abstract_cpu.cpp
++++ b/src/cpu/abstract_cpu.cpp
+@@ -210,7 +210,7 @@ void abstract_cpu::insert_cstate(const char *linux_name=
+, const char *human_name,
+ =
 
---===============5354296494591523311==--
+ 	state->line_level =3D -1;
+ =
+
+-	c =3D human_name;
++	c =3D linux_name;
+ 	while (*c) {
+ 		if (strcmp(linux_name, "active")=3D=3D0) {
+ 			state->line_level =3D LEVEL_C0;
+@@ -223,15 +223,6 @@ void abstract_cpu::insert_cstate(const char *linux_nam=
+e, const char *human_name,
+ 		c++;
+ 	}
+ =
+
+-	/* some architectures (ARM) don't have good numbers in their human name..=
+ fall back to the linux name for those */
+-	c =3D linux_name;
+-	while (*c && state->line_level < 0) {
+-		if (*c >=3D '0' && *c <=3D'9') {
+-			state->line_level =3D strtoull(c, NULL, 10);
+-			break;
+-		}
+-		c++;
+-	}
+ =
+
+ 	if (level >=3D 0)
+ 		state->line_level =3D level;
+-- =
+
+1.9.1
+
+
+--===============2710055013110119489==--
 
