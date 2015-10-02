@@ -1,163 +1,192 @@
-Content-Type: multipart/mixed; boundary="===============7767151717442266567=="
+Content-Type: multipart/mixed; boundary="===============6006958180407933153=="
 MIME-Version: 1.0
-From: Nanley Chery <nanleychery at gmail.com>
-Subject: [Powertop] [RFC 7/9] runtime_pm: use udev
-Date: Mon, 01 Jun 2015 09:09:13 -0700
-Message-ID: <1433174955-17349-8-git-send-email-nanleychery@gmail.com>
-In-Reply-To: 1433174955-17349-1-git-send-email-nanleychery@gmail.com
+From: Swaminathan, Nivedita <nivedita.swaminathan at intel.com>
+Subject: [Powertop] Segmentation fault with powertop --html option
+Date: Fri, 02 Oct 2015 21:09:15 +0000
+Message-ID: <203C9A218350B94EAF34403F81F162AE195F6D54@ORSMSX116.amr.corp.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7767151717442266567==
+--===============6006958180407933153==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Nanley Chery <nanley.g.chery(a)intel.com>
----
- src/devices/runtime_pm.cpp | 98 +++++++++++++-----------------------------=
-----
- 1 file changed, 27 insertions(+), 71 deletions(-)
+When you run powertop with the '--html' option, it fails to produce powerto=
+p.html. The commit that causes this issue is: commit 0b9387287fd0055f29786d=
+17ba61f8a5c6099bea
 
-diff --git a/src/devices/runtime_pm.cpp b/src/devices/runtime_pm.cpp
-index 3dfebf4..edcfb0f 100644
---- a/src/devices/runtime_pm.cpp
-+++ b/src/devices/runtime_pm.cpp
-@@ -29,7 +29,6 @@
- #include <stdio.h>
- #include <unistd.h>
- #include <sys/types.h>
--#include <dirent.h>
- =
+$sudo powertop -html
+Loaded 0 prior measurements
+Cannot load from file /var/cache/powertop/saved_parameters.powertop
+RAPL device for cpu 0
+RAPL Using PowerCap Sysfs : Domain Mask d
+RAPL device for cpu 0
+RAPL Using PowerCap Sysfs : Domain Mask d
+RAPL device for cpu 0
+RAPL Using PowerCap Sysfs : Domain Mask d
+Devfreq not enabled
+Cannot load from file /var/cache/powertop/saved_parameters.powertop
+Preparing to take measurements
+  unknown op '{'
+nswamina(a)nswamina-desktop:~/powertop/test-powertop/powertop/src$
 
- #include "../parameters/parameters.h"
- #include "../lib.h"
-@@ -178,85 +177,42 @@ int device_has_runtime_pm(const char *sysfs_path)
- 	return 0;
- }
- =
+Further debugging using gdb shows the cause to be a segmentation fault:
 
--static void do_bus(const char *bus)
-+static void do_bus(const char *filename)
- {
- 	/* /sys/bus/pci/devices/0000\:00\:1f.0/power/runtime_suspended_time */
-+	struct udev_device *udevice =3D udev_device_new_from_syspath(get_udev(), =
-filename);
-+	const char * name =3D udev_device_get_sysname(udevice);
-+	const char * bus =3D udev_device_get_subsystem(udevice);
-+	runtime_pmdevice *dev =3D new runtime_pmdevice(name, filename);
-+
-+	if (strcmp(bus, "i2c") =3D=3D 0) {
-+		char dev_name[4096];
-+		const char *new_dev =3D udev_device_get_sysattr_value(udevice, "new_devi=
-ce");
-+		const char *devname =3D udev_device_get_sysattr_value(udevice, "name");
-+		sprintf(dev_name, _("I2C Device: %s"), devname);
-+		sprintf(dev_name, _("I2C %s (%s): %s"), (new_dev ? _("Adapter") : _("Dev=
-ice")), name, devname);
-+		dev->set_human_name(dev_name);
-+	}
- =
+nswamina(a)nswamina-desktop:~/powertop/test-powertop/powertop/src$ sudo gdb=
+ powertop
+(gdb) r --html
+Starting program: /home/nswamina/powertop/test-powertop/powertop/src/powert=
+op --html
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+Loaded 0 prior measurements
+Cannot load from file /var/cache/powertop/saved_parameters.powertop
+RAPL device for cpu 0
+RAPL Using PowerCap Sysfs : Domain Mask d
+RAPL device for cpu 0
+RAPL Using PowerCap Sysfs : Domain Mask d
+RAPL device for cpu 0
+RAPL Using PowerCap Sysfs : Domain Mask d
+Devfreq not enabled
+Cannot load from file /var/cache/powertop/saved_parameters.powertop
+Preparing to take measurements
+  unknown op '{'
 
--	struct dirent *entry;
--	DIR *dir;
--	char filename[4096];
-+	if (strcmp(bus, "pci") =3D=3D 0) {
-+		char dev_name[4096];
-+		char devname[4096];
- =
+Program received signal SIGSEGV, Segmentation fault.
+0x00007ffff72e3b63 in std::string::swap(std::string&) () from /usr/lib/x86_=
+64-linux-gnu/libstdc++.so.6
 
--	sprintf(filename, "/sys/bus/%s/devices/", bus);
--	dir =3D opendir(filename);
--	if (!dir)
--		return;
--	while (1) {
--		ifstream file;
--		class runtime_pmdevice *dev;
--		entry =3D readdir(dir);
--
--		if (!entry)
--			break;
--		if (entry->d_name[0] =3D=3D '.')
--			continue;
--
--		dev =3D new class runtime_pmdevice(entry->d_name, filename);
--
--		if (strcmp(bus, "i2c") =3D=3D 0) {
--			string devname;
--			char dev_name[4096];
--			bool is_adapter =3D false;
--
--			sprintf(filename, "/sys/bus/%s/devices/%s/new_device", bus, entry->d_na=
-me);
--			if (access(filename, W_OK) =3D=3D 0)
--				is_adapter =3D true;
--
--			sprintf(filename, "/sys/bus/%s/devices/%s/name", bus, entry->d_name);
--			file.open(filename, ios::in);
--			if (file) {
--				getline(file, devname);
--				file.close();
--			}
--
--			sprintf(dev_name, _("I2C %s (%s): %s"), (is_adapter ? _("Adapter") : _(=
-"Device")), entry->d_name, devname.c_str());
-+		if (upci_id_to_name(udevice, devname)) {
-+			sprintf(dev_name, _("PCI Device: %s"), devname);
- 			dev->set_human_name(dev_name);
- 		}
--
--		if (strcmp(bus, "pci") =3D=3D 0) {
--			uint16_t vendor =3D 0, device =3D 0;
--
--			sprintf(filename, "/sys/bus/%s/devices/%s/vendor", bus, entry->d_name);
--
--			file.open(filename, ios::in);
--			if (file) {
--				file >> hex >> vendor;
--				file.close();
--			}
--
--
--			sprintf(filename, "/sys/bus/%s/devices/%s/device", bus, entry->d_name);
--			file.open(filename, ios::in);
--			if (file) {
--				file >> hex >> device;
--				file.close();
--			}
--
--			if (vendor && device) {
--				char devname[4096];
--				sprintf(devname, _("PCI Device: %s"),
--					pci_id_to_name(vendor, device, filename, 4095));
--				dev->set_human_name(devname);
--			}
--		}
--		all_devices.push_back(dev);
- 	}
--	closedir(dir);
-+	all_devices.push_back(dev);
-+
-+	/* Cleanup */
-+	udev_device_unref(udevice);
- }
- =
+(gdb) backtrace
+#0  0x00007ffff72e3b63 in std::string::swap(std::string&) () from /usr/lib/=
+x86_64-linux-gnu/libstdc++.so.6
+#1  0x0000000000415675 in operator=3D (__str=3D<unknown type in /home/nswam=
+ina/powertop/test-powertop/powertop/src/powertop, CU 0x72c3a, DIE 0x86efe>,=
+ this=3D0x941998)
+    at /usr/include/c++/4.9/bits/basic_string.h:592
+#2  report_display_cpu_cstates () at cpu/cpu.cpp:573
+#3  0x000000000040fe92 in one_measurement (seconds=3Dseconds(a)entry=3D1, w=
+orkload=3Dworkload(a)entry=3D0x0) at main.cpp:232
+#4  0x00000000004100e2 in make_report (time=3D20, workload=3Dworkload(a)ent=
+ry=3D0x7fffffffd550 "", iterations=3Diterations(a)entry=3D1, file=3Dfile(a)=
+entry=3D0x7fffffffc550 "powertop.html") at main.cpp:267
+#5  0x0000000000406e0e in main (argc=3D2, argv=3D0x7fffffffe678) at main.cp=
+p:476
 
- void create_all_runtime_pm_devices(void)
- {
--	do_bus("pci");
--	do_bus("spi");
--	do_bus("platform");
--	do_bus("i2c");
-+	process_subsystem("pci", do_bus, 0);
-+	process_subsystem("spi", do_bus, 0);
-+	process_subsystem("platform", do_bus, 0);
-+	process_subsystem("i2c", do_bus, 0);
- }
--- =
+--===============6006958180407933153==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
-2.4.1
+PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
+bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
+YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
+cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
+VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
+bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
+ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTUgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
+PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseToiQ2Ft
+YnJpYSBNYXRoIjsKCXBhbm9zZS0xOjIgNCA1IDMgNSA0IDYgMyAyIDQ7fQpAZm9udC1mYWNlCgl7
+Zm9udC1mYW1pbHk6Q2FsaWJyaTsKCXBhbm9zZS0xOjIgMTUgNSAyIDIgMiA0IDMgMiA0O30KLyog
+U3R5bGUgRGVmaW5pdGlvbnMgKi8KcC5Nc29Ob3JtYWwsIGxpLk1zb05vcm1hbCwgZGl2Lk1zb05v
+cm1hbAoJe21hcmdpbjowaW47CgltYXJnaW4tYm90dG9tOi4wMDAxcHQ7Cglmb250LXNpemU6MTEu
+MHB0OwoJZm9udC1mYW1pbHk6IkNhbGlicmkiLHNhbnMtc2VyaWY7fQphOmxpbmssIHNwYW4uTXNv
+SHlwZXJsaW5rCgl7bXNvLXN0eWxlLXByaW9yaXR5Ojk5OwoJY29sb3I6IzA1NjNDMTsKCXRleHQt
+ZGVjb3JhdGlvbjp1bmRlcmxpbmU7fQphOnZpc2l0ZWQsIHNwYW4uTXNvSHlwZXJsaW5rRm9sbG93
+ZWQKCXttc28tc3R5bGUtcHJpb3JpdHk6OTk7Cgljb2xvcjojOTU0RjcyOwoJdGV4dC1kZWNvcmF0
+aW9uOnVuZGVybGluZTt9CnNwYW4uRW1haWxTdHlsZTE3Cgl7bXNvLXN0eWxlLXR5cGU6cGVyc29u
+YWw7Cglmb250LWZhbWlseToiQ2FsaWJyaSIsc2Fucy1zZXJpZjsKCWNvbG9yOndpbmRvd3RleHQ7
+fQpzcGFuLkVtYWlsU3R5bGUxOAoJe21zby1zdHlsZS10eXBlOnBlcnNvbmFsOwoJZm9udC1mYW1p
+bHk6IkNhbGlicmkiLHNhbnMtc2VyaWY7Cgljb2xvcjojMUY0OTdEO30Kc3Bhbi5FbWFpbFN0eWxl
+MTkKCXttc28tc3R5bGUtdHlwZTpwZXJzb25hbC1jb21wb3NlOwoJZm9udC1mYW1pbHk6IkNhbGli
+cmkiLHNhbnMtc2VyaWY7Cgljb2xvcjp3aW5kb3d0ZXh0O30KLk1zb0NocERlZmF1bHQKCXttc28t
+c3R5bGUtdHlwZTpleHBvcnQtb25seTsKCWZvbnQtc2l6ZToxMC4wcHQ7fQpAcGFnZSBXb3JkU2Vj
+dGlvbjEKCXtzaXplOjguNWluIDExLjBpbjsKCW1hcmdpbjoxLjBpbiAxLjBpbiAxLjBpbiAxLjBp
+bjt9CmRpdi5Xb3JkU2VjdGlvbjEKCXtwYWdlOldvcmRTZWN0aW9uMTt9Ci0tPjwvc3R5bGU+PCEt
+LVtpZiBndGUgbXNvIDldPjx4bWw+CjxvOnNoYXBlZGVmYXVsdHMgdjpleHQ9ImVkaXQiIHNwaWRt
+YXg9IjEwMjYiIC8+CjwveG1sPjwhW2VuZGlmXS0tPjwhLS1baWYgZ3RlIG1zbyA5XT48eG1sPgo8
+bzpzaGFwZWxheW91dCB2OmV4dD0iZWRpdCI+CjxvOmlkbWFwIHY6ZXh0PSJlZGl0IiBkYXRhPSIx
+IiAvPgo8L286c2hhcGVsYXlvdXQ+PC94bWw+PCFbZW5kaWZdLS0+CjwvaGVhZD4KPGJvZHkgbGFu
+Zz0iRU4tVVMiIGxpbms9IiMwNTYzQzEiIHZsaW5rPSIjOTU0RjcyIj4KPGRpdiBjbGFzcz0iV29y
+ZFNlY3Rpb24xIj4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+V2hlbiB5b3UgcnVuIHBvd2VydG9wIHdp
+dGggdGhlICYjODIxNjstLWh0bWwmIzgyMTc7IG9wdGlvbiwgaXQgZmFpbHMgdG8gcHJvZHVjZSBw
+b3dlcnRvcC5odG1sLiBUaGUgY29tbWl0IHRoYXQgY2F1c2VzIHRoaXMgaXNzdWUgaXM6CjxzcGFu
+IHN0eWxlPSJiYWNrZ3JvdW5kOnllbGxvdzttc28taGlnaGxpZ2h0OnllbGxvdyI+Y29tbWl0IDBi
+OTM4NzI4N2ZkMDA1NWYyOTc4NmQxN2JhNjFmOGE1YzYwOTliZWE8L3NwYW4+PG86cD48L286cD48
+L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8cCBjbGFzcz0i
+TXNvTm9ybWFsIj4kc3VkbyBwb3dlcnRvcCAmIzgyMTE7aHRtbDxvOnA+PC9vOnA+PC9wPgo8cCBj
+bGFzcz0iTXNvTm9ybWFsIj5Mb2FkZWQgMCBwcmlvciBtZWFzdXJlbWVudHM8bzpwPjwvbzpwPjwv
+cD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+Q2Fubm90IGxvYWQgZnJvbSBmaWxlIC92YXIvY2FjaGUv
+cG93ZXJ0b3Avc2F2ZWRfcGFyYW1ldGVycy5wb3dlcnRvcDxvOnA+PC9vOnA+PC9wPgo8cCBjbGFz
+cz0iTXNvTm9ybWFsIj5SQVBMIGRldmljZSBmb3IgY3B1IDA8bzpwPjwvbzpwPjwvcD4KPHAgY2xh
+c3M9Ik1zb05vcm1hbCI+UkFQTCBVc2luZyBQb3dlckNhcCBTeXNmcyA6IERvbWFpbiBNYXNrIGQ8
+bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+UkFQTCBkZXZpY2UgZm9yIGNwdSAw
+PG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPlJBUEwgVXNpbmcgUG93ZXJDYXAg
+U3lzZnMgOiBEb21haW4gTWFzayBkPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwi
+PlJBUEwgZGV2aWNlIGZvciBjcHUgMDxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFs
+Ij5SQVBMIFVzaW5nIFBvd2VyQ2FwIFN5c2ZzIDogRG9tYWluIE1hc2sgZDxvOnA+PC9vOnA+PC9w
+Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5EZXZmcmVxIG5vdCBlbmFibGVkPG86cD48L286cD48L3A+
+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPkNhbm5vdCBsb2FkIGZyb20gZmlsZSAvdmFyL2NhY2hlL3Bv
+d2VydG9wL3NhdmVkX3BhcmFtZXRlcnMucG93ZXJ0b3A8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9
+Ik1zb05vcm1hbCI+UHJlcGFyaW5nIHRvIHRha2UgbWVhc3VyZW1lbnRzPG86cD48L286cD48L3A+
+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPiZuYnNwOyB1bmtub3duIG9wICd7JzxvOnA+PC9vOnA+PC9w
+Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5uc3dhbWluYUBuc3dhbWluYS1kZXNrdG9wOn4vcG93ZXJ0
+b3AvdGVzdC1wb3dlcnRvcC9wb3dlcnRvcC9zcmMkPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJN
+c29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5GdXJ0
+aGVyIGRlYnVnZ2luZyB1c2luZyBnZGIgc2hvd3MgdGhlIGNhdXNlIHRvIGJlIGEgc2VnbWVudGF0
+aW9uIGZhdWx0OjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpwPiZuYnNw
+OzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+bnN3YW1pbmFAbnN3YW1pbmEtZGVza3Rv
+cDp+L3Bvd2VydG9wL3Rlc3QtcG93ZXJ0b3AvcG93ZXJ0b3Avc3JjJCBzdWRvIGdkYiBwb3dlcnRv
+cDxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj4oZ2RiKSByIC0taHRtbDxvOnA+
+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5TdGFydGluZyBwcm9ncmFtOiAvaG9tZS9u
+c3dhbWluYS9wb3dlcnRvcC90ZXN0LXBvd2VydG9wL3Bvd2VydG9wL3NyYy9wb3dlcnRvcCAtLWh0
+bWw8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+W1RocmVhZCBkZWJ1Z2dpbmcg
+dXNpbmcgbGlidGhyZWFkX2RiIGVuYWJsZWRdPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29O
+b3JtYWwiPlVzaW5nIGhvc3QgbGlidGhyZWFkX2RiIGxpYnJhcnkgJnF1b3Q7L2xpYi94ODZfNjQt
+bGludXgtZ251L2xpYnRocmVhZF9kYi5zby4xJnF1b3Q7LjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFz
+cz0iTXNvTm9ybWFsIj5Mb2FkZWQgMCBwcmlvciBtZWFzdXJlbWVudHM8bzpwPjwvbzpwPjwvcD4K
+PHAgY2xhc3M9Ik1zb05vcm1hbCI+Q2Fubm90IGxvYWQgZnJvbSBmaWxlIC92YXIvY2FjaGUvcG93
+ZXJ0b3Avc2F2ZWRfcGFyYW1ldGVycy5wb3dlcnRvcDxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0i
+TXNvTm9ybWFsIj5SQVBMIGRldmljZSBmb3IgY3B1IDA8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9
+Ik1zb05vcm1hbCI+UkFQTCBVc2luZyBQb3dlckNhcCBTeXNmcyA6IERvbWFpbiBNYXNrIGQ8bzpw
+PjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+UkFQTCBkZXZpY2UgZm9yIGNwdSAwPG86
+cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPlJBUEwgVXNpbmcgUG93ZXJDYXAgU3lz
+ZnMgOiBEb21haW4gTWFzayBkPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPlJB
+UEwgZGV2aWNlIGZvciBjcHUgMDxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5S
+QVBMIFVzaW5nIFBvd2VyQ2FwIFN5c2ZzIDogRG9tYWluIE1hc2sgZDxvOnA+PC9vOnA+PC9wPgo8
+cCBjbGFzcz0iTXNvTm9ybWFsIj5EZXZmcmVxIG5vdCBlbmFibGVkPG86cD48L286cD48L3A+Cjxw
+IGNsYXNzPSJNc29Ob3JtYWwiPkNhbm5vdCBsb2FkIGZyb20gZmlsZSAvdmFyL2NhY2hlL3Bvd2Vy
+dG9wL3NhdmVkX3BhcmFtZXRlcnMucG93ZXJ0b3A8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1z
+b05vcm1hbCI+UHJlcGFyaW5nIHRvIHRha2UgbWVhc3VyZW1lbnRzPG86cD48L286cD48L3A+Cjxw
+IGNsYXNzPSJNc29Ob3JtYWwiPiZuYnNwOyB1bmtub3duIG9wICd7JzxvOnA+PC9vOnA+PC9wPgo8
+cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05v
+cm1hbCI+UHJvZ3JhbSByZWNlaXZlZCBzaWduYWwgU0lHU0VHViwgU2VnbWVudGF0aW9uIGZhdWx0
+LjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj4weDAwMDA3ZmZmZjcyZTNiNjMg
+aW4gc3RkOjpzdHJpbmc6OnN3YXAoc3RkOjpzdHJpbmcmYW1wOykgKCkgZnJvbSAvdXNyL2xpYi94
+ODZfNjQtbGludXgtZ251L2xpYnN0ZGMmIzQzOyYjNDM7LnNvLjY8bzpwPjwvbzpwPjwvcD4KPHAg
+Y2xhc3M9Ik1zb05vcm1hbCI+PG86cD4mbmJzcDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3Jt
+YWwiPihnZGIpIGJhY2t0cmFjZTxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj4j
+MCZuYnNwOyAweDAwMDA3ZmZmZjcyZTNiNjMgaW4gc3RkOjpzdHJpbmc6OnN3YXAoc3RkOjpzdHJp
+bmcmYW1wOykgKCkgZnJvbSAvdXNyL2xpYi94ODZfNjQtbGludXgtZ251L2xpYnN0ZGMmIzQzOyYj
+NDM7LnNvLjY8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+IzEmbmJzcDsgMHgw
+MDAwMDAwMDAwNDE1Njc1IGluIG9wZXJhdG9yPSAoX19zdHI9Jmx0O3Vua25vd24gdHlwZSBpbiAv
+aG9tZS9uc3dhbWluYS9wb3dlcnRvcC90ZXN0LXBvd2VydG9wL3Bvd2VydG9wL3NyYy9wb3dlcnRv
+cCwgQ1UgMHg3MmMzYSwgRElFIDB4ODZlZmUmZ3Q7LCB0aGlzPTB4OTQxOTk4KTxvOnA+PC9vOnA+
+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj4mbmJzcDsmbmJzcDsmbmJzcDsgYXQgL3Vzci9pbmNs
+dWRlL2MmIzQzOyYjNDM7LzQuOS9iaXRzL2Jhc2ljX3N0cmluZy5oOjU5MjxvOnA+PC9vOnA+PC9w
+Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIj4jMiZuYnNwOyByZXBvcnRfZGlzcGxheV9jcHVfY3N0YXRl
+cyAoKSBhdCBjcHUvY3B1LmNwcDo1NzM8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1h
+bCI+IzMmbmJzcDsgMHgwMDAwMDAwMDAwNDBmZTkyIGluIG9uZV9tZWFzdXJlbWVudCAoc2Vjb25k
+cz1zZWNvbmRzQGVudHJ5PTEsIHdvcmtsb2FkPXdvcmtsb2FkQGVudHJ5PTB4MCkgYXQgbWFpbi5j
+cHA6MjMyPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPiM0Jm5ic3A7IDB4MDAw
+MDAwMDAwMDQxMDBlMiBpbiBtYWtlX3JlcG9ydCAodGltZT0yMCwgd29ya2xvYWQ9d29ya2xvYWRA
+ZW50cnk9MHg3ZmZmZmZmZmQ1NTAgJnF1b3Q7JnF1b3Q7LCBpdGVyYXRpb25zPWl0ZXJhdGlvbnNA
+ZW50cnk9MSwgZmlsZT1maWxlQGVudHJ5PTB4N2ZmZmZmZmZjNTUwICZxdW90O3Bvd2VydG9wLmh0
+bWwmcXVvdDspIGF0IG1haW4uY3BwOjI2NzxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9y
+bWFsIj4jNSZuYnNwOyAweDAwMDAwMDAwMDA0MDZlMGUgaW4gbWFpbiAoYXJnYz0yLCBhcmd2PTB4
+N2ZmZmZmZmZlNjc4KSBhdCBtYWluLmNwcDo0NzY8bzpwPjwvbzpwPjwvcD4KPC9kaXY+CjwvYm9k
+eT4KPC9odG1sPgo=
 
-
---===============7767151717442266567==--
+--===============6006958180407933153==--
 
