@@ -1,60 +1,25 @@
-Content-Type: multipart/mixed; boundary="===============2389821780189356868=="
+Content-Type: multipart/mixed; boundary="===============5883025688723800905=="
 MIME-Version: 1.0
-From: George Barrett <bob at bob131.so>
-Subject: Re: [Powertop] Fwd: Suggested tunables addition: sysctl
- kernel.core_pattern
-Date: Tue, 05 Jan 2016 11:49:23 +1100
-Message-ID: <1451954963.2932.0@mail.bob131.so>
-In-Reply-To: 20160105004749.GA18569@noemi.bahnhof.se
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: [Powertop] [Announce] PowerTOP v2.8-rc4
+Date: Fri, 30 Oct 2015 17:39:00 -0700
+Message-ID: <56340DA4.7010402@linux.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2389821780189356868==
+--===============5883025688723800905==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-I primarily use my laptop for hacking on my own little projects, so =
+This contains the accepted patches from mailing list. Some bug fixes, =
 
-this occurs fairly frequently
+and version string changes.  Please give it a test.
 
-On Tue, Jan 5, 2016 at 11:47 AM, Magnus Fromreide =
+-- =
 
-<magfr(a)lysator.liu.se> wrote:
-> On Sat, Jan 02, 2016 at 09:00:57PM +1100, George Barrett wrote:
->>  Hi, first off thanks for the great tool!
->> =
+Thank you,
+<Alexandra>
 
->>  I currently rely on a systemd unit file present in the Fedora =
-
->> package for
->>  powertop to do most of my laptop's power saving config on boot, and =
-
->> it works
->>  great. However, I've noticed a missing tunable which might be =
-
->> helpful for
->>  some folks: setting the kernel.core_pattern sysctl parameter to =
-
->> |/dev/null
->>  or similar. On my x220, this parameter set to it's default causes
->>  systemd-coredump to peg a single core, sometimes for quite an =
-
->> extended
->>  period of time. On many devices this would cause substantially =
-
->> greater heat
->>  output, and most importantly substantially higher power consumption.
-> =
-
-> I have to ask, why do you get enough core dumps for this to be a =
-
-> problem?
-> Wouldn't a better solution be to fix the application that dumps core?
-> =
-
-> /MF
-
-
---===============2389821780189356868==--
+--===============5883025688723800905==--
 
