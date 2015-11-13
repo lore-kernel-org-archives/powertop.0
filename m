@@ -1,87 +1,79 @@
-Content-Type: multipart/mixed; boundary="===============2427699206395877274=="
+Content-Type: multipart/mixed; boundary="===============8058072072436862865=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] Too much memory consumption by powertop
-Date: Wed, 29 Apr 2015 10:39:37 -0700
-Message-ID: <53172.10.24.5.14.1430329177.squirrel@linux.intel.com>
-In-Reply-To: s5hvbgg83a0.wl-tiwai@suse.de
+From: Jan Engelhardt <jengelh at inai.de>
+Subject: [Powertop] Fix crash due to unbounded string copies
+Date: Fri, 13 Nov 2015 16:50:19 +0100
+Message-ID: <1447429821-1631-1-git-send-email-jengelh@inai.de>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2427699206395877274==
+--===============8058072072436862865==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 
-> At Tue, 28 Apr 2015 10:14:17 -0700 (PDT),
-> Alexandra Yates wrote:
->>
->>
->> > As powertop list is for subscribers only, here Takashi's
->> > findings concerning a big memory waste fowarded:
->> >
->> > ----------  Forwarded Message  ----------
->> >
->> > Subject: Too much memory consumption by powertop
->> > Date: Tuesday, April 28, 2015, 05:32:41 PM
->> > From: Takashi Iwai <tiwai(a)suse.de>
->> > To: powertop(a)lists.01.org
->> > CC: trenn(a)suse.de
->> >
->> > Hi,
->> >
->> > I noticed that powertop consumes way too much memory than needed.  It
->> > constantly takes over 170MB RES, sometimes over 200MB.
->> >
->> > Then I looked at profile, and it showed that most of memory is
->> > allocated for newpad_sp().  Indeed, the current code allocates a pad
->> > of the fixed size of 1000x1000 (!) for each tab, and we have five
->> > tabs, so five times of that.  No wonder that such a small neat CUI
->> > program is so hungry.
->> >
->> > For example, a hack like below already reduces the memory footprint
->> > to around 20MB, 90% cut.  Not bad.
->> >
->> > --- a/src/display.cpp
->> > +++ b/src/display.cpp
->> > @@ -48,7 +48,7 @@ void create_tab(const string &name, cons
->> >         if (!w)
->> >                 w =3D new(class tab_window);
->> >
->> > -       w->win =3D newpad(1000,1000);
->> > +       w->win =3D newpad(80,160); // XXX FIXME XXX
->> >         tab_names.push_back(name);
->> >         tab_windows[name] =3D w;
->> >         tab_translations[name] =3D translation;
->> >
->> > Can anyone look into this and give a better / smarter solution?
->> >
->> >
->> > thanks,
->> >
->> > Takashi
->> > -----------------------------------------
->> > _______________________________________________
->> > PowerTop mailing list
->> > PowerTop(a)lists.01.org
->> > https://lists.01.org/mailman/listinfo/powertop
->> >
->>
->> To avoid the high memory consumption on testing run it on HTML mode so
->> that the powertop.html report is generated in the background.
->
-> Yeah, starting firefox is smaller than powertop, indeed :)
->
->
-> Takashi
->
+The following changes since commit 35057dc9d707076a9fe5fee17e2c8357a942e167:
 
-Now if you really want save resources you could go by having your output
-on a .txt file.
+  PowerTOP v2.8 (2015-11-05 15:47:37 -0800)
 
-Thank you,
-Alexandra.
+are available in the git repository at:
 
---===============2427699206395877274==--
+  git://github.com/jengelh/powertop master
+
+for you to fetch changes up to f212625d0acbc6340e6b61b1538f318302c8cb90:
+
+  Avoid hardcoding magic values when sizeof can be used (2015-11-13 15:07:5=
+6 +0100)
+
+----------------------------------------------------------------
+Jan Engelhardt (2):
+      Fix crash due to buffer overruns
+      Avoid hardcoding magic values when sizeof can be used
+
+ src/calibrate/calibrate.cpp    | 16 ++++++------
+ src/cpu/abstract_cpu.cpp       | 18 ++++++-------
+ src/cpu/cpu.cpp                | 18 ++++++-------
+ src/cpu/cpu_linux.cpp          | 36 +++++++++++++-------------
+ src/cpu/cpudevice.cpp          |  5 ++--
+ src/cpu/intel_cpus.cpp         |  6 ++---
+ src/devices/ahci.cpp           | 58 +++++++++++++++++++++-----------------=
+----
+ src/devices/alsa.cpp           | 34 ++++++++++++-------------
+ src/devices/backlight.cpp      | 18 ++++++-------
+ src/devices/devfreq.cpp        |  2 +-
+ src/devices/device.cpp         |  4 +--
+ src/devices/i915-gpu.cpp       |  6 ++---
+ src/devices/network.cpp        | 35 ++++++++++++-------------
+ src/devices/rfkill.cpp         | 30 +++++++++++-----------
+ src/devices/runtime_pm.cpp     | 34 ++++++++++++-------------
+ src/devices/thinkpad-fan.cpp   |  2 +-
+ src/devices/thinkpad-light.cpp |  2 +-
+ src/devices/usb.cpp            | 40 ++++++++++++++---------------
+ src/devlist.cpp                | 14 +++++-----
+ src/lib.cpp                    | 10 ++++----
+ src/lib.h                      |  7 +++++
+ src/main.cpp                   |  6 ++---
+ src/measurement/acpi.cpp       | 11 ++++----
+ src/measurement/sysfs.cpp      |  2 +-
+ src/parameters/parameters.cpp  |  4 +--
+ src/process/do_process.cpp     | 36 +++++++++++++-------------
+ src/process/interrupt.cpp      |  4 +--
+ src/process/process.cpp        |  7 ++---
+ src/process/processdevice.cpp  |  2 +-
+ src/process/timer.cpp          |  2 +-
+ src/process/work.cpp           |  2 +-
+ src/report/report.cpp          |  4 +--
+ src/tuning/bluetooth.cpp       |  4 +--
+ src/tuning/ethernet.cpp        |  6 ++---
+ src/tuning/runtime.cpp         | 14 +++++-----
+ src/tuning/tunable.cpp         | 15 ++++++-----
+ src/tuning/tuning.cpp          |  4 +--
+ src/tuning/tuningi2c.cpp       | 18 ++++++-------
+ src/tuning/tuningsysfs.cpp     | 14 +++++-----
+ src/tuning/tuningusb.cpp       | 28 ++++++++++----------
+ src/tuning/wifi.cpp            |  6 ++---
+ 41 files changed, 298 insertions(+), 286 deletions(-)
+
+--===============8058072072436862865==--
 
