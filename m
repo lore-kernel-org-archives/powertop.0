@@ -1,94 +1,97 @@
-Content-Type: multipart/mixed; boundary="===============5435235129905598132=="
+Content-Type: multipart/mixed; boundary="===============2457874810935263473=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: Re: [Powertop] Some settings can not be set back from "Good" to "Bad"
-Date: Tue, 26 Apr 2016 13:13:54 -0700
-Message-ID: <20160426201354.GA19746@jbkonno-anise.jf.intel.com>
-In-Reply-To: 1794735.5a5bPLbTgx@tacticalops
+From: Swaminathan, Nivedita <nivedita.swaminathan at intel.com>
+Subject: Re: [Powertop] Fix crash due to unbounded string copies
+Date: Mon, 23 Nov 2015 19:39:28 +0000
+Message-ID: <203C9A218350B94EAF34403F81F162AE1975125D@ORSMSX116.amr.corp.intel.com>
+In-Reply-To: 1447429821-1631-1-git-send-email-jengelh@inai.de
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5435235129905598132==
+--===============2457874810935263473==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Martin,
+Thank you for sending your patches. Your patches have been added to the git=
+hub repository.
 
-It is possible-- it's just a matter of time and scarcity thereof (in
-my case, anyway). If you'd like to file a bug report (doesn't have to be
-elaborate), we could see how the community may be able to help:
+Regards,
+Nivedita
 
-https://app.devzing.com/powertopbugs/bugzilla
+-----Original Message-----
+From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of Jan En=
+gelhardt
+Sent: Friday, November 13, 2015 7:50 AM
+To: powertop(a)lists.01.org
+Subject: [Powertop] Fix crash due to unbounded string copies
 
-Cheers, hth
 
-On Sun, Apr 24, 2016 at 12:33:59AM +0200, Martin Walch wrote:
-> Hi,
-> =
+The following changes since commit 35057dc9d707076a9fe5fee17e2c8357a942e167:
 
-> it is possible to toggle some settings like "Enable Audio codec power =
+  PowerTOP v2.8 (2015-11-05 15:47:37 -0800)
 
-> management" from "Bad" to "Good" and back again. However, when exiting =
+are available in the git repository at:
 
-> powertop while it is set to "Good", and then re-running powertop, the val=
-ue is =
+  git://github.com/jengelh/powertop master
 
-> stuck at "Good", i.e. it is not possible to toggle it to "Bad". When tryi=
-ng to =
+for you to fetch changes up to f212625d0acbc6340e6b61b1538f318302c8cb90:
 
-> do so, the status line only shows ">> (null)" instead of something like "=
-echo =
+  Avoid hardcoding magic values when sizeof can be used (2015-11-13 15:07:5=
+6 +0100)
 
-> '' > '/sys/module/snd_hda_intel/parameters/power_save';".
-> =
+----------------------------------------------------------------
+Jan Engelhardt (2):
+      Fix crash due to buffer overruns
+      Avoid hardcoding magic values when sizeof can be used
 
-> This is probably because sysfs_tunable::bad_value is initialized with "\0=
-" and =
+ src/calibrate/calibrate.cpp    | 16 ++++++------
+ src/cpu/abstract_cpu.cpp       | 18 ++++++-------
+ src/cpu/cpu.cpp                | 18 ++++++-------
+ src/cpu/cpu_linux.cpp          | 36 +++++++++++++-------------
+ src/cpu/cpudevice.cpp          |  5 ++--
+ src/cpu/intel_cpus.cpp         |  6 ++---
+ src/devices/ahci.cpp           | 58 +++++++++++++++++++++-----------------=
+----
+ src/devices/alsa.cpp           | 34 ++++++++++++-------------
+ src/devices/backlight.cpp      | 18 ++++++-------
+ src/devices/devfreq.cpp        |  2 +-
+ src/devices/device.cpp         |  4 +--
+ src/devices/i915-gpu.cpp       |  6 ++---
+ src/devices/network.cpp        | 35 ++++++++++++-------------
+ src/devices/rfkill.cpp         | 30 +++++++++++-----------
+ src/devices/runtime_pm.cpp     | 34 ++++++++++++-------------
+ src/devices/thinkpad-fan.cpp   |  2 +-
+ src/devices/thinkpad-light.cpp |  2 +-
+ src/devices/usb.cpp            | 40 ++++++++++++++---------------
+ src/devlist.cpp                | 14 +++++-----
+ src/lib.cpp                    | 10 ++++----
+ src/lib.h                      |  7 +++++
+ src/main.cpp                   |  6 ++---
+ src/measurement/acpi.cpp       | 11 ++++----
+ src/measurement/sysfs.cpp      |  2 +-
+ src/parameters/parameters.cpp  |  4 +--
+ src/process/do_process.cpp     | 36 +++++++++++++-------------
+ src/process/interrupt.cpp      |  4 +--
+ src/process/process.cpp        |  7 ++---
+ src/process/processdevice.cpp  |  2 +-
+ src/process/timer.cpp          |  2 +-
+ src/process/work.cpp           |  2 +-
+ src/report/report.cpp          |  4 +--
+ src/tuning/bluetooth.cpp       |  4 +--
+ src/tuning/ethernet.cpp        |  6 ++---
+ src/tuning/runtime.cpp         | 14 +++++-----
+ src/tuning/tunable.cpp         | 15 ++++++-----
+ src/tuning/tuning.cpp          |  4 +--
+ src/tuning/tuningi2c.cpp       | 18 ++++++-------
+ src/tuning/tuningsysfs.cpp     | 14 +++++-----
+ src/tuning/tuningusb.cpp       | 28 ++++++++++----------
+ src/tuning/wifi.cpp            |  6 ++---
+ 41 files changed, 298 insertions(+), 286 deletions(-) ____________________=
+___________________________
+PowerTop mailing list
+PowerTop(a)lists.01.org
+https://lists.01.org/mailman/listinfo/powertop
 
-> does not change its value if it is already set to "Good" when starting up =
-
-> powertop. When now calling sysfs_tunable::toggle(void), strlen(bad_value)=
- is 0 =
-
-> and the write_sysfs line is not executed.
-> =
-
-> Is it possible to fix this?
-> =
-
-> Regards,
-> Martin Walch
-> -- =
-
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
-
---===============5435235129905598132==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjIKCmlRSWNCQUVC
-Q0FBR0JRSlhIOHY3QUFvSkVJMklSOVV2U3FwbW5Oa1AvMkxzeWUzdy9zam0wYnhYeGVqV3N1eHAK
-WkUwanVBaEJ4TEozdzJ2VGxSb243RkdVYmVnRzhnNTBvSlpJTk53V2VTZ0lXOUJIVENoc1k1OU1X
-L2c3VndlRQpxTk51M1dVUDd1YnZDdXkzUjlORTMzbHZlV2wxV0xkNk1vWis0U3hSV3JNQjZyWEtJ
-c3JWOWZvdEtpbHNxajBpCm5kU0lXUVBhbWlnWWRzOUNnVktrQXEyS0pDWXQ3Q3ZGVDhYNEJiR2tB
-bWdZSFZmTWhkTnlTWGFtN2sydmMzMjMKa3hWWGoyZGp6VXNJaEhnVHVueS9sYzk5ajFhSDFEemtX
-dittR0NxUGlDSWVJRTcwcnd0eXd3Ri85TjN6eUF1ZwpYVC9aVHVwZ3hJZVZGeFpHVWluWW52SjhV
-TmxuWG5sZGU3U1BSZEFSb1VCN1YwbDJ5OE5tRy9sakdWWEp2VnRGClhTL253S2hQbUlYcmU1NWdT
-SXhnTDdCeHVndE1OYWxkZlpRRW1KWXlaeUF0cVpEOFJBc1lLSlU5d1ppQWx6cWoKaHBxRGpreVkw
-dDIxR3N5Z0ZiRExZL05aWHpkY3R5d1NkYUY0Qk13MEJPMU9ZM2w3WHBQcDh5QXVDeHBxZTNnZgpk
-SFI1ZGpPcTFnU2lqZlNYc0pvT3QybkRmUk5sZW12UUxOMy9CSkVQcHJ5eGdaS1NtcStCRlU4N09E
-ckZQWTBFCmhNM2s0cGZxSUkyc3N5WUFMLzVHQUxVbTY4T0p3a3pJQk1IcCtDWS9vNkNNdkpDY3pJ
-bUEySmZSZkwveEp2SUcKMjBjcE00MHh3NWFURm9ZK2t0T1dWdTYrblM0aTRTVkc0SFJ6YlY3R1NK
-RWQ3Yml3RnovY0t2SVV5WjhnQjhCeQpDMk5Ganpac2l4NXBHYUlsQ1NoMAo9VXJBMwotLS0tLUVO
-RCBQR1AgU0lHTkFUVVJFLS0tLS0K
-
---===============5435235129905598132==--
+--===============2457874810935263473==--
 
