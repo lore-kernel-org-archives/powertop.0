@@ -1,55 +1,47 @@
-Content-Type: multipart/mixed; boundary="===============4502527072412269478=="
+Content-Type: multipart/mixed; boundary="===============4321083287470327829=="
 MIME-Version: 1.0
-From: Zhaoyang Huang <zhaoyang.huang at linaro.org>
-Subject: [Powertop] [PATCH 2/2] comment process_cpu_data in the
- one_measurement() for it clears all pstat data
-Date: Wed, 01 Jul 2015 19:34:40 +0800
-Message-ID: <1435750481-9543-1-git-send-email-zhaoyang.huang@linaro.org>
+From: Alexandra Yates <alexandra.yates at linux.intel.com>
+Subject: Re: [Powertop] Fix crash due to unbounded string copies
+Date: Tue, 01 Dec 2015 15:14:58 -0800
+Message-ID: <565E29F2.6000600@linux.intel.com>
+In-Reply-To: alpine.LSU.2.20.1511232129580.28868@nerf40.vanv.qr
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4502527072412269478==
+--===============4321083287470327829==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-all children cpu's pstat data will be cleared in process_cpu_data,which
-cause the pstat shows abnormal, we have to comment this line of code. Howev=
-er,
-it looks too rough.
+Hi Nivedita,
 
-Signed-off-by: Zhaoyang Huang <zhaoyang.huang(a)linaro.org>
----
- src/main.cpp |    7 +++++++
- 1 file changed, 7 insertions(+)
+To hold the commit message we can revert the patch and reapply it with =
 
-diff --git a/src/main.cpp b/src/main.cpp
-index 1e56af1..9526084 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -221,7 +221,14 @@ void one_measurement(int seconds, char *workload)
- 	devices_end_measurement();
- 	end_power_measurement();
- =
+the original commit.
 
-+	/*
-+	FIX ME:all children cpu's pstat data will be cleared in process_cpu_data,=
-which
-+	cause the pstat shows abnormal, we have to comment this line of code. How=
-ever,
-+	it looks to rough
-+	*/
-+	/*
- 	process_cpu_data();
-+	*/
- 	process_process_data();
- =
+Thank you,
+Alexandra.
 
- 	/* output stats */
+
+
+On 11/23/2015 12:30 PM, Jan Engelhardt wrote:
+>
+> On Monday 2015-11-23 20:39, Swaminathan, Nivedita wrote:
+>
+>> Thank you for sending your patches. Your patches have been added to the =
+github repository.
+>
+> Was there any particular reason you could not retain the commit messages?
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+>
+
 -- =
 
-1.7.9.5
+Thank you,
+<Alexandra>
 
-
---===============4502527072412269478==--
+--===============4321083287470327829==--
 
