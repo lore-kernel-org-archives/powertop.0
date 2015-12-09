@@ -1,66 +1,64 @@
-Content-Type: multipart/mixed; boundary="===============7869180323942821479=="
+Content-Type: multipart/mixed; boundary="===============4910924120748163058=="
 MIME-Version: 1.0
-From: Alexandra Yates <alexandra.yates at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Assign line level based on linux name
-Date: Wed, 23 Sep 2015 14:13:52 -0700
-Message-ID: <56031610.8080304@linux.intel.com>
-In-Reply-To: 8C2593290C2B3E488D763E819AF1F02E0AF8A2CE@ORSMSX101.amr.corp.intel.com
+From: Swaminathan, Nivedita <nivedita.swaminathan at intel.com>
+Subject: Re: [Powertop] [PATCH 0/2] powerpc powernv platform support
+Date: Wed, 09 Dec 2015 23:16:14 +0000
+Message-ID: <203C9A218350B94EAF34403F81F162AE1982ABFF@ORSMSX116.amr.corp.intel.com>
+In-Reply-To: 1448582849-1707-1-git-send-email-stewart@linux.vnet.ibm.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7869180323942821479==
+--===============4910924120748163058==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Thank you for sending your patch. Your patch has been added to the github r=
+epository.
 
+Regards,
+Nivedita
 
-On 09/21/2015 02:26 PM, Sripada, Radhakrishna wrote:
-> intel_idle driver exposes the sates C1-SKL and C1E-SKL. Powertop Idle Sta=
-ts only show the statistics of C1E-SKL and not C1-SKL. By parsing the human=
- name for the two states, the same line level '1' gets assigned to both C1-=
-SKL and C1E-SKL. Hence the statistics of C1-SKL are always overwritten by t=
-he statistics of C1E-SKL. To eliminate this parsing linux name would assign=
- different line levels to different cstates irrespective of their human nam=
-es.
->
-> -----Original Message-----
-> From: Arjan van de Ven [mailto:arjan(a)linux.intel.com]
-> Sent: Monday, September 21, 2015 12:49 PM
-> To: Sripada, Radhakrishna; powertop(a)lists.01.org
-> Subject: Re: [Powertop] [PATCH] Assign line level based on linux name
->
-> On 9/21/2015 11:34 AM, Radhakrishna Sripada wrote:
->> C-states having the same number in their human names have the same
->> line levels. Switching to linux names assigns seperate levels to each C-=
-state.
->>
->> Signed-off-by: Radhakrishna Sripada <radhakrishna.sripada(a)intel.com>
->
-> hmm do you have a before/after kind of thing?
-> (your description is a bit cryptic in that sense)
->
-> also of course this code isn't used for Intel cpus normally...
->
->
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
->
+-----Original Message-----
+From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of Stewar=
+t Smith
+Sent: Thursday, November 26, 2015 4:07 PM
+To: powertop(a)lists.01.org
+Cc: svaidy(a)linux.vnet.ibm.com
+Subject: [Powertop] [PATCH 0/2] powerpc powernv platform support
 
-Does anyone from the ARM community have an issue with this patch?
+Hi!
 
-RD,
-Please re-send your patch with a more clear description on what the =
+These two patches get powertop to work on current powernv machines.
 
-patch fixes.  like you do in this message.
+These are POWER8 based systems from IBM (and others) running OPAL firmware.
 
--- =
+The first patch correctly parses /proc/cpuinfo so information about process=
+ors and pstates is displayed (at all).
 
-Thank you,
-<Alexandra>
+The second uses the existing userspace interface for getting power consumpt=
+ion.
 
---===============7869180323942821479==--
+Stewart Smith (2):
+  cpu: support powerpc /proc/cpuinfo
+  Add support for power consumption sensors through opal-sensors sysfs
+
+ src/Makefile.am                  |  2 ++
+ src/cpu/cpu.cpp                  | 20 ++++++----------
+ src/measurement/measurement.cpp  | 14 +++++++++++  src/measurement/opal-se=
+nsors.cpp | 50 ++++++++++++++++++++++++++++++++++++++++
+ src/measurement/opal-sensors.h   | 41 ++++++++++++++++++++++++++++++++
+ 5 files changed, 114 insertions(+), 13 deletions(-)  create mode 100644 sr=
+c/measurement/opal-sensors.cpp  create mode 100644 src/measurement/opal-sen=
+sors.h
+
+--
+2.1.4
+
+_______________________________________________
+PowerTop mailing list
+PowerTop(a)lists.01.org
+https://lists.01.org/mailman/listinfo/powertop
+
+--===============4910924120748163058==--
 
