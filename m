@@ -1,54 +1,50 @@
-Content-Type: multipart/mixed; boundary="===============6828649681972102252=="
+Content-Type: multipart/mixed; boundary="===============6752276855868691295=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: Re: [Powertop] Powertop crashes with 'powertop --auto-tune'
-Date: Sun, 21 Dec 2014 21:25:40 +0000
-Message-ID: <CAG27Bk1Y+S=yakWkiResNsrSeJf=g9HfsqEP5E---tamhnqH-A@mail.gmail.com>
-In-Reply-To: 54971B20.6020708@gmx.de
+From: George Barrett <bob at bob131.so>
+Subject: [Powertop] Fwd: Suggested tunables addition: sysctl
+ kernel.core_pattern
+Date: Sat, 02 Jan 2016 21:00:57 +1100
+Message-ID: <1451728857.27353.1@mail.bob131.so>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6828649681972102252==
+--===============6752276855868691295==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 21 December 2014 at 19:10, Harvey <harv(a)gmx.de> wrote:
-> Hope I am right here:
->
-> On Archlinux 64bit as well as 32bit systems powertop 2.7 crashes
-> reproducible like this when called with the parameter --auto-tune:
+Hi, first off thanks for the great tool!
 
-Hi Harvey,
+I currently rely on a systemd unit file present in the Fedora package =
 
-Rather strange. I have up to date archlinux and the same does not
-happen when I run --auto-tune.
+for powertop to do most of my laptop's power saving config on boot, and =
 
-I'm just a hobbyist contributor and I haven't cracked out how to know
-where in code 'double free or corruption (!prev): 0x0975bc20' issue
-happen. Could you compile the tool with debugging symbols, and
-recreate issue the way we could see backtrace? That would make fixing
-a lot easier.
+it works great. However, I've noticed a missing tunable which might be =
 
-cd /tmp
-wget https://01.org/sites/default/files/downloads/powertop/powertop-2.7.tar=
-.gz
-tar xzf powertop-2.7.tar.gz
-cd powertop-2.7
-CXXLAGS=3D"-O0 -g -ggdb -fno-omit-frame-pointer" ./configure
-make -j3
-sudo -i
-cd /tmp/powertop-2.7
-./src/powertop --auto-tune
-[crash]
-coredumpctl gdb
-(gdb) bt full
-<copy paste this output to reply>
+helpful for some folks: setting the kernel.core_pattern sysctl =
 
--- =
+parameter to |/dev/null or similar. On my x220, this parameter set to =
 
-Sami Kerola
-http://www.iki.fi/kerolasa/
+it's default causes systemd-coredump to peg a single core, sometimes =
 
---===============6828649681972102252==--
+for quite an extended period of time. On many devices this would cause =
+
+substantially greater heat output, and most importantly substantially =
+
+higher power consumption.
+
+I had a quick browse of the source code to see if this addition was =
+
+trivial enough for me to submit a patch over, but from what I could see =
+
+the existing tunables seem to work exclusively with sysfs. =
+
+Unfortunately I don't write much C++, so I apologise for sending this =
+
+particular email rather than submitting a patch for y'all.
+
+Thanks
+
+
+--===============6752276855868691295==--
 
