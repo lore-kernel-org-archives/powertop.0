@@ -1,49 +1,38 @@
-Content-Type: multipart/mixed; boundary="===============1162324414912439692=="
+Content-Type: multipart/mixed; boundary="===============7423172740676163068=="
 MIME-Version: 1.0
-From: Romain Naour <romain.naour at openwide.fr>
-Subject: [Powertop] [PATCH 1/2] add missing sys/time.h header
-Date: Sun, 20 Sep 2015 12:31:58 +0200
-Message-ID: <1442745119-680-1-git-send-email-romain.naour@openwide.fr>
+From: Magnus Fromreide <magfr at lysator.liu.se>
+Subject: Re: [Powertop] Fwd: Suggested tunables addition: sysctl
+ kernel.core_pattern
+Date: Tue, 05 Jan 2016 01:47:49 +0100
+Message-ID: <20160105004749.GA18569@noemi.bahnhof.se>
+In-Reply-To: 1451728857.27353.1@mail.bob131.so
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1162324414912439692==
+--===============7423172740676163068==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-struct timeval is defined in sys/time.h with a musl toolchain.
+On Sat, Jan 02, 2016 at 09:00:57PM +1100, George Barrett wrote:
+> Hi, first off thanks for the great tool!
+> =
 
-Fixes:
-In file included from devices/devfreq.cpp:35:0:
-devices/devfreq.h:35:18: error: field =E2=80=98stamp_before=E2=80=99 has in=
-complete type =E2=80=98timeval=E2=80=99
-  struct timeval  stamp_before, stamp_after;
+> I currently rely on a systemd unit file present in the Fedora package for
+> powertop to do most of my laptop's power saving config on boot, and it wo=
+rks
+> great. However, I've noticed a missing tunable which might be helpful for
+> some folks: setting the kernel.core_pattern sysctl parameter to |/dev/null
+> or similar. On my x220, this parameter set to it's default causes
+> systemd-coredump to peg a single core, sometimes for quite an extended
+> period of time. On many devices this would cause substantially greater he=
+at
+> output, and most importantly substantially higher power consumption.
 
-Signed-off-by: Romain Naour <romain.naour(a)openwide.fr>
----
- src/devices/devfreq.h | 1 +
- 1 file changed, 1 insertion(+)
+I have to ask, why do you get enough core dumps for this to be a problem?
+Wouldn't a better solution be to fix the application that dumps core?
 
-diff --git a/src/devices/devfreq.h b/src/devices/devfreq.h
-index 16a60fb..4a8983b 100644
---- a/src/devices/devfreq.h
-+++ b/src/devices/devfreq.h
-@@ -27,6 +27,7 @@
- =
+/MF
 
- #include "device.h"
- #include "../parameters/parameters.h"
-+#include <sys/time.h>
- =
-
- struct frequency;
- =
-
--- =
-
-2.4.3
-
-
---===============1162324414912439692==--
+--===============7423172740676163068==--
 
