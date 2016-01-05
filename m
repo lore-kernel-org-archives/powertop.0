@@ -1,34 +1,28 @@
-Content-Type: multipart/mixed; boundary="===============0672611890564466089=="
+Content-Type: multipart/mixed; boundary="===============3661584991598000362=="
 MIME-Version: 1.0
-From: Magnus Fromreide <magfr at lysator.liu.se>
-Subject: Re: [Powertop] Completion of error handling
-Date: Sat, 01 Nov 2014 11:52:51 +0100
-Message-ID: <20141101105251.GA31366@sara.bahnhof.se>
-In-Reply-To: 5454A279.80104@users.sourceforge.net
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] Fwd: Suggested tunables addition: sysctl
+ kernel.core_pattern
+Date: Mon, 04 Jan 2016 17:11:26 -0800
+Message-ID: <568B183E.1080702@linux.intel.com>
+In-Reply-To: 1451954963.2932.0@mail.bob131.so
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0672611890564466089==
+--===============3661584991598000362==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Nov 01, 2014 at 10:06:01AM +0100, SF Markus Elfring wrote:
-> > They are both great ideas to make PowerTOP more robust.
-> =
+On 1/4/2016 4:49 PM, George Barrett wrote:
+> I primarily use my laptop for hacking on my own little projects, so this =
+occurs fairly frequently
 
-> Would it be acceptable to integrate a tool like "AspectC++" into the build
-> process for your software?
-> http://aspectc.org/
+hmm but wouldn't you WANT the core dumps?
 
-I think it would be a severe mistake - even if AspectC++ is an excellent to=
-ol
-it is a tool that almost nobody (well, save for you) knows about and so I
-would say it adds a big cost to contributing to the project.
+(I know I do ;-) )
 
-So, why would you want it? Convince us!
 
-/MF
 
---===============0672611890564466089==--
+--===============3661584991598000362==--
 
