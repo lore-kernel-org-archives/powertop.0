@@ -1,102 +1,54 @@
-Content-Type: multipart/mixed; boundary="===============6572336363854135416=="
+Content-Type: multipart/mixed; boundary="===============6260076950279778734=="
 MIME-Version: 1.0
-From: David E. Box <david.e.box at linux.intel.com>
-Subject: [Powertop] [PATCH V2] Fix Powertop support for Intel Braswell SOC
-Date: Thu, 02 Apr 2015 21:24:29 -0700
-Message-ID: <1428035069-310-1-git-send-email-david.e.box@linux.intel.com>
-In-Reply-To: 55034617.5040507@linux.intel.com
+From: Yaroslav Isakov <yaroslav.isakov at gmail.com>
+Subject: [Powertop] [PATCH 2/2] Fixed bug when all PCI devices usage is shown
+ as 00%
+Date: Mon, 22 Feb 2016 17:27:42 +0300
+Message-ID: <CADS+iDVzfppVyeV=SN8H4NfyLV48wxx53SoHneKc+YNc7OUeZA@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6572336363854135416==
+--===============6260076950279778734==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Correct Braswell MSR used to determine PC6 residency.
+ src/devices/runtime_pm.cpp | 1 +
+ 1 file changed, 1 insertion(+)
 
-Signed-off-by: David E. Box <david.e.box(a)linux.intel.com>
----
+diff --git a/src/devices/runtime_pm.cpp b/src/devices/runtime_pm.cpp
+index ccfd945..f387b21 100644
+--- a/src/devices/runtime_pm.cpp
++++ b/src/devices/runtime_pm.cpp
+@@ -194,6 +194,7 @@ static void do_bus(const char *bus)
+         if (entry->d_name[0] =3D=3D '.')
+             continue;
 
-V2: Add missing whitespace between '=3D' in assignment statement
++        snprintf(filename, PATH_MAX, "/sys/bus/%s/devices/%s", bus,
+entry->d_name);
+         dev =3D new class runtime_pmdevice(entry->d_name, filename);
 
- src/cpu/intel_cpus.cpp | 21 +++++++++++++++++++--
- src/cpu/intel_cpus.h   |  1 +
- 2 files changed, 20 insertions(+), 2 deletions(-)
+         if (strcmp(bus, "i2c") =3D=3D 0) {
 
-diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
-index 72ecd50..02b420e 100644
---- a/src/cpu/intel_cpus.cpp
-+++ b/src/cpu/intel_cpus.cpp
-@@ -289,6 +289,7 @@ nhm_package::nhm_package(int model)
- 	has_c8c9c10_res =3D 0;
- 	has_c2c6_res =3D 0;
- 	has_c7_res =3D 0;
-+	has_c6c_res =3D 0;
- =
+--===============6260076950279778734==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
- 	switch(model) {
- 		case 0x2A:	/* SNB */
-@@ -314,6 +315,9 @@ nhm_package::nhm_package(int model)
- 		else
- 			has_c7_res =3D 0;
- 	}
-+	/* BSW only exposes package C6 */
-+	else if (model =3D=3D 0x4C)
-+		has_c6c_res =3D 1;
- 	else
- 		has_c3_res =3D 1;
- =
+PGRpdiBkaXI9Imx0ciI+wqBzcmMvZGV2aWNlcy9ydW50aW1lX3BtLmNwcCB8IDEgKzxicj7CoDEg
+ZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKTxicj48YnI+ZGlmZiAtLWdpdCBhL3NyYy9kZXZp
+Y2VzL3J1bnRpbWVfcG0uY3BwIGIvc3JjL2RldmljZXMvcnVudGltZV9wbS5jcHA8YnI+aW5kZXgg
+Y2NmZDk0NS4uZjM4N2IyMSAxMDA2NDQ8YnI+LS0tIGEvc3JjL2RldmljZXMvcnVudGltZV9wbS5j
+cHA8YnI+KysrIGIvc3JjL2RldmljZXMvcnVudGltZV9wbS5jcHA8YnI+QEAgLTE5NCw2ICsxOTQs
+NyBAQCBzdGF0aWMgdm9pZCBkb19idXMoY29uc3QgY2hhciAqYnVzKTxicj7CoMKgwqDCoCDCoMKg
+wqAgaWYgKGVudHJ5LSZndDtkX25hbWVbMF0gPT0gJiMzOTsuJiMzOTspPGJyPsKgwqDCoMKgIMKg
+wqDCoCDCoMKgwqAgY29udGludWU7PGJyPsKgPGJyPivCoMKgwqAgwqDCoMKgIHNucHJpbnRmKGZp
+bGVuYW1lLCBQQVRIX01BWCwgJnF1b3Q7L3N5cy9idXMvJXMvZGV2aWNlcy8lcyZxdW90OywgYnVz
+LCBlbnRyeS0mZ3Q7ZF9uYW1lKTs8YnI+wqDCoMKgwqAgwqDCoMKgIGRldiA9IG5ldyBjbGFzcyBy
+dW50aW1lX3BtZGV2aWNlKGVudHJ5LSZndDtkX25hbWUsIGZpbGVuYW1lKTs8YnI+wqA8YnI+wqDC
+oMKgwqAgwqDCoMKgIGlmIChzdHJjbXAoYnVzLCAmcXVvdDtpMmMmcXVvdDspID09IDApIHs8YnI+
+PGJyPjwvZGl2Pgo=
 
-@@ -360,7 +364,15 @@ void nhm_package::measurement_start(void)
- =
-
- 	if (this->has_c3_res)
- 		c3_before    =3D get_msr(number, MSR_PKG_C3_RESIDENCY);
--	c6_before    =3D get_msr(number, MSR_PKG_C6_RESIDENCY);
-+
-+	/*
-+	 * Hack for Braswell where C7 MSR is actually BSW C6
-+	 */
-+	if (this->has_c6c_res)
-+		c6_before    =3D get_msr(number, MSR_PKG_C7_RESIDENCY);
-+	else
-+		c6_before    =3D get_msr(number, MSR_PKG_C6_RESIDENCY);
-+
- 	if (this->has_c7_res)
- 		c7_before    =3D get_msr(number, MSR_PKG_C7_RESIDENCY);
- 	if (this->has_c8c9c10_res) {
-@@ -401,7 +413,12 @@ void nhm_package::measurement_end(void)
- =
-
- 	if (this->has_c3_res)
- 		c3_after    =3D get_msr(number, MSR_PKG_C3_RESIDENCY);
--	c6_after    =3D get_msr(number, MSR_PKG_C6_RESIDENCY);
-+
-+	if (this->has_c6c_res)
-+		c6_after    =3D get_msr(number, MSR_PKG_C7_RESIDENCY);
-+	else
-+		c6_after    =3D get_msr(number, MSR_PKG_C6_RESIDENCY);
-+
- 	if (this->has_c7_res)
- 		c7_after    =3D get_msr(number, MSR_PKG_C7_RESIDENCY);
- 	if (has_c8c9c10_res) {
-diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
-index 810a243..0331069 100644
---- a/src/cpu/intel_cpus.h
-+++ b/src/cpu/intel_cpus.h
-@@ -77,6 +77,7 @@ public:
- 	int		has_c7_res;
- 	int		has_c2c6_res;
- 	int		has_c3_res;
-+	int		has_c6c_res;		/* BSW */
- 	int		has_c8c9c10_res;
- 	nhm_package(int model);
- 	virtual void	measurement_start(void);
--- =
-
-1.9.1
-
-
---===============6572336363854135416==--
+--===============6260076950279778734==--
 
