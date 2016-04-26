@@ -1,106 +1,72 @@
-Content-Type: multipart/mixed; boundary="===============2016460477861826494=="
+Content-Type: multipart/mixed; boundary="===============3692865781244271652=="
 MIME-Version: 1.0
-From: Sami Kerola <kerolasa at iki.fi>
-Subject: [Powertop] [PATCH v2 06/14] powertop.m4: GCC_FORTIFY_SOURCE_CC copy
- idea of macro from Archlinux pacman
-Date: Sun, 09 Nov 2014 13:14:23 +0000
-Message-ID: <1415538871-11411-7-git-send-email-sami.kerola@lastminute.com>
-In-Reply-To: 1415538871-11411-1-git-send-email-sami.kerola@lastminute.com
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: Re: [Powertop] [Bug] Unknown op {
+Date: Tue, 26 Apr 2016 14:21:20 -0700
+Message-ID: <20160426212120.GA21326@jbkonno-anise.jf.intel.com>
+In-Reply-To: CAH1MQxy0W88qVkh3zfqmrJbYaBAphZq3SDGoi5Wkcb8uNKdKrQ@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2016460477861826494==
+--===============3692865781244271652==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Sami Kerola <kerolasa(a)iki.fi>
+Hi Ciprian,
 
-The powertop.m4 is a collection file for autoconf m4 helper macros, such
-as GCC_FORTIFY_SOURCE_CC.  The macro in case will define feature
-_FORTIFY_SOURCE=3D2 when it is possible, instead of trying to enable when
-it will not work, such as at times when optimization is turned off.
+Nope, you didn't miss anything. That's a bug. If you feel so inclined,
+feel free to file a bug on our bugzilla (doesn't have to be elaborate).
 
-Signed-off-by: Sami Kerola <kerolasa(a)iki.fi>
----
- configure.ac                |  2 ++
- m4/gcc_fortify_source_cc.m4 | 29 +++++++++++++++++++++++++++++
- src/Makefile.am             |  1 -
- 3 files changed, 31 insertions(+), 1 deletion(-)
- create mode 100644 m4/gcc_fortify_source_cc.m4
+https://app.devzing.com/powertopbugs/bugzilla/
 
-diff --git a/configure.ac b/configure.ac
-index 94ec789..c723347 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -34,6 +34,7 @@ AC_PROG_LIBTOOL
- AC_PROG_CC
- AC_PROG_INSTALL
- AM_PROG_CC_C_O
-+GCC_FORTIFY_SOURCE_CC
- =
+Cheers, hth
 
- # Checks for libraries.
- AX_PTHREAD([
-@@ -145,4 +146,5 @@ AC_SEARCH_LIBS([inet_aton], [resolv], [], [
- 	AC_MSG_ERROR([libresolv is required but was not found])
- ], [])
- =
+On Wed, Mar 30, 2016 at 04:04:40AM +0100, Ciprian Tomoiaga wrote:
+> Hi,
+> =
 
-+
- AC_OUTPUT
-diff --git a/m4/gcc_fortify_source_cc.m4 b/m4/gcc_fortify_source_cc.m4
-new file mode 100644
-index 0000000..1206672
---- /dev/null
-+++ b/m4/gcc_fortify_source_cc.m4
-@@ -0,0 +1,29 @@
-+dnl GCC_FORTIFY_SOURCE_CC
-+dnl checks -D_FORTIFY_SOURCE with the C++ compiler, if it exists then
-+dnl updates CXXCPP
-+AC_DEFUN([GCC_FORTIFY_SOURCE_CC],[
-+  AC_LANG_ASSERT([C++])
-+  AS_IF([test "X$CXX" !=3D "X"], [
-+    AC_MSG_CHECKING([for FORTIFY_SOURCE support])
-+    fs_old_cxxcpp=3D"$CXXCPP"
-+    fs_old_cxxflags=3D"$CXXFLAGS"
-+    CXXCPP=3D"$CXXCPP -D_FORTIFY_SOURCE=3D2"
-+    CXXFLAGS=3D"$CXXFLAGS -Werror"
-+    AC_COMPILE_IFELSE([
-+      AC_LANG_PROGRAM([[]], [[
-+        int main(void) {
-+        #if !(__GNUC_PREREQ (4, 1) )
-+        #error No FORTIFY_SOURCE support
-+        #endif
-+          return 0;
-+        }
-+      ]], [
-+        AC_MSG_RESULT([yes])
-+      ], [
-+        AC_MSG_RESULT([no])
-+        CXXCPP=3D"$fs_old_cxxcpp"
-+      ])
-+    ])
-+    CXXFLAGS=3D"$fs_old_cxxflags"
-+  ])
-+])
-diff --git a/src/Makefile.am b/src/Makefile.am
-index d2f1da7..0bccdb4 100644
---- a/src/Makefile.am
-+++ b/src/Makefile.am
-@@ -135,7 +135,6 @@ powertop_CXXFLAGS =3D \
- =
+> When running powertop --configure for the first time, I saw this error on
+> the output:
+> Calibrating idle
+> System is not available
+>   unknown op '{'
+> System is not available
+> Calibrating: disk usage
+> =
 
- powertop_CPPFLAGS =3D \
- 	-DLOCALEDIR=3D\"$(localedir)\" \
--	-D_FORTIFY_SOURCE=3D2 \
- 	$(GLIB2_CFLAGS) \
- 	$(LIBNL_CFLAGS) \
- 	$(LIBZ_CFLAGS) \
--- =
+> The configuration continued though until completion.
+> Did I miss anything?
+> =
 
-2.1.3
+> Regards,
+> Ciprian
+> -------------- next part --------------
+> An HTML attachment was scrubbed...
+> URL: <http://lists.01.org/pipermail/powertop/attachments/20160330/a3341ae=
+e/attachment.html>
 
+--===============3692865781244271652==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="signature.asc"
 
---===============2016460477861826494==--
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjIKCmlRSWNCQUVC
+Q0FBR0JRSlhIOXZJQUFvSkVJMklSOVV2U3FwbVZmUVAvMzRWbWZkc29hczg5VVUzRFg3dFI5V1gK
+aGpHTUdyUnc1L1NsaDNLQ05PNDhxWU5JS0thRGFVcUZ5bHBCOHdjZy9yZDVURjdkVjlPSHd6VHNS
+NFlFRzM0dQpOQmdqQzZaSHhUNWJYZVFJQlB4U2tWN0dBZTlialhscWtERW1vdmJ0QkNreXhuT0VS
+RWMwaUdONGt1dTEwckxICnNCSTVyOHlKb2hnOG9aR3pyRmhSZ0dYemlCYmQyNFdBaW1oNUVhR25I
+d042U3pkS2dtVk8yNEdxV0hsU0NOSlAKUTc5Z2hHVS9acktNVUVpbmRnT01md25KQUVVclQ5WnRa
+T1RXS3J0a2ZmdmFwNnF2c05xUjlBUkdPUlhTN3c4MApSUkZuaVhxNlNNcmdvYWtRUHlLbkFJZVBz
+TVFMM09hQkJMWDJHK0k2N1dxQUVJQUFlTmp6c1k1YTF3aXJjZlpDCmo0MWk2ZVlvTitxN0xoQnJq
+WGZ2cDhwQXE1MWU1OEc2emFoTi9hNGx6R29qNW0xRDVKR2NHWVgxVkNWbzR5T2cKNFdLV09UQWs5
+RmF6bUlZTUVZS1VVWUNPQytyb0pESTYyOXFiYnBKOE5tR242L3JON3E0bm1WUEJlcDR0SmhvZgpv
+Q29yUDVZcVBtejA4cHE1RmE0S1pQeC9KOGk3Q1p6alFvZVFnKy9NaWsyZ29ldVp0Q3JVQlVmanhQ
+ZmkzamlZCjVhVk14Y1piTGJQWTVDOGhobFBCNkh0bVBTT1ArcGZFb3AvMG5zdUhLcEZGM3Y4eWZE
+RkdxcEQweHlCdXRvODEKRGx0ZGxqbXY5S25sVGdsSFJTOWNiWGpVN3BmNWNGTHFzUmE1NThYY1NH
+Nk9TMjF6cDA5ZUtVcVE3czBJcTNBeQpFQjBXWTJoc1NUY1ZrYmNOQWxUcQo9SWIwUgotLS0tLUVO
+RCBQR1AgU0lHTkFUVVJFLS0tLS0K
+
+--===============3692865781244271652==--
 
