@@ -1,56 +1,76 @@
-Content-Type: multipart/mixed; boundary="===============7236539825137512985=="
+Content-Type: multipart/mixed; boundary="===============1349752331921177895=="
 MIME-Version: 1.0
-From: Ross Burton <ross at burtonini.com>
-Subject: [Powertop] [PATCH] tuningsysfs: use med_power_with_dipm for SATA link
- power management
-Date: Tue, 25 Feb 2020 17:06:16 +0000
-Message-ID: <20200225170616.37648-1-ross@burtonini.com>
+From: Swaminathan, Nivedita <nivedita.swaminathan at intel.com>
+Subject: Re: [Powertop] [PATCH] Throw error message when system cmd
+ returns	Non-zero value.
+Date: Fri, 29 Apr 2016 16:21:09 +0000
+Message-ID: <203C9A218350B94EAF34403F81F162AE198D45FB@ORSMSX116.amr.corp.intel.com>
+In-Reply-To: 1461938712-1162-1-git-send-email-xiechj@mail2.sysu.edu.cn
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7236539825137512985==
+--===============1349752331921177895==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Ross Burton <ross.burton(a)intel.com>
+Thank you for sending your patch. Your patch has been added to the github r=
+epository.
 
-Instead of using min_power, which has reports of data corruption, use
-med_power_with_dipm (Device Interface Power Management) available since 4.1=
-5.
+Regards,
+Nivedita
 
-This has the same behaviour as the Windows IRST driver so both power usage =
-and
-stability should be improved.
+> -----Original Message-----
+> From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of
+> xiechj(a)mail2.sysu.edu.cn
+> Sent: Friday, April 29, 2016 7:05 AM
+> To: powertop(a)lists.01.org
+> Subject: [Powertop] [PATCH] Throw error message when system cmd returns
+> Non-zero value.
+> =
 
-See https://lore.kernel.org/patchwork/patch/830838/ for more context.
+> From: Madper Xie <madper.xie(a)canonical.com>
+> =
 
-Signed-off-by: Ross Burton <ross.burton(a)intel.com>
----
- src/tuning/tuningsysfs.cpp | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> hciconfig returns 0 when succeed.
+> Signed-off-by: Madper Xie <madper.xie(a)canonical.com>
+> ---
+>  src/tuning/bluetooth.cpp | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> =
 
-diff --git a/src/tuning/tuningsysfs.cpp b/src/tuning/tuningsysfs.cpp
-index 954f52e..631e9fd 100644
---- a/src/tuning/tuningsysfs.cpp
-+++ b/src/tuning/tuningsysfs.cpp
-@@ -121,7 +121,7 @@ static void add_sata_tunables_callback(const char *d_na=
-me)
- =
+> diff --git a/src/tuning/bluetooth.cpp b/src/tuning/bluetooth.cpp index
+> dab46d7..2958849 100644
+> --- a/src/tuning/bluetooth.cpp
+> +++ b/src/tuning/bluetooth.cpp
+> @@ -176,11 +176,11 @@ void bt_tunable::toggle(void)
+>  	good =3D good_bad();
+> =
 
- 	snprintf(filename, sizeof(filename), "/sys/class/scsi_host/%s/link_power_=
-management_policy", d_name);
- 	snprintf(msg, sizeof(msg), _("Enable SATA link power management for %s"),=
- d_name);
--	add_sysfs_tunable(msg, filename,"min_power");
-+	add_sysfs_tunable(msg, filename, "med_power_with_dipm");
- }
- =
+>  	if (good =3D=3D TUNE_GOOD) {
+> -		if(!system("/usr/sbin/hciconfig hci0 up &> /dev/null &"))
+> +		if(system("/usr/sbin/hciconfig hci0 up &> /dev/null &"))
+>  			printf("System is not available\n");
+>  		return;
+>  	}
+> -	if(!system("/usr/sbin/hciconfig hci0 down &> /dev/null"))
+> +	if(system("/usr/sbin/hciconfig hci0 down &> /dev/null"))
+>  		printf("System is not available\n");
+>  }
+> =
 
- void add_sata_tunables(void)
--- =
+> --
+> 2.7.4
+> =
 
-2.25.1
+> =
 
---===============7236539825137512985==--
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+
+--===============1349752331921177895==--
 
