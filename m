@@ -1,31 +1,52 @@
-Content-Type: multipart/mixed; boundary="===============6940279491543385430=="
+Content-Type: multipart/mixed; boundary="===============3849589757507089057=="
 MIME-Version: 1.0
-From: SF Markus Elfring <elfring at users.sourceforge.net>
-Subject: Re: [Powertop] Completion of error handling
-Date: Fri, 31 Oct 2014 08:08:29 +0100
-Message-ID: <5453356D.8060201@users.sourceforge.net>
-In-Reply-To: 63367.10.255.85.192.1414719876.squirrel@linux.intel.com
+From: xiechj at mail2.sysu.edu.cn
+Subject: [Powertop] [PATCH] Throw error message when system cmd returns
+ Non-zero value.
+Date: Fri, 29 Apr 2016 22:05:12 +0800
+Message-ID: <1461938712-1162-1-git-send-email-xiechj@mail2.sysu.edu.cn>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6940279491543385430==
+--===============3849589757507089057==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-> This is a good idea,  please send your patches with the fixes.
+From: Madper Xie <madper.xie(a)canonical.com>
 
-I suggest to avoid ignorance of return values a bit more.
-https://cwe.mitre.org/data/definitions/252
+hciconfig returns 0 when succeed.
+Signed-off-by: Madper Xie <madper.xie(a)canonical.com>
+---
+ src/tuning/bluetooth.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Are you interested to apply aspect-oriented software development?
-How do you think about to encapsulate error detection and corresponding
-exception handling as a reusable aspect in your software?
-https://en.wikipedia.org/wiki/Aspect_%28computer_programming%29
+diff --git a/src/tuning/bluetooth.cpp b/src/tuning/bluetooth.cpp
+index dab46d7..2958849 100644
+--- a/src/tuning/bluetooth.cpp
++++ b/src/tuning/bluetooth.cpp
+@@ -176,11 +176,11 @@ void bt_tunable::toggle(void)
+ 	good =3D good_bad();
+ =
 
-Regards,
-Markus
+ 	if (good =3D=3D TUNE_GOOD) {
+-		if(!system("/usr/sbin/hciconfig hci0 up &> /dev/null &"))
++		if(system("/usr/sbin/hciconfig hci0 up &> /dev/null &"))
+ 			printf("System is not available\n");
+ 		return;
+ 	}
+-	if(!system("/usr/sbin/hciconfig hci0 down &> /dev/null"))
++	if(system("/usr/sbin/hciconfig hci0 down &> /dev/null"))
+ 		printf("System is not available\n");
+ }
+ =
+
+-- =
+
+2.7.4
 
 
---===============6940279491543385430==--
+
+
+--===============3849589757507089057==--
 
