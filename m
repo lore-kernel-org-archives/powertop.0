@@ -1,39 +1,135 @@
-Content-Type: multipart/mixed; boundary="===============6049308639334777986=="
+Content-Type: multipart/mixed; boundary="===============3776684918616716925=="
 MIME-Version: 1.0
-From: Auke Kok <auke-jan.h.kok at intel.com>
-Subject: Re: [Powertop] RH Bugzilla [Bug 1482649] Logitech USB Unified
- Receiver+M570 need 'waking' up by click after kernel update
-Date: Thu, 07 Sep 2017 13:11:29 -0700
-Message-ID: <b92fbbf0-72c3-d380-8f99-5d4ee96f129d@intel.com>
-In-Reply-To: VI1PR0301MB2510765FF1A9FBAE0EDEFDFD87940@VI1PR0301MB2510.eurprd03.prod.outlook.com
+From: Daniel Black <daniel.black at au1.ibm.com>
+Subject: [Powertop] [PATCH] Update OPAL power management to handle different
+ paths
+Date: Mon, 23 May 2016 12:55:57 +1000
+Message-ID: <2a641f00-5ec1-b11b-8a63-58e87021701c@au.ibm.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6049308639334777986==
+--===============3776684918616716925==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 09/07/2017 11:09 AM, Mike Simms wrote:
-> Then explain why it was never an issue before kernel 4.12 please
 
-I can only take a guess, based on the info you provided, most
-importantly I lack the hardware that you have.
+$ ls -lad /sys/devices/platform/opal-sensor/hwmon/*/power*
+drwxr-xr-x 2 root root     0 May 23 10:16
+/sys/devices/platform/opal-sensor/hwmon/hwmon4/power
+-r--r--r-- 1 root root 65536 May 23 10:16
+/sys/devices/platform/opal-sensor/hwmon/hwmon4/power1_input
 
-Joe's comments are obviously important - there may be several points of
-failure. The one that I spotted, is this one:
 
->>> powertop is using the autotune profile and the usb autosuspend
->>> entry is Good.
+$ cat /sys/devices/platform/opal-sensor/hwmon/hwmon4/power1_input
+566000000
 
-Turn it to "Bad" and see if it resolves the problem.
+There patches allow any
+/sys/devices/platform/opal-sensor/hwmon/hwmon*/power* file to be
+detected as a measurement sysfs entry excluding directories.
 
-I am wondering if powertop autotuning was recently turned on in your
-distro, and the trackpoint isn't properly blacklisted as a device that
-shouldn't be put into usb autosuspend (if that is actually a thing in
-code, it's been a while since I last worked on it).
 
-Auke
+--===============3776684918616716925==
+Content-Type: text/x-patch
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="0001-Add-process_glob-similar-to-process_directory.patch"
 
---===============6049308639334777986==--
+PkZyb20gODcxYmZhNWZmODEwN2JkNDg5NmU4YTQwYTI0MTYxZGRjMjAyNWE4NSBNb24gU2VwIDE3
+IDAwOjAwOjAwIDIwMDEKRnJvbTogRGFuaWVsIEJsYWNrIDxkYW5pZWwuYmxhY2tAYXUxLmlibS5j
+b20+CkRhdGU6IE1vbiwgMjMgTWF5IDIwMTYgMTE6Mzk6MTEgKzEwMDAKU3ViamVjdDogW1BBVENI
+IDEvMl0gQWRkIHByb2Nlc3NfZ2xvYiBzaW1pbGFyIHRvIHByb2Nlc3NfZGlyZWN0b3J5LgoKVGhp
+cyBlbmFibGVzIGEgZ2xvYiB0byBiZSBzcGVjaWZpZWQgdG8gZ3JhYiBzeXNmcyBmaWxlcyBpbgpz
+dWJkaXJlY3RvcmllcyBmb3Igc2V0dGluZyB1cCBtZWFzdXJlbWVudCBvciBhbnl0aGluZyBlbHNl
+CnRoZSBjYWxsYmFjayBmdW5jdGlvbiBkb2VzLgotLS0KIHNyYy9saWIuY3BwIHwgMjcgKysrKysr
+KysrKysrKysrKysrKysrKysrKysrCiBzcmMvbGliLmggICB8ICAxICsKIDIgZmlsZXMgY2hhbmdl
+ZCwgMjggaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL3NyYy9saWIuY3BwIGIvc3JjL2xpYi5j
+cHAKaW5kZXggNTZlMTY4MS4uY2RiZDBjZCAxMDA2NDQKLS0tIGEvc3JjL2xpYi5jcHAKKysrIGIv
+c3JjL2xpYi5jcHAKQEAgLTU4LDYgKzU4LDcgQEAgZXh0ZXJuICJDIiB7CiAjaW5jbHVkZSA8bWF0
+aC5oPgogI2luY2x1ZGUgPG5jdXJzZXMuaD4KICNpbmNsdWRlIDxmY250bC5oPgorI2luY2x1ZGUg
+PGdsb2IuaD4KIAogc3RhdGljIGludCBrYWxsc3ltc19yZWFkID0gMDsKIApAQCAtNDU2LDYgKzQ1
+NywzMiBAQCB2b2lkIHByb2Nlc3NfZGlyZWN0b3J5KGNvbnN0IGNoYXIgKmRfbmFtZSwgY2FsbGJh
+Y2sgZm4pCiAJY2xvc2VkaXIoZGlyKTsKIH0KIAordm9pZCBwcm9jZXNzX2dsb2IoY29uc3QgY2hh
+ciAqZF9nbG9iLCBjYWxsYmFjayBmbikKK3sKKwlnbG9iX3QgZzsKKwlzaXplX3QgYzsKKworCXN3
+aXRjaCAoZ2xvYihkX2dsb2IsIEdMT0JfRVJSIHwgR0xPQl9NQVJLIHwgR0xPQl9OT1NPUlQsIE5V
+TEwsICZnKSkgeworCWNhc2UgR0xPQl9OT1NQQUNFOgorCQlmcHJpbnRmKHN0ZGVycixfKCJnbG9i
+IHJldHVybmVkIEdMT0JfTk9TUEFDRVxuIikpOworCQlnbG9iZnJlZSgmZyk7CisJCXJldHVybjsK
+KwljYXNlIEdMT0JfQUJPUlRFRDoKKwkJZnByaW50ZihzdGRlcnIsXygiZ2xvYiByZXR1cm5lZCBH
+TE9CX0FCT1JURURcbiIpKTsKKwkJZ2xvYmZyZWUoJmcpOworCQlyZXR1cm47CisJY2FzZSBHTE9C
+X05PTUFUQ0g6CisJCWZwcmludGYoc3RkZXJyLF8oImdsb2IgcmV0dXJuZWQgR0xPQl9OT01BVENI
+XG4iKSk7CisJCWdsb2JmcmVlKCZnKTsKKwkJcmV0dXJuOworCX0KKworCWZvciAoYz0wOyBjIDwg
+Zy5nbF9wYXRoYzsgYysrKSB7CisJCWZuKGcuZ2xfcGF0aHZbY10pOworCX0KKwlnbG9iZnJlZSgm
+Zyk7Cit9CisKIGludCBnZXRfdXNlcl9pbnB1dChjaGFyICpidWYsIHVuc2lnbmVkIHN6KQogewog
+CWZmbHVzaChzdGRvdXQpOwpkaWZmIC0tZ2l0IGEvc3JjL2xpYi5oIGIvc3JjL2xpYi5oCmluZGV4
+IDYzMTY1OTAuLmMzMzI0ZWYgMTAwNjQ0Ci0tLSBhL3NyYy9saWIuaAorKysgYi9zcmMvbGliLmgK
+QEAgLTg0LDYgKzg0LDcgQEAgdGVtcGxhdGU8c2l6ZV90IE4+IHZvaWQgcHRfc3RyY3B5KGNoYXIg
+KCZkKVtOXSwgY29uc3QgY2hhciAqcykKIAogdHlwZWRlZiB2b2lkICgqY2FsbGJhY2spKGNvbnN0
+IGNoYXIqKTsKIGV4dGVybiB2b2lkIHByb2Nlc3NfZGlyZWN0b3J5KGNvbnN0IGNoYXIgKmRfbmFt
+ZSwgY2FsbGJhY2sgZm4pOworZXh0ZXJuIHZvaWQgcHJvY2Vzc19nbG9iKGNvbnN0IGNoYXIgKmds
+b2IsIGNhbGxiYWNrIGZuKTsKIGV4dGVybiBpbnQgdXRmX29rOwogZXh0ZXJuIGludCBnZXRfdXNl
+cl9pbnB1dChjaGFyICpidWYsIHVuc2lnbmVkIHN6KTsKIGV4dGVybiBpbnQgcmVhZF9tc3IoaW50
+IGNwdSwgdWludDY0X3Qgb2Zmc2V0LCB1aW50NjRfdCAqdmFsdWUpOwotLSAKMi43LjQKCgo=
+
+--===============3776684918616716925==
+Content-Type: text/x-patch
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="0002-Widen-ppc64-paths-for-sysfs-file.patch"
+
+PkZyb20gMDI0YzIzYTk3MDM2NTJhYTI0OTgyNTFkMDcxNDQ2NWE1NTcyZmEzZCBNb24gU2VwIDE3
+IDAwOjAwOjAwIDIwMDEKRnJvbTogRGFuaWVsIEJsYWNrIDxkYW5pZWwuYmxhY2tAYXUxLmlibS5j
+b20+CkRhdGU6IE1vbiwgMjMgTWF5IDIwMTYgMTE6NDE6NTYgKzEwMDAKU3ViamVjdDogW1BBVENI
+IDIvMl0gV2lkZW4gcHBjNjQgcGF0aHMgZm9yIHN5c2ZzIGZpbGUKCmh3bW9uMCB3YXMgYXNzdW1l
+ZCB0byBiZSB0aGUgb25seSBod21vbiBkaXJlY3RvcnkgdXNlZCBieSBQT1dFUgpob3dldmVyIGh3
+bW9uNCB3YXMgb2JzZXJ2ZXJlZCBvbiBkaWZmZXJlbnQgaGFyZHdhcmUuCgpIZXJlIHdlIHVzZSB0
+aGUgcHJvY2Vzc19nbG9iIGZ1bmN0aW9uIHRvIHJldHJpZXZlIGFsbCBtZWFzdXJlbWVudApsb2Nh
+dGlvbnMuCgpUaGUgb3BhbF9zZW5zb3JzX3Bvd2VyX21ldGVyIGNsYXNzIG5vdyBzdG9yZXMgdGhl
+IGZ1bGwgcGF0aC4KClNpZ25lZC1vZmYtYnk6IERhbmllbCBCbGFjayA8ZGFuaWVsLmJsYWNrQGF1
+MS5pYm0uY29tPgotLS0KIHNyYy9tZWFzdXJlbWVudC9tZWFzdXJlbWVudC5jcHAgIHwgNyArKysr
+Ky0tCiBzcmMvbWVhc3VyZW1lbnQvb3BhbC1zZW5zb3JzLmNwcCB8IDQgKy0tLQogc3JjL21lYXN1
+cmVtZW50L29wYWwtc2Vuc29ycy5oICAgfCAzICsrLQogMyBmaWxlcyBjaGFuZ2VkLCA4IGluc2Vy
+dGlvbnMoKyksIDYgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvc3JjL21lYXN1cmVtZW50L21l
+YXN1cmVtZW50LmNwcCBiL3NyYy9tZWFzdXJlbWVudC9tZWFzdXJlbWVudC5jcHAKaW5kZXggNjhj
+NDFmZS4uMWM4ZTRkYSAxMDA2NDQKLS0tIGEvc3JjL21lYXN1cmVtZW50L21lYXN1cmVtZW50LmNw
+cAorKysgYi9zcmMvbWVhc3VyZW1lbnQvbWVhc3VyZW1lbnQuY3BwCkBAIC0xMzQsOCArMTM0LDEx
+IEBAIHZvaWQgYWNwaV9wb3dlcl9tZXRlcnNfY2FsbGJhY2soY29uc3QgY2hhciAqZF9uYW1lKQog
+dm9pZCBzeXNmc19vcGFsX3NlbnNvcnNfY2FsbGJhY2soY29uc3QgY2hhciAqZF9uYW1lKQogewog
+CWNsYXNzIG9wYWxfc2Vuc29yc19wb3dlcl9tZXRlciAqbWV0ZXI7CisJY29uc3QgY2hhciAqYzsK
+IAotCWlmIChzdHJuY21wKGRfbmFtZSwgInBvd2VyIiwgNSkgIT0gMCkKKwkvKiBUaG9zZSB0aGF0
+IGVuZCBpbiAvIGFyZSBkaXJlY3RvcmllcyBhbmQgd2UgZG9uJ3Qgd2FudCB0aGVtICovCisJYyA9
+IHN0cnJjaHIoZF9uYW1lLCAnLycpOworCWlmIChjICYmICooYysxKSA9PSAnXDAnKQogCQlyZXR1
+cm47CiAKIAltZXRlciA9IG5ldyhzdGQ6Om5vdGhyb3cpIGNsYXNzIG9wYWxfc2Vuc29yc19wb3dl
+cl9tZXRlcihkX25hbWUpOwpAQCAtMTQ2LDcgKzE0OSw3IEBAIHZvaWQgc3lzZnNfb3BhbF9zZW5z
+b3JzX2NhbGxiYWNrKGNvbnN0IGNoYXIgKmRfbmFtZSkKIHZvaWQgZGV0ZWN0X3Bvd2VyX21ldGVy
+cyh2b2lkKQogewogCXByb2Nlc3NfZGlyZWN0b3J5KCIvc3lzL2NsYXNzL3Bvd2VyX3N1cHBseSIs
+IHN5c2ZzX3Bvd2VyX21ldGVyc19jYWxsYmFjayk7Ci0JcHJvY2Vzc19kaXJlY3RvcnkoIi9zeXMv
+ZGV2aWNlcy9wbGF0Zm9ybS9vcGFsLXNlbnNvci9od21vbi9od21vbjAiLCBzeXNmc19vcGFsX3Nl
+bnNvcnNfY2FsbGJhY2spOworCXByb2Nlc3NfZ2xvYigiL3N5cy9kZXZpY2VzL3BsYXRmb3JtL29w
+YWwtc2Vuc29yL2h3bW9uL2h3bW9uKi9wb3dlcioiLCBzeXNmc19vcGFsX3NlbnNvcnNfY2FsbGJh
+Y2spOwogCWlmIChwb3dlcl9tZXRlcnMuc2l6ZSgpID09IDApIHsKIAkJcHJvY2Vzc19kaXJlY3Rv
+cnkoIi9wcm9jL2FjcGkvYmF0dGVyeSIsIGFjcGlfcG93ZXJfbWV0ZXJzX2NhbGxiYWNrKTsKIAl9
+CmRpZmYgLS1naXQgYS9zcmMvbWVhc3VyZW1lbnQvb3BhbC1zZW5zb3JzLmNwcCBiL3NyYy9tZWFz
+dXJlbWVudC9vcGFsLXNlbnNvcnMuY3BwCmluZGV4IDQxOThiNjMuLjczMTZkMWYgMTAwNjQ0Ci0t
+LSBhL3NyYy9tZWFzdXJlbWVudC9vcGFsLXNlbnNvcnMuY3BwCisrKyBiL3NyYy9tZWFzdXJlbWVu
+dC9vcGFsLXNlbnNvcnMuY3BwCkBAIC0zNiwxMyArMzYsMTEgQEAgb3BhbF9zZW5zb3JzX3Bvd2Vy
+X21ldGVyOjpvcGFsX3NlbnNvcnNfcG93ZXJfbWV0ZXIoY29uc3QgY2hhciAqcG93ZXJfc3VwcGx5
+X25hbWUKIAogZG91YmxlIG9wYWxfc2Vuc29yc19wb3dlcl9tZXRlcjo6am91bGVzX2NvbnN1bWVk
+KHZvaWQpCiB7Ci0JY2hhciBmaWxlbmFtZVtQQVRIX01BWF07CiAJYm9vbCBvazsKIAlpbnQgdmFs
+dWU7CiAJZG91YmxlIHIgPSAwOwogCi0Jc25wcmludGYoZmlsZW5hbWUsIHNpemVvZihmaWxlbmFt
+ZSksICIvc3lzL2RldmljZXMvcGxhdGZvcm0vb3BhbC1zZW5zb3IvaHdtb24vaHdtb24wLyVzIiwg
+bmFtZSk7Ci0JdmFsdWUgPSByZWFkX3N5c2ZzKGZpbGVuYW1lLCAmb2spOworCXZhbHVlID0gcmVh
+ZF9zeXNmcyhuYW1lLCAmb2spOwogCiAJaWYob2spCiAJCXIgPSB2YWx1ZSAvIDEwMDAwMDAuMDsK
+ZGlmZiAtLWdpdCBhL3NyYy9tZWFzdXJlbWVudC9vcGFsLXNlbnNvcnMuaCBiL3NyYy9tZWFzdXJl
+bWVudC9vcGFsLXNlbnNvcnMuaAppbmRleCBkOGFhNWUyLi44MzQ3NzMzIDEwMDY0NAotLS0gYS9z
+cmMvbWVhc3VyZW1lbnQvb3BhbC1zZW5zb3JzLmgKKysrIGIvc3JjL21lYXN1cmVtZW50L29wYWwt
+c2Vuc29ycy5oCkBAIC0yNiw5ICsyNiwxMCBAQAogI2RlZmluZSBJTkNMVURFX0dVQVJEX09QQUxf
+U0VOU09SU19ICiAKICNpbmNsdWRlICJtZWFzdXJlbWVudC5oIgorI2luY2x1ZGUgPGxpbWl0cy5o
+PgogCiBjbGFzcyBvcGFsX3NlbnNvcnNfcG93ZXJfbWV0ZXI6IHB1YmxpYyBwb3dlcl9tZXRlciB7
+Ci0JY2hhciBuYW1lWzI1Nl07CisJY2hhciBuYW1lW1BBVEhfTUFYXTsKIHB1YmxpYzoKIAlvcGFs
+X3NlbnNvcnNfcG93ZXJfbWV0ZXIoY29uc3QgY2hhciAqcG93ZXJfc3VwcGx5X25hbWUpOwogCXZp
+cnR1YWwgdm9pZCBzdGFydF9tZWFzdXJlbWVudCh2b2lkKSB7fTsKLS0gCjIuNy40CgoK
+
+--===============3776684918616716925==--
 
