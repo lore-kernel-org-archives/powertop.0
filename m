@@ -1,30 +1,35 @@
-Content-Type: multipart/mixed; boundary="===============6867403525142330438=="
+Content-Type: multipart/mixed; boundary="===============6813505137374132604=="
 MIME-Version: 1.0
-From: Swaminathan, Nivedita <nivedita.swaminathan at intel.com>
-Subject: [Powertop] PowerTOP v2.9
-Date: Fri, 10 Mar 2017 23:21:02 +0000
-Message-ID: <203C9A218350B94EAF34403F81F162AE1AF3DF91@ORSMSX116.amr.corp.intel.com>
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: [Powertop] [PATCH 0/1 v1] Have git ignore editor and tool files
+Date: Fri, 10 Jun 2016 08:26:59 -0700
+Message-ID: <20160610152700.6825-1-joe.konno@linux.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6867403525142330438==
+--===============6813505137374132604==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The downloads page for PowerTOP v2.9: https://01.org/powertop/downloads/pow=
-ertop-v2.9
-The tarball can also be downloaded from: https://github.com/fenrus75/powert=
-op/releases
+From: Joe Konno <joe.konno(a)intel.com>
 
-Thanks and regards,
+Simple patch to .gitignore which ignores files output by vim, cscope, and
+ctags.
 
-Nivedita Swaminathan
-Linux Power Management Enabling Team
-SSG-OTC
+Did a sanity check with 'git ls-files -i --exclude-standard' after applying
+this patch and no red flags raised.
+
+Joe Konno (1):
+  .gitignore: ignore vim swap, cscope, ctags
+
+ .gitignore | 3 +++
+ 1 file changed, 3 insertions(+)
+
+-- =
+
+2.8.3
 
 
-
-
---===============6867403525142330438==--
+--===============6813505137374132604==--
 
