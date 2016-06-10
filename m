@@ -1,53 +1,49 @@
-Content-Type: multipart/mixed; boundary="===============7839034589528384096=="
+Content-Type: multipart/mixed; boundary="===============3362271857307877015=="
 MIME-Version: 1.0
-From: Paul Menzel <paulepanter at users.sourceforge.net>
-Subject: [Powertop] [PATCH] cpu: Add space after comma
-Date: Fri, 30 Dec 2016 12:23:16 +0100
-Message-ID: <1483096996.3846.56.camel@users.sourceforge.net>
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: [Powertop] [PATCH 1/1 v1] .gitignore: ignore vim swap, cscope, ctags
+Date: Fri, 10 Jun 2016 08:27:00 -0700
+Message-ID: <20160610152700.6825-2-joe.konno@linux.intel.com>
+In-Reply-To: 20160610152700.6825-1-joe.konno@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7839034589528384096==
+--===============3362271857307877015==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Date: Fri, 30 Dec 2016 12:21:07 +0100
+From: Joe Konno <joe.konno(a)intel.com>
 
-Fix up commit ab7108a6 (Fixed some potentially unterminated strings) by
-adding a space after the comma.
-
-Signed-off-by: Paul Menzel <paulepanter(a)users.sourceforge.net>
+Signed-off-by: Joe Konno <joe.konno(a)intel.com>
 ---
-=C2=A0src/cpu/cpu.cpp | 2 +-
-=C2=A01 file changed, 1 insertion(+), 1 deletion(-)
+ .gitignore | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-index a801033..f3711f5 100644
---- a/src/cpu/cpu.cpp
-+++ b/src/cpu/cpu.cpp
-@@ -258,7 +258,7 @@ void enumerate_cpus(void)
-=C2=A0				c++;
-=C2=A0				if (*c =3D=3D ' ')
-=C2=A0					c++;
--				pt_strcpy(vendor,c);
-+				pt_strcpy(vendor, c);
-=C2=A0			}
-=C2=A0		}
-=C2=A0		if (strncmp(line, "processor\t",10) =3D=3D 0) {
---=C2=A0
-2.11.0
+diff --git a/.gitignore b/.gitignore
+index f879840d9057..de3c3b1670cf 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -9,7 +9,9 @@
+ *.powertop
+ *~
+ .deps
++.*.swp
+ /po/*.gmo
++cscope.*
+ Makefile
+ Makefile.in
+ =
 
---===============7839034589528384096==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
+@@ -84,3 +86,4 @@ Makefile.in
+ /src/powertop
+ /stamp-h1
+ /stamp-po
++tags
+-- =
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KCmlGMEVBQkVDQUIwV0lRUTgrdzlkNDE0RkFW
-QVJJcGs5ZlZvcmJBNGRXQVVDV0daRHBBQUtDUkE5ZlZvcmJBNGQKV09QUUFKOUIySHZZckVLY2Zs
-UWxtKzZzOVNkV1FWWDdzQUNmVzNwdURrbFBQVjd4VmJiT0E1RVBwSkRSZHlJPQo9RWFWOAotLS0t
-LUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
+2.8.3
 
---===============7839034589528384096==--
+
+--===============3362271857307877015==--
 
