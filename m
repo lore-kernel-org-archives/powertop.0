@@ -1,81 +1,69 @@
-Content-Type: multipart/mixed; boundary="===============5045969986758801763=="
+Content-Type: multipart/mixed; boundary="===============2835751693924346201=="
 MIME-Version: 1.0
-From: Nils Kaiser <mail at nils-kaiser.de>
-Subject: Re: [Powertop] Wrong discharge rate on HP Zbook Studio G5
-Date: Mon, 24 Jun 2019 16:20:14 +0000
-Message-ID: <CAA6E4vNOzw97g_hG2-=ZWQdp3RpeOv-1cj3vuRL34Ze=+Lmzsg@mail.gmail.com>
-In-Reply-To: CAA6E4vNacTOiydWr6ta=DHZQvbSftKTLuoPRRvHORk6d4cWfLQ@mail.gmail.com
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: Re: [Powertop] [PATCH 2/2] intel_cpus: no pstate Idle pct with
+ intel_pstate
+Date: Wed, 15 Jun 2016 07:56:25 -0700
+Message-ID: <20160615145625.GA27695@jbkonno-anise.jf.intel.com>
+In-Reply-To: 3D803AC0BEBB604B9799C45D4E4A14B7113C646C@SHSMSX103.ccr.corp.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5045969986758801763==
+--===============2835751693924346201==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi folks,
-Following up on this - is there a better way to submit an issue than the
-mailing list?
-Cheers,
-Nils
+On Wed, Jun 15, 2016 at 01:51:22AM +0000, Wang, Xiaolong wrote:
+> Hi Joe,
+> I just realized a further scenario that would be problematic with your cu=
+rrent patch:
+> once I'd read from Len Brown's post to Red Hat, that enabling HWP in inte=
+l_pstate driver is considered a mistake,
+> because enabling HWP only need to write a few msr bits, based on a few si=
+mple policies,
+> there's no need to load a whole intel_pstate driver to do that.
+> so future upstream kernel would remove that part, and HWP enabling will b=
+e put to some CPPC driver,
+> and on HWP reinforced platform, intel_pstate driver will not be loaded at=
+ all.
+> =
 
-On Wed, 5 Jun 2019 at 04:19, Nils Kaiser <mail(a)nils-kaiser.de> wrote:
+> So, if that happen, the is_intel_pstate_driver_loaded() will return false=
+, and code will go to the old path,
+> but the frequency statistics still not exist, then we got nothing.
 
-> Hi all,
->
-> When I run powertop on my HP Zbook Studio G5 laptop I get a discharge rate
-> of ~400 mW (I wish!!).
->
-> Apparently this has been reported by another HP user here:
-> https://bugs.launchpad.net/ubuntu/+source/powertop/+bug/1813496
->
-> Any info I can provide to help debugging?
->
-> Cheers,
->
-> Nils
->
+Good catch, thanks!
 
+> mmm... maybe you could use 'cpufreq statistics exists or not' to branch y=
+our code,
+>   if exist, use it; if not, calculate average freq from msrs.
+> there should have been such a function to check that condition.
 
--- =
+My thoughts exactly. I'll see about submitting a new revision of this
+series.
 
-Nils Kaiser
-
-tel / whatsapp: +49 1788079029
-skype: berlinils
-https://www.linkedin.com/in/nilskaiser/
-
---===============5045969986758801763==
-Content-Type: text/html
+--===============2835751693924346201==
+Content-Type: application/pgp-signature
 MIME-Version: 1.0
 Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+Content-Disposition: attachment; filename="signature.asc"
 
-PGRpdiBkaXI9Imx0ciI+SGkgZm9sa3MsPGRpdj5Gb2xsb3dpbmcgdXAgb24gdGhpcyAtIGlzIHRo
-ZXJlIGEgYmV0dGVyIHdheSB0byBzdWJtaXQgYW4gaXNzdWUgdGhhbiB0aGUgbWFpbGluZyBsaXN0
-PzwvZGl2PjxkaXY+Q2hlZXJzLDwvZGl2PjxkaXY+TmlsczwvZGl2PjwvZGl2Pjxicj48ZGl2IGNs
-YXNzPSJnbWFpbF9xdW90ZSI+PGRpdiBkaXI9Imx0ciIgY2xhc3M9ImdtYWlsX2F0dHIiPk9uIFdl
-ZCwgNSBKdW4gMjAxOSBhdCAwNDoxOSwgTmlscyBLYWlzZXIgJmx0OzxhIGhyZWY9Im1haWx0bzpt
-YWlsQG5pbHMta2Fpc2VyLmRlIj5tYWlsQG5pbHMta2Fpc2VyLmRlPC9hPiZndDsgd3JvdGU6PGJy
-PjwvZGl2PjxibG9ja3F1b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9Im1hcmdpbjowcHgg
-MHB4IDBweCAwLjhleDtib3JkZXItbGVmdDoxcHggc29saWQgcmdiKDIwNCwyMDQsMjA0KTtwYWRk
-aW5nLWxlZnQ6MWV4Ij48ZGl2IGRpcj0ibHRyIj5IaSBhbGwsPGRpdj48YnI+PC9kaXY+PGRpdj5X
-aGVuIEkgcnVuIHBvd2VydG9wIG9uIG15IEhQIFpib29rIFN0dWRpbyBHNSBsYXB0b3AgSSBnZXQg
-YSBkaXNjaGFyZ2UgcmF0ZSBvZiB+NDAwIG1XIChJIHdpc2ghISkuPC9kaXY+PGRpdj48YnI+PC9k
-aXY+PGRpdj5BcHBhcmVudGx5IHRoaXMgaGFzIGJlZW4gcmVwb3J0ZWQgYnkgYW5vdGhlciBIUCB1
-c2VyIGhlcmU6wqA8YSBocmVmPSJodHRwczovL2J1Z3MubGF1bmNocGFkLm5ldC91YnVudHUvK3Nv
-dXJjZS9wb3dlcnRvcC8rYnVnLzE4MTM0OTYiIHRhcmdldD0iX2JsYW5rIj5odHRwczovL2J1Z3Mu
-bGF1bmNocGFkLm5ldC91YnVudHUvK3NvdXJjZS9wb3dlcnRvcC8rYnVnLzE4MTM0OTY8L2E+PC9k
-aXY+PGRpdj48YnI+PC9kaXY+PGRpdj5BbnkgaW5mbyBJIGNhbiBwcm92aWRlIHRvIGhlbHAgZGVi
-dWdnaW5nPzwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+Q2hlZXJzLDwvZGl2PjxkaXY+PGJyPjwv
-ZGl2PjxkaXY+TmlsczwvZGl2PjwvZGl2Pgo8L2Jsb2NrcXVvdGU+PC9kaXY+PGJyIGNsZWFyPSJh
-bGwiPjxkaXY+PGJyPjwvZGl2Pi0tIDxicj48ZGl2IGRpcj0ibHRyIiBjbGFzcz0iZ21haWxfc2ln
-bmF0dXJlIj48ZGl2IGRpcj0ibHRyIj48ZGl2PjxkaXYgZGlyPSJsdHIiPjxkaXYgc3R5bGU9ImZv
-bnQtc2l6ZTpzbWFsbCI+PGRpdj5OaWxzIEthaXNlcjwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+
-dGVsIC8gd2hhdHNhcHA6ICs0OSAxNzg4MDc5MDI5PC9kaXY+PGRpdj5za3lwZTogYmVybGluaWxz
-PC9kaXY+PGRpdj48YSBocmVmPSJodHRwczovL3d3dy5saW5rZWRpbi5jb20vaW4vbmlsc2thaXNl
-ci8iIHRhcmdldD0iX2JsYW5rIj5odHRwczovL3d3dy5saW5rZWRpbi5jb20vaW4vbmlsc2thaXNl
-ci88L2E+wqA8L2Rpdj48L2Rpdj48L2Rpdj48L2Rpdj48L2Rpdj48L2Rpdj4K
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjIKCmlRSWNCQUVC
+Q0FBR0JRSlhZV3lTQUFvSkVJMklSOVV2U3FwbTl2d1FBS2E5OWFsU210eEZFakcyNUdkdjM4anUK
+eWExUERiVXhYUUZnL05ya2tJSUNBVmJ6SkFtZTJaeFNZVHR5d1ZqVkpwMU1DVDd5UndXanduVUZk
+dlExVFVROQpnd21XR0pNNXJnODMvdEdnRCtZM1psaWUxeDlIRnVmVUZ0anNNUVBCL3pZUTdjN1FE
+ZkJDb2Rjenc0WXo4M25NClFRV0ZvOEhLRlgrb2pxMHlhM2N4UlpKQTF6clJVUC9kK09VRlM4NDZR
+Y2NmQXhwQzg5bUNDSWZaTUlsY0RHdnkKQ2kvY0VPSlNNMHdlNVY0SnF5QVp6WHUreTRPd3c3OUtn
+SG9jZkpDdEJyUDA2clZ3TG5XRmJkYjJQS3JaK0F3VQpzWmdWRG41QnZXdEtLaFJZT29JaHd3L1hM
+YmlhaGlzMitxQ010RSthbDhKYjVSbWFMWDRUSWJrRzhWSnRPUTJLCmljeHl3dGhjQ2ZKWjJTaGcv
+Uk1abmhac01TUDk2Y2UzeGVtcFozRXV2Z2hzak00NVVoLzhWR1BJMFFXeUptYncKOWEzdy9QUSt3
+cjNiMk9PM245Y3RWLzdUOFJLVi9SSEZ0OE1wT0kvSk13ejl4VzdTSzI1djVsdk1KM0lIR3hXQQov
+TUFkZUoyQ0h3bklaZzAxUFdJRFQ4akJkTGNqNkpQeXZUN2taSWZseFV6RnVoMU1sUzkwSktRa1A4
+QURFT2JMCml2TndPSllvdEV4Y0VuT3V4RThZV0h2R1Rkb1dtem1maGlGNkJma0JKOEpmQ09tN0N6
+TjZJdHcvbU5HeFpGekIKKzhHU2Rtd0pVUGc3Y2U1aXZNN3Y1dzltV0lqeGdqUk1ETEhJRWNFN0JC
+M0ZKSFBQVkZycGVDekVkNEh4R01zMwpGUExMUE9KaUxreTRLQjV4aXZMOQo9cVZlagotLS0tLUVO
+RCBQR1AgU0lHTkFUVVJFLS0tLS0K
 
---===============5045969986758801763==--
+--===============2835751693924346201==--
 
