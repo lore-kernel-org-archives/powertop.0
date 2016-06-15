@@ -1,100 +1,80 @@
-Content-Type: multipart/mixed; boundary="===============1087957750970493665=="
+Content-Type: multipart/mixed; boundary="===============6086101436680947138=="
 MIME-Version: 1.0
 From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH v2 00/10] Housecleaning and Gettext cleanup
-Date: Wed, 03 Aug 2016 17:59:10 -0700
-Message-ID: <1470272369-218664-1-git-send-email-joe.konno@linux.intel.com>
-In-Reply-To: 20160726193535.27247-1-joe.konno@linux.intel.com
+Subject: Re: [Powertop] [PATCH 2/2] intel_cpus: no pstate Idle pct with
+ intel_pstate
+Date: Wed, 15 Jun 2016 08:14:04 -0700
+Message-ID: <20160615151404.GA2586@jbkonno-anise.jf.intel.com>
+In-Reply-To: 20160615145625.GA27695@jbkonno-anise.jf.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1087957750970493665==
+--===============6086101436680947138==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Joe Konno <joe.konno(a)intel.com>
+On Wed, Jun 15, 2016 at 07:56:25AM -0700, Joe Konno wrote:
+> On Wed, Jun 15, 2016 at 01:51:22AM +0000, Wang, Xiaolong wrote:
+> > Hi Joe,
+> > I just realized a further scenario that would be problematic with your =
+current patch:
+> > once I'd read from Len Brown's post to Red Hat, that enabling HWP in in=
+tel_pstate driver is considered a mistake,
+> > because enabling HWP only need to write a few msr bits, based on a few =
+simple policies,
+> > there's no need to load a whole intel_pstate driver to do that.
+> > so future upstream kernel would remove that part, and HWP enabling will=
+ be put to some CPPC driver,
+> > and on HWP reinforced platform, intel_pstate driver will not be loaded =
+at all.
+> > =
 
-Hey gang,
+> > So, if that happen, the is_intel_pstate_driver_loaded() will return fal=
+se, and code will go to the old path,
+> > but the frequency statistics still not exist, then we got nothing.
+> =
 
-v2 of this series tackles gettext refreshing once again. This time, though,=
- I
-included some additional housecleaning items. I would have submitted those
-separately if they did not influence the other bits in this series.
+> Good catch, thanks!
+> =
 
-In a nutshell, I ran gettextize (from v0.18.2), and touched a few configura=
-tion
-files as directed by the gettext documentation (along with .gitignore).
+> > mmm... maybe you could use 'cpufreq statistics exists or not' to branch=
+ your code,
+> >   if exist, use it; if not, calculate average freq from msrs.
+> > there should have been such a function to check that condition.
 
-The "biggest" change is the (re-)generation of POTFILES.in. This lead to
-regeneration of powertop.pot (the basis upon which translation work is done=
-),
-which prompted a re-generation of all pre-existing translation artifacts. I=
- had
-originally generated a single patch for all the .po files, but I decided to
-break it up in case folks have per-message size constraints set by their ma=
-il
-provider's MTA. I will likely squash all *.po patches into one commit at pu=
-sh
-time.
+The check is duplicated in no less than four places-- there is no
+standalone utility function to perform the check. I'll address that
+duplication in my next revision by re-factoring the check into a proper
+function to ease re-use and maintenance.
 
-The other housecleaning items I tackled here:
-  * AC_REVISION to "2.9-pre"
-  * --version now embeds "__DATE__ at __TIME__" in output
-  * Added a maintainer script for (re-)generating POTFILES.in
+> =
 
-No functional side-effects anticipated.
-
-Joe Konno (10):
-  configure.ac: bump version to 2.9-pre
-  main.cpp: append __TIME__ to --version output
-  Makefile.am: add --install to ACLOCAL_AMFLAGS
-  gettext: run gettextize-0.18.2
-  .gitignore: ignnore m4/pkg.m4
-  Makevars: align more closely to generated .template
-  scripts: add regenerate-potfiles-in script
-  POTFILES.in: refresh files with strings
-  powertop.pot: xgettext refresh, attribution fix
-  po: regenerate with new POT and strings
-
- .gitignore                     |    1 +
- Makefile.am                    |    4 +-
- configure.ac                   |    4 +-
- m4/ChangeLog                   |   11 +
- po/ChangeLog                   |   11 +
- po/Makefile.in.in              |   19 +-
- po/Makevars                    |   14 +-
- po/POTFILES.in                 |   47 +-
- po/ca.po                       |  989 ++++++++++++++++++++----------------=
---
- po/cs_CZ.po                    | 1005 ++++++++++++++++++++----------------=
---
- po/de_DE.po                    | 1011 ++++++++++++++++++++----------------=
---
- po/en_GB.po                    |  915 +++++++++++++++++++----------------
- po/en_US.po                    |  987 ++++++++++++++++++++----------------=
---
- po/es_ES.po                    | 1040 +++++++++++++++++++++---------------=
-----
- po/hu_HU.po                    | 1003 ++++++++++++++++++++----------------=
---
- po/id_ID.po                    | 1001 ++++++++++++++++++++----------------=
---
- po/nl_NL.po                    |  931 ++++++++++++++++++-----------------
- po/powertop.pot                |  839 +++++++++++++++++---------------
- po/zh_TW.po                    | 1001 ++++++++++++++++++++----------------=
---
- scripts/regenerate-potfiles-in |   15 +
- src/main.cpp                   |    2 +-
- 21 files changed, 5879 insertions(+), 4971 deletions(-)
- create mode 100644 m4/ChangeLog
- create mode 100644 po/ChangeLog
- create mode 100644 scripts/regenerate-potfiles-in
-
--- =
-
-1.8.3.1
+> My thoughts exactly. I'll see about submitting a new revision of this
+> series.
 
 
---===============1087957750970493665==--
+--===============6086101436680947138==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="signature.asc"
+
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjIKCmlRSWNCQUVC
+Q0FBR0JRSlhZWEN3QUFvSkVJMklSOVV2U3FwbWZmSVFBTEo4aC9JZk1BOWZxVFlVQmNOTEpESFkK
+K0pUU0dRdGEwTU0zVVRFd2tjUm1OREx1VGRWU09rVnJLZzZpMWxCcm51TGx3azhoTS9BQVdodW90
+dXhudTBuMwpjc05kVkdobGlSaElEblhNYjZVQlVaZlVuRXp5dXc1cTlQOUhnSGEvS3htUC9BU1h6
+WnpoN25EUC9LT1NZTUtnCjZ0SHZzZklQRFltSWxqWkxuTHI0TzZEb3IrdWxPbmlBZVdjWkViSG5Z
+MmplR0lWMjRTSGxPcjFMS0tLRGJsTmoKRE03SmdFRkxNckduZDV1OVZLZE41ejYwZGNlSFFIc2Jz
+N0w2OTBQR3owbGpEOFEzVUVROFVpd0FUZDBKVVk4LwpLNTFaeFM4dk8vTlpta1puL29odkV3QVB4
+T2g5Zk10c1JVSDkwUDZOeFpuQlN5RGd0aHByNlQ2MTEreFNSWlJvCmFxZDVyN0VtdDAvcjk0Sytq
+V1NGWk5PR3liL3lrcURaN2gwQW14VlMxU3ArdmhhK2VIaXBFSzFTSkltN0NVRm0KcitJKzdxQXo4
+aHRKSTI0Qk5abVVUamIvOFZMTmx3MUJ6RHI1VXJ0T0tUSDNhT05yWFpEM0Q2YndtZEdXL1lDegpR
+SU9QSDBTZnVlb1drbW1qNm1LdEl5SnpNaXptVkJ1OE5qQUJoQ2dGV282VlE5WEprWktPdEFZa0NI
+eFlEQU1NClBJNTNhSGdkdE9sSm9hN0ZpL3lOQzJaOFVBVjdVUGV2aHFTNnRtdG1YUEF2MXh4T1Zz
+TFFDSWJRclp6VHFaZ3IKclBZaXpKaFlnWmZvcXVQYWtVQTYybWpIbTBmU3JpUEY4TXdNZ3Vha3pU
+Ykl0cmMwU1lkNUprWEJna001R1o4cQovQkU2eWFYTnB4UEE3RTJTVXBvVQo9SFA4SAotLS0tLUVO
+RCBQR1AgU0lHTkFUVVJFLS0tLS0K
+
+--===============6086101436680947138==--
 
