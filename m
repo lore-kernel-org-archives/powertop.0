@@ -1,47 +1,80 @@
-Content-Type: multipart/mixed; boundary="===============2577763492929294641=="
+Content-Type: multipart/mixed; boundary="===============8721140698662399108=="
 MIME-Version: 1.0
-From: Eugene Syromyatnikov <evgsyr at gmail.com>
-Subject: Re: [Powertop] [PATCH v2 02/19] main.cpp: append __TIME__ to
- --version output
-Date: Thu, 04 Aug 2016 14:48:13 +0300
-Message-ID: <CACGkJdtaJAUUURNu72ntQsxT8RhMQ2uvBTU7sZV04XNrEsQqXg@mail.gmail.com>
-In-Reply-To: 1470272369-218664-3-git-send-email-joe.konno@linux.intel.com
+From: Boris ARZUR <boris at strl.cat>
+Subject: [Powertop] --auto-tune without debugfs
+Date: Wed, 06 Jul 2016 08:09:00 +0000
+Message-ID: <20160706080859.GA32706@odroid>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2577763492929294641==
+--===============8721140698662399108==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 4, 2016 at 3:59 AM, Joe Konno <joe.konno(a)linux.intel.com> wro=
-te:
-> From: Joe Konno <joe.konno(a)intel.com>
-> -       printf(_("PowerTOP version " POWERTOP_VERSION ", compiled on " __=
-DATE__ "\n"));
-> +       printf(_("PowerTOP version " POWERTOP_VERSION ", compiled on " __=
-DATE__ " at " __TIME__ "\n"));
-By the way, there is a warning regarding reproducibility produced
-during build of Debian package.
+Dear Powertop Team,
 
-main.cpp:101:78: warning: macro "__DATE__" might prevent reproducible
-builds [-Wdate-time]
- printf(("PowerTOP version " POWERTOP_VERSION ", compiled on " __DATE_ "\n"=
-));
-                                                                           =
-  ^
+I use your utility at boot time to auto-tune my laptop.
+When using a grsec kernel, debugfs may not be available. This causes your
+utility to complain & exit.
+I use this very simple patch to force your wonderful tool to ignore that
+problem when auto-tuning.
 
-I'm not aware whether powertop project cares about build
-reproducibility, but in case you are, may be it's better to put
-generation of timestamps in version string under some development
-define (#ifdef DEVEL or something) =E2=80=94
-https://reproducible-builds.org/docs/timestamps/.
+Thank you and best regard,
+Boris.
 
--- =
+--===============8721140698662399108==
+Content-Type: text/x-diff
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="autotune_nodebugfs.patch"
 
-Eugene "eSyr" Syromyatnikov
-mailto:evgSyr(a)gmail.com
-xmpp:eSyr(a)jabber.{ru|org}
+LS0tIHBvd2VydG9wLW9yaWcvc3JjL21haW4uY3BwCTIwMTYtMDctMDYgMDc6NTc6MjAuMzUxNDc4
+NDEwICswMDAwCisrKyBwb3dlcnRvcCthdXRvdHVuZV93aXRob3V0X2RlYnVnZnMvc3JjL21haW4u
+Y3BwCTIwMTYtMDctMDYgMDg6MDI6MjMuMzM1NDQ4OTY2ICswMDAwCkBAIC0zMTEsNyArMzExLDcg
+QEAgc3RhdGljIGludCBnZXRfbnJfb3Blbih2b2lkKSB7CiAJcmV0dXJuIG5yX29wZW47CiB9CiAK
+LXN0YXRpYyB2b2lkIHBvd2VydG9wX2luaXQodm9pZCkKK3N0YXRpYyB2b2lkIHBvd2VydG9wX2lu
+aXQoaW50IGF1dG9fdHVuZSkKIHsKIAlzdGF0aWMgY2hhciBpbml0aWFsaXplZCA9IDA7CiAJaW50
+IHJldDsKQEAgLTMzOSw5ICszMzksMTQgQEAgc3RhdGljIHZvaWQgcG93ZXJ0b3BfaW5pdCh2b2lk
+KQogCQkJcmV0ID0gc3lzdGVtKCJtb3VudCAtdCBkZWJ1Z2ZzIGRlYnVnZnMgL3N5cy9rZXJuZWwv
+ZGVidWcgPiAvZGV2L251bGwgMj4mMSIpOwogCQl9CiAJCWlmIChyZXQgIT0gMCkgewotCQkJcHJp
+bnRmKF8oIkZhaWxlZCB0byBtb3VudCBkZWJ1Z2ZzIVxuIikpOwotCQkJcHJpbnRmKF8oImV4aXRp
+bmcuLi5cbiIpKTsKLQkJCWV4aXQoRVhJVF9GQUlMVVJFKTsKKwkJCWlmICghYXV0b190dW5lKSB7
+CisJCQkJZnByaW50ZihzdGRlcnIsIF8oIkZhaWxlZCB0byBtb3VudCBkZWJ1Z2ZzIVxuIikpOwor
+CQkJCWZwcmludGYoc3RkZXJyLCBfKCJleGl0aW5nLi4uXG4iKSk7CisJCQkJZXhpdChFWElUX0ZB
+SUxVUkUpOworCQkJfSBlbHNlIHsKKwkJCQlmcHJpbnRmKHN0ZGVyciwgXygiRmFpbGVkIHRvIG1v
+dW50IGRlYnVnZnMhXG4iKSk7CisJCQkJZnByaW50ZihzdGRlcnIsIF8oIlNob3VsZCBzdGlsbCBi
+ZSBhYmxlIHRvIGF1dG8gdHVuZS4uLlxuIikpOworCQkJfQogCQl9CiAJfQogCkBAIC00MTQsNyAr
+NDE5LDcgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KQogCQkJdWlfbm90aWZ5X3Vz
+ZXIgPSB1aV9ub3RpZnlfdXNlcl9jb25zb2xlOwogCQkJYnJlYWs7CiAJCWNhc2UgJ2MnOgotCQkJ
+cG93ZXJ0b3BfaW5pdCgpOworCQkJcG93ZXJ0b3BfaW5pdCgwKTsKIAkJCWNhbGlicmF0ZSgpOwog
+CQkJYnJlYWs7CiAJCWNhc2UgJ0MnOgkJLyogY3N2IHJlcG9ydCAqLwpAQCAtNDcwLDcgKzQ3NSw3
+IEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikKIAkJfQogCX0KIAotCXBvd2VydG9w
+X2luaXQoKTsKKwlwb3dlcnRvcF9pbml0KGF1dG9fdHVuZSk7CiAKIAlpZiAocmVwb3J0dHlwZSAh
+PSBSRVBPUlRfT0ZGKQogCQltYWtlX3JlcG9ydCh0aW1lX291dCwgd29ya2xvYWQsIGl0ZXJhdGlv
+bnMsIGZpbGVuYW1lKTsK
 
---===============2577763492929294641==--
+--===============8721140698662399108==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="signature.asc"
+
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEKCmlRSWNCQUVC
+Q0FBR0JRSlhmTHlhQUFvSkVNREpNUFpPbktIajBhOFArUUgvZkZGUi9hVHp3Mk10KzZxRU9aUnEK
+R0NVbm16WEJ3LzVLblU4dVd2elExRHF3Vlk3ai9WaVNpY2piMjM5a00xRkxyeUhDbWlXYnVmM0J0
+NGJhVTJWKwp1MGFoQzdkeHBNUTBOejV1Y3VuTXBnSGVjSnFGK1lnVFJIYkZnMzc2N2w5TjdsL3Bz
+QTlPMHUvSVkrM293ZGtxCkxnRjdxUjhCVzh3YVlsQlJmc0p1bG8ybFlLK3prY2F4ZkdqQVR2cjZo
+ZFBkWVBtMmFjRlhndWx4NGJjdFpBMUYKTFplUHM1dUtHV1hBQWtvQzlOMWRDRlhvTTRCTTRuVEdR
+ZURaaFh2TUg5MFJTK0pVQ0E2U2Fidm9aVHNnMHYxMQpZYlYycWRFYm51VFk0WHdwTHNxM2x2dGFG
+WFBQd3B5VWZlQ0pjdVJMVDRvN04yc0hzdTRyU0x5Sk0xbG1iRWY5CkpCeFdxUkhmdDAwRjE1VFpj
+WHhLRUtFcUpqR3RwUFhoZmlhdWgvRWlQdC9wVkgvdWNtVkE1YnMrVXFMY1JCcGwKUVdYNHlLRVVX
+YU93WkluLzVoTXczYjNTcWg2OUxDck1rUW9vNVc4WnA0U1hmaktyL3lLN0RwR3Fndis4anhLcAp2
+YUYzSlV3ZkVqMWpJaWVmNDlFQTUyR3lEZEI3a1IydjVjMnROeEtLUkNXUlZUNUtaOXp3SVB5UnZH
+TWZVcS9nCnRCTlRiSEowUkxKRFA3dms3Vzc0S0hvbXBtTTZjNDRZcitnQTlrK0Z0STZQSmIxSG82
+VzFIWVNvZjNLeVp1Rm4KSW91OEFtNDNMZERXVll2N1IySXB4bk9pZGZWZ1d5UVd4a3J5WjJRSVFU
+Z0o1ZmxnY0duNXRXYWNzeks0MlNjOQpDWTdXZXJ4bjljUVNKOWtNOEhkYQo9YWxoVwotLS0tLUVO
+RCBQR1AgU0lHTkFUVVJFLS0tLS0K
+
+--===============8721140698662399108==--
 
