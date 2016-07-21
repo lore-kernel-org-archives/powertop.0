@@ -1,82 +1,90 @@
-Content-Type: multipart/mixed; boundary="===============5175969107256431727=="
+Content-Type: multipart/mixed; boundary="===============1239458325700496302=="
 MIME-Version: 1.0
-From: Mingye Wang (Artoria2e5) <arthur2e5 at aosc.io>
-Subject: [Powertop] [PATCH 0/2] Align multi-column characters properly (SPLIT
- [po] Updated zh_CN translation)
-Date: Sat, 03 Mar 2018 14:49:09 -0500
-Message-ID: <ffa8a2ae-46b8-3c55-4feb-9aa581c4cbea@aosc.io>
-In-Reply-To: 72eb9191-c31e-465a-e0a9-8439a3692e74@aosc.io
+From: Daniel Black <daniel.black at au1.ibm.com>
+Subject: [Powertop] [PATCH] MSR is valid for x86_32/x86_64 only
+Date: Thu, 21 Jul 2016 10:55:48 +1000
+Message-ID: <1469062548-6768-1-git-send-email-daniel.black@au1.ibm.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5175969107256431727==
+--===============1239458325700496302==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi folks,
+As such we compile guard the portions of code related to msr
+modprobing, reads and writes.
 
-On 18/03/03 03:14, Mingcong Bai wrote:
-> Updated Mingye Wang's patches to fix build - PowerTOP has been built and =
+Signed-off-by: Daniel Black <daniel.black(a)au1.ibm.com>
+---
+ src/lib.cpp  | 8 ++++++++
+ src/main.cpp | 2 ++
+ 2 files changed, 10 insertions(+)
 
-> tested and columns are now aligned correctly when using zh_CN.
-> =
+diff --git a/src/lib.cpp b/src/lib.cpp
+index cdbd0cd..5e48f37 100644
+--- a/src/lib.cpp
++++ b/src/lib.cpp
+@@ -497,6 +497,7 @@ int get_user_input(char *buf, unsigned sz)
+ =
 
-> Best Regards,
-> Mingcong Bai
+ int read_msr(int cpu, uint64_t offset, uint64_t *value)
+ {
++#if defined(__i386__) || defined(__x86_64__)
+ 	ssize_t retval;
+ 	uint64_t msr;
+ 	int fd;
+@@ -526,10 +527,14 @@ int read_msr(int cpu, uint64_t offset, uint64_t *valu=
+e)
+ 	*value =3D msr;
+ =
 
-I will post the patches below, as I just found something else to revise. =
+ 	return retval;
++#else
++	return -1;
++#endif
+ }
+ =
 
-Here are some quick answers to typical code reviewer questions:
+ int write_msr(int cpu, uint64_t offset, uint64_t value)
+ {
++#if defined(__i386__) || defined(__x86_64__)
+ 	ssize_t retval;
+ 	int fd;
+ 	char msr_path[256];
+@@ -557,6 +562,9 @@ int write_msr(int cpu, uint64_t offset, uint64_t value)
+ 	}
+ =
 
-Q. What strings does measure_string fail on?
-A. Strings with invalid multibyte sequences (-3), non-printable =
+ 	return retval;
++#else
++	return -1;
++#endif
+ }
+ =
 
-characters such as newlines and tabs (-1), NULL (-2), and huge strings =
+ #define UI_NOTIFY_BUFF_SZ 2048
+diff --git a/src/main.cpp b/src/main.cpp
+index f2569c1..31e3e71 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -328,8 +328,10 @@ static void powertop_init(void)
+ =
 
-that fail malloc (-2).
+ 	if (system("/sbin/modprobe cpufreq_stats > /dev/null 2>&1"))
+ 		fprintf(stderr, _("modprobe cpufreq_stats failed"));
++#if defined(__i386__) || defined(__x86_64__)
+ 	if (system("/sbin/modprobe msr > /dev/null 2>&1"))
+ 		fprintf(stderr, _("modprobe msr failed"));
++#endif
+ 	statfs("/sys/kernel/debug", &st_fs);
+ =
 
-Q. Why is measure_string returning an int instead of a size_t?
-A. I blame wcswidth.
+ 	if (st_fs.f_type !=3D (long) DEBUGFS_MAGIC) {
+-- =
 
-Q. What does measure_string depend on?
-A. malloc/free, mbsrtowcs, and wcswidth.
-
-Q. Is align_string slower now?
-A. Yes. It needs to do a full encoding conversion in measure_string =
-
-instead of just counting.
-
-Q. Are you making a more "naive" version of align_string?
-A. Not now. But note that the unit-printing parts (watts, rpm...) =
-
-generally only involve printable ASCII, so strlen() will suffice for =
-
-them. It should not matter too much.
-
-Q. Is the "ctr" variable useless in cpu.cpp now?
-A. Yes, but it still should sync up with the actual column count.
-
-Things we want you all to fix up that aren't included in the patch:
-
-1. LINGUAS, or we will never see the translations used.
-
-2. The use of #include <stdfoo.h> in C++ where #include <cstdfoo> is =
-
-available. The C++ variants of these headers work much better (you don't =
-
-have to memset the mbstate_t, for example) in C++.
-
-3. Use some C++ strings maybe? It's not that bad for me as compilers =
-
-know how to optimize out stuff like "if (strlen(x))", but those new =
-
-stuff sure are much easier to use.
-
---
-Regards,
-Mingye Wang
+2.7.4
 
 
---===============5175969107256431727==--
+--===============1239458325700496302==--
 
