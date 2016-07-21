@@ -1,54 +1,180 @@
-Content-Type: multipart/mixed; boundary="===============1302548665019820711=="
+Content-Type: multipart/mixed; boundary="===============7194396497120545823=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH v1 0/4] gettext cleanup series
-Date: Tue, 26 Jul 2016 12:35:31 -0700
-Message-ID: <20160726193535.27247-1-joe.konno@linux.intel.com>
+From: Thomas Ilsche <thomas.ilsche at tu-dresden.de>
+Subject: [Powertop] cpu wiggle changes userspace governor settings
+Date: Thu, 21 Jul 2016 12:13:17 +0200
+Message-ID: <c9a9b03b-a3b1-d362-7bbc-60e84af79acb@tu-dresden.de>
+In-Reply-To: b3065b18-3740-55c8-425b-1bbb46944d87@tu-dresden.de
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1302548665019820711==
+--===============7194396497120545823==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Joe Konno <joe.konno(a)intel.com>
+Dear Powertop Team,
 
-Hey gang,
+I have noticed that powertop changes the frequency set by the userspace gov=
+ernor to the minimum available frequency.
 
-I've been getting gettext warnings during the configuration stage for some
-time. This fixes most of them. Review and feedback welcomed, as always.
+This is caused by abstract_cpu::wiggle that touches the {min,max}_freq. By =
+doing so, it also narrows down the scaling_setspeed setting within the min-=
+max-range, but it is not reset upon restoring max_freq. To illustrate what =
+is happening behind the scenes:
 
-In a nutshell, I ran gettextize (from v0.19.8), and touched a few configura=
-tion
-files as directed by the gettext documentation. As a result, there was some
-gitignore housecleaning that needed attention.
+$ cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_{min,max,cur}_freq
+1200000
+2901000
+2000000
+$ cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_{governor,setspeed}
+userspace
+2000000
+$ echo 1200000 | sudo tee /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_=
+freq
+1200000
+$ cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_setspeed
+1200000
 
-No functional side-effects anticipated.
+(Tested with Linux 4.4.0-21 Ubuntu)
 
-Joe Konno (4):
-  gettext: bump to 0.19.8
-  Makefile.am: ACLOCAL_AMFLAGS updated
-  .gitignore: ignore a few more m4 macros
-  LINGUAS: add en(a)quot and en(a)boldquot
+Attached is a patch that resets the setspeed value if it was set to a numer=
+ic value before the wiggle.
 
- .gitignore        |  2 ++
- Makefile.am       |  4 ++-
- configure.ac      |  2 +-
- m4/ChangeLog      | 11 ++++++++
- po/ChangeLog      | 11 ++++++++
- po/LINGUAS        |  2 ++
- po/Makefile.in.in | 77 +++++++++++++++++++++++++++++++++++++++++----------=
-----
- po/Makevars       | 37 ++++++++++++++++++++++++++
- 8 files changed, 125 insertions(+), 21 deletions(-)
- create mode 100644 m4/ChangeLog
- create mode 100644 po/ChangeLog
+Please note that I don't really understand what you are trying to achieve w=
+ith the wiggle in the first place. It seems for instance that this doesn't =
+do anything if max_freq =3D=3D min_freq.
 
--- =
-
-2.9.0
+Best Regards,
+Thomas Ilsche
 
 
---===============1302548665019820711==--
+--===============7194396497120545823==
+Content-Type: text/x-patch
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="wiggle_frequency_userspace.patch"
+
+ZGlmZiAtLWdpdCBhL3NyYy9jcHUvYWJzdHJhY3RfY3B1LmNwcCBiL3NyYy9jcHUvYWJzdHJhY3Rf
+Y3B1LmNwcAppbmRleCBmNDE5ZGJmLi5iYzMyMzM2IDEwMDY0NAotLS0gYS9zcmMvY3B1L2Fic3Ry
+YWN0X2NwdS5jcHAKKysrIGIvc3JjL2NwdS9hYnN0cmFjdF9jcHUuY3BwCkBAIC00NDMsNiArNDQz
+LDcgQEAgdm9pZCBhYnN0cmFjdF9jcHU6OndpZ2dsZSh2b2lkKQogCWlmc3RyZWFtIGlmaWxlOwog
+CW9mc3RyZWFtIG9maWxlOwogCXVpbnQ2NF90IG1pbmYsbWF4ZjsKKwl1aW50NjRfdCBzZXRzcGVl
+ZCA9IDA7CiAKIAkvKiB3aWdnbGUgYSBDUFUgc28gdGhhdCB3ZSBoYXZlIGEgcmVjb3JkIG9mIGl0
+IGF0IHRoZSBzdGFydCBhbmQgZW5kIG9mIHRoZSBwZXJmIHRyYWNlICovCiAKQEAgLTQ1Niw2ICs0
+NTcsMTMgQEAgdm9pZCBhYnN0cmFjdF9jcHU6OndpZ2dsZSh2b2lkKQogCWlmaWxlID4+IG1pbmY7
+CiAJaWZpbGUuY2xvc2UoKTsKIAorCS8qIEluIGNhc2Ugb2YgdGhlIHVzZXJzcGFjZSBnb3Zlcm5v
+ciwgcmVtZW1iZXIgdGhlIG9sZCBzZXRzcGVlZCBzZXR0aW5nLCBpdCB3aWxsIGJlIGFmZmVjdGVk
+IGJ5IHdpZ2dsZSAqLworCXNucHJpbnRmKGZpbGVuYW1lLCBzaXplb2YoZmlsZW5hbWUpLCAiL3N5
+cy9kZXZpY2VzL3N5c3RlbS9jcHUvY3B1JWkvY3B1ZnJlcS9zY2FsaW5nX3NldHNwZWVkIiwgZmly
+c3RfY3B1KTsKKwlpZmlsZS5vcGVuKGZpbGVuYW1lLCBpb3M6OmluKTsKKwkvKiBOb3RlIHRoYXQg
+bm9uLXVzZXJzcGFjZSBnb3Zlcm5vcnMgcmVwb3J0ICI8dW5zdXBwb3J0ZWQ+Ii4gSW4gdGhhdCBj
+YXNlIGlmaWxlIHdpbGwgZmFpbCBhbmQgc2V0c3BlZWQgcmVtYWlucyAwICovCisJaWZpbGUgPj4g
+c2V0c3BlZWQ7CisJaWZpbGUuY2xvc2UoKTsKKwogCW9maWxlLm9wZW4oZmlsZW5hbWUsIGlvczo6
+b3V0KTsKIAlvZmlsZSA8PCBtYXhmOwogCW9maWxlLmNsb3NlKCk7CkBAIC00NzAsNiArNDc4LDEy
+IEBAIHZvaWQgYWJzdHJhY3RfY3B1Ojp3aWdnbGUodm9pZCkKIAlvZmlsZSA8PCBtYXhmOwogCW9m
+aWxlLmNsb3NlKCk7CiAKKwlpZiAoc2V0c3BlZWQgIT0gMCkgeworCQlzbnByaW50ZihmaWxlbmFt
+ZSwgc2l6ZW9mKGZpbGVuYW1lKSwgIi9zeXMvZGV2aWNlcy9zeXN0ZW0vY3B1L2NwdSVpL2NwdWZy
+ZXEvc2NhbGluZ19zZXRzcGVlZCIsIGZpcnN0X2NwdSk7CisJCW9maWxlLm9wZW4oZmlsZW5hbWUs
+IGlvczo6b3V0KTsKKwkJb2ZpbGUgPDwgc2V0c3BlZWQ7CisJCW9maWxlLmNsb3NlKCk7CisJfQog
+fQogdWludDY0X3QgYWJzdHJhY3RfY3B1Ojp0b3RhbF9wc3RhdGVfdGltZSh2b2lkKQogewoK
+
+--===============7194396497120545823==
+Content-Type: application/pkcs7-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD+Yw
+ggTVMIIDvaADAgECAghQTsb1PRG0ZDANBgkqhkiG9w0BAQsFADBxMQswCQYDVQQGEwJERTEcMBoG
+A1UEChMTRGV1dHNjaGUgVGVsZWtvbSBBRzEfMB0GA1UECxMWVC1UZWxlU2VjIFRydXN0IENlbnRl
+cjEjMCEGA1UEAxMaRGV1dHNjaGUgVGVsZWtvbSBSb290IENBIDIwHhcNMTQwNzIyMTIwODI2WhcN
+MTkwNzA5MjM1OTAwWjBaMQswCQYDVQQGEwJERTETMBEGA1UEChMKREZOLVZlcmVpbjEQMA4GA1UE
+CxMHREZOLVBLSTEkMCIGA1UEAxMbREZOLVZlcmVpbiBQQ0EgR2xvYmFsIC0gRzAxMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6ZvDZ4X5Da71jVTDllA1PWLpbkztlNcAW5UidNQg6zSP
+1uzAMQQLmYHiphTSUqAoI4SLdIkEXlvg4njBeMsWyyg1OXstkEXQ7aAAeny/Sg4bAMOG6VwrMRF7
+DPOCJEOMHDiLamgAmu7cT3ir0sYTm3at7t4m6O8Br3QPwQmi9mvOvdPNFDBP9eXjpMhim4IaAycw
+DQJlYE3t0QkjKpY1WCfTdsZxtpAdxO3/NYZ9bzOz2w/FEcKKg6GUXUFr2NIQ9Uz9ylGs2b3vkoO7
+2uuLFlZWQ8/h1RM9ph8nMM1JVNvJEzSacXXFbOqnC5j5IZ0nrz6jOTlIaoytyZn7wxLyvQIDAQAB
+o4IBhjCCAYIwDgYDVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRJt8bP6D0ff+pEexMp9/EKcD7eZDAf
+BgNVHSMEGDAWgBQxw3kbuvVT1xfgiXotF2wKsyudMzASBgNVHRMBAf8ECDAGAQH/AgECMGIGA1Ud
+IARbMFkwEQYPKwYBBAGBrSGCLAEBBAICMBEGDysGAQQBga0hgiwBAQQDADARBg8rBgEEAYGtIYIs
+AQEEAwEwDwYNKwYBBAGBrSGCLAEBBDANBgsrBgEEAYGtIYIsHjA+BgNVHR8ENzA1MDOgMaAvhi1o
+dHRwOi8vcGtpMDMzNi50ZWxlc2VjLmRlL3JsL0RUX1JPT1RfQ0FfMi5jcmwweAYIKwYBBQUHAQEE
+bDBqMCwGCCsGAQUFBzABhiBodHRwOi8vb2NzcDAzMzYudGVsZXNlYy5kZS9vY3NwcjA6BggrBgEF
+BQcwAoYuaHR0cDovL3BraTAzMzYudGVsZXNlYy5kZS9jcnQvRFRfUk9PVF9DQV8yLmNlcjANBgkq
+hkiG9w0BAQsFAAOCAQEAYyAo/ZwhhnK+OUZZOTIlvKkBmw3Myn1BnIZtCm4ssxNZdbEzkhthJxb/
+w7LVNYL7hCoBSb1mu2YvssIGXW4/buMBWlvKQ2NclbbhMacf1QdfTeZlgk4y+cN8ekvNTVx07iHy
+dQLsUj7SyWrTkCNuSWc1vn9NVqTszC/Pt6GXqHI+ybxA1lqkCD3WvILDt7cyjrEsjmpttzUCGc/1
+OURYY6ckABCwu/xOr24vOLulV0k/2G5QbyyXltwdRpplic+uzPLl2Z9Tsz6hL5Kp2AvGhB8Exuse
+6J99tXulAvEkxSRjETTMWpMgKnmIOiVCkKllO3yG0xIVIyn8LNrMOVtUFzCCBWEwggRJoAMCAQIC
+BxekJHloXI4wDQYJKoZIhvcNAQELBQAwWjELMAkGA1UEBhMCREUxEzARBgNVBAoTCkRGTi1WZXJl
+aW4xEDAOBgNVBAsTB0RGTi1QS0kxJDAiBgNVBAMTG0RGTi1WZXJlaW4gUENBIEdsb2JhbCAtIEcw
+MTAeFw0xNDA1MjcxNDUzMjlaFw0xOTA3MDkyMzU5MDBaMIGFMQswCQYDVQQGEwJERTEoMCYGA1UE
+ChMfVGVjaG5pc2NoZSBVbml2ZXJzaXRhZXQgRHJlc2RlbjEMMAoGA1UECxMDWklIMRwwGgYDVQQD
+ExNUVSBEcmVzZGVuIENBIC0gRzAyMSAwHgYJKoZIhvcNAQkBFhFwa2lAdHUtZHJlc2Rlbi5kZTCC
+ASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMEOHpPzRPbs0Cf3UHphCwQ0FZP8sR9sY9qA
+7OEzXDUKPHcgIKKVgKAl4g9CYFlP1FqXHEXbPY4YM9xFO6pxoU+SC10ZrDUEUQhf6QZ7ci3PYaVo
+os+dAEfByn44OPw52C8PjBmpiS+yNoPHVyTaykcdXEsSH/vJt7Ekvd/XNq2o8mQrZ8m4555TPcin
+viw+qEqfdADlDkTglQeW+HeXhMMWtuYQgye1Gqsn4tobYkJDYb2F8RS/F6jdmvrLzwh0b53sdun5
+cmRlig56dUi2b3P5q3Oj40HF2ZbycPTTEkAbnbFBLA3gdH6q2PQJycy2PjXNe/q6XYTuW1G5uo0z
+eycCAwEAAaOCAf4wggH6MBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYDVR0PAQH/BAQDAgEGMBEGA1Ud
+IAQKMAgwBgYEVR0gADAdBgNVHQ4EFgQUxStTkxeDyfVGQu1Dat+2gKZH8uAwHwYDVR0jBBgwFoAU
+SbfGz+g9H3/qRHsTKffxCnA+3mQwHAYDVR0RBBUwE4ERcGtpQHR1LWRyZXNkZW4uZGUwgYgGA1Ud
+HwSBgDB+MD2gO6A5hjdodHRwOi8vY2RwMS5wY2EuZGZuLmRlL2dsb2JhbC1yb290LWNhL3B1Yi9j
+cmwvY2FjcmwuY3JsMD2gO6A5hjdodHRwOi8vY2RwMi5wY2EuZGZuLmRlL2dsb2JhbC1yb290LWNh
+L3B1Yi9jcmwvY2FjcmwuY3JsMIHXBggrBgEFBQcBAQSByjCBxzAzBggrBgEFBQcwAYYnaHR0cDov
+L29jc3AucGNhLmRmbi5kZS9PQ1NQLVNlcnZlci9PQ1NQMEcGCCsGAQUFBzAChjtodHRwOi8vY2Rw
+MS5wY2EuZGZuLmRlL2dsb2JhbC1yb290LWNhL3B1Yi9jYWNlcnQvY2FjZXJ0LmNydDBHBggrBgEF
+BQcwAoY7aHR0cDovL2NkcDIucGNhLmRmbi5kZS9nbG9iYWwtcm9vdC1jYS9wdWIvY2FjZXJ0L2Nh
+Y2VydC5jcnQwDQYJKoZIhvcNAQELBQADggEBAImEwEPg6Hg9eFHAQKtaCiYMOcQsMMWHgU3V7aDS
+BhsouD+QDSDDpEoiaHgaFNEBsQ3FbYzL60dooWO3BB0FpqeKWTgM3nzWOrGOjfuM8TAOY03NPxTi
+yyLCaQwPZtYza9NxzuUOPaDvD6xHMgnzOLUC0JXjdslPzEFWPQ9CkW6phW9jOAyr4o20afhjKIEA
+zINjUTM8SC06i83uypdveMYNrvWCp0dYgp/2it8NYJn9jx35j6tKq0EAePR+cDOOciC0m9QiJ/4B
+/H/hG/HLQwePerq4eE8Vxn1AE+b6/FfadZcQyUlx/UD8iB1qHmFSmSYBAhRQmyjxBsTiBcFL8E8w
+ggWkMIIEjKADAgECAgcXLFnWLtRIMA0GCSqGSIb3DQEBBQUAMIGFMQswCQYDVQQGEwJERTEoMCYG
+A1UEChMfVGVjaG5pc2NoZSBVbml2ZXJzaXRhZXQgRHJlc2RlbjEMMAoGA1UECxMDWklIMRwwGgYD
+VQQDExNUVSBEcmVzZGVuIENBIC0gRzAyMSAwHgYJKoZIhvcNAQkBFhFwa2lAdHUtZHJlc2Rlbi5k
+ZTAeFw0xNDAyMjUxODA5MTFaFw0xNzAyMjQxODA5MTFaMF0xCzAJBgNVBAYTAkRFMSgwJgYDVQQK
+Ex9UZWNobmlzY2hlIFVuaXZlcnNpdGFldCBEcmVzZGVuMQwwCgYDVQQLEwNaSUgxFjAUBgNVBAMT
+DVRob21hcyBJbHNjaGUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDPGhz2VxL3s414
+BVLVjfrVYIFfewKMeWimc86AsayxxMjeN3vkHGIB5IK8XC7084aza+wgd6IopDK77cWzdAcpt7Bg
+f8T0Pl1wnxW0oUEvSNTs1pebyMtj/Sc845fW3w4Z3KRXUeKjsoflHLI5f9dnpywM1EU0AJw4zIxM
+e5IhwxfiG3E+aIuw0FdNDQ6F//tYKUhEhfFg7QQwwD/gVvdYLbdh09J50mtFFT9yzScpxXiDo7Xh
+l+/M3eFAWqzTpMGF17cy/7JTIodqVo6iCA2UGqNFeHorIJgNmei7oGZLURCz5RyFZTqOjxZdoptp
+0mlojEvce1xXkkUdk6Ju2bMlAgMBAAGjggI+MIICOjAvBgNVHSAEKDAmMBEGDysGAQQBga0hgiwB
+AQQDATARBg8rBgEEAYGtIYIsAgEEAwEwCQYDVR0TBAIwADALBgNVHQ8EBAMCBeAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwIGCCsGAQUFBwMEMB0GA1UdDgQWBBS2XdMo7Wr8gHKK2qVaH32OuPsBqDAfBgNV
+HSMEGDAWgBTFK1OTF4PJ9UZC7UNq37aApkfy4DAmBgNVHREEHzAdgRt0aG9tYXMuaWxzY2hlQHR1
+LWRyZXNkZW4uZGUwgYsGA1UdHwSBgzCBgDA+oDygOoY4aHR0cDovL2NkcDEucGNhLmRmbi5kZS90
+dS1kcmVzZGVuLWNhL3B1Yi9jcmwvZ19jYWNybC5jcmwwPqA8oDqGOGh0dHA6Ly9jZHAyLnBjYS5k
+Zm4uZGUvdHUtZHJlc2Rlbi1jYS9wdWIvY3JsL2dfY2FjcmwuY3JsMIHZBggrBgEFBQcBAQSBzDCB
+yTAzBggrBgEFBQcwAYYnaHR0cDovL29jc3AucGNhLmRmbi5kZS9PQ1NQLVNlcnZlci9PQ1NQMEgG
+CCsGAQUFBzAChjxodHRwOi8vY2RwMS5wY2EuZGZuLmRlL3R1LWRyZXNkZW4tY2EvcHViL2NhY2Vy
+dC9nX2NhY2VydC5jcnQwSAYIKwYBBQUHMAKGPGh0dHA6Ly9jZHAyLnBjYS5kZm4uZGUvdHUtZHJl
+c2Rlbi1jYS9wdWIvY2FjZXJ0L2dfY2FjZXJ0LmNydDANBgkqhkiG9w0BAQUFAAOCAQEAOR5nzR1a
+yOmM6Sf9GT/WcFYePXf2tGw80KvCvYJkscuI72kHpJhPH1bn/u/mGDzzzcT0+ugX+H6eEqJou03G
+wHCPHxrW/xTPhu4lJ5iwWzTASXew6gKx/BU2OAn74Bxi7zOw5pqUjN4Fzh06I/uAzI3q/I4Nfccc
+lLJLO59+X7LAZAIlZyyM2s6etFjD32+YpwsH1ojvbwAw2v+6AlwgZwR+7oAG0QIcOGyBgpKJL4oS
+VPtipqThSnsmL5DTeXivSzp702NP6dJw3lqnyDfSPQ9FZ2xD9/GkzlzA/yc/eJ/uLmndDLkYScgS
+6x+QsVyQ9UsmFFi0vX6Qk5WxSz5LiDGCA+QwggPgAgEBMIGRMIGFMQswCQYDVQQGEwJERTEoMCYG
+A1UEChMfVGVjaG5pc2NoZSBVbml2ZXJzaXRhZXQgRHJlc2RlbjEMMAoGA1UECxMDWklIMRwwGgYD
+VQQDExNUVSBEcmVzZGVuIENBIC0gRzAyMSAwHgYJKoZIhvcNAQkBFhFwa2lAdHUtZHJlc2Rlbi5k
+ZQIHFyxZ1i7USDANBglghkgBZQMEAgEFAKCCAiMwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAc
+BgkqhkiG9w0BCQUxDxcNMTYwNzIxMTAxMzE3WjAvBgkqhkiG9w0BCQQxIgQgMviT1G547mnDxHeU
+71n99aka8alM13KnLFBqqtdYlEgwbAYJKoZIhvcNAQkPMV8wXTALBglghkgBZQMEASowCwYJYIZI
+AWUDBAECMAoGCCqGSIb3DQMHMA4GCCqGSIb3DQMCAgIAgDANBggqhkiG9w0DAgIBQDAHBgUrDgMC
+BzANBggqhkiG9w0DAgIBKDCBogYJKwYBBAGCNxAEMYGUMIGRMIGFMQswCQYDVQQGEwJERTEoMCYG
+A1UEChMfVGVjaG5pc2NoZSBVbml2ZXJzaXRhZXQgRHJlc2RlbjEMMAoGA1UECxMDWklIMRwwGgYD
+VQQDExNUVSBEcmVzZGVuIENBIC0gRzAyMSAwHgYJKoZIhvcNAQkBFhFwa2lAdHUtZHJlc2Rlbi5k
+ZQIHFyxZ1i7USDCBpAYLKoZIhvcNAQkQAgsxgZSggZEwgYUxCzAJBgNVBAYTAkRFMSgwJgYDVQQK
+Ex9UZWNobmlzY2hlIFVuaXZlcnNpdGFldCBEcmVzZGVuMQwwCgYDVQQLEwNaSUgxHDAaBgNVBAMT
+E1RVIERyZXNkZW4gQ0EgLSBHMDIxIDAeBgkqhkiG9w0BCQEWEXBraUB0dS1kcmVzZGVuLmRlAgcX
+LFnWLtRIMA0GCSqGSIb3DQEBAQUABIIBAASBqG10ZT1U5FtQuK63XxM71twZLrXvIi2/q2codvue
+GDtw8PkYRYyd3YY7Ai/1H2wDtuLqPEFLVUFLkociGOSvsk9T0H0BUxsRzg+dYg1MQ2DsvmGyMs1j
+ciKMtnafhnCqHrHxI5EwII9KB884RYX8ozS7pkTgek3PeF2ea1DPLqMHGUpmucUCjG2LxiD+FmbA
+y4Ofspxr/tplLV+yaXiOiwG4G3HuLmM2xf1dtQIKle1oQYx2mlXtkYE68YLPwL3bM4eKpImmuSl8
+ZxHdkurVWMR/9mQw7XdPwenFDPSc/e5IGxjbeCZF00p2Msc/oPWtdjX382cVEIuBPhsDvQAAAAAA
+AAA=
+--===============7194396497120545823==--
 
