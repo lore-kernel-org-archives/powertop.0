@@ -1,69 +1,104 @@
-Content-Type: multipart/mixed; boundary="===============8503968394193169595=="
+Content-Type: multipart/mixed; boundary="===============2099563789342681823=="
 MIME-Version: 1.0
 From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH 1/4 v1] lib: refactor pci_access checks
-Date: Fri, 08 Sep 2017 15:36:48 -0700
-Message-ID: <20170908223651.27979-2-joe.konno@linux.intel.com>
-In-Reply-To: 20170908223651.27979-1-joe.konno@linux.intel.com
+Subject: Re: [Powertop] [PATCH] Makefile.am need reference to m4 directory
+Date: Thu, 21 Jul 2016 14:26:41 -0700
+Message-ID: <20160721142641.66a33513@jbkonno-lemu6.jf.intel.com>
+In-Reply-To: ea5e3f56-3143-4916-5956-880c05a45ee5@au.ibm.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8503968394193169595==
+--===============2099563789342681823==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Joe Konno <joe.konno(a)intel.com>
+Hi David,
 
-Pull the libpci initialization bits out and into its own dedicated function.
+A big sigh about the lag between patch submission and a response.
+Apologies for that. That lag is not indicative of your
+submission's value. I appreciate your submissions very much. ^_^
 
-Signed-off-by: Joe Konno <joe.konno(a)intel.com>
----
- src/lib.cpp | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+There was a whitespace quirk, likely due to the MUA used to submit it,
+so I had to pass --ignore-whitespace to git-am for a clean application.
+That issue seems to specific to this submission and not subsequent
+ones, so I'll use git-send-email to submit a 'v2' to maintain
+a strict association between the mailing list and what ultimately
+lands in the repository.
 
-diff --git a/src/lib.cpp b/src/lib.cpp
-index 5e48f375d087..2b95e64f427b 100644
---- a/src/lib.cpp
-+++ b/src/lib.cpp
-@@ -296,16 +296,21 @@ void format_watts(double W, char *buffer, unsigned in=
-t len)
- #ifndef HAVE_NO_PCI
- static struct pci_access *pci_access;
- =
+Style nit inlined below which will not hinder progress whatsoever...
 
-+static void check_pci_access(void)
-+{
-+	if (!pci_access) {
-+		pci_access =3D pci_alloc();
-+		pci_init(pci_access);
-+	}
-+}
-+
- char *pci_id_to_name(uint16_t vendor, uint16_t device, char *buffer, int l=
-en)
- {
- 	char *ret;
- =
+On Mon, 23 May 2016 12:56:06 +1000
+Daniel Black <daniel.black(a)au1.ibm.com> wrote:
 
- 	buffer[0] =3D 0;
- =
+> Running autoreconf (autconf-2.69/automake-1.15/libtoolize-2.4.6)
+> without the m4 directory specified in the Makefile.am file generates
+> the following warning:
+> =
 
--	if (!pci_access) {
--		pci_access =3D pci_alloc();
--		pci_init(pci_access);
--	}
-+	check_pci_access();
- =
+>  ./autogen.sh
+> autoreconf: Entering directory `.'
+> autoreconf: running: autopoint
+> autoreconf: running: aclocal
+> autoreconf: configure.ac: tracing
+> autoreconf: running: libtoolize --copy
+> libtoolize: Consider adding '-I m4' to ACLOCAL_AMFLAGS in Makefile.am.
+> autoreconf: running: /usr/bin/autoconf
+> autoreconf: running: /usr/bin/autoheader
+> autoreconf: running: automake --add-missing --copy --no-force
+> configure.ac:26: warning: The 'AM_PROG_MKDIR_P' macro is deprecated,
+> and its use is discouraged.
+> configure.ac:26: You should use the Autoconf-provided
+> 'AC_PROG_MKDIR_P' macro instead,
+> configure.ac:26: and use '$(MKDIR_P)' instead of '$(mkdir_p)'in your
+> Makefile.am files.
+> autoreconf: Leaving directory `.'
+> ---
+>  Makefile.am | 1 +
+>  1 file changed, 1 insertion(+)
+> =
 
- 	ret =3D pci_lookup_name(pci_access, buffer, len, PCI_LOOKUP_VENDOR | PCI_=
-LOOKUP_DEVICE, vendor, device);
- =
+> diff --git a/Makefile.am b/Makefile.am
+> index c8d0ae2..a9cf9db 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -1,4 +1,5 @@
+>  AUTOMAKE_OPTIONS =3D subdir-objects
+> +ACLOCAL_AMFLAGS=3D-I m4
 
--- =
+v2 will have spaces surrounding '=3D' to maintain style consistency. (PS:
+I'm aware of numerous style issues around the codebase).
 
-2.13.5
+> =
 
+>  SUBDIRS =3D \
+>         traceevent \
+> --
+> 2.7.4
 
---===============8503968394193169595==--
+Cheers, and thanks again for the submission
+
+--===============2099563789342681823==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.sig"
+
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjIKCmlRSWNCQUVC
+Q0FBR0JRSlhrVDRSQUFvSkVJMklSOVV2U3FwbTFGWVFBSUwrY2gzVGNtSWJNVi9ybTlVWlgrQUoK
+L2VFeU9LYjlyN1pGancvWFJ3N01KdW1MdU50WDQ5YThlb2JuZmVVSHZ4RHdCaS9RYnpwVDhZbkQx
+alRNb2pKVwp1eXlITU9mVUlOeWYxWmVBMU1FTWNYdFROVDkwdDNMUjlSQ1B6U1kzd3BLZkVhbG1T
+QlZsK2NyQXdBOEhiYXVBCnFVTnZaZ0RqdEYybUpKRFMzSEdRcWdTTVB1dXB3ZTBYakI4VXN2MFVF
+NU9VVTEwbE1wYk5kUythYkNnRFFUdnQKVkQrMGVyV2hlblg1ZlBIaW04R1lKSWJBaUtQWjFuWUZm
+N1BZQ2ZPcXpyaE5HalYvbU5MendWclY4MXlWSGgyRQpTd2hNRXlUUVRrdHpvVEhiT0JlUnhKUzhQ
+NjB2RmlDU3NuelRoTDE5VVIybXIvaS9hV2ZTRHpOa0tqMFVvWHBkCkhLM2xweU84TFVtUWFwYW1o
+M0xJcDNpWXAvY2tJRDRuMlFLY3RlM1NVNjZKbVo4Q1BObG9yVlRyekpiY3IrZ1UKdWNCT2RhZzFZ
+aks5NjcwUFdiMXJTWVY3KzQwRjRJemtaRExnODZLK3JhMlp0M1JsYUlUNzcrbVArOUQ5cHMxUwpm
+dVhQZnJsYVZzek1TZU93ckNXQmFyeCsvS2NNSm1OVXVmSS8yNEduS25WWXNzOFJqZFJUSm9GRld0
+eCs4SzhuClNUakw3R2VBcU45MndhcjZFVGc2WFNlZ1E5RlJNRy9KWFNUT2NFdEYvU1M3dS9ORjQr
+R1lBU01LTmZZQ1RGVlcKd3NuUzZpbk5yeEllblJYTXlBb1pUaHd2ZTZkMytSN0F6L3FGRnYwVTdI
+NWtkcWlIdFRnL3NmcDVYcGNKZUVERgpJdWR4MHMvN3V2R2VQUWdSa0VTNgo9Q3E4TwotLS0tLUVO
+RCBQR1AgU0lHTkFUVVJFLS0tLS0K
+
+--===============2099563789342681823==--
 
