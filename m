@@ -1,48 +1,64 @@
-Content-Type: multipart/mixed; boundary="===============2530735398021399385=="
+Content-Type: multipart/mixed; boundary="===============6385593208108799591=="
 MIME-Version: 1.0
-From: Oleg Drokin <green at linuxhacker.ru>
-Subject: [Powertop] [PATCH 2/2] Show idle processes holding devices at full
- power
-Date: Sat, 18 Jun 2016 20:26:02 -0400
-Message-ID: <1466295962-1181132-3-git-send-email-green@linuxhacker.ru>
-In-Reply-To: 1466295962-1181132-1-git-send-email-green@linuxhacker.ru
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: [Powertop] [PATCH v2 0/1] Rebase of "Calculate the number of joules
+ consumed over time"
+Date: Thu, 21 Jul 2016 16:24:40 -0700
+Message-ID: <20160721232441.29802-1-joe.konno@linux.intel.com>
+In-Reply-To: 1469075277-35705-1-git-send-email-daniel.black@au1.ibm.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2530735398021399385==
+--===============6385593208108799591==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Even if process did not spend any time running but holds
-a device open, it deserves its line on the "Wall of Shame".
-Otherwise we get erratic "now we show it, now we don't"
-behavior which is confusing.
+From: Joe Konno <joe.konno(a)intel.com>
 
-Signed-off-by: Oleg Drokin <green(a)linuxhacker.ru>
----
- src/process/process.cpp | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Hey gang,
 
-diff --git a/src/process/process.cpp b/src/process/process.cpp
-index 25de86f..caeccec 100644
---- a/src/process/process.cpp
-+++ b/src/process/process.cpp
-@@ -230,7 +230,8 @@ void all_processes_to_all_power(void)
- {
- 	unsigned int i;
- 	for (i =3D 0; i < all_processes.size() ; i++)
--		if (all_processes[i]->accumulated_runtime)
-+		if (all_processes[i]->accumulated_runtime ||
-+		    all_processes[i]->power_charge)
- 			all_power.push_back(all_processes[i]);
- }
- =
+An attempt to apply v1 of this patch resulted in a git-am rejection in
+main.cpp, in the main() function. This was due to a context change introduc=
+ed
+in main.cpp line 514 (post git am --reject). The following patch introduced=
+ the
+context change:
+
+    - 06696d4e5f2e ("enable --auto-tune without debugfs")
+
+As a courtesy (and as thanks for the submission), I am re-submitting with t=
+he
+new context incorporated.
+
+Cheers
+
+Daniel Black (1):
+  Calculate the number of joules consumed over time
+
+ src/calibrate/calibrate.cpp      | 26 +++++++++----------
+ src/calibrate/calibrate.h        |  2 +-
+ src/devices/device.cpp           | 11 ++++++--
+ src/main.cpp                     | 54 ++++++++++++++++++++++++++++++++----=
+----
+ src/measurement/acpi.cpp         |  2 +-
+ src/measurement/acpi.h           |  2 +-
+ src/measurement/extech.cpp       |  2 +-
+ src/measurement/extech.h         |  2 +-
+ src/measurement/measurement.cpp  | 31 ++++++++++++++++++++---
+ src/measurement/measurement.h    |  6 +++--
+ src/measurement/opal-sensors.cpp |  2 +-
+ src/measurement/opal-sensors.h   |  2 +-
+ src/measurement/sysfs.h          |  2 +-
+ src/parameters/parameters.cpp    |  2 +-
+ src/parameters/parameters.h      |  1 +
+ src/process/do_process.cpp       |  8 ++++--
+ 16 files changed, 113 insertions(+), 42 deletions(-)
 
 -- =
 
-2.7.4
+2.9.0
 
 
---===============2530735398021399385==--
+--===============6385593208108799591==--
 
