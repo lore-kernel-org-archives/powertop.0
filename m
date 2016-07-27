@@ -1,45 +1,88 @@
-Content-Type: multipart/mixed; boundary="===============4586200201809937702=="
+Content-Type: multipart/mixed; boundary="===============4065238835305564411=="
 MIME-Version: 1.0
-From: Jaroslav Skarvada <jskarvad at redhat.com>
-Subject: [Powertop] [PATCH] Fix vertical scrolling in powertop-2.10
-Date: Thu, 21 Mar 2019 12:13:00 -0400
-Message-ID: <718243314.14463242.1553184780440.JavaMail.zimbra@redhat.com>
-In-Reply-To: 304227599.14463032.1553184675742.JavaMail.zimbra@redhat.com
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: Re: [Powertop] cpu wiggle changes userspace governor settings
+Date: Wed, 27 Jul 2016 07:34:31 -0700
+Message-ID: <20160727073431.1fbe4a6c@jbkonno-lemu6>
+In-Reply-To: a093d2a4-a720-034d-e679-abb8332ba567@tu-dresden.de
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4586200201809937702==
+--===============4065238835305564411==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Wed, 27 Jul 2016 09:07:04 +0200
+Thomas Ilsche <thomas.ilsche(a)tu-dresden.de> wrote:
 
-it seems there is an regression in powertop-2.10 causing
-that the vertical scrolling is not working, e.g. you cannot
-scroll in the overview tab. The attached patch should fix it
+> Hi Joe,
+> =
 
-thanks & regards
+> seems the patch was already applied successfully:
+> =
 
-Jaroslav
+> https://github.com/fenrus75/powertop/commit/1636ce2c01d9bba024f2840f114b6=
+c0554d05724
+> =
 
---===============4586200201809937702==
-Content-Type: text/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="powertop-2.10-fix-vert-scrolling.patch"
 
-ZGlmZiAtLWdpdCBhL3NyYy9kaXNwbGF5LmNwcCBiL3NyYy9kaXNwbGF5LmNwcAppbmRleCAwNzIy
-N2M1Li43YjNhN2EyIDEwMDY0NAotLS0gYS9zcmMvZGlzcGxheS5jcHAKKysrIGIvc3JjL2Rpc3Bs
-YXkuY3BwCkBAIC0yNDQsNyArMjQ0LDcgQEAgdm9pZCBjdXJzb3JfZG93bih2b2lkKQogCXcgPSB0
-YWJfd2luZG93c1t0YWJfbmFtZXNbY3VycmVudF90YWJdXTsKIAlpZiAodykgewogCQlpZiAody0+
-eXBhZF9wb3MgPCAxMDAwKSB7Ci0JCQlpZiAodGFiX25hbWVzW2N1cnJlbnRfdGFiXSA9PSAiVHVu
-YWJsZXMiIHx8ICJXYWtlVXAiKSB7CisJCQlpZiAodGFiX25hbWVzW2N1cnJlbnRfdGFiXSA9PSAi
-VHVuYWJsZXMiIHx8IHRhYl9uYW1lc1tjdXJyZW50X3RhYl0gPT0gIldha2VVcCIpIHsKIAkJICAg
-ICAgICAgICAgICAgIGlmICgody0+Y3Vyc29yX3BvcyArIDcpID49IExJTkVTKSB7IAogCQkJCQlw
-cmVmcmVzaCh3LT53aW4sICsrdy0+eXBhZF9wb3MsIHctPnhwYWRfcG9zLCAKIAkJCQkJCTEsIDAs
-IExJTkVTIC0gMywgQ09MUyAtIDEpOwo=
+Hah! Sorry for the noise. Cheers, and thanks for the contribution!
 
---===============4586200201809937702==--
+> On 2016-07-26 19:27, Joe Konno wrote:
+> > Hi Thomas,
+> >
+> > I cannot apply your diff to either the v2.8 tag or master. Could you
+> > rebase it atop master and re-submit? Thanks!
+> >
+> > PS: I'll address the question about wiggle particulars separately.
+> > To be perfectly honest I have some digging to do. ^_^
+> >
+> > On Thu, 21 Jul 2016 12:13:17 +0200
+> > Thomas Ilsche <thomas.ilsche(a)tu-dresden.de> wrote:
+> >  =
+
+> >> Dear Powertop Team,
+> >>
+> >> I have noticed that powertop changes the frequency set by the
+> >> userspace governor to the minimum available frequency.
+> >>
+> >> This is caused by abstract_cpu::wiggle that touches the
+> >> {min,max}_freq. By doing so, it also narrows down the
+> >> scaling_setspeed setting within the min-max-range, but it is not
+> >> reset upon restoring max_freq. To illustrate what is happening
+> >> behind the scenes:
+> >>
+> >> $
+> >> cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_{min,max,cur}_freq
+> >> 1200000 2901000
+> >> 2000000
+> >> $
+> >> cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_{governor,setspeed}
+> >> userspace 2000000
+> >> $ echo 1200000 | sudo
+> >> tee /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1200000
+> >> $ cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_setspeed
+> >> 1200000
+> >>
+> >> (Tested with Linux 4.4.0-21 Ubuntu)
+> >>
+> >> Attached is a patch that resets the setspeed value if it was set
+> >> to a numeric value before the wiggle.
+> >>
+> >> Please note that I don't really understand what you are trying to
+> >> achieve with the wiggle in the first place. It seems for instance
+> >> that this doesn't do anything if max_freq =3D=3D min_freq.
+> >>
+> >> Best Regards,
+> >> Thomas Ilsche
+> >>  =
+
+> >  =
+
+> =
+
+
+
+--===============4065238835305564411==--
 
