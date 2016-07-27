@@ -1,301 +1,143 @@
-Content-Type: multipart/mixed; boundary="===============1889349898504335694=="
+Content-Type: multipart/mixed; boundary="===============8285484400944791170=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Fixed some potentially unterminated strings
-Date: Fri, 26 Aug 2016 08:39:44 -0700
-Message-ID: <20160826083944.10da2703@jbkonno-cardamom.jf.intel.com>
-In-Reply-To: 69f5af73-a23e-f2e8-7779-d64d9a20cbbb@redhat.com
+From: Thomas Ilsche <thomas.ilsche at tu-dresden.de>
+Subject: Re: [Powertop] cpu wiggle changes userspace governor settings
+Date: Wed, 27 Jul 2016 09:10:09 +0200
+Message-ID: <342d1204-68b7-7943-9a17-61b98f2763cb@tu-dresden.de>
+In-Reply-To: 20160726112053.4982a0da@jbkonno-lemu6.jf.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1889349898504335694==
+--===============8285484400944791170==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 24 Aug 2016 14:09:37 +0200
-Ond=C5=99ej Lyson=C4=9Bk <olysonek(a)redhat.com> wrote:
+On 2016-07-26 20:20, Joe Konno wrote:
+>> >
+>> > Please note that I don't really understand what you are trying to
+>> > achieve with the wiggle in the first place. It seems for instance
+>> > that this doesn't do anything if max_freq =3D=3D min_freq.
+> We need to force a perf event at the beginning of the sampling
+> period. That's the only way the code can determine the starting
+> frequency. There may be other/better ways to do this. Patches, input
+> always welcome.
 
-> ---
->  src/cpu/cpu.cpp            | 2 +-
->  src/devices/ahci.cpp       | 4 ++--
->  src/devices/alsa.cpp       | 4 ++--
->  src/devices/backlight.cpp  | 2 +-
->  src/devices/devfreq.cpp    | 2 +-
->  src/devices/network.cpp    | 4 ++--
->  src/devices/rfkill.cpp     | 4 ++--
->  src/measurement/acpi.cpp   | 2 +-
->  src/measurement/extech.cpp | 3 ++-
->  src/measurement/sysfs.cpp  | 2 +-
->  src/process/interrupt.cpp  | 2 +-
->  src/process/timer.cpp      | 2 +-
->  src/process/work.cpp       | 2 +-
->  src/tuning/ethernet.cpp    | 2 +-
->  14 files changed, 19 insertions(+), 18 deletions(-)
-> =
-
-> diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-> index 64e1d3d..a801033 100644
-> --- a/src/cpu/cpu.cpp
-> +++ b/src/cpu/cpu.cpp
-> @@ -258,7 +258,7 @@ void enumerate_cpus(void)
->  				c++;
->  				if (*c =3D=3D ' ')
->  					c++;
-> -				strncpy(vendor,c, 127);
-> +				pt_strcpy(vendor,c);
->  			}
->  		}
->  		if (strncmp(line, "processor\t",10) =3D=3D 0) {
-> diff --git a/src/devices/ahci.cpp b/src/devices/ahci.cpp
-> index b8adf72..2fa2f52 100644
-> --- a/src/devices/ahci.cpp
-> +++ b/src/devices/ahci.cpp
-> @@ -127,12 +127,12 @@ ahci::ahci(char *_name, char *path): device()
->  	start_slumber =3D 0;
->  	start_devslp =3D 0;
->  	start_partial =3D 0;
-> -	strncpy(sysfs_path, path, sizeof(sysfs_path));
-> +	pt_strcpy(sysfs_path, path);
->  =
-
->  	register_sysfs_path(sysfs_path);
->  =
-
->  	snprintf(devname, sizeof(devname), "ahci:%s", _name);
-> -	strncpy(name, devname, sizeof(name));
-> +	pt_strcpy(name, devname);
->  	active_index =3D get_param_index("ahci-link-power-active");
->  	partial_index =3D get_param_index("ahci-link-power-partial");
->  =
-
-> diff --git a/src/devices/alsa.cpp b/src/devices/alsa.cpp
-> index f7ba2b6..7e22975 100644
-> --- a/src/devices/alsa.cpp
-> +++ b/src/devices/alsa.cpp
-> @@ -51,11 +51,11 @@ alsa::alsa(const char *_name, const char *path): devi=
-ce()
->  	start_active =3D 0;
->  	end_inactive =3D 0;
->  	start_inactive =3D 0;
-> -	strncpy(sysfs_path, path, sizeof(sysfs_path));
-> +	pt_strcpy(sysfs_path, path);
->  =
-
->  	snprintf(devname, sizeof(devname), "alsa:%s", _name);
->  	snprintf(humanname, sizeof(humanname), "alsa:%s", _name);
-> -	strncpy(name, devname, sizeof(name));
-> +	pt_strcpy(name, devname);
->  	rindex =3D get_result_index(name);
->  =
-
->  	guilty[0] =3D 0;
-> diff --git a/src/devices/backlight.cpp b/src/devices/backlight.cpp
-> index 609f851..c73e4c9 100644
-> --- a/src/devices/backlight.cpp
-> +++ b/src/devices/backlight.cpp
-> @@ -46,7 +46,7 @@ backlight::backlight(const char *_name, const char *pat=
-h): device()
->  	max_level =3D 0;
->  	start_level =3D 0;
->  	end_level =3D 0;
-> -	strncpy(sysfs_path, path, sizeof(sysfs_path));
-> +	pt_strcpy(sysfs_path, path);
->  	register_sysfs_path(sysfs_path);
->  	snprintf(name, sizeof(name) - 1, "backlight:%s", _name);
->  	r_index =3D get_result_index(name);
-> diff --git a/src/devices/devfreq.cpp b/src/devices/devfreq.cpp
-> index 89a36d8..c958865 100644
-> --- a/src/devices/devfreq.cpp
-> +++ b/src/devices/devfreq.cpp
-> @@ -45,7 +45,7 @@ static vector<class devfreq *> all_devfreq;
->  =
-
->  devfreq::devfreq(const char* dpath): device()
->  {
-> -	strncpy(dir_name, dpath, sizeof(dir_name));
-> +	pt_strcpy(dir_name, dpath);
->  }
->  =
-
->  uint64_t devfreq::parse_freq_time(char* pchr)
-> diff --git a/src/devices/network.cpp b/src/devices/network.cpp
-> index f8f4212..8087b7f 100644
-> --- a/src/devices/network.cpp
-> +++ b/src/devices/network.cpp
-> @@ -141,11 +141,11 @@ network::network(const char *_name, const char *pat=
-h): device()
->  	valid_high =3D -1;
->  	valid_powerunsave =3D -1;
->  =
-
-> -	strncpy(sysfs_path, path, sizeof(sysfs_path));
-> +	pt_strcpy(sysfs_path, path);
->  	register_sysfs_path(sysfs_path);
->  	pt_strcpy(devname, _name);
->  	sprintf(humanname, "nic:%s", _name);
-> -	strncpy(name, devname, sizeof(name));
-> +	pt_strcpy(name, devname);
->  =
-
->  	snprintf(devname, sizeof(devname), "%s-up", _name);
->  	index_up =3D get_param_index(devname);
-> diff --git a/src/devices/rfkill.cpp b/src/devices/rfkill.cpp
-> index 2115b5b..99a652f 100644
-> --- a/src/devices/rfkill.cpp
-> +++ b/src/devices/rfkill.cpp
-> @@ -50,11 +50,11 @@ rfkill::rfkill(char *_name, char *path): device()
->  	start_hard =3D 0;
->  	end_soft =3D 0;
->  	end_hard =3D 0;
-> -	strncpy(sysfs_path, path, sizeof(sysfs_path));
-> +	pt_strcpy(sysfs_path, path);
->  	register_sysfs_path(sysfs_path);
->  	snprintf(devname, sizeof(devname), "radio:%s", _name);
->  	snprintf(humanname, sizeof(humanname), "radio:%s", _name);
-> -	strncpy(name, devname, sizeof(name));
-> +	pt_strcpy(name, devname);
->  	register_parameter(devname);
->  	index =3D get_param_index(devname);
->  	rindex =3D get_result_index(name);
-> diff --git a/src/measurement/acpi.cpp b/src/measurement/acpi.cpp
-> index ede2782..572852c 100644
-> --- a/src/measurement/acpi.cpp
-> +++ b/src/measurement/acpi.cpp
-> @@ -39,7 +39,7 @@ acpi_power_meter::acpi_power_meter(const char *acpi_nam=
-e)
->  	rate =3D 0.0;
->  	capacity =3D 0.0;
->  	voltage =3D 0.0;
-> -	strncpy(battery_name, acpi_name, sizeof(battery_name));
-> +	pt_strcpy(battery_name, acpi_name);
->  }
->  =
-
->  /*
-> diff --git a/src/measurement/extech.cpp b/src/measurement/extech.cpp
-> index 0849907..867aca7 100644
-> --- a/src/measurement/extech.cpp
-> +++ b/src/measurement/extech.cpp
-> @@ -54,6 +54,7 @@
->  =
-
->  #include "measurement.h"
->  #include "extech.h"
-> +#include "../lib.h"
->  #include <iostream>
->  #include <fstream>
->  #include <string.h>
-> @@ -268,7 +269,7 @@ static double extech_read(int fd)
->  extech_power_meter::extech_power_meter(const char *extech_name)
->  {
->  	rate =3D 0.0;
-> -	strncpy(dev_name, extech_name, sizeof(dev_name));
-> +	pt_strcpy(dev_name, extech_name);
->  	int ret;
->  =
-
->  	fd =3D open_device(dev_name);
-> diff --git a/src/measurement/sysfs.cpp b/src/measurement/sysfs.cpp
-> index 8126104..c5a7a12 100644
-> --- a/src/measurement/sysfs.cpp
-> +++ b/src/measurement/sysfs.cpp
-> @@ -33,7 +33,7 @@ sysfs_power_meter::sysfs_power_meter(const char *power_=
-supply_name)
->  {
->  	rate =3D 0.0;
->  	capacity =3D 0.0;
-> -	strncpy(name, power_supply_name, sizeof(name));
-> +	pt_strcpy(name, power_supply_name);
->  }
->  =
-
->  bool sysfs_power_meter::get_sysfs_attr(const char *attribute, int *value)
-> diff --git a/src/process/interrupt.cpp b/src/process/interrupt.cpp
-> index 53b0367..a6553b1 100644
-> --- a/src/process/interrupt.cpp
-> +++ b/src/process/interrupt.cpp
-> @@ -49,7 +49,7 @@ interrupt::interrupt(const char *_handler, int _number)=
- : power_consumer()
->  	char buf[128];
->  	running_since =3D 0;
->  	number =3D _number;
-> -	strncpy(handler, _handler, 31);
-> +	pt_strcpy(handler, _handler);
->  	raw_count =3D 0;
->  	snprintf(desc, sizeof(desc), "[%i] %s", number, pretty_print(handler, b=
-uf, 128));
->  }
-> diff --git a/src/process/timer.cpp b/src/process/timer.cpp
-> index d2b5abe..5d9d2f8 100644
-> --- a/src/process/timer.cpp
-> +++ b/src/process/timer.cpp
-> @@ -61,7 +61,7 @@ static bool timer_is_deferred(const char *handler)
->  =
-
->  timer::timer(unsigned long address) : power_consumer()
->  {
-> -	strncpy(handler, kernel_function(address), 31);
-> +	pt_strcpy(handler, kernel_function(address));
->  	raw_count =3D 0;
->  	deferred =3D timer_is_deferred(handler);
->  }
-> diff --git a/src/process/work.cpp b/src/process/work.cpp
-> index 797f766..1b5c71d 100644
-> --- a/src/process/work.cpp
-> +++ b/src/process/work.cpp
-> @@ -38,7 +38,7 @@ using namespace std;
->  =
-
->  work::work(unsigned long address) : power_consumer()
->  {
-> -	strncpy(handler, kernel_function(address), 31);
-> +	pt_strcpy(handler, kernel_function(address));
->  	raw_count =3D 0;
->  	snprintf(desc, sizeof(desc), "%s", handler);
->  }
-> diff --git a/src/tuning/ethernet.cpp b/src/tuning/ethernet.cpp
-> index 6b1f393..5b128d1 100644
-> --- a/src/tuning/ethernet.cpp
-> +++ b/src/tuning/ethernet.cpp
-> @@ -50,7 +50,7 @@ extern void create_all_nics(callback fn);
->  ethernet_tunable::ethernet_tunable(const char *iface) : tunable("", 0.3,=
- _("Good"), _("Bad"), _("Unknown"))
->  {
->  	memset(interf, 0, sizeof(interf));
-> -	strncpy(interf, iface, sizeof(interf));
-> +	pt_strcpy(interf, iface);
->  	sprintf(desc, _("Wake-on-lan status for device %s"), iface);
->  	snprintf(toggle_good, sizeof(toggle_good), "ethtool -s %s wol d;", ifac=
-e);
->  =
+If the event is only used to get the frequency at the start, is there a rea=
+son why scaling_cur_freq is not used instead?
 
 
-Thanks for the contribution! Commit message updated with my Acked-by. Pushe=
-d.
-    ab7108a678e5 Fixed some potentially unterminated strings
+-- =
 
---===============1889349898504335694==
-Content-Type: application/pgp-signature
+Dipl. Inf. Thomas Ilsche
+Computer Scientist
+Highly Adaptive Energy-Efficient Computing
+CRC 912 HAEC: http://tu-dresden.de/sfb912
+Technische Universit=C3=A4t Dresden
+Center for Information Services and High Performance Computing (ZIH)
+01062 Dresden, Germany
+
+Phone: +49 351 463-42168
+Fax: +49 351 463-37773
+E-Mail: thomas.ilsche(a)tu-dresden.de
+
+
+--===============8285484400944791170==
+Content-Type: application/pkcs7-signature
 MIME-Version: 1.0
 Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.sig"
+Content-Disposition: attachment; filename="smime.p7s"
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjIuMC4yMiAoR05V
-L0xpbnV4KQoKaVFJY0JBRUJBZ0FHQlFKWHdHTEFBQW9KRUkySVI5VXZTcXBtTmc0UCt3VFA4eXZy
-TXBqUGpMbzN1eHFoTVh6Mgo2dWJHbUhRNW1yUzZtQWVGb3hVdjc0YnROWlZsM09jMkcrRTh2V1oy
-QjJsM1dQVzdlY3pzTmwyQVF6eWNiQUR1CmJ5cThteHdIT2tET3BGUFQ1RFpoMDNobzgyM3dINVdk
-dlZTUVdMNzl5OWVyR2FiU1BtdFIyS1U0aDIrRmZOVGkKSGxiMldUNnF6SlpzN01lbFc4YTErdWpa
-WWlsUFQ0Z2JuNU92YysrL1FzZXl5djRvU1Y2b2M3Wm1CRG9SL0xmNwpaWGIvcFVoREE2UUZHSFN6
-Wjl5LzZENllIMCsyRERpT1hXbDkvRGRlUXB4MHZwOXl6dXNpRHRDMTFVSWtaV3hyClRxejBoVGdo
-VEMwekw2Y0ZzdUZGZzVici82NGtmS0dGK0haNXBORVRsUjZFMXNBWnQyZ2ZZQzRwOGJJUjhoMU8K
-SnRyL0NhYjhYSWYxS3Z2YjBNVXZuN1BJdk11dEVteEdXTWJrd3l1VEIvbXZZeDREZVpTL2dXZHRQ
-NTlnV1FBdQp1QzIrMHNrS1I1YzFNRmtFR3RFY3dGT2FZYm4wdmw5MGxscmVHdmxKZ1BHVCtLUDBW
-RjVlZFZCUDFIVlo1YUpuCmNGVnpZMlJUQytvdVdRZmNwZWZYTkYwUWttZkFIYU5TOWV1NE54eHVY
-U0EvV0hzVnlvTGJKdDNJQlJjNWNPM2MKd0IzMmg3Q0VNOU0xcGowTFJlQlJPdU9JWDl2RGVLQ3My
-ZlFnazUrS3oweHVPUkxMRHVLOFBpMlBCZzhqLzl2cApZMmt1RlBhWktIUTdTTlA2S0NQNTFwbVVt
-TWxjOUErYU5TSTMvcDg4U3RQSnFZakxlc0t2Y2hWakN3bnhKSFBRCnRMdFlMKzc3THdNZi92SjRB
-bzdhCj11ZDkxCi0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQo=
-
---===============1889349898504335694==--
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD+Yw
+ggTVMIIDvaADAgECAghQTsb1PRG0ZDANBgkqhkiG9w0BAQsFADBxMQswCQYDVQQGEwJERTEcMBoG
+A1UEChMTRGV1dHNjaGUgVGVsZWtvbSBBRzEfMB0GA1UECxMWVC1UZWxlU2VjIFRydXN0IENlbnRl
+cjEjMCEGA1UEAxMaRGV1dHNjaGUgVGVsZWtvbSBSb290IENBIDIwHhcNMTQwNzIyMTIwODI2WhcN
+MTkwNzA5MjM1OTAwWjBaMQswCQYDVQQGEwJERTETMBEGA1UEChMKREZOLVZlcmVpbjEQMA4GA1UE
+CxMHREZOLVBLSTEkMCIGA1UEAxMbREZOLVZlcmVpbiBQQ0EgR2xvYmFsIC0gRzAxMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6ZvDZ4X5Da71jVTDllA1PWLpbkztlNcAW5UidNQg6zSP
+1uzAMQQLmYHiphTSUqAoI4SLdIkEXlvg4njBeMsWyyg1OXstkEXQ7aAAeny/Sg4bAMOG6VwrMRF7
+DPOCJEOMHDiLamgAmu7cT3ir0sYTm3at7t4m6O8Br3QPwQmi9mvOvdPNFDBP9eXjpMhim4IaAycw
+DQJlYE3t0QkjKpY1WCfTdsZxtpAdxO3/NYZ9bzOz2w/FEcKKg6GUXUFr2NIQ9Uz9ylGs2b3vkoO7
+2uuLFlZWQ8/h1RM9ph8nMM1JVNvJEzSacXXFbOqnC5j5IZ0nrz6jOTlIaoytyZn7wxLyvQIDAQAB
+o4IBhjCCAYIwDgYDVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRJt8bP6D0ff+pEexMp9/EKcD7eZDAf
+BgNVHSMEGDAWgBQxw3kbuvVT1xfgiXotF2wKsyudMzASBgNVHRMBAf8ECDAGAQH/AgECMGIGA1Ud
+IARbMFkwEQYPKwYBBAGBrSGCLAEBBAICMBEGDysGAQQBga0hgiwBAQQDADARBg8rBgEEAYGtIYIs
+AQEEAwEwDwYNKwYBBAGBrSGCLAEBBDANBgsrBgEEAYGtIYIsHjA+BgNVHR8ENzA1MDOgMaAvhi1o
+dHRwOi8vcGtpMDMzNi50ZWxlc2VjLmRlL3JsL0RUX1JPT1RfQ0FfMi5jcmwweAYIKwYBBQUHAQEE
+bDBqMCwGCCsGAQUFBzABhiBodHRwOi8vb2NzcDAzMzYudGVsZXNlYy5kZS9vY3NwcjA6BggrBgEF
+BQcwAoYuaHR0cDovL3BraTAzMzYudGVsZXNlYy5kZS9jcnQvRFRfUk9PVF9DQV8yLmNlcjANBgkq
+hkiG9w0BAQsFAAOCAQEAYyAo/ZwhhnK+OUZZOTIlvKkBmw3Myn1BnIZtCm4ssxNZdbEzkhthJxb/
+w7LVNYL7hCoBSb1mu2YvssIGXW4/buMBWlvKQ2NclbbhMacf1QdfTeZlgk4y+cN8ekvNTVx07iHy
+dQLsUj7SyWrTkCNuSWc1vn9NVqTszC/Pt6GXqHI+ybxA1lqkCD3WvILDt7cyjrEsjmpttzUCGc/1
+OURYY6ckABCwu/xOr24vOLulV0k/2G5QbyyXltwdRpplic+uzPLl2Z9Tsz6hL5Kp2AvGhB8Exuse
+6J99tXulAvEkxSRjETTMWpMgKnmIOiVCkKllO3yG0xIVIyn8LNrMOVtUFzCCBWEwggRJoAMCAQIC
+BxekJHloXI4wDQYJKoZIhvcNAQELBQAwWjELMAkGA1UEBhMCREUxEzARBgNVBAoTCkRGTi1WZXJl
+aW4xEDAOBgNVBAsTB0RGTi1QS0kxJDAiBgNVBAMTG0RGTi1WZXJlaW4gUENBIEdsb2JhbCAtIEcw
+MTAeFw0xNDA1MjcxNDUzMjlaFw0xOTA3MDkyMzU5MDBaMIGFMQswCQYDVQQGEwJERTEoMCYGA1UE
+ChMfVGVjaG5pc2NoZSBVbml2ZXJzaXRhZXQgRHJlc2RlbjEMMAoGA1UECxMDWklIMRwwGgYDVQQD
+ExNUVSBEcmVzZGVuIENBIC0gRzAyMSAwHgYJKoZIhvcNAQkBFhFwa2lAdHUtZHJlc2Rlbi5kZTCC
+ASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMEOHpPzRPbs0Cf3UHphCwQ0FZP8sR9sY9qA
+7OEzXDUKPHcgIKKVgKAl4g9CYFlP1FqXHEXbPY4YM9xFO6pxoU+SC10ZrDUEUQhf6QZ7ci3PYaVo
+os+dAEfByn44OPw52C8PjBmpiS+yNoPHVyTaykcdXEsSH/vJt7Ekvd/XNq2o8mQrZ8m4555TPcin
+viw+qEqfdADlDkTglQeW+HeXhMMWtuYQgye1Gqsn4tobYkJDYb2F8RS/F6jdmvrLzwh0b53sdun5
+cmRlig56dUi2b3P5q3Oj40HF2ZbycPTTEkAbnbFBLA3gdH6q2PQJycy2PjXNe/q6XYTuW1G5uo0z
+eycCAwEAAaOCAf4wggH6MBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYDVR0PAQH/BAQDAgEGMBEGA1Ud
+IAQKMAgwBgYEVR0gADAdBgNVHQ4EFgQUxStTkxeDyfVGQu1Dat+2gKZH8uAwHwYDVR0jBBgwFoAU
+SbfGz+g9H3/qRHsTKffxCnA+3mQwHAYDVR0RBBUwE4ERcGtpQHR1LWRyZXNkZW4uZGUwgYgGA1Ud
+HwSBgDB+MD2gO6A5hjdodHRwOi8vY2RwMS5wY2EuZGZuLmRlL2dsb2JhbC1yb290LWNhL3B1Yi9j
+cmwvY2FjcmwuY3JsMD2gO6A5hjdodHRwOi8vY2RwMi5wY2EuZGZuLmRlL2dsb2JhbC1yb290LWNh
+L3B1Yi9jcmwvY2FjcmwuY3JsMIHXBggrBgEFBQcBAQSByjCBxzAzBggrBgEFBQcwAYYnaHR0cDov
+L29jc3AucGNhLmRmbi5kZS9PQ1NQLVNlcnZlci9PQ1NQMEcGCCsGAQUFBzAChjtodHRwOi8vY2Rw
+MS5wY2EuZGZuLmRlL2dsb2JhbC1yb290LWNhL3B1Yi9jYWNlcnQvY2FjZXJ0LmNydDBHBggrBgEF
+BQcwAoY7aHR0cDovL2NkcDIucGNhLmRmbi5kZS9nbG9iYWwtcm9vdC1jYS9wdWIvY2FjZXJ0L2Nh
+Y2VydC5jcnQwDQYJKoZIhvcNAQELBQADggEBAImEwEPg6Hg9eFHAQKtaCiYMOcQsMMWHgU3V7aDS
+BhsouD+QDSDDpEoiaHgaFNEBsQ3FbYzL60dooWO3BB0FpqeKWTgM3nzWOrGOjfuM8TAOY03NPxTi
+yyLCaQwPZtYza9NxzuUOPaDvD6xHMgnzOLUC0JXjdslPzEFWPQ9CkW6phW9jOAyr4o20afhjKIEA
+zINjUTM8SC06i83uypdveMYNrvWCp0dYgp/2it8NYJn9jx35j6tKq0EAePR+cDOOciC0m9QiJ/4B
+/H/hG/HLQwePerq4eE8Vxn1AE+b6/FfadZcQyUlx/UD8iB1qHmFSmSYBAhRQmyjxBsTiBcFL8E8w
+ggWkMIIEjKADAgECAgcXLFnWLtRIMA0GCSqGSIb3DQEBBQUAMIGFMQswCQYDVQQGEwJERTEoMCYG
+A1UEChMfVGVjaG5pc2NoZSBVbml2ZXJzaXRhZXQgRHJlc2RlbjEMMAoGA1UECxMDWklIMRwwGgYD
+VQQDExNUVSBEcmVzZGVuIENBIC0gRzAyMSAwHgYJKoZIhvcNAQkBFhFwa2lAdHUtZHJlc2Rlbi5k
+ZTAeFw0xNDAyMjUxODA5MTFaFw0xNzAyMjQxODA5MTFaMF0xCzAJBgNVBAYTAkRFMSgwJgYDVQQK
+Ex9UZWNobmlzY2hlIFVuaXZlcnNpdGFldCBEcmVzZGVuMQwwCgYDVQQLEwNaSUgxFjAUBgNVBAMT
+DVRob21hcyBJbHNjaGUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDPGhz2VxL3s414
+BVLVjfrVYIFfewKMeWimc86AsayxxMjeN3vkHGIB5IK8XC7084aza+wgd6IopDK77cWzdAcpt7Bg
+f8T0Pl1wnxW0oUEvSNTs1pebyMtj/Sc845fW3w4Z3KRXUeKjsoflHLI5f9dnpywM1EU0AJw4zIxM
+e5IhwxfiG3E+aIuw0FdNDQ6F//tYKUhEhfFg7QQwwD/gVvdYLbdh09J50mtFFT9yzScpxXiDo7Xh
+l+/M3eFAWqzTpMGF17cy/7JTIodqVo6iCA2UGqNFeHorIJgNmei7oGZLURCz5RyFZTqOjxZdoptp
+0mlojEvce1xXkkUdk6Ju2bMlAgMBAAGjggI+MIICOjAvBgNVHSAEKDAmMBEGDysGAQQBga0hgiwB
+AQQDATARBg8rBgEEAYGtIYIsAgEEAwEwCQYDVR0TBAIwADALBgNVHQ8EBAMCBeAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwIGCCsGAQUFBwMEMB0GA1UdDgQWBBS2XdMo7Wr8gHKK2qVaH32OuPsBqDAfBgNV
+HSMEGDAWgBTFK1OTF4PJ9UZC7UNq37aApkfy4DAmBgNVHREEHzAdgRt0aG9tYXMuaWxzY2hlQHR1
+LWRyZXNkZW4uZGUwgYsGA1UdHwSBgzCBgDA+oDygOoY4aHR0cDovL2NkcDEucGNhLmRmbi5kZS90
+dS1kcmVzZGVuLWNhL3B1Yi9jcmwvZ19jYWNybC5jcmwwPqA8oDqGOGh0dHA6Ly9jZHAyLnBjYS5k
+Zm4uZGUvdHUtZHJlc2Rlbi1jYS9wdWIvY3JsL2dfY2FjcmwuY3JsMIHZBggrBgEFBQcBAQSBzDCB
+yTAzBggrBgEFBQcwAYYnaHR0cDovL29jc3AucGNhLmRmbi5kZS9PQ1NQLVNlcnZlci9PQ1NQMEgG
+CCsGAQUFBzAChjxodHRwOi8vY2RwMS5wY2EuZGZuLmRlL3R1LWRyZXNkZW4tY2EvcHViL2NhY2Vy
+dC9nX2NhY2VydC5jcnQwSAYIKwYBBQUHMAKGPGh0dHA6Ly9jZHAyLnBjYS5kZm4uZGUvdHUtZHJl
+c2Rlbi1jYS9wdWIvY2FjZXJ0L2dfY2FjZXJ0LmNydDANBgkqhkiG9w0BAQUFAAOCAQEAOR5nzR1a
+yOmM6Sf9GT/WcFYePXf2tGw80KvCvYJkscuI72kHpJhPH1bn/u/mGDzzzcT0+ugX+H6eEqJou03G
+wHCPHxrW/xTPhu4lJ5iwWzTASXew6gKx/BU2OAn74Bxi7zOw5pqUjN4Fzh06I/uAzI3q/I4Nfccc
+lLJLO59+X7LAZAIlZyyM2s6etFjD32+YpwsH1ojvbwAw2v+6AlwgZwR+7oAG0QIcOGyBgpKJL4oS
+VPtipqThSnsmL5DTeXivSzp702NP6dJw3lqnyDfSPQ9FZ2xD9/GkzlzA/yc/eJ/uLmndDLkYScgS
+6x+QsVyQ9UsmFFi0vX6Qk5WxSz5LiDGCA+QwggPgAgEBMIGRMIGFMQswCQYDVQQGEwJERTEoMCYG
+A1UEChMfVGVjaG5pc2NoZSBVbml2ZXJzaXRhZXQgRHJlc2RlbjEMMAoGA1UECxMDWklIMRwwGgYD
+VQQDExNUVSBEcmVzZGVuIENBIC0gRzAyMSAwHgYJKoZIhvcNAQkBFhFwa2lAdHUtZHJlc2Rlbi5k
+ZQIHFyxZ1i7USDANBglghkgBZQMEAgEFAKCCAiMwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAc
+BgkqhkiG9w0BCQUxDxcNMTYwNzI3MDcxMDA5WjAvBgkqhkiG9w0BCQQxIgQgqbc+88p9W/53lAdy
+gwpOGm/zPkmLvOW0++zigHigIUMwbAYJKoZIhvcNAQkPMV8wXTALBglghkgBZQMEASowCwYJYIZI
+AWUDBAECMAoGCCqGSIb3DQMHMA4GCCqGSIb3DQMCAgIAgDANBggqhkiG9w0DAgIBQDAHBgUrDgMC
+BzANBggqhkiG9w0DAgIBKDCBogYJKwYBBAGCNxAEMYGUMIGRMIGFMQswCQYDVQQGEwJERTEoMCYG
+A1UEChMfVGVjaG5pc2NoZSBVbml2ZXJzaXRhZXQgRHJlc2RlbjEMMAoGA1UECxMDWklIMRwwGgYD
+VQQDExNUVSBEcmVzZGVuIENBIC0gRzAyMSAwHgYJKoZIhvcNAQkBFhFwa2lAdHUtZHJlc2Rlbi5k
+ZQIHFyxZ1i7USDCBpAYLKoZIhvcNAQkQAgsxgZSggZEwgYUxCzAJBgNVBAYTAkRFMSgwJgYDVQQK
+Ex9UZWNobmlzY2hlIFVuaXZlcnNpdGFldCBEcmVzZGVuMQwwCgYDVQQLEwNaSUgxHDAaBgNVBAMT
+E1RVIERyZXNkZW4gQ0EgLSBHMDIxIDAeBgkqhkiG9w0BCQEWEXBraUB0dS1kcmVzZGVuLmRlAgcX
+LFnWLtRIMA0GCSqGSIb3DQEBAQUABIIBACMYFgdaFoMywlnx/YhA4/VvuoNkmk7BBKP8xnaTQqHP
+maG8Shr1Fvql3oufLBpCYhv8FC0Al3zFosOlaaiaT+K6GHFg5SgCpIVsj8ejkRrhBF7tXh34XydY
+Ie3aAH6x9aON2AlpwEJoF3ypj7Fg2TtER8pHuI5cUr1t3wFGA3RwGU2rjzPK7nYhy9Zl1WnqLneo
+C8JAS0qDacN3CqrIug4iV27tx18dhGAbEPvnxmP2EvJEaH2b4Q99ZoFyAc3Wg8zG37Qqhj1eCdM+
+kFQo61uwP/pxF2piRGhLaBh8P50w/fUbqiy6xaqJmAzmT6L7W3ksIck/jDwE4OY+LpvQBV0AAAAA
+AAA=
+--===============8285484400944791170==--
 
