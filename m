@@ -1,85 +1,82 @@
-Content-Type: multipart/mixed; boundary="===============6042659964784530779=="
+Content-Type: multipart/mixed; boundary="===============8244799779791537749=="
 MIME-Version: 1.0
-From: Victor Rodriguez <vm.rod25 at gmail.com>
-Subject: Re: [Powertop] seg fault at clearlinux v2.10 with kernel 4.20
-Date: Mon, 04 Mar 2019 07:51:43 -0600
-Message-ID: <CAK5mtex6-EsGUNpvU4qVCHRjymgTAwRG2cGr7RweLH7uHdB0xw@mail.gmail.com>
-In-Reply-To: 2824B99DC70CE746926327C52CA42F76487EA080@ORSMSX111.amr.corp.intel.com
+From: eSyr <evgsyr at gmail.com>
+Subject: [Powertop] [PATCH] Adding PID to process description.
+Date: Tue, 02 Aug 2016 06:39:31 +0300
+Message-ID: <20160802033927.GA22138@obsidian>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6042659964784530779==
+--===============8244799779791537749==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Fixed , thanks :)
+Currently, multiple processes shown in overview and consumers list are
+indistinguishable in case they have the same command line. This commit
+prepends PID enclosed in square brackets to the beginning of description
+line, similarly to the interrupt ID in interrupt description.
 
-On Sun, Mar 3, 2019 at 3:05 PM Kammela, Gayatri
-<gayatri.kammela(a)intel.com> wrote:
->
-> Hi Victor,
-> 4.20.10 has a kernel bug that breaks powertop. Please refer this https://=
-lists.01.org/pipermail/powertop/2019-February/002040.html . Also, try lates=
-t Clear Linux version 28100.
->
-> Thanks,
-> Gayatri
->
-> > -----Original Message-----
-> > From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of
-> > Victor Rodriguez
-> > Sent: Sunday, March 3, 2019 9:25 AM
-> > To: powertop(a)lists.01.org; Simental Magana, Marcos
-> > <marcos.simental.magana(a)intel.com>
-> > Subject: [Powertop] seg fault at clearlinux v2.10 with kernel 4.20
-> >
-> > Hi Marc and I were debugging segfault in Clear Linux version 28020
-> >
-> > Program received signal SIGSEGV, Segmentation fault.
-> >                                                     0x0000000000442b66 =
-in perf_event::process
-> > (this=3D0x4a3ab0, cookie=3Dcookie(a)entry=3D0x4b1d10) at perf/perf.cpp:=
-233
-> > 233 if (perf_fd < 0)
-> > (gdb) bt
-> > #0  0x0000000000442b66 in perf_event::process (this=3D0x4a3ab0,
-> > cookie=3Dcookie(a)entry=3D0x4b1d10) at perf/perf.cpp:233
-> > #1  0x00000000004439d8 in perf_bundle::process (this=3D0x4b1cc0) at
-> > perf/perf_bundle.cpp:326
-> > #2  0x0000000000420ce1 in process_cpu_data () at cpu/cpu.cpp:1037
-> > #3  0x00000000004146d5 in one_measurement (seconds=3D-4,
-> > seconds(a)entry=3D1, sample_interval=3D<optimized out>,
-> >     sample_interval(a)entry=3D5, workload=3Dworkload(a)entry=3D0x0) at
-> > main.cpp:255
-> > #4  0x000000000040aad3 in main (argc=3D1, argv=3D0x7fffffffcf58) at
-> > main.cpp:542
-> >
-> > The bug seems to be in this call of the perf file descriptor
-> > https://github.com/fenrus75/powertop/blob/master/src/perf/perf_bundle.c
-> > pp#L323
-> >
-> > by the call of perf_event::process in perf.cpp
-> >
-> > I guess that perf_fd =3D sys_perf_event_open(&attr, -1, _cpu, -1, 0); i=
-s not
-> > generating the perf event
-> >
-> > We have a copy of perf_event.h taken from the kernel and I wonder if we=
- do
-> > need to update it
-> >
-> > In the Clear Linux  we are running kernel: 4.20.10-698.native
-> >
-> > Happy to help with the fix, just need a bit of direction
-> >
-> > Regards
-> >
-> > Victor Rodriguez
-> > _______________________________________________
-> > PowerTop mailing list
-> > PowerTop(a)lists.01.org
-> > https://lists.01.org/mailman/listinfo/powertop
+* src/process/process.cpp (process::process): printing PID to desc,
+  adding process description after it.
+---
+ src/process/process.cpp |   17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
---===============6042659964784530779==--
+diff --git a/src/process/process.cpp b/src/process/process.cpp
+index caeccec..e244c5d 100644
+--- a/src/process/process.cpp
++++ b/src/process/process.cpp
+@@ -89,6 +89,7 @@ process::process(const char *_comm, int _pid, int _tid) :=
+ power_consumer()
+ {
+ 	char line[4097];
+ 	ifstream file;
++	ssize_t pos;
+ =
+
+ 	pt_strcpy(comm, _comm);
+ 	pid =3D _pid;
+@@ -121,7 +122,15 @@ process::process(const char *_comm, int _pid, int _tid=
+) : power_consumer()
+ 	if (strncmp(_comm, "kondemand/", 10) =3D=3D 0)
+ 		is_idle =3D 1;
+ =
+
+-	pt_strcpy(desc, comm);
++	pos =3D snprintf(desc, sizeof(desc), "[PID %d] ", pid);
++
++	if (pos < 0)
++		pos =3D 0;
++	if ((size_t)pos > sizeof(desc))
++		return;
++
++	strncpy(desc + pos, comm, sizeof(desc) - pos - 1);
++	desc[sizeof(desc) - 1] =3D '\0';
+ =
+
+ 	sprintf(line, "/proc/%i/cmdline", _pid);
+ 	file.open(line, ios::binary);
+@@ -131,11 +140,11 @@ process::process(const char *_comm, int _pid, int _ti=
+d) : power_consumer()
+ 		file.close();
+ 		if (strlen(line) < 1) {
+ 			is_kernel =3D 1;
+-			snprintf(desc, sizeof(desc), "[%s]", comm);
++			snprintf(desc + pos, sizeof(desc) - pos, "[%s]", comm);
+ 		} else {
+-			int sz =3D sizeof(desc) - 1;
++			int sz =3D sizeof(desc) - pos - 1;
+ 			cmdline_to_string(line);
+-			strncpy(desc, line, sz);
++			strncpy(desc + pos, line, sz);
+ 			desc[sz] =3D 0x00;
+ 		}
+ 	}
+-- =
+
+1.7.10.4
+
+
+--===============8244799779791537749==--
 
