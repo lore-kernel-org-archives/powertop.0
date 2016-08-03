@@ -1,143 +1,97 @@
-Content-Type: multipart/mixed; boundary="===============8285484400944791170=="
+Content-Type: multipart/mixed; boundary="===============3235964489273195659=="
 MIME-Version: 1.0
-From: Thomas Ilsche <thomas.ilsche at tu-dresden.de>
-Subject: Re: [Powertop] cpu wiggle changes userspace governor settings
-Date: Wed, 27 Jul 2016 09:10:09 +0200
-Message-ID: <342d1204-68b7-7943-9a17-61b98f2763cb@tu-dresden.de>
-In-Reply-To: 20160726112053.4982a0da@jbkonno-lemu6.jf.intel.com
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: Re: [Powertop] [PATCH] Checking whether librt is needed for
+ clock_gettime().
+Date: Wed, 03 Aug 2016 08:31:15 -0700
+Message-ID: <20160803083115.44b00021@jbkonno-basil.jf.intel.com>
+In-Reply-To: 20160802032949.GA18501@obsidian
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8285484400944791170==
+--===============3235964489273195659==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 2016-07-26 20:20, Joe Konno wrote:
->> >
->> > Please note that I don't really understand what you are trying to
->> > achieve with the wiggle in the first place. It seems for instance
->> > that this doesn't do anything if max_freq =3D=3D min_freq.
-> We need to force a perf event at the beginning of the sampling
-> period. That's the only way the code can determine the starting
-> frequency. There may be other/better ways to do this. Patches, input
-> always welcome.
+On Tue, 2 Aug 2016 06:29:53 +0300
+eSyr <evgsyr(a)gmail.com> wrote:
 
-If the event is only used to get the frequency at the start, is there a rea=
-son why scaling_cur_freq is not used instead?
+> Commit ef79e28 introduced usage of clock_gettime() function, which,
+> unfortunately, breaks build on some systems, namely Debian Wheezy, due
+> to the fact it should be linked with librt. This commit adds configure
+> check whether additional library is needed in order to use
+> aforementioned function.
+> =
 
+> * configure.ac: using AC_SEARCH_LIBS() for checking whether librt is
+>   needed for clock_gettime().
+> ---
+>  configure.ac |    2 ++
+>  1 file changed, 2 insertions(+)
+> =
 
--- =
+> diff --git a/configure.ac b/configure.ac
+> index 088d0de..7573d84 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -106,6 +106,8 @@ AC_CHECK_FUNCS([ \
+>  	strtoull \
+>  ])
+>  =
 
-Dipl. Inf. Thomas Ilsche
-Computer Scientist
-Highly Adaptive Energy-Efficient Computing
-CRC 912 HAEC: http://tu-dresden.de/sfb912
-Technische Universit=C3=A4t Dresden
-Center for Information Services and High Performance Computing (ZIH)
-01062 Dresden, Germany
+> +AC_SEARCH_LIBS([clock_gettime], [rt])
+> +
+>  PKG_CHECK_MODULES([NCURSES], [ncursesw ncurses], [LIBS=3D"$LIBS $ncurses=
+_LIBS"], [
+>  	AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], [
+>  		AC_MSG_ERROR([ncurses is required but was not found])
 
-Phone: +49 351 463-42168
-Fax: +49 351 463-37773
-E-Mail: thomas.ilsche(a)tu-dresden.de
+You have my Acked-by. Pushed, and thanks for your contribution!
 
+commit 25558463a185e8c606bd0a341e18d0996ade5f4e
+Author:     eSyr <evgsyr(a)gmail.com>
+AuthorDate: Tue Aug 2 06:29:53 2016 +0300
+Commit:     Joe Konno <joe.konno(a)intel.com>
+CommitDate: Wed Aug 3 08:26:38 2016 -0700
 
---===============8285484400944791170==
-Content-Type: application/pkcs7-signature
+    Checking whether librt is needed for clock_gettime().
+    =
+
+    Commit ef79e28 introduced usage of clock_gettime() function, which,
+    unfortunately, breaks build on some systems, namely Debian Wheezy, due
+    to the fact it should be linked with librt. This commit adds configure
+    check whether additional library is needed in order to use
+    aforementioned function.
+    =
+
+    * configure.ac: using AC_SEARCH_LIBS() for checking whether librt is
+      needed for clock_gettime().
+    =
+
+    Acked-by: Joe Konno <joe.konno(a)intel.com>
+
+--===============3235964489273195659==
+Content-Type: application/pgp-signature
 MIME-Version: 1.0
 Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
+Content-Disposition: attachment; filename="attachment.sig"
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD+Yw
-ggTVMIIDvaADAgECAghQTsb1PRG0ZDANBgkqhkiG9w0BAQsFADBxMQswCQYDVQQGEwJERTEcMBoG
-A1UEChMTRGV1dHNjaGUgVGVsZWtvbSBBRzEfMB0GA1UECxMWVC1UZWxlU2VjIFRydXN0IENlbnRl
-cjEjMCEGA1UEAxMaRGV1dHNjaGUgVGVsZWtvbSBSb290IENBIDIwHhcNMTQwNzIyMTIwODI2WhcN
-MTkwNzA5MjM1OTAwWjBaMQswCQYDVQQGEwJERTETMBEGA1UEChMKREZOLVZlcmVpbjEQMA4GA1UE
-CxMHREZOLVBLSTEkMCIGA1UEAxMbREZOLVZlcmVpbiBQQ0EgR2xvYmFsIC0gRzAxMIIBIjANBgkq
-hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6ZvDZ4X5Da71jVTDllA1PWLpbkztlNcAW5UidNQg6zSP
-1uzAMQQLmYHiphTSUqAoI4SLdIkEXlvg4njBeMsWyyg1OXstkEXQ7aAAeny/Sg4bAMOG6VwrMRF7
-DPOCJEOMHDiLamgAmu7cT3ir0sYTm3at7t4m6O8Br3QPwQmi9mvOvdPNFDBP9eXjpMhim4IaAycw
-DQJlYE3t0QkjKpY1WCfTdsZxtpAdxO3/NYZ9bzOz2w/FEcKKg6GUXUFr2NIQ9Uz9ylGs2b3vkoO7
-2uuLFlZWQ8/h1RM9ph8nMM1JVNvJEzSacXXFbOqnC5j5IZ0nrz6jOTlIaoytyZn7wxLyvQIDAQAB
-o4IBhjCCAYIwDgYDVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRJt8bP6D0ff+pEexMp9/EKcD7eZDAf
-BgNVHSMEGDAWgBQxw3kbuvVT1xfgiXotF2wKsyudMzASBgNVHRMBAf8ECDAGAQH/AgECMGIGA1Ud
-IARbMFkwEQYPKwYBBAGBrSGCLAEBBAICMBEGDysGAQQBga0hgiwBAQQDADARBg8rBgEEAYGtIYIs
-AQEEAwEwDwYNKwYBBAGBrSGCLAEBBDANBgsrBgEEAYGtIYIsHjA+BgNVHR8ENzA1MDOgMaAvhi1o
-dHRwOi8vcGtpMDMzNi50ZWxlc2VjLmRlL3JsL0RUX1JPT1RfQ0FfMi5jcmwweAYIKwYBBQUHAQEE
-bDBqMCwGCCsGAQUFBzABhiBodHRwOi8vb2NzcDAzMzYudGVsZXNlYy5kZS9vY3NwcjA6BggrBgEF
-BQcwAoYuaHR0cDovL3BraTAzMzYudGVsZXNlYy5kZS9jcnQvRFRfUk9PVF9DQV8yLmNlcjANBgkq
-hkiG9w0BAQsFAAOCAQEAYyAo/ZwhhnK+OUZZOTIlvKkBmw3Myn1BnIZtCm4ssxNZdbEzkhthJxb/
-w7LVNYL7hCoBSb1mu2YvssIGXW4/buMBWlvKQ2NclbbhMacf1QdfTeZlgk4y+cN8ekvNTVx07iHy
-dQLsUj7SyWrTkCNuSWc1vn9NVqTszC/Pt6GXqHI+ybxA1lqkCD3WvILDt7cyjrEsjmpttzUCGc/1
-OURYY6ckABCwu/xOr24vOLulV0k/2G5QbyyXltwdRpplic+uzPLl2Z9Tsz6hL5Kp2AvGhB8Exuse
-6J99tXulAvEkxSRjETTMWpMgKnmIOiVCkKllO3yG0xIVIyn8LNrMOVtUFzCCBWEwggRJoAMCAQIC
-BxekJHloXI4wDQYJKoZIhvcNAQELBQAwWjELMAkGA1UEBhMCREUxEzARBgNVBAoTCkRGTi1WZXJl
-aW4xEDAOBgNVBAsTB0RGTi1QS0kxJDAiBgNVBAMTG0RGTi1WZXJlaW4gUENBIEdsb2JhbCAtIEcw
-MTAeFw0xNDA1MjcxNDUzMjlaFw0xOTA3MDkyMzU5MDBaMIGFMQswCQYDVQQGEwJERTEoMCYGA1UE
-ChMfVGVjaG5pc2NoZSBVbml2ZXJzaXRhZXQgRHJlc2RlbjEMMAoGA1UECxMDWklIMRwwGgYDVQQD
-ExNUVSBEcmVzZGVuIENBIC0gRzAyMSAwHgYJKoZIhvcNAQkBFhFwa2lAdHUtZHJlc2Rlbi5kZTCC
-ASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMEOHpPzRPbs0Cf3UHphCwQ0FZP8sR9sY9qA
-7OEzXDUKPHcgIKKVgKAl4g9CYFlP1FqXHEXbPY4YM9xFO6pxoU+SC10ZrDUEUQhf6QZ7ci3PYaVo
-os+dAEfByn44OPw52C8PjBmpiS+yNoPHVyTaykcdXEsSH/vJt7Ekvd/XNq2o8mQrZ8m4555TPcin
-viw+qEqfdADlDkTglQeW+HeXhMMWtuYQgye1Gqsn4tobYkJDYb2F8RS/F6jdmvrLzwh0b53sdun5
-cmRlig56dUi2b3P5q3Oj40HF2ZbycPTTEkAbnbFBLA3gdH6q2PQJycy2PjXNe/q6XYTuW1G5uo0z
-eycCAwEAAaOCAf4wggH6MBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYDVR0PAQH/BAQDAgEGMBEGA1Ud
-IAQKMAgwBgYEVR0gADAdBgNVHQ4EFgQUxStTkxeDyfVGQu1Dat+2gKZH8uAwHwYDVR0jBBgwFoAU
-SbfGz+g9H3/qRHsTKffxCnA+3mQwHAYDVR0RBBUwE4ERcGtpQHR1LWRyZXNkZW4uZGUwgYgGA1Ud
-HwSBgDB+MD2gO6A5hjdodHRwOi8vY2RwMS5wY2EuZGZuLmRlL2dsb2JhbC1yb290LWNhL3B1Yi9j
-cmwvY2FjcmwuY3JsMD2gO6A5hjdodHRwOi8vY2RwMi5wY2EuZGZuLmRlL2dsb2JhbC1yb290LWNh
-L3B1Yi9jcmwvY2FjcmwuY3JsMIHXBggrBgEFBQcBAQSByjCBxzAzBggrBgEFBQcwAYYnaHR0cDov
-L29jc3AucGNhLmRmbi5kZS9PQ1NQLVNlcnZlci9PQ1NQMEcGCCsGAQUFBzAChjtodHRwOi8vY2Rw
-MS5wY2EuZGZuLmRlL2dsb2JhbC1yb290LWNhL3B1Yi9jYWNlcnQvY2FjZXJ0LmNydDBHBggrBgEF
-BQcwAoY7aHR0cDovL2NkcDIucGNhLmRmbi5kZS9nbG9iYWwtcm9vdC1jYS9wdWIvY2FjZXJ0L2Nh
-Y2VydC5jcnQwDQYJKoZIhvcNAQELBQADggEBAImEwEPg6Hg9eFHAQKtaCiYMOcQsMMWHgU3V7aDS
-BhsouD+QDSDDpEoiaHgaFNEBsQ3FbYzL60dooWO3BB0FpqeKWTgM3nzWOrGOjfuM8TAOY03NPxTi
-yyLCaQwPZtYza9NxzuUOPaDvD6xHMgnzOLUC0JXjdslPzEFWPQ9CkW6phW9jOAyr4o20afhjKIEA
-zINjUTM8SC06i83uypdveMYNrvWCp0dYgp/2it8NYJn9jx35j6tKq0EAePR+cDOOciC0m9QiJ/4B
-/H/hG/HLQwePerq4eE8Vxn1AE+b6/FfadZcQyUlx/UD8iB1qHmFSmSYBAhRQmyjxBsTiBcFL8E8w
-ggWkMIIEjKADAgECAgcXLFnWLtRIMA0GCSqGSIb3DQEBBQUAMIGFMQswCQYDVQQGEwJERTEoMCYG
-A1UEChMfVGVjaG5pc2NoZSBVbml2ZXJzaXRhZXQgRHJlc2RlbjEMMAoGA1UECxMDWklIMRwwGgYD
-VQQDExNUVSBEcmVzZGVuIENBIC0gRzAyMSAwHgYJKoZIhvcNAQkBFhFwa2lAdHUtZHJlc2Rlbi5k
-ZTAeFw0xNDAyMjUxODA5MTFaFw0xNzAyMjQxODA5MTFaMF0xCzAJBgNVBAYTAkRFMSgwJgYDVQQK
-Ex9UZWNobmlzY2hlIFVuaXZlcnNpdGFldCBEcmVzZGVuMQwwCgYDVQQLEwNaSUgxFjAUBgNVBAMT
-DVRob21hcyBJbHNjaGUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDPGhz2VxL3s414
-BVLVjfrVYIFfewKMeWimc86AsayxxMjeN3vkHGIB5IK8XC7084aza+wgd6IopDK77cWzdAcpt7Bg
-f8T0Pl1wnxW0oUEvSNTs1pebyMtj/Sc845fW3w4Z3KRXUeKjsoflHLI5f9dnpywM1EU0AJw4zIxM
-e5IhwxfiG3E+aIuw0FdNDQ6F//tYKUhEhfFg7QQwwD/gVvdYLbdh09J50mtFFT9yzScpxXiDo7Xh
-l+/M3eFAWqzTpMGF17cy/7JTIodqVo6iCA2UGqNFeHorIJgNmei7oGZLURCz5RyFZTqOjxZdoptp
-0mlojEvce1xXkkUdk6Ju2bMlAgMBAAGjggI+MIICOjAvBgNVHSAEKDAmMBEGDysGAQQBga0hgiwB
-AQQDATARBg8rBgEEAYGtIYIsAgEEAwEwCQYDVR0TBAIwADALBgNVHQ8EBAMCBeAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwIGCCsGAQUFBwMEMB0GA1UdDgQWBBS2XdMo7Wr8gHKK2qVaH32OuPsBqDAfBgNV
-HSMEGDAWgBTFK1OTF4PJ9UZC7UNq37aApkfy4DAmBgNVHREEHzAdgRt0aG9tYXMuaWxzY2hlQHR1
-LWRyZXNkZW4uZGUwgYsGA1UdHwSBgzCBgDA+oDygOoY4aHR0cDovL2NkcDEucGNhLmRmbi5kZS90
-dS1kcmVzZGVuLWNhL3B1Yi9jcmwvZ19jYWNybC5jcmwwPqA8oDqGOGh0dHA6Ly9jZHAyLnBjYS5k
-Zm4uZGUvdHUtZHJlc2Rlbi1jYS9wdWIvY3JsL2dfY2FjcmwuY3JsMIHZBggrBgEFBQcBAQSBzDCB
-yTAzBggrBgEFBQcwAYYnaHR0cDovL29jc3AucGNhLmRmbi5kZS9PQ1NQLVNlcnZlci9PQ1NQMEgG
-CCsGAQUFBzAChjxodHRwOi8vY2RwMS5wY2EuZGZuLmRlL3R1LWRyZXNkZW4tY2EvcHViL2NhY2Vy
-dC9nX2NhY2VydC5jcnQwSAYIKwYBBQUHMAKGPGh0dHA6Ly9jZHAyLnBjYS5kZm4uZGUvdHUtZHJl
-c2Rlbi1jYS9wdWIvY2FjZXJ0L2dfY2FjZXJ0LmNydDANBgkqhkiG9w0BAQUFAAOCAQEAOR5nzR1a
-yOmM6Sf9GT/WcFYePXf2tGw80KvCvYJkscuI72kHpJhPH1bn/u/mGDzzzcT0+ugX+H6eEqJou03G
-wHCPHxrW/xTPhu4lJ5iwWzTASXew6gKx/BU2OAn74Bxi7zOw5pqUjN4Fzh06I/uAzI3q/I4Nfccc
-lLJLO59+X7LAZAIlZyyM2s6etFjD32+YpwsH1ojvbwAw2v+6AlwgZwR+7oAG0QIcOGyBgpKJL4oS
-VPtipqThSnsmL5DTeXivSzp702NP6dJw3lqnyDfSPQ9FZ2xD9/GkzlzA/yc/eJ/uLmndDLkYScgS
-6x+QsVyQ9UsmFFi0vX6Qk5WxSz5LiDGCA+QwggPgAgEBMIGRMIGFMQswCQYDVQQGEwJERTEoMCYG
-A1UEChMfVGVjaG5pc2NoZSBVbml2ZXJzaXRhZXQgRHJlc2RlbjEMMAoGA1UECxMDWklIMRwwGgYD
-VQQDExNUVSBEcmVzZGVuIENBIC0gRzAyMSAwHgYJKoZIhvcNAQkBFhFwa2lAdHUtZHJlc2Rlbi5k
-ZQIHFyxZ1i7USDANBglghkgBZQMEAgEFAKCCAiMwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAc
-BgkqhkiG9w0BCQUxDxcNMTYwNzI3MDcxMDA5WjAvBgkqhkiG9w0BCQQxIgQgqbc+88p9W/53lAdy
-gwpOGm/zPkmLvOW0++zigHigIUMwbAYJKoZIhvcNAQkPMV8wXTALBglghkgBZQMEASowCwYJYIZI
-AWUDBAECMAoGCCqGSIb3DQMHMA4GCCqGSIb3DQMCAgIAgDANBggqhkiG9w0DAgIBQDAHBgUrDgMC
-BzANBggqhkiG9w0DAgIBKDCBogYJKwYBBAGCNxAEMYGUMIGRMIGFMQswCQYDVQQGEwJERTEoMCYG
-A1UEChMfVGVjaG5pc2NoZSBVbml2ZXJzaXRhZXQgRHJlc2RlbjEMMAoGA1UECxMDWklIMRwwGgYD
-VQQDExNUVSBEcmVzZGVuIENBIC0gRzAyMSAwHgYJKoZIhvcNAQkBFhFwa2lAdHUtZHJlc2Rlbi5k
-ZQIHFyxZ1i7USDCBpAYLKoZIhvcNAQkQAgsxgZSggZEwgYUxCzAJBgNVBAYTAkRFMSgwJgYDVQQK
-Ex9UZWNobmlzY2hlIFVuaXZlcnNpdGFldCBEcmVzZGVuMQwwCgYDVQQLEwNaSUgxHDAaBgNVBAMT
-E1RVIERyZXNkZW4gQ0EgLSBHMDIxIDAeBgkqhkiG9w0BCQEWEXBraUB0dS1kcmVzZGVuLmRlAgcX
-LFnWLtRIMA0GCSqGSIb3DQEBAQUABIIBACMYFgdaFoMywlnx/YhA4/VvuoNkmk7BBKP8xnaTQqHP
-maG8Shr1Fvql3oufLBpCYhv8FC0Al3zFosOlaaiaT+K6GHFg5SgCpIVsj8ejkRrhBF7tXh34XydY
-Ie3aAH6x9aON2AlpwEJoF3ypj7Fg2TtER8pHuI5cUr1t3wFGA3RwGU2rjzPK7nYhy9Zl1WnqLneo
-C8JAS0qDacN3CqrIug4iV27tx18dhGAbEPvnxmP2EvJEaH2b4Q99ZoFyAc3Wg8zG37Qqhj1eCdM+
-kFQo61uwP/pxF2piRGhLaBh8P50w/fUbqiy6xaqJmAzmT6L7W3ksIck/jDwE4OY+LpvQBV0AAAAA
-AAA=
---===============8285484400944791170==--
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjIuMC4yMiAoR05V
+L0xpbnV4KQoKaVFJY0JBRUJBZ0FHQlFKWG9nNURBQW9KRUkySVI5VXZTcXBtbzBNUUFNYVNQY0w5
+VUZuOEdFNUs4Tm1rM1RPOQp3d2t6V3h1QjVYVkZCc2IvbndCSlNpeGNvaWRlSUpqSG10cWE5eGJj
+cC9nSCs5ZnA5TzlIOTdmTlVvNHQyZ29KCklqdzhacXpHZHVndHJwS0dYUHNIaGdNZFpjVHN1VXBF
+T1A4alcyalRTS2cxTXFTcDBiazhFVWRGYlFiYzNrQlcKemVlMURvVFBJZmw4RVgxeHdnOFgwRUZr
+NEMrUFA4L3p6RW9GOURnaG9OUS9YV1BiRG5xK2Mxbld5aUlDci9UWApBbjhwaGZ6djZyZ2I5dmdL
+ajB5NXJ0bUluMjdnMVZ5L3lqY0p4dkxPcnhYdklXSnlhekp6SHBlT1d1VW1URkZVCjZkdjNtcElX
+T2hpMkZYV2FQSXJSajh3KzRNcDJKZVlPU2FLUTR6UnFsZ2dlZnl3aERXdnlWNlB3WHNUY3ZjOGwK
+OXhOU05GSUJSenpMaTR2bXdBYkg5L3RNNGZzS1dDMGN4T2V4OU9zUG5XSU9ST3NZQUtHWDJrdDZ4
+amNxS29hcwppb2EvTTlHZzFpaVFsQnFWZXY4OWpyakpneEprVFFDbGJqYmgxRmk2QkQ2WExQcVhN
+dmNVTm5Odno4WU03R0MyCjZwUk1OeStKMHFwcG0yY25nVjRGWGN5a3VseFI1dmVRd2Q4NVd1T24r
+cWM0anRETGNzSWpJUWJld2sxVklEd0YKem9Ra2hxcWduLzZzYnlEbHlxdldhQnl5US9QMHZkcXc1
+Q3hwbDNvK1U1S1VTQUJTQTNod2pHNWt4bVhuZWFnSQo4cmFkTnZDSkJLdFhOVWdCK1AvUFFlUjl4
+TW9qQXNIZVlvTlVCbFZsYVBUaU9Yb2sxeW5JcVdyQ1p3SE00ZmFICkpTUDBta3ExVDRlQlVSakdE
+RGFpCj1tbW56Ci0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQo=
+
+--===============3235964489273195659==--
 
