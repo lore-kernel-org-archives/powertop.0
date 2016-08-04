@@ -1,43 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============0401458108053829000=="
+Content-Type: multipart/mixed; boundary="===============8751851575856062411=="
 MIME-Version: 1.0
-From: Eugene Syromyatnikov <evgsyr at gmail.com>
-Subject: Re: [Powertop] 'PowerTOP --calibrate' output
-Date: Sun, 21 May 2017 19:17:36 +0000
-Message-ID: <CACGkJdu-NYUqz_9MBQDGdjjp4-117V=MU+pXdT17RDWSKcRw0g@mail.gmail.com>
-In-Reply-To: CAOZcyfbJ3R+qP+0DgVjrT8f8+p+_nYssky_EkmfwjnXP9_Jp9A@mail.gmail.com
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: Re: [Powertop] [PATCH v2 00/10] Housecleaning and Gettext cleanup
+Date: Thu, 04 Aug 2016 15:01:30 -0700
+Message-ID: <20160804150130.4b42e787@jbkonno-basil.jf.intel.com>
+In-Reply-To: 1470272369-218664-1-git-send-email-joe.konno@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0401458108053829000==
+--===============8751851575856062411==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, May 21, 2017 at 6:36 PM, Amit Singh <amit112amit(a)gmail.com> wrote:
-> Hi.
-> After exiting 'sudo powertop --calibrate', there are some statistics prin=
-ted
-> like "Score =3D 1.7 (18069.1) Guess =3D 12.1 Actual =3D 12.3" (These numb=
-ers are
-> made up, I do not remember the actual values I got). I tried looking up w=
-hat
-> these values mean but could not find it mentioned anywhere in the User's
-> guide. Can someone point me to a resource that has this information? Or if
-> you know what these mean then kindly explain it to me as well.
+On Wed,  3 Aug 2016 17:59:10 -0700
+Joe Konno <joe.konno(a)linux.intel.com> wrote:
 
-https://github.com/fenrus75/powertop/blob/master/src/parameters/parameters.=
-cpp#L255
+> Joe Konno (10):
+>   configure.ac: bump version to 2.9-pre
+>   main.cpp: append __TIME__ to --version output
+>   Makefile.am: add --install to ACLOCAL_AMFLAGS
+>   gettext: run gettextize-0.18.2
+>   .gitignore: ignnore m4/pkg.m4
+>   Makevars: align more closely to generated .template
+>   scripts: add regenerate-potfiles-in script
+>   POTFILES.in: refresh files with strings
+>   powertop.pot: xgettext refresh, attribution fix
+>   po: regenerate with new POT and strings
 
-They are calculated in [1].
+Second patch was removed from series. As promised, v2 patches 10-19 were
+squashed into one, for a total of 9 patches pushed (listed git log --reverse
+order):
 
-[1] https://github.com/fenrus75/powertop/blob/master/src/parameters/paramet=
-ers.cpp#L182
+  7b35acae25e3 configure.ac: bump version to 2.9-pre
+  fadd7a020c05 Makefile.am: add --install to ACLOCAL_AMFLAGS
+  c0bb3d79f3e4 gettext: run gettextize-0.18.2
+  f791afba18ec .gitignore: ignnore m4/pkg.m4
+  6d56120e04f2 Makevars: align more closely to generated .template
+  49fbc68887ea scripts: add regenerate-potfiles-in script
+  8d89b588d977 POTFILES.in: refresh files with strings
+  de4b41828aac powertop.pot: xgettext refresh, attribution fix
+  1bfd95884978 po: regenerate with new POT and strings
 
--- =
+Cheers
 
-Eugene Syromyatnikov
-mailto:evgsyr(a)gmail.com
-xmpp:esyr(a)jabber.{ru|org}
-
---===============0401458108053829000==--
+--===============8751851575856062411==--
 
