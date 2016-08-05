@@ -1,206 +1,118 @@
-Content-Type: multipart/mixed; boundary="===============8729459080967028029=="
+Content-Type: multipart/mixed; boundary="===============2636758824677750050=="
 MIME-Version: 1.0
 From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH 2/2] intel_cpus: no pstate Idle pct with
- intel_pstate
-Date: Mon, 13 Jun 2016 09:00:34 -0700
-Message-ID: <20160613160034.29283-3-joe.konno@linux.intel.com>
-In-Reply-To: 20160613160034.29283-1-joe.konno@linux.intel.com
+Subject: [Powertop] [PATCH v1 2/3] configure.ac: version strings from git
+ describe
+Date: Fri, 05 Aug 2016 12:27:20 -0700
+Message-ID: <1470425241-215266-3-git-send-email-joe.konno@linux.intel.com>
+In-Reply-To: 1470425241-215266-1-git-send-email-joe.konno@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8729459080967028029==
+--===============2636758824677750050==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 From: Joe Konno <joe.konno(a)intel.com>
 
-Do not display "percent Idle" in the Frequency Stats tab when the
-intel_pstate kernel driver is loaded. This is because Idle time is
-inferred through kernel PM trace events, which may be insufficient for
-proper computation in certain scenarios. Therefore, best to display no
-data than potentially inaccurate data.
-
-End-users are encouraged to use the Idle Stats tab in the UI or report
-to analyze their system's idle time. When the intel_pstate kernel driver
-is loaded, the Frequency Stats tab will only present the end-user with
-the average frequency of each logical core.
+There are two version strings we need during runtime: a long version
+(for reports and --version), and a short version for the ncurses UI. Use
+a utility script to generate those strings (version-long and
+version-short) which will be cat'ed by configure and bundled when 'make
+dist' is run.
 
 Signed-off-by: Joe Konno <joe.konno(a)intel.com>
 ---
- src/cpu/intel_cpus.cpp | 50 +++++++++++++++++++++++++++++++++++++++++++---=
-----
- src/cpu/intel_cpus.h   |  2 ++
- 2 files changed, 45 insertions(+), 7 deletions(-)
+ .gitignore      |  1 +
+ Makefile.am     |  2 ++
+ autogen.sh      |  1 +
+ configure.ac    |  5 ++++-
+ scripts/version | 13 +++++++++++++
+ 5 files changed, 21 insertions(+), 1 deletion(-)
+ create mode 100644 scripts/version
 
-diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
-index 8151292238ec..330050e37473 100644
---- a/src/cpu/intel_cpus.cpp
-+++ b/src/cpu/intel_cpus.cpp
-@@ -70,6 +70,8 @@ static int intel_cpu_models[] =3D {
- 	0	/* last entry must be zero */
- };
+diff --git a/.gitignore b/.gitignore
+index 7eb138a094ce..ef817dc076bd 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -87,4 +87,5 @@ Makefile.in
+ /src/powertop
+ /stamp-h1
+ /stamp-po
++/version*
+ tags
+diff --git a/Makefile.am b/Makefile.am
+index b519d110a118..3aabb22eca6e 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -14,4 +14,6 @@ EXTRA_DIST =3D \
+ 	TODO \
+ 	Android.mk \
+ 	COPYING \
++	version-long \
++	version-short \
+ 	autogen.sh
+diff --git a/autogen.sh b/autogen.sh
+index e210037d70e0..444f9998f806 100755
+--- a/autogen.sh
++++ b/autogen.sh
+@@ -1,3 +1,4 @@
+ #!/bin/sh	=
+
  =
 
-+static int intel_pstate_driver_loaded =3D -1;
++sh scripts/version
+ autoreconf --install --verbose
+diff --git a/configure.ac b/configure.ac
+index 646b402101bb..ccfbf7ee0bb8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2,7 +2,8 @@
+ # Process this file with autoconf to produce a configure script.
+ =
+
+ AC_PREREQ([2.68])
+-AC_INIT([powertop], [2.9-pre], [powertop(a)lists.01.org], [], [https://01.=
+org/powertop])
++AC_INIT([powertop], m4_esyscmd_s([cat version-long]),
++	[powertop(a)lists.01.org], [], [https://01.org/powertop])
+ AM_INIT_AUTOMAKE([
+ 	-Wall
+ 	1.12.2
+@@ -149,5 +150,7 @@ AC_SEARCH_LIBS([inet_aton], [resolv], [], [
+ 	AC_MSG_ERROR([libresolv is required but was not found])
+ ], [])
+ =
+
++AC_DEFINE([PACKAGE_SHORT_VERSION], m4_esyscmd_s([cat version-short]),
++	[Short package version])
+ =
+
+ AC_OUTPUT
+diff --git a/scripts/version b/scripts/version
+new file mode 100644
+index 000000000000..348b13d9f785
+--- /dev/null
++++ b/scripts/version
+@@ -0,0 +1,13 @@
++#!/bin/sh
 +
- int is_supported_intel_cpu(int model)
- {
- 	int i;
-@@ -81,6 +83,34 @@ int is_supported_intel_cpu(int model)
- 	return 0;
- }
- =
-
-+int is_intel_pstate_driver_loaded()
-+{
-+	const string filename("/sys/devices/system/cpu/cpu0/cpufreq/scaling_drive=
-r");
-+	const string intel_pstate("intel_pstate");
-+	char line[32] =3D { '\0' };
-+	ifstream file;
++git branch > /dev/null 2>&1
++if [ "$?" =3D "0" ]; then
++	LONG=3D$(git describe --abbrev=3D7 --tags --always --dirty 2> /dev/null)
++	SHORT=3D\"$(git describe --tags --abbrev=3D0 2> /dev/null)\"
++else
++	LONG=3D"RUN-VERSION-SCRIPT-IN-GIT-REPOSITORY-ONLY"
++	SHORT=3D\"$LONG\"
++fi
 +
-+	if (intel_pstate_driver_loaded > -1)
-+		return intel_pstate_driver_loaded;
-+
-+	file.open(filename, ios::in);
-+
-+	if (!file)
-+		return -1;
-+
-+	file.getline(line, sizeof(line)-1);
-+	file.close();
-+
-+	const string scaling_driver(line);
-+	if (scaling_driver =3D=3D intel_pstate) {
-+		intel_pstate_driver_loaded =3D 1;
-+	} else {
-+		intel_pstate_driver_loaded =3D 0;
-+	}
-+
-+	return intel_pstate_driver_loaded;
-+}
-+
- static uint64_t get_msr(int cpu, uint64_t offset)
- {
- 	ssize_t retval;
-@@ -267,10 +297,11 @@ void nhm_core::measurement_end(void)
- =
-
- char * nhm_core::fill_pstate_line(int line_nr, char *buffer)
- {
-+	const int intel_pstate =3D is_intel_pstate_driver_loaded();
- 	buffer[0] =3D 0;
- 	unsigned int i;
- =
-
--	if (total_stamp =3D=3D0) {
-+	if (!intel_pstate && total_stamp =3D=3D0) {
- 		for (i =3D 0; i < pstates.size(); i++)
- 			total_stamp +=3D pstates[i]->time_after;
- 		if (total_stamp =3D=3D 0)
-@@ -282,10 +313,11 @@ char * nhm_core::fill_pstate_line(int line_nr, char *=
-buffer)
- 		return buffer;
- 	}
- =
-
--	if (line_nr >=3D (int)pstates.size() || line_nr < 0)
-+	if (intel_pstate > 0 || line_nr >=3D (int)pstates.size() || line_nr < 0)
- 		return buffer;
- =
-
- 	sprintf(buffer," %5.1f%% ", percentage(1.0* (pstates[line_nr]->time_after=
-) / total_stamp));
-+
- 	return buffer;
- }
- =
-
-@@ -342,10 +374,11 @@ nhm_package::nhm_package(int model)
- =
-
- char * nhm_package::fill_pstate_line(int line_nr, char *buffer)
- {
-+	const int intel_pstate =3D is_intel_pstate_driver_loaded();
- 	buffer[0] =3D 0;
- 	unsigned int i;
- =
-
--	if (total_stamp =3D=3D0) {
-+	if (!intel_pstate && total_stamp =3D=3D0) {
- 		for (i =3D 0; i < pstates.size(); i++)
- 			total_stamp +=3D pstates[i]->time_after;
- 		if (total_stamp =3D=3D 0)
-@@ -358,10 +391,11 @@ char * nhm_package::fill_pstate_line(int line_nr, cha=
-r *buffer)
- 		return buffer;
- 	}
- =
-
--	if (line_nr >=3D (int)pstates.size() || line_nr < 0)
-+	if (intel_pstate > 0 || line_nr >=3D (int)pstates.size() || line_nr < 0)
- 		return buffer;
- =
-
- 	sprintf(buffer," %5.1f%% ", percentage(1.0* (pstates[line_nr]->time_after=
-) / total_stamp));
-+
- 	return buffer;
- }
- =
-
-@@ -581,7 +615,9 @@ char * nhm_cpu::fill_pstate_name(int line_nr, char *buf=
-fer)
- =
-
- char * nhm_cpu::fill_pstate_line(int line_nr, char *buffer)
- {
--	if (total_stamp =3D=3D0) {
-+	const int intel_pstate =3D is_intel_pstate_driver_loaded();
-+
-+	if (!intel_pstate && total_stamp =3D=3D0) {
- 		unsigned int i;
- 		for (i =3D 0; i < pstates.size(); i++)
- 			total_stamp +=3D pstates[i]->time_after;
-@@ -600,12 +636,12 @@ char * nhm_cpu::fill_pstate_line(int line_nr, char *b=
-uffer)
- 		hz_to_human(F, buffer, 1);
- 		return buffer;
- 	}
--	if (line_nr >=3D (int)pstates.size() || line_nr < 0)
-+	if (intel_pstate > 0 || line_nr >=3D (int)pstates.size() || line_nr < 0)
- 		return buffer;
- =
-
- 	sprintf(buffer," %5.1f%% ", percentage(1.0* (pstates[line_nr]->time_after=
-) / total_stamp));
--	return buffer;
- =
-
-+	return buffer;
- }
- =
-
- =
-
-diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
-index 03310692a83b..d20db9ae3986 100644
---- a/src/cpu/intel_cpus.h
-+++ b/src/cpu/intel_cpus.h
-@@ -175,4 +175,6 @@ public:
- int is_supported_intel_cpu(int model);
- int byt_has_ahci();
- =
-
-+int is_intel_pstate_driver_loaded();
-+
- #endif
++echo $LONG  > version-long
++echo $SHORT > version-short
 -- =
 
-2.8.3
+1.8.3.1
 
 
---===============8729459080967028029==--
+--===============2636758824677750050==--
 
