@@ -1,66 +1,65 @@
-Content-Type: multipart/mixed; boundary="===============1988688635679823304=="
+Content-Type: multipart/mixed; boundary="===============5584699608045351105=="
 MIME-Version: 1.0
-From: Gayatri Kammela <gayatri.kammela at intel.com>
-Subject: [Powertop] [PATCH] src/display.cpp: Fix: Add the missing part of the
- patch changes
-Date: Thu, 02 Apr 2020 13:18:26 -0700
-Message-ID: <20200402201826.1348-1-gayatri.kammela@intel.com>
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: [Powertop] [PATCH v1 0/3] Version strings from git describe
+Date: Fri, 05 Aug 2016 12:27:18 -0700
+Message-ID: <1470425241-215266-1-git-send-email-joe.konno@linux.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1988688635679823304==
+--===============5584699608045351105==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This patch fixes the part of missing patch changes and updates the
-version in configure.ac to 2.12-pre
+From: Joe Konno <joe.konno(a)intel.com>
 
-fixes: 152a39949691 ("Revert "configure.ac: version strings from git
-describe"")
+Hey gang,
 
-Reported-by: Anthony Wong <yp(a)anthonywong.net>
-Signed-off-by: Joe Konno <joe.konno(a)intel.com>
-Signed-off-by: Gayatri Kammela <gayatri.kammela(a)intel.com>
----
- configure.ac    | 2 +-
- src/display.cpp | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+This is a series using 'git describe' to construct version strings. But, th=
+ere
+are caveats.
 
-diff --git a/configure.ac b/configure.ac
-index bc3b5b935703..d5d33762a136 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -2,7 +2,7 @@
- # Process this file with autoconf to produce a configure script.
- =
+With autotools, there doesn't seem to be a reliable way to capture code sta=
+te
+in incremental builds (git repo or no), "dirty" code (git repo or no), code
+modified in a snapshot (git repo or no), or from a released tarball. The
+autotools versioning workflow assumes you unpack/checkout the code, run
+configure once, and build once, with no changes made. Assuming that workflo=
+w,
+this series provides "dynamic"* version information.
 
- AC_PREREQ([2.69])
--AC_INIT([powertop], [2.9-pre], [powertop(a)lists.01.org], [], [https://01.=
-org/powertop])
-+AC_INIT([powertop], [2.12-pre], [powertop(a)lists.01.org], [], [https://01=
-.org/powertop])
- AM_INIT_AUTOMAKE([
- 	-Wall
- 	1.12.2
-diff --git a/src/display.cpp b/src/display.cpp
-index 7b3a7a2f2073..71311446728d 100644
---- a/src/display.cpp
-+++ b/src/display.cpp
-@@ -117,7 +117,7 @@ void show_tab(unsigned int tab)
- =
+That said: once generated, the PACKAGE_VERSION strings in config.h are
+effectively static-- irrespective of code changes or commits-- until all
+autotools artifacts are removed and autogen.sh run again.
 
- 	wattrset(tab_bar, A_REVERSE);
- 	mvwprintw(tab_bar, 0,0, "%120s", "");
--	mvwprintw(tab_bar, 0,0, "PowerTOP %s", PACKAGE_SHORT_VERSION);
-+	mvwprintw(tab_bar, 0,0, "PowerTOP %s", PACKAGE_VERSION);
- =
+Thanks to eSyr for the note on reproducible builds in a prior review,
+specifically the point about time stamps built into the binary. Credit give=
+n in
+the first patch. ^_^
 
- 	bottom_line =3D newwin(1, 0, LINES-1, 0);
- 	wattrset(bottom_line, A_REVERSE);
+Joe Konno (3):
+  main.cpp: remove __DATE__ from --version
+  configure.ac: version strings from git describe
+  search/replace POWERTOP_VERSION and SHORT_VERSION
+
+ .gitignore            |  1 +
+ Makefile.am           |  2 ++
+ autogen.sh            |  1 +
+ configure.ac          |  5 ++++-
+ scripts/version       | 13 +++++++++++++
+ src/display.cpp       |  2 +-
+ src/lib.h             |  3 ---
+ src/main.cpp          |  4 ++--
+ src/perf/perf.cpp     |  2 +-
+ src/report/report.cpp |  2 +-
+ 10 files changed, 26 insertions(+), 9 deletions(-)
+ create mode 100644 scripts/version
+
 -- =
 
-2.17.1
+1.8.3.1
 
---===============1988688635679823304==--
+
+--===============5584699608045351105==--
 
