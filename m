@@ -1,123 +1,99 @@
-Content-Type: multipart/mixed; boundary="===============3415550252479657673=="
+Content-Type: multipart/mixed; boundary="===============0548870132712501944=="
 MIME-Version: 1.0
-From: Jaroslav Skarvada <jskarvad at redhat.com>
-Subject: [Powertop] Segfault on ppc64
-Date: Tue, 04 Jun 2019 10:01:17 -0400
-Message-ID: <1068529415.9789856.1559656877115.JavaMail.zimbra@redhat.com>
-In-Reply-To: 1497495027.9778940.1559655311590.JavaMail.zimbra@redhat.com
+From: =?utf-8?q?=D0=95=D0=B2=D0=B3=D0=B5=D0=BD=D0=B8=D0=B9_=D0=A1=D1=8B=D1=80?=
+ =?utf-8?q?=D0=BE=D0=BC=D1=8F=D1=82=D0=BD=D0=B8=D0=BA=D0=BE=D0=B2_=3Cevgsy?=
+ =?utf-8?q?r_at_gmail=2Ecom=3E?=
+Subject: Re: [Powertop] [PATCH v1 2/3] configure.ac: version strings from git
+ describe
+Date: Sat, 06 Aug 2016 15:14:18 +0300
+Message-ID: <20160806121418.GA13520@obsidian>
+In-Reply-To: 20160806015336.GA11403@noemi
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3415550252479657673==
+--===============0548870132712501944==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-PowerTOP crashes on ppc64 machine with 1 idle state, reproducer:
-# powertop -t 1 --html
-
-Parameters of the machine are attached.
-
-It seems the problem is caused by the report_display_cpu_cstates()
-function from the src/cpu/cpu.cpp file.
-
-On https://github.com/fenrus75/powertop/blob/e8765b5475b22b7a2b6e9e8a031c68=
-a268a0b0b3/src/cpu/cpu.cpp#L494
-it allocates table 2x1, but the table should be 2x2 (header + 1 state), so =
-it
-later crashes on
-https://github.com/fenrus75/powertop/blob/e8765b5475b22b7a2b6e9e8a031c68a26=
-8a0b0b3/src/cpu/cpu.cpp#L580
-where it tries to fill the table.
-
-Unfortunately, the whole reporting code is quite unclear, so I am not sure =
-how
-to correctly fix it and not break anything else. The attached patch fixes
-the problem for me, but it can have side-effects - feel free to propose
-better fix
-
-thanks & regards
-
-Jaroslav
 
 
-Machine parameters:
+On Sat, Aug 6, 2016 at 4:53 AM, Magnus Fromreide <magfr(a)lysator.liu.se> w=
+rote:
+> On Fri, Aug 05, 2016 at 12:27:20PM -0700, Joe Konno wrote:
+>> From: Joe Konno <joe.konno(a)intel.com>
+>>
+>> There are two version strings we need during runtime: a long version
+>> (for reports and --version), and a short version for the ncurses UI. Use
+>> a utility script to generate those strings (version-long and
+>> version-short) which will be cat'ed by configure and bundled when 'make
+>> dist' is run.
+>>
+>> Signed-off-by: Joe Konno <joe.konno(a)intel.com>
+>
+> What happens if I build this from a distributed package, i.e.
+>
+> ./configure
+> make dist
+> ta xzf powertop-version.tar.gz
+> cd powertop-version
+> ./configure
+> make
+>
+> This would normally create a package with no git version info so the vers=
+ion
+> scripts couldn't work.
+>
+> This could obviously be regarded as an unsupported case but if so then I =
+think
+> it should be said so explicitly.
+Version script is called from autogen, configure just uses already generate=
+d files (which are in dist tarball), so there is no problem (since it is ex=
+pected that autogen is called within git repo). If one wants to support cas=
+e of autogen-out-of-git-repo, he should add version script to dist and modi=
+fy it like this:
 
-# cpupower idle-info
-CPUidle driver: pseries_idle
-CPUidle governor: menu
-analyzing CPU 0:
+---8<---
+#!/bin/sh
 
-Number of idle states: 1
-Available idle states: Shared Cede
-Shared Cede:
-Flags/Description: Shared Cede
-Latency: 0
-Usage: 1188350
-Duration: 14152220333
+: "${LONG_VERSION_PATH=3Dversion-long}"
+: "${SHORT_VERSION_PATH=3Dversion-short}"
+: "${DIST_SUFFIX=3D-dist}"
 
-# cat /proc/cpuinfo
-processor	: 0
-cpu		: POWER8E (raw), altivec supported
-clock		: 3425.000000MHz
-revision	: 2.1 (pvr 004b 0201)
+LONG=3D$(cat "${LONG_VERSION_PATH}" 2>/dev/null)
+SHORT=3D$(cat "${SHORT_VERSION_PATH}" 2>/dev/null)
 
-processor	: 1
-cpu		: POWER8E (raw), altivec supported
-clock		: 3425.000000MHz
-revision	: 2.1 (pvr 004b 0201)
+git branch > /dev/null 2>&1
+if [ "$?" =3D "0" ]; then
+	LONG=3D$(git describe --abbrev=3D7 --tags --always --dirty 2> /dev/null)
+	SHORT=3D\"$(git describe --tags --abbrev=3D0 2> /dev/null)\"
+else
+	[ -z "$LONG" -a -n "$SHORT" ] && LONG=3D"${SHORT}"
+	[ -z "$SHORT" -a -n "$LONG" ] && SHORT=3D"${LONG}"
 
-processor	: 2
-cpu		: POWER8E (raw), altivec supported
-clock		: 3425.000000MHz
-revision	: 2.1 (pvr 004b 0201)
+	if [ -z "$SHORT" -a -z "$LONG" ]
+	then
+		SHORT=3D"${SHORT_VERSION-unknown}"
+		LONG=3D"${LONG_VERSION-unknown}"
+	fi
 
-processor	: 3
-cpu		: POWER8E (raw), altivec supported
-clock		: 3425.000000MHz
-revision	: 2.1 (pvr 004b 0201)
+	LONG=3D"${LONG%${DIST_SUFFIX}}${DIST_SUFFIX}"
+	SHORT=3D"${SHORT%${DIST_SUFFIX}}${DIST_SUFFIX}"
+fi
 
-processor	: 4
-cpu		: POWER8E (raw), altivec supported
-clock		: 3425.000000MHz
-revision	: 2.1 (pvr 004b 0201)
+echo $LONG  > "${LONG_VERSION_PATH}"
+echo $SHORT > "${SHORT_VERSION_PATH}"
+--->8---
 
-processor	: 5
-cpu		: POWER8E (raw), altivec supported
-clock		: 3425.000000MHz
-revision	: 2.1 (pvr 004b 0201)
+Two main points here =E2=80=94 reading cached values at the start of the sc=
+ript and adding a dist prefix in order to signalize that this is out-of-rep=
+o configuration.
 
-processor	: 6
-cpu		: POWER8E (raw), altivec supported
-clock		: 3425.000000MHz
-revision	: 2.1 (pvr 004b 0201)
+-- =
 
-processor	: 7
-cpu		: POWER8E (raw), altivec supported
-clock		: 3425.000000MHz
-revision	: 2.1 (pvr 004b 0201)
+Eugene "eSyr" Syromyatnikov
+mailto:evgSyr(a)gmail.com
+xmpp:eSyr(a)jabber.{ru|org}
 
-timebase	: 512000000
-platform	: pSeries
-model		: IBM pSeries (emulated by qemu)
-machine		: CHRP IBM pSeries (emulated by qemu)
-
---===============3415550252479657673==
-Content-Type: text/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="powertop-2.10-ppc64-crash-fix.patch"
-
-ZGlmZiAtLWdpdCBhL3NyYy9jcHUvY3B1LmNwcCBiL3NyYy9jcHUvY3B1LmNwcAppbmRleCAyOGFm
-YzRmLi4wNjNmMmNhIDEwMDY0NAotLS0gYS9zcmMvY3B1L2NwdS5jcHAKKysrIGIvc3JjL2NwdS9j
-cHUuY3BwCkBAIC00ODksNyArNDg5LDcgQEAgdm9pZCByZXBvcnRfZGlzcGxheV9jcHVfY3N0YXRl
-cyh2b2lkKQogCQlzdHJpbmcgKnBrZ19kYXRhID0gbmV3IHN0cmluZ1twa2dfdGJsX3NpemUuY29s
-cyAqIHBrZ190Ymxfc2l6ZS5yb3dzXTsKIAogCQljb3JlX3RibF9zaXplLmNvbHM9MjsKLQkJY29y
-ZV90Ymxfc2l6ZS5yb3dzPShjc3RhdGVzX251bSAqX3BhY2thZ2UtPmNoaWxkcmVuLnNpemUoKSkK
-KwkJY29yZV90Ymxfc2l6ZS5yb3dzPSgoY3N0YXRlc19udW0gKyAxKSAqIF9wYWNrYWdlLT5jaGls
-ZHJlbi5zaXplKCkpCiAJCQkJKyBfcGFja2FnZS0+Y2hpbGRyZW4uc2l6ZSgpOwogCQlzdHJpbmcg
-KmNvcmVfZGF0YSA9IG5ldyBzdHJpbmdbY29yZV90Ymxfc2l6ZS5jb2xzICogY29yZV90Ymxfc2l6
-ZS5yb3dzXTsKIAkJaW50IG51bV9jcHVzPTAsIG51bV9jb3Jlcz0wOwo=
-
---===============3415550252479657673==--
+--===============0548870132712501944==--
 
