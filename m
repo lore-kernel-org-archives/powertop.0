@@ -1,60 +1,48 @@
-Content-Type: multipart/mixed; boundary="===============6383314236475086750=="
+Content-Type: multipart/mixed; boundary="===============7530584813634194105=="
 MIME-Version: 1.0
-From: Sergey Senozhatsky <sergey.senozhatsky at gmail.com>
-Subject: Re: [Powertop] [RFC][PATCH 1/2] Adding report generator facility
-Date: Mon, 08 Oct 2012 09:57:44 -0700
-Message-ID: <20121008165743.GA21958@swordfish.datadirect.datadirectnet.com>
-In-Reply-To: 1349283900-26721-1-git-send-email-i.zhbanov@samsung.com
+From: Chris Samuel <chris at csamuel.org>
+Subject: [Powertop] Powertop recently started reporting "glob returned
+ GLOB_ABORTED"
+Date: Sun, 07 Aug 2016 09:35:06 +1000
+Message-ID: <1656195.aRiASJK4c9@quad>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6383314236475086750==
+--===============7530584813634194105==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On (10/03/12 21:05), Igor Zhbanov wrote:
-> ---
->  po/Makevars                          |    2 +-
->  src/Makefile.am                      |    4 +
->  src/report/report-formatter-csv.cpp  |  274 ++++++++++++++++++
->  src/report/report-formatter-csv.h    |   89 ++++++
->  src/report/report-formatter-html.cpp |  514 ++++++++++++++++++++++++++++=
-++++++
->  src/report/report-formatter-html.h   |  127 +++++++++
->  src/report/report-formatter-null.cpp |  179 ++++++++++++
->  src/report/report-formatter-null.h   |   67 +++++
->  src/report/report-formatter.h        |   63 ++++
->  src/report/report-maker.cpp          |  331 ++++++++++++++++++++++
->  src/report/report-maker.h            |  209 ++++++++++++++
->  11 files changed, 1858 insertions(+), 1 deletions(-)
->  create mode 100644 src/report/report-formatter-csv.cpp
->  create mode 100644 src/report/report-formatter-csv.h
->  create mode 100644 src/report/report-formatter-html.cpp
->  create mode 100644 src/report/report-formatter-html.h
->  create mode 100644 src/report/report-formatter-null.cpp
->  create mode 100644 src/report/report-formatter-null.h
->  create mode 100644 src/report/report-formatter.h
->  create mode 100644 src/report/report-maker.cpp
->  create mode 100644 src/report/report-maker.h
-> =
+Hi folks,
 
+I'm running powertop from git master on my Toshiba Chromebook (Intel Celero=
+n =
 
-Hello,
+N2840) using Crouton to provide an Ubuntu 14.04 chroot.  Probably not a com=
+mon =
 
+configuration. :-)
 
-- can we please avoid code duplication? for example, both html and csv
-reporters contain identical implementations of
+Anyway on startup it has recently starting reporting "glob returned =
 
-clear_result()/get_result()/add*() and friends.
+GLOB_ABORTED", thus:
 
+RAPL device for cpu 0
+RAPL device for cpu 0
+RAPL device for cpu 0
+Devfreq not enabled
+glob returned GLOB_ABORTED
 
-- I think null formatter could be a basic class with default
-implementation (null) of virtual functions, rather than separate
-implementation of basic formatter interface (abstract class).
+Kernel is 3.10.18 and this ChromeOS does provide the configs.ko kernel modu=
+le =
 
+(not loaded by default) so I can provide the kernel config if it's useful.
 
-	-ss
+All the best,
+Chris
+-- =
 
---===============6383314236475086750==--
+ Chris Samuel  :  http://www.csamuel.org/  :  Melbourne, VIC
+
+--===============7530584813634194105==--
 
