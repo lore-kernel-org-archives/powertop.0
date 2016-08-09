@@ -1,66 +1,51 @@
-Content-Type: multipart/mixed; boundary="===============0363423430247926463=="
+Content-Type: multipart/mixed; boundary="===============5020320588653974716=="
 MIME-Version: 1.0
 From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH 4/4 v1] tuning: complete tunable result switch
-Date: Fri, 08 Sep 2017 15:36:51 -0700
-Message-ID: <20170908223651.27979-5-joe.konno@linux.intel.com>
-In-Reply-To: 20170908223651.27979-1-joe.konno@linux.intel.com
+Subject: [Powertop] [PATCH v2 0/3] Versions strings from git describe
+Date: Tue, 09 Aug 2016 12:59:28 -0700
+Message-ID: <1470772771-114174-1-git-send-email-joe.konno@linux.intel.com>
+In-Reply-To: 1470425241-215266-1-git-send-email-joe.konno@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0363423430247926463==
+--===============5020320588653974716==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
 From: Joe Konno <joe.konno(a)intel.com>
 
-After implementing the tunable_state enum, compiler warning showed switch
-statement within tunable result code was incomplete. Put another way, not a=
-ll
-possible enum values were checked for. Fix the code so the compiler warning
-goes away.
+Hey gang,
 
-Signed-off-by: Joe Konno <joe.konno(a)intel.com>
----
- src/tuning/tunable.h | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+Thanks to Magnus and eSyr for the review and feedback. I changed the commit
+message in patch 2/3 to clarify use of the version script. No other changes
+made to that patch or the others in the series.
 
-diff --git a/src/tuning/tunable.h b/src/tuning/tunable.h
-index 5ea7cdfb5389..afb789d6f4a7 100644
---- a/src/tuning/tunable.h
-+++ b/src/tuning/tunable.h
-@@ -59,14 +59,20 @@ public:
- =
+See the v1 cover letter for the particulars of this series:
+  * https://lists.01.org/pipermail/powertop/2016-August/001948.html
 
- 	virtual char *result_string(void)
- 	{
-+		char *result =3D NULL;
-+
- 		switch (good_bad()) {
- 		case TUNE_GOOD:
--			return good_string;
-+			result =3D good_string;
- 		case TUNE_BAD:
- 		case TUNE_UNFIXABLE:
--			return bad_string;
-+			result =3D bad_string;
-+		case TUNE_NEUTRAL:
-+		case TUNE_UNKNOWN:
-+			result =3D neutral_string;
- 		}
--		return neutral_string;
-+
-+		return result;
- 	}
- =
+Joe Konno (3):
+  main.cpp: remove __DATE__ from --version
+  configure.ac: version strings from git describe
+  search/replace POWERTOP_VERSION and SHORT_VERSION
 
- =
+ .gitignore            |  1 +
+ Makefile.am           |  2 ++
+ autogen.sh            |  1 +
+ configure.ac          |  5 ++++-
+ scripts/version       | 13 +++++++++++++
+ src/display.cpp       |  2 +-
+ src/lib.h             |  3 ---
+ src/main.cpp          |  4 ++--
+ src/perf/perf.cpp     |  2 +-
+ src/report/report.cpp |  2 +-
+ 10 files changed, 26 insertions(+), 9 deletions(-)
+ create mode 100644 scripts/version
 
 -- =
 
-2.13.5
+1.8.3.1
 
 
---===============0363423430247926463==--
+--===============5020320588653974716==--
 
