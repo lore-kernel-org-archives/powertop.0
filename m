@@ -1,707 +1,272 @@
-Content-Type: multipart/mixed; boundary="===============8287523533208508896=="
+Content-Type: multipart/mixed; boundary="===============2906931403831437692=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH] po: update translation files and template
-Date: Fri, 17 Apr 2020 10:00:46 -0700
-Message-ID: <20200417170046.21048-1-joe.konno@linux.intel.com>
+From: =?utf-8?q?Ond=C5=99ej_Lyson=C4=9Bk_=3Colysonek_at_redhat=2Ecom=3E?=
+Subject: [Powertop] [PATCH] Fixed some potentially unterminated strings
+Date: Wed, 24 Aug 2016 14:09:37 +0200
+Message-ID: <69f5af73-a23e-f2e8-7779-d64d9a20cbbb@redhat.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8287523533208508896==
+--===============2906931403831437692==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Joe Konno <joe.konno(a)intel.com>
-
-Use gettext makefile script to update all translation files in
-preparation for next release.
-
-The template (POT) file need not be manually updated as we did in an
-earlier commit, so let gettext update it without manual intervention.
-
-Fixes: 4da1908824f6 ("powertop.pot: Update powertop.pot")
-Signed-off-by: Joe Konno <joe.konno(a)intel.com>
 ---
- po/ca.po        | 14 +++++++-------
- po/cs_CZ.po     | 14 +++++++-------
- po/de_DE.po     | 14 +++++++-------
- po/en_GB.po     | 14 +++++++-------
- po/en_US.po     | 14 +++++++-------
- po/es_ES.po     | 14 +++++++-------
- po/hu_HU.po     | 14 +++++++-------
- po/id_ID.po     | 14 +++++++-------
- po/nl_NL.po     | 14 +++++++-------
- po/powertop.pot | 12 ++++++------
- po/zh_TW.po     | 14 +++++++-------
- 11 files changed, 76 insertions(+), 76 deletions(-)
+ src/cpu/cpu.cpp            | 2 +-
+ src/devices/ahci.cpp       | 4 ++--
+ src/devices/alsa.cpp       | 4 ++--
+ src/devices/backlight.cpp  | 2 +-
+ src/devices/devfreq.cpp    | 2 +-
+ src/devices/network.cpp    | 4 ++--
+ src/devices/rfkill.cpp     | 4 ++--
+ src/measurement/acpi.cpp   | 2 +-
+ src/measurement/extech.cpp | 3 ++-
+ src/measurement/sysfs.cpp  | 2 +-
+ src/process/interrupt.cpp  | 2 +-
+ src/process/timer.cpp      | 2 +-
+ src/process/work.cpp       | 2 +-
+ src/tuning/ethernet.cpp    | 2 +-
+ 14 files changed, 19 insertions(+), 18 deletions(-)
 
-diff --git a/po/ca.po b/po/ca.po
-index 2c824e2a97c5..acfacfa69432 100644
---- a/po/ca.po
-+++ b/po/ca.po
-@@ -10,7 +10,7 @@ msgid ""
- msgstr ""
- "Project-Id-Version: PowerTOP\n"
- "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
--"POT-Creation-Date: 2019-09-26 15:56-0700\n"
-+"POT-Creation-Date: 2020-04-17 09:26-0700\n"
- "PO-Revision-Date: 2013-11-05 08:40+0000\n"
- "Last-Translator: Margie Foster <margie(a)linux.intel.com>\n"
- "Language-Team: Catalan (http://www.transifex.com/projects/p/PowerTOP/"
-@@ -98,7 +98,7 @@ msgstr ""
- msgid " Core(OS)"
- msgstr ""
+diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+index 64e1d3d..a801033 100644
+--- a/src/cpu/cpu.cpp
++++ b/src/cpu/cpu.cpp
+@@ -258,7 +258,7 @@ void enumerate_cpus(void)
+ 				c++;
+ 				if (*c =3D=3D ' ')
+ 					c++;
+-				strncpy(vendor,c, 127);
++				pt_strcpy(vendor,c);
+ 			}
+ 		}
+ 		if (strncmp(line, "processor\t",10) =3D=3D 0) {
+diff --git a/src/devices/ahci.cpp b/src/devices/ahci.cpp
+index b8adf72..2fa2f52 100644
+--- a/src/devices/ahci.cpp
++++ b/src/devices/ahci.cpp
+@@ -127,12 +127,12 @@ ahci::ahci(char *_name, char *path): device()
+ 	start_slumber =3D 0;
+ 	start_devslp =3D 0;
+ 	start_partial =3D 0;
+-	strncpy(sysfs_path, path, sizeof(sysfs_path));
++	pt_strcpy(sysfs_path, path);
  =
 
--#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
-+#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
- #, c-format
- msgid "  Core"
- msgstr ""
-@@ -175,7 +175,7 @@ msgstr "C0 sondejant"
- msgid " CPU(OS) %i"
- msgstr ""
+ 	register_sysfs_path(sysfs_path);
  =
 
--#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
-+#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
- #, c-format
- msgid " CPU %i"
- msgstr ""
-@@ -190,21 +190,21 @@ msgstr ""
- msgid " Pkg(OS)"
- msgstr ""
+ 	snprintf(devname, sizeof(devname), "ahci:%s", _name);
+-	strncpy(name, devname, sizeof(name));
++	pt_strcpy(name, devname);
+ 	active_index =3D get_param_index("ahci-link-power-active");
+ 	partial_index =3D get_param_index("ahci-link-power-partial");
  =
 
--#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
-+#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
- #, c-format
- msgid "  Package"
- msgstr ""
+diff --git a/src/devices/alsa.cpp b/src/devices/alsa.cpp
+index f7ba2b6..7e22975 100644
+--- a/src/devices/alsa.cpp
++++ b/src/devices/alsa.cpp
+@@ -51,11 +51,11 @@ alsa::alsa(const char *_name, const char *path): device=
+()
+ 	start_active =3D 0;
+ 	end_inactive =3D 0;
+ 	start_inactive =3D 0;
+-	strncpy(sysfs_path, path, sizeof(sysfs_path));
++	pt_strcpy(sysfs_path, path);
  =
 
--#: src/cpu/intel_cpus.cpp:135
-+#: src/cpu/intel_cpus.cpp:139
- #, c-format
- msgid "read_msr cpu%d 0x%llx : "
- msgstr ""
+ 	snprintf(devname, sizeof(devname), "alsa:%s", _name);
+ 	snprintf(humanname, sizeof(humanname), "alsa:%s", _name);
+-	strncpy(name, devname, sizeof(name));
++	pt_strcpy(name, devname);
+ 	rindex =3D get_result_index(name);
  =
 
--#: src/cpu/intel_cpus.cpp:598
-+#: src/cpu/intel_cpus.cpp:614
- msgid "C0 active"
- msgstr "C0 actiu"
+ 	guilty[0] =3D 0;
+diff --git a/src/devices/backlight.cpp b/src/devices/backlight.cpp
+index 609f851..c73e4c9 100644
+--- a/src/devices/backlight.cpp
++++ b/src/devices/backlight.cpp
+@@ -46,7 +46,7 @@ backlight::backlight(const char *_name, const char *path)=
+: device()
+ 	max_level =3D 0;
+ 	start_level =3D 0;
+ 	end_level =3D 0;
+-	strncpy(sysfs_path, path, sizeof(sysfs_path));
++	pt_strcpy(sysfs_path, path);
+ 	register_sysfs_path(sysfs_path);
+ 	snprintf(name, sizeof(name) - 1, "backlight:%s", _name);
+ 	r_index =3D get_result_index(name);
+diff --git a/src/devices/devfreq.cpp b/src/devices/devfreq.cpp
+index 89a36d8..c958865 100644
+--- a/src/devices/devfreq.cpp
++++ b/src/devices/devfreq.cpp
+@@ -45,7 +45,7 @@ static vector<class devfreq *> all_devfreq;
  =
 
--#: src/cpu/intel_cpus.cpp:656
-+#: src/cpu/intel_cpus.cpp:672
- #, c-format
- msgid "Average"
- msgstr ""
-diff --git a/po/cs_CZ.po b/po/cs_CZ.po
-index 731f3697d50c..6386c0c34c16 100644
---- a/po/cs_CZ.po
-+++ b/po/cs_CZ.po
-@@ -9,7 +9,7 @@ msgid ""
- msgstr ""
- "Project-Id-Version: PowerTOP\n"
- "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
--"POT-Creation-Date: 2019-09-26 15:56-0700\n"
-+"POT-Creation-Date: 2020-04-17 09:26-0700\n"
- "PO-Revision-Date: 2013-11-05 08:40+0000\n"
- "Last-Translator: Margie Foster <margie(a)linux.intel.com>\n"
- "Language-Team: Czech (Czech Republic) (http://www.transifex.com/projects/=
-p/"
-@@ -97,7 +97,7 @@ msgstr "  J=C3=A1dro"
- msgid " Core(OS)"
- msgstr "  J=C3=A1dro"
+ devfreq::devfreq(const char* dpath): device()
+ {
+-	strncpy(dir_name, dpath, sizeof(dir_name));
++	pt_strcpy(dir_name, dpath);
+ }
  =
 
--#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
-+#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
- #, c-format
- msgid "  Core"
- msgstr "  J=C3=A1dro"
-@@ -177,7 +177,7 @@ msgstr "C0 sd=C3=ADlen=C3=AD"
- msgid " CPU(OS) %i"
- msgstr " CPU %i"
+ uint64_t devfreq::parse_freq_time(char* pchr)
+diff --git a/src/devices/network.cpp b/src/devices/network.cpp
+index f8f4212..8087b7f 100644
+--- a/src/devices/network.cpp
++++ b/src/devices/network.cpp
+@@ -141,11 +141,11 @@ network::network(const char *_name, const char *path)=
+: device()
+ 	valid_high =3D -1;
+ 	valid_powerunsave =3D -1;
  =
 
--#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
-+#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
- #, c-format
- msgid " CPU %i"
- msgstr " CPU %i"
-@@ -192,21 +192,21 @@ msgstr ""
- msgid " Pkg(OS)"
- msgstr ""
+-	strncpy(sysfs_path, path, sizeof(sysfs_path));
++	pt_strcpy(sysfs_path, path);
+ 	register_sysfs_path(sysfs_path);
+ 	pt_strcpy(devname, _name);
+ 	sprintf(humanname, "nic:%s", _name);
+-	strncpy(name, devname, sizeof(name));
++	pt_strcpy(name, devname);
  =
 
--#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
-+#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
- #, c-format
- msgid "  Package"
- msgstr "  Bal=C3=AD=C4=8Dek"
+ 	snprintf(devname, sizeof(devname), "%s-up", _name);
+ 	index_up =3D get_param_index(devname);
+diff --git a/src/devices/rfkill.cpp b/src/devices/rfkill.cpp
+index 2115b5b..99a652f 100644
+--- a/src/devices/rfkill.cpp
++++ b/src/devices/rfkill.cpp
+@@ -50,11 +50,11 @@ rfkill::rfkill(char *_name, char *path): device()
+ 	start_hard =3D 0;
+ 	end_soft =3D 0;
+ 	end_hard =3D 0;
+-	strncpy(sysfs_path, path, sizeof(sysfs_path));
++	pt_strcpy(sysfs_path, path);
+ 	register_sysfs_path(sysfs_path);
+ 	snprintf(devname, sizeof(devname), "radio:%s", _name);
+ 	snprintf(humanname, sizeof(humanname), "radio:%s", _name);
+-	strncpy(name, devname, sizeof(name));
++	pt_strcpy(name, devname);
+ 	register_parameter(devname);
+ 	index =3D get_param_index(devname);
+ 	rindex =3D get_result_index(name);
+diff --git a/src/measurement/acpi.cpp b/src/measurement/acpi.cpp
+index ede2782..572852c 100644
+--- a/src/measurement/acpi.cpp
++++ b/src/measurement/acpi.cpp
+@@ -39,7 +39,7 @@ acpi_power_meter::acpi_power_meter(const char *acpi_name)
+ 	rate =3D 0.0;
+ 	capacity =3D 0.0;
+ 	voltage =3D 0.0;
+-	strncpy(battery_name, acpi_name, sizeof(battery_name));
++	pt_strcpy(battery_name, acpi_name);
+ }
  =
 
--#: src/cpu/intel_cpus.cpp:135
-+#: src/cpu/intel_cpus.cpp:139
- #, c-format
- msgid "read_msr cpu%d 0x%llx : "
- msgstr ""
+ /*
+diff --git a/src/measurement/extech.cpp b/src/measurement/extech.cpp
+index 0849907..867aca7 100644
+--- a/src/measurement/extech.cpp
++++ b/src/measurement/extech.cpp
+@@ -54,6 +54,7 @@
  =
 
--#: src/cpu/intel_cpus.cpp:598
-+#: src/cpu/intel_cpus.cpp:614
- msgid "C0 active"
- msgstr "C0 aktivn=C3=AD"
+ #include "measurement.h"
+ #include "extech.h"
++#include "../lib.h"
+ #include <iostream>
+ #include <fstream>
+ #include <string.h>
+@@ -268,7 +269,7 @@ static double extech_read(int fd)
+ extech_power_meter::extech_power_meter(const char *extech_name)
+ {
+ 	rate =3D 0.0;
+-	strncpy(dev_name, extech_name, sizeof(dev_name));
++	pt_strcpy(dev_name, extech_name);
+ 	int ret;
  =
 
--#: src/cpu/intel_cpus.cpp:656
-+#: src/cpu/intel_cpus.cpp:672
- #, c-format
- msgid "Average"
- msgstr ""
-diff --git a/po/de_DE.po b/po/de_DE.po
-index dcf675856900..60506d44a858 100644
---- a/po/de_DE.po
-+++ b/po/de_DE.po
-@@ -10,7 +10,7 @@ msgid ""
- msgstr ""
- "Project-Id-Version: PowerTOP\n"
- "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
--"POT-Creation-Date: 2019-09-26 15:56-0700\n"
-+"POT-Creation-Date: 2020-04-17 09:26-0700\n"
- "PO-Revision-Date: 2013-11-05 19:48+0000\n"
- "Last-Translator: Ettore Atalan <atalanttore(a)googlemail.com>\n"
- "Language-Team: German (Germany) (http://www.transifex.com/projects/p/"
-@@ -98,7 +98,7 @@ msgstr "Kern"
- msgid " Core(OS)"
- msgstr "Kern"
+ 	fd =3D open_device(dev_name);
+diff --git a/src/measurement/sysfs.cpp b/src/measurement/sysfs.cpp
+index 8126104..c5a7a12 100644
+--- a/src/measurement/sysfs.cpp
++++ b/src/measurement/sysfs.cpp
+@@ -33,7 +33,7 @@ sysfs_power_meter::sysfs_power_meter(const char *power_su=
+pply_name)
+ {
+ 	rate =3D 0.0;
+ 	capacity =3D 0.0;
+-	strncpy(name, power_supply_name, sizeof(name));
++	pt_strcpy(name, power_supply_name);
+ }
  =
 
--#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
-+#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
- #, c-format
- msgid "  Core"
- msgstr "Kern"
-@@ -176,7 +176,7 @@ msgstr "C0 sammeln"
- msgid " CPU(OS) %i"
- msgstr "CPU %i"
+ bool sysfs_power_meter::get_sysfs_attr(const char *attribute, int *value)
+diff --git a/src/process/interrupt.cpp b/src/process/interrupt.cpp
+index 53b0367..a6553b1 100644
+--- a/src/process/interrupt.cpp
++++ b/src/process/interrupt.cpp
+@@ -49,7 +49,7 @@ interrupt::interrupt(const char *_handler, int _number) :=
+ power_consumer()
+ 	char buf[128];
+ 	running_since =3D 0;
+ 	number =3D _number;
+-	strncpy(handler, _handler, 31);
++	pt_strcpy(handler, _handler);
+ 	raw_count =3D 0;
+ 	snprintf(desc, sizeof(desc), "[%i] %s", number, pretty_print(handler, buf=
+, 128));
+ }
+diff --git a/src/process/timer.cpp b/src/process/timer.cpp
+index d2b5abe..5d9d2f8 100644
+--- a/src/process/timer.cpp
++++ b/src/process/timer.cpp
+@@ -61,7 +61,7 @@ static bool timer_is_deferred(const char *handler)
  =
 
--#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
-+#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
- #, c-format
- msgid " CPU %i"
- msgstr "CPU %i"
-@@ -191,21 +191,21 @@ msgstr ""
- msgid " Pkg(OS)"
- msgstr ""
+ timer::timer(unsigned long address) : power_consumer()
+ {
+-	strncpy(handler, kernel_function(address), 31);
++	pt_strcpy(handler, kernel_function(address));
+ 	raw_count =3D 0;
+ 	deferred =3D timer_is_deferred(handler);
+ }
+diff --git a/src/process/work.cpp b/src/process/work.cpp
+index 797f766..1b5c71d 100644
+--- a/src/process/work.cpp
++++ b/src/process/work.cpp
+@@ -38,7 +38,7 @@ using namespace std;
  =
 
--#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
-+#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
- #, c-format
- msgid "  Package"
- msgstr "Paket"
+ work::work(unsigned long address) : power_consumer()
+ {
+-	strncpy(handler, kernel_function(address), 31);
++	pt_strcpy(handler, kernel_function(address));
+ 	raw_count =3D 0;
+ 	snprintf(desc, sizeof(desc), "%s", handler);
+ }
+diff --git a/src/tuning/ethernet.cpp b/src/tuning/ethernet.cpp
+index 6b1f393..5b128d1 100644
+--- a/src/tuning/ethernet.cpp
++++ b/src/tuning/ethernet.cpp
+@@ -50,7 +50,7 @@ extern void create_all_nics(callback fn);
+ ethernet_tunable::ethernet_tunable(const char *iface) : tunable("", 0.3, _=
+("Good"), _("Bad"), _("Unknown"))
+ {
+ 	memset(interf, 0, sizeof(interf));
+-	strncpy(interf, iface, sizeof(interf));
++	pt_strcpy(interf, iface);
+ 	sprintf(desc, _("Wake-on-lan status for device %s"), iface);
+ 	snprintf(toggle_good, sizeof(toggle_good), "ethtool -s %s wol d;", iface);
  =
 
--#: src/cpu/intel_cpus.cpp:135
-+#: src/cpu/intel_cpus.cpp:139
- #, c-format
- msgid "read_msr cpu%d 0x%llx : "
- msgstr ""
- =
-
--#: src/cpu/intel_cpus.cpp:598
-+#: src/cpu/intel_cpus.cpp:614
- msgid "C0 active"
- msgstr "C0 aktiv"
- =
-
--#: src/cpu/intel_cpus.cpp:656
-+#: src/cpu/intel_cpus.cpp:672
- #, c-format
- msgid "Average"
- msgstr ""
-diff --git a/po/en_GB.po b/po/en_GB.po
-index 6f9e94930e03..aa569d8250d2 100644
---- a/po/en_GB.po
-+++ b/po/en_GB.po
-@@ -9,7 +9,7 @@ msgid ""
- msgstr ""
- "Project-Id-Version: PowerTOP\n"
- "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
--"POT-Creation-Date: 2019-09-26 15:56-0700\n"
-+"POT-Creation-Date: 2020-04-17 09:26-0700\n"
- "PO-Revision-Date: 2013-11-05 08:40+0000\n"
- "Last-Translator: Margie Foster <margie(a)linux.intel.com>\n"
- "Language-Team: English (United Kingdom) (http://www.transifex.com/project=
-s/p/"
-@@ -97,7 +97,7 @@ msgstr ""
- msgid " Core(OS)"
- msgstr ""
- =
-
--#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
-+#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
- #, c-format
- msgid "  Core"
- msgstr ""
-@@ -174,7 +174,7 @@ msgstr "C0 polling"
- msgid " CPU(OS) %i"
- msgstr ""
- =
-
--#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
-+#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
- #, c-format
- msgid " CPU %i"
- msgstr ""
-@@ -189,21 +189,21 @@ msgstr ""
- msgid " Pkg(OS)"
- msgstr ""
- =
-
--#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
-+#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
- #, c-format
- msgid "  Package"
- msgstr ""
- =
-
--#: src/cpu/intel_cpus.cpp:135
-+#: src/cpu/intel_cpus.cpp:139
- #, c-format
- msgid "read_msr cpu%d 0x%llx : "
- msgstr ""
- =
-
--#: src/cpu/intel_cpus.cpp:598
-+#: src/cpu/intel_cpus.cpp:614
- msgid "C0 active"
- msgstr "C0 active"
- =
-
--#: src/cpu/intel_cpus.cpp:656
-+#: src/cpu/intel_cpus.cpp:672
- #, c-format
- msgid "Average"
- msgstr ""
-diff --git a/po/en_US.po b/po/en_US.po
-index 3ce213f2af25..8b4ce6427a93 100644
---- a/po/en_US.po
-+++ b/po/en_US.po
-@@ -8,7 +8,7 @@ msgid ""
- msgstr ""
- "Project-Id-Version: PowerTOP\n"
- "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
--"POT-Creation-Date: 2019-09-26 15:56-0700\n"
-+"POT-Creation-Date: 2020-04-17 09:26-0700\n"
- "PO-Revision-Date: 2013-11-05 08:40+0000\n"
- "Last-Translator: Margie Foster <margie(a)linux.intel.com>\n"
- "Language-Team: English (United States) (http://www.transifex.com/projects=
-/p/"
-@@ -96,7 +96,7 @@ msgstr ""
- msgid " Core(OS)"
- msgstr ""
- =
-
--#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
-+#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
- #, c-format
- msgid "  Core"
- msgstr ""
-@@ -173,7 +173,7 @@ msgstr "C0 polling"
- msgid " CPU(OS) %i"
- msgstr ""
- =
-
--#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
-+#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
- #, c-format
- msgid " CPU %i"
- msgstr ""
-@@ -188,21 +188,21 @@ msgstr ""
- msgid " Pkg(OS)"
- msgstr ""
- =
-
--#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
-+#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
- #, c-format
- msgid "  Package"
- msgstr ""
- =
-
--#: src/cpu/intel_cpus.cpp:135
-+#: src/cpu/intel_cpus.cpp:139
- #, c-format
- msgid "read_msr cpu%d 0x%llx : "
- msgstr ""
- =
-
--#: src/cpu/intel_cpus.cpp:598
-+#: src/cpu/intel_cpus.cpp:614
- msgid "C0 active"
- msgstr "C0 active"
- =
-
--#: src/cpu/intel_cpus.cpp:656
-+#: src/cpu/intel_cpus.cpp:672
- #, c-format
- msgid "Average"
- msgstr ""
-diff --git a/po/es_ES.po b/po/es_ES.po
-index a862f65fa6ee..0716523a3b53 100644
---- a/po/es_ES.po
-+++ b/po/es_ES.po
-@@ -9,7 +9,7 @@ msgid ""
- msgstr ""
- "Project-Id-Version: PowerTOP\n"
- "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
--"POT-Creation-Date: 2019-09-26 15:56-0700\n"
-+"POT-Creation-Date: 2020-04-17 09:26-0700\n"
- "PO-Revision-Date: 2013-11-05 08:40+0000\n"
- "Last-Translator: Margie Foster <margie(a)linux.intel.com>\n"
- "Language-Team: Spanish (Spain) (http://www.transifex.com/projects/p/Power=
-TOP/"
-@@ -97,7 +97,7 @@ msgstr ""
- msgid " Core(OS)"
- msgstr ""
- =
-
--#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
-+#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
- #, c-format
- msgid "  Core"
- msgstr ""
-@@ -175,7 +175,7 @@ msgstr "C0 sondeando"
- msgid " CPU(OS) %i"
- msgstr ""
- =
-
--#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
-+#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
- #, c-format
- msgid " CPU %i"
- msgstr ""
-@@ -190,21 +190,21 @@ msgstr ""
- msgid " Pkg(OS)"
- msgstr ""
- =
-
--#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
-+#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
- #, c-format
- msgid "  Package"
- msgstr ""
- =
-
--#: src/cpu/intel_cpus.cpp:135
-+#: src/cpu/intel_cpus.cpp:139
- #, c-format
- msgid "read_msr cpu%d 0x%llx : "
- msgstr ""
- =
-
--#: src/cpu/intel_cpus.cpp:598
-+#: src/cpu/intel_cpus.cpp:614
- msgid "C0 active"
- msgstr "C0 activo"
- =
-
--#: src/cpu/intel_cpus.cpp:656
-+#: src/cpu/intel_cpus.cpp:672
- #, c-format
- msgid "Average"
- msgstr ""
-diff --git a/po/hu_HU.po b/po/hu_HU.po
-index 12bd29021a5b..dded3143ff5e 100644
---- a/po/hu_HU.po
-+++ b/po/hu_HU.po
-@@ -11,7 +11,7 @@ msgid ""
- msgstr ""
- "Project-Id-Version: PowerTOP\n"
- "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
--"POT-Creation-Date: 2019-09-26 15:56-0700\n"
-+"POT-Creation-Date: 2020-04-17 09:26-0700\n"
- "PO-Revision-Date: 2013-11-05 08:40+0000\n"
- "Last-Translator: Margie Foster <margie(a)linux.intel.com>\n"
- "Language-Team: Hungarian (Hungary) (http://www.transifex.com/projects/p/"
-@@ -99,7 +99,7 @@ msgstr ""
- msgid " Core(OS)"
- msgstr ""
- =
-
--#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
-+#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
- #, c-format
- msgid "  Core"
- msgstr ""
-@@ -177,7 +177,7 @@ msgstr "C0 ciklikus lek=C3=A9rdez=C3=A9s"
- msgid " CPU(OS) %i"
- msgstr ""
- =
-
--#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
-+#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
- #, c-format
- msgid " CPU %i"
- msgstr ""
-@@ -192,21 +192,21 @@ msgstr ""
- msgid " Pkg(OS)"
- msgstr ""
- =
-
--#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
-+#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
- #, c-format
- msgid "  Package"
- msgstr ""
- =
-
--#: src/cpu/intel_cpus.cpp:135
-+#: src/cpu/intel_cpus.cpp:139
- #, c-format
- msgid "read_msr cpu%d 0x%llx : "
- msgstr ""
- =
-
--#: src/cpu/intel_cpus.cpp:598
-+#: src/cpu/intel_cpus.cpp:614
- msgid "C0 active"
- msgstr "C0 akt=C3=ADv"
- =
-
--#: src/cpu/intel_cpus.cpp:656
-+#: src/cpu/intel_cpus.cpp:672
- #, c-format
- msgid "Average"
- msgstr ""
-diff --git a/po/id_ID.po b/po/id_ID.po
-index 994413567cd0..2ccefe790eb3 100644
---- a/po/id_ID.po
-+++ b/po/id_ID.po
-@@ -8,7 +8,7 @@ msgid ""
- msgstr ""
- "Project-Id-Version: PowerTOP\n"
- "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
--"POT-Creation-Date: 2019-09-26 15:56-0700\n"
-+"POT-Creation-Date: 2020-04-17 09:26-0700\n"
- "PO-Revision-Date: 2013-11-05 08:40+0000\n"
- "Last-Translator: Margie Foster <margie(a)linux.intel.com>\n"
- "Language-Team: Indonesian (Indonesia) (http://www.transifex.com/projects/=
-p/"
-@@ -96,7 +96,7 @@ msgstr "  Core"
- msgid " Core(OS)"
- msgstr "  Core"
- =
-
--#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
-+#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
- #, c-format
- msgid "  Core"
- msgstr "  Core"
-@@ -174,7 +174,7 @@ msgstr "C0 polling"
- msgid " CPU(OS) %i"
- msgstr " CPU %i"
- =
-
--#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
-+#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
- #, c-format
- msgid " CPU %i"
- msgstr " CPU %i"
-@@ -189,21 +189,21 @@ msgstr ""
- msgid " Pkg(OS)"
- msgstr ""
- =
-
--#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
-+#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
- #, c-format
- msgid "  Package"
- msgstr "Paket"
- =
-
--#: src/cpu/intel_cpus.cpp:135
-+#: src/cpu/intel_cpus.cpp:139
- #, c-format
- msgid "read_msr cpu%d 0x%llx : "
- msgstr ""
- =
-
--#: src/cpu/intel_cpus.cpp:598
-+#: src/cpu/intel_cpus.cpp:614
- msgid "C0 active"
- msgstr "C0 aktif"
- =
-
--#: src/cpu/intel_cpus.cpp:656
-+#: src/cpu/intel_cpus.cpp:672
- #, c-format
- msgid "Average"
- msgstr ""
-diff --git a/po/nl_NL.po b/po/nl_NL.po
-index aa5237818c40..7986de5b26fc 100644
---- a/po/nl_NL.po
-+++ b/po/nl_NL.po
-@@ -9,7 +9,7 @@ msgid ""
- msgstr ""
- "Project-Id-Version: PowerTOP\n"
- "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
--"POT-Creation-Date: 2019-09-26 15:56-0700\n"
-+"POT-Creation-Date: 2020-04-17 09:26-0700\n"
- "PO-Revision-Date: 2013-11-05 08:40+0000\n"
- "Last-Translator: Margie Foster <margie(a)linux.intel.com>\n"
- "Language-Team: Dutch (Netherlands) (http://www.transifex.com/projects/p/"
-@@ -97,7 +97,7 @@ msgstr ""
- msgid " Core(OS)"
- msgstr ""
- =
-
--#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
-+#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
- #, c-format
- msgid "  Core"
- msgstr ""
-@@ -174,7 +174,7 @@ msgstr "C0 polling"
- msgid " CPU(OS) %i"
- msgstr ""
- =
-
--#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
-+#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
- #, c-format
- msgid " CPU %i"
- msgstr ""
-@@ -189,21 +189,21 @@ msgstr ""
- msgid " Pkg(OS)"
- msgstr ""
- =
-
--#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
-+#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
- #, c-format
- msgid "  Package"
- msgstr ""
- =
-
--#: src/cpu/intel_cpus.cpp:135
-+#: src/cpu/intel_cpus.cpp:139
- #, c-format
- msgid "read_msr cpu%d 0x%llx : "
- msgstr ""
- =
-
--#: src/cpu/intel_cpus.cpp:598
-+#: src/cpu/intel_cpus.cpp:614
- msgid "C0 active"
- msgstr "C0 active"
- =
-
--#: src/cpu/intel_cpus.cpp:656
-+#: src/cpu/intel_cpus.cpp:672
- #, c-format
- msgid "Average"
- msgstr ""
-diff --git a/po/powertop.pot b/po/powertop.pot
-index 7e19e080fbbf..caad4750d758 100644
---- a/po/powertop.pot
-+++ b/po/powertop.pot
-@@ -1,17 +1,17 @@
--# PowerTOP
--# Copyright (C) 2020 Intel Corporation
-+# SOME DESCRIPTIVE TITLE.
-+# Copyright (C) YEAR Intel Corporation
- # This file is distributed under the same license as the powertop package.
--# Arjan van de Ven <arjan(a)linux.intel.com>, 2010.
-+# FIRST AUTHOR <EMAIL(a)ADDRESS>, YEAR.
- #
- #, fuzzy
- msgid ""
- msgstr ""
--"Project-Id-Version: PowerTOP 2.12-rc1\n"
-+"Project-Id-Version: powertop 2.12-rc1\n"
- "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
--"POT-Creation-Date: 2020-04-02 14:20-0700\n"
-+"POT-Creation-Date: 2020-04-17 09:26-0700\n"
- "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
- "Last-Translator: FULL NAME <EMAIL(a)ADDRESS>\n"
--"Language-Team: powertop(a)lists.01.org\n"
-+"Language-Team: LANGUAGE <LL(a)li.org>\n"
- "Language: \n"
- "MIME-Version: 1.0\n"
- "Content-Type: text/plain; charset=3DCHARSET\n"
-diff --git a/po/zh_TW.po b/po/zh_TW.po
-index 0d248044949e..6f1a5c90fd28 100644
---- a/po/zh_TW.po
-+++ b/po/zh_TW.po
-@@ -8,7 +8,7 @@ msgid ""
- msgstr ""
- "Project-Id-Version: PowerTOP\n"
- "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
--"POT-Creation-Date: 2019-09-26 15:56-0700\n"
-+"POT-Creation-Date: 2020-04-17 09:26-0700\n"
- "PO-Revision-Date: 2013-11-05 08:40+0000\n"
- "Last-Translator: Margie Foster <margie(a)linux.intel.com>\n"
- "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/"
-@@ -96,7 +96,7 @@ msgstr "  =E6=A0=B8=E5=BF=83"
- msgid " Core(OS)"
- msgstr "  =E6=A0=B8=E5=BF=83"
- =
-
--#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
-+#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
- #, c-format
- msgid "  Core"
- msgstr "  =E6=A0=B8=E5=BF=83"
-@@ -174,7 +174,7 @@ msgstr "C0 =E8=BC=AA=E5=B7=A1"
- msgid " CPU(OS) %i"
- msgstr " CPU %i"
- =
-
--#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
-+#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
- #, c-format
- msgid " CPU %i"
- msgstr " CPU %i"
-@@ -189,21 +189,21 @@ msgstr ""
- msgid " Pkg(OS)"
- msgstr ""
- =
-
--#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
-+#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
- #, c-format
- msgid "  Package"
- msgstr "=E4=BB=A3=E8=99=9F"
- =
-
--#: src/cpu/intel_cpus.cpp:135
-+#: src/cpu/intel_cpus.cpp:139
- #, c-format
- msgid "read_msr cpu%d 0x%llx : "
- msgstr ""
- =
-
--#: src/cpu/intel_cpus.cpp:598
-+#: src/cpu/intel_cpus.cpp:614
- msgid "C0 active"
- msgstr "C0 =E9=81=8B=E4=BD=9C=E4=B8=AD"
- =
-
--#: src/cpu/intel_cpus.cpp:656
-+#: src/cpu/intel_cpus.cpp:672
- #, c-format
- msgid "Average"
- msgstr ""
 -- =
 
-2.26.0
+2.5.5
 
---===============8287523533208508896==--
+
+--===============2906931403831437692==--
 
