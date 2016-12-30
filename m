@@ -1,48 +1,37 @@
-Content-Type: multipart/mixed; boundary="===============7530584813634194105=="
+Content-Type: multipart/mixed; boundary="===============4867590892061952812=="
 MIME-Version: 1.0
-From: Chris Samuel <chris at csamuel.org>
-Subject: [Powertop] Powertop recently started reporting "glob returned
- GLOB_ABORTED"
-Date: Sun, 07 Aug 2016 09:35:06 +1000
-Message-ID: <1656195.aRiASJK4c9@quad>
+From: Paul Menzel <paulepanter at users.sourceforge.net>
+Subject: [Powertop] Is Kaby Lake support tested?
+Date: Fri, 30 Dec 2016 12:26:18 +0100
+Message-ID: <1483097178.3846.59.camel@users.sourceforge.net>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7530584813634194105==
+--===============4867590892061952812==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi folks,
+Dear PowerTOP folks,
 
-I'm running powertop from git master on my Toshiba Chromebook (Intel Celero=
-n =
 
-N2840) using Crouton to provide an Ubuntu 14.04 chroot.  Probably not a com=
-mon =
+Has PowerTOP been tested with systems using Intel Kaby Lake devices?
 
-configuration. :-)
 
-Anyway on startup it has recently starting reporting "glob returned =
+Thanks,
 
-GLOB_ABORTED", thus:
+Paul
 
-RAPL device for cpu 0
-RAPL device for cpu 0
-RAPL device for cpu 0
-Devfreq not enabled
-glob returned GLOB_ABORTED
+--===============4867590892061952812==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="signature.asc"
 
-Kernel is 3.10.18 and this ChromeOS does provide the configs.ko kernel modu=
-le =
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KCmlGMEVBQkVDQUIwV0lRUTgrdzlkNDE0RkFW
+QVJJcGs5ZlZvcmJBNGRXQVVDV0daRVd3QUtDUkE5ZlZvcmJBNGQKV0JzWEFKOU9PNTBTT3ZvcW93
+bWhLSzgwU0xsY21ReS93UUNmVFltcVlGZ1JZcnpSclQzTHFZZi9jQkhvWVlrPQo9OEFGSgotLS0t
+LUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
 
-(not loaded by default) so I can provide the kernel config if it's useful.
-
-All the best,
-Chris
--- =
-
- Chris Samuel  :  http://www.csamuel.org/  :  Melbourne, VIC
-
---===============7530584813634194105==--
+--===============4867590892061952812==--
 
