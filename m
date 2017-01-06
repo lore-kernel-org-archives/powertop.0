@@ -1,86 +1,83 @@
-Content-Type: multipart/mixed; boundary="===============1161206721307000949=="
+Content-Type: multipart/mixed; boundary="===============6536136670671188592=="
 MIME-Version: 1.0
-From: Anthony Wong <yp at anthonywong.net>
-Subject: [Powertop] [PATCH, Resend] Add bash command-line completion.
-Date: Tue, 23 Jul 2019 22:06:40 +0800
-Message-ID: <CAC=0FnH7SBPKpH2PxnFiqxNt1=O8i7CVyEa_4UWvJQo8WthQXg@mail.gmail.com>
-In-Reply-To: CAC=0FnEFHg+fMVjtGp5G=7mtTXJeP69tNi+wOt=nb9GGgZTdhA@mail.gmail.com
+From: Oleg Drokin <green at linuxhacker.ru>
+Subject: Re: [Powertop] powertop accounting for virtual network interfaces
+Date: Fri, 06 Jan 2017 12:41:39 -0500
+Message-ID: <7BC14323-F682-460B-B088-0F3EDAD97AEA@linuxhacker.ru>
+In-Reply-To: 20170106172925.hliuc27ifi4pim4o@redhat.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1161206721307000949==
+--===============6536136670671188592==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Resend as attachment.
 
---===============1161206721307000949==
-Content-Type: application/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="0001-Add-bash-command-line-completion.patch"
+On Jan 6, 2017, at 12:29 PM, Peter Jones wrote:
 
-RnJvbSAyMjhjNzI3YTdjNzI1OTBkN2VhNTJjZGU1YzkzNGQ1MzgxODY2Y2VlIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBBbnRob255IFdvbmcgPHlwQGFudGhvbnl3b25nLm5ldD4KRGF0
-ZTogU3VuLCAyMyBKdW4gMjAxOSAxMjoxMjowNSArMDgwMApTdWJqZWN0OiBbUEFUQ0hdIEFkZCBi
-YXNoIGNvbW1hbmQtbGluZSBjb21wbGV0aW9uLgoKU2lnbmVkLW9mZi1ieTogQW50aG9ueSBXb25n
-IDx5cEBhbnRob255d29uZy5uZXQ+Ci0tLQogTWFrZWZpbGUuYW0gICAgICAgICAgICAgICAgICAg
-ICAgICAgfCAgMyArLQogY29uZmlndXJlLmFjICAgICAgICAgICAgICAgICAgICAgICAgfCAgOCAr
-KysrKysKIHNjcmlwdHMvYmFzaC1jb21wbGV0aW9uL01ha2VmaWxlLmFtIHwgIDIgKysKIHNjcmlw
-dHMvYmFzaC1jb21wbGV0aW9uL3Bvd2VydG9wICAgIHwgNDMgKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysKIDQgZmlsZXMgY2hhbmdlZCwgNTUgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigt
-KQogY3JlYXRlIG1vZGUgMTAwNjQ0IHNjcmlwdHMvYmFzaC1jb21wbGV0aW9uL01ha2VmaWxlLmFt
-CiBjcmVhdGUgbW9kZSAxMDA2NDQgc2NyaXB0cy9iYXNoLWNvbXBsZXRpb24vcG93ZXJ0b3AKCmRp
-ZmYgLS1naXQgYS9NYWtlZmlsZS5hbSBiL01ha2VmaWxlLmFtCmluZGV4IDNhYWJiMjIuLmZmYjVl
-OTEgMTAwNjQ0Ci0tLSBhL01ha2VmaWxlLmFtCisrKyBiL01ha2VmaWxlLmFtCkBAIC01LDcgKzUs
-OCBAQCBTVUJESVJTID0gXAogCXRyYWNlZXZlbnQgXAogCXNyYyBcCiAJcG8gXAotCWRvYworCWRv
-YyBcCisJc2NyaXB0cy9iYXNoLWNvbXBsZXRpb24KIAogRVhUUkFfRElTVCA9IFwKIAljb25maWcu
-cnBhdGggXApkaWZmIC0tZ2l0IGEvY29uZmlndXJlLmFjIGIvY29uZmlndXJlLmFjCmluZGV4IGQ2
-YTE1ZTEuLmNhN2YxZDUgMTAwNjQ0Ci0tLSBhL2NvbmZpZ3VyZS5hYworKysgYi9jb25maWd1cmUu
-YWMKQEAgLTE3LDYgKzE3LDcgQEAgQUNfQ09ORklHX0ZJTEVTKFsKIAl0cmFjZWV2ZW50L01ha2Vm
-aWxlCiAJcG8vTWFrZWZpbGUuaW4KIAlkb2MvTWFrZWZpbGUKKwlzY3JpcHRzL2Jhc2gtY29tcGxl
-dGlvbi9NYWtlZmlsZQogXSkKIEFDX0NPTkZJR19TUkNESVIoW3NyYy9tYWluLmNwcF0pCiBBQ19D
-T05GSUdfTUFDUk9fRElSKFttNF0pCkBAIC0xNTQsNCArMTU1LDExIEBAIEFDX1NFQVJDSF9MSUJT
-KFtpbmV0X2F0b25dLCBbcmVzb2x2XSwgW10sIFsKIEFDX0RFRklORShbUEFDS0FHRV9TSE9SVF9W
-RVJTSU9OXSwgbTRfZXN5c2NtZF9zKFtjYXQgdmVyc2lvbi1zaG9ydF0pLAogCVtTaG9ydCBwYWNr
-YWdlIHZlcnNpb25dKQogCitBU19JRihbYHBrZy1jb25maWcgLS1leGlzdHMgYmFzaC1jb21wbGV0
-aW9uYF0sIFsKKwliYXNoY29tcGxldGlvbmRpcj1gcGtnLWNvbmZpZyAtLXZhcmlhYmxlPWNvbXBs
-ZXRpb25zZGlyIC0tZGVmaW5lLXZhcmlhYmxlPXByZWZpeD0ke3ByZWZpeH0gYmFzaC1jb21wbGV0
-aW9uYAorXSwgWworCWJhc2hjb21wbGV0aW9uZGlyPSR7ZGF0YWRpcn0vYmFzaC1jb21wbGV0aW9u
-L2NvbXBsZXRpb25zCitdKQorQUNfU1VCU1QoW2Jhc2hjb21wbGV0aW9uZGlyXSwgWyRiYXNoY29t
-cGxldGlvbmRpcl0pCisKIEFDX09VVFBVVApkaWZmIC0tZ2l0IGEvc2NyaXB0cy9iYXNoLWNvbXBs
-ZXRpb24vTWFrZWZpbGUuYW0gYi9zY3JpcHRzL2Jhc2gtY29tcGxldGlvbi9NYWtlZmlsZS5hbQpu
-ZXcgZmlsZSBtb2RlIDEwMDY0NAppbmRleCAwMDAwMDAwLi40NTA3M2JkCi0tLSAvZGV2L251bGwK
-KysrIGIvc2NyaXB0cy9iYXNoLWNvbXBsZXRpb24vTWFrZWZpbGUuYW0KQEAgLTAsMCArMSwyIEBA
-CitiYXNoY29tcGxldGlvbmRpciA9IEBiYXNoY29tcGxldGlvbmRpckAKK2Rpc3RfYmFzaGNvbXBs
-ZXRpb25fREFUQSA9IHBvd2VydG9wCmRpZmYgLS1naXQgYS9zY3JpcHRzL2Jhc2gtY29tcGxldGlv
-bi9wb3dlcnRvcCBiL3NjcmlwdHMvYmFzaC1jb21wbGV0aW9uL3Bvd2VydG9wCm5ldyBmaWxlIG1v
-ZGUgMTAwNjQ0CmluZGV4IDAwMDAwMDAuLjAzZDIzOGUKLS0tIC9kZXYvbnVsbAorKysgYi9zY3Jp
-cHRzL2Jhc2gtY29tcGxldGlvbi9wb3dlcnRvcApAQCAtMCwwICsxLDQzIEBACisjIS9iaW4vYmFz
-aAorIworIyBQb3dlcnRvcCB0YWIgY29tcGxldGlvbiBmb3IgYmFzaC4KKyMKKyMgVGhpcyBpcyBw
-YXJ0IG9mIFBvd2VyVE9QCisjCisjIFRoaXMgcHJvZ3JhbSBmaWxlIGlzIGZyZWUgc29mdHdhcmU7
-IHlvdSBjYW4gcmVkaXN0cmlidXRlIGl0IGFuZC9vciBtb2RpZnkgaXQKKyMgdW5kZXIgdGhlIHRl
-cm1zIG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZSBhcyBwdWJsaXNoZWQgYnkgdGhl
-CisjIEZyZWUgU29mdHdhcmUgRm91bmRhdGlvbjsgdmVyc2lvbiAyIG9mIHRoZSBMaWNlbnNlLgor
-IworIyBUaGlzIHByb2dyYW0gaXMgZGlzdHJpYnV0ZWQgaW4gdGhlIGhvcGUgdGhhdCBpdCB3aWxs
-IGJlIHVzZWZ1bCwgYnV0IFdJVEhPVVQKKyMgQU5ZIFdBUlJBTlRZOyB3aXRob3V0IGV2ZW4gdGhl
-IGltcGxpZWQgd2FycmFudHkgb2YgTUVSQ0hBTlRBQklMSVRZIG9yCisjIEZJVE5FU1MgRk9SIEEg
-UEFSVElDVUxBUiBQVVJQT1NFLiAgU2VlIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZQor
-IyBmb3IgbW9yZSBkZXRhaWxzLgorIworIyBZb3Ugc2hvdWxkIGhhdmUgcmVjZWl2ZWQgYSBjb3B5
-IG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZQorIyBhbG9uZyB3aXRoIHRoaXMgcHJv
-Z3JhbSBpbiBhIGZpbGUgbmFtZWQgQ09QWUlORzsgaWYgbm90LCB3cml0ZSB0byB0aGUKKyMgRnJl
-ZSBTb2Z0d2FyZSBGb3VuZGF0aW9uLCBJbmMsCisjIDUxIEZyYW5rbGluIFN0cmVldCwgRmlmdGgg
-Rmxvb3IsCisjIEJvc3RvbiwgTUEgMDIxMTAtMTMwMSBVU0EKKyMgb3IganVzdCBnb29nbGUgZm9y
-IGl0LgorCitfcG93ZXJ0b3AoKQoreworICAgIGxvY2FsIGN1ciBwcmV2IHdvcmRzIGN3b3JkIHNw
-bGl0CisgICAgX2luaXRfY29tcGxldGlvbiAtcyB8fCByZXR1cm4KKworCWNhc2UgJHByZXYgaW4K
-KwkJJy1DJ3wnLS1jc3YnfCctLWV4dGVjaCd8Jy1yJ3wnLS1odG1sJ3wnLXcnfCctLXdvcmtsb2Fk
-JykKKwkJCV9maWxlZGlyCisJCQlyZXR1cm4gMAorCQkJOzsKKyAgICBlc2FjCisKKyAgICBsb2Nh
-bCBhbGxfbG9uZ19vcHRpb25zPSQoIF9wYXJzZV9oZWxwICIkMSIgKQorCisgICAgQ09NUFJFUExZ
-PSggJCggY29tcGdlbiAtVyAiJHthbGxfbG9uZ19vcHRpb25zfSIgLS0gIiRjdXIiICkgKQorCisg
-ICAgcmV0dXJuIDAKK30KKworIyBsb2FkIHRoZSBjb21wbGV0aW9uCitjb21wbGV0ZSAtRiBfcG93
-ZXJ0b3AgcG93ZXJ0b3AKLS0gCjIuMjAuMQoK
+> On Fri, Jan 06, 2017 at 11:49:59AM -0500, Oleg Drokin wrote:
+>> =
 
---===============1161206721307000949==--
+>> On Jan 6, 2017, at 10:10 AM, Peter Jones wrote:
+>> =
+
+>>> Hi,
+>>> =
+
+>>> I noticed something this morning when running powertop on my Dell XPS-13
+>>> (skylake).  I've got wifi tethered to my phone, which is also plugged in
+>>> the USB port, and the company vpn running on a virtual bridge on top of
+>>> that.  Powertop accounts for that like this:
+>>> =
+
+>>> -------------------------
+>>> The battery reports a discharge rate of 5.99 W
+>>> The estimated remaining time is 8 hours, 32 minutes
+>>> =
+
+>>> Summary: 529.1 wakeups/second,  5.2 GPU ops/seconds, 0.0 VFS ops/sec an=
+d 8.9% CPU use
+>>> =
+
+>>> Power est.              Usage       Events/s    Category       Descript=
+ion
+>>> 3.32 W      0.0 pkts/s                Device         nic:virbr0
+>>> 2.71 W    100.0%                      Device         USB device: usb-de=
+vice-8087-0a2a
+>>> 739 mW     53.6 ms/s      36.2        Process        /usr/bin/gnome-she=
+ll
+>>> 477 mW    100.0%                      Device         Display backlight
+>>> ...
+>>> -------------------------
+>>> =
+
+>>> The second line is the (disabled) bluetooth device.  No idea what's goi=
+ng on
+>>> there; bluetoothctl believes it's powered down.
+>> =
+
+>> Is this Fedora 24/25?
+>> I filed a ticket for this last summer, it's fwupd holding the mouse
+>> usbfs device open.
+> =
+
+> Yeah, it's f25.  So that's interesting, but it's not the mouse device
+> (because I don't have one).  I suspect you're right about the cause,
+> though.  I'll poke hughsie about it, thanks.
+
+Right, mouse is BT, so you can only get to btusb locally, that's what I see
+too, just a bit misworded since it was awhile ago and my memory is a bit ha=
+zy.
+
+>> If you'd use current master version of powertop, you'd see it
+>> correctly attributed to fwupd.
+> =
+
+> I'm not sure how to take to this statement.  Are you really chiding me
+> for using the version that's in the distro I'm using?
+
+Oh, no. Just a comment that current powertop handles this better and
+once Fedora catches up you'll see the benefits too.
+--===============6536136670671188592==--
 
