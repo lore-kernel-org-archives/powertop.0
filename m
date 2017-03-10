@@ -1,65 +1,147 @@
-Content-Type: multipart/mixed; boundary="===============2078871772740026058=="
+Content-Type: multipart/mixed; boundary="===============4836591949814813561=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH 0/2 v1] intel_cpus: average cpu frequency,
- dnd some idle data
-Date: Mon, 13 Jun 2016 09:00:32 -0700
-Message-ID: <20160613160034.29283-1-joe.konno@linux.intel.com>
+From: Swaminathan, Nivedita <nivedita.swaminathan at intel.com>
+Subject: [Powertop]  [Announce] PowerTOP v2.9
+Date: Fri, 10 Mar 2017 23:17:13 +0000
+Message-ID: <203C9A218350B94EAF34403F81F162AE1AF3CF78@ORSMSX116.amr.corp.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2078871772740026058==
+--===============4836591949814813561==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Joe Konno <joe.konno(a)intel.com>
+PowerTOP v2.9 Release
 
-The first patch in this series makes a cosmetic change to the Frequency Sta=
-ts
-tab for Intel end-users. "Actual" cpu frequency will be changed to "Average=
-",
-which is a more accurate representation of that data (since it displays the
-average cpu frequency for the sampling period). The underlying algorithms w=
-hich
-generate this data remain unchanged.
+We are pleased to announce the release of PowerTOP v2.9.
 
-The second patch will add a condition to the Frequency Stats tab "Idle"
-display, which will _not_ display "Idle" data if the intel_pstate kernel dr=
-iver
-(not cpufreq) is loaded. Only the average frequency of each logical core for
-the sample period will be displayed (if intel_pstate is loaded).
+About PowerTOP:
+PowerTOP is a Linux tool to diagnose issues with power consumption and powe=
+r management. In addition to being a diagnostic tool, PowerTOP also has an =
+interactive mode you can use to experiment with various power management se=
+ttings, for cases where the Linux distribution has not enabled those settin=
+gs.
+PowerTOP reports which components in the system are most likely to blame fo=
+r higher-than-needed power consumption, ranging from software applications =
+to active components in the system. Detailed screens are available for CPU =
+C and P states, device activity, and software activity. For many years, Pow=
+erTOP has been used heavily by Intel, Linux distributors, and various parts=
+ of the open source community.
 
-With intel_pstate, Idle data for the Frequency Stats tab is inferred from
-cpu_frequency PM trace events. There have been particular workloads where
-PowerTOP may display 100% idle (in Frequency Stats) for the sampling period
-despite logical cores doing work. Further, Frequency Stats' 'idle' data may=
- not
-match idle data presented in the Idle Stats tab. This is a bug, and is the
-justification for patch 2 in this series.
+About PowerTOP v2.9 release:
+This is a minor release enabling support for the 7th generation IntelR Core=
+T processors based on Kaby Lake microarchitecture and Next Generation Intel=
+ Atom processors based on Goldmont Microarchitecture. Other important featu=
+re change in this release is that, for Intel cpus we have stopped displayin=
+g pstate idle percentage when intel_pstate is enabled. This change will be =
+reflected in the Frequency Stats tab. There has also been a lot of bug fixe=
+s thanks to the contributors' from the open source community. =
 
-After this patch series is committed, end-users who load the intel_pstate
-driver are directed to perform idle analysis on data gathered from the Idle
-Stats tab, as the Frequency Stats tab will only provide average logical core
-frequency for the sampling period. It may be possible to bring idle statist=
-ics
-back to the Frequency Stats tab for intel_pstate in the future, but only af=
-ter
-careful re-examination of Frequency Stats' idle calculations.
+ =
 
-Joe Konno (2):
-  intel_cpus: frequency: clarify average clock speed
-  intel_cpus: no pstate Idle pct with intel_pstate
+Highlights:
 
- src/cpu/intel_cpus.cpp | 52 ++++++++++++++++++++++++++++++++++++++++++----=
-----
- src/cpu/intel_cpus.h   |  2 ++
- 2 files changed, 46 insertions(+), 8 deletions(-)
+Thank you to everyone who contributed to this release!
 
--- =
+Boris ARZUR (1):
+      enable --auto-tune without debugfs
 
-2.8.3
+Daniel Black (5):
+      Makefile.am need reference to m4 directory
+      Add process_glob similar to process_directory.
+      Widen ppc64 paths for sysfs file
+      MSR is valid for x86_32/x86_64 only
+      Calculate the number of joules consumed over time
+
+Jan Engelhardt (2):
+      Fix crash due to buffer overruns
+      Avoid hardcoding magic values when sizeof can be used
+
+Joe Konno (17):
+      .gitignore: ignore vim swap, cscope, ctags
+      intel_cpus: frequency: clarify average clock speed
+      intel_cpus: no pstate Idle pct with intel_pstate
+      configure.ac: bump version to 2.9-pre
+      Makefile.am: add --install to ACLOCAL_AMFLAGS
+      gettext: run gettextize-0.18.2
+      .gitignore: ignnore m4/pkg.m4
+      Makevars: align more closely to generated .template
+      scripts: add regenerate-potfiles-in script
+      POTFILES.in: refresh files with strings
+      powertop.pot: xgettext refresh, attribution fix
+      po: regenerate with new POT and strings
+      main.cpp: remove __DATE__ from --version
+      configure.ac: version strings from git describe
+      search/replace POWERTOP_VERSION and SHORT_VERSION
+      Doxyfile.in: add doxygen support
+      Enable Intel KBL support
+
+Madper Xie (1):
+      Throw error message when system cmd returns Non-zero value.
+
+Nivedita Swaminathan (5):
+      Adding the PTHREAD_CFLAGS option
+      Fix crash due to unbounded string copies
+      Revert "Fix crash due to unbounded string copies"
+      Enabling Intel BXT support
+      Additional comments added for clarity
+
+Oleg Drokin (3):
+      Add support for usbdevfs
+      Show idle processes holding devices at full power
+      Fix misaligned curly brace
+
+Ond=C5=99ej Lyson=C4=9Bk (2):
+      Fixed some potentially unterminated strings
+      Fixed a dangling pointer
+
+Paul Menzel (1):
+      cpu: Add space after comma
+
+Stewart Smith (2):
+      cpu: support powerpc /proc/cpuinfo
+      Add support for power consumption sensors through opal-sensors sysfs
+
+Thomas Ilsche (1):
+      powertop changes the frequency set by the userspace governor to the m=
+inimum available frequency.
+
+Yaroslav Isakov (2):
+      Detect all audio cards in the system (not only card0)
+      Fixed bug when all PCI devices usage is shown as 00%
+
+eSyr (2):
+      Checking whether librt is needed for clock_gettime().
+      Adding PID to process description.
 
 
---===============2078871772740026058==--
+Thanks and regards,
+
+Nivedita Swaminathan
+
+
+
+
+--===============4836591949814813561==
+Content-Type: text/plain
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="1_Warning.txt"
+
+DQpCTE9DS0VEIEZJTEUgQUxFUlRBIGZpbGUgaGFzIGJlZW4gYmxvY2tlZCBkdWUgdG8gdGhlICdJ
+bnRlbCBFbWFpbCBGaWxlIEZpbHRlcmluZyBQb2xpY3knIHJ1bGUuQ29udGV4dDogJ2F1dG9nZW4u
+c2gnRGlzYWxsb3dlZCBkdWUgdG8gZmlsZW5hbWVUaWNrZXQgTnVtYmVyOiAnMGI5NC01OGMzLTMz
+ZmQtMDAwMScNCg0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KDQpC
+TE9DS0VEIEZJTEUgQUxFUlRBIGZpbGUgaGFzIGJlZW4gYmxvY2tlZCBkdWUgdG8gdGhlICdJbnRl
+bCBFbWFpbCBGaWxlIEZpbHRlcmluZyBQb2xpY3knIHJ1bGUuQ29udGV4dDogJ2Nzc3RvaC5zaCdE
+aXNhbGxvd2VkIGR1ZSB0byBmaWxlbmFtZVRpY2tldCBOdW1iZXI6ICcwYjk0LTU4YzMtMzNmZC0w
+MDAxJw0KDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQoNCkJMT0NL
+RUQgRklMRSBBTEVSVEEgZmlsZSBoYXMgYmVlbiBibG9ja2VkIGR1ZSB0byB0aGUgJ0ludGVsIEVt
+YWlsIEZpbGUgRmlsdGVyaW5nIFBvbGljeScgcnVsZS5Db250ZXh0OiAnbHRtYWluLnNoJ0Rpc2Fs
+bG93ZWQgZHVlIHRvIGZpbGVuYW1lVGlja2V0IE51bWJlcjogJzBiOTQtNThjMy0zM2ZkLTAwMDEn
+DQpTZWUgeW91ciBzeXN0ZW0gYWRtaW5pc3RyYXRvciBmb3IgZnVydGhlciBpbmZvcm1hdGlvbi4g
+Q29weXJpZ2h0IDE5OTktMjAxMSBNY0FmZWUsIEluYy5BbGwgUmlnaHRzIFJlc2VydmVkLmh0dHA6
+Ly93d3cubWNhZmVlLmNvbQ==
+--===============4836591949814813561==--
 
