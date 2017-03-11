@@ -1,64 +1,59 @@
-Content-Type: multipart/mixed; boundary="===============3438256922415699658=="
+Content-Type: multipart/mixed; boundary="===============5141434792837546293=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH] Makefile.am need reference to m4 directory
-Date: Thu, 21 Jul 2016 14:28:00 -0700
-Message-ID: <20160721212800.9873-1-joe.konno@linux.intel.com>
-In-Reply-To: ea5e3f56-3143-4916-5956-880c05a45ee5@au.ibm.com
+From: Chris Murphy <lists at colorremedies.com>
+Subject: [Powertop] error: possibly undefined macro: AC_PROG_LIBTOOL
+Date: Fri, 10 Mar 2017 18:43:07 -0700
+Message-ID: <CAJCQCtT-s7zoNrg052ctZfL8BS7_pvBwG3YVuftQOJtN9NKwFA@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3438256922415699658==
+--===============5141434792837546293==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Daniel Black <daniel.black(a)au1.ibm.com>
+I'm getting the following with master branch when using autogen.sh:
 
-Running autoreconf (autconf-2.69/automake-1.15/libtoolize-2.4.6)
-without the m4 directory specified in the Makefile.am file generates
-the following warning:
+[...snip...]
 
- ./autogen.sh
+Copying file po/insert-header.sin
+Copying file po/quot.sed
+Copying file po/remove-potcdate.sin
+autoreconf: running: aclocal --install -I m4
+aclocal: installing 'm4/pkg.m4' from '/usr/share/aclocal/pkg.m4'
+autoreconf: configure.ac: tracing
+autoreconf: configure.ac: not using Libtool
+autoreconf: running: /usr/bin/autoconf
+configure.ac:35: error: possibly undefined macro: AC_PROG_LIBTOOL
+      If this token and others are legitimate, please use m4_pattern_allow.
+      See the Autoconf documentation.
+autoreconf: /usr/bin/autoconf failed with exit status: 1
+[chris(a)f25s powertop]$
+
+IF I checkout tag v2.9, HEAD is now at 746abef,
+
+[chris(a)f25s powertop]$ ./autogen.sh
 autoreconf: Entering directory `.'
 autoreconf: running: autopoint
-autoreconf: running: aclocal
+autoreconf: running: aclocal --install -I m4
 autoreconf: configure.ac: tracing
-autoreconf: running: libtoolize --copy
-libtoolize: Consider adding '-I m4' to ACLOCAL_AMFLAGS in Makefile.am.
+autoreconf: configure.ac: not using Libtool
 autoreconf: running: /usr/bin/autoconf
 autoreconf: running: /usr/bin/autoheader
 autoreconf: running: automake --add-missing --copy --no-force
-configure.ac:26: warning: The 'AM_PROG_MKDIR_P' macro is deprecated, and
-its use is discouraged.
-configure.ac:26: You should use the Autoconf-provided 'AC_PROG_MKDIR_P'
-macro instead,
-configure.ac:26: and use '$(MKDIR_P)' instead of '$(mkdir_p)'in your
-Makefile.am files.
-autoreconf: Leaving directory `.'
+traceevent/Makefile.am:1: error: Libtool library used but 'LIBTOOL' is unde=
+fined
+traceevent/Makefile.am:1:   The usual way to define 'LIBTOOL' is to
+add 'LT_INIT'
+traceevent/Makefile.am:1:   to 'configure.ac' and run 'aclocal' and
+'autoconf' again.
+traceevent/Makefile.am:1:   If 'LT_INIT' is in 'configure.ac', make sure
+traceevent/Makefile.am:1:   its definition is in aclocal's search path.
+autoreconf: automake failed with exit status: 1
 
-v2: (Joe) Re-submission due to a whitespace -ism, added Acked-by
 
-Acked-by: Joe Konno <joe.konno(a)intel.com>
 ---
- Makefile.am | 1 +
- 1 file changed, 1 insertion(+)
+Chris Murphy
 
-diff --git a/Makefile.am b/Makefile.am
-index c8d0ae210e3f..a9cf9db62601 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -1,4 +1,5 @@
- AUTOMAKE_OPTIONS =3D subdir-objects
-+ACLOCAL_AMFLAGS=3D-I m4
- =
-
- SUBDIRS =3D \
- 	traceevent \
--- =
-
-2.9.0
-
-
---===============3438256922415699658==--
+--===============5141434792837546293==--
 
