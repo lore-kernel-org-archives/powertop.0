@@ -1,146 +1,36 @@
-Content-Type: multipart/mixed; boundary="===============4015873098098262966=="
+Content-Type: multipart/mixed; boundary="===============0354131085050810566=="
 MIME-Version: 1.0
-From: Magnus Fromreide <magfr at lysator.liu.se>
-Subject: Re: [Powertop] [PATCH v1 2/3] configure.ac: version strings from git
- describe
-Date: Sat, 06 Aug 2016 03:53:36 +0200
-Message-ID: <20160806015336.GA11403@noemi>
-In-Reply-To: 1470425241-215266-3-git-send-email-joe.konno@linux.intel.com
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] 'PowerTOP --calibrate' output
+Date: Sun, 21 May 2017 14:02:43 -0700
+Message-ID: <2a2afafd-650e-f011-0fc8-ee35454afe0a@linux.intel.com>
+In-Reply-To: CAOZcyfbJ3R+qP+0DgVjrT8f8+p+_nYssky_EkmfwjnXP9_Jp9A@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4015873098098262966==
+--===============0354131085050810566==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 05, 2016 at 12:27:20PM -0700, Joe Konno wrote:
-> From: Joe Konno <joe.konno(a)intel.com>
-> =
+On 5/21/2017 11:36 AM, Amit Singh wrote:
+> Hi.
+> After exiting 'sudo powertop --calibrate', there are some statistics prin=
+ted like "Score =3D 1.7 (18069.1) Guess =3D 12.1 Actual =3D 12.3" (These nu=
+mbers are made up, I do not
+> remember the actual values I got). I tried looking up what these values m=
+ean but could not find it mentioned anywhere in the User's guide. Can someo=
+ne point me to a
+> resource that has this information? Or if you know what these mean then k=
+indly explain it to me as well.
+> Thanks!
 
-> There are two version strings we need during runtime: a long version
-> (for reports and --version), and a short version for the ncurses UI. Use
-> a utility script to generate those strings (version-long and
-> version-short) which will be cat'ed by configure and bundled when 'make
-> dist' is run.
-> =
+so powertop tries to do a least squares fit of the calibration measurements=
+ to a model it builds of your PC,
+and this is basically diagnotics output that tries to print how well the le=
+ast squares worked
 
-> Signed-off-by: Joe Konno <joe.konno(a)intel.com>
 
-What happens if I build this from a distributed package, i.e.
 
-./configure
-make dist
-ta xzf powertop-version.tar.gz
-cd powertop-version
-./configure
-make
-
-This would normally create a package with no git version info so the version
-scripts couldn't work.
-
-This could obviously be regarded as an unsupported case but if so then I th=
-ink
-it should be said so explicitly.
-
-/MF
-
-> ---
->  .gitignore      |  1 +
->  Makefile.am     |  2 ++
->  autogen.sh      |  1 +
->  configure.ac    |  5 ++++-
->  scripts/version | 13 +++++++++++++
->  5 files changed, 21 insertions(+), 1 deletion(-)
->  create mode 100644 scripts/version
-> =
-
-> diff --git a/.gitignore b/.gitignore
-> index 7eb138a094ce..ef817dc076bd 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -87,4 +87,5 @@ Makefile.in
->  /src/powertop
->  /stamp-h1
->  /stamp-po
-> +/version*
->  tags
-> diff --git a/Makefile.am b/Makefile.am
-> index b519d110a118..3aabb22eca6e 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -14,4 +14,6 @@ EXTRA_DIST =3D \
->  	TODO \
->  	Android.mk \
->  	COPYING \
-> +	version-long \
-> +	version-short \
->  	autogen.sh
-> diff --git a/autogen.sh b/autogen.sh
-> index e210037d70e0..444f9998f806 100755
-> --- a/autogen.sh
-> +++ b/autogen.sh
-> @@ -1,3 +1,4 @@
->  #!/bin/sh	=
-
->  =
-
-> +sh scripts/version
->  autoreconf --install --verbose
-> diff --git a/configure.ac b/configure.ac
-> index 646b402101bb..ccfbf7ee0bb8 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -2,7 +2,8 @@
->  # Process this file with autoconf to produce a configure script.
->  =
-
->  AC_PREREQ([2.68])
-> -AC_INIT([powertop], [2.9-pre], [powertop(a)lists.01.org], [], [https://0=
-1.org/powertop])
-> +AC_INIT([powertop], m4_esyscmd_s([cat version-long]),
-> +	[powertop(a)lists.01.org], [], [https://01.org/powertop])
->  AM_INIT_AUTOMAKE([
->  	-Wall
->  	1.12.2
-> @@ -149,5 +150,7 @@ AC_SEARCH_LIBS([inet_aton], [resolv], [], [
->  	AC_MSG_ERROR([libresolv is required but was not found])
->  ], [])
->  =
-
-> +AC_DEFINE([PACKAGE_SHORT_VERSION], m4_esyscmd_s([cat version-short]),
-> +	[Short package version])
->  =
-
->  AC_OUTPUT
-> diff --git a/scripts/version b/scripts/version
-> new file mode 100644
-> index 000000000000..348b13d9f785
-> --- /dev/null
-> +++ b/scripts/version
-> @@ -0,0 +1,13 @@
-> +#!/bin/sh
-> +
-> +git branch > /dev/null 2>&1
-> +if [ "$?" =3D "0" ]; then
-> +	LONG=3D$(git describe --abbrev=3D7 --tags --always --dirty 2> /dev/null)
-> +	SHORT=3D\"$(git describe --tags --abbrev=3D0 2> /dev/null)\"
-> +else
-> +	LONG=3D"RUN-VERSION-SCRIPT-IN-GIT-REPOSITORY-ONLY"
-> +	SHORT=3D\"$LONG\"
-> +fi
-> +
-> +echo $LONG  > version-long
-> +echo $SHORT > version-short
-> -- =
-
-> 1.8.3.1
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
-
---===============4015873098098262966==--
+--===============0354131085050810566==--
 
