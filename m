@@ -1,83 +1,127 @@
-Content-Type: multipart/mixed; boundary="===============6536136670671188592=="
+Content-Type: multipart/mixed; boundary="===============2230888493313176417=="
 MIME-Version: 1.0
-From: Oleg Drokin <green at linuxhacker.ru>
-Subject: Re: [Powertop] powertop accounting for virtual network interfaces
-Date: Fri, 06 Jan 2017 12:41:39 -0500
-Message-ID: <7BC14323-F682-460B-B088-0F3EDAD97AEA@linuxhacker.ru>
-In-Reply-To: 20170106172925.hliuc27ifi4pim4o@redhat.com
+From: Paranjape, Gautam <gautam.paranjape at intel.com>
+Subject: [Powertop] [PATCH] Modify how line_levels are assigned so c-states
+ won't overwrite other c-states
+Date: Mon, 17 Jul 2017 22:39:52 +0000
+Message-ID: <55056A404D4AA94785E70767BB51D122173E12@ORSMSX111.amr.corp.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6536136670671188592==
+--===============2230888493313176417==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Some c-states exposed by the intel_idle driver are assigned the same line_l=
+evel, which
+means that the most recent one assigned can overwrite another c-state. For
+example, the C1-SKL c-state is overwriten by the C1E-SKL c-state because bo=
+th
+are assigned line_level 1. To fix this, check if a "sub c-state" (ex. C1E-S=
+KL)
+is being inserted. If so, check the vector of c-states if a c-state with si=
+milar name
+(ex. C1-SKL, compared to C1E-SKL), and modify the line level so there is no
+overwriting.
 
-On Jan 6, 2017, at 12:29 PM, Peter Jones wrote:
+Signed-off-by: Gautam Paranjape <gautam.paranjape(a)intel.com>
+---
+ src/cpu/abstract_cpu.cpp | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-> On Fri, Jan 06, 2017 at 11:49:59AM -0500, Oleg Drokin wrote:
->> =
+diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
+index bc323368b71f..c59721cb349a 100644
+--- a/src/cpu/abstract_cpu.cpp
++++ b/src/cpu/abstract_cpu.cpp
+@@ -218,6 +218,17 @@ void abstract_cpu::insert_cstate(const char *linux_nam=
+e, const char *human_name,
+         }
+         if (*c >=3D '0' && *c <=3D'9') {
+             state->line_level =3D strtoull(c, NULL, 10);
++            if(*(c+1) !=3D '-'){
++                int greater_line_level =3D strtoull(c, NULL, 10);
++                for(unsigned int pos =3D 0; pos < cstates.size(); pos++){
++                    if(*c =3D=3D cstates[pos]->human_name[1]){
++                        if(*(c+1) !=3D cstates[pos]->human_name[2]){
++                            greater_line_level =3D max(greater_line_level,=
+ cstates[pos]->line_level);
++                            state->line_level =3D greater_line_level + 1;
++                        }
++                    }
++                }
++            }
+             break;
+         }
+         c++;
+--
+2.9.3
 
->> On Jan 6, 2017, at 10:10 AM, Peter Jones wrote:
->> =
+--===============2230888493313176417==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
->>> Hi,
->>> =
+PGh0bWwgZGlyPSJsdHIiPgo8aGVhZD4KPG1ldGEgaHR0cC1lcXVpdj0iQ29udGVudC1UeXBlIiBj
+b250ZW50PSJ0ZXh0L2h0bWw7IGNoYXJzZXQ9aXNvLTg4NTktMSI+CjxzdHlsZSB0eXBlPSJ0ZXh0
+L2NzcyIgaWQ9Im93YVBhcmFTdHlsZSI+UCB7bWFyZ2luLXRvcDowO21hcmdpbi1ib3R0b206MDt9
+PC9zdHlsZT4KPC9oZWFkPgo8Ym9keSBmcHN0eWxlPSIxIiBvY3NpPSIwIj4KPGRpdiBzdHlsZT0i
+ZGlyZWN0aW9uOiBsdHI7Zm9udC1mYW1pbHk6IFRhaG9tYTtjb2xvcjogIzAwMDAwMDtmb250LXNp
+emU6IDEwcHQ7Ij5Tb21lIGMtc3RhdGVzIGV4cG9zZWQgYnkgdGhlIGludGVsX2lkbGUgZHJpdmVy
+IGFyZSBhc3NpZ25lZCB0aGUgc2FtZSBsaW5lX2xldmVsLCB3aGljaDxicj4KbWVhbnMgdGhhdCB0
+aGUgbW9zdCByZWNlbnQgb25lIGFzc2lnbmVkIGNhbiBvdmVyd3JpdGUgYW5vdGhlciBjLXN0YXRl
+LiBGb3I8YnI+CmV4YW1wbGUsIHRoZSBDMS1TS0wgYy1zdGF0ZSBpcyBvdmVyd3JpdGVuIGJ5IHRo
+ZSBDMUUtU0tMIGMtc3RhdGUgYmVjYXVzZSBib3RoPGJyPgphcmUgYXNzaWduZWQgbGluZV9sZXZl
+bCAxLiBUbyBmaXggdGhpcywgY2hlY2sgaWYgYSAmcXVvdDtzdWIgYy1zdGF0ZSZxdW90OyAoZXgu
+IEMxRS1TS0wpPGJyPgppcyBiZWluZyBpbnNlcnRlZC4gSWYgc28sIGNoZWNrIHRoZSB2ZWN0b3Ig
+b2YgYy1zdGF0ZXMgaWYgYSBjLXN0YXRlIHdpdGggc2ltaWxhciBuYW1lPGJyPgooZXguIEMxLVNL
+TCwgY29tcGFyZWQgdG8gQzFFLVNLTCksIGFuZCBtb2RpZnkgdGhlIGxpbmUgbGV2ZWwgc28gdGhl
+cmUgaXMgbm88YnI+Cm92ZXJ3cml0aW5nLjxicj4KPGJyPgpTaWduZWQtb2ZmLWJ5OiBHYXV0YW0g
+UGFyYW5qYXBlICZsdDtnYXV0YW0ucGFyYW5qYXBlQGludGVsLmNvbSZndDs8YnI+Ci0tLTxicj4K
+Jm5ic3A7c3JjL2NwdS9hYnN0cmFjdF9jcHUuY3BwIHwgMTEgJiM0MzsmIzQzOyYjNDM7JiM0Mzsm
+IzQzOyYjNDM7JiM0MzsmIzQzOyYjNDM7JiM0MzsmIzQzOzxicj4KJm5ic3A7MSBmaWxlIGNoYW5n
+ZWQsIDExIGluc2VydGlvbnMoJiM0MzspPGJyPgo8YnI+CmRpZmYgLS1naXQgYS9zcmMvY3B1L2Fi
+c3RyYWN0X2NwdS5jcHAgYi9zcmMvY3B1L2Fic3RyYWN0X2NwdS5jcHA8YnI+CmluZGV4IGJjMzIz
+MzY4YjcxZi4uYzU5NzIxY2IzNDlhIDEwMDY0NDxicj4KLS0tIGEvc3JjL2NwdS9hYnN0cmFjdF9j
+cHUuY3BwPGJyPgomIzQzOyYjNDM7JiM0MzsgYi9zcmMvY3B1L2Fic3RyYWN0X2NwdS5jcHA8YnI+
+CkBAIC0yMTgsNiAmIzQzOzIxOCwxNyBAQCB2b2lkIGFic3RyYWN0X2NwdTo6aW5zZXJ0X2NzdGF0
+ZShjb25zdCBjaGFyICpsaW51eF9uYW1lLCBjb25zdCBjaGFyICpodW1hbl9uYW1lLDxicj4KJm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyB9PGJyPgombmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7Jm5ic3A7IGlmICgqYyAmZ3Q7PSAnMCcgJmFtcDsm
+YW1wOyAqYyAmbHQ7PSc5Jykgezxicj4KJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZu
+YnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgc3RhdGUtJmd0O2xpbmVfbGV2ZWwgPSBzdHJ0
+b3VsbChjLCBOVUxMLCAxMCk7PGJyPgomIzQzOyZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJz
+cDsmbmJzcDsgJm5ic3A7Jm5ic3A7Jm5ic3A7IGlmKCooYyYjNDM7MSkgIT0gJy0nKXs8YnI+CiYj
+NDM7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJz
+cDsgJm5ic3A7Jm5ic3A7Jm5ic3A7IGludCBncmVhdGVyX2xpbmVfbGV2ZWwgPSBzdHJ0b3VsbChj
+LCBOVUxMLCAxMCk7PGJyPgomIzQzOyZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJz
+cDsgJm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyBmb3IodW5zaWduZWQgaW50
+IHBvcyA9IDA7IHBvcyAmbHQ7IGNzdGF0ZXMuc2l6ZSgpOyBwb3MmIzQzOyYjNDM7KXs8YnI+CiYj
+NDM7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJz
+cDsgJm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyBpZigqYyA9PSBjc3RhdGVz
+W3Bvc10tJmd0O2h1bWFuX25hbWVbMV0pezxicj4KJiM0MzsmbmJzcDsmbmJzcDsmbmJzcDsgJm5i
+c3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgJm5i
+c3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyBpZigqKGMmIzQzOzEpICE9IGNzdGF0
+ZXNbcG9zXS0mZ3Q7aHVtYW5fbmFtZVsyXSl7PGJyPgomIzQzOyZuYnNwOyZuYnNwOyZuYnNwOyAm
+bmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAm
+bmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyBn
+cmVhdGVyX2xpbmVfbGV2ZWwgPSBtYXgoZ3JlYXRlcl9saW5lX2xldmVsLCBjc3RhdGVzW3Bvc10t
+Jmd0O2xpbmVfbGV2ZWwpOzxicj4KJiM0MzsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7
+Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7
+Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgc3RhdGUtJmd0O2xp
+bmVfbGV2ZWwgPSBncmVhdGVyX2xpbmVfbGV2ZWwgJiM0MzsgMTs8YnI+CiYjNDM7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5i
+c3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgfTxicj4KJiM0
+MzsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNw
+OyAmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7Jm5ic3A7IH08YnI+CiYjNDM7Jm5ic3A7
+Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7
+Jm5ic3A7Jm5ic3A7IH08YnI+CiYjNDM7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZu
+YnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgfTxicj4KJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZu
+YnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgYnJlYWs7PGJyPgombmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7Jm5ic3A7IH08YnI+CiZuYnNwOyZuYnNwOyZuYnNw
+OyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgYyYjNDM7JiM0Mzs7PGJyPgotLSA8YnI+CjIuOS4z
+PGJyPgo8L2Rpdj4KPC9ib2R5Pgo8L2h0bWw+Cg==
 
->>> I noticed something this morning when running powertop on my Dell XPS-13
->>> (skylake).  I've got wifi tethered to my phone, which is also plugged in
->>> the USB port, and the company vpn running on a virtual bridge on top of
->>> that.  Powertop accounts for that like this:
->>> =
-
->>> -------------------------
->>> The battery reports a discharge rate of 5.99 W
->>> The estimated remaining time is 8 hours, 32 minutes
->>> =
-
->>> Summary: 529.1 wakeups/second,  5.2 GPU ops/seconds, 0.0 VFS ops/sec an=
-d 8.9% CPU use
->>> =
-
->>> Power est.              Usage       Events/s    Category       Descript=
-ion
->>> 3.32 W      0.0 pkts/s                Device         nic:virbr0
->>> 2.71 W    100.0%                      Device         USB device: usb-de=
-vice-8087-0a2a
->>> 739 mW     53.6 ms/s      36.2        Process        /usr/bin/gnome-she=
-ll
->>> 477 mW    100.0%                      Device         Display backlight
->>> ...
->>> -------------------------
->>> =
-
->>> The second line is the (disabled) bluetooth device.  No idea what's goi=
-ng on
->>> there; bluetoothctl believes it's powered down.
->> =
-
->> Is this Fedora 24/25?
->> I filed a ticket for this last summer, it's fwupd holding the mouse
->> usbfs device open.
-> =
-
-> Yeah, it's f25.  So that's interesting, but it's not the mouse device
-> (because I don't have one).  I suspect you're right about the cause,
-> though.  I'll poke hughsie about it, thanks.
-
-Right, mouse is BT, so you can only get to btusb locally, that's what I see
-too, just a bit misworded since it was awhile ago and my memory is a bit ha=
-zy.
-
->> If you'd use current master version of powertop, you'd see it
->> correctly attributed to fwupd.
-> =
-
-> I'm not sure how to take to this statement.  Are you really chiding me
-> for using the version that's in the distro I'm using?
-
-Oh, no. Just a comment that current powertop handles this better and
-once Fedora catches up you'll see the benefits too.
---===============6536136670671188592==--
+--===============2230888493313176417==--
 
