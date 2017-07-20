@@ -1,36 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============0354131085050810566=="
+Content-Type: multipart/mixed; boundary="===============4511910295700144086=="
 MIME-Version: 1.0
-From: Arjan van de Ven <arjan at linux.intel.com>
-Subject: Re: [Powertop] 'PowerTOP --calibrate' output
-Date: Sun, 21 May 2017 14:02:43 -0700
-Message-ID: <2a2afafd-650e-f011-0fc8-ee35454afe0a@linux.intel.com>
-In-Reply-To: CAOZcyfbJ3R+qP+0DgVjrT8f8+p+_nYssky_EkmfwjnXP9_Jp9A@mail.gmail.com
+From: Gautam Paranjape <gautam.paranjape at intel.com>
+Subject: [Powertop] [PATCH] Modify how line_levels are assigned so c-states
+ don't overwrite other c-states
+Date: Thu, 20 Jul 2017 14:25:05 -0700
+Message-ID: <20170720212505.29922-1-gautam.paranjape@intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============0354131085050810566==
+--===============4511910295700144086==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On 5/21/2017 11:36 AM, Amit Singh wrote:
-> Hi.
-> After exiting 'sudo powertop --calibrate', there are some statistics prin=
-ted like "Score =3D 1.7 (18069.1) Guess =3D 12.1 Actual =3D 12.3" (These nu=
-mbers are made up, I do not
-> remember the actual values I got). I tried looking up what these values m=
-ean but could not find it mentioned anywhere in the User's guide. Can someo=
-ne point me to a
-> resource that has this information? Or if you know what these mean then k=
-indly explain it to me as well.
-> Thanks!
+Some c-states exposed by the intel_idle driver are assigned the same
+line_level, which means that the most recent one assigned can overwrite
+another c-state. For example, the C1-SKL c-state is overwritten by the
+C1E-SKL c-state because both have a "1" in the name and are assigned the
+same line level. To fix this, check if a "sub c-state" (ex. C1E-SKL) is
+being inserted. If so, check the vector of c-states if a c-state with
+similar name (ex. C1-SKL) exists, and increment the line level.
 
-so powertop tries to do a least squares fit of the calibration measurements=
- to a model it builds of your PC,
-and this is basically diagnotics output that tries to print how well the le=
-ast squares worked
+Signed-off-by: Gautam Paranjape <gautam.paranjape(a)intel.com>
+
+diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
+index bc323368b71f..c59721cb349a 100644
+--- a/src/cpu/abstract_cpu.cpp
++++ b/src/cpu/abstract_cpu.cpp
+@@ -218,6 +218,17 @@ void abstract_cpu::insert_cstate(const char *linux_nam=
+e, const char *human_name,
+ 		}
+ 		if (*c >=3D '0' && *c <=3D'9') {
+ 			state->line_level =3D strtoull(c, NULL, 10);
++			if(*(c+1) !=3D '-'){
++				int greater_line_level =3D strtoull(c, NULL, 10);
++				for(unsigned int pos =3D 0; pos < cstates.size(); pos++){
++					if(*c =3D=3D cstates[pos]->human_name[1]){
++						if(*(c+1) !=3D cstates[pos]->human_name[2]){
++							greater_line_level =3D max(greater_line_level, cstates[pos]->line_l=
+evel);
++							state->line_level =3D greater_line_level + 1;
++						}
++					}
++				}
++			}
+ 			break;
+ 		}
+ 		c++;
+-- =
+
+2.9.3
 
 
-
---===============0354131085050810566==--
+--===============4511910295700144086==--
 
