@@ -1,41 +1,30 @@
-Content-Type: multipart/mixed; boundary="===============8231112690768065382=="
+Content-Type: multipart/mixed; boundary="===============3233280872570259054=="
 MIME-Version: 1.0
-From: Theodore Ts'o <tytso at mit.edu>
-Subject: [Powertop] [PATCH] Ignore docker network interfaces
-Date: Mon, 12 Feb 2018 17:57:40 -0500
-Message-ID: <20180212225740.4021-1-tytso@mit.edu>
+From: Arjan van de Ven <arjan at linux.intel.com>
+Subject: Re: [Powertop] 700+mW for nic:virbr0?
+Date: Wed, 30 Aug 2017 14:48:33 -0700
+Message-ID: <6b8d62d9-5292-83b4-2a89-b487a6da07d7@linux.intel.com>
+In-Reply-To: CAJCQCtRUCK-Aie1tB2wiSfvxZD0cHL-XWKjDhA=TvLBEVB_SHw@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8231112690768065382==
+--===============3233280872570259054==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Theodore Ts'o <tytso(a)mit.edu>
----
- src/devices/network.cpp | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/src/devices/network.cpp b/src/devices/network.cpp
-index 8087b7f..45396ee 100644
---- a/src/devices/network.cpp
-+++ b/src/devices/network.cpp
-@@ -351,6 +351,8 @@ static void netdev_callback(const char *d_name)
- 	std::string f_name("/sys/class/net/");
- 	if (strcmp(d_name, "lo") =3D=3D 0)
- 		return;
-+	if (strncmp(d_name, "docker", 6) =3D=3D 0)
-+		return;
- =
-
- 	f_name.append(d_name);
- =
-
--- =
-
-2.16.1.72.g5be1f00a9a
+On 8/30/2017 2:36 PM, Chris Murphy wrote:
+> The #2 power consumer on my laptop according to powertop is
+> nic:virbr0 which seems unlikely. That's more than Firefox, and a bit
+> less than the display backlight. And it's nearly 300x more power than
+> used by the wifi driver.
+> =
 
 
---===============8231112690768065382==--
+so powertop seems to correlate virbr activity with power consumption...
+so while it may not be the virtual bridge itself to cause power consumption=
+, the usage of it very likely is
+
+
+--===============3233280872570259054==--
 
