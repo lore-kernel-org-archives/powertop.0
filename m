@@ -1,92 +1,39 @@
-Content-Type: multipart/mixed; boundary="===============4432960219984417307=="
+Content-Type: multipart/mixed; boundary="===============6049308639334777986=="
 MIME-Version: 1.0
-From: Kammela, Gayatri <gayatri.kammela at intel.com>
-Subject: [Powertop] PowerTop V2.11 tar file
-Date: Fri, 27 Sep 2019 19:10:54 +0000
-Message-ID: <SN6PR11MB318188A1CF65C79E918E9F15F2810@SN6PR11MB3181.namprd11.prod.outlook.com>
+From: Auke Kok <auke-jan.h.kok at intel.com>
+Subject: Re: [Powertop] RH Bugzilla [Bug 1482649] Logitech USB Unified
+ Receiver+M570 need 'waking' up by click after kernel update
+Date: Thu, 07 Sep 2017 13:11:29 -0700
+Message-ID: <b92fbbf0-72c3-d380-8f99-5d4ee96f129d@intel.com>
+In-Reply-To: VI1PR0301MB2510765FF1A9FBAE0EDEFDFD87940@VI1PR0301MB2510.eurprd03.prod.outlook.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4432960219984417307==
+--===============6049308639334777986==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi All,
-PowerTop v2.11 is released and I am attaching the v2.11 tar file. You can n=
-ow file issues here<https://github.com/fenrus75/powertop/issues>. Please vi=
-sit https://01.org/powertop for more information. The tar file will be avai=
-lable there. Kindly let us know your comments, questions and suggestions.
+On 09/07/2017 11:09 AM, Mike Simms wrote:
+> Then explain why it was never an issue before kernel 4.12 please
 
-Thanks ,
-Gayatri Kammela
+I can only take a guess, based on the info you provided, most
+importantly I lack the hardware that you have.
 
+Joe's comments are obviously important - there may be several points of
+failure. The one that I spotted, is this one:
 
---===============4432960219984417307==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+>>> powertop is using the autotune profile and the usb autosuspend
+>>> entry is Good.
 
-PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
-bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
-YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
-cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
-VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
-bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
-ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTUgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
-PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseToiQ2Ft
-YnJpYSBNYXRoIjsKCXBhbm9zZS0xOjIgNCA1IDMgNSA0IDYgMyAyIDQ7fQpAZm9udC1mYWNlCgl7
-Zm9udC1mYW1pbHk6Q2FsaWJyaTsKCXBhbm9zZS0xOjIgMTUgNSAyIDIgMiA0IDMgMiA0O30KLyog
-U3R5bGUgRGVmaW5pdGlvbnMgKi8KcC5Nc29Ob3JtYWwsIGxpLk1zb05vcm1hbCwgZGl2Lk1zb05v
-cm1hbAoJe21hcmdpbjowaW47CgltYXJnaW4tYm90dG9tOi4wMDAxcHQ7Cglmb250LXNpemU6MTEu
-MHB0OwoJZm9udC1mYW1pbHk6IkNhbGlicmkiLHNhbnMtc2VyaWY7fQphOmxpbmssIHNwYW4uTXNv
-SHlwZXJsaW5rCgl7bXNvLXN0eWxlLXByaW9yaXR5Ojk5OwoJY29sb3I6IzA1NjNDMTsKCXRleHQt
-ZGVjb3JhdGlvbjp1bmRlcmxpbmU7fQphOnZpc2l0ZWQsIHNwYW4uTXNvSHlwZXJsaW5rRm9sbG93
-ZWQKCXttc28tc3R5bGUtcHJpb3JpdHk6OTk7Cgljb2xvcjojOTU0RjcyOwoJdGV4dC1kZWNvcmF0
-aW9uOnVuZGVybGluZTt9CnNwYW4uRW1haWxTdHlsZTE3Cgl7bXNvLXN0eWxlLXR5cGU6cGVyc29u
-YWwtY29tcG9zZTsKCWZvbnQtZmFtaWx5OiJDYWxpYnJpIixzYW5zLXNlcmlmOwoJY29sb3I6d2lu
-ZG93dGV4dDt9Ci5Nc29DaHBEZWZhdWx0Cgl7bXNvLXN0eWxlLXR5cGU6ZXhwb3J0LW9ubHk7Cglm
-b250LWZhbWlseToiQ2FsaWJyaSIsc2Fucy1zZXJpZjt9CkBwYWdlIFdvcmRTZWN0aW9uMQoJe3Np
-emU6OC41aW4gMTEuMGluOwoJbWFyZ2luOjEuMGluIDEuMGluIDEuMGluIDEuMGluO30KZGl2Lldv
-cmRTZWN0aW9uMQoJe3BhZ2U6V29yZFNlY3Rpb24xO30KLS0+PC9zdHlsZT48IS0tW2lmIGd0ZSBt
-c28gOV0+PHhtbD4KPG86c2hhcGVkZWZhdWx0cyB2OmV4dD0iZWRpdCIgc3BpZG1heD0iMTAyNiIg
-Lz4KPC94bWw+PCFbZW5kaWZdLS0+PCEtLVtpZiBndGUgbXNvIDldPjx4bWw+CjxvOnNoYXBlbGF5
-b3V0IHY6ZXh0PSJlZGl0Ij4KPG86aWRtYXAgdjpleHQ9ImVkaXQiIGRhdGE9IjEiIC8+Cjwvbzpz
-aGFwZWxheW91dD48L3htbD48IVtlbmRpZl0tLT4KPC9oZWFkPgo8Ym9keSBsYW5nPSJFTi1VUyIg
-bGluaz0iIzA1NjNDMSIgdmxpbms9IiM5NTRGNzIiPgo8ZGl2IGNsYXNzPSJXb3JkU2VjdGlvbjEi
-Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5IaSBBbGwsPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJN
-c29Ob3JtYWwiPlBvd2VyVG9wIHYyLjExIGlzIHJlbGVhc2VkIGFuZCBJIGFtIGF0dGFjaGluZyB0
-aGUgdjIuMTEgdGFyIGZpbGUuIFlvdSBjYW4gbm93IGZpbGUgaXNzdWVzCjxhIGhyZWY9Imh0dHBz
-Oi8vZ2l0aHViLmNvbS9mZW5ydXM3NS9wb3dlcnRvcC9pc3N1ZXMiPmhlcmU8L2E+LiBQbGVhc2Ug
-dmlzaXQgPGEgaHJlZj0iaHR0cHM6Ly8wMS5vcmcvcG93ZXJ0b3AiPgpodHRwczovLzAxLm9yZy9w
-b3dlcnRvcDwvYT4gZm9yIG1vcmUgaW5mb3JtYXRpb24uIFRoZSB0YXIgZmlsZSB3aWxsIGJlIGF2
-YWlsYWJsZSB0aGVyZS4gS2luZGx5IGxldCB1cyBrbm93IHlvdXIgY29tbWVudHMsIHF1ZXN0aW9u
-cyBhbmQgc3VnZ2VzdGlvbnMuCjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48
-bzpwPiZuYnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+VGhhbmtzICw8bzpwPjwv
-bzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+R2F5YXRyaSBLYW1tZWxhPG86cD48L286cD48
-L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8L2Rpdj4KPC9i
-b2R5Pgo8L2h0bWw+Cg==
+Turn it to "Bad" and see if it resolves the problem.
 
---===============4432960219984417307==
-Content-Type: text/plain
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="1_Warning.txt"
+I am wondering if powertop autotuning was recently turned on in your
+distro, and the trackpoint isn't properly blacklisted as a device that
+shouldn't be put into usb autosuspend (if that is actually a thing in
+code, it's been a while since I last worked on it).
 
-DQpCTE9DS0VEIEZJTEUgQUxFUlRBIGZpbGUgaGFzIGJlZW4gYmxvY2tlZCBkdWUgdG8gdGhlICdJ
-bnRlbCBFbWFpbCBGaWxlIEZpbHRlcmluZyBQb2xpY3knIHJ1bGUuQ29udGV4dDogJ2F1dG9nZW4u
-c2gnRGlzYWxsb3dlZCBkdWUgdG8gZmlsZW5hbWVUaWNrZXQgTnVtYmVyOiAnMGU3MC01ZDhlLTVl
-YzMtMDAwMScNCg0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KDQpC
-TE9DS0VEIEZJTEUgQUxFUlRBIGZpbGUgaGFzIGJlZW4gYmxvY2tlZCBkdWUgdG8gdGhlICdJbnRl
-bCBFbWFpbCBGaWxlIEZpbHRlcmluZyBQb2xpY3knIHJ1bGUuQ29udGV4dDogJ2Nzc3RvaC5zaCdE
-aXNhbGxvd2VkIGR1ZSB0byBmaWxlbmFtZVRpY2tldCBOdW1iZXI6ICcwZTcwLTVkOGUtNWVjMy0w
-MDAxJw0KDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQoNCkJMT0NL
-RUQgRklMRSBBTEVSVEEgZmlsZSBoYXMgYmVlbiBibG9ja2VkIGR1ZSB0byB0aGUgJ0ludGVsIEVt
-YWlsIEZpbGUgRmlsdGVyaW5nIFBvbGljeScgcnVsZS5Db250ZXh0OiAnbHRtYWluLnNoJ0Rpc2Fs
-bG93ZWQgZHVlIHRvIGZpbGVuYW1lVGlja2V0IE51bWJlcjogJzBlNzAtNWQ4ZS01ZWMzLTAwMDEn
-DQpTZWUgeW91ciBzeXN0ZW0gYWRtaW5pc3RyYXRvciBmb3IgZnVydGhlciBpbmZvcm1hdGlvbi4g
-Q29weXJpZ2h0IDE5OTktMjAxMSBNY0FmZWUsIEluYy5BbGwgUmlnaHRzIFJlc2VydmVkLmh0dHA6
-Ly93d3cubWNhZmVlLmNvbQ==
---===============4432960219984417307==--
+Auke
+
+--===============6049308639334777986==--
 
