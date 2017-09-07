@@ -1,166 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============7355627344338949745=="
+Content-Type: multipart/mixed; boundary="===============4189591810045872720=="
 MIME-Version: 1.0
-From: Kammela, Gayatri <gayatri.kammela at intel.com>
-Subject: Re: [Powertop] CoreDump on version 2.9 and git.
-Date: Fri, 22 Feb 2019 17:59:31 +0000
-Message-ID: <2824B99DC70CE746926327C52CA42F76487E65C2@ORSMSX111.amr.corp.intel.com>
-In-Reply-To: bab55e50-3e5d-90ac-a692-59564fe5d084@gmx.de
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: Re: [Powertop] RH Bugzilla [Bug 1482649] Logitech USB Unified
+ Receiver+M570 need 'waking' up by click after kernel update
+Date: Thu, 07 Sep 2017 13:03:47 -0700
+Message-ID: <419c8d$u57vqs@orsmga003.jf.intel.com>
+In-Reply-To: VI1PR0301MB2510765FF1A9FBAE0EDEFDFD87940@VI1PR0301MB2510.eurprd03.prod.outlook.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7355627344338949745==
+--===============4189591810045872720==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Harvey,
-Great! Thanks for the update. =
+On Thu, 7 Sep 2017 18:09:59 +0000
+Mike Simms <micsim2007(a)outlook.com> wrote:
 
+> Then explain why it was never an issue before kernel 4.12 please
 
-Thanks,
-Gayatri
+That's a question for the maintainer of the kernel USB HID driver driver
+community. The Linux kernel is a very large piece of software with many, ma=
+ny
+device drivers supporting still more devices. These drivers can and do chan=
+ge,
+for myriad reasons, from kernel release to kernel release.
 
-> -----Original Message-----
-> From: Harvey [mailto:harv(a)gmx.de]
-> Sent: Friday, February 22, 2019 5:25 AM
-> To: Kammela, Gayatri <gayatri.kammela(a)intel.com>
-> Subject: Re: [Powertop] CoreDump on version 2.9 and git.
-> =
+Particular device power management behaviors are implemented by kernel devi=
+ce
+drivers. PowerTOP gives you the ability to toggle (or tune) low-level,
+power-sensitive settings for each device. If by toggling a setting for a
+particular device that device behaves in an undesirable way, you may have a
+kernel device driver bug.
 
-> Hi all
-> =
+USB HID-- human interface device-- drivers, which include mice and the like,
+have an upstream kernel maintainer. In this specific case, the linux-usb
+mailing list would be a good starting point, or the kernel.org bugzilla.
 
-> as Pablo already stated the issue has gone with kernel 4.20.11. All my
-> machines using powertop are back to normal now.
-> =
+In the general case, consulting the kernel MAINTAINERS file for the device =
+in
+question should provide a mailing list starting point when issues like these
+arise.
 
-> Greetings
-> Harvey
-> =
+Here I can only offer general advice, nothing specific. Hope it helps!
 
-> Am 20.02.19 um 11:21 schrieb Kammela, Gayatri:
-> > Hi Harvey,
-> > Thanks for the report! I will try and reproduce the issue on ArchLinux.=
- Just
-> curious if Archlinux has any issues with PowerTop v2.9 on 4.20 kernel as =
-well.
-> >
-> > Thanks,
-> > Gayatri
-> >
-> >> -----Original Message-----
-> >> From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of
-> >> Harvey
-> >> Sent: Tuesday, February 19, 2019 2:05 AM
-> >> To: powertop(a)lists.01.org
-> >> Subject: Re: [Powertop] CoreDump on version 2.9 and git.
-> >>
-> >> Hello,
-> >>
-> >> please forgive me to chime in here, but...
-> >>
-> >> this happens as well on Archlinux with a vanilla kernel
-> >> 4.20.10-arch1-1-ARCH and powertop 2.10
-> >> (https://www.archlinux.org/packages/community/x86_64/powertop/)
-> >>
-> >> If one starts powertop it bails out with
-> >>
-> >> Feb 19 11:03:13 obelix systemd-coredump[14698]: Process 14692
-> >> (powertop) of user 0 dumped core.
-> >>
-> >>                                                 Stack trace of thread =
-14692:
-> >>                                                 #0  0x000055868ba1d157=
- n/a (powertop)
-> >>                                                 #1  0x000055868ba1df22=
- n/a (powertop)
-> >>                                                 #2  0x000055868b9f7cb3=
- n/a (powertop)
-> >>                                                 #3  0x000055868b9f2556=
- n/a (powertop)
-> >>                                                 #4  0x000055868b9e8a16=
- n/a (powertop)
-> >>                                                 #5
-> >> 0x00007f7215905223 __libc_start_main
-> >> (libc.so.6)
-> >>                                                 #6
-> >> 0x000055868b9e9b5e n/a (powertop)
-> >>
-> >>
-> >> HTH
-> >>
-> >> Greetings
-> >> Harvey
-> >>
-> >> Am 19.02.19 um 10:30 schrieb Kammela, Gayatri:
-> >>> Hi Pablo,
-> >>> Thanks for reporting! I have tried powertop v2.9 and v2.10 on kernel
-> >>> 4.20
-> >> with Ubuntu generic+ additional config options and didn't notice any
-> >> core dump issues. I have changed the processor type to Xeon and I
-> >> couldn't reproduce it. Could you please share the kernel config that
-> >> you've used to reproduce this issue? Also, could you try running
-> >> latest powertop with latest kernel to see if it is still reproducible?
-> >>>
-> >>> Thanks,
-> >>> Gayatri
-> >>>
-> >>>> -----Original Message-----
-> >>>> From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of
-> >>>> Pablo Catalina
-> >>>> Sent: Monday, February 18, 2019 1:46 PM
-> >>>> To: powertop(a)lists.01.org
-> >>>> Subject: [Powertop] CoreDump on version 2.9 and git.
-> >>>>
-> >>>> Hi,
-> >>>>
-> >>>> I have an Ubuntu 18.04 with kernel 4.20.10 (compiled manually with
-> >>>> default Ubuntu options but changing the processor type to Xeon)
-> >>>>
-> >>>>
-> >>>> I tested the version 2.9 and the latest code from git (tag 2.10):
-> >>>>
-> >>>> # git log
-> >>>>
-> >>>> e8765b5 (HEAD -> master, tag: v2.10, origin/master, origin/HEAD)
-> >>>> src/wakeup/wakeup.h: Fix a minor issue in the wakeup.h file
-> >>>>
-> >>>>
-> >>>> And I got a coredump when I run it normally and with --auto-tune (I
-> >>>> dont have the coredump with --debug).
-> >>>>
-> >>>>
-> >>>> The same coredump on normal run and with --auto-autotune.
-> >>>>
-> >>>>
-> >>>> See attached the output of gdb (bt, registers, ...) and the coredump.
-> >>>>
-> >>>>
-> >>>> Let me know if I can do anything else to help you to fix the bug,
-> >>>> I'm not C developer but I have a minimal knowledge about compiling
-> >>>> code, patching, debug, ...
-> >>>>
-> >>>>
-> >>>>
-> >>>> Regards,
-> >>>>
-> >>>>
-> >>>> Pablo
-> >>>
-> >>> _______________________________________________
-> >>> PowerTop mailing list
-> >>> PowerTop(a)lists.01.org
-> >>> https://lists.01.org/mailman/listinfo/powertop
-> >>>
-> >>
-> >> --
-> >> I am root. If you see me laughing, you'd better have a backup!
-> >
-> =
+--===============4189591810045872720==
+Content-Type: application/pgp-signature
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.sig"
 
-> --
-> I am root. If you see me laughing, you'd better have a backup!
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KCmlRSXpCQUVCQ0FBZEZpRUVrUS8vcXlmRjdF
+UndpV2hLalloSDFTOUtxbVlGQWxteHBpTUFDZ2tRalloSDFTOUsKcW1aZVJnLy9WQjNSS3dvdkE4
+Q0EvN2VBc1dXSnd4MlMvZmRTVnJjSlkrdFRVUjhZbzBPT3hRaWgxNVo4aTdVQwptK1FHNUx6VVI5
+U0ZQMENzV0hEQ3dCK1d3NXpjZWMwQ2dCOTZQdFRUd2l0cXoya2VIQ3EvUDJVTWlqZ0xYcU1iCkJm
+dldPVjl1cVd3WTFwSmNXWGFxM1gzR1ZvQms2NXNtbWVndjFxalYvSktEQTlnbEpsZnBzNUYxQjlT
+SHRkMk0KbzB0eVJjTy9XTXlhbWNEWXd3NUhNQ2k5M2NweVZHWHJyaFJJaFphWC8ydFFQMlFsUW9w
+bFZJWG5KRnVTMDRYYwpnUlhqbmNIY1VZbmlxRG5qbWh6anJBWlltSWxQUTFQak1OVjI1d3dxelhS
+ZHBOWTE4WTQ4V21DYkJOOUJzNlYrCmJ6SzhDdzUwY25XUmFteTZ5RkY4VTNZaVdYS2wvUHRjeDg1
+UUllR3lDamp3K29YUzBWSE1HM1B6UHFwOHRqb0EKWWw1WHFPMzFKdzJCS2t0VDdZa1F0bjBCaVpI
+aXZqcFlRcDZYZlFzalZrR1pXNXBNSStpaUZVNys1MGpiWld6aQpSVnIwVlFXSVlHZUNUU21MdEND
+MW5Ec3VZVTRLQWxzbm16cEV2SDJRZlp2ZjVaNXZPblVVZTY3K20zNlZUeTc0CjFDWWZUZ2d4ZzRn
+bHFJZ3VBUGNvSVU5eml4aE1wWnhTZ2RFSXRnTm1KR0g3cU5qQ1dOT0YzYjZwMTZRaVowaUQKWDQ1
+NG9TUVI5T0hsU1Y5R0RZWUNySGpoRGZWQzlaR1J5MnoxL2ZwOWFnbEJ4eDRYSUJ0NWxUKyt2bDlQ
+V0lEegp4UGtBRkJkb1hHbzc4U1RGNEhpZXhxSE9aOU50Y3VJSlh3MndnbTJ2cDJEWWdBQmFLcFE9
+Cj1tVmJhCi0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQo=
 
-
---===============7355627344338949745==--
+--===============4189591810045872720==--
 
