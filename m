@@ -1,172 +1,70 @@
-Content-Type: multipart/mixed; boundary="===============1375813292424632597=="
+Content-Type: multipart/mixed; boundary="===============8481844715842994413=="
 MIME-Version: 1.0
-From: dmummenschanz at web.de
-Subject: Re: [Powertop] wrong package C-State with KBL
-Date: Tue, 28 Mar 2017 06:45:54 +0200
-Message-ID: <trinity-5a10753a-aded-4c03-9f56-c716243fe1e3-1490676354544@3capp-webde-bs63>
+From: Mike Simms <micsim2007 at outlook.com>
+Subject: [Powertop] RH Bugzilla [Bug 1482649] Logitech USB Unified
+ Receiver+M570 need 'waking' up by click after kernel update
+Date: Thu, 07 Sep 2017 13:32:51 +0000
+Message-ID: <VI1PR0301MB25106F2829C6ABB1D42798A087940@VI1PR0301MB2510.eurprd03.prod.outlook.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1375813292424632597==
+--===============8481844715842994413==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
- =
+Description of problem: For some reason the trackball is no longer able
+to respond to user input immediately. it only responds when I click a
+button to wake it up or roll the ball about a bit first. With earlier
+kernels this was not necessary. Booting from the previous kernel
+4.11.11-300.fc26 and it still works fine.
 
-of course! :) Here it is. If you need any more information please let me kn=
-ow.
-Btw. I`ve enabled psr and fbc but there were too many freezing screens (no =
-gpu hangs) so I've disabled it. The pc states however didn't change at all =
-between psr/fbc on and off.
- =
 
-HTH
- =
+Version-Release number of selected component (if
+applicable):4.12.5-300.fc26.x86_64
 
-cat /proc/cpuinfo
-processor       : 0
-vendor_id       : GenuineIntel
-cpu family      : 6
-model           : 158
-model name      : Intel(R) Core(TM) i5-7400T CPU @ 2.40GHz
-stepping        : 9
-microcode       : 0x48
-cpu MHz         : 799.658
-cache size      : 6144 KB
-physical id     : 0
-siblings        : 4
-core id         : 0
-cpu cores       : 4
-apicid          : 0
-initial apicid  : 0
-fpu             : yes
-fpu_exception   : yes
-cpuid level     : 22
-wp              : yes
-flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca =
-cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx p=
-dpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopo=
-logy nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monit=
-or ds_cpl vmx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2ap=
-ic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3d=
-nowprefetch epb intel_pt tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc=
-_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt xsa=
-veopt xsavec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_=
-window hwp_epp
-bugs            :
-bogomips        : 4800.00
-clflush size    : 64
-cache_alignment : 64
-address sizes   : 39 bits physical, 48 bits virtual
-power management:
-processor       : 1
-vendor_id       : GenuineIntel
-cpu family      : 6
-model           : 158
-model name      : Intel(R) Core(TM) i5-7400T CPU @ 2.40GHz
-stepping        : 9
-microcode       : 0x48
-cpu MHz         : 800.097
-cache size      : 6144 KB
-physical id     : 0
-siblings        : 4
-core id         : 1
-cpu cores       : 4
-apicid          : 2
-initial apicid  : 2
-fpu             : yes
-fpu_exception   : yes
-cpuid level     : 22
-wp              : yes
-flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca =
-cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx p=
-dpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopo=
-logy nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monit=
-or ds_cpl vmx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2ap=
-ic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3d=
-nowprefetch epb intel_pt tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc=
-_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt xsa=
-veopt xsavec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_=
-window hwp_epp
-bugs            :
-bogomips        : 4800.71
-clflush size    : 64
-cache_alignment : 64
-address sizes   : 39 bits physical, 48 bits virtual
-power management:
-processor       : 2
-vendor_id       : GenuineIntel
-cpu family      : 6
-model           : 158
-model name      : Intel(R) Core(TM) i5-7400T CPU @ 2.40GHz
-stepping        : 9
-microcode       : 0x48
-cpu MHz         : 799.951
-cache size      : 6144 KB
-physical id     : 0
-siblings        : 4
-core id         : 2
-cpu cores       : 4
-apicid          : 4
-initial apicid  : 4
-fpu             : yes
-fpu_exception   : yes
-cpuid level     : 22
-wp              : yes
-flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca =
-cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx p=
-dpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopo=
-logy nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monit=
-or ds_cpl vmx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2ap=
-ic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3d=
-nowprefetch epb intel_pt tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc=
-_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt xsa=
-veopt xsavec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_=
-window hwp_epp
-bugs            :
-bogomips        : 4800.80
-clflush size    : 64
-cache_alignment : 64
-address sizes   : 39 bits physical, 48 bits virtual
-power management:
-processor       : 3
-vendor_id       : GenuineIntel
-cpu family      : 6
-model           : 158
-model name      : Intel(R) Core(TM) i5-7400T CPU @ 2.40GHz
-stepping        : 9
-microcode       : 0x48
-cpu MHz         : 799.951
-cache size      : 6144 KB
-physical id     : 0
-siblings        : 4
-core id         : 3
-cpu cores       : 4
-apicid          : 6
-initial apicid  : 6
-fpu             : yes
-fpu_exception   : yes
-cpuid level     : 22
-wp              : yes
-flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca =
-cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx p=
-dpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopo=
-logy nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monit=
-or ds_cpl vmx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2ap=
-ic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3d=
-nowprefetch epb intel_pt tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc=
-_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt xsa=
-veopt xsavec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_=
-window hwp_epp
-bugs            :
-bogomips        : 4800.81
-clflush size    : 64
-cache_alignment : 64
-address sizes   : 39 bits physical, 48 bits virtual
-power management:
-=20
+Also affected Fedora 27 4.13 rc kernel
 
---===============1375813292424632597==--
+
+How reproducible: consistently
+
+
+Steps to Reproduce:
+1. start notebook computer with the unified receiver attached
+2. login and use the computer as normal
+
+Actual results: trackball works initially but if left for a few seconds
+to type or read for example, it needs waking up with movement or a
+click of a button.
+
+
+Expected results: should respond normally without this lag or waking up
+nonsense
+
+
+Additional info:the unified receiver is plugged into the same USB 2
+port it has always been.
+
+powertop is using the autotune profile and the usb autosuspend entry is
+Good.
+
+Something in the kernel code has caused a power management regression.
+I'm not sure what and the bug I opened so far has drawn a blank. The
+kernel maintainer is not able to help as they don't know about power
+management or powertop. please give some guidance as to where to look
+and how to resolve this if possible. Full information so far here,
+including dmesg, lspci, lsusb output, dumps for comparison of power
+profiles etc.
+
+I'm an end user, not a developer or maintainer so please keep it in
+relatively simple terms I can relay back to the maintainers please and
+understand at the same time.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1482649
+
+Thanks
+
+Mike Simms
+
+--===============8481844715842994413==--
 
