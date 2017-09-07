@@ -1,94 +1,29 @@
-Content-Type: multipart/mixed; boundary="===============2693547997143876564=="
+Content-Type: multipart/mixed; boundary="===============5422045721809190153=="
 MIME-Version: 1.0
-From: Sedat Dilek <sedat.dilek at gmail.com>
-Subject: [PowerTOP] Re: ANNOUNCING PowerTOP v2.13
-Date: Thu, 11 Jun 2020 23:47:10 +0200
-Message-ID: <CA+icZUUeNije-AQspvUpr6w-fdXqKRFoLk-YX0EFnC5SFj_0Kg@mail.gmail.com>
-In-Reply-To: 20200611202251.GA160987@localhost
+From: Mike Simms <micsim2007 at outlook.com>
+Subject: Re: [Powertop] RH Bugzilla [Bug 1482649] Logitech USB Unified
+ Receiver+M570 need 'waking' up by click after kernel update
+Date: Thu, 07 Sep 2017 22:46:53 +0000
+Message-ID: <VI1PR0301MB2510658F71CFC487F7265E7187940@VI1PR0301MB2510.eurprd03.prod.outlook.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2693547997143876564==
+--===============5422045721809190153==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Joe,
+Thanks Joe, I've found an email address for a Jiri Kosina who maintains
+the HID driver for linux-usb if their site list is up to date. I've
+tried emailing them and will see what comes of it now.
 
-thanks to all contributors for this release.
+--===============5422045721809190153==
+Content-Type: message/rfc822
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.mht"
 
-Regards,
-- Sedat -
 
-On Thu, Jun 11, 2020 at 10:23 PM Joe Konno <joe.konno(a)linux.intel.com> wr=
-ote:
->
-> Hey all,
->
-> PowerTOP v2.13 has been tagged and released[1]. Thank you to all who have
-> contributed!
->
-> This release does have functional fixes (see shortlog below), but is more=
- a
-> "cleanup" release.
->
-> Developers and enthusiasts, the project has documented how you can
-> contribute to the project. See the CONTRIBUTE.md document for more. The
-> short version? Fork on GitHub, and send us your pull requests!
->
-> I encourage you to monitor the project issue tracker[2]. Within the next =
-few
-> weeks, PowerTOP's maintainers will open issues to scrutinize PowerTOP's
-> existing feature set. Your input (and patches) will be welcomed.
->
-> If you use PowerTOP and find a bug, or have an idea for improving
-> PowerTOP, please open an issue[2] to start a discussion. Pull requests
-> are always welcome.
->
->
-> Output of 'git shortlog -n --no-merges v2.12..v2.13'
->
-> Joe Konno (19):
->       README.md: rename, add md syntax, and major tweaks
->       README.md: Fix a misspelled name
->       Add CONTRIBUTE.md
->       Remove Android build artifacts
->       configure.ac: bump version to v2.13-pre
->       configure.ac: use ax_cxx_compile_stdcxx instead
->       po: regenerate gettext files
->       Enable support for DNV
->       intel_cpus: Fix ICX definition
->       configure.ac: add missing checks from autoscan
->       gettext: update to 0.20.2
->       remove INSTALL relic
->       gitignore: refresh ignored files
->       Doxyfile.in: refresh for version 1.8.18
->       Doxyfile.in: modernize configuration
->       intel_cpus: Fix SKY-X definition
->       configure.ac: bump to version v2.13-rc1
->       README: clarify dependencies, contrib, and support
->       PowerTOP v2.13
->
-> Edward Betts (1):
->       correct spelling mistake
->
-> James Earl Douglas (1):
->       Update wording to match units of measure
->
-> Jaroslav =C5=A0karvada (1):
->       Dropped unused variable "entry" detected by Coverity
->
-> Michael Vetter (1):
->       intel_cpus.cpp: Only call closedir() if opened
->
->
-> [1] https://github.com/fenrus75/powertop/releases/tag/v2.13
-> [2] https://github.com/fenrus75/powertop/issues
->
->
-> Cheers!
-> _______________________________________________
-> PowerTOP mailing list -- powertop(a)lists.01.org
-> To unsubscribe send an email to powertop-leave(a)lists.01.org
---===============2693547997143876564==--
+WzxlbWFpbC5tZXNzYWdlLk1lc3NhZ2UgaW5zdGFuY2UgYXQgMHg3ZmRiOGEyODViZDg+XQ==
+--===============5422045721809190153==--
 
