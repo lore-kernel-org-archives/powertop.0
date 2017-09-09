@@ -1,42 +1,87 @@
-Content-Type: multipart/mixed; boundary="===============4793738232630427400=="
+Content-Type: multipart/mixed; boundary="===============2525281724501252411=="
 MIME-Version: 1.0
-From: Mike Simms <micsim2007 at outlook.com>
-Subject: Re: [Powertop] RH Bugzilla [Bug 1482649] Logitech USB Unified
- Receiver+M570 need 'waking' up by click after kernel update
-Date: Thu, 07 Sep 2017 22:51:49 +0000
-Message-ID: <VI1PR0301MB25109F61A556DE2CF5E58EED87940@VI1PR0301MB2510.eurprd03.prod.outlook.com>
+From: Magnus Fromreide <magfr at lysator.liu.se>
+Subject: Re: [Powertop] [PATCH 1/4 v1] lib: refactor pci_access checks
+Date: Sat, 09 Sep 2017 09:18:18 +0200
+Message-ID: <20170909071818.GD18791@noemi.bahnhof.se>
+In-Reply-To: 20170908223651.27979-2-joe.konno@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4793738232630427400==
+--===============2525281724501252411==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Auke, no that autotune has always been set to good. It's been discussed
-already in the RH bug thread I linked to in my 1st post here. I didn't
-want to duplicate everything already gone through because it's quite
-lengthy. I'm asking here in case someone has any better suggestions
-because it should still work the same in theory. No settings have been
-changed in powertop. It autodetects and sets good for both kernel
-versions with regards the Logitech unified receiver.
+On Fri, Sep 08, 2017 at 03:36:48PM -0700, Joe Konno wrote:
+> From: Joe Konno <joe.konno(a)intel.com>
+> =
 
-To summarise for people who don't want to read the RH bugzilla thread:
+> Pull the libpci initialization bits out and into its own dedicated functi=
+on.
 
-Autotune service for both kernels tunes the same devices to Good.
-Nothing is set to Bad.
+I think the name you choose for the function is odd since what it does is
+that it creates the pci_access object if it doesn't exist. It certainly ain=
+'t
+checking anything.
 
-With kernel 4.11.11-300 there is no wake up lag when the receiver and
-connected device has entered low power state
+Maybe something along the lines of create_pci_access or initialize_pci_acce=
+ss
+would be a better name?
 
-With kernel 4.12.x and 4.13 release candidate there is lag you can
-measure in seconds and it's extremely frustrating. It causes missed
-clicks, keyboard characters,  duplicate form submissions on websites.
+> Signed-off-by: Joe Konno <joe.konno(a)intel.com>
+> ---
+>  src/lib.cpp | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
+> =
 
-Setting the autosuspend for the receiver to Bad is an obvious
-workaround but it isn't the solution we're looking for. There is a
-regression here that needs addressing. Hopefully the HID driver contact
-I found thanks to Joe will be able to advise further on this.
+> diff --git a/src/lib.cpp b/src/lib.cpp
+> index 5e48f375d087..2b95e64f427b 100644
+> --- a/src/lib.cpp
+> +++ b/src/lib.cpp
+> @@ -296,16 +296,21 @@ void format_watts(double W, char *buffer, unsigned =
+int len)
+>  #ifndef HAVE_NO_PCI
+>  static struct pci_access *pci_access;
+>  =
 
---===============4793738232630427400==--
+> +static void check_pci_access(void)
+> +{
+> +	if (!pci_access) {
+> +		pci_access =3D pci_alloc();
+> +		pci_init(pci_access);
+> +	}
+> +}
+> +
+>  char *pci_id_to_name(uint16_t vendor, uint16_t device, char *buffer, int=
+ len)
+>  {
+>  	char *ret;
+>  =
+
+>  	buffer[0] =3D 0;
+>  =
+
+> -	if (!pci_access) {
+> -		pci_access =3D pci_alloc();
+> -		pci_init(pci_access);
+> -	}
+> +	check_pci_access();
+>  =
+
+>  	ret =3D pci_lookup_name(pci_access, buffer, len, PCI_LOOKUP_VENDOR | PC=
+I_LOOKUP_DEVICE, vendor, device);
+>  =
+
+> -- =
+
+> 2.13.5
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+
+--===============2525281724501252411==--
 
