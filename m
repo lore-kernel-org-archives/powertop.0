@@ -1,44 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============5428995029611294235=="
+Content-Type: multipart/mixed; boundary="===============6447117591240635974=="
 MIME-Version: 1.0
-From: Fabrice Fontaine <fontaine.fabrice at gmail.com>
-Subject: Re: [Powertop] [PATCH] wakeup_xxx.h: include limits.h
-Date: Wed, 03 Jul 2019 00:00:11 +0200
-Message-ID: <CAPi7W82VJZ_4i=i87DO7nD_DL0Ez67Z99m9ZvXNpYPDkEqEXfA@mail.gmail.com>
-In-Reply-To: 2824B99DC70CE746926327C52CA42F764F155528@ORSMSX111.amr.corp.intel.com
+From: Mike Simms <micsim2007 at outlook.com>
+Subject: Re: [Powertop] RH Bugzilla [Bug 1482649] Logitech USB Unified
+ Receiver+M570 need 'waking' up by click after kernel update
+Date: Wed, 13 Sep 2017 08:26:12 +0000
+Message-ID: <VI1PR0301MB2510F8832D2F672FD4DA69A7876E0@VI1PR0301MB2510.eurprd03.prod.outlook.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5428995029611294235==
+--===============6447117591240635974==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Dear Gayatri,
+Out of courtesy, just a quick message thank you for your help
+and pointing me in the right direction with this issue. I'm closing it
+after further consultation with linux-usb contributors. Here is the
+reason copied from my RH Bugzilla submission:
 
-Le mar. 2 juil. 2019 =C3=A0 23:48, Kammela, Gayatri
-<gayatri.kammela(a)intel.com> a =C3=A9crit :
->
-> > -----Original Message-----
-> > From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of
-> > Fabrice Fontaine
-> > Sent: Monday, May 20, 2019 11:44 AM
-> > To: powertop(a)lists.01.org
-> > Subject: [Powertop] [PATCH] wakeup_xxx.h: include limits.h
-> >
-> > limits.h must be included to define PATH_MAX otherwise build will fail
-> > on:
-> >
->  Sorry for my delayed response. Thanks for the patch!  Perhaps it makes m=
-ore sense to include limits.h file in wakeup.h as we included wakeup.h in b=
-oth  wakeup_ethernet.h and wakeup_usb.h files.
-Indeed, this is also acceptable.
->
-> Thanks,
-> Gayatri
->
-Best Regards,
+I've been collaborating the last 6 days with powertop and linux-usb
+contributors upstream over this issue. They have been very helpful.
+What we've managed to do is establish exactly what has changed and
+where using a number of different trace methods.
 
-Fabrice
+There's basically not a bug as such, it is a setting that has been
+fixed in 4.12 and above that never worked before.
 
---===============5428995029611294235==--
+The value for power stored in
+the /sys/bus/usb/devices/2.1.3/power/control file for this device was
+being ignored when set to auto (Good) by powertop with kernel 4.11 and
+instead a non-existent setting of ON is used. ON means no autosuspend
+as power saving is 'Bad' in powertop tunable terms.
+
+with 4.12 it is not being ignored. So what I'm going to do now is
+investigate masking that setting with powertop by removing it as a
+system service and coding a script (found something similar done for
+another distribution so I'm going to at least try it) to autostart
+powertop at boot ignoring the pointing device. OR using something else
+like tlp which I have no experience with. Either way, this is clearly
+not a bug after further investigation upstream so I'm closing it. I
+will post the powertop solution if I can get it worked but this should
+remain closed from here on in.
+
+--===============6447117591240635974==--
 
