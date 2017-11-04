@@ -1,115 +1,65 @@
-Content-Type: multipart/mixed; boundary="===============5845006612822959839=="
+Content-Type: multipart/mixed; boundary="===============2649639394173331951=="
 MIME-Version: 1.0
-From: =?utf-8?q?Jaroslav_=C5=A0karvada_=3Cjskarvad_at_redhat=2Ecom=3E?=
-Subject: [Powertop] [PATCH] Don't use intel_cpus if APERF MSR isn't supported
-Date: Fri, 04 May 2018 23:55:55 +0200
-Message-ID: <20180504215555.8489-1-jskarvad@redhat.com>
+From: Manoj Gupta <manojgupta at chromium.org>
+Subject: [Powertop] Fix powertop build with libc++
+Date: Sat, 04 Nov 2017 15:30:06 -0700
+Message-ID: <CAAMbb04MYopNxfRYY-PVpt-XcQjg_ogxsTyvMhEO07b+6vpOxw@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5845006612822959839==
+--===============2649639394173331951==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The intel_cpus (class nhm_package) needs APERF MSR. This maybe problem on
-some virtual machines (e.g. KVM) where the APERF MSR is not implemented.
-On such VMs powertop exits with MSR read error and doesn't work. Previously,
-powertop worked in such cases (e.g. powertop-2.3). This patch adds check
-whether APERF MSR is supported, if not, intel_cpus is not used.
+Hi,
 
-Signed-off-by: Jaroslav =C5=A0karvada <jskarvad(a)redhat.com>
----
- src/cpu/cpu.cpp        | 6 +++---
- src/cpu/intel_cpus.cpp | 6 ++++--
- src/cpu/intel_cpus.h   | 2 +-
- 3 files changed, 8 insertions(+), 6 deletions(-)
-
-diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-index f3711f5..019d922 100644
---- a/src/cpu/cpu.cpp
-+++ b/src/cpu/cpu.cpp
-@@ -68,7 +68,7 @@ static class abstract_cpu * new_package(int package, int =
-cpu, char * vendor, int
- 	char packagename[128];
- 	if (strcmp(vendor, "GenuineIntel") =3D=3D 0)
- 		if (family =3D=3D 6)
--			if (is_supported_intel_cpu(model))
-+			if (is_supported_intel_cpu(model, cpu))
- 				ret =3D new class nhm_package(model);
- =
-
- 	if (!ret)
-@@ -105,7 +105,7 @@ static class abstract_cpu * new_core(int core, int cpu,=
- char * vendor, int famil
- =
-
- 	if (strcmp(vendor, "GenuineIntel") =3D=3D 0)
- 		if (family =3D=3D 6)
--			if (is_supported_intel_cpu(model))
-+			if (is_supported_intel_cpu(model, cpu))
- 				ret =3D new class nhm_core(model);
- =
-
- 	if (!ret)
-@@ -134,7 +134,7 @@ static class abstract_cpu * new_cpu(int number, char * =
-vendor, int family, int m
- =
-
- 	if (strcmp(vendor, "GenuineIntel") =3D=3D 0)
- 		if (family =3D=3D 6)
--			if (is_supported_intel_cpu(model))
-+			if (is_supported_intel_cpu(model, number))
- 				ret =3D new class nhm_cpu;
- =
-
- 	if (!ret)
-diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
-index 4c7b315..0030dba 100644
---- a/src/cpu/intel_cpus.cpp
-+++ b/src/cpu/intel_cpus.cpp
-@@ -77,13 +77,15 @@ static int intel_cpu_models[] =3D {
- =
-
- static int intel_pstate_driver_loaded =3D -1;
- =
-
--int is_supported_intel_cpu(int model)
-+int is_supported_intel_cpu(int model, int cpu)
- {
- 	int i;
-+	uint64_t msr;
- =
-
- 	for (i =3D 0; intel_cpu_models[i] !=3D 0; i++)
- 		if (model =3D=3D intel_cpu_models[i])
--			return 1;
-+			if (cpu < 0 || read_msr(cpu, MSR_APERF, &msr) >=3D 0)
-+				return 1;
- =
-
- 	return 0;
- }
-diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
-index d20db9a..79afb98 100644
---- a/src/cpu/intel_cpus.h
-+++ b/src/cpu/intel_cpus.h
-@@ -172,7 +172,7 @@ public:
- =
-
- };
- =
-
--int is_supported_intel_cpu(int model);
-+int is_supported_intel_cpu(int model, int cpu);
- int byt_has_ahci();
- =
-
- int is_intel_pstate_driver_loaded();
--- =
-
-2.14.3
+We are facing a build issue in powertop with libc++.
+The attached patch fixes the problem by including the <ctime> header in
+lib/src.h
 
 
---===============5845006612822959839==--
+Thanks,
+Manoj
+
+--===============2649639394173331951==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+PGRpdiBkaXI9Imx0ciI+PGRpdiBjbGFzcz0iZ21haWxfcXVvdGUiPjxkaXYgZGlyPSJsdHIiPkhp
+LDxkaXY+PGJyPjwvZGl2PjxkaXY+V2UgYXJlIGZhY2luZyBhIGJ1aWxkIGlzc3VlIGluIHBvd2Vy
+dG9wIHdpdGggbGliYysrLjwvZGl2PjxkaXY+VGhlIGF0dGFjaGVkIHBhdGNoIGZpeGVzIHRoZSBw
+cm9ibGVtIGJ5IGluY2x1ZGluZyB0aGUgJmx0O2N0aW1lJmd0OyBoZWFkZXIgaW4gbGliL3NyYy5o
+PC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj5UaGFua3MsPC9kaXY+PGRp
+dj5NYW5vajwvZGl2PjwvZGl2Pgo8L2Rpdj48YnI+PC9kaXY+Cg==
+
+--===============2649639394173331951==
+Content-Type: application/octet-stream
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="powertop-libcxx.patch"
+
+RnJvbSBjZTNlYWJmYmU4YmJmOTJhOTg0YTQ3ZThiZWViYjk0OGFjZjExMGQ0IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBNYW5vaiBHdXB0YSA8bWFub2pndXB0YUBjaHJvbWl1bS5vcmc+
+CkRhdGU6IFNhdCwgNCBOb3YgMjAxNyAxMzo0NDowNCAtMDcwMApTdWJqZWN0OiBbUEFUQ0hdIEZp
+eCBwb3dlcnRvcCBidWlsZCB3aXRoIGxpYmMrKy4KCjxjdGltZT4gaGVhZGVyIGlzIG5vdCBhdXRv
+bWF0aWNhbGx5IGluY2x1ZGVkIHdpdGggbGliYysrLgpBZGQgaXQgZXhwbGljaXRseSB0byBtYWtl
+IHBvd2VydG9wIGJ1aWxkIHdpdGggbGliYysrLgoKVGhpcyBmaXhlcyB0aGUgZm9sbG93aW5nIGVy
+cm9yczoKZGV2aWNlcy9ncHVfcmFwbF9kZXZpY2UuY3BwOjM1OjE0OiBlcnJvcjogdXNlIG9mIHVu
+ZGVjbGFyZWQgaWRlbnRpZmllcgondGltZSc7IGRpZCB5b3UgbWVhbiAndGllJz8KbGFzdF90aW1l
+ID0gdGltZShOVUxMKTsKICAgICAgICAgICAgICAgIF5+fn4KZGV2aWNlcy9ncHVfcmFwbF9kZXZp
+Y2UuY3BwOjQ1OjE0OiBlcnJvcjp1c2Ugb2YgdW5kZWNsYXJlZCBpZGVudGlmaWVyCid0aW1lJzsg
+ZGlkIHlvdSBtZWFuICd0aWUnPwpsYXN0X3RpbWUgPSB0aW1lKE5VTEwpOwogICAgICAgICAgICAg
+ICAgXn5+fgoKcGFyYW1ldGVycy9sZWFybi5jcHA6MTYxOjEwOiBlcnJvcjogdXNlIG9mIHVuZGVj
+bGFyZWQgaWRlbnRpZmllcgondGltZSc7IGRpZCB5b3UgbWVhbiAndGllJz8Kc3RhcnQgPQl0aW1l
+KE5VTEwpOwogICAgICAgICAgICBefn5+Ci0tLQogc3JjL2xpYi5oIHwgMiArLQogMSBmaWxlIGNo
+YW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvc3JjL2xp
+Yi5oIGIvc3JjL2xpYi5oCmluZGV4IGI2NGJiMGYuLjZkODVlYjYgMTAwNjQ0Ci0tLSBhL3NyYy9s
+aWIuaAorKysgYi9zcmMvbGliLmgKQEAgLTU0LDcgKzU0LDcgQEAgZXh0ZXJuIGNvbnN0IGNoYXIg
+Kmtlcm5lbF9mdW5jdGlvbih1aW50NjRfdCBhZGRyZXNzKTsKIAogCiAKLQorI2luY2x1ZGUgPGN0
+aW1lPgogI2luY2x1ZGUgPHN0cmluZz4KIHVzaW5nIG5hbWVzcGFjZSBzdGQ7CiAKCg==
+
+--===============2649639394173331951==--
 
