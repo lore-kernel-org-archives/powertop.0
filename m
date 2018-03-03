@@ -1,112 +1,82 @@
-Content-Type: multipart/mixed; boundary="===============1355349232144365926=="
+Content-Type: multipart/mixed; boundary="===============5175969107256431727=="
 MIME-Version: 1.0
-From: =?utf-8?q?Jaroslav_=C5=A0karvada_=3Cjskarvad_at_redhat=2Ecom=3E?=
-Subject: [Powertop] [PATCH] Don't use intel_cpus if APERF MSR isn't supported
-Date: Tue, 15 May 2018 18:20:11 +0200
-Message-ID: <20180515162011.25915-1-jskarvad@redhat.com>
+From: Mingye Wang (Artoria2e5) <arthur2e5 at aosc.io>
+Subject: [Powertop] [PATCH 0/2] Align multi-column characters properly (SPLIT
+ [po] Updated zh_CN translation)
+Date: Sat, 03 Mar 2018 14:49:09 -0500
+Message-ID: <ffa8a2ae-46b8-3c55-4feb-9aa581c4cbea@aosc.io>
+In-Reply-To: 72eb9191-c31e-465a-e0a9-8439a3692e74@aosc.io
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1355349232144365926==
+--===============5175969107256431727==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The intel_cpus (class nhm_package) needs APERF MSR. This maybe problem on
-some virtual machines (e.g. KVM) where the APERF MSR is not implemented.
-On such VMs powertop exits with MSR read error and doesn't work. Previously,
-powertop worked in such cases (e.g. powertop-2.3). This patch adds check
-whether APERF MSR is supported, if not, intel_cpus is not used.
+Hi folks,
 
-Signed-off-by: Jaroslav =C5=A0karvada <jskarvad(a)redhat.com>
----
- src/cpu/cpu.cpp        | 6 +++---
- src/cpu/intel_cpus.cpp | 6 ++++--
- src/cpu/intel_cpus.h   | 2 +-
- 3 files changed, 8 insertions(+), 6 deletions(-)
+On 18/03/03 03:14, Mingcong Bai wrote:
+> Updated Mingye Wang's patches to fix build - PowerTOP has been built and =
 
-diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
-index f6bae03..28afc4f 100644
---- a/src/cpu/cpu.cpp
-+++ b/src/cpu/cpu.cpp
-@@ -68,7 +68,7 @@ static class abstract_cpu * new_package(int package, int =
-cpu, char * vendor, int
- 	char packagename[128];
- 	if (strcmp(vendor, "GenuineIntel") =3D=3D 0)
- 		if (family =3D=3D 6)
--			if (is_supported_intel_cpu(model)) {
-+			if (is_supported_intel_cpu(model, cpu)) {
- 				ret =3D new class nhm_package(model);
- 				ret->set_intel_MSR(true);
- 			}
-@@ -109,7 +109,7 @@ static class abstract_cpu * new_core(int core, int cpu,=
- char * vendor, int famil
- =
+> tested and columns are now aligned correctly when using zh_CN.
+> =
 
- 	if (strcmp(vendor, "GenuineIntel") =3D=3D 0)
- 		if (family =3D=3D 6)
--			if (is_supported_intel_cpu(model)) {
-+			if (is_supported_intel_cpu(model, cpu)) {
- 				ret =3D new class nhm_core(model);
- 				ret->set_intel_MSR(true);
- 			}
-@@ -143,7 +143,7 @@ static class abstract_cpu * new_cpu(int number, char * =
-vendor, int family, int m
- =
+> Best Regards,
+> Mingcong Bai
 
- 	if (strcmp(vendor, "GenuineIntel") =3D=3D 0)
- 		if (family =3D=3D 6)
--			if (is_supported_intel_cpu(model)) {
-+			if (is_supported_intel_cpu(model, number)) {
- 				ret =3D new class nhm_cpu;
- 				ret->set_intel_MSR(true);
- 			}
-diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
-index 4c7b315..0030dba 100644
---- a/src/cpu/intel_cpus.cpp
-+++ b/src/cpu/intel_cpus.cpp
-@@ -77,13 +77,15 @@ static int intel_cpu_models[] =3D {
- =
+I will post the patches below, as I just found something else to revise. =
 
- static int intel_pstate_driver_loaded =3D -1;
- =
+Here are some quick answers to typical code reviewer questions:
 
--int is_supported_intel_cpu(int model)
-+int is_supported_intel_cpu(int model, int cpu)
- {
- 	int i;
-+	uint64_t msr;
- =
+Q. What strings does measure_string fail on?
+A. Strings with invalid multibyte sequences (-3), non-printable =
 
- 	for (i =3D 0; intel_cpu_models[i] !=3D 0; i++)
- 		if (model =3D=3D intel_cpu_models[i])
--			return 1;
-+			if (cpu < 0 || read_msr(cpu, MSR_APERF, &msr) >=3D 0)
-+				return 1;
- =
+characters such as newlines and tabs (-1), NULL (-2), and huge strings =
 
- 	return 0;
- }
-diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
-index d20db9a..79afb98 100644
---- a/src/cpu/intel_cpus.h
-+++ b/src/cpu/intel_cpus.h
-@@ -172,7 +172,7 @@ public:
- =
+that fail malloc (-2).
 
- };
- =
+Q. Why is measure_string returning an int instead of a size_t?
+A. I blame wcswidth.
 
--int is_supported_intel_cpu(int model);
-+int is_supported_intel_cpu(int model, int cpu);
- int byt_has_ahci();
- =
+Q. What does measure_string depend on?
+A. malloc/free, mbsrtowcs, and wcswidth.
 
- int is_intel_pstate_driver_loaded();
--- =
+Q. Is align_string slower now?
+A. Yes. It needs to do a full encoding conversion in measure_string =
 
-2.14.3
+instead of just counting.
+
+Q. Are you making a more "naive" version of align_string?
+A. Not now. But note that the unit-printing parts (watts, rpm...) =
+
+generally only involve printable ASCII, so strlen() will suffice for =
+
+them. It should not matter too much.
+
+Q. Is the "ctr" variable useless in cpu.cpp now?
+A. Yes, but it still should sync up with the actual column count.
+
+Things we want you all to fix up that aren't included in the patch:
+
+1. LINGUAS, or we will never see the translations used.
+
+2. The use of #include <stdfoo.h> in C++ where #include <cstdfoo> is =
+
+available. The C++ variants of these headers work much better (you don't =
+
+have to memset the mbstate_t, for example) in C++.
+
+3. Use some C++ strings maybe? It's not that bad for me as compilers =
+
+know how to optimize out stuff like "if (strlen(x))", but those new =
+
+stuff sure are much easier to use.
+
+--
+Regards,
+Mingye Wang
 
 
---===============1355349232144365926==--
+--===============5175969107256431727==--
 
