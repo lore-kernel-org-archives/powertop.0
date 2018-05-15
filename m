@@ -1,80 +1,112 @@
-Content-Type: multipart/mixed; boundary="===============8721140698662399108=="
+Content-Type: multipart/mixed; boundary="===============1355349232144365926=="
 MIME-Version: 1.0
-From: Boris ARZUR <boris at strl.cat>
-Subject: [Powertop] --auto-tune without debugfs
-Date: Wed, 06 Jul 2016 08:09:00 +0000
-Message-ID: <20160706080859.GA32706@odroid>
+From: =?utf-8?q?Jaroslav_=C5=A0karvada_=3Cjskarvad_at_redhat=2Ecom=3E?=
+Subject: [Powertop] [PATCH] Don't use intel_cpus if APERF MSR isn't supported
+Date: Tue, 15 May 2018 18:20:11 +0200
+Message-ID: <20180515162011.25915-1-jskarvad@redhat.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8721140698662399108==
+--===============1355349232144365926==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Dear Powertop Team,
+The intel_cpus (class nhm_package) needs APERF MSR. This maybe problem on
+some virtual machines (e.g. KVM) where the APERF MSR is not implemented.
+On such VMs powertop exits with MSR read error and doesn't work. Previously,
+powertop worked in such cases (e.g. powertop-2.3). This patch adds check
+whether APERF MSR is supported, if not, intel_cpus is not used.
 
-I use your utility at boot time to auto-tune my laptop.
-When using a grsec kernel, debugfs may not be available. This causes your
-utility to complain & exit.
-I use this very simple patch to force your wonderful tool to ignore that
-problem when auto-tuning.
+Signed-off-by: Jaroslav =C5=A0karvada <jskarvad(a)redhat.com>
+---
+ src/cpu/cpu.cpp        | 6 +++---
+ src/cpu/intel_cpus.cpp | 6 ++++--
+ src/cpu/intel_cpus.h   | 2 +-
+ 3 files changed, 8 insertions(+), 6 deletions(-)
 
-Thank you and best regard,
-Boris.
+diff --git a/src/cpu/cpu.cpp b/src/cpu/cpu.cpp
+index f6bae03..28afc4f 100644
+--- a/src/cpu/cpu.cpp
++++ b/src/cpu/cpu.cpp
+@@ -68,7 +68,7 @@ static class abstract_cpu * new_package(int package, int =
+cpu, char * vendor, int
+ 	char packagename[128];
+ 	if (strcmp(vendor, "GenuineIntel") =3D=3D 0)
+ 		if (family =3D=3D 6)
+-			if (is_supported_intel_cpu(model)) {
++			if (is_supported_intel_cpu(model, cpu)) {
+ 				ret =3D new class nhm_package(model);
+ 				ret->set_intel_MSR(true);
+ 			}
+@@ -109,7 +109,7 @@ static class abstract_cpu * new_core(int core, int cpu,=
+ char * vendor, int famil
+ =
 
---===============8721140698662399108==
-Content-Type: text/x-diff
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="autotune_nodebugfs.patch"
+ 	if (strcmp(vendor, "GenuineIntel") =3D=3D 0)
+ 		if (family =3D=3D 6)
+-			if (is_supported_intel_cpu(model)) {
++			if (is_supported_intel_cpu(model, cpu)) {
+ 				ret =3D new class nhm_core(model);
+ 				ret->set_intel_MSR(true);
+ 			}
+@@ -143,7 +143,7 @@ static class abstract_cpu * new_cpu(int number, char * =
+vendor, int family, int m
+ =
 
-LS0tIHBvd2VydG9wLW9yaWcvc3JjL21haW4uY3BwCTIwMTYtMDctMDYgMDc6NTc6MjAuMzUxNDc4
-NDEwICswMDAwCisrKyBwb3dlcnRvcCthdXRvdHVuZV93aXRob3V0X2RlYnVnZnMvc3JjL21haW4u
-Y3BwCTIwMTYtMDctMDYgMDg6MDI6MjMuMzM1NDQ4OTY2ICswMDAwCkBAIC0zMTEsNyArMzExLDcg
-QEAgc3RhdGljIGludCBnZXRfbnJfb3Blbih2b2lkKSB7CiAJcmV0dXJuIG5yX29wZW47CiB9CiAK
-LXN0YXRpYyB2b2lkIHBvd2VydG9wX2luaXQodm9pZCkKK3N0YXRpYyB2b2lkIHBvd2VydG9wX2lu
-aXQoaW50IGF1dG9fdHVuZSkKIHsKIAlzdGF0aWMgY2hhciBpbml0aWFsaXplZCA9IDA7CiAJaW50
-IHJldDsKQEAgLTMzOSw5ICszMzksMTQgQEAgc3RhdGljIHZvaWQgcG93ZXJ0b3BfaW5pdCh2b2lk
-KQogCQkJcmV0ID0gc3lzdGVtKCJtb3VudCAtdCBkZWJ1Z2ZzIGRlYnVnZnMgL3N5cy9rZXJuZWwv
-ZGVidWcgPiAvZGV2L251bGwgMj4mMSIpOwogCQl9CiAJCWlmIChyZXQgIT0gMCkgewotCQkJcHJp
-bnRmKF8oIkZhaWxlZCB0byBtb3VudCBkZWJ1Z2ZzIVxuIikpOwotCQkJcHJpbnRmKF8oImV4aXRp
-bmcuLi5cbiIpKTsKLQkJCWV4aXQoRVhJVF9GQUlMVVJFKTsKKwkJCWlmICghYXV0b190dW5lKSB7
-CisJCQkJZnByaW50ZihzdGRlcnIsIF8oIkZhaWxlZCB0byBtb3VudCBkZWJ1Z2ZzIVxuIikpOwor
-CQkJCWZwcmludGYoc3RkZXJyLCBfKCJleGl0aW5nLi4uXG4iKSk7CisJCQkJZXhpdChFWElUX0ZB
-SUxVUkUpOworCQkJfSBlbHNlIHsKKwkJCQlmcHJpbnRmKHN0ZGVyciwgXygiRmFpbGVkIHRvIG1v
-dW50IGRlYnVnZnMhXG4iKSk7CisJCQkJZnByaW50ZihzdGRlcnIsIF8oIlNob3VsZCBzdGlsbCBi
-ZSBhYmxlIHRvIGF1dG8gdHVuZS4uLlxuIikpOworCQkJfQogCQl9CiAJfQogCkBAIC00MTQsNyAr
-NDE5LDcgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KQogCQkJdWlfbm90aWZ5X3Vz
-ZXIgPSB1aV9ub3RpZnlfdXNlcl9jb25zb2xlOwogCQkJYnJlYWs7CiAJCWNhc2UgJ2MnOgotCQkJ
-cG93ZXJ0b3BfaW5pdCgpOworCQkJcG93ZXJ0b3BfaW5pdCgwKTsKIAkJCWNhbGlicmF0ZSgpOwog
-CQkJYnJlYWs7CiAJCWNhc2UgJ0MnOgkJLyogY3N2IHJlcG9ydCAqLwpAQCAtNDcwLDcgKzQ3NSw3
-IEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikKIAkJfQogCX0KIAotCXBvd2VydG9w
-X2luaXQoKTsKKwlwb3dlcnRvcF9pbml0KGF1dG9fdHVuZSk7CiAKIAlpZiAocmVwb3J0dHlwZSAh
-PSBSRVBPUlRfT0ZGKQogCQltYWtlX3JlcG9ydCh0aW1lX291dCwgd29ya2xvYWQsIGl0ZXJhdGlv
-bnMsIGZpbGVuYW1lKTsK
+ 	if (strcmp(vendor, "GenuineIntel") =3D=3D 0)
+ 		if (family =3D=3D 6)
+-			if (is_supported_intel_cpu(model)) {
++			if (is_supported_intel_cpu(model, number)) {
+ 				ret =3D new class nhm_cpu;
+ 				ret->set_intel_MSR(true);
+ 			}
+diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
+index 4c7b315..0030dba 100644
+--- a/src/cpu/intel_cpus.cpp
++++ b/src/cpu/intel_cpus.cpp
+@@ -77,13 +77,15 @@ static int intel_cpu_models[] =3D {
+ =
 
---===============8721140698662399108==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
+ static int intel_pstate_driver_loaded =3D -1;
+ =
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjEKCmlRSWNCQUVC
-Q0FBR0JRSlhmTHlhQUFvSkVNREpNUFpPbktIajBhOFArUUgvZkZGUi9hVHp3Mk10KzZxRU9aUnEK
-R0NVbm16WEJ3LzVLblU4dVd2elExRHF3Vlk3ai9WaVNpY2piMjM5a00xRkxyeUhDbWlXYnVmM0J0
-NGJhVTJWKwp1MGFoQzdkeHBNUTBOejV1Y3VuTXBnSGVjSnFGK1lnVFJIYkZnMzc2N2w5TjdsL3Bz
-QTlPMHUvSVkrM293ZGtxCkxnRjdxUjhCVzh3YVlsQlJmc0p1bG8ybFlLK3prY2F4ZkdqQVR2cjZo
-ZFBkWVBtMmFjRlhndWx4NGJjdFpBMUYKTFplUHM1dUtHV1hBQWtvQzlOMWRDRlhvTTRCTTRuVEdR
-ZURaaFh2TUg5MFJTK0pVQ0E2U2Fidm9aVHNnMHYxMQpZYlYycWRFYm51VFk0WHdwTHNxM2x2dGFG
-WFBQd3B5VWZlQ0pjdVJMVDRvN04yc0hzdTRyU0x5Sk0xbG1iRWY5CkpCeFdxUkhmdDAwRjE1VFpj
-WHhLRUtFcUpqR3RwUFhoZmlhdWgvRWlQdC9wVkgvdWNtVkE1YnMrVXFMY1JCcGwKUVdYNHlLRVVX
-YU93WkluLzVoTXczYjNTcWg2OUxDck1rUW9vNVc4WnA0U1hmaktyL3lLN0RwR3Fndis4anhLcAp2
-YUYzSlV3ZkVqMWpJaWVmNDlFQTUyR3lEZEI3a1IydjVjMnROeEtLUkNXUlZUNUtaOXp3SVB5UnZH
-TWZVcS9nCnRCTlRiSEowUkxKRFA3dms3Vzc0S0hvbXBtTTZjNDRZcitnQTlrK0Z0STZQSmIxSG82
-VzFIWVNvZjNLeVp1Rm4KSW91OEFtNDNMZERXVll2N1IySXB4bk9pZGZWZ1d5UVd4a3J5WjJRSVFU
-Z0o1ZmxnY0duNXRXYWNzeks0MlNjOQpDWTdXZXJ4bjljUVNKOWtNOEhkYQo9YWxoVwotLS0tLUVO
-RCBQR1AgU0lHTkFUVVJFLS0tLS0K
+-int is_supported_intel_cpu(int model)
++int is_supported_intel_cpu(int model, int cpu)
+ {
+ 	int i;
++	uint64_t msr;
+ =
 
---===============8721140698662399108==--
+ 	for (i =3D 0; intel_cpu_models[i] !=3D 0; i++)
+ 		if (model =3D=3D intel_cpu_models[i])
+-			return 1;
++			if (cpu < 0 || read_msr(cpu, MSR_APERF, &msr) >=3D 0)
++				return 1;
+ =
+
+ 	return 0;
+ }
+diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h
+index d20db9a..79afb98 100644
+--- a/src/cpu/intel_cpus.h
++++ b/src/cpu/intel_cpus.h
+@@ -172,7 +172,7 @@ public:
+ =
+
+ };
+ =
+
+-int is_supported_intel_cpu(int model);
++int is_supported_intel_cpu(int model, int cpu);
+ int byt_has_ahci();
+ =
+
+ int is_intel_pstate_driver_loaded();
+-- =
+
+2.14.3
+
+
+--===============1355349232144365926==--
 
