@@ -1,45 +1,84 @@
-Content-Type: multipart/mixed; boundary="===============1008784022437737698=="
+Content-Type: multipart/mixed; boundary="===============1088781573171623040=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH v1 2/4] Makefile.am: ACLOCAL_AMFLAGS updated
-Date: Tue, 26 Jul 2016 12:35:33 -0700
-Message-ID: <20160726193535.27247-3-joe.konno@linux.intel.com>
-In-Reply-To: 20160726193535.27247-1-joe.konno@linux.intel.com
+From: Jaroslav Skarvada <jskarvad at redhat.com>
+Subject: [Powertop] Don't use intel_cpus if APERF MSR isn't supported
+Date: Tue, 15 May 2018 06:47:03 -0400
+Message-ID: <1961529890.2819749.1526381223415.JavaMail.zimbra@redhat.com>
+In-Reply-To: 1894742732.2819528.1526381127107.JavaMail.zimbra@redhat.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1008784022437737698==
+--===============1088781573171623040==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Joe Konno <joe.konno(a)intel.com>
+Hi,
 
-According to the gettext documentation, "--install -I m4" are the
-recommended AMFLAGS when using automake >=3D 1.10. Let's assume builders
-are using a recent automake.
+resending the patch which should allow PowerTOP to run on KVM and
+other VMs not fully supporting MSR
 
-Signed-off-by: Joe Konno <joe.konno(a)intel.com>
----
- Makefile.am | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+thanks & regards
 
-diff --git a/Makefile.am b/Makefile.am
-index 8e4e09d6145d..bf087e8caef3 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -1,5 +1,5 @@
- AUTOMAKE_OPTIONS =3D subdir-objects
--ACLOCAL_AMFLAGS =3D -I m4
-+ACLOCAL_AMFLAGS =3D --install -I m4
- =
+Jaroslav
 
- SUBDIRS =3D \
- 	traceevent \
--- =
+--===============1088781573171623040==
+Content-Type: text/x-patch
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="0001-Don-t-use-intel_cpus-if-APERF-MSR-isn-t-supported.patch"
 
-2.9.0
+RnJvbSBmM2IyMWQ4YWE0Nzk5ZGI1YjFlYzQxNTQzZmNhZTY4MWMwMmE4Yzg5IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiA9P1VURi04P3E/SmFyb3NsYXY9MjA9QzU9QTBrYXJ2YWRhPz0g
+PGpza2FydmFkQHJlZGhhdC5jb20+CkRhdGU6IEZyaSwgNCBNYXkgMjAxOCAyMzozNjo0NiArMDIw
+MApTdWJqZWN0OiBbUEFUQ0hdIERvbid0IHVzZSBpbnRlbF9jcHVzIGlmIEFQRVJGIE1TUiBpc24n
+dCBzdXBwb3J0ZWQKTUlNRS1WZXJzaW9uOiAxLjAKQ29udGVudC1UeXBlOiB0ZXh0L3BsYWluOyBj
+aGFyc2V0PVVURi04CkNvbnRlbnQtVHJhbnNmZXItRW5jb2Rpbmc6IDhiaXQKClRoZSBpbnRlbF9j
+cHVzIChjbGFzcyBuaG1fcGFja2FnZSkgbmVlZHMgQVBFUkYgTVNSLiBUaGlzIG1heWJlIHByb2Js
+ZW0gb24Kc29tZSB2aXJ0dWFsIG1hY2hpbmVzIChlLmcuIEtWTSkgd2hlcmUgdGhlIEFQRVJGIE1T
+UiBpcyBub3QgaW1wbGVtZW50ZWQuCk9uIHN1Y2ggVk1zIHBvd2VydG9wIGV4aXRzIHdpdGggTVNS
+IHJlYWQgZXJyb3IgYW5kIGRvZXNuJ3Qgd29yay4gUHJldmlvdXNseSwKcG93ZXJ0b3Agd29ya2Vk
+IGluIHN1Y2ggY2FzZXMgKGUuZy4gcG93ZXJ0b3AtMi4zKS4gVGhpcyBwYXRjaCBhZGRzIGNoZWNr
+CndoZXRoZXIgQVBFUkYgTVNSIGlzIHN1cHBvcnRlZCwgaWYgbm90LCBpbnRlbF9jcHVzIGlzIG5v
+dCB1c2VkLgoKU2lnbmVkLW9mZi1ieTogSmFyb3NsYXYgxaBrYXJ2YWRhIDxqc2thcnZhZEByZWRo
+YXQuY29tPgotLS0KIHNyYy9jcHUvY3B1LmNwcCAgICAgICAgfCA2ICsrKy0tLQogc3JjL2NwdS9p
+bnRlbF9jcHVzLmNwcCB8IDYgKysrKy0tCiBzcmMvY3B1L2ludGVsX2NwdXMuaCAgIHwgMiArLQog
+MyBmaWxlcyBjaGFuZ2VkLCA4IGluc2VydGlvbnMoKyksIDYgZGVsZXRpb25zKC0pCgpkaWZmIC0t
+Z2l0IGEvc3JjL2NwdS9jcHUuY3BwIGIvc3JjL2NwdS9jcHUuY3BwCmluZGV4IGYzNzExZjUuLjAx
+OWQ5MjIgMTAwNjQ0Ci0tLSBhL3NyYy9jcHUvY3B1LmNwcAorKysgYi9zcmMvY3B1L2NwdS5jcHAK
+QEAgLTY4LDcgKzY4LDcgQEAgc3RhdGljIGNsYXNzIGFic3RyYWN0X2NwdSAqIG5ld19wYWNrYWdl
+KGludCBwYWNrYWdlLCBpbnQgY3B1LCBjaGFyICogdmVuZG9yLCBpbnQKIAljaGFyIHBhY2thZ2Vu
+YW1lWzEyOF07CiAJaWYgKHN0cmNtcCh2ZW5kb3IsICJHZW51aW5lSW50ZWwiKSA9PSAwKQogCQlp
+ZiAoZmFtaWx5ID09IDYpCi0JCQlpZiAoaXNfc3VwcG9ydGVkX2ludGVsX2NwdShtb2RlbCkpCisJ
+CQlpZiAoaXNfc3VwcG9ydGVkX2ludGVsX2NwdShtb2RlbCwgY3B1KSkKIAkJCQlyZXQgPSBuZXcg
+Y2xhc3MgbmhtX3BhY2thZ2UobW9kZWwpOwogCiAJaWYgKCFyZXQpCkBAIC0xMDUsNyArMTA1LDcg
+QEAgc3RhdGljIGNsYXNzIGFic3RyYWN0X2NwdSAqIG5ld19jb3JlKGludCBjb3JlLCBpbnQgY3B1
+LCBjaGFyICogdmVuZG9yLCBpbnQgZmFtaWwKIAogCWlmIChzdHJjbXAodmVuZG9yLCAiR2VudWlu
+ZUludGVsIikgPT0gMCkKIAkJaWYgKGZhbWlseSA9PSA2KQotCQkJaWYgKGlzX3N1cHBvcnRlZF9p
+bnRlbF9jcHUobW9kZWwpKQorCQkJaWYgKGlzX3N1cHBvcnRlZF9pbnRlbF9jcHUobW9kZWwsIGNw
+dSkpCiAJCQkJcmV0ID0gbmV3IGNsYXNzIG5obV9jb3JlKG1vZGVsKTsKIAogCWlmICghcmV0KQpA
+QCAtMTM0LDcgKzEzNCw3IEBAIHN0YXRpYyBjbGFzcyBhYnN0cmFjdF9jcHUgKiBuZXdfY3B1KGlu
+dCBudW1iZXIsIGNoYXIgKiB2ZW5kb3IsIGludCBmYW1pbHksIGludCBtCiAKIAlpZiAoc3RyY21w
+KHZlbmRvciwgIkdlbnVpbmVJbnRlbCIpID09IDApCiAJCWlmIChmYW1pbHkgPT0gNikKLQkJCWlm
+IChpc19zdXBwb3J0ZWRfaW50ZWxfY3B1KG1vZGVsKSkKKwkJCWlmIChpc19zdXBwb3J0ZWRfaW50
+ZWxfY3B1KG1vZGVsLCBudW1iZXIpKQogCQkJCXJldCA9IG5ldyBjbGFzcyBuaG1fY3B1OwogCiAJ
+aWYgKCFyZXQpCmRpZmYgLS1naXQgYS9zcmMvY3B1L2ludGVsX2NwdXMuY3BwIGIvc3JjL2NwdS9p
+bnRlbF9jcHVzLmNwcAppbmRleCA0YzdiMzE1Li4wMDMwZGJhIDEwMDY0NAotLS0gYS9zcmMvY3B1
+L2ludGVsX2NwdXMuY3BwCisrKyBiL3NyYy9jcHUvaW50ZWxfY3B1cy5jcHAKQEAgLTc3LDEzICs3
+NywxNSBAQCBzdGF0aWMgaW50IGludGVsX2NwdV9tb2RlbHNbXSA9IHsKIAogc3RhdGljIGludCBp
+bnRlbF9wc3RhdGVfZHJpdmVyX2xvYWRlZCA9IC0xOwogCi1pbnQgaXNfc3VwcG9ydGVkX2ludGVs
+X2NwdShpbnQgbW9kZWwpCitpbnQgaXNfc3VwcG9ydGVkX2ludGVsX2NwdShpbnQgbW9kZWwsIGlu
+dCBjcHUpCiB7CiAJaW50IGk7CisJdWludDY0X3QgbXNyOwogCiAJZm9yIChpID0gMDsgaW50ZWxf
+Y3B1X21vZGVsc1tpXSAhPSAwOyBpKyspCiAJCWlmIChtb2RlbCA9PSBpbnRlbF9jcHVfbW9kZWxz
+W2ldKQotCQkJcmV0dXJuIDE7CisJCQlpZiAoY3B1IDwgMCB8fCByZWFkX21zcihjcHUsIE1TUl9B
+UEVSRiwgJm1zcikgPj0gMCkKKwkJCQlyZXR1cm4gMTsKIAogCXJldHVybiAwOwogfQpkaWZmIC0t
+Z2l0IGEvc3JjL2NwdS9pbnRlbF9jcHVzLmggYi9zcmMvY3B1L2ludGVsX2NwdXMuaAppbmRleCBk
+MjBkYjlhLi43OWFmYjk4IDEwMDY0NAotLS0gYS9zcmMvY3B1L2ludGVsX2NwdXMuaAorKysgYi9z
+cmMvY3B1L2ludGVsX2NwdXMuaApAQCAtMTcyLDcgKzE3Miw3IEBAIHB1YmxpYzoKIAogfTsKIAot
+aW50IGlzX3N1cHBvcnRlZF9pbnRlbF9jcHUoaW50IG1vZGVsKTsKK2ludCBpc19zdXBwb3J0ZWRf
+aW50ZWxfY3B1KGludCBtb2RlbCwgaW50IGNwdSk7CiBpbnQgYnl0X2hhc19haGNpKCk7CiAKIGlu
+dCBpc19pbnRlbF9wc3RhdGVfZHJpdmVyX2xvYWRlZCgpOwotLSAKMi4xNC4zCgo=
 
-
---===============1008784022437737698==--
+--===============1088781573171623040==--
 
