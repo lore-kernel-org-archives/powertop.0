@@ -1,53 +1,87 @@
-Content-Type: multipart/mixed; boundary="===============5012551036985268833=="
+Content-Type: multipart/mixed; boundary="===============1375518284991452904=="
 MIME-Version: 1.0
-From: =?utf-8?q?Jaroslav_=C5=A0karvada_=3Cjskarvad_at_redhat=2Ecom=3E?=
-Subject: [Powertop] [PATCH] Fixed -C and -r to take optional argument
-Date: Wed, 28 Nov 2018 18:31:48 +0100
-Message-ID: <20181128173148.21132-1-jskarvad@redhat.com>
+From: Zen <illiminable at gmail.com>
+Subject: [Powertop] [PATCH] Support ncurses when built with tinfo
+Date: Thu, 14 Jun 2018 13:34:07 -0700
+Message-ID: <CAOOEN5KMgdgbqGd4vN0RXOw2Zmtmcku731rwvREC5Zcrc6i=Gg@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5012551036985268833==
+--===============1375518284991452904==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-I.e. it fixes the following:
-powertop -C -t 1
-...
-Taking 1 measurement(s) for a duration of 20 second(s) each.
-PowerTOP outputing using base filename -t
+This fixes the configure check for when building ncurses with tinfo as a
+separate library.
 
-But:
-powertop --html -t 1
-...
-Taking 1 measurement(s) for a duration of 1 second(s) each.
-PowerTOP outputing using base filename powertop.html
+The check would previously only set the libs from pkg-config correctly if
+both ncursesw and ncurses existed, when it should work also when only
+libncurses exists.
 
-Signed-off-by: Jaroslav =C5=A0karvada <jskarvad(a)redhat.com>
----
- src/main.cpp | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Also removed the redundant concatenation to LIBS in PKG_CHECK_MODULES. It
+already happens in makefile.am
 
-diff --git a/src/main.cpp b/src/main.cpp
-index 7467f0f..d1c18cc 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -441,7 +441,7 @@ int main(int argc, char **argv)
- #endif
- 	ui_notify_user =3D ui_notify_user_ncurses;
- 	while (1) { /* parse commandline options */
--		c =3D getopt_long(argc, argv, "cC:r:i:qt:w:Vh", long_options, &option_in=
-dex);
-+		c =3D getopt_long(argc, argv, "cC::r::i:qt:w:Vh", long_options, &option_=
-index);
- 		/* Detect the end of the options. */
- 		if (c =3D=3D -1)
- 			break;
--- =
+Thanks!
 
-2.14.5
+--===============1375518284991452904==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
+PGRpdiBkaXI9Imx0ciI+PGRpdiBzdHlsZT0iZm9udC1zaXplOjEyLjhweDt0ZXh0LWRlY29yYXRp
+b24tc3R5bGU6aW5pdGlhbDt0ZXh0LWRlY29yYXRpb24tY29sb3I6aW5pdGlhbCI+VGhpcyBmaXhl
+cyB0aGUgY29uZmlndXJlIGNoZWNrIGZvciB3aGVuIGJ1aWxkaW5nIG5jdXJzZXMgd2l0aCB0aW5m
+byBhcyBhIHNlcGFyYXRlIGxpYnJhcnkuPGJyPjwvZGl2PjxkaXYgc3R5bGU9ImZvbnQtc2l6ZTox
+Mi44cHg7dGV4dC1kZWNvcmF0aW9uLXN0eWxlOmluaXRpYWw7dGV4dC1kZWNvcmF0aW9uLWNvbG9y
+OmluaXRpYWwiPjxicj48L2Rpdj48ZGl2IHN0eWxlPSJmb250LXNpemU6MTIuOHB4O3RleHQtZGVj
+b3JhdGlvbi1zdHlsZTppbml0aWFsO3RleHQtZGVjb3JhdGlvbi1jb2xvcjppbml0aWFsIj5UaGUg
+Y2hlY2sgd291bGQgcHJldmlvdXNseSBvbmx5IHNldCB0aGUgbGlicyBmcm9tIHBrZy1jb25maWcg
+Y29ycmVjdGx5IGlmIGJvdGggbmN1cnNlc3cgYW5kIG5jdXJzZXMgZXhpc3RlZCwgd2hlbiBpdCBz
+aG91bGQgd29yayBhbHNvIHdoZW4gb25seSBsaWJuY3Vyc2VzIGV4aXN0cy7CoDwvZGl2PjxkaXYg
+c3R5bGU9ImZvbnQtc2l6ZToxMi44cHg7dGV4dC1kZWNvcmF0aW9uLXN0eWxlOmluaXRpYWw7dGV4
+dC1kZWNvcmF0aW9uLWNvbG9yOmluaXRpYWwiPjxicj48L2Rpdj48ZGl2IHN0eWxlPSJmb250LXNp
+emU6MTIuOHB4O3RleHQtZGVjb3JhdGlvbi1zdHlsZTppbml0aWFsO3RleHQtZGVjb3JhdGlvbi1j
+b2xvcjppbml0aWFsIj5BbHNvIHJlbW92ZWQgdGhlIHJlZHVuZGFudCBjb25jYXRlbmF0aW9uIHRv
+IExJQlMgaW4gUEtHX0NIRUNLX01PRFVMRVMuIEl0IGFscmVhZHkgaGFwcGVucyBpbjxzcGFuPsKg
+PC9zcGFuPjxhIGhyZWY9Imh0dHA6Ly9tYWtlZmlsZS5hbS8iIHRhcmdldD0iX2JsYW5rIiBzdHls
+ZT0iY29sb3I6cmdiKDE3LDg1LDIwNCkiPm1ha2VmaWxlLmFtPC9hPjwvZGl2PjxkaXYgc3R5bGU9
+ImZvbnQtc2l6ZToxMi44cHg7dGV4dC1kZWNvcmF0aW9uLXN0eWxlOmluaXRpYWw7dGV4dC1kZWNv
+cmF0aW9uLWNvbG9yOmluaXRpYWwiPjxicj48L2Rpdj48ZGl2IHN0eWxlPSJmb250LXNpemU6MTIu
+OHB4O3RleHQtZGVjb3JhdGlvbi1zdHlsZTppbml0aWFsO3RleHQtZGVjb3JhdGlvbi1jb2xvcjpp
+bml0aWFsIj5UaGFua3MhPC9kaXY+PGJyPjwvZGl2Pgo=
 
---===============5012551036985268833==--
+--===============1375518284991452904==
+Content-Type: text/x-patch
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="0001-Fix-configure-to-support-ncurses-w-tinfo.patch"
+
+RnJvbSBlMTI5NTA5OWY4YjQyNjcwNzE4YmE4NzVjYjY3NDlhOTAwNDIyOTNmIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBaZW50YXJvIEthdmFuYWdoIDx6ZW50YXJvQGNocm9taXVtLm9y
+Zz4KRGF0ZTogVGh1LCAxNCBKdW4gMjAxOCAxMzoxMzozNyAtMDcwMApTdWJqZWN0OiBbUEFUQ0hd
+IEZpeCBjb25maWd1cmUgdG8gc3VwcG9ydCBuY3Vyc2VzIHcvIHRpbmZvCgotIFRoZSBleGlzdGlu
+ZyBjb2RlIGNoZWNrZWQgZm9yIGJvdGggbmN1cnNlc3cgYW5kIG5jdXJzZXMgYW5kIGlmCiAgYm90
+aCB3ZXJlIG5vdCBmb3VuZCwgTkNVUlNFU19MSUJTIHdhcyBub3Qgc2V0IGNvcnJlY3RseS4KLSBS
+ZW1vdmVkIHJlZHVuZGFudCBjb25jYXRlbmF0aW9uIHRvICRMSUJTIHNpbmNlIHRoZSBtYWtlZmls
+ZS5hbQogIGFscmVhZHkgbWFwcyBOQ1VSU0VTX0xJQlMgaW50byBMSUJTLgotLS0KIGNvbmZpZ3Vy
+ZS5hYyB8IDExICsrKysrKystLS0tCiAxIGZpbGUgY2hhbmdlZCwgNyBpbnNlcnRpb25zKCspLCA0
+IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2NvbmZpZ3VyZS5hYyBiL2NvbmZpZ3VyZS5hYwpp
+bmRleCBkNmExNWUxLi5jNmVlNTBhIDEwMDY0NAotLS0gYS9jb25maWd1cmUuYWMKKysrIGIvY29u
+ZmlndXJlLmFjCkBAIC0xMTAsMTAgKzExMCwxMyBAQCBBQ19DSEVDS19GVU5DUyhbIFwKIAogQUNf
+U0VBUkNIX0xJQlMoW2Nsb2NrX2dldHRpbWVdLCBbcnRdKQogCi1QS0dfQ0hFQ0tfTU9EVUxFUyhb
+TkNVUlNFU10sIFtuY3Vyc2VzdyBuY3Vyc2VzXSwgW0xJQlM9IiRMSUJTICRuY3Vyc2VzX0xJQlMi
+XSwgWwotCUFDX1NFQVJDSF9MSUJTKFtkZWx3aW5dLCBbbmN1cnNlc3cgbmN1cnNlc10sIFtdLCBb
+Ci0JCUFDX01TR19FUlJPUihbbmN1cnNlcyBpcyByZXF1aXJlZCBidXQgd2FzIG5vdCBmb3VuZF0p
+Ci0JXSwgW10pCitQS0dfQ0hFQ0tfTU9EVUxFUyhbbmN1cnNlc3ddLCBbbmN1cnNlc3ddLAorCVtO
+Q1VSU0VTX0NGTEFHUz0iJG5jdXJzZXN3X0NGTEFHUyI7IE5DVVJTRVNfTElCUz0iJG5jdXJzZXN3
+X0xJQlMiXSwgWworCVBLR19DSEVDS19NT0RVTEVTKFtOQ1VSU0VTXSwgW25jdXJzZXNdLCBbXSwg
+WworCQlBQ19TRUFSQ0hfTElCUyhbZGVsd2luXSwgW25jdXJzZXN3IG5jdXJzZXNdLCBbXSwgWwor
+CQkJQUNfTVNHX0VSUk9SKFtuY3Vyc2VzIGlzIHJlcXVpcmVkIGJ1dCB3YXMgbm90IGZvdW5kXSkK
+KwkJXSkKKwldKQogXSkKIAogaGFzX2xpYnBjaT0wCi0tIAoyLjE4LjAucmMxLjI0Mi5nNjE4NTZh
+ZTY5YS1nb29nCgo=
+
+--===============1375518284991452904==--
 
