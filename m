@@ -1,49 +1,45 @@
-Content-Type: multipart/mixed; boundary="===============3362271857307877015=="
+Content-Type: multipart/mixed; boundary="===============7165319653118867670=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH 1/1 v1] .gitignore: ignore vim swap, cscope, ctags
-Date: Fri, 10 Jun 2016 08:27:00 -0700
-Message-ID: <20160610152700.6825-2-joe.konno@linux.intel.com>
-In-Reply-To: 20160610152700.6825-1-joe.konno@linux.intel.com
+From: Wolf Drechsel <wd-p at trolink.de>
+Subject: [Powertop] last bit of tuning
+Date: Sat, 16 Jun 2018 21:57:32 +0200
+Message-ID: <1529179052.11174.1.camel@trolink.de>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3362271857307877015==
+--===============7165319653118867670==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Joe Konno <joe.konno(a)intel.com>
+Hello,
 
-Signed-off-by: Joe Konno <joe.konno(a)intel.com>
----
- .gitignore | 3 +++
- 1 file changed, 3 insertions(+)
+powertop works like a charm - nearly a litte magic...
 
-diff --git a/.gitignore b/.gitignore
-index f879840d9057..de3c3b1670cf 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -9,7 +9,9 @@
- *.powertop
- *~
- .deps
-+.*.swp
- /po/*.gmo
-+cscope.*
- Makefile
- Makefile.in
- =
+I'm on a Debian 9.1, PowerTOP version v2.8, compiled on Nov=C2=A0=C2=A06 20=
+15.
+"powertop --auto-tune" did a very good job, most "bad" signs changed to
+"good"
 
-@@ -84,3 +86,4 @@ Makefile.in
- /src/powertop
- /stamp-h1
- /stamp-po
-+tags
--- =
+Only a little bit remains - these three lines remain "bad" (in need of
+tuning):
 
-2.8.3
+Energieverwaltung f=C3=BCr Audiocodec aktivieren=C2=A0	echo '1' >
+'/sys/module/snd_hda_intel/parameters/power_save';
+
+Zeit=C3=BCberschreitung beim VM zur=C3=BCckschreiben=C2=A0	echo '1500' >
+'/proc/sys/vm/dirty_writeback_centisecs';
+
+Wake-On-LAN-Status f=C3=BCr Ger=C3=A4t enp0s25=C2=A0	ethtool -s enp0s25 wol=
+ d;=C2=A0
 
 
---===============3362271857307877015==--
+Web hits seem to be quite outdated.. - so: Where should I place the
+three commands above?
+
+Cheers,
+Wolf
+
+
+--===============7165319653118867670==--
 
