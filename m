@@ -1,60 +1,58 @@
-Content-Type: multipart/mixed; boundary="===============5023434677095688436=="
+Content-Type: multipart/mixed; boundary="===============3078108426155094980=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH] src/display.h: fix misleading-indentation warning
-Date: Mon, 15 May 2017 13:31:29 -0700
-Message-ID: <20170515203129.32553-1-joe.konno@linux.intel.com>
+From: Sergey Alirzaev <zl29ah at gmail.com>
+Subject: [Powertop] [PATCH] calibrate: do not override DISPLAY env var on xset
+Date: Thu, 16 Aug 2018 19:55:55 +0300
+Message-ID: <20180816165555.13751-1-zl29ah@gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5023434677095688436==
+--===============3078108426155094980==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Joe Konno <joe.konno(a)intel.com>
-
-Because of how the code blocks are formatted, gcc 6 emits a "misleading
-indentation" warning around the cursor_up() and cursor_down() virtual
-methods.
-
-Fix the warning by tweaking the code's indentation.
-
-Signed-off-by: Joe Konno <joe.konno(a)intel.com>
+since X may live on another display, and the variable exists for this
+very case
 ---
- src/display.h | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ src/calibrate/calibrate.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/src/display.h b/src/display.h
-index 9af3ec0b6e72..9db87ec85464 100644
---- a/src/display.h
-+++ b/src/display.h
-@@ -62,10 +62,14 @@ public:
+diff --git a/src/calibrate/calibrate.cpp b/src/calibrate/calibrate.cpp
+index 745d544..4efb5a6 100644
+--- a/src/calibrate/calibrate.cpp
++++ b/src/calibrate/calibrate.cpp
+@@ -353,20 +353,20 @@ static void backlight_calibration(void)
+ 		sleep(1);
  	}
+ 	printf(_("Calibrating idle\n"));
+-	if(!system("DISPLAY=3D:0 /usr/bin/xset dpms force off"))
++	if(!system("/usr/bin/xset dpms force off"))
+ 		printf("System is not available\n");
+ 	one_measurement(15, 15, NULL);
+-	if(!system("DISPLAY=3D:0 /usr/bin/xset dpms force on"))
++	if(!system("/usr/bin/xset dpms force on"))
+ 		printf("System is not available\n");
+ }
  =
 
- 	virtual void cursor_down(void) { =
+ static void idle_calibration(void)
+ {
+ 	printf(_("Calibrating idle\n"));
+-	if(!system("DISPLAY=3D:0 /usr/bin/xset dpms force off"))
++	if(!system("/usr/bin/xset dpms force off"))
+ 		printf("System is not available\n");
+ 	one_measurement(15, 15, NULL);
+-	if(!system("DISPLAY=3D:0 /usr/bin/xset dpms force on"))
++	if(!system("/usr/bin/xset dpms force on"))
+ 		printf("System is not available\n");
+ }
+ =
 
--		if (cursor_pos < cursor_max ) cursor_pos++; repaint(); =
-
-+		if (cursor_pos < cursor_max)
-+			cursor_pos++;
-+		repaint();
- 	} ;
- 	virtual void cursor_up(void) { =
-
--		if (cursor_pos > 0) cursor_pos--; repaint(); =
-
-+		if (cursor_pos > 0)
-+			cursor_pos--;
-+		repaint();
- 	};
- 	virtual void cursor_left(void) { };
- 	virtual void cursor_right(void) { };
 -- =
 
-2.13.0
+2.18.0
 
 
---===============5023434677095688436==--
+--===============3078108426155094980==--
 
