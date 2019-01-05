@@ -1,37 +1,257 @@
-Content-Type: multipart/mixed; boundary="===============2128924288143948490=="
+Content-Type: multipart/mixed; boundary="===============4663753567360892837=="
 MIME-Version: 1.0
 From: Kammela, Gayatri <gayatri.kammela at intel.com>
-Subject: Re: [Powertop] [PATCH] wakeup_xxx.h: include limits.h
-Date: Tue, 02 Jul 2019 21:48:29 +0000
-Message-ID: <2824B99DC70CE746926327C52CA42F764F155528@ORSMSX111.amr.corp.intel.com>
-In-Reply-To: 20190520184417.14922-1-fontaine.fabrice@gmail.com
+Subject: [Powertop] [Announce] PowerTOP v2.10
+Date: Sat, 05 Jan 2019 01:07:02 +0000
+Message-ID: <2824B99DC70CE746926327C52CA42F76487B6420@ORSMSX111.amr.corp.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2128924288143948490==
+--===============4663753567360892837==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-> -----Original Message-----
-> From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of
-> Fabrice Fontaine
-> Sent: Monday, May 20, 2019 11:44 AM
-> To: powertop(a)lists.01.org
-> Subject: [Powertop] [PATCH] wakeup_xxx.h: include limits.h
-> =
+PowerTOP v2.10 Release
 
-> limits.h must be included to define PATH_MAX otherwise build will fail
-> on:
-> =
+We are pleased to announce the release of PowerTOP v2.10.
 
- Sorry for my delayed response. Thanks for the patch!  Perhaps it makes mor=
-e sense to include limits.h file in wakeup.h as we included wakeup.h in bot=
-h  wakeup_ethernet.h and wakeup_usb.h files.
+About PowerTOP:
+PowerTOP is a Linux tool to diagnose issues with power consumption and powe=
+r management. In addition to being a diagnostic tool, PowerTOP also has an =
+interactive mode you can use to experiment with various power management se=
+ttings, for cases where the Linux distribution has not enabled those settin=
+gs.
 
-Thanks,
-Gayatri
+PowerTOP reports which components in the system are most likely to blae for=
+ higher-than-needed power consumption, ranging from software applications t=
+o active components in the system. Detailed screens are available for CPU C=
+ and P states, device activity, and software activity. For many years, Powe=
+rTOP has been used heavily by Intel, Linux distributors, and various parts =
+of the open source community.
+
+About PowerTOP v2.10 release:
+This release has an important feature called "WakeUp" tab, a new tab that d=
+isplays the device wakeup settings available for users to change as and whe=
+n required. We have also enabled support for Gemini Lake SoC with Goldmont =
+Plus microarchitecture and for Cannon Lake U/Y with Cannon Lake microarchit=
+ecture. There has also been some bug fixes thanks to the contributors from =
+the open source community.
+
+Highlights:
+
+Thank you to everyone who contributed to this release!
+
+Gayatri Kammela (5):
+      src/wakeup: Add a new tab "WakeUp" to the PowerTop
+      src/wakeup: Add USB device settings to the WakeUp tab
+      tuning.cpp: Remove Wake-on-lan from the tunables tab
+      PowerTop:README: Update README file
+      src/wakeup/wakeup.h: Fix a minor issue in the wakeup.h file
+
+Nivedita Swaminathan (5):
+      Enable support for Intel GLK
+      Enable support for Intel CNL-U/Y
+      POTFILES.in: refresh files with strings
+      powertop.pot: xgettext refresh, attribution fix
+      po: regenerate with new POT and strings
+
+Gautam Paranjape (1):
+      Some c-states exposed by the intel_idle driver are assigned the same =
+line_level, which means that the most recent one assigned can overwrite ano=
+ther c-state. For example, the C1-SKL c-state is overwritten by the C1E-SKL=
+ c-state because both have a "1" in the name and are assigned the same line=
+ level. To fix this, check if a "sub c-state" (ex. C1E-SKL) is being insert=
+ed. If so, check the vector of c-states if a c-state with similar name (ex.=
+ C1-SKL) exists, and increment the line level.
+
+Jaroslav =C5=A0karvada (2):
+      I.e. it fixes the following: powertop -C -t 1 - Taking 1 measurement(=
+s) for a duration of 20 second(s) each.     PowerTOP outputing using base f=
+ilename -t
+      The intel_cpus (class nhm_package) needs APERF MSR. This maybe proble=
+m on some virtual machines (e.g. KVM) where the APERF MSR is not implemente=
+d. On such VMs powertop exits with MSR read error and doesn't work. Previou=
+sly, powertop worked in such cases (e.g. powertop-2.3). This patch adds che=
+ck whether APERF MSR is supported, if not, Intel cpus are not used.
+
+Joe Konno (1):
+      Because of how the code blocks are formatted, gcc 6 emits a "misleadi=
+ng     indentation" warning around the cursor_up() and cursor_down() virtua=
+l methods.
+
+Manoj Gupta (1):
+      Fix powertop build with libc++.
+
+Michael Cheng (1):
+      This patch introduces a more descriptive column headers to show where=
+ Powertop gets these values from (OS versus model specific registers).
+
+More information about PowerTOP can be found here<https://01.org/powertop>.=
+ To contribute to PowerTOP, get started by cloning the repo<https://github.=
+com/fenrus75/powertop.git>.
+
+Thanks ,
+Gayatri Kammela
 
 
---===============2128924288143948490==--
+--===============4663753567360892837==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+PGh0bWw+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNvbnRlbnQ9InRl
+eHQvaHRtbDsgY2hhcnNldD1pc28tODg1OS0yIj4KPG1ldGEgbmFtZT0iR2VuZXJhdG9yIiBjb250
+ZW50PSJNaWNyb3NvZnQgV29yZCAxNSAoZmlsdGVyZWQgbWVkaXVtKSI+CjxzdHlsZT48IS0tCi8q
+IEZvbnQgRGVmaW5pdGlvbnMgKi8KQGZvbnQtZmFjZQoJe2ZvbnQtZmFtaWx5OiJDYW1icmlhIE1h
+dGgiOwoJcGFub3NlLTE6MiA0IDUgMyA1IDQgNiAzIDIgNDt9CkBmb250LWZhY2UKCXtmb250LWZh
+bWlseTpDYWxpYnJpOwoJcGFub3NlLTE6MiAxNSA1IDIgMiAyIDQgMyAyIDQ7fQovKiBTdHlsZSBE
+ZWZpbml0aW9ucyAqLwpwLk1zb05vcm1hbCwgbGkuTXNvTm9ybWFsLCBkaXYuTXNvTm9ybWFsCgl7
+bWFyZ2luOjBpbjsKCW1hcmdpbi1ib3R0b206LjAwMDFwdDsKCWZvbnQtc2l6ZToxMS4wcHQ7Cglm
+b250LWZhbWlseToiQ2FsaWJyaSIsc2Fucy1zZXJpZjt9CmE6bGluaywgc3Bhbi5Nc29IeXBlcmxp
+bmsKCXttc28tc3R5bGUtcHJpb3JpdHk6OTk7Cgljb2xvcjojMDU2M0MxOwoJdGV4dC1kZWNvcmF0
+aW9uOnVuZGVybGluZTt9CmE6dmlzaXRlZCwgc3Bhbi5Nc29IeXBlcmxpbmtGb2xsb3dlZAoJe21z
+by1zdHlsZS1wcmlvcml0eTo5OTsKCWNvbG9yOiM5NTRGNzI7Cgl0ZXh0LWRlY29yYXRpb246dW5k
+ZXJsaW5lO30Kc3Bhbi5FbWFpbFN0eWxlMTcKCXttc28tc3R5bGUtdHlwZTpwZXJzb25hbC1jb21w
+b3NlOwoJZm9udC1mYW1pbHk6IkNhbGlicmkiLHNhbnMtc2VyaWY7Cgljb2xvcjp3aW5kb3d0ZXh0
+O30KLk1zb0NocERlZmF1bHQKCXttc28tc3R5bGUtdHlwZTpleHBvcnQtb25seTt9CkBwYWdlIFdv
+cmRTZWN0aW9uMQoJe3NpemU6OC41aW4gMTEuMGluOwoJbWFyZ2luOjEuMGluIDEuMGluIDEuMGlu
+IDEuMGluO30KZGl2LldvcmRTZWN0aW9uMQoJe3BhZ2U6V29yZFNlY3Rpb24xO30KLS0+PC9zdHls
+ZT48IS0tW2lmIGd0ZSBtc28gOV0+PHhtbD4KPG86c2hhcGVkZWZhdWx0cyB2OmV4dD0iZWRpdCIg
+c3BpZG1heD0iMTAyNiIgLz4KPC94bWw+PCFbZW5kaWZdLS0+PCEtLVtpZiBndGUgbXNvIDldPjx4
+bWw+CjxvOnNoYXBlbGF5b3V0IHY6ZXh0PSJlZGl0Ij4KPG86aWRtYXAgdjpleHQ9ImVkaXQiIGRh
+dGE9IjEiIC8+CjwvbzpzaGFwZWxheW91dD48L3htbD48IVtlbmRpZl0tLT4KPC9oZWFkPgo8Ym9k
+eSBsYW5nPSJFTi1VUyIgbGluaz0iIzA1NjNDMSIgdmxpbms9IiM5NTRGNzIiPgo8ZGl2IGNsYXNz
+PSJXb3JkU2VjdGlvbjEiPgo8cCBjbGFzcz0iTXNvTm9ybWFsIiBzdHlsZT0idGV4dC1hbGlnbjpq
+dXN0aWZ5Ij5Qb3dlclRPUCB2Mi4xMCBSZWxlYXNlPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJN
+c29Ob3JtYWwiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnkiPjxvOnA+Jm5ic3A7PC9vOnA+PC9w
+Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIiBzdHlsZT0idGV4dC1hbGlnbjpqdXN0aWZ5Ij5XZSBhcmUg
+cGxlYXNlZCB0byBhbm5vdW5jZSB0aGUgcmVsZWFzZSBvZiBQb3dlclRPUCB2Mi4xMC48bzpwPjwv
+bzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCIgc3R5bGU9InRleHQtYWxpZ246anVzdGlmeSI+
+PG86cD4mbmJzcDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiIHN0eWxlPSJ0ZXh0LWFs
+aWduOmp1c3RpZnkiPkFib3V0IFBvd2VyVE9QOjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNv
+Tm9ybWFsIiBzdHlsZT0idGV4dC1hbGlnbjpqdXN0aWZ5Ij5Qb3dlclRPUCBpcyBhIExpbnV4IHRv
+b2wgdG8gZGlhZ25vc2UgaXNzdWVzIHdpdGggcG93ZXIgY29uc3VtcHRpb24gYW5kIHBvd2VyIG1h
+bmFnZW1lbnQuIEluIGFkZGl0aW9uIHRvIGJlaW5nIGEgZGlhZ25vc3RpYyB0b29sLCBQb3dlclRP
+UCBhbHNvIGhhcyBhbiBpbnRlcmFjdGl2ZSBtb2RlIHlvdSBjYW4gdXNlIHRvIGV4cGVyaW1lbnQg
+d2l0aCB2YXJpb3VzIHBvd2VyCiBtYW5hZ2VtZW50IHNldHRpbmdzLCBmb3IgY2FzZXMgd2hlcmUg
+dGhlIExpbnV4IGRpc3RyaWJ1dGlvbiBoYXMgbm90IGVuYWJsZWQgdGhvc2Ugc2V0dGluZ3MuPG86
+cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3Rp
+ZnkiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIiBzdHlsZT0idGV4
+dC1hbGlnbjpqdXN0aWZ5Ij5Qb3dlclRPUCByZXBvcnRzIHdoaWNoIGNvbXBvbmVudHMgaW4gdGhl
+IHN5c3RlbSBhcmUgbW9zdCBsaWtlbHkgdG8gYmxhZSBmb3IgaGlnaGVyLXRoYW4tbmVlZGVkIHBv
+d2VyIGNvbnN1bXB0aW9uLCByYW5naW5nIGZyb20gc29mdHdhcmUgYXBwbGljYXRpb25zIHRvIGFj
+dGl2ZSBjb21wb25lbnRzIGluIHRoZSBzeXN0ZW0uIERldGFpbGVkIHNjcmVlbnMgYXJlIGF2YWls
+YWJsZQogZm9yIENQVSBDIGFuZCBQIHN0YXRlcywgZGV2aWNlIGFjdGl2aXR5LCBhbmQgc29mdHdh
+cmUgYWN0aXZpdHkuIEZvciBtYW55IHllYXJzLCBQb3dlclRPUCBoYXMgYmVlbiB1c2VkIGhlYXZp
+bHkgYnkgSW50ZWwsIExpbnV4IGRpc3RyaWJ1dG9ycywgYW5kIHZhcmlvdXMgcGFydHMgb2YgdGhl
+IG9wZW4gc291cmNlIGNvbW11bml0eS48bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1h
+bCIgc3R5bGU9InRleHQtYWxpZ246anVzdGlmeSI+PG86cD4mbmJzcDs8L286cD48L3A+CjxwIGNs
+YXNzPSJNc29Ob3JtYWwiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnkiPkFib3V0IFBvd2VyVE9Q
+IHYyLjEwIHJlbGVhc2U6PG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiIHN0eWxl
+PSJ0ZXh0LWFsaWduOmp1c3RpZnkiPlRoaXMgcmVsZWFzZSBoYXMgYW4gaW1wb3J0YW50IGZlYXR1
+cmUgY2FsbGVkICZxdW90O1dha2VVcCZxdW90OyB0YWIsIGEgbmV3IHRhYiB0aGF0IGRpc3BsYXlz
+IHRoZSBkZXZpY2Ugd2FrZXVwIHNldHRpbmdzIGF2YWlsYWJsZSBmb3IgdXNlcnMgdG8gY2hhbmdl
+IGFzIGFuZCB3aGVuIHJlcXVpcmVkLiBXZSBoYXZlIGFsc28gZW5hYmxlZCBzdXBwb3J0IGZvciBH
+ZW1pbmkgTGFrZSBTb0MKIHdpdGggR29sZG1vbnQgUGx1cyBtaWNyb2FyY2hpdGVjdHVyZSBhbmQg
+Zm9yIENhbm5vbiBMYWtlIFUvWSB3aXRoIENhbm5vbiBMYWtlIG1pY3JvYXJjaGl0ZWN0dXJlLiBU
+aGVyZSBoYXMgYWxzbyBiZWVuIHNvbWUgYnVnIGZpeGVzIHRoYW5rcyB0byB0aGUgY29udHJpYnV0
+b3JzIGZyb20gdGhlIG9wZW4gc291cmNlIGNvbW11bml0eS4KPG86cD48L286cD48L3A+CjxwIGNs
+YXNzPSJNc29Ob3JtYWwiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnkiPjxvOnA+Jm5ic3A7PC9v
+OnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIiBzdHlsZT0idGV4dC1hbGlnbjpqdXN0aWZ5Ij5I
+aWdobGlnaHRzOjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIiBzdHlsZT0idGV4
+dC1hbGlnbjpqdXN0aWZ5Ij48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1h
+bCIgc3R5bGU9InRleHQtYWxpZ246anVzdGlmeSI+VGhhbmsgeW91IHRvIGV2ZXJ5b25lIHdobyBj
+b250cmlidXRlZCB0byB0aGlzIHJlbGVhc2UhPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29O
+b3JtYWwiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnkiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8
+cCBjbGFzcz0iTXNvTm9ybWFsIiBzdHlsZT0idGV4dC1hbGlnbjpqdXN0aWZ5Ij5HYXlhdHJpIEth
+bW1lbGEgKDUpOjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIiBzdHlsZT0idGV4
+dC1hbGlnbjpqdXN0aWZ5Ij4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgc3JjL3dha2V1
+cDogQWRkIGEgbmV3IHRhYiAmcXVvdDtXYWtlVXAmcXVvdDsgdG8gdGhlIFBvd2VyVG9wPG86cD48
+L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnki
+PiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBzcmMvd2FrZXVwOiBBZGQgVVNCIGRldmlj
+ZSBzZXR0aW5ncyB0byB0aGUgV2FrZVVwIHRhYjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNv
+Tm9ybWFsIiBzdHlsZT0idGV4dC1hbGlnbjpqdXN0aWZ5Ij4mbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsgdHVuaW5nLmNwcDogUmVtb3ZlIFdha2Utb24tbGFuIGZyb20gdGhlIHR1bmFibGVz
+IHRhYjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIiBzdHlsZT0idGV4dC1hbGln
+bjpqdXN0aWZ5Ij4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgUG93ZXJUb3A6UkVBRE1F
+OiBVcGRhdGUgUkVBRE1FIGZpbGU8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCIg
+c3R5bGU9InRleHQtYWxpZ246anVzdGlmeSI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+IHNyYy93YWtldXAvd2FrZXVwLmg6IEZpeCBhIG1pbm9yIGlzc3VlIGluIHRoZSB3YWtldXAuaCBm
+aWxlPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiIHN0eWxlPSJ0ZXh0LWFsaWdu
+Omp1c3RpZnkiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIiBzdHls
+ZT0idGV4dC1hbGlnbjpqdXN0aWZ5Ij5OaXZlZGl0YSBTd2FtaW5hdGhhbiAoNSk6PG86cD48L286
+cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnkiPiZu
+YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBFbmFibGUgc3VwcG9ydCBmb3IgSW50ZWwgR0xL
+PG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1
+c3RpZnkiPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBFbmFibGUgc3VwcG9ydCBmb3Ig
+SW50ZWwgQ05MLVUvWTxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIiBzdHlsZT0i
+dGV4dC1hbGlnbjpqdXN0aWZ5Ij4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgUE9URklM
+RVMuaW46IHJlZnJlc2ggZmlsZXMgd2l0aCBzdHJpbmdzPG86cD48L286cD48L3A+CjxwIGNsYXNz
+PSJNc29Ob3JtYWwiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnkiPiZuYnNwOyZuYnNwOyZuYnNw
+OyZuYnNwOyZuYnNwOyBwb3dlcnRvcC5wb3Q6IHhnZXR0ZXh0IHJlZnJlc2gsIGF0dHJpYnV0aW9u
+IGZpeDxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIiBzdHlsZT0idGV4dC1hbGln
+bjpqdXN0aWZ5Ij4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgcG86IHJlZ2VuZXJhdGUg
+d2l0aCBuZXcgUE9UIGFuZCBzdHJpbmdzPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3Jt
+YWwiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnkiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8cCBj
+bGFzcz0iTXNvTm9ybWFsIiBzdHlsZT0idGV4dC1hbGlnbjpqdXN0aWZ5Ij5HYXV0YW0gUGFyYW5q
+YXBlICgxKTo8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCIgc3R5bGU9InRleHQt
+YWxpZ246anVzdGlmeSI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IFNvbWUgYy1zdGF0
+ZXMgZXhwb3NlZCBieSB0aGUgaW50ZWxfaWRsZSBkcml2ZXIgYXJlIGFzc2lnbmVkIHRoZSBzYW1l
+IGxpbmVfbGV2ZWwsIHdoaWNoIG1lYW5zIHRoYXQgdGhlIG1vc3QgcmVjZW50IG9uZSBhc3NpZ25l
+ZCBjYW4gb3ZlcndyaXRlIGFub3RoZXIgYy1zdGF0ZS4gRm9yIGV4YW1wbGUsIHRoZSBDMS1TS0wg
+Yy1zdGF0ZSBpcyBvdmVyd3JpdHRlbgogYnkgdGhlIEMxRS1TS0wgYy1zdGF0ZSBiZWNhdXNlIGJv
+dGggaGF2ZSBhICZxdW90OzEmcXVvdDsgaW4gdGhlIG5hbWUgYW5kIGFyZSBhc3NpZ25lZCB0aGUg
+c2FtZSBsaW5lIGxldmVsLiBUbyBmaXggdGhpcywgY2hlY2sgaWYgYSAmcXVvdDtzdWIgYy1zdGF0
+ZSZxdW90OyAoZXguIEMxRS1TS0wpIGlzIGJlaW5nIGluc2VydGVkLiBJZiBzbywgY2hlY2sgdGhl
+IHZlY3RvciBvZiBjLXN0YXRlcyBpZiBhIGMtc3RhdGUgd2l0aCBzaW1pbGFyIG5hbWUgKGV4LiBD
+MS1TS0wpIGV4aXN0cywKIGFuZCBpbmNyZW1lbnQgdGhlIGxpbmUgbGV2ZWwuPG86cD48L286cD48
+L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnkiPjxvOnA+
+Jm5ic3A7PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIiBzdHlsZT0idGV4dC1hbGlnbjpq
+dXN0aWZ5Ij5KYXJvc2xhdiCpa2FydmFkYSAoMik6PG86cD48L286cD48L3A+CjxwIGNsYXNzPSJN
+c29Ob3JtYWwiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnkiPiZuYnNwOyZuYnNwOyZuYnNwOyZu
+YnNwOyZuYnNwOyBJLmUuIGl0IGZpeGVzIHRoZSBmb2xsb3dpbmc6IHBvd2VydG9wIC1DIC10IDEg
+LSBUYWtpbmcgMSBtZWFzdXJlbWVudChzKSBmb3IgYSBkdXJhdGlvbiBvZiAyMCBzZWNvbmQocykg
+ZWFjaC4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgUG93ZXJUT1Agb3V0cHV0aW5nIHVzaW5nIGJh
+c2UgZmlsZW5hbWUgLXQ8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCIgc3R5bGU9
+InRleHQtYWxpZ246anVzdGlmeSI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IFRoZSBp
+bnRlbF9jcHVzIChjbGFzcyBuaG1fcGFja2FnZSkgbmVlZHMgQVBFUkYgTVNSLiBUaGlzIG1heWJl
+IHByb2JsZW0gb24gc29tZSB2aXJ0dWFsIG1hY2hpbmVzIChlLmcuIEtWTSkgd2hlcmUgdGhlIEFQ
+RVJGIE1TUiBpcyBub3QgaW1wbGVtZW50ZWQuIE9uIHN1Y2ggVk1zIHBvd2VydG9wIGV4aXRzIHdp
+dGggTVNSIHJlYWQgZXJyb3IgYW5kIGRvZXNuJ3QKIHdvcmsuIFByZXZpb3VzbHksIHBvd2VydG9w
+IHdvcmtlZCBpbiBzdWNoIGNhc2VzIChlLmcuIHBvd2VydG9wLTIuMykuIFRoaXMgcGF0Y2ggYWRk
+cyBjaGVjayB3aGV0aGVyIEFQRVJGIE1TUiBpcyBzdXBwb3J0ZWQsIGlmIG5vdCwgSW50ZWwgY3B1
+cyBhcmUgbm90IHVzZWQuPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiIHN0eWxl
+PSJ0ZXh0LWFsaWduOmp1c3RpZnkiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNv
+Tm9ybWFsIiBzdHlsZT0idGV4dC1hbGlnbjpqdXN0aWZ5Ij5Kb2UgS29ubm8gKDEpOjxvOnA+PC9v
+OnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIiBzdHlsZT0idGV4dC1hbGlnbjpqdXN0aWZ5Ij4m
+bmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7QmVjYXVzZSBvZiBob3cgdGhlIGNvZGUgYmxv
+Y2tzIGFyZSBmb3JtYXR0ZWQsIGdjYyA2IGVtaXRzIGEgJnF1b3Q7bWlzbGVhZGluZyZuYnNwOyZu
+YnNwOyZuYnNwOyZuYnNwOyBpbmRlbnRhdGlvbiZxdW90OyB3YXJuaW5nIGFyb3VuZCB0aGUgY3Vy
+c29yX3VwKCkgYW5kIGN1cnNvcl9kb3duKCkgdmlydHVhbCBtZXRob2RzLjxvOnA+PC9vOnA+PC9w
+Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIiBzdHlsZT0idGV4dC1hbGlnbjpqdXN0aWZ5Ij48bzpwPiZu
+YnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCIgc3R5bGU9InRleHQtYWxpZ246anVz
+dGlmeSI+TWFub2ogR3VwdGEgKDEpOjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFs
+IiBzdHlsZT0idGV4dC1hbGlnbjpqdXN0aWZ5Ij4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsgRml4IHBvd2VydG9wIGJ1aWxkIHdpdGggbGliYyYjNDM7JiM0MzsuPG86cD48L286cD48L3A+
+CjxwIGNsYXNzPSJNc29Ob3JtYWwiIHN0eWxlPSJ0ZXh0LWFsaWduOmp1c3RpZnkiPjxvOnA+Jm5i
+c3A7PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIiBzdHlsZT0idGV4dC1hbGlnbjpqdXN0
+aWZ5Ij5NaWNoYWVsIENoZW5nICgxKTo8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1h
+bCIgc3R5bGU9InRleHQtYWxpZ246anVzdGlmeSI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7IFRoaXMgcGF0Y2ggaW50cm9kdWNlcyBhIG1vcmUgZGVzY3JpcHRpdmUgY29sdW1uIGhlYWRl
+cnMgdG8gc2hvdyB3aGVyZSBQb3dlcnRvcCBnZXRzIHRoZXNlIHZhbHVlcyBmcm9tIChPUyB2ZXJz
+dXMgbW9kZWwgc3BlY2lmaWMgcmVnaXN0ZXJzKS48bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1z
+b05vcm1hbCI+PG86cD4mbmJzcDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPk1vcmUg
+aW5mb3JtYXRpb24gYWJvdXQgUG93ZXJUT1AgY2FuIGJlIGZvdW5kIDxhIGhyZWY9Imh0dHBzOi8v
+MDEub3JnL3Bvd2VydG9wIj4KPHNwYW4gc3R5bGU9ImNvbG9yOiMwNTYzQzEiPmhlcmU8L3NwYW4+
+PC9hPi4gVG8gY29udHJpYnV0ZSB0byBQb3dlclRPUCwgZ2V0IHN0YXJ0ZWQgYnkgY2xvbmluZyB0
+aGUKPGEgaHJlZj0iaHR0cHM6Ly9naXRodWIuY29tL2ZlbnJ1czc1L3Bvd2VydG9wLmdpdCI+PHNw
+YW4gc3R5bGU9ImNvbG9yOiMwNTYzQzEiPnJlcG88L3NwYW4+PC9hPi4KPG86cD48L286cD48L3A+
+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNv
+Tm9ybWFsIj5UaGFua3MgLDxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5HYXlh
+dHJpIEthbW1lbGE8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PG86cD4mbmJz
+cDs8L286cD48L3A+CjwvZGl2Pgo8L2JvZHk+CjwvaHRtbD4K
+
+--===============4663753567360892837==--
 
