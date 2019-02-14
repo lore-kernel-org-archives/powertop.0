@@ -1,25 +1,152 @@
-Content-Type: multipart/mixed; boundary="===============1693148868158585185=="
+Content-Type: multipart/mixed; boundary="===============4408800936400047234=="
 MIME-Version: 1.0
-From: Chris Murphy <lists at colorremedies.com>
-Subject: [Powertop] powertop 2.9 not listed on website
-Date: Fri, 07 Apr 2017 16:29:35 -0600
-Message-ID: <CAJCQCtRrhEdkjMLxkELrOAHmz6PZ-sJRdBiKms4k2vyNQCL76g@mail.gmail.com>
+From: Kammela, Gayatri <gayatri.kammela at intel.com>
+Subject: Re: [Powertop] SIGSEGV (Address boundary error) on Ubuntu 19.04 with
+ kernel 5.0
+Date: Thu, 14 Feb 2019 00:19:36 +0000
+Message-ID: <2824B99DC70CE746926327C52CA42F76487E2536@ORSMSX111.amr.corp.intel.com>
+In-Reply-To: CANp3UNCPernYzpHvH=L6Zk_327GdN=AYOJ94Nt3EFUbLMKeqGg@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1693148868158585185==
+--===============4408800936400047234==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-https://01.org/powertop
+Hi,
+The issue was  first noticed on 2/11 and it was due to this patch https://l=
+kml.org/lkml/2019/2/12/452 . The fix was suggested by Peter Z and I believe=
+ the fix is not merged yet to the mainline. Please use the above link to tr=
+y the fix and build the kernel. It should work with the fix. I had tested i=
+t yesterday and it worked fine!
 
-Still says 2.8 is the latest release.
+Thanks,
+Gayatri
 
+From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of Sparr
+Sent: Wednesday, February 13, 2019 4:13 PM
+To: powertop(a)lists.01.org
+Subject: [Powertop] SIGSEGV (Address boundary error) on Ubuntu 19.04 with k=
+ernel 5.0
 
--- =
+The last time I ran powertop, a few days ago, it worked fine. Since then I'=
+ve updated my kernel. Then today I get what looks like the usual initial be=
+havior, output to the console like this:
 
-Chris Murphy
+modprobe cpufreq_stats failedLoaded 391 prior measurements
+RAPL device for cpu 0
+RAPL Using PowerCap Sysfs : Domain Mask f
+RAPL device for cpu 0
+RAPL Using PowerCap Sysfs : Domain Mask f
+Devfreq not enabled
+glob returned GLOB_ABORTED
 
---===============1693148868158585185==--
+then the console clears and there is an approx two second delay, which is a=
+lso normal. Then when I would expect the first screen of data to appear, in=
+stead powertop crashes with SIGSEGV (Address boundary error). I'm putting f=
+urther details of the segfault in this gist, which I can update as I learn =
+more about using gdb and slowly bisect the kernel commit history to find th=
+e change that triggers the misbehavior.
+
+https://gist.github.com/sparr/fc97f4a265971bf720aedeaeb6874fd6
+
+I would appreciate help in narrowing down the cause of the problem, or even=
+ someone confirming that they do or do not have this problem on kernel 5. T=
+hank you.
+
+--===============4408800936400047234==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
+bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
+YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
+cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
+VFIvUkVDLWh0bWw0MCI+DQo8aGVhZD4NCjxtZXRhIGh0dHAtZXF1aXY9IkNvbnRlbnQtVHlwZSIg
+Y29udGVudD0idGV4dC9odG1sOyBjaGFyc2V0PXV0Zi04Ij4NCjxtZXRhIG5hbWU9IkdlbmVyYXRv
+ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTUgKGZpbHRlcmVkIG1lZGl1bSkiPg0KPHN0eWxl
+PjwhLS0NCi8qIEZvbnQgRGVmaW5pdGlvbnMgKi8NCkBmb250LWZhY2UNCgl7Zm9udC1mYW1pbHk6
+IkNhbWJyaWEgTWF0aCI7DQoJcGFub3NlLTE6MiA0IDUgMyA1IDQgNiAzIDIgNDt9DQpAZm9udC1m
+YWNlDQoJe2ZvbnQtZmFtaWx5OkNhbGlicmk7DQoJcGFub3NlLTE6MiAxNSA1IDIgMiAyIDQgMyAy
+IDQ7fQ0KLyogU3R5bGUgRGVmaW5pdGlvbnMgKi8NCnAuTXNvTm9ybWFsLCBsaS5Nc29Ob3JtYWws
+IGRpdi5Nc29Ob3JtYWwNCgl7bWFyZ2luOjBpbjsNCgltYXJnaW4tYm90dG9tOi4wMDAxcHQ7DQoJ
+Zm9udC1zaXplOjEyLjBwdDsNCglmb250LWZhbWlseToiVGltZXMgTmV3IFJvbWFuIixzZXJpZjt9
+DQphOmxpbmssIHNwYW4uTXNvSHlwZXJsaW5rDQoJe21zby1zdHlsZS1wcmlvcml0eTo5OTsNCglj
+b2xvcjpibHVlOw0KCXRleHQtZGVjb3JhdGlvbjp1bmRlcmxpbmU7fQ0KYTp2aXNpdGVkLCBzcGFu
+Lk1zb0h5cGVybGlua0ZvbGxvd2VkDQoJe21zby1zdHlsZS1wcmlvcml0eTo5OTsNCgljb2xvcjpw
+dXJwbGU7DQoJdGV4dC1kZWNvcmF0aW9uOnVuZGVybGluZTt9DQpzcGFuLkVtYWlsU3R5bGUxNw0K
+CXttc28tc3R5bGUtdHlwZTpwZXJzb25hbC1yZXBseTsNCglmb250LWZhbWlseToiQ2FsaWJyaSIs
+c2Fucy1zZXJpZjsNCgljb2xvcjojMUY0OTdEO30NCi5Nc29DaHBEZWZhdWx0DQoJe21zby1zdHls
+ZS10eXBlOmV4cG9ydC1vbmx5Ow0KCWZvbnQtZmFtaWx5OiJDYWxpYnJpIixzYW5zLXNlcmlmO30N
+CkBwYWdlIFdvcmRTZWN0aW9uMQ0KCXtzaXplOjguNWluIDExLjBpbjsNCgltYXJnaW46MS4waW4g
+MS4waW4gMS4waW4gMS4waW47fQ0KZGl2LldvcmRTZWN0aW9uMQ0KCXtwYWdlOldvcmRTZWN0aW9u
+MTt9DQotLT48L3N0eWxlPjwhLS1baWYgZ3RlIG1zbyA5XT48eG1sPg0KPG86c2hhcGVkZWZhdWx0
+cyB2OmV4dD0iZWRpdCIgc3BpZG1heD0iMTAyNiIgLz4NCjwveG1sPjwhW2VuZGlmXS0tPjwhLS1b
+aWYgZ3RlIG1zbyA5XT48eG1sPg0KPG86c2hhcGVsYXlvdXQgdjpleHQ9ImVkaXQiPg0KPG86aWRt
+YXAgdjpleHQ9ImVkaXQiIGRhdGE9IjEiIC8+DQo8L286c2hhcGVsYXlvdXQ+PC94bWw+PCFbZW5k
+aWZdLS0+DQo8L2hlYWQ+DQo8Ym9keSBsYW5nPSJFTi1VUyIgbGluaz0iYmx1ZSIgdmxpbms9InB1
+cnBsZSI+DQo8ZGl2IGNsYXNzPSJXb3JkU2VjdGlvbjEiPg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+
+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMS4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7Q2FsaWJyaSZx
+dW90OyxzYW5zLXNlcmlmO2NvbG9yOiMxRjQ5N0QiPkhpLDxvOnA+PC9vOnA+PC9zcGFuPjwvcD4N
+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTEuMHB0O2ZvbnQt
+ZmFtaWx5OiZxdW90O0NhbGlicmkmcXVvdDssc2Fucy1zZXJpZjtjb2xvcjojMUY0OTdEIj5UaGUg
+aXNzdWUgd2FzJm5ic3A7IGZpcnN0IG5vdGljZWQgb24gMi8xMSBhbmQgaXQgd2FzIGR1ZSB0byB0
+aGlzIHBhdGNoDQo8YSBocmVmPSJodHRwczovL2xrbWwub3JnL2xrbWwvMjAxOS8yLzEyLzQ1MiI+
+aHR0cHM6Ly9sa21sLm9yZy9sa21sLzIwMTkvMi8xMi80NTI8L2E+IC4gVGhlIGZpeCB3YXMgc3Vn
+Z2VzdGVkIGJ5IFBldGVyIFogYW5kIEkgYmVsaWV2ZSB0aGUgZml4IGlzIG5vdCBtZXJnZWQgeWV0
+IHRvIHRoZSBtYWlubGluZS4gUGxlYXNlIHVzZSB0aGUgYWJvdmUgbGluayB0byB0cnkgdGhlIGZp
+eCBhbmQgYnVpbGQgdGhlIGtlcm5lbC4gSXQgc2hvdWxkIHdvcmsgd2l0aA0KIHRoZSBmaXguIEkg
+aGFkIHRlc3RlZCBpdCB5ZXN0ZXJkYXkgYW5kIGl0IHdvcmtlZCBmaW5lITxvOnA+PC9vOnA+PC9z
+cGFuPjwvcD4NCjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTEu
+MHB0O2ZvbnQtZmFtaWx5OiZxdW90O0NhbGlicmkmcXVvdDssc2Fucy1zZXJpZjtjb2xvcjojMUY0
+OTdEIj48bzpwPiZuYnNwOzwvbzpwPjwvc3Bhbj48L3A+DQo8cCBjbGFzcz0iTXNvTm9ybWFsIj48
+c3BhbiBzdHlsZT0iZm9udC1zaXplOjExLjBwdDtmb250LWZhbWlseTomcXVvdDtDYWxpYnJpJnF1
+b3Q7LHNhbnMtc2VyaWY7Y29sb3I6IzFGNDk3RCI+VGhhbmtzLDxvOnA+PC9vOnA+PC9zcGFuPjwv
+cD4NCjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTEuMHB0O2Zv
+bnQtZmFtaWx5OiZxdW90O0NhbGlicmkmcXVvdDssc2Fucy1zZXJpZjtjb2xvcjojMUY0OTdEIj5H
+YXlhdHJpPG86cD48L286cD48L3NwYW4+PC9wPg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PGEgbmFt
+ZT0iX01haWxFbmRDb21wb3NlIj48c3BhbiBzdHlsZT0iZm9udC1zaXplOjExLjBwdDtmb250LWZh
+bWlseTomcXVvdDtDYWxpYnJpJnF1b3Q7LHNhbnMtc2VyaWY7Y29sb3I6IzFGNDk3RCI+PG86cD4m
+bmJzcDs8L286cD48L3NwYW4+PC9hPjwvcD4NCjxkaXYgc3R5bGU9ImJvcmRlcjpub25lO2JvcmRl
+ci1sZWZ0OnNvbGlkIGJsdWUgMS41cHQ7cGFkZGluZzowaW4gMGluIDBpbiA0LjBwdCI+DQo8ZGl2
+Pg0KPGRpdiBzdHlsZT0iYm9yZGVyOm5vbmU7Ym9yZGVyLXRvcDpzb2xpZCAjRTFFMUUxIDEuMHB0
+O3BhZGRpbmc6My4wcHQgMGluIDBpbiAwaW4iPg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PGI+PHNw
+YW4gc3R5bGU9ImZvbnQtc2l6ZToxMS4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7Q2FsaWJyaSZxdW90
+OyxzYW5zLXNlcmlmIj5Gcm9tOjwvc3Bhbj48L2I+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMS4w
+cHQ7Zm9udC1mYW1pbHk6JnF1b3Q7Q2FsaWJyaSZxdW90OyxzYW5zLXNlcmlmIj4gUG93ZXJUb3Ag
+W21haWx0bzpwb3dlcnRvcC1ib3VuY2VzQGxpc3RzLjAxLm9yZ10NCjxiPk9uIEJlaGFsZiBPZiA8
+L2I+U3BhcnI8YnI+DQo8Yj5TZW50OjwvYj4gV2VkbmVzZGF5LCBGZWJydWFyeSAxMywgMjAxOSA0
+OjEzIFBNPGJyPg0KPGI+VG86PC9iPiBwb3dlcnRvcEBsaXN0cy4wMS5vcmc8YnI+DQo8Yj5TdWJq
+ZWN0OjwvYj4gW1Bvd2VydG9wXSBTSUdTRUdWIChBZGRyZXNzIGJvdW5kYXJ5IGVycm9yKSBvbiBV
+YnVudHUgMTkuMDQgd2l0aCBrZXJuZWwgNS4wPG86cD48L286cD48L3NwYW4+PC9wPg0KPC9kaXY+
+DQo8L2Rpdj4NCjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPg0KPGRp
+dj4NCjxkaXY+DQo8cCBjbGFzcz0iTXNvTm9ybWFsIj5UaGUgbGFzdCB0aW1lIEkgcmFuIHBvd2Vy
+dG9wLCBhIGZldyBkYXlzIGFnbywgaXQgd29ya2VkIGZpbmUuIFNpbmNlIHRoZW4gSSd2ZSB1cGRh
+dGVkIG15IGtlcm5lbC4gVGhlbiB0b2RheSBJIGdldCB3aGF0IGxvb2tzIGxpa2UgdGhlIHVzdWFs
+IGluaXRpYWwgYmVoYXZpb3IsIG91dHB1dCB0byB0aGUgY29uc29sZSBsaWtlIHRoaXM6PGJyPg0K
+PGJyPg0KbW9kcHJvYmUgY3B1ZnJlcV9zdGF0cyBmYWlsZWRMb2FkZWQgMzkxIHByaW9yIG1lYXN1
+cmVtZW50czxicj4NClJBUEwgZGV2aWNlIGZvciBjcHUgMDxicj4NClJBUEwgVXNpbmcgUG93ZXJD
+YXAgU3lzZnMgOiBEb21haW4gTWFzayBmPGJyPg0KUkFQTCBkZXZpY2UgZm9yIGNwdSAwPGJyPg0K
+UkFQTCBVc2luZyBQb3dlckNhcCBTeXNmcyA6IERvbWFpbiBNYXNrIGY8YnI+DQpEZXZmcmVxIG5v
+dCBlbmFibGVkPGJyPg0KZ2xvYiByZXR1cm5lZCBHTE9CX0FCT1JURUQ8YnI+DQo8YnI+DQp0aGVu
+IHRoZSBjb25zb2xlIGNsZWFycyBhbmQgdGhlcmUgaXMgYW4gYXBwcm94IHR3byBzZWNvbmQgZGVs
+YXksIHdoaWNoIGlzIGFsc28gbm9ybWFsLiBUaGVuIHdoZW4gSSB3b3VsZCBleHBlY3QgdGhlIGZp
+cnN0IHNjcmVlbiBvZiBkYXRhIHRvIGFwcGVhciwgaW5zdGVhZCBwb3dlcnRvcCBjcmFzaGVzIHdp
+dGggU0lHU0VHViAoQWRkcmVzcyBib3VuZGFyeSBlcnJvcikuIEknbSBwdXR0aW5nIGZ1cnRoZXIg
+ZGV0YWlscyBvZiB0aGUgc2VnZmF1bHQgaW4NCiB0aGlzIGdpc3QsIHdoaWNoIEkgY2FuIHVwZGF0
+ZSBhcyBJIGxlYXJuIG1vcmUgYWJvdXQgdXNpbmcgZ2RiIGFuZCBzbG93bHkgYmlzZWN0IHRoZSBr
+ZXJuZWwgY29tbWl0IGhpc3RvcnkgdG8gZmluZCB0aGUgY2hhbmdlIHRoYXQgdHJpZ2dlcnMgdGhl
+IG1pc2JlaGF2aW9yLjxicj4NCjxicj4NCjxhIGhyZWY9Imh0dHBzOi8vZ2lzdC5naXRodWIuY29t
+L3NwYXJyL2ZjOTdmNGEyNjU5NzFiZjcyMGFlZGVhZWI2ODc0ZmQ2Ij5odHRwczovL2dpc3QuZ2l0
+aHViLmNvbS9zcGFyci9mYzk3ZjRhMjY1OTcxYmY3MjBhZWRlYWViNjg3NGZkNjwvYT48YnI+DQo8
+YnI+DQpJIHdvdWxkIGFwcHJlY2lhdGUgaGVscCBpbiBuYXJyb3dpbmcgZG93biB0aGUgY2F1c2Ug
+b2YgdGhlIHByb2JsZW0sIG9yIGV2ZW4gc29tZW9uZSBjb25maXJtaW5nIHRoYXQgdGhleSBkbyBv
+ciBkbyBub3QgaGF2ZSB0aGlzIHByb2JsZW0gb24ga2VybmVsIDUuIFRoYW5rIHlvdS48bzpwPjwv
+bzpwPjwvcD4NCjwvZGl2Pg0KPC9kaXY+DQo8L2Rpdj4NCjwvZGl2Pg0KPC9ib2R5Pg0KPC9odG1s
+Pg0K
+
+--===============4408800936400047234==--
 
