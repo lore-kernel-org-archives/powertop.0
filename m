@@ -1,121 +1,219 @@
-Content-Type: multipart/mixed; boundary="===============6668895047875780507=="
+Content-Type: multipart/mixed; boundary="===============6880053542085916396=="
 MIME-Version: 1.0
-From: Mike Simms <micsim2007 at outlook.com>
-Subject: Re: [Powertop] RH Bugzilla [Bug 1482649] Logitech USB Unified
- Receiver+M570 need 'waking' up by click after kernel update
-Date: Thu, 07 Sep 2017 18:09:59 +0000
-Message-ID: <VI1PR0301MB2510765FF1A9FBAE0EDEFDFD87940@VI1PR0301MB2510.eurprd03.prod.outlook.com>
-In-Reply-To: bb7316ca-780d-2e1a-8f21-9151b17e163d@intel.com
+From: Kammela, Gayatri <gayatri.kammela at intel.com>
+Subject: Re: [Powertop] issue with powertop, linux kernel 4.20 and OpenSuse
+Date: Wed, 20 Feb 2019 10:35:04 +0000
+Message-ID: <2824B99DC70CE746926327C52CA42F76487E5BEE@ORSMSX111.amr.corp.intel.com>
+In-Reply-To: CAEKPhUQKwAEnEaT2Z=OVG-T3BB4TK2VyAeqbNuidyc2JqdrViA@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6668895047875780507==
+--===============6880053542085916396==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Then explain why it was never an issue before kernel 4.12 please
+Hi Ivo,
+Thanks for the report! We have come across a similar issue with mainline ke=
+rnel 5.0-rc6 and this patch https://lkml.org/lkml/2019/2/12/452 caused the =
+segfault(failed to mmap with 12). I am not sure if 4.20 kernel you are usin=
+g has this fix. Could you please try the fix mentioned in the link above if=
+ that patch is made it to 4.20. We will gather more information on this and=
+ will get back to you.
 
-On Thu, 7 Sep 2017 10:30:34 -0700
-Auke Kok <auke-jan.h.kok(a)intel.com> wrote:
+Thanks,
+Gayatri
 
-> =
+From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of Ivo Ne=
+nchev
+Sent: Wednesday, February 20, 2019 1:51 AM
+To: powertop(a)lists.01.org
+Subject: [Powertop] issue with powertop, linux kernel 4.20 and OpenSuse
 
-> This is indicative of enabling usb suspend for the trackball device,
-> and common to mice, touchpads and trackballs.
-> =
+After upgrade of operation system OpenSuse Tumbleweed to the last version a=
+nd after upgrade kernel to 4.20 I received an issue with powertop.
 
-> The only solution is to disable usb suspend for these devices, and
-> remember not to enable it for the device in powertop.
-> =
+After command :
 
-> Auke
-> =
+systemctl enable powertop && systemctl start powertop
 
-> =
-
-> =
-
-> On 09/07/2017 06:32 AM, Mike Simms wrote:
-> > Description of problem: For some reason the trackball is no longer
-> > able to respond to user input immediately. it only responds when I
-> > click a button to wake it up or roll the ball about a bit first.
-> > With earlier kernels this was not necessary. Booting from the
-> > previous kernel 4.11.11-300.fc26 and it still works fine.
-> > =
-
-> > =
-
-> > Version-Release number of selected component (if
-> > applicable):4.12.5-300.fc26.x86_64
-> > =
-
-> > Also affected Fedora 27 4.13 rc kernel
-> > =
-
-> > =
-
-> > How reproducible: consistently
-> > =
-
-> > =
-
-> > Steps to Reproduce:
-> > 1. start notebook computer with the unified receiver attached
-> > 2. login and use the computer as normal
-> > =
-
-> > Actual results: trackball works initially but if left for a few
-> > seconds to type or read for example, it needs waking up with
-> > movement or a click of a button.
-> > =
-
-> > =
-
-> > Expected results: should respond normally without this lag or
-> > waking up nonsense
-> > =
-
-> > =
-
-> > Additional info:the unified receiver is plugged into the same USB 2
-> > port it has always been.
-> > =
-
-> > powertop is using the autotune profile and the usb autosuspend
-> > entry is Good.
-> > =
-
-> > Something in the kernel code has caused a power management
-> > regression. I'm not sure what and the bug I opened so far has drawn
-> > a blank. The kernel maintainer is not able to help as they don't
-> > know about power management or powertop. please give some guidance
-> > as to where to look and how to resolve this if possible. Full
-> > information so far here, including dmesg, lspci, lsusb output,
-> > dumps for comparison of power profiles etc.
-> > =
-
-> > I'm an end user, not a developer or maintainer so please keep it in
-> > relatively simple terms I can relay back to the maintainers please
-> > and understand at the same time.
-> > =
-
-> > https://bugzilla.redhat.com/show_bug.cgi?id=3D1482649
-> > =
-
-> > Thanks
-> > =
-
-> > Mike Simms
-> > _______________________________________________
-> > PowerTop mailing list
-> > PowerTop(a)lists.01.org
-> > https://lists.01.org/mailman/listinfo/powertop
-> > =
-
-> =
+I received issue with follow text :
 
 
+powertop.service - Extend the battery life of laptop
+Loaded: loaded (/usr/lib/systemd/system/powertop.service; enabled; vendor p=
+reset: disabled)
+Active: failed (Result: core-dump) since Wed 2019-02-13 23:07:48 EET; 5s ago
+Process: 15964 ExecStart=3D/usr/sbin/powertop --auto-tune (code=3Ddumped, s=
+ignal=3DSEGV)
+Main PID: 15964 (code=3Ddumped, signal=3DSEGV)
 
---===============6668895047875780507==--
+
+Feb 13 23:07:47 linux-qx0s powertop[15964]: Devfreq not enabled
+Feb 13 23:07:47 linux-qx0s powertop[15964]: glob returned GLOB_ABORTED
+Feb 13 23:07:47 linux-qx0s powertop[15964]: failed to mmap with 12 (=D0=9D=
+=D0=B5 =D0=BC=D0=BE=D0=B6=D0=B5 =D0=B4=D0=B0 =D1=81=D0=B5 =D0=B7=D0=B0=D0=
+=B4=D0=B5=D0=BB=D0=B8 =D0=BF=D0=B0=D0=BC=D0=B5=D1=82)
+Feb 13 23:07:47 linux-qx0s powertop[15964]: failed to mmap with 12 (=D0=9D=
+=D0=B5 =D0=BC=D0=BE=D0=B6=D0=B5 =D0=B4=D0=B0 =D1=81=D0=B5 =D0=B7=D0=B0=D0=
+=B4=D0=B5=D0=BB=D0=B8 =D0=BF=D0=B0=D0=BC=D0=B5=D1=82)
+Feb 13 23:07:47 linux-qx0s powertop[15964]: failed to mmap with 12 (=D0=9D=
+=D0=B5 =D0=BC=D0=BE=D0=B6=D0=B5 =D0=B4=D0=B0 =D1=81=D0=B5 =D0=B7=D0=B0=D0=
+=B4=D0=B5=D0=BB=D0=B8 =D0=BF=D0=B0=D0=BC=D0=B5=D1=82)
+Feb 13 23:07:47 linux-qx0s powertop[15964]: failed to mmap with 12 (=D0=9D=
+=D0=B5 =D0=BC=D0=BE=D0=B6=D0=B5 =D0=B4=D0=B0 =D1=81=D0=B5 =D0=B7=D0=B0=D0=
+=B4=D0=B5=D0=BB=D0=B8 =D0=BF=D0=B0=D0=BC=D0=B5=D1=82)
+Feb 13 23:07:47 linux-qx0s powertop[15964]: failed to mmap with 12 (=D0=9D=
+=D0=B5 =D0=BC=D0=BE=D0=B6=D0=B5 =D0=B4=D0=B0 =D1=81=D0=B5 =D0=B7=D0=B0=D0=
+=B4=D0=B5=D0=BB=D0=B8 =D0=BF=D0=B0=D0=BC=D0=B5=D1=82)
+Feb 13 23:07:48 linux-qx0s systemd[1]: powertop.service: Main process exite=
+d, code=3Ddumped, status=3D11/SEGV
+Feb 13 23:07:48 linux-qx0s systemd[1]: powertop.service: Failed with result=
+ 'core-dump'.
+Feb 13 23:07:48 linux-qx0s systemd[1]: Failed to start Extend the battery l=
+ife of laptop.
+
+p.s.
+
+The version of the PowerTop is 2.10
+
+--===============6880053542085916396==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
+bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
+YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
+cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
+VFIvUkVDLWh0bWw0MCI+DQo8aGVhZD4NCjxtZXRhIGh0dHAtZXF1aXY9IkNvbnRlbnQtVHlwZSIg
+Y29udGVudD0idGV4dC9odG1sOyBjaGFyc2V0PXV0Zi04Ij4NCjxtZXRhIG5hbWU9IkdlbmVyYXRv
+ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTUgKGZpbHRlcmVkIG1lZGl1bSkiPg0KPHN0eWxl
+PjwhLS0NCi8qIEZvbnQgRGVmaW5pdGlvbnMgKi8NCkBmb250LWZhY2UNCgl7Zm9udC1mYW1pbHk6
+IkNhbWJyaWEgTWF0aCI7DQoJcGFub3NlLTE6MiA0IDUgMyA1IDQgNiAzIDIgNDt9DQpAZm9udC1m
+YWNlDQoJe2ZvbnQtZmFtaWx5OkNhbGlicmk7DQoJcGFub3NlLTE6MiAxNSA1IDIgMiAyIDQgMyAy
+IDQ7fQ0KQGZvbnQtZmFjZQ0KCXtmb250LWZhbWlseTpWZXJkYW5hOw0KCXBhbm9zZS0xOjIgMTEg
+NiA0IDMgNSA0IDQgMiA0O30NCi8qIFN0eWxlIERlZmluaXRpb25zICovDQpwLk1zb05vcm1hbCwg
+bGkuTXNvTm9ybWFsLCBkaXYuTXNvTm9ybWFsDQoJe21hcmdpbjowaW47DQoJbWFyZ2luLWJvdHRv
+bTouMDAwMXB0Ow0KCWZvbnQtc2l6ZToxMi4wcHQ7DQoJZm9udC1mYW1pbHk6IlRpbWVzIE5ldyBS
+b21hbiIsc2VyaWY7fQ0KYTpsaW5rLCBzcGFuLk1zb0h5cGVybGluaw0KCXttc28tc3R5bGUtcHJp
+b3JpdHk6OTk7DQoJY29sb3I6IzA1NjNDMTsNCgl0ZXh0LWRlY29yYXRpb246dW5kZXJsaW5lO30N
+CmE6dmlzaXRlZCwgc3Bhbi5Nc29IeXBlcmxpbmtGb2xsb3dlZA0KCXttc28tc3R5bGUtcHJpb3Jp
+dHk6OTk7DQoJY29sb3I6Izk1NEY3MjsNCgl0ZXh0LWRlY29yYXRpb246dW5kZXJsaW5lO30NCnNw
+YW4uRW1haWxTdHlsZTE3DQoJe21zby1zdHlsZS10eXBlOnBlcnNvbmFsLXJlcGx5Ow0KCWZvbnQt
+ZmFtaWx5OiJDYWxpYnJpIixzYW5zLXNlcmlmOw0KCWNvbG9yOiMxRjQ5N0Q7fQ0KLk1zb0NocERl
+ZmF1bHQNCgl7bXNvLXN0eWxlLXR5cGU6ZXhwb3J0LW9ubHk7DQoJZm9udC1zaXplOjEwLjBwdDsN
+Cglmb250LWZhbWlseToiQ2FsaWJyaSIsc2Fucy1zZXJpZjt9DQpAcGFnZSBXb3JkU2VjdGlvbjEN
+Cgl7c2l6ZTo4LjVpbiAxMS4waW47DQoJbWFyZ2luOjEuMGluIDEuMGluIDEuMGluIDEuMGluO30N
+CmRpdi5Xb3JkU2VjdGlvbjENCgl7cGFnZTpXb3JkU2VjdGlvbjE7fQ0KLS0+PC9zdHlsZT48IS0t
+W2lmIGd0ZSBtc28gOV0+PHhtbD4NCjxvOnNoYXBlZGVmYXVsdHMgdjpleHQ9ImVkaXQiIHNwaWRt
+YXg9IjEwMjYiIC8+DQo8L3htbD48IVtlbmRpZl0tLT48IS0tW2lmIGd0ZSBtc28gOV0+PHhtbD4N
+CjxvOnNoYXBlbGF5b3V0IHY6ZXh0PSJlZGl0Ij4NCjxvOmlkbWFwIHY6ZXh0PSJlZGl0IiBkYXRh
+PSIxIiAvPg0KPC9vOnNoYXBlbGF5b3V0PjwveG1sPjwhW2VuZGlmXS0tPg0KPC9oZWFkPg0KPGJv
+ZHkgbGFuZz0iRU4tVVMiIGxpbms9IiMwNTYzQzEiIHZsaW5rPSIjOTU0RjcyIj4NCjxkaXYgY2xh
+c3M9IldvcmRTZWN0aW9uMSI+DQo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iZm9u
+dC1zaXplOjExLjBwdDtmb250LWZhbWlseTomcXVvdDtDYWxpYnJpJnF1b3Q7LHNhbnMtc2VyaWY7
+Y29sb3I6IzFGNDk3RCI+SGkgSXZvLDxvOnA+PC9vOnA+PC9zcGFuPjwvcD4NCjxwIGNsYXNzPSJN
+c29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTEuMHB0O2ZvbnQtZmFtaWx5OiZxdW90
+O0NhbGlicmkmcXVvdDssc2Fucy1zZXJpZjtjb2xvcjojMUY0OTdEIj5UaGFua3MgZm9yIHRoZSBy
+ZXBvcnQhIFdlIGhhdmUgY29tZSBhY3Jvc3MgYSBzaW1pbGFyIGlzc3VlIHdpdGggbWFpbmxpbmUg
+a2VybmVsIDUuMC1yYzYgYW5kIHRoaXMgcGF0Y2gNCjwvc3Bhbj48c3BhbiBzdHlsZT0iZm9udC1z
+aXplOjExLjBwdDtmb250LWZhbWlseTomcXVvdDtDYWxpYnJpJnF1b3Q7LHNhbnMtc2VyaWY7Y29s
+b3I6IzFGNDk3RCI+PGEgaHJlZj0iaHR0cHM6Ly9sa21sLm9yZy9sa21sLzIwMTkvMi8xMi80NTIi
+Pmh0dHBzOi8vbGttbC5vcmcvbGttbC8yMDE5LzIvMTIvNDUyPC9hPg0KPC9zcGFuPjxzcGFuIHN0
+eWxlPSJmb250LXNpemU6MTEuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0NhbGlicmkmcXVvdDssc2Fu
+cy1zZXJpZjtjb2xvcjojMUY0OTdEIj5jYXVzZWQgdGhlIHNlZ2ZhdWx0KGZhaWxlZCB0byBtbWFw
+IHdpdGggMTIpLiBJIGFtIG5vdCBzdXJlIGlmIDQuMjAga2VybmVsIHlvdSBhcmUgdXNpbmcgaGFz
+IHRoaXMgZml4LiBDb3VsZCB5b3UgcGxlYXNlIHRyeSB0aGUgZml4IG1lbnRpb25lZCBpbiB0aGUg
+bGluayBhYm92ZSBpZiB0aGF0IHBhdGNoDQogaXMgbWFkZSBpdCB0byA0LjIwLiBXZSB3aWxsIGdh
+dGhlciBtb3JlIGluZm9ybWF0aW9uIG9uIHRoaXMgYW5kIHdpbGwgZ2V0IGJhY2sgdG8geW91Lg0K
+PG86cD48L286cD48L3NwYW4+PC9wPg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9
+ImZvbnQtc2l6ZToxMS4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7Q2FsaWJyaSZxdW90OyxzYW5zLXNl
+cmlmO2NvbG9yOiMxRjQ5N0QiPjxvOnA+Jm5ic3A7PC9vOnA+PC9zcGFuPjwvcD4NCjxwIGNsYXNz
+PSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTEuMHB0O2ZvbnQtZmFtaWx5OiZx
+dW90O0NhbGlicmkmcXVvdDssc2Fucy1zZXJpZjtjb2xvcjojMUY0OTdEIj5UaGFua3MsPG86cD48
+L286cD48L3NwYW4+PC9wPg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5bGU9ImZvbnQt
+c2l6ZToxMS4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7Q2FsaWJyaSZxdW90OyxzYW5zLXNlcmlmO2Nv
+bG9yOiMxRjQ5N0QiPkdheWF0cmk8bzpwPjwvbzpwPjwvc3Bhbj48L3A+DQo8cCBjbGFzcz0iTXNv
+Tm9ybWFsIj48YSBuYW1lPSJfTWFpbEVuZENvbXBvc2UiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6
+MTEuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0NhbGlicmkmcXVvdDssc2Fucy1zZXJpZjtjb2xvcjoj
+MUY0OTdEIj48bzpwPiZuYnNwOzwvbzpwPjwvc3Bhbj48L2E+PC9wPg0KPGRpdj4NCjxkaXYgc3R5
+bGU9ImJvcmRlcjpub25lO2JvcmRlci10b3A6c29saWQgI0UxRTFFMSAxLjBwdDtwYWRkaW5nOjMu
+MHB0IDBpbiAwaW4gMGluIj4NCjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxiPjxzcGFuIHN0eWxlPSJm
+b250LXNpemU6MTEuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O0NhbGlicmkmcXVvdDssc2Fucy1zZXJp
+ZiI+RnJvbTo8L3NwYW4+PC9iPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTEuMHB0O2ZvbnQtZmFt
+aWx5OiZxdW90O0NhbGlicmkmcXVvdDssc2Fucy1zZXJpZiI+IFBvd2VyVG9wIFttYWlsdG86cG93
+ZXJ0b3AtYm91bmNlc0BsaXN0cy4wMS5vcmddDQo8Yj5PbiBCZWhhbGYgT2YgPC9iPkl2byBOZW5j
+aGV2PGJyPg0KPGI+U2VudDo8L2I+IFdlZG5lc2RheSwgRmVicnVhcnkgMjAsIDIwMTkgMTo1MSBB
+TTxicj4NCjxiPlRvOjwvYj4gcG93ZXJ0b3BAbGlzdHMuMDEub3JnPGJyPg0KPGI+U3ViamVjdDo8
+L2I+IFtQb3dlcnRvcF0gaXNzdWUgd2l0aCBwb3dlcnRvcCwgbGludXgga2VybmVsIDQuMjAgYW5k
+IE9wZW5TdXNlPG86cD48L286cD48L3NwYW4+PC9wPg0KPC9kaXY+DQo8L2Rpdj4NCjxwIGNsYXNz
+PSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+
+QWZ0ZXIgdXBncmFkZSBvZiBvcGVyYXRpb24gc3lzdGVtIE9wZW5TdXNlIFR1bWJsZXdlZWQgdG8g
+dGhlIGxhc3QgdmVyc2lvbiBhbmQgYWZ0ZXIgdXBncmFkZSBrZXJuZWwgdG8gNC4yMCBJIHJlY2Vp
+dmVkIGFuIGlzc3VlIHdpdGggcG93ZXJ0b3AuPG86cD48L286cD48L3A+DQo8ZGl2Pg0KPHAgY2xh
+c3M9Ik1zb05vcm1hbCI+PG86cD4mbmJzcDs8L286cD48L3A+DQo8L2Rpdj4NCjxkaXY+DQo8cCBj
+bGFzcz0iTXNvTm9ybWFsIj5BZnRlciBjb21tYW5kIDo8bzpwPjwvbzpwPjwvcD4NCjwvZGl2Pg0K
+PGRpdj4NCjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPg0KPC9kaXY+
+DQo8ZGl2Pg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+c3lzdGVtY3RsIGVuYWJsZSBwb3dlcnRvcCAm
+YW1wOyZhbXA7IHN5c3RlbWN0bCBzdGFydCBwb3dlcnRvcDxvOnA+PC9vOnA+PC9wPg0KPC9kaXY+
+DQo8ZGl2Pg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PG86cD4mbmJzcDs8L286cD48L3A+DQo8L2Rp
+dj4NCjxkaXY+DQo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iZm9udC1mYW1pbHk6
+JnF1b3Q7VmVyZGFuYSZxdW90OyxzYW5zLXNlcmlmO2NvbG9yOiMzMzMzMzM7YmFja2dyb3VuZDoj
+RkVGRUZFIj5JIHJlY2VpdmVkIGlzc3VlIHdpdGggZm9sbG93IHRleHQgOjwvc3Bhbj48bzpwPjwv
+bzpwPjwvcD4NCjwvZGl2Pg0KPGRpdj4NCjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7
+PC9vOnA+PC9wPg0KPC9kaXY+DQo8ZGl2Pg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNwYW4gc3R5
+bGU9ImZvbnQtZmFtaWx5OiZxdW90O1ZlcmRhbmEmcXVvdDssc2Fucy1zZXJpZjtjb2xvcjojMzMz
+MzMzIj48YnI+DQo8L3NwYW4+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMC4wcHQ7Zm9udC1mYW1p
+bHk6JnF1b3Q7VmVyZGFuYSZxdW90OyxzYW5zLXNlcmlmO2NvbG9yOiMzMzMzMzM7YmFja2dyb3Vu
+ZDojRkVGRUZFIj5wb3dlcnRvcC5zZXJ2aWNlIC0gRXh0ZW5kIHRoZSBiYXR0ZXJ5IGxpZmUgb2Yg
+bGFwdG9wPC9zcGFuPjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTAuMHB0O2ZvbnQtZmFtaWx5OiZx
+dW90O1ZlcmRhbmEmcXVvdDssc2Fucy1zZXJpZjtjb2xvcjojMzMzMzMzIj48YnI+DQo8c3BhbiBz
+dHlsZT0iYmFja2dyb3VuZDojRkVGRUZFIj5Mb2FkZWQ6IGxvYWRlZCAoL3Vzci9saWIvc3lzdGVt
+ZC9zeXN0ZW0vcG93ZXJ0b3Auc2VydmljZTsgZW5hYmxlZDsgdmVuZG9yIHByZXNldDogZGlzYWJs
+ZWQpPC9zcGFuPjxicj4NCjxzcGFuIHN0eWxlPSJiYWNrZ3JvdW5kOiNGRUZFRkUiPkFjdGl2ZTog
+ZmFpbGVkIChSZXN1bHQ6IGNvcmUtZHVtcCkgc2luY2UgV2VkIDIwMTktMDItMTMgMjM6MDc6NDgg
+RUVUOyA1cyBhZ288L3NwYW4+PGJyPg0KPHNwYW4gc3R5bGU9ImJhY2tncm91bmQ6I0ZFRkVGRSI+
+UHJvY2VzczogMTU5NjQgRXhlY1N0YXJ0PS91c3Ivc2Jpbi9wb3dlcnRvcCAtLWF1dG8tdHVuZSAo
+Y29kZT1kdW1wZWQsIHNpZ25hbD1TRUdWKTwvc3Bhbj48YnI+DQo8c3BhbiBzdHlsZT0iYmFja2dy
+b3VuZDojRkVGRUZFIj5NYWluIFBJRDogMTU5NjQgKGNvZGU9ZHVtcGVkLCBzaWduYWw9U0VHVik8
+L3NwYW4+PGJyPg0KPGJyPg0KPGJyPg0KPHNwYW4gc3R5bGU9ImJhY2tncm91bmQ6I0ZFRkVGRSI+
+RmViIDEzIDIzOjA3OjQ3IGxpbnV4LXF4MHMgcG93ZXJ0b3BbMTU5NjRdOiBEZXZmcmVxIG5vdCBl
+bmFibGVkPC9zcGFuPjxicj4NCjxzcGFuIHN0eWxlPSJiYWNrZ3JvdW5kOiNGRUZFRkUiPkZlYiAx
+MyAyMzowNzo0NyBsaW51eC1xeDBzIHBvd2VydG9wWzE1OTY0XTogZ2xvYiByZXR1cm5lZCBHTE9C
+X0FCT1JURUQ8L3NwYW4+PGJyPg0KPHNwYW4gc3R5bGU9ImJhY2tncm91bmQ6I0ZFRkVGRSI+RmVi
+IDEzIDIzOjA3OjQ3IGxpbnV4LXF4MHMgcG93ZXJ0b3BbMTU5NjRdOiBmYWlsZWQgdG8gbW1hcCB3
+aXRoIDEyICjQndC1INC80L7QttC1INC00LAg0YHQtSDQt9Cw0LTQtdC70Lgg0L/QsNC80LXRgik8
+L3NwYW4+PGJyPg0KPHNwYW4gc3R5bGU9ImJhY2tncm91bmQ6I0ZFRkVGRSI+RmViIDEzIDIzOjA3
+OjQ3IGxpbnV4LXF4MHMgcG93ZXJ0b3BbMTU5NjRdOiBmYWlsZWQgdG8gbW1hcCB3aXRoIDEyICjQ
+ndC1INC80L7QttC1INC00LAg0YHQtSDQt9Cw0LTQtdC70Lgg0L/QsNC80LXRgik8L3NwYW4+PGJy
+Pg0KPHNwYW4gc3R5bGU9ImJhY2tncm91bmQ6I0ZFRkVGRSI+RmViIDEzIDIzOjA3OjQ3IGxpbnV4
+LXF4MHMgcG93ZXJ0b3BbMTU5NjRdOiBmYWlsZWQgdG8gbW1hcCB3aXRoIDEyICjQndC1INC80L7Q
+ttC1INC00LAg0YHQtSDQt9Cw0LTQtdC70Lgg0L/QsNC80LXRgik8L3NwYW4+PGJyPg0KPHNwYW4g
+c3R5bGU9ImJhY2tncm91bmQ6I0ZFRkVGRSI+RmViIDEzIDIzOjA3OjQ3IGxpbnV4LXF4MHMgcG93
+ZXJ0b3BbMTU5NjRdOiBmYWlsZWQgdG8gbW1hcCB3aXRoIDEyICjQndC1INC80L7QttC1INC00LAg
+0YHQtSDQt9Cw0LTQtdC70Lgg0L/QsNC80LXRgik8L3NwYW4+PGJyPg0KPHNwYW4gc3R5bGU9ImJh
+Y2tncm91bmQ6I0ZFRkVGRSI+RmViIDEzIDIzOjA3OjQ3IGxpbnV4LXF4MHMgcG93ZXJ0b3BbMTU5
+NjRdOiBmYWlsZWQgdG8gbW1hcCB3aXRoIDEyICjQndC1INC80L7QttC1INC00LAg0YHQtSDQt9Cw
+0LTQtdC70Lgg0L/QsNC80LXRgik8L3NwYW4+PGJyPg0KPHNwYW4gc3R5bGU9ImJhY2tncm91bmQ6
+I0ZFRkVGRSI+RmViIDEzIDIzOjA3OjQ4IGxpbnV4LXF4MHMgc3lzdGVtZFsxXTogcG93ZXJ0b3Au
+c2VydmljZTogTWFpbiBwcm9jZXNzIGV4aXRlZCwgY29kZT1kdW1wZWQsIHN0YXR1cz0xMS9TRUdW
+PC9zcGFuPjxicj4NCjxzcGFuIHN0eWxlPSJiYWNrZ3JvdW5kOiNGRUZFRkUiPkZlYiAxMyAyMzow
+Nzo0OCBsaW51eC1xeDBzIHN5c3RlbWRbMV06IHBvd2VydG9wLnNlcnZpY2U6IEZhaWxlZCB3aXRo
+IHJlc3VsdCAnY29yZS1kdW1wJy48L3NwYW4+PGJyPg0KPHNwYW4gc3R5bGU9ImJhY2tncm91bmQ6
+I0ZFRkVGRSI+RmViIDEzIDIzOjA3OjQ4IGxpbnV4LXF4MHMgc3lzdGVtZFsxXTogRmFpbGVkIHRv
+IHN0YXJ0IEV4dGVuZCB0aGUgYmF0dGVyeSBsaWZlIG9mIGxhcHRvcC48L3NwYW4+PC9zcGFuPjxv
+OnA+PC9vOnA+PC9wPg0KPC9kaXY+DQo8ZGl2Pg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PG86cD4m
+bmJzcDs8L286cD48L3A+DQo8L2Rpdj4NCjxkaXY+DQo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3Bh
+biBzdHlsZT0iZm9udC1zaXplOjEwLjBwdDtmb250LWZhbWlseTomcXVvdDtWZXJkYW5hJnF1b3Q7
+LHNhbnMtc2VyaWY7Y29sb3I6IzMzMzMzMztiYWNrZ3JvdW5kOiNGRUZFRkUiPnAucy4mbmJzcDs8
+L3NwYW4+PG86cD48L286cD48L3A+DQo8L2Rpdj4NCjxkaXY+DQo8cCBjbGFzcz0iTXNvTm9ybWFs
+Ij48bzpwPiZuYnNwOzwvbzpwPjwvcD4NCjwvZGl2Pg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PHNw
+YW4gc3R5bGU9ImZvbnQtZmFtaWx5OiZxdW90O1ZlcmRhbmEmcXVvdDssc2Fucy1zZXJpZjtjb2xv
+cjojMzMzMzMzO2JhY2tncm91bmQ6I0ZFRkVGRSI+VGhlIHZlcnNpb24gb2YgdGhlIFBvd2VyVG9w
+IGlzIDIuMTA8L3NwYW4+PG86cD48L286cD48L3A+DQo8L2Rpdj4NCjwvYm9keT4NCjwvaHRtbD4N
+Cg==
+
+--===============6880053542085916396==--
 
