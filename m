@@ -1,140 +1,148 @@
-Content-Type: multipart/mixed; boundary="===============7121132617483186024=="
+Content-Type: multipart/mixed; boundary="===============1528335620211050948=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Adding PID to process description.
-Date: Wed, 03 Aug 2016 08:41:07 -0700
-Message-ID: <20160803084107.4492d61e@jbkonno-basil.jf.intel.com>
-In-Reply-To: 20160802033927.GA22138@obsidian
+From: Kammela, Gayatri <gayatri.kammela at intel.com>
+Subject: Re: [Powertop] CoreDump on version 2.9 and git.
+Date: Wed, 20 Feb 2019 10:21:48 +0000
+Message-ID: <2824B99DC70CE746926327C52CA42F76487E5BCE@ORSMSX111.amr.corp.intel.com>
+In-Reply-To: 8795bd83-c0ea-2457-de75-ea84b0f4a65b@gmx.de
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7121132617483186024==
+--===============1528335620211050948==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2 Aug 2016 06:39:31 +0300
-eSyr <evgsyr(a)gmail.com> wrote:
+Hi Harvey,
+Thanks for the report! I will try and reproduce the issue on ArchLinux. Jus=
+t curious if Archlinux has any issues with PowerTop v2.9 on 4.20 kernel as =
+well. =
 
-> Currently, multiple processes shown in overview and consumers list are
-> indistinguishable in case they have the same command line. This commit
-> prepends PID enclosed in square brackets to the beginning of description
-> line, similarly to the interrupt ID in interrupt description.
+
+Thanks,
+Gayatri
+
+> -----Original Message-----
+> From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of
+> Harvey
+> Sent: Tuesday, February 19, 2019 2:05 AM
+> To: powertop(a)lists.01.org
+> Subject: Re: [Powertop] CoreDump on version 2.9 and git.
 > =
 
-> * src/process/process.cpp (process::process): printing PID to desc,
->   adding process description after it.
-> ---
->  src/process/process.cpp |   17 +++++++++++++----
->  1 file changed, 13 insertions(+), 4 deletions(-)
+> Hello,
 > =
 
-> diff --git a/src/process/process.cpp b/src/process/process.cpp
-> index caeccec..e244c5d 100644
-> --- a/src/process/process.cpp
-> +++ b/src/process/process.cpp
-> @@ -89,6 +89,7 @@ process::process(const char *_comm, int _pid, int _tid)=
- : power_consumer()
->  {
->  	char line[4097];
->  	ifstream file;
-> +	ssize_t pos;
->  =
+> please forgive me to chime in here, but...
+> =
 
->  	pt_strcpy(comm, _comm);
->  	pid =3D _pid;
-> @@ -121,7 +122,15 @@ process::process(const char *_comm, int _pid, int _t=
-id) : power_consumer()
->  	if (strncmp(_comm, "kondemand/", 10) =3D=3D 0)
->  		is_idle =3D 1;
->  =
+> this happens as well on Archlinux with a vanilla kernel 4.20.10-arch1-1-A=
+RCH
+> and powertop 2.10
+> (https://www.archlinux.org/packages/community/x86_64/powertop/)
+> =
 
-> -	pt_strcpy(desc, comm);
-> +	pos =3D snprintf(desc, sizeof(desc), "[PID %d] ", pid);
-> +
-> +	if (pos < 0)
-> +		pos =3D 0;
-> +	if ((size_t)pos > sizeof(desc))
-> +		return;
-> +
-> +	strncpy(desc + pos, comm, sizeof(desc) - pos - 1);
-> +	desc[sizeof(desc) - 1] =3D '\0';
->  =
+> If one starts powertop it bails out with
+> =
 
->  	sprintf(line, "/proc/%i/cmdline", _pid);
->  	file.open(line, ios::binary);
-> @@ -131,11 +140,11 @@ process::process(const char *_comm, int _pid, int _=
-tid) : power_consumer()
->  		file.close();
->  		if (strlen(line) < 1) {
->  			is_kernel =3D 1;
-> -			snprintf(desc, sizeof(desc), "[%s]", comm);
-> +			snprintf(desc + pos, sizeof(desc) - pos, "[%s]", comm);
->  		} else {
-> -			int sz =3D sizeof(desc) - 1;
-> +			int sz =3D sizeof(desc) - pos - 1;
->  			cmdline_to_string(line);
-> -			strncpy(desc, line, sz);
-> +			strncpy(desc + pos, line, sz);
->  			desc[sz] =3D 0x00;
->  		}
->  	}
+> Feb 19 11:03:13 obelix systemd-coredump[14698]: Process 14692 (powertop)
+> of user 0 dumped core.
+> =
 
-Thinking aloud: In the future I'd like to see a dedicated "ID" column in the
-Overview tab. For 'Process'-type listings, it would contain the process
-identifier. For 'Interrupt', its identifier. This would enforce something l=
-ike
-1NF discipline from the relational database camp. (That would necessitate
-cleanups in other tabs, though, as well as CSV and HTML report output.) In =
-the
-Overview tab, the "Description" column is a bit cluttered, imho.
+>                                                 Stack trace of thread 146=
+92:
+>                                                 #0  0x000055868ba1d157 n/=
+a (powertop)
+>                                                 #1  0x000055868ba1df22 n/=
+a (powertop)
+>                                                 #2  0x000055868b9f7cb3 n/=
+a (powertop)
+>                                                 #3  0x000055868b9f2556 n/=
+a (powertop)
+>                                                 #4  0x000055868b9e8a16 n/=
+a (powertop)
+>                                                 #5  0x00007f7215905223 __=
+libc_start_main
+> (libc.so.6)
+>                                                 #6  0x000055868b9e9b5e n/=
+a (powertop)
+> =
 
-Having said my piece...
+> =
 
-You have my Acked-by. Pushed, and thanks for your contribution!
+> HTH
+> =
 
-commit f69d4dc45ab526b87a14a04e9dead4f9fc76f8be
-Author:     eSyr <evgsyr(a)gmail.com>
-AuthorDate: Tue Aug 2 06:39:31 2016 +0300
-Commit:     Joe Konno <joe.konno(a)intel.com>
-CommitDate: Wed Aug 3 08:27:38 2016 -0700
+> Greetings
+> Harvey
+> =
 
-    Adding PID to process description.
-    =
+> Am 19.02.19 um 10:30 schrieb Kammela, Gayatri:
+> > Hi Pablo,
+> > Thanks for reporting! I have tried powertop v2.9 and v2.10 on kernel 4.=
+20
+> with Ubuntu generic+ additional config options and didn't notice any core
+> dump issues. I have changed the processor type to Xeon and I couldn't
+> reproduce it. Could you please share the kernel config that you've used to
+> reproduce this issue? Also, could you try running latest powertop with la=
+test
+> kernel to see if it is still reproducible?
+> >
+> > Thanks,
+> > Gayatri
+> >
+> >> -----Original Message-----
+> >> From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of
+> >> Pablo Catalina
+> >> Sent: Monday, February 18, 2019 1:46 PM
+> >> To: powertop(a)lists.01.org
+> >> Subject: [Powertop] CoreDump on version 2.9 and git.
+> >>
+> >> Hi,
+> >>
+> >> I have an Ubuntu 18.04 with kernel 4.20.10 (compiled manually with
+> >> default Ubuntu options but changing the processor type to Xeon)
+> >>
+> >>
+> >> I tested the version 2.9 and the latest code from git (tag 2.10):
+> >>
+> >> # git log
+> >>
+> >> e8765b5 (HEAD -> master, tag: v2.10, origin/master, origin/HEAD)
+> >> src/wakeup/wakeup.h: Fix a minor issue in the wakeup.h file
+> >>
+> >>
+> >> And I got a coredump when I run it normally and with --auto-tune (I
+> >> dont have the coredump with --debug).
+> >>
+> >>
+> >> The same coredump on normal run and with --auto-autotune.
+> >>
+> >>
+> >> See attached the output of gdb (bt, registers, ...) and the coredump.
+> >>
+> >>
+> >> Let me know if I can do anything else to help you to fix the bug, I'm
+> >> not C developer but I have a minimal knowledge about compiling code,
+> >> patching, debug, ...
+> >>
+> >>
+> >>
+> >> Regards,
+> >>
+> >>
+> >> Pablo
+> >
+> > _______________________________________________
+> > PowerTop mailing list
+> > PowerTop(a)lists.01.org
+> > https://lists.01.org/mailman/listinfo/powertop
+> >
+> =
 
-    Currently, multiple processes shown in overview and consumers list are
-    indistinguishable in case they have the same command line. This commit
-    prepends PID enclosed in square brackets to the beginning of description
-    line, similarly to the interrupt ID in interrupt description.
-    =
+> --
+> I am root. If you see me laughing, you'd better have a backup!
 
-    * src/process/process.cpp (process::process): printing PID to desc,
-      adding process description after it.
-    =
 
-    Acked-by: Joe Konno <joe.konno(a)intel.com>
-
---===============7121132617483186024==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.sig"
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjIuMC4yMiAoR05V
-L0xpbnV4KQoKaVFJY0JBRUJBZ0FHQlFKWG9oQ1RBQW9KRUkySVI5VXZTcXBtemQ4UUFOSVYxZklz
-SWpTNEZ3WWhOZURQNmVWdwpQakVKTXdqWU1DaFhrRlhEZWg2bW55SjJQZG16dTVsTkNjOUZ1SGdC
-SmlVVjVUNnBUSVNFSDIzWGxnbVA3NWlMCkhFdHVicGVXM0xZdmRiWXJteWNkUkxxZnZ5Tlp0bzYw
-VVFlT1U4aldvenFiZnNteGU5M044QmhaTHFVS2p4ZCsKV2t0dXlRWmNnVllTTGJ5SC81NG1aM1Rj
-cmNmUXl2bmR3SEd2NG5abjd2RllxRFU1SFVnUnN2cHJueUQxRjZLSgpCWkpteHREZkY0cEdQNmpx
-QTVHL1VYSUhnbURXWWd5YXVQSk85WTM5VWZIeW1PeEljbW5iSUVOeitUZXZFTTlmCnpkNjNQSFF2
-Wk5Xd0swci9HVHcyVmlud2tqektOamxXbkh5bXBXS2dRZlVxWXRtMjhyaG1mYUJrSVVYS0hXQk4K
-YzZjem5CZ2MxWEtsQlZrc1FlMGt1NDdiV3B2THE3aUo0MFEybkd5bzFmeE9FYjRFbHVOZlRSQ2Fs
-emE2WDl1YwpPRDZiVHZpYW9UdXErOENVSGhXRlBwZzdaSi9kTjJNMFpzMEozMWhEelVRcHphSjli
-V0FiclE4dkE0Y0dYZUlHCk5FZTRmUURmVlN6L2Q0NGYydktCTElKV3U5cE90amJtYUNwUHlIcTMx
-eHg1NlowK0dRRnNHdUJYMksyUnVFU0sKa1l0ZnFDZzYrbWVxQmtqOUZNOGtnWDhpT3UzMGhLdnVp
-VExMSVJvOFE5UmhXTW9hS0RzOGlsNS85UXN4ZFpsMwpZeGUybzd3cmgyeWdoM1pzV1ZRUU8ycU9B
-TGMvVUhiT3ZvOC9iL2ZzelpZaHc0WituS0R4OVQ1b2RTQjcvSVJmCmxaYTVKditxNGhmc2VwYzVH
-bldWCj1ocTBwCi0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQo=
-
---===============7121132617483186024==--
+--===============1528335620211050948==--
 
