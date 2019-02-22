@@ -1,201 +1,154 @@
-Content-Type: multipart/mixed; boundary="===============2400620958168653115=="
+Content-Type: multipart/mixed; boundary="===============5735508568064075344=="
 MIME-Version: 1.0
-From: dmummenschanz at web.de
-Subject: [Powertop]  wrong package C-State with KBL
-Date: Mon, 27 Mar 2017 19:33:47 +0200
-Message-ID: <trinity-f76efab9-847e-45c3-bba1-023a4b0754e1-1490636027812@3capp-webde-bs47>
+From: Kammela, Gayatri <gayatri.kammela at intel.com>
+Subject: Re: [Powertop] CoreDump on version 2.9 and git.
+Date: Fri, 22 Feb 2019 18:14:24 +0000
+Message-ID: <2824B99DC70CE746926327C52CA42F76487E65E0@ORSMSX111.amr.corp.intel.com>
+In-Reply-To: 4f6c529d-7c96-9f0b-8a15-cc1883ab923d@locolandia.net
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2400620958168653115==
+--===============5735508568064075344==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Hi Pablo,
+Thanks for the update, looks like there is a kernel bug  in 4.20.8-4.20.10 =
+kernel versions and was fixed in 4.20.11.
 
---===============2400620958168653115==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+Thanks,
+Gayatri
 
-PGh0bWw+PGhlYWQ+PC9oZWFkPjxib2R5PjxkaXYgc3R5bGU9ImZvbnQtZmFtaWx5OiBWZXJkYW5h
-O2ZvbnQtc2l6ZTogMTIuMHB4OyI+PGRpdj5IZWxsbyw8L2Rpdj4KCjxkaXY+Jm5ic3A7PC9kaXY+
-Cgo8ZGl2PmFmdGVyIHVwZ3JhZGluZyB0byBQb3dlcnRvcCAyLjkgbXkgUGFja2FnZSBzdGF0ZSB2
-YWx1ZXMgZGlmZmVyIGZyb20gdGhlIG9uZXMgUG93ZXJ0b3AgMi44IHdhcyBzaG93aW5nLjwvZGl2
-PgoKPGRpdj4mbmJzcDs8L2Rpdj4KCjxkaXY+UG93ZXJ0b3AgMi44OjwvZGl2PgoKPGRpdj4KPGRp
-dj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsg
-UGFja2FnZSZuYnNwOyZuYnNwOyAmIzEyNDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgQ1BVIDA8YnIvPgpQb3dlcmVkIE9u
-Jm5ic3A7IDAuMCUmbmJzcDsmbmJzcDsmbmJzcDsgJiMxMjQ7IFBPTEwmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgMC4wJSZuYnNwOyZuYnNwOyZuYnNwOyAwLjAgbXM8
-YnIvPgpDMUUmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsg
-MC4yJSZuYnNwOyZuYnNwOyZuYnNwOyAmIzEyNDsgQzFFJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IDAuMyUmbmJzcDsmbmJzcDsmbmJzcDsgMC41IG1zPGJy
-Lz4KJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7ICYjMTI0Ozxici8+CkMzJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7IDAuMiUmbmJzcDsmbmJzcDsmbmJzcDsgJiMxMjQ7IEMzJm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IDAuNiUmbmJzcDsm
-bmJzcDsmbmJzcDsgMC40IG1zPGJyLz4KUkM2cHAmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsgMC4wJSZuYnNwOyZuYnNwOyZuYnNwOyAmIzEyNDsgQzYmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgNi41JSZuYnNwOyZuYnNwOyZu
-YnNwOyAwLjUgbXM8YnIvPgpDN3MmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsgMC4wJSZuYnNwOyZuYnNwOyZuYnNwOyAmIzEyNDsgQzdzJm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IDAuMCUmbmJzcDsmbmJzcDsmbmJz
-cDsgMC40IG1zPGJyLz4KQzgmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsgOTIuNSUmbmJzcDsmbmJzcDsmbmJzcDsgJiMxMjQ7IEM4Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IDg4LjUlJm5ic3A7Jm5ic3A7Jm5ic3A7
-IDQuOSBtczwvZGl2PgoKPGRpdj4mbmJzcDs8L2Rpdj4KCjxkaXY+Jm5ic3A7PC9kaXY+Cgo8ZGl2
-PlBvd2VydG9wIDIuOTo8L2Rpdj4KCjxkaXY+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IFBhY2thZ2UmbmJzcDsmbmJzcDsgJiMxMjQ7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7IENvcmUmbmJzcDsmbmJzcDsmbmJzcDsgJiMxMjQ7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IENQVSAwPGJy
-Lz4KJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7ICYjMTI0OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyAmIzEyNDsgQzAgYWN0aXZlJm5ic3A7Jm5ic3A7IDIuNyU8YnIvPgom
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsg
-JiMxMjQ7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7ICYjMTI0OyBQT0xMJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7IDAuMCUmbmJzcDsmbmJzcDsmbmJzcDsgMC4wIG1zPGJyLz4KJm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICYjMTI0OyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyAmIzEyNDsgQzFFJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7IDAuMiUmbmJzcDsmbmJzcDsmbmJzcDsgMC40IG1zPGJyLz4KQzIgKHBjMikmbmJzcDsmbmJz
-cDsgMTIuNCUmbmJzcDsmbmJzcDsmbmJzcDsgJiMxMjQ7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICYjMTI0Ozxici8+CkMzIChw
-YzMpJm5ic3A7Jm5ic3A7IDcwLjglJm5ic3A7Jm5ic3A7Jm5ic3A7ICYjMTI0OyBDMyAoY2MzKSZu
-YnNwOyZuYnNwOyZuYnNwOyAxLjclJm5ic3A7Jm5ic3A7Jm5ic3A7ICYjMTI0OyBDMyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAwLjglJm5ic3A7
-Jm5ic3A7Jm5ic3A7IDAuNCBtczxici8+CkM2IChwYzYpJm5ic3A7Jm5ic3A7Jm5ic3A7IDAuMCUm
-bmJzcDsmbmJzcDsmbmJzcDsgJiMxMjQ7IEM2IChjYzYpJm5ic3A7Jm5ic3A7Jm5ic3A7IDYuMyUm
-bmJzcDsmbmJzcDsmbmJzcDsgJiMxMjQ7IEM2Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IDcuOCUmbmJzcDsmbmJzcDsmbmJzcDsgMC41IG1zPGJy
-Lz4KQzcgKHBjNykmbmJzcDsmbmJzcDsmbmJzcDsgMC4wJSZuYnNwOyZuYnNwOyZuYnNwOyAmIzEy
-NDsgQzcgKGNjNykmbmJzcDsmbmJzcDsgODQuMCUmbmJzcDsmbmJzcDsmbmJzcDsgJiMxMjQ7IEM3
-cyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAwLjAlJm5i
-c3A7Jm5ic3A7Jm5ic3A7IDAuMCBtczxici8+CkM4IChwYzgpJm5ic3A7Jm5ic3A7Jm5ic3A7IDAu
-MCUmbmJzcDsmbmJzcDsmbmJzcDsgJiMxMjQ7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICYjMTI0OyBDOCZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyA4NC45JSZuYnNwOyZuYnNwOyZuYnNw
-OyA0LjIgbXM8YnIvPgpDOSAocGM5KSZuYnNwOyZuYnNwOyZuYnNwOyAwLjAlJm5ic3A7Jm5ic3A7
-Jm5ic3A7ICYjMTI0OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyAmIzEyNDs8YnIvPgpDMTAgKHBjMTApJm5ic3A7IDAuMCUmbmJz
-cDsmbmJzcDsmbmJzcDsgJiMxMjQ7PC9kaXY+Cgo8ZGl2PiZuYnNwOzwvZGl2PgoKPGRpdj5UaGUg
-UG93ZXJ0b3Agb3V0cHV0IGlzIHdlaXJkIHNpbmNlIEkgaGF2ZSBhIGk1LTc0MDBUIGFuZCBQb3dl
-cnRvcCBzaG93cyBQYWNrYWNlIEMgU3RhdGVzIHBjOS1wYzEwIHRoYXQgc2hvdWxkIG5vdCBiZSBw
-cmVzZW5kIGF0IGFsbCBvbiBhIGRlc2t0b3AgY3B1LCByaWdodD88L2Rpdj4KCjxkaXY+Jm5ic3A7
-PC9kaXY+Cgo8ZGl2PlBvd2VydG9wIDIuOSBhbHNvIHNob3dzIFBDaSBEZXZpY2VzIGFjdGl2ZSBl
-dmVuIGlmIG15IG1hY2hpbmUgaXMgaWRsZTo8L2Rpdj4KCjxkaXY+Jm5ic3A7PC9kaXY+Cgo8ZGl2
-Pgo8ZGl2PlBvd2VyVE9QIHYyLjkmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgT3ZlcnZpZXcmbmJz
-cDsmbmJzcDsgSWRsZSBzdGF0cyZuYnNwOyZuYnNwOyBGcmVxdWVuY3kgc3RhdHMmbmJzcDsmbmJz
-cDsgRGV2aWNlIHN0YXRzJm5ic3A7Jm5ic3A7IFR1bmFibGVzPC9kaXY+Cgo8ZGl2Pjxici8+ClRo
-ZSBiYXR0ZXJ5IHJlcG9ydHMgYSBkaXNjaGFyZ2UgcmF0ZSBvZiAxMS4wIFc8YnIvPgpUaGUgcG93
-ZXIgY29uc3VtZWQgd2FzIDE5NSBKPC9kaXY+Cgo8ZGl2PiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBV
-c2FnZSZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBEZXZpY2UgbmFtZTxici8+CiZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAuLi4uPGJyLz4KJm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-IDEwMC4wJSZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBQQ0kgRGV2
-aWNlOiBJbnRlbCBDb3Jwb3JhdGlvbiBTdW5yaXNlIFBvaW50LUggU0FUQSBjb250cm9sbGVyIFtB
-SENJIG1vZGVdPGJyLz4KJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IDEwMC4wJSZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyBQQ0kgRGV2aWNlOiBJbnRlbCBDb3Jwb3JhdGlvbiBTdW5yaXNlIFBv
-aW50LUggUENJIEV4cHJlc3MgUm9vdCBQb3J0ICM0PGJyLz4KJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IDEwMC4wJSZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBQQ0kgRGV2aWNlOiBJbnRlbCBD
-b3Jwb3JhdGlvbiBEZXZpY2UgNTkxMjxici8+CiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAxMDAuMCUmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgUENJIERldmljZTogSW50ZWwgQ29ycG9yYXRp
-b24gRGV2aWNlIDI0ZmQ8YnIvPgombmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgMTAwLjAlJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IFBDSSBEZXZpY2U6IEludGVsIENvcnBvcmF0aW9uIFN1bnJp
-c2UgUG9pbnQtSCBUaGVybWFsIHN1YnN5c3RlbTxici8+CiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAw
-LjAlJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IFVTQiBkZXZpY2U6
-IHhIQ0kgSG9zdCBDb250cm9sbGVyPGJyLz4KJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IDAuMCUmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgSTJDIEFkYXB0ZXIgKGkyYy01
-KTogRFBEREMtQjxici8+CiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAwLjAlJm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHJ1bnRpbWUtQUNQSTAwMDM6MDA8YnIvPgombmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDs8L2Rpdj4KCjxkaXY+UG93ZXJ0b3AgMi44
-IHNob3dzIDAlIHVzYWdlIGFjcm9zcyB0aGUgYm9hcmQ6PC9kaXY+Cgo8ZGl2PiZuYnNwOzwvZGl2
-PgoKPGRpdj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgMC4wJSZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBVU0IgZGV2aWNlOiB4SENJIEhvc3QgQ29udHJv
-bGxlcjxici8+CiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAwLjAlJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IEF1ZGlvIGNvZGVjIGh3QzBEMjogSW50ZWw8YnIvPgombmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsgMC4wJSZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyBQQ0kgRGV2aWNlOiBJbnRlbCBDb3Jwb3JhdGlvbiBTdW5yaXNlIFBvaW50LUggSEQg
-QXVkaW88YnIvPgombmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgMC4wJSZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBQQ0kgRGV2aWNlOiBJbnRlbCBDb3Jwb3JhdGlvbiBEZXZp
-Y2UgNTkxZjxici8+CiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAwLjAlJm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IFBDSSBEZXZpY2U6IEludGVsIENvcnBvcmF0aW9uIFN1
-bnJpc2UgUG9pbnQtSCBQQ0kgRXhwcmVzcyBSb290IFBvcnQgIzEzPGJyLz4KJm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7IDAuMCUmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsg
-UENJIERldmljZTogUmVhbHRlayBTZW1pY29uZHVjdG9yIENvLiwgTHRkLiBSVEw4MTExLzgxNjgv
-ODQxMSBQQ0kgRXhwcmVzcyBHaWdhYml0IEV0aGVybmV0IENvbnRyb2xsZXI8YnIvPgombmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsgMC4wJSZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyBQQ0kgRGV2aWNlOiBJbnRlbCBDb3Jwb3JhdGlvbiBTdW5yaXNlIFBvaW50LUggUENJIEV4
-cHJlc3MgUm9vdCBQb3J0ICM5PGJyLz4KJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IDAuMCUmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgUENJIERldmljZTogSW50ZWwgQ29y
-cG9yYXRpb24gU3VucmlzZSBQb2ludC1IIFBDSSBFeHByZXNzIFJvb3QgUG9ydCAjNzxici8+CiZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyAwLjAlJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7IFBDSSBEZXZpY2U6IEludGVsIENvcnBvcmF0aW9uIFN1bnJpc2UgUG9pbnQtSCBU
-aGVybWFsIHN1YnN5c3RlbTxici8+CiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAwLjAlJm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IFBDSSBEZXZpY2U6IEludGVsIENvcnBv
-cmF0aW9uIFN1bnJpc2UgUG9pbnQtSCBQQ0kgRXhwcmVzcyBSb290IFBvcnQgIzU8YnIvPgombmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsgMC4wJSZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyBQQ0kgRGV2aWNlOiBSZWFsdGVrIFNlbWljb25kdWN0b3IgQ28uLCBMdGQuIFJUUzUy
-MjkgUENJIEV4cHJlc3MgQ2FyZCBSZWFkZXI8YnIvPgombmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgMC4w
-JSZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBQQ0kgRGV2aWNlOiBJ
-bnRlbCBDb3Jwb3JhdGlvbiBTdW5yaXNlIFBvaW50LUggVVNCIDMuMCB4SENJIENvbnRyb2xsZXI8
-YnIvPgombmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgMC4wJSZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyBQQ0kgRGV2aWNlOiBJbnRlbCBDb3Jwb3JhdGlvbiBEZXZpY2UgMjRm
-ZDxici8+CiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAwLjAlJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7IFBDSSBEZXZpY2U6IEludGVsIENvcnBvcmF0aW9uIFN1bnJpc2Ug
-UG9pbnQtSCBTQVRBIGNvbnRyb2xsZXIgW0FIQ0kgbW9kZV08YnIvPgombmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsgMC4wJSZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBydW50
-aW1lLXBsYXRmb3JtLWZyYW1lYnVmZmVyLjA8YnIvPgombmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgMC4w
-JSZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBQQ0kgRGV2aWNlOiBB
-U01lZGlhIFRlY2hub2xvZ3kgSW5jLiBBU00xMTQyIFVTQiAzLjEgSG9zdCBDb250cm9sbGVyPGJy
-Lz4KJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IDAuMCUmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsgUENJIERldmljZTogSW50ZWwgQ29ycG9yYXRpb24gRGV2aWNlIDU5MTI8
-YnIvPgombmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgMC4wJSZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyBQQ0kgRGV2aWNlOiBJbnRlbCBDb3Jwb3JhdGlvbiBTdW5yaXNlIFBv
-aW50LUggTFBDIENvbnRyb2xsZXI8YnIvPgombmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgMC4wJSZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOzwvZGl2Pgo8L2Rpdj4KCjxkaXY+Jm5ic3A7
-PC9kaXY+Cgo8ZGl2PldoaWNoIG9uZSBpcyB0ZWxsaW5nIHRoZSB0cnV0aCwgUG93ZXJ0b3AgMi44
-IG9yIDIuOT88L2Rpdj4KCjxkaXY+Jm5ic3A7PC9kaXY+Cgo8ZGl2PkFueSBpZGVhcz88L2Rpdj4K
-PC9kaXY+PC9kaXY+PC9ib2R5PjwvaHRtbD4K
+> -----Original Message-----
+> From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of
+> Pablo Catalina
+> Sent: Wednesday, February 20, 2019 9:18 AM
+> To: powertop(a)lists.01.org
+> Subject: Re: [Powertop] CoreDump on version 2.9 and git.
+> =
 
---===============2400620958168653115==--
+> Hi,
+> =
+
+> =
+
+> OK, kernel compilation finished and I tested it.
+> =
+
+> =
+
+> I can confirm that works fine on kernel 4.20.7 and 4.20.11, but not on ke=
+rnel
+> 4.20.10
+> =
+
+> So, it seems a problem with powertop running on kernel 4.20.10=C2=A0 (not=
+ tested
+> 4.20.9 nor 4.20.8 as I did not compiled it)
+> =
+
+> =
+
+> Regards,
+> =
+
+> =
+
+> Pablo
+> =
+
+> =
+
+> =
+
+> On 20/2/19 17:30, Pablo Catalina wrote:
+> > Hi,
+> >
+> > Now compiling the latest kernel, I'll provide you more feedback tomorro=
+w.
+> Attached my kernel config.
+> >
+> > Not sure if it is a problem with the kernel or hardware... I'll check it
+> tomorrow too by running the latest stable kernel provided by Ubuntu.
+> >
+> >
+> > Regarding powertop version: I tested with latest version from git (tag:
+> v2.10) and powertop 2.9 from Ubuntu 18.10 package.
+> >
+> >
+> > Same coredump when running powertop without args and with --auto-
+> tune.
+> >
+> >
+> > Regards,
+> >
+> >
+> > Pablo
+> >
+> >
+> >
+> > On 19/2/19 10:30, Kammela, Gayatri wrote:
+> >> Hi Pablo,
+> >> Thanks for reporting! I have tried powertop v2.9 and v2.10 on kernel 4=
+.20
+> with Ubuntu generic+ additional config options and didn't notice any core
+> dump issues. I have changed the processor type to Xeon and I couldn't
+> reproduce it. Could you please share the kernel config that you've used to
+> reproduce this issue? Also, could you try running latest powertop with la=
+test
+> kernel to see if it is still reproducible?
+> >>
+> >> Thanks,
+> >> Gayatri
+> >>
+> >>> -----Original Message-----
+> >>> From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of
+> >>> Pablo Catalina
+> >>> Sent: Monday, February 18, 2019 1:46 PM
+> >>> To: powertop(a)lists.01.org
+> >>> Subject: [Powertop] CoreDump on version 2.9 and git.
+> >>>
+> >>> Hi,
+> >>>
+> >>> I have an Ubuntu 18.04 with kernel 4.20.10 (compiled manually with
+> >>> default Ubuntu options but changing the processor type to Xeon)
+> >>>
+> >>>
+> >>> I tested the version 2.9 and the latest code from git (tag 2.10):
+> >>>
+> >>> # git log
+> >>>
+> >>> e8765b5 (HEAD -> master, tag: v2.10, origin/master, origin/HEAD)
+> >>> src/wakeup/wakeup.h: Fix a minor issue in the wakeup.h file
+> >>>
+> >>>
+> >>> And I got a coredump when I run it normally and with --auto-tune (I
+> >>> dont have the coredump with --debug).
+> >>>
+> >>>
+> >>> The same coredump on normal run and with --auto-autotune.
+> >>>
+> >>>
+> >>> See attached the output of gdb (bt, registers, ...) and the coredump.
+> >>>
+> >>>
+> >>> Let me know if I can do anything else to help you to fix the bug,
+> >>> I'm not C developer but I have a minimal knowledge about compiling
+> >>> code, patching, debug, ...
+> >>>
+> >>>
+> >>>
+> >>> Regards,
+> >>>
+> >>>
+> >>> Pablo
+> >>>
+> >>> _______________________________________________
+> >>> PowerTop mailing list
+> >>> PowerTop(a)lists.01.org
+> >>> https://lists.01.org/mailman/listinfo/powertop
+
+
+--===============5735508568064075344==--
 
