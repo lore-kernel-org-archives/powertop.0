@@ -1,65 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============5584699608045351105=="
+Content-Type: multipart/mixed; boundary="===============1713466284863022144=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH v1 0/3] Version strings from git describe
-Date: Fri, 05 Aug 2016 12:27:18 -0700
-Message-ID: <1470425241-215266-1-git-send-email-joe.konno@linux.intel.com>
+From: Victor Rodriguez <vm.rod25 at gmail.com>
+Subject: [Powertop] seg fault at clearlinux v2.10 with kernel 4.20
+Date: Sun, 03 Mar 2019 11:25:17 -0600
+Message-ID: <CAK5mteyfDq6Wm-wdbfiWO8iJc=kgJFRN13=uECJX4W8=_BEjGQ@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5584699608045351105==
+--===============1713466284863022144==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Joe Konno <joe.konno(a)intel.com>
+Hi Marc and I were debugging segfault in Clear Linux version 28020
 
-Hey gang,
+Program received signal SIGSEGV, Segmentation fault.
+                                                    0x0000000000442b66
+in perf_event::process (this=3D0x4a3ab0, cookie=3Dcookie(a)entry=3D0x4b1d10)
+at perf/perf.cpp:233
+233 if (perf_fd < 0)
+(gdb) bt
+#0  0x0000000000442b66 in perf_event::process (this=3D0x4a3ab0,
+cookie=3Dcookie(a)entry=3D0x4b1d10) at perf/perf.cpp:233
+#1  0x00000000004439d8 in perf_bundle::process (this=3D0x4b1cc0) at
+perf/perf_bundle.cpp:326
+#2  0x0000000000420ce1 in process_cpu_data () at cpu/cpu.cpp:1037
+#3  0x00000000004146d5 in one_measurement (seconds=3D-4,
+seconds(a)entry=3D1, sample_interval=3D<optimized out>,
+    sample_interval(a)entry=3D5, workload=3Dworkload(a)entry=3D0x0) at main=
+.cpp:255
+#4  0x000000000040aad3 in main (argc=3D1, argv=3D0x7fffffffcf58) at main.cp=
+p:542
 
-This is a series using 'git describe' to construct version strings. But, th=
-ere
-are caveats.
+The bug seems to be in this call of the perf file descriptor
+https://github.com/fenrus75/powertop/blob/master/src/perf/perf_bundle.cpp#L=
+323
 
-With autotools, there doesn't seem to be a reliable way to capture code sta=
-te
-in incremental builds (git repo or no), "dirty" code (git repo or no), code
-modified in a snapshot (git repo or no), or from a released tarball. The
-autotools versioning workflow assumes you unpack/checkout the code, run
-configure once, and build once, with no changes made. Assuming that workflo=
-w,
-this series provides "dynamic"* version information.
+by the call of perf_event::process in perf.cpp
 
-That said: once generated, the PACKAGE_VERSION strings in config.h are
-effectively static-- irrespective of code changes or commits-- until all
-autotools artifacts are removed and autogen.sh run again.
+I guess that perf_fd =3D sys_perf_event_open(&attr, -1, _cpu, -1, 0); is
+not generating the perf event
 
-Thanks to eSyr for the note on reproducible builds in a prior review,
-specifically the point about time stamps built into the binary. Credit give=
-n in
-the first patch. ^_^
+We have a copy of perf_event.h taken from the kernel and I wonder if
+we do need to update it
 
-Joe Konno (3):
-  main.cpp: remove __DATE__ from --version
-  configure.ac: version strings from git describe
-  search/replace POWERTOP_VERSION and SHORT_VERSION
+In the Clear Linux  we are running kernel: 4.20.10-698.native
 
- .gitignore            |  1 +
- Makefile.am           |  2 ++
- autogen.sh            |  1 +
- configure.ac          |  5 ++++-
- scripts/version       | 13 +++++++++++++
- src/display.cpp       |  2 +-
- src/lib.h             |  3 ---
- src/main.cpp          |  4 ++--
- src/perf/perf.cpp     |  2 +-
- src/report/report.cpp |  2 +-
- 10 files changed, 26 insertions(+), 9 deletions(-)
- create mode 100644 scripts/version
+Happy to help with the fix, just need a bit of direction
 
--- =
+Regards
 
-1.8.3.1
+Victor Rodriguez
 
-
---===============5584699608045351105==--
+--===============1713466284863022144==--
 
