@@ -1,80 +1,88 @@
-Content-Type: multipart/mixed; boundary="===============8891890524113811074=="
+Content-Type: multipart/mixed; boundary="===============8524232242276973924=="
 MIME-Version: 1.0
 From: Kammela, Gayatri <gayatri.kammela at intel.com>
-Subject: [Powertop] Re: [PATCH 0/3 v1] Rewrite README, and contribution guide
-Date: Wed, 06 May 2020 17:59:18 +0000
-Message-ID: <BYAPR11MB371887CB6188716DF4C05FCEF2A40@BYAPR11MB3718.namprd11.prod.outlook.com>
-In-Reply-To: 20200504165014.6409-1-joe.konno@linux.intel.com
+Subject: Re: [Powertop] seg fault at clearlinux v2.10 with kernel 4.20
+Date: Sun, 03 Mar 2019 21:05:37 +0000
+Message-ID: <2824B99DC70CE746926327C52CA42F76487EA080@ORSMSX111.amr.corp.intel.com>
+In-Reply-To: CAK5mteyfDq6Wm-wdbfiWO8iJc=kgJFRN13=uECJX4W8=_BEjGQ@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8891890524113811074==
+--===============8524232242276973924==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
+Hi Victor,
+4.20.10 has a kernel bug that breaks powertop. Please refer this https://li=
+sts.01.org/pipermail/powertop/2019-February/002040.html . Also, try latest =
+Clear Linux version 28100.
+
+Thanks,
+Gayatri
+
 > -----Original Message-----
-> From: Joe Konno <joe.konno(a)linux.intel.com>
-> Sent: Monday, May 4, 2020 9:50 AM
-> To: powertop(a)lists.01.org
-> Subject: [Powertop] [PATCH 0/3 v1] Rewrite README, and contribution guide
+> From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of
+> Victor Rodriguez
+> Sent: Sunday, March 3, 2019 9:25 AM
+> To: powertop(a)lists.01.org; Simental Magana, Marcos
+> <marcos.simental.magana(a)intel.com>
+> Subject: [Powertop] seg fault at clearlinux v2.10 with kernel 4.20
 > =
 
-> From: Joe Konno <joe.konno(a)intel.com>
+> Hi Marc and I were debugging segfault in Clear Linux version 28020
 > =
 
-> This series rewrites the README using markdown syntax and adds a
-> contribution guide.
+> Program received signal SIGSEGV, Segmentation fault.
+>                                                     0x0000000000442b66 in=
+ perf_event::process
+> (this=3D0x4a3ab0, cookie=3Dcookie(a)entry=3D0x4b1d10) at perf/perf.cpp:233
+> 233 if (perf_fd < 0)
+> (gdb) bt
+> #0  0x0000000000442b66 in perf_event::process (this=3D0x4a3ab0,
+> cookie=3Dcookie(a)entry=3D0x4b1d10) at perf/perf.cpp:233
+> #1  0x00000000004439d8 in perf_bundle::process (this=3D0x4b1cc0) at
+> perf/perf_bundle.cpp:326
+> #2  0x0000000000420ce1 in process_cpu_data () at cpu/cpu.cpp:1037
+> #3  0x00000000004146d5 in one_measurement (seconds=3D-4,
+> seconds(a)entry=3D1, sample_interval=3D<optimized out>,
+>     sample_interval(a)entry=3D5, workload=3Dworkload(a)entry=3D0x0) at
+> main.cpp:255
+> #4  0x000000000040aad3 in main (argc=3D1, argv=3D0x7fffffffcf58) at
+> main.cpp:542
 > =
 
-> Series was submitted as a GitHub pull request as well:
->   * https://github.com/fenrus75/powertop/pull/43
+> The bug seems to be in this call of the perf file descriptor
+> https://github.com/fenrus75/powertop/blob/master/src/perf/perf_bundle.c
+> pp#L323
 > =
 
-> Thanks to my colleague, Doug Martin, for reviewing these changes.
+> by the call of perf_event::process in perf.cpp
 > =
 
-> CONTRIBUTE.md changes up development workflows in (hopefully) a good
-> way. In my opinion, these are the key take-aways from that document:
->   * Use GitHub workflows for sharing/collaborating (e.g. PRs, Issues)
->   * Use the Linux kernel coding style
+> I guess that perf_fd =3D sys_perf_event_open(&attr, -1, _cpu, -1, 0); is =
+not
+> generating the perf event
 > =
 
-> The README and CONTRIBUTE documents will continue to evolve, but this
-> should get us going in the right direction.
+> We have a copy of perf_event.h taken from the kernel and I wonder if we do
+> need to update it
 > =
 
-> PS: PowerTOP's project description on GitHub ("please post patches to the
-> mailing list instead of using github pull requests") will be changed afte=
-r this
-> series is merged-- if it is.
+> In the Clear Linux  we are running kernel: 4.20.10-698.native
 > =
 
-Thanks for the series Joe! I only have one comment for the patch 1. Everyth=
-ing else looks good.
+> Happy to help with the fix, just need a bit of direction
 > =
 
-> Joe Konno (3):
->   README.md: rename, add md syntax, and major tweaks
->   README.md: Fix a misspelled name
->   Add CONTRIBUTE.md
+> Regards
 > =
 
->  CONTRIBUTE.md | 188
-> ++++++++++++++++++++++++++++++++++++++++++++++
->  README        | 157 --------------------------------------
->  README.md     | 204
-> ++++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 392 insertions(+), 157 deletions(-)  create mode 100644
-> CONTRIBUTE.md  delete mode 100644 README  create mode 100644
-> README.md
-> =
-
-> --
-> 2.26.2
+> Victor Rodriguez
 > _______________________________________________
-> PowerTop mailing list -- powertop(a)lists.01.org To unsubscribe send an e=
-mail
-> to powertop-leave(a)lists.01.org
---===============8891890524113811074==--
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+
+--===============8524232242276973924==--
 
