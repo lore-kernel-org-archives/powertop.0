@@ -1,46 +1,85 @@
-Content-Type: multipart/mixed; boundary="===============6447117591240635974=="
+Content-Type: multipart/mixed; boundary="===============6042659964784530779=="
 MIME-Version: 1.0
-From: Mike Simms <micsim2007 at outlook.com>
-Subject: Re: [Powertop] RH Bugzilla [Bug 1482649] Logitech USB Unified
- Receiver+M570 need 'waking' up by click after kernel update
-Date: Wed, 13 Sep 2017 08:26:12 +0000
-Message-ID: <VI1PR0301MB2510F8832D2F672FD4DA69A7876E0@VI1PR0301MB2510.eurprd03.prod.outlook.com>
+From: Victor Rodriguez <vm.rod25 at gmail.com>
+Subject: Re: [Powertop] seg fault at clearlinux v2.10 with kernel 4.20
+Date: Mon, 04 Mar 2019 07:51:43 -0600
+Message-ID: <CAK5mtex6-EsGUNpvU4qVCHRjymgTAwRG2cGr7RweLH7uHdB0xw@mail.gmail.com>
+In-Reply-To: 2824B99DC70CE746926327C52CA42F76487EA080@ORSMSX111.amr.corp.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============6447117591240635974==
+--===============6042659964784530779==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Out of courtesy, just a quick message thank you for your help
-and pointing me in the right direction with this issue. I'm closing it
-after further consultation with linux-usb contributors. Here is the
-reason copied from my RH Bugzilla submission:
+Fixed , thanks :)
 
-I've been collaborating the last 6 days with powertop and linux-usb
-contributors upstream over this issue. They have been very helpful.
-What we've managed to do is establish exactly what has changed and
-where using a number of different trace methods.
+On Sun, Mar 3, 2019 at 3:05 PM Kammela, Gayatri
+<gayatri.kammela(a)intel.com> wrote:
+>
+> Hi Victor,
+> 4.20.10 has a kernel bug that breaks powertop. Please refer this https://=
+lists.01.org/pipermail/powertop/2019-February/002040.html . Also, try lates=
+t Clear Linux version 28100.
+>
+> Thanks,
+> Gayatri
+>
+> > -----Original Message-----
+> > From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of
+> > Victor Rodriguez
+> > Sent: Sunday, March 3, 2019 9:25 AM
+> > To: powertop(a)lists.01.org; Simental Magana, Marcos
+> > <marcos.simental.magana(a)intel.com>
+> > Subject: [Powertop] seg fault at clearlinux v2.10 with kernel 4.20
+> >
+> > Hi Marc and I were debugging segfault in Clear Linux version 28020
+> >
+> > Program received signal SIGSEGV, Segmentation fault.
+> >                                                     0x0000000000442b66 =
+in perf_event::process
+> > (this=3D0x4a3ab0, cookie=3Dcookie(a)entry=3D0x4b1d10) at perf/perf.cpp:=
+233
+> > 233 if (perf_fd < 0)
+> > (gdb) bt
+> > #0  0x0000000000442b66 in perf_event::process (this=3D0x4a3ab0,
+> > cookie=3Dcookie(a)entry=3D0x4b1d10) at perf/perf.cpp:233
+> > #1  0x00000000004439d8 in perf_bundle::process (this=3D0x4b1cc0) at
+> > perf/perf_bundle.cpp:326
+> > #2  0x0000000000420ce1 in process_cpu_data () at cpu/cpu.cpp:1037
+> > #3  0x00000000004146d5 in one_measurement (seconds=3D-4,
+> > seconds(a)entry=3D1, sample_interval=3D<optimized out>,
+> >     sample_interval(a)entry=3D5, workload=3Dworkload(a)entry=3D0x0) at
+> > main.cpp:255
+> > #4  0x000000000040aad3 in main (argc=3D1, argv=3D0x7fffffffcf58) at
+> > main.cpp:542
+> >
+> > The bug seems to be in this call of the perf file descriptor
+> > https://github.com/fenrus75/powertop/blob/master/src/perf/perf_bundle.c
+> > pp#L323
+> >
+> > by the call of perf_event::process in perf.cpp
+> >
+> > I guess that perf_fd =3D sys_perf_event_open(&attr, -1, _cpu, -1, 0); i=
+s not
+> > generating the perf event
+> >
+> > We have a copy of perf_event.h taken from the kernel and I wonder if we=
+ do
+> > need to update it
+> >
+> > In the Clear Linux  we are running kernel: 4.20.10-698.native
+> >
+> > Happy to help with the fix, just need a bit of direction
+> >
+> > Regards
+> >
+> > Victor Rodriguez
+> > _______________________________________________
+> > PowerTop mailing list
+> > PowerTop(a)lists.01.org
+> > https://lists.01.org/mailman/listinfo/powertop
 
-There's basically not a bug as such, it is a setting that has been
-fixed in 4.12 and above that never worked before.
-
-The value for power stored in
-the /sys/bus/usb/devices/2.1.3/power/control file for this device was
-being ignored when set to auto (Good) by powertop with kernel 4.11 and
-instead a non-existent setting of ON is used. ON means no autosuspend
-as power saving is 'Bad' in powertop tunable terms.
-
-with 4.12 it is not being ignored. So what I'm going to do now is
-investigate masking that setting with powertop by removing it as a
-system service and coding a script (found something similar done for
-another distribution so I'm going to at least try it) to autostart
-powertop at boot ignoring the pointing device. OR using something else
-like tlp which I have no experience with. Either way, this is clearly
-not a bug after further investigation upstream so I'm closing it. I
-will post the powertop solution if I can get it worked but this should
-remain closed from here on in.
-
---===============6447117591240635974==--
+--===============6042659964784530779==--
 
