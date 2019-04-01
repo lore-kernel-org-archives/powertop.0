@@ -1,56 +1,66 @@
-Content-Type: multipart/mixed; boundary="===============5099588845271244939=="
+Content-Type: multipart/mixed; boundary="===============5423087150892862565=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH 0/3 v1] Rewrite README, and contribution guide
-Date: Mon, 04 May 2020 09:50:11 -0700
-Message-ID: <20200504165014.6409-1-joe.konno@linux.intel.com>
+From: Kammela, Gayatri <gayatri.kammela at intel.com>
+Subject: Re: [Powertop] [PATCH] intel_cpus.cpp: Change open parameter to const
+ char *
+Date: Mon, 01 Apr 2019 17:05:56 +0000
+Message-ID: <2824B99DC70CE746926327C52CA42F764880BBCC@ORSMSX111.amr.corp.intel.com>
+In-Reply-To: 20190331032132.17697-1-rosenp@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5099588845271244939==
+--===============5423087150892862565==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Joe Konno <joe.konno(a)intel.com>
+Thanks, Applied!
 
-This series rewrites the README using markdown syntax and adds a
-contribution guide.
+> -----Original Message-----
+> From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of
+> Rosen Penev
+> Sent: Saturday, March 30, 2019 8:22 PM
+> To: powertop(a)lists.01.org
+> Subject: [Powertop] [PATCH] intel_cpus.cpp: Change open parameter to
+> const char *
+> =
 
-Series was submitted as a GitHub pull request as well:
-  * https://github.com/fenrus75/powertop/pull/43
+> ifstream::open takes std::string starting with C++11, not before.
+> =
 
-Thanks to my colleague, Doug Martin, for reviewing these changes.
+> This fixes compilation with uClibc++ and potentially other older libraries
+> =
 
-CONTRIBUTE.md changes up development workflows in (hopefully) a good
-way. In my opinion, these are the key take-aways from that document:
-  * Use GitHub workflows for sharing/collaborating (e.g. PRs, Issues)
-  * Use the Linux kernel coding style
+> Signed-off-by: Rosen Penev <rosenp(a)gmail.com>
+> ---
+>  src/cpu/intel_cpus.cpp | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> =
 
-The README and CONTRIBUTE documents will continue to evolve, but this
-should get us going in the right direction.
+> diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp index
+> 0030dba..4dffadc 100644
+> --- a/src/cpu/intel_cpus.cpp
+> +++ b/src/cpu/intel_cpus.cpp
+> @@ -92,7 +92,7 @@ int is_supported_intel_cpu(int model, int cpu)
+> =
 
-PS: PowerTOP's project description on GitHub ("please post patches to
-the mailing list instead of using github pull requests") will be changed
-after this series is merged-- if it is.
+>  int is_intel_pstate_driver_loaded()
+>  {
+> -	const string
+> filename("/sys/devices/system/cpu/cpu0/cpufreq/scaling_driver");
+> +	const char *filename =3D
+> +"/sys/devices/system/cpu/cpu0/cpufreq/scaling_driver";
+>  	const string intel_pstate("intel_pstate");
+>  	char line[32] =3D { '\0' };
+>  	ifstream file;
+> --
+> 2.17.1
+> =
 
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
 
-Joe Konno (3):
-  README.md: rename, add md syntax, and major tweaks
-  README.md: Fix a misspelled name
-  Add CONTRIBUTE.md
-
- CONTRIBUTE.md | 188 ++++++++++++++++++++++++++++++++++++++++++++++
- README        | 157 --------------------------------------
- README.md     | 204 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 392 insertions(+), 157 deletions(-)
- create mode 100644 CONTRIBUTE.md
- delete mode 100644 README
- create mode 100644 README.md
-
--- =
-
-2.26.2
-
---===============5099588845271244939==--
+--===============5423087150892862565==--
 
