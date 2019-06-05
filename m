@@ -1,92 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============8313737094691710806=="
+Content-Type: multipart/mixed; boundary="===============9200775687972785604=="
 MIME-Version: 1.0
-From: Magnus Fromreide <magfr at lysator.liu.se>
-Subject: Re: [Powertop] [PATCH 4/4 v1] tuning: complete tunable result switch
-Date: Sat, 09 Sep 2017 09:11:56 +0200
-Message-ID: <20170909071156.GB18791@noemi.bahnhof.se>
-In-Reply-To: 20170908223651.27979-5-joe.konno@linux.intel.com
+From: Nils Kaiser <mail at nils-kaiser.de>
+Subject: [Powertop] Wrong discharge rate on HP Zbook Studio G5
+Date: Tue, 04 Jun 2019 23:19:16 -0500
+Message-ID: <CAA6E4vNacTOiydWr6ta=DHZQvbSftKTLuoPRRvHORk6d4cWfLQ@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8313737094691710806==
+--===============9200775687972785604==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 08, 2017 at 03:36:51PM -0700, Joe Konno wrote:
-> From: Joe Konno <joe.konno(a)intel.com>
-> =
+Hi all,
 
-> After implementing the tunable_state enum, compiler warning showed switch
-> statement within tunable result code was incomplete. Put another way, not=
- all
-> possible enum values were checked for. Fix the code so the compiler warni=
-ng
-> goes away.
+When I run powertop on my HP Zbook Studio G5 laptop I get a discharge rate
+of ~400 mW (I wish!!).
 
-Why do you change it from multiple return statements?
-Wouldn't
+Apparently this has been reported by another HP user here:
+https://bugs.launchpad.net/ubuntu/+source/powertop/+bug/1813496
 
-              switch (good_bad()) {
-              case TUNE_GOOD:
-                      return good_string;
-              case TUNE_BAD:
-              case TUNE_UNFIXABLE:
-                      return bad_string;
-+             case TUNE_NEUTRAL:
-+             case TUNE_UNKNOWN:
-+                     break;
-              }
-              return neutral_string;
+Any info I can provide to help debugging?
 
-make for an eqiuivalent but smaller patch?
+Cheers,
 
-> Signed-off-by: Joe Konno <joe.konno(a)intel.com>
-> ---
->  src/tuning/tunable.h | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
-> =
+Nils
 
-> diff --git a/src/tuning/tunable.h b/src/tuning/tunable.h
-> index 5ea7cdfb5389..afb789d6f4a7 100644
-> --- a/src/tuning/tunable.h
-> +++ b/src/tuning/tunable.h
-> @@ -59,14 +59,20 @@ public:
->  =
+--===============9200775687972785604==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
->  	virtual char *result_string(void)
->  	{
-> +		char *result =3D NULL;
-> +
->  		switch (good_bad()) {
->  		case TUNE_GOOD:
-> -			return good_string;
-> +			result =3D good_string;
->  		case TUNE_BAD:
->  		case TUNE_UNFIXABLE:
-> -			return bad_string;
-> +			result =3D bad_string;
-> +		case TUNE_NEUTRAL:
-> +		case TUNE_UNKNOWN:
-> +			result =3D neutral_string;
->  		}
-> -		return neutral_string;
-> +
-> +		return result;
->  	}
->  =
+PGRpdiBkaXI9Imx0ciI+SGkgYWxsLDxkaXY+PGJyPjwvZGl2PjxkaXY+V2hlbiBJIHJ1biBwb3dl
+cnRvcCBvbiBteSBIUCBaYm9vayBTdHVkaW8gRzUgbGFwdG9wIEkgZ2V0IGEgZGlzY2hhcmdlIHJh
+dGUgb2YgfjQwMCBtVyAoSSB3aXNoISEpLjwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+QXBwYXJl
+bnRseSB0aGlzIGhhcyBiZWVuIHJlcG9ydGVkIGJ5IGFub3RoZXIgSFAgdXNlciBoZXJlOsKgPGEg
+aHJlZj0iaHR0cHM6Ly9idWdzLmxhdW5jaHBhZC5uZXQvdWJ1bnR1Lytzb3VyY2UvcG93ZXJ0b3Av
+K2J1Zy8xODEzNDk2Ij5odHRwczovL2J1Z3MubGF1bmNocGFkLm5ldC91YnVudHUvK3NvdXJjZS9w
+b3dlcnRvcC8rYnVnLzE4MTM0OTY8L2E+PC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj5BbnkgaW5m
+byBJIGNhbiBwcm92aWRlIHRvIGhlbHAgZGVidWdnaW5nPzwvZGl2PjxkaXY+PGJyPjwvZGl2Pjxk
+aXY+Q2hlZXJzLDwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+TmlsczwvZGl2PjwvZGl2Pgo=
 
->  =
-
-> -- =
-
-> 2.13.5
-> =
-
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
-
---===============8313737094691710806==--
+--===============9200775687972785604==--
 
