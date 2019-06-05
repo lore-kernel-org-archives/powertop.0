@@ -1,65 +1,87 @@
-Content-Type: multipart/mixed; boundary="===============7868582158652238484=="
+Content-Type: multipart/mixed; boundary="===============2749001778622846205=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH v3] Makefile.am need reference to m4 directory
-Date: Thu, 21 Jul 2016 14:32:38 -0700
-Message-ID: <20160721213238.9951-1-joe.konno@linux.intel.com>
-In-Reply-To: ea5e3f56-3143-4916-5956-880c05a45ee5@au.ibm.com
+From: Magnus Fromreide <magfr at lysator.liu.se>
+Subject: Re: [Powertop] [PATCH] event-parse: Add compatibility for non GNU
+ strerror_r
+Date: Wed, 05 Jun 2019 08:53:04 +0200
+Message-ID: <20190605065304.GA18527@noemi.bahnhof.se>
+In-Reply-To: 20190604190447.8561-1-rosenp@gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============7868582158652238484==
+--===============2749001778622846205==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Daniel Black <daniel.black(a)au1.ibm.com>
+On Tue, Jun 04, 2019 at 12:04:47PM -0700, Rosen Penev wrote:
+> Needed for libraries like musl that do not implement the GNU variant.
 
-Running autoreconf (autconf-2.69/automake-1.15/libtoolize-2.4.6)
-without the m4 directory specified in the Makefile.am file generates
-the following warning:
+This patch seems curious.
 
- ./autogen.sh
-autoreconf: Entering directory `.'
-autoreconf: running: autopoint
-autoreconf: running: aclocal
-autoreconf: configure.ac: tracing
-autoreconf: running: libtoolize --copy
-libtoolize: Consider adding '-I m4' to ACLOCAL_AMFLAGS in Makefile.am.
-autoreconf: running: /usr/bin/autoconf
-autoreconf: running: /usr/bin/autoheader
-autoreconf: running: automake --add-missing --copy --no-force
-configure.ac:26: warning: The 'AM_PROG_MKDIR_P' macro is deprecated, and
-its use is discouraged.
-configure.ac:26: You should use the Autoconf-provided 'AC_PROG_MKDIR_P'
-macro instead,
-configure.ac:26: and use '$(MKDIR_P)' instead of '$(mkdir_p)'in your
-Makefile.am files.
-autoreconf: Leaving directory `.'
+> Signed-off-by: Rosen Penev <rosenp(a)gmail.com>
+> ---
+>  traceevent/event-parse.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> =
 
-v3: (Joe) The irony. 'Real' submission fixing all nits from v2.
-v2: (Joe) Re-submission due to a whitespace -ism, added Acked-by
+> diff --git a/traceevent/event-parse.c b/traceevent/event-parse.c
+> index 5a717a0..1f7eb80 100644
+> --- a/traceevent/event-parse.c
+> +++ b/traceevent/event-parse.c
+> @@ -5121,12 +5121,17 @@ int pevent_strerror(struct pevent *pevent __maybe=
+_unused,
+>  	const char *msg;
+>  =
 
-Acked-by: Joe Konno <joe.konno(a)intel.com>
----
- Makefile.am | 1 +
- 1 file changed, 1 insertion(+)
+>  	if (errnum >=3D 0) {
+> +#if defined(__GLIBC__)
+>  		msg =3D strerror_r(errnum, buf, buflen);
+>  		if (msg !=3D buf) {
+>  			size_t len =3D strlen(msg);
+>  			memcpy(buf, msg, min(buflen - 1, len));
+>  			*(buf + min(buflen - 1, len)) =3D '\0';
+>  		}
+> +#else
+> +		if (strerror_r(errnum, buf, buflen))
+> +			snprintf(buf, buflen, "errnum %i", errnum);
 
-diff --git a/Makefile.am b/Makefile.am
-index c8d0ae210e3f..128500e9b67c 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -1,4 +1,5 @@
- AUTOMAKE_OPTIONS =3D subdir-objects
-+ACLOCAL_AMFLAGS =3D -I m4
- =
+Was
 
- SUBDIRS =3D \
- 	traceevent \
--- =
+if (a human readable response is returned from strerror_r)
+  clobber it with a numeric version of the error
 
-2.9.0
+really what you wanted to achieve?
 
+I would rather expect something like
 
---===============7868582158652238484==--
+	if (errnum >=3D 0) {
+		msg =3D strerror_r(errnum, buf, buflen);
+#if defined(__GLIBC__)
+		if (msg !=3D buf)
+			strlcpy(buf, msg, buflen);
+	#endif
+	}
+
+where the #ifdef ends up as a pure optimization if strerror_r is the XSI ve=
+rsion.
+
+/MF
+
+> +#endif
+>  		return 0;
+>  	}
+>  =
+
+> -- =
+
+> 2.17.1
+> =
+
+> _______________________________________________
+> PowerTop mailing list
+> PowerTop(a)lists.01.org
+> https://lists.01.org/mailman/listinfo/powertop
+
+--===============2749001778622846205==--
 
