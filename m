@@ -1,92 +1,88 @@
-Content-Type: multipart/mixed; boundary="===============1775636050094564552=="
+Content-Type: multipart/mixed; boundary="===============9014427876946550566=="
 MIME-Version: 1.0
-From: Kammela, Gayatri <gayatri.kammela at intel.com>
-Subject: Re: [Powertop] CoreDump on version 2.9 and git.
-Date: Tue, 19 Feb 2019 09:30:48 +0000
-Message-ID: <2824B99DC70CE746926327C52CA42F76487E461A@ORSMSX111.amr.corp.intel.com>
-In-Reply-To: 80190921-c55b-6bef-02c8-d7030d8cfed4@locolandia.net
+From: Rosen Penev <rosenp at gmail.com>
+Subject: Re: [Powertop] [PATCH] event-parse: Add compatibility for non GNU
+ strerror_r
+Date: Thu, 06 Jun 2019 18:24:46 -0700
+Message-ID: <1670e3ae-6772-cf27-b60d-0c5d7a3b21de@gmail.com>
+In-Reply-To: 20190605065304.GA18527@noemi.bahnhof.se
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1775636050094564552==
+--===============9014427876946550566==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Pablo,
-Thanks for reporting! I have tried powertop v2.9 and v2.10 on kernel 4.20 w=
-ith Ubuntu generic+ additional config options and didn't notice any core du=
-mp issues. I have changed the processor type to Xeon and I couldn't reprodu=
-ce it. Could you please share the kernel config that you've used to reprodu=
-ce this issue? Also, could you try running latest powertop with latest kern=
-el to see if it is still reproducible? =
 
+On 6/4/2019 11:53 PM, Magnus Fromreide wrote:
+> On Tue, Jun 04, 2019 at 12:04:47PM -0700, Rosen Penev wrote:
+>> Needed for libraries like musl that do not implement the GNU variant.
+> This patch seems curious.
+>
+>> Signed-off-by: Rosen Penev <rosenp(a)gmail.com>
+>> ---
+>>   traceevent/event-parse.c | 5 +++++
+>>   1 file changed, 5 insertions(+)
+>>
+>> diff --git a/traceevent/event-parse.c b/traceevent/event-parse.c
+>> index 5a717a0..1f7eb80 100644
+>> --- a/traceevent/event-parse.c
+>> +++ b/traceevent/event-parse.c
+>> @@ -5121,12 +5121,17 @@ int pevent_strerror(struct pevent *pevent __mayb=
+e_unused,
+>>   	const char *msg;
+>>   =
 
-Thanks,
-Gayatri
+>>   	if (errnum >=3D 0) {
+>> +#if defined(__GLIBC__)
+>>   		msg =3D strerror_r(errnum, buf, buflen);
+>>   		if (msg !=3D buf) {
+>>   			size_t len =3D strlen(msg);
+>>   			memcpy(buf, msg, min(buflen - 1, len));
+>>   			*(buf + min(buflen - 1, len)) =3D '\0';
+>>   		}
+>> +#else
+>> +		if (strerror_r(errnum, buf, buflen))
+>> +			snprintf(buf, buflen, "errnum %i", errnum);
+> Was
+>
+> if (a human readable response is returned from strerror_r)
+>    clobber it with a numeric version of the error
+>
+> really what you wanted to achieve?
+>
+> I would rather expect something like
+>
+> 	if (errnum >=3D 0) {
+> 		msg =3D strerror_r(errnum, buf, buflen);
+No idea what you mean by this. The XSI strerror_r returns an int, not a =
 
-> -----Original Message-----
-> From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of
-> Pablo Catalina
-> Sent: Monday, February 18, 2019 1:46 PM
-> To: powertop(a)lists.01.org
-> Subject: [Powertop] CoreDump on version 2.9 and git.
-> =
+char pointer.
+> #if defined(__GLIBC__)
+> 		if (msg !=3D buf)
+> 			strlcpy(buf, msg, buflen);
+> 	#endif
+> 	}
+>
+> where the #ifdef ends up as a pure optimization if strerror_r is the XSI =
+version.
+>
+> /MF
+>
+>> +#endif
+>>   		return 0;
+>>   	}
+>>   =
 
-> Hi,
-> =
+>> -- =
 
-> I have an Ubuntu 18.04 with kernel 4.20.10 (compiled manually with default
-> Ubuntu options but changing the processor type to Xeon)
-> =
+>> 2.17.1
+>>
+>> _______________________________________________
+>> PowerTop mailing list
+>> PowerTop(a)lists.01.org
+>> https://lists.01.org/mailman/listinfo/powertop
 
-> =
-
-> I tested the version 2.9 and the latest code from git (tag 2.10):
-> =
-
-> # git log
-> =
-
-> e8765b5 (HEAD -> master, tag: v2.10, origin/master, origin/HEAD)
-> src/wakeup/wakeup.h: Fix a minor issue in the wakeup.h file
-> =
-
-> =
-
-> And I got a coredump when I run it normally and with --auto-tune (I dont
-> have the coredump with --debug).
-> =
-
-> =
-
-> The same coredump on normal run and with --auto-autotune.
-> =
-
-> =
-
-> See attached the output of gdb (bt, registers, ...) and the coredump.
-> =
-
-> =
-
-> Let me know if I can do anything else to help you to fix the bug, I'm not=
- C
-> developer but I have a minimal knowledge about compiling code, patching,
-> debug, ...
-> =
-
-> =
-
-> =
-
-> Regards,
-> =
-
-> =
-
-> Pablo
-
-
---===============1775636050094564552==--
+--===============9014427876946550566==--
 
