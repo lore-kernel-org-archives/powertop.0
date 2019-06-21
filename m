@@ -1,48 +1,65 @@
-Content-Type: multipart/mixed; boundary="===============8751851575856062411=="
+Content-Type: multipart/mixed; boundary="===============4402473728890713945=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: Re: [Powertop] [PATCH v2 00/10] Housecleaning and Gettext cleanup
-Date: Thu, 04 Aug 2016 15:01:30 -0700
-Message-ID: <20160804150130.4b42e787@jbkonno-basil.jf.intel.com>
-In-Reply-To: 1470272369-218664-1-git-send-email-joe.konno@linux.intel.com
+From: Kai-Heng Feng <kai.heng.feng at canonical.com>
+Subject: [Powertop] [RESEND] [PATCH] Enable support for Intel ICL
+Date: Fri, 21 Jun 2019 14:43:00 +0800
+Message-ID: <20190621064300.4384-1-kai.heng.feng@canonical.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8751851575856062411==
+--===============4402473728890713945==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Wed,  3 Aug 2016 17:59:10 -0700
-Joe Konno <joe.konno(a)linux.intel.com> wrote:
+This commit adds support for Intel ICL platforms
 
-> Joe Konno (10):
->   configure.ac: bump version to 2.9-pre
->   main.cpp: append __TIME__ to --version output
->   Makefile.am: add --install to ACLOCAL_AMFLAGS
->   gettext: run gettextize-0.18.2
->   .gitignore: ignnore m4/pkg.m4
->   Makevars: align more closely to generated .template
->   scripts: add regenerate-potfiles-in script
->   POTFILES.in: refresh files with strings
->   powertop.pot: xgettext refresh, attribution fix
->   po: regenerate with new POT and strings
+Signed-off-by: Kai-Heng Feng <kai.heng.feng(a)canonical.com>
+---
+ src/cpu/intel_cpus.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Second patch was removed from series. As promised, v2 patches 10-19 were
-squashed into one, for a total of 9 patches pushed (listed git log --reverse
-order):
+diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp
+index 0030dba..27c70fb 100644
+--- a/src/cpu/intel_cpus.cpp
++++ b/src/cpu/intel_cpus.cpp
+@@ -70,6 +70,7 @@ static int intel_cpu_models[] =3D {
+ 	0x5c,   /* BXT-P */
+ 	0x66,   /* CNL-U/Y */
+ 	0x7A,   /* GLK */
++	0x7E,   /* ICL */
+ 	0x8E,	/* KBL */
+ 	0x9E,	/* KBL */
+ 	0	/* last entry must be zero */
+@@ -171,6 +172,7 @@ nhm_core::nhm_core(int model)
+ 		case 0x5c:      /* BXT-P */
+ 		case 0x66:	/* CNL-U/Y */
+ 		case 0x7A:	/* GLK */
++		case 0x7E:	/* ICL */
+ 		case 0x8E:	/* KBL */
+ 		case 0x9E:	/* KBL */
+ 			has_c7_res =3D 1;
+@@ -353,6 +355,7 @@ nhm_package::nhm_package(int model)
+ 		case 0x5c:      /* BXT-P */
+ 		case 0x66:	/* CNL-U/Y */
+ 		case 0x7A:	/* GLK */
++		case 0x7E:	/* ICL */
+ 		case 0x8E:	/* KBL */
+ 		case 0x9E:	/* KBL */
+ 			has_c2c6_res=3D1;
+@@ -387,6 +390,7 @@ nhm_package::nhm_package(int model)
+ 		case 0x5c:	/* BXT-P */ =
 
-  7b35acae25e3 configure.ac: bump version to 2.9-pre
-  fadd7a020c05 Makefile.am: add --install to ACLOCAL_AMFLAGS
-  c0bb3d79f3e4 gettext: run gettextize-0.18.2
-  f791afba18ec .gitignore: ignnore m4/pkg.m4
-  6d56120e04f2 Makevars: align more closely to generated .template
-  49fbc68887ea scripts: add regenerate-potfiles-in script
-  8d89b588d977 POTFILES.in: refresh files with strings
-  de4b41828aac powertop.pot: xgettext refresh, attribution fix
-  1bfd95884978 po: regenerate with new POT and strings
+ 		case 0x66:	/* CNL-U/Y */
+ 		case 0x7A:	/* GLK */
++		case 0x7E:	/* ICL */
+ 		case 0x8E:	/* KBL */
+ 		case 0x9E:	/* KBL */
+ 			has_c8c9c10_res =3D 1;
+-- =
 
-Cheers
+2.17.1
 
---===============8751851575856062411==--
+
+--===============4402473728890713945==--
 
