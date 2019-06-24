@@ -1,142 +1,81 @@
-Content-Type: multipart/mixed; boundary="===============2324730756860465075=="
+Content-Type: multipart/mixed; boundary="===============5045969986758801763=="
 MIME-Version: 1.0
-From: Anthony Wong <yp at anthonywong.net>
-Subject: [Powertop] Re: [PATCH 1/3 v1] Revert "configure.ac: version strings
- from git describe"
-Date: Thu, 02 Apr 2020 13:55:07 +0800
-Message-ID: <CAC=0FnGCS7A6uwSeV6SLgb60Qfpv85AKBhH2F1RJb6NMyiX7cw@mail.gmail.com>
-In-Reply-To: 20200211221542.46228-2-joe.konno@linux.intel.com
+From: Nils Kaiser <mail at nils-kaiser.de>
+Subject: Re: [Powertop] Wrong discharge rate on HP Zbook Studio G5
+Date: Mon, 24 Jun 2019 16:20:14 +0000
+Message-ID: <CAA6E4vNOzw97g_hG2-=ZWQdp3RpeOv-1cj3vuRL34Ze=+Lmzsg@mail.gmail.com>
+In-Reply-To: CAA6E4vNacTOiydWr6ta=DHZQvbSftKTLuoPRRvHORk6d4cWfLQ@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2324730756860465075==
+--===============5045969986758801763==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-This patch has not been fully applied to the github project, the
-src/display.cpp part has been left out, making the program now fail to
-compile.
-Please see https://github.com/fenrus75/powertop/commit/152a39949691d34e1c6d=
-67272f3b63cbbe61bf81
+Hi folks,
+Following up on this - is there a better way to submit an issue than the
+mailing list?
+Cheers,
+Nils
+
+On Wed, 5 Jun 2019 at 04:19, Nils Kaiser <mail(a)nils-kaiser.de> wrote:
+
+> Hi all,
+>
+> When I run powertop on my HP Zbook Studio G5 laptop I get a discharge rate
+> of ~400 mW (I wish!!).
+>
+> Apparently this has been reported by another HP user here:
+> https://bugs.launchpad.net/ubuntu/+source/powertop/+bug/1813496
+>
+> Any info I can provide to help debugging?
+>
+> Cheers,
+>
+> Nils
+>
+
 
 -- =
 
-Anthony
+Nils Kaiser
 
-On Wed, 12 Feb 2020 at 06:16, Joe Konno <joe.konno(a)linux.intel.com> wrote:
->
-> From: Joe Konno <joe.konno(a)intel.com>
->
-> This doesn't work as well as I thought it would. So, let's remove it. As
-> a result of the revert, remove a reference to a now-dead preprocessor
-> define (PACKAGE_SHORT_VERSION).
->
-> This reverts commit 2daaaf54d07340610af759cc7f4c41742abb3277.
->
-> Signed-off-by: Joe Konno <joe.konno(a)intel.com>
-> ---
->  .gitignore      |  1 -
->  Makefile.am     |  2 --
->  autogen.sh      |  1 -
->  configure.ac    |  5 +----
->  scripts/version | 13 -------------
->  src/display.cpp |  2 +-
->  6 files changed, 2 insertions(+), 22 deletions(-)
->  delete mode 100644 scripts/version
->
-> diff --git a/.gitignore b/.gitignore
-> index 8358ca4c6c0f..c1fc2be37afe 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -89,5 +89,4 @@ Makefile.in
->  /src/powertop
->  /stamp-h1
->  /stamp-po
-> -/version*
->  tags
-> diff --git a/Makefile.am b/Makefile.am
-> index ffb5e91b2834..22429e0ce562 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -15,6 +15,4 @@ EXTRA_DIST =3D \
->         TODO \
->         Android.mk \
->         COPYING \
-> -       version-long \
-> -       version-short \
->         autogen.sh
-> diff --git a/autogen.sh b/autogen.sh
-> index 444f9998f806..e210037d70e0 100755
-> --- a/autogen.sh
-> +++ b/autogen.sh
-> @@ -1,4 +1,3 @@
->  #!/bin/sh
->
-> -sh scripts/version
->  autoreconf --install --verbose
-> diff --git a/configure.ac b/configure.ac
-> index ca7f1d5cefea..b3a6b2ca2639 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -2,8 +2,7 @@
->  # Process this file with autoconf to produce a configure script.
->
->  AC_PREREQ([2.68])
-> -AC_INIT([powertop], m4_esyscmd_s([cat version-long]),
-> -       [powertop(a)lists.01.org], [], [https://01.org/powertop])
-> +AC_INIT([powertop], [2.12-pre], [powertop(a)lists.01.org], [], [https://=
-01.org/powertop])
->  AM_INIT_AUTOMAKE([
->         -Wall
->         1.12.2
-> @@ -152,8 +151,6 @@ AC_SEARCH_LIBS([inet_aton], [resolv], [], [
->         AC_MSG_ERROR([libresolv is required but was not found])
->  ], [])
->
-> -AC_DEFINE([PACKAGE_SHORT_VERSION], m4_esyscmd_s([cat version-short]),
-> -       [Short package version])
->
->  AS_IF([`pkg-config --exists bash-completion`], [
->         bashcompletiondir=3D`pkg-config --variable=3Dcompletionsdir --def=
-ine-variable=3Dprefix=3D${prefix} bash-completion`
-> diff --git a/scripts/version b/scripts/version
-> deleted file mode 100644
-> index 348b13d9f785..000000000000
-> --- a/scripts/version
-> +++ /dev/null
-> @@ -1,13 +0,0 @@
-> -#!/bin/sh
-> -
-> -git branch > /dev/null 2>&1
-> -if [ "$?" =3D "0" ]; then
-> -       LONG=3D$(git describe --abbrev=3D7 --tags --always --dirty 2> /de=
-v/null)
-> -       SHORT=3D\"$(git describe --tags --abbrev=3D0 2> /dev/null)\"
-> -else
-> -       LONG=3D"RUN-VERSION-SCRIPT-IN-GIT-REPOSITORY-ONLY"
-> -       SHORT=3D\"$LONG\"
-> -fi
-> -
-> -echo $LONG  > version-long
-> -echo $SHORT > version-short
-> diff --git a/src/display.cpp b/src/display.cpp
-> index 7b3a7a2f2073..71311446728d 100644
-> --- a/src/display.cpp
-> +++ b/src/display.cpp
-> @@ -117,7 +117,7 @@ void show_tab(unsigned int tab)
->
->         wattrset(tab_bar, A_REVERSE);
->         mvwprintw(tab_bar, 0,0, "%120s", "");
-> -       mvwprintw(tab_bar, 0,0, "PowerTOP %s", PACKAGE_SHORT_VERSION);
-> +       mvwprintw(tab_bar, 0,0, "PowerTOP %s", PACKAGE_VERSION);
->
->         bottom_line =3D newwin(1, 0, LINES-1, 0);
->         wattrset(bottom_line, A_REVERSE);
-> --
-> 2.25.0
-> _______________________________________________
-> PowerTop mailing list -- powertop(a)lists.01.org
-> To unsubscribe send an email to powertop-leave(a)lists.01.org
---===============2324730756860465075==--
+tel / whatsapp: +49 1788079029
+skype: berlinils
+https://www.linkedin.com/in/nilskaiser/
+
+--===============5045969986758801763==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+PGRpdiBkaXI9Imx0ciI+SGkgZm9sa3MsPGRpdj5Gb2xsb3dpbmcgdXAgb24gdGhpcyAtIGlzIHRo
+ZXJlIGEgYmV0dGVyIHdheSB0byBzdWJtaXQgYW4gaXNzdWUgdGhhbiB0aGUgbWFpbGluZyBsaXN0
+PzwvZGl2PjxkaXY+Q2hlZXJzLDwvZGl2PjxkaXY+TmlsczwvZGl2PjwvZGl2Pjxicj48ZGl2IGNs
+YXNzPSJnbWFpbF9xdW90ZSI+PGRpdiBkaXI9Imx0ciIgY2xhc3M9ImdtYWlsX2F0dHIiPk9uIFdl
+ZCwgNSBKdW4gMjAxOSBhdCAwNDoxOSwgTmlscyBLYWlzZXIgJmx0OzxhIGhyZWY9Im1haWx0bzpt
+YWlsQG5pbHMta2Fpc2VyLmRlIj5tYWlsQG5pbHMta2Fpc2VyLmRlPC9hPiZndDsgd3JvdGU6PGJy
+PjwvZGl2PjxibG9ja3F1b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9Im1hcmdpbjowcHgg
+MHB4IDBweCAwLjhleDtib3JkZXItbGVmdDoxcHggc29saWQgcmdiKDIwNCwyMDQsMjA0KTtwYWRk
+aW5nLWxlZnQ6MWV4Ij48ZGl2IGRpcj0ibHRyIj5IaSBhbGwsPGRpdj48YnI+PC9kaXY+PGRpdj5X
+aGVuIEkgcnVuIHBvd2VydG9wIG9uIG15IEhQIFpib29rIFN0dWRpbyBHNSBsYXB0b3AgSSBnZXQg
+YSBkaXNjaGFyZ2UgcmF0ZSBvZiB+NDAwIG1XIChJIHdpc2ghISkuPC9kaXY+PGRpdj48YnI+PC9k
+aXY+PGRpdj5BcHBhcmVudGx5IHRoaXMgaGFzIGJlZW4gcmVwb3J0ZWQgYnkgYW5vdGhlciBIUCB1
+c2VyIGhlcmU6wqA8YSBocmVmPSJodHRwczovL2J1Z3MubGF1bmNocGFkLm5ldC91YnVudHUvK3Nv
+dXJjZS9wb3dlcnRvcC8rYnVnLzE4MTM0OTYiIHRhcmdldD0iX2JsYW5rIj5odHRwczovL2J1Z3Mu
+bGF1bmNocGFkLm5ldC91YnVudHUvK3NvdXJjZS9wb3dlcnRvcC8rYnVnLzE4MTM0OTY8L2E+PC9k
+aXY+PGRpdj48YnI+PC9kaXY+PGRpdj5BbnkgaW5mbyBJIGNhbiBwcm92aWRlIHRvIGhlbHAgZGVi
+dWdnaW5nPzwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+Q2hlZXJzLDwvZGl2PjxkaXY+PGJyPjwv
+ZGl2PjxkaXY+TmlsczwvZGl2PjwvZGl2Pgo8L2Jsb2NrcXVvdGU+PC9kaXY+PGJyIGNsZWFyPSJh
+bGwiPjxkaXY+PGJyPjwvZGl2Pi0tIDxicj48ZGl2IGRpcj0ibHRyIiBjbGFzcz0iZ21haWxfc2ln
+bmF0dXJlIj48ZGl2IGRpcj0ibHRyIj48ZGl2PjxkaXYgZGlyPSJsdHIiPjxkaXYgc3R5bGU9ImZv
+bnQtc2l6ZTpzbWFsbCI+PGRpdj5OaWxzIEthaXNlcjwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+
+dGVsIC8gd2hhdHNhcHA6ICs0OSAxNzg4MDc5MDI5PC9kaXY+PGRpdj5za3lwZTogYmVybGluaWxz
+PC9kaXY+PGRpdj48YSBocmVmPSJodHRwczovL3d3dy5saW5rZWRpbi5jb20vaW4vbmlsc2thaXNl
+ci8iIHRhcmdldD0iX2JsYW5rIj5odHRwczovL3d3dy5saW5rZWRpbi5jb20vaW4vbmlsc2thaXNl
+ci88L2E+wqA8L2Rpdj48L2Rpdj48L2Rpdj48L2Rpdj48L2Rpdj48L2Rpdj4K
+
+--===============5045969986758801763==--
 
