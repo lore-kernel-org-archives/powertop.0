@@ -1,172 +1,86 @@
-Content-Type: multipart/mixed; boundary="===============1723004585714039964=="
+Content-Type: multipart/mixed; boundary="===============1161206721307000949=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] [PATCH v2 04/19] gettext: run gettextize-0.18.2
-Date: Wed, 03 Aug 2016 17:59:14 -0700
-Message-ID: <1470272369-218664-5-git-send-email-joe.konno@linux.intel.com>
-In-Reply-To: 1470272369-218664-1-git-send-email-joe.konno@linux.intel.com
+From: Anthony Wong <yp at anthonywong.net>
+Subject: [Powertop] [PATCH, Resend] Add bash command-line completion.
+Date: Tue, 23 Jul 2019 22:06:40 +0800
+Message-ID: <CAC=0FnH7SBPKpH2PxnFiqxNt1=O8i7CVyEa_4UWvJQo8WthQXg@mail.gmail.com>
+In-Reply-To: CAC=0FnEFHg+fMVjtGp5G=7mtTXJeP69tNi+wOt=nb9GGgZTdhA@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1723004585714039964==
+--===============1161206721307000949==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-From: Joe Konno <joe.konno(a)intel.com>
+Resend as attachment.
 
-Ran gettextize from gettext-0.18.2 to clean up some annoying
-configuration warnings.
+--===============1161206721307000949==
+Content-Type: application/x-patch
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="0001-Add-bash-command-line-completion.patch"
 
-Also, allow m4 and po changelogs to be created, especially to help folks
-concerned with the particulars of string translation.
+RnJvbSAyMjhjNzI3YTdjNzI1OTBkN2VhNTJjZGU1YzkzNGQ1MzgxODY2Y2VlIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBBbnRob255IFdvbmcgPHlwQGFudGhvbnl3b25nLm5ldD4KRGF0
+ZTogU3VuLCAyMyBKdW4gMjAxOSAxMjoxMjowNSArMDgwMApTdWJqZWN0OiBbUEFUQ0hdIEFkZCBi
+YXNoIGNvbW1hbmQtbGluZSBjb21wbGV0aW9uLgoKU2lnbmVkLW9mZi1ieTogQW50aG9ueSBXb25n
+IDx5cEBhbnRob255d29uZy5uZXQ+Ci0tLQogTWFrZWZpbGUuYW0gICAgICAgICAgICAgICAgICAg
+ICAgICAgfCAgMyArLQogY29uZmlndXJlLmFjICAgICAgICAgICAgICAgICAgICAgICAgfCAgOCAr
+KysrKysKIHNjcmlwdHMvYmFzaC1jb21wbGV0aW9uL01ha2VmaWxlLmFtIHwgIDIgKysKIHNjcmlw
+dHMvYmFzaC1jb21wbGV0aW9uL3Bvd2VydG9wICAgIHwgNDMgKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysKIDQgZmlsZXMgY2hhbmdlZCwgNTUgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigt
+KQogY3JlYXRlIG1vZGUgMTAwNjQ0IHNjcmlwdHMvYmFzaC1jb21wbGV0aW9uL01ha2VmaWxlLmFt
+CiBjcmVhdGUgbW9kZSAxMDA2NDQgc2NyaXB0cy9iYXNoLWNvbXBsZXRpb24vcG93ZXJ0b3AKCmRp
+ZmYgLS1naXQgYS9NYWtlZmlsZS5hbSBiL01ha2VmaWxlLmFtCmluZGV4IDNhYWJiMjIuLmZmYjVl
+OTEgMTAwNjQ0Ci0tLSBhL01ha2VmaWxlLmFtCisrKyBiL01ha2VmaWxlLmFtCkBAIC01LDcgKzUs
+OCBAQCBTVUJESVJTID0gXAogCXRyYWNlZXZlbnQgXAogCXNyYyBcCiAJcG8gXAotCWRvYworCWRv
+YyBcCisJc2NyaXB0cy9iYXNoLWNvbXBsZXRpb24KIAogRVhUUkFfRElTVCA9IFwKIAljb25maWcu
+cnBhdGggXApkaWZmIC0tZ2l0IGEvY29uZmlndXJlLmFjIGIvY29uZmlndXJlLmFjCmluZGV4IGQ2
+YTE1ZTEuLmNhN2YxZDUgMTAwNjQ0Ci0tLSBhL2NvbmZpZ3VyZS5hYworKysgYi9jb25maWd1cmUu
+YWMKQEAgLTE3LDYgKzE3LDcgQEAgQUNfQ09ORklHX0ZJTEVTKFsKIAl0cmFjZWV2ZW50L01ha2Vm
+aWxlCiAJcG8vTWFrZWZpbGUuaW4KIAlkb2MvTWFrZWZpbGUKKwlzY3JpcHRzL2Jhc2gtY29tcGxl
+dGlvbi9NYWtlZmlsZQogXSkKIEFDX0NPTkZJR19TUkNESVIoW3NyYy9tYWluLmNwcF0pCiBBQ19D
+T05GSUdfTUFDUk9fRElSKFttNF0pCkBAIC0xNTQsNCArMTU1LDExIEBAIEFDX1NFQVJDSF9MSUJT
+KFtpbmV0X2F0b25dLCBbcmVzb2x2XSwgW10sIFsKIEFDX0RFRklORShbUEFDS0FHRV9TSE9SVF9W
+RVJTSU9OXSwgbTRfZXN5c2NtZF9zKFtjYXQgdmVyc2lvbi1zaG9ydF0pLAogCVtTaG9ydCBwYWNr
+YWdlIHZlcnNpb25dKQogCitBU19JRihbYHBrZy1jb25maWcgLS1leGlzdHMgYmFzaC1jb21wbGV0
+aW9uYF0sIFsKKwliYXNoY29tcGxldGlvbmRpcj1gcGtnLWNvbmZpZyAtLXZhcmlhYmxlPWNvbXBs
+ZXRpb25zZGlyIC0tZGVmaW5lLXZhcmlhYmxlPXByZWZpeD0ke3ByZWZpeH0gYmFzaC1jb21wbGV0
+aW9uYAorXSwgWworCWJhc2hjb21wbGV0aW9uZGlyPSR7ZGF0YWRpcn0vYmFzaC1jb21wbGV0aW9u
+L2NvbXBsZXRpb25zCitdKQorQUNfU1VCU1QoW2Jhc2hjb21wbGV0aW9uZGlyXSwgWyRiYXNoY29t
+cGxldGlvbmRpcl0pCisKIEFDX09VVFBVVApkaWZmIC0tZ2l0IGEvc2NyaXB0cy9iYXNoLWNvbXBs
+ZXRpb24vTWFrZWZpbGUuYW0gYi9zY3JpcHRzL2Jhc2gtY29tcGxldGlvbi9NYWtlZmlsZS5hbQpu
+ZXcgZmlsZSBtb2RlIDEwMDY0NAppbmRleCAwMDAwMDAwLi40NTA3M2JkCi0tLSAvZGV2L251bGwK
+KysrIGIvc2NyaXB0cy9iYXNoLWNvbXBsZXRpb24vTWFrZWZpbGUuYW0KQEAgLTAsMCArMSwyIEBA
+CitiYXNoY29tcGxldGlvbmRpciA9IEBiYXNoY29tcGxldGlvbmRpckAKK2Rpc3RfYmFzaGNvbXBs
+ZXRpb25fREFUQSA9IHBvd2VydG9wCmRpZmYgLS1naXQgYS9zY3JpcHRzL2Jhc2gtY29tcGxldGlv
+bi9wb3dlcnRvcCBiL3NjcmlwdHMvYmFzaC1jb21wbGV0aW9uL3Bvd2VydG9wCm5ldyBmaWxlIG1v
+ZGUgMTAwNjQ0CmluZGV4IDAwMDAwMDAuLjAzZDIzOGUKLS0tIC9kZXYvbnVsbAorKysgYi9zY3Jp
+cHRzL2Jhc2gtY29tcGxldGlvbi9wb3dlcnRvcApAQCAtMCwwICsxLDQzIEBACisjIS9iaW4vYmFz
+aAorIworIyBQb3dlcnRvcCB0YWIgY29tcGxldGlvbiBmb3IgYmFzaC4KKyMKKyMgVGhpcyBpcyBw
+YXJ0IG9mIFBvd2VyVE9QCisjCisjIFRoaXMgcHJvZ3JhbSBmaWxlIGlzIGZyZWUgc29mdHdhcmU7
+IHlvdSBjYW4gcmVkaXN0cmlidXRlIGl0IGFuZC9vciBtb2RpZnkgaXQKKyMgdW5kZXIgdGhlIHRl
+cm1zIG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZSBhcyBwdWJsaXNoZWQgYnkgdGhl
+CisjIEZyZWUgU29mdHdhcmUgRm91bmRhdGlvbjsgdmVyc2lvbiAyIG9mIHRoZSBMaWNlbnNlLgor
+IworIyBUaGlzIHByb2dyYW0gaXMgZGlzdHJpYnV0ZWQgaW4gdGhlIGhvcGUgdGhhdCBpdCB3aWxs
+IGJlIHVzZWZ1bCwgYnV0IFdJVEhPVVQKKyMgQU5ZIFdBUlJBTlRZOyB3aXRob3V0IGV2ZW4gdGhl
+IGltcGxpZWQgd2FycmFudHkgb2YgTUVSQ0hBTlRBQklMSVRZIG9yCisjIEZJVE5FU1MgRk9SIEEg
+UEFSVElDVUxBUiBQVVJQT1NFLiAgU2VlIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZQor
+IyBmb3IgbW9yZSBkZXRhaWxzLgorIworIyBZb3Ugc2hvdWxkIGhhdmUgcmVjZWl2ZWQgYSBjb3B5
+IG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZQorIyBhbG9uZyB3aXRoIHRoaXMgcHJv
+Z3JhbSBpbiBhIGZpbGUgbmFtZWQgQ09QWUlORzsgaWYgbm90LCB3cml0ZSB0byB0aGUKKyMgRnJl
+ZSBTb2Z0d2FyZSBGb3VuZGF0aW9uLCBJbmMsCisjIDUxIEZyYW5rbGluIFN0cmVldCwgRmlmdGgg
+Rmxvb3IsCisjIEJvc3RvbiwgTUEgMDIxMTAtMTMwMSBVU0EKKyMgb3IganVzdCBnb29nbGUgZm9y
+IGl0LgorCitfcG93ZXJ0b3AoKQoreworICAgIGxvY2FsIGN1ciBwcmV2IHdvcmRzIGN3b3JkIHNw
+bGl0CisgICAgX2luaXRfY29tcGxldGlvbiAtcyB8fCByZXR1cm4KKworCWNhc2UgJHByZXYgaW4K
+KwkJJy1DJ3wnLS1jc3YnfCctLWV4dGVjaCd8Jy1yJ3wnLS1odG1sJ3wnLXcnfCctLXdvcmtsb2Fk
+JykKKwkJCV9maWxlZGlyCisJCQlyZXR1cm4gMAorCQkJOzsKKyAgICBlc2FjCisKKyAgICBsb2Nh
+bCBhbGxfbG9uZ19vcHRpb25zPSQoIF9wYXJzZV9oZWxwICIkMSIgKQorCisgICAgQ09NUFJFUExZ
+PSggJCggY29tcGdlbiAtVyAiJHthbGxfbG9uZ19vcHRpb25zfSIgLS0gIiRjdXIiICkgKQorCisg
+ICAgcmV0dXJuIDAKK30KKworIyBsb2FkIHRoZSBjb21wbGV0aW9uCitjb21wbGV0ZSAtRiBfcG93
+ZXJ0b3AgcG93ZXJ0b3AKLS0gCjIuMjAuMQoK
 
-Signed-off-by: Joe Konno <joe.konno(a)intel.com>
----
- Makefile.am       |  2 ++
- configure.ac      |  2 +-
- m4/ChangeLog      | 11 +++++++++++
- po/ChangeLog      | 11 +++++++++++
- po/Makefile.in.in | 19 ++++++++++++++-----
- 5 files changed, 39 insertions(+), 6 deletions(-)
- create mode 100644 m4/ChangeLog
- create mode 100644 po/ChangeLog
-
-diff --git a/Makefile.am b/Makefile.am
-index 819441e982c8..b519d110a118 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -8,6 +8,8 @@ SUBDIRS =3D \
- 	doc
- =
-
- EXTRA_DIST =3D \
-+	config.rpath \
-+	m4/ChangeLog  \
- 	README \
- 	TODO \
- 	Android.mk \
-diff --git a/configure.ac b/configure.ac
-index 4681c9e3ad28..646b402101bb 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -24,7 +24,7 @@ GETTEXT_PACKAGE=3Dpowertop
- AC_SUBST([GETTEXT_PACKAGE])
- AM_SILENT_RULES([yes])
- AM_GNU_GETTEXT([external])
--AM_GNU_GETTEXT_VERSION([0.18])
-+AM_GNU_GETTEXT_VERSION([0.18.2])
- =
-
- m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
- # Checks for programs.
-diff --git a/m4/ChangeLog b/m4/ChangeLog
-new file mode 100644
-index 000000000000..f415dc03d1be
---- /dev/null
-+++ b/m4/ChangeLog
-@@ -0,0 +1,11 @@
-+2016-08-03  gettextize  <bug-gnu-gettext(a)gnu.org>
-+
-+	* gettext.m4: New file, from gettext-0.18.2.
-+	* iconv.m4: New file, from gettext-0.18.2.
-+	* lib-ld.m4: New file, from gettext-0.18.2.
-+	* lib-link.m4: New file, from gettext-0.18.2.
-+	* lib-prefix.m4: New file, from gettext-0.18.2.
-+	* nls.m4: New file, from gettext-0.18.2.
-+	* po.m4: New file, from gettext-0.18.2.
-+	* progtest.m4: New file, from gettext-0.18.2.
-+
-diff --git a/po/ChangeLog b/po/ChangeLog
-new file mode 100644
-index 000000000000..11de90cb3926
---- /dev/null
-+++ b/po/ChangeLog
-@@ -0,0 +1,11 @@
-+2016-08-03  gettextize  <bug-gnu-gettext(a)gnu.org>
-+
-+	* Makefile.in.in: Upgrade to gettext-0.18.2.
-+	* boldquot.sed: New file, from gettext-0.18.2.
-+	* en(a)boldquot.header: New file, from gettext-0.18.2.
-+	* en(a)quot.header: New file, from gettext-0.18.2.
-+	* insert-header.sin: New file, from gettext-0.18.2.
-+	* quot.sed: New file, from gettext-0.18.2.
-+	* remove-potcdate.sin: New file, from gettext-0.18.2.
-+	* Rules-quot: New file, from gettext-0.18.2.
-+
-diff --git a/po/Makefile.in.in b/po/Makefile.in.in
-index 83d8838ac017..fce63a6e95e3 100644
---- a/po/Makefile.in.in
-+++ b/po/Makefile.in.in
-@@ -8,7 +8,7 @@
- # Please note that the actual code of GNU gettext is covered by the GNU
- # General Public License and is *not* in the public domain.
- #
--# Origin: gettext-0.18
-+# Origin: gettext-0.18.2
- GETTEXT_MACRO_VERSION =3D 0.18
- =
-
- PACKAGE =3D @PACKAGE@
-@@ -96,14 +96,14 @@ CATALOGS =3D @CATALOGS@
- 	mv t-$@ $@
- =
-
- =
-
--all: check-macro-version all-(a)USE_NLS@
-+all: all-(a)USE_NLS@
- =
-
- all-yes: stamp-po
- all-no:
- =
-
- # Ensure that the gettext macros and this Makefile.in.in are in sync.
--check-macro-version:
--	@test "$(GETTEXT_MACRO_VERSION)" =3D "@GETTEXT_MACRO_VERSION@" \
-+CHECK_MACRO_VERSION =3D \
-+	test "$(GETTEXT_MACRO_VERSION)" =3D "@GETTEXT_MACRO_VERSION@" \
- 	  || { echo "*** error: gettext infrastructure mismatch: using a Makefile=
-.in.in from gettext version $(GETTEXT_MACRO_VERSION) but the autoconf macro=
-s are from gettext version @GETTEXT_MACRO_VERSION@" 1>&2; \
- 	       exit 1; \
- 	     }
-@@ -123,6 +123,7 @@ check-macro-version:
- # $(POFILES) has been designed to not touch files that don't need to be
- # changed.
- stamp-po: $(srcdir)/$(DOMAIN).pot
-+	@$(CHECK_MACRO_VERSION)
- 	test ! -f $(srcdir)/$(DOMAIN).pot || \
- 	  test -z "$(GMOFILES)" || $(MAKE) $(GMOFILES)
- 	@test ! -f $(srcdir)/$(DOMAIN).pot || { \
-@@ -137,8 +138,16 @@ stamp-po: $(srcdir)/$(DOMAIN).pot
- =
-
- # This target rebuilds $(DOMAIN).pot; it is an expensive operation.
- # Note that $(DOMAIN).pot is not touched if it doesn't need to be changed.
-+# The determination of whether the package xyz is a GNU one is based on the
-+# heuristic whether some file in the top level directory mentions "GNU xyz=
-".
-+# If GNU 'find' is available, we avoid grepping through monster files.
- $(DOMAIN).pot-update: $(POTFILES) $(srcdir)/POTFILES.in remove-potcdate.sed
--	if LC_ALL=3DC grep 'GNU @PACKAGE@' $(top_srcdir)/* 2>/dev/null | grep -v =
-'libtool:' >/dev/null; then \
-+	if { if (LC_ALL=3DC find --version) 2>/dev/null | grep GNU >/dev/null; th=
-en \
-+	       LC_ALL=3DC find -L $(top_srcdir) -maxdepth 1 -type f -size -100000=
-00c -exec grep 'GNU @PACKAGE@' /dev/null '{}' ';' 2>/dev/null; \
-+	     else \
-+	       LC_ALL=3DC grep 'GNU @PACKAGE@' $(top_srcdir)/* 2>/dev/null; \
-+	     fi; \
-+	   } | grep -v 'libtool:' >/dev/null; then \
- 	  package_gnu=3D'GNU '; \
- 	else \
- 	  package_gnu=3D''; \
--- =
-
-1.8.3.1
-
-
---===============1723004585714039964==--
+--===============1161206721307000949==--
 
