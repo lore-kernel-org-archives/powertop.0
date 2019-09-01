@@ -1,135 +1,179 @@
-Content-Type: multipart/mixed; boundary="===============2872584002553623266=="
+Content-Type: multipart/mixed; boundary="===============7511687022883868373=="
 MIME-Version: 1.0
-From: Pablo Catalina <xkill at locolandia.net>
-Subject: Re: [Powertop] CoreDump on version 2.9 and git.
-Date: Wed, 20 Feb 2019 18:18:13 +0100
-Message-ID: <4f6c529d-7c96-9f0b-8a15-cc1883ab923d@locolandia.net>
-In-Reply-To: 9001559f-e811-0d3f-c7e1-68181fb1d3d2@locolandia.net
+From: Chris Murphy <lists at colorremedies.com>
+Subject: [Powertop] powertop and upower disagree by order magnitude
+Date: Sun, 01 Sep 2019 10:16:39 -0600
+Message-ID: <CAJCQCtRahTcEdZU4r9vmNQwBPN1V1tJ-Y-mXuSG-j0ncwnS4Qg@mail.gmail.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2872584002553623266==
+--===============7511687022883868373==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Summary: powertop says I've got 43 hours battery left, upower says I've got=
+ 5.
+
+model name    : Intel(R) Core(TM) i7-6500U CPU @ 2.50GHz
+
+kernel-5.3.0-0.rc6.git1.1.fc32.x86_64
+powertop-2.10-2.fc30.x86_64
+thermald-1.8-2.fc30.x86_64
 
 
-OK, kernel compilation finished and I tested it.
+$ sudo upower -d
+Device: /org/freedesktop/UPower/devices/line_power_ACAD
+  native-path:          ACAD
+  power supply:         yes
+  updated:              Sun 01 Sep 2019 09:42:27 AM MDT (511 seconds ago)
+  has history:          no
+  has statistics:       no
+  line-power
+    warning-level:       none
+    online:              no
+    icon-name:          'ac-adapter-symbolic'
+
+Device: /org/freedesktop/UPower/devices/battery_BAT1
+  native-path:          BAT1
+  vendor:               Hewlett-Packard
+  model:                PABAS0241231
+  serial:               41167
+  power supply:         yes
+  updated:              Sun 01 Sep 2019 09:50:27 AM MDT (31 seconds ago)
+  has history:          yes
+  has statistics:       yes
+  battery
+    present:             yes
+    rechargeable:        yes
+    state:               discharging
+    warning-level:       none
+    energy:              10.8801 Wh
+    energy-empty:        0 Wh
+    energy-full:         26.642 Wh
+    energy-full-design:  38.115 Wh
+    energy-rate:         2.112 W
+    voltage:             7.26 V
+    time to empty:       5.2 hours
+    percentage:          40%
+    capacity:            67.3939%
+    technology:          lithium-ion
+    icon-name:          'battery-good-symbolic'
+  History (rate):
+    1567353027    2.112    discharging
+
+Device: /org/freedesktop/UPower/devices/DisplayDevice
+  power supply:         yes
+  updated:              Sun 01 Sep 2019 09:50:27 AM MDT (31 seconds ago)
+  has history:          no
+  has statistics:       no
+  battery
+    present:             yes
+    state:               discharging
+    warning-level:       none
+    energy:              10.8801 Wh
+    energy-full:         26.642 Wh
+    energy-rate:         2.112 W
+    time to empty:       5.2 hours
+    percentage:          40%
+    icon-name:          'battery-good-symbolic'
+
+Daemon:
+  daemon-version:  0.99.10
+  on-battery:      yes
+  lid-is-closed:   no
+  lid-is-present:  yes
+  critical-action: PowerOff
+$
+
+PowerTOP v2.10    Overview   Idle stats   Frequency stats   Device
+stats   Tunables   WakeUp
+
+The battery reports a discharge rate of 229 mW
+The power consumed was 4.76 J
+The estimated remaining time is 43 hours, 7 minutes
+
+MUA is going to mess up the powertop paste, so this URL will have a
+tidy version for a while
+https://pastebin.com/raw/t1yxG0Av
+
+PowerTOP v2.10    Overview   Idle stats   Frequency stats   Device
+stats   Tunables   WakeUp
+
+The battery reports a discharge rate of 229 mW
+The power consumed was 4.76 J
+The estimated remaining time is 43 hours, 7 minutes
+
+Summary: 977.0 wakeups/second,  0.0 GPU ops/seconds, 0.0 VFS ops/sec
+and 29.2% CPU use
+
+                Usage       Events/s    Category       Description
+             63.7 ms/s       6.9        kWork          intel_atomic_commit_=
+work
+             57.5 ms/s      52.8        Process        [PID 22591]
+/usr/lib64/firefox/firefox -contentproc -childID 4 -isForBrowser
+-prefsLen 7781 -prefMapSiz
+             37.4 ms/s      59.9        Process        [PID 22336]
+/usr/lib64/firefox/firefox --name firefox-wayland
+             23.7 ms/s      26.5        Process        [PID 20600]
+/usr/bin/gnome-shell
+             14.1 ms/s     393.5        Timer          tick_sched_timer
+              9.9 ms/s       4.3        Process        [PID 23518]
+/usr/lib64/firefox/firefox -contentproc -childID 11 -isForBrowser
+-prefsLen 10181 -prefMapS
+              8.9 ms/s      53.2        Interrupt      PS/2 Touchpad /
+Keyboard / Mouse
+              7.0 ms/s      35.7        Process        [PID 22594]
+/usr/lib64/firefox/firefox -contentproc -childID 4 -isForBrowser
+-prefsLen 7781 -prefMapSiz
+              6.3 ms/s      41.8        Process        [PID 22376]
+/usr/lib64/firefox/firefox --name firefox-wayland
+              5.8 ms/s       2.2        Process        [PID 23528]
+/usr/lib64/firefox/firefox -contentproc -childID 12 -isForBrowser
+-prefsLen 10181 -prefMapS
+              5.1 ms/s      33.1        Interrupt      [7] sched(softirq)
+              5.0 ms/s       1.9        Process        [PID 23611]
+/usr/lib64/firefox/firefox -contentproc -childID 15 -isForBrowser
+-prefsLen 10181 -prefMapS
+              4.9 ms/s       2.7        Process        [PID 22439]
+/usr/lib64/firefox/firefox -contentproc -childID 1 -isForBrowser
+-prefsLen 1 -prefMapSize 1
+              3.8 ms/s      27.8        Process        [PID 22427]
+/usr/lib64/firefox/firefox --name firefox-wayland
+              3.4 ms/s      0.00        Interrupt      [1] timer(softirq)
+              2.9 ms/s      18.5        Timer          hrtimer_wakeup
+              2.7 ms/s      75.6        Process        [PID 22423]
+/usr/lib64/firefox/firefox --name firefox-wayland
+              2.6 ms/s      0.20        kWork          delayed_fput
+              2.3 ms/s      0.00        Interrupt      [9] RCU(softirq)
+              2.2 ms/s       2.8        kWork          gc_worker
+              2.1 ms/s       3.1        Process        [PID 23547]
+/usr/lib64/firefox/firefox -contentproc -childID 13 -isForBrowser
+-prefsLen 10181 -prefMapS
+              2.0 ms/s       4.3        Process        [PID 22483]
+/usr/lib64/firefox/firefox -contentproc -childID 2 -isForBrowser
+-prefsLen 6086 -prefMapSiz
+              1.7 ms/s      0.20        kWork          __i915_gem_free_work
+              1.5 ms/s      0.20        kWork          btrfs_endio_write_he=
+lper
+              1.3 ms/s       3.6        Process        [PID 23384] [kworker=
+/0:4]
+
+<ESC> Exit | <TAB> / <Shift + TAB> Navigate |
 
 
-I can confirm that works fine on kernel 4.20.7 and 4.20.11, but not on kern=
-el 4.20.10
+A discharge rate of 229 mW is not likely.
 
-So, it seems a problem with powertop running on kernel 4.20.10=C2=A0 (not t=
-ested 4.20.9 nor 4.20.8 as I did not compiled it)
+The other problem though is that upower is all over the map, it varies
+between 1 hour and 5 hours remaining. So I wonder if they're both
+getting spurious data from the battery or from the kernel (not sure
+how it works) and are just handling bad data differently?
 
-
-Regards,
-
-
-Pablo
+Thanks,
 
 
+--
+Chris Murphy
 
-On 20/2/19 17:30, Pablo Catalina wrote:
-> Hi,
->
-> Now compiling the latest kernel, I'll provide you more feedback tomorrow.=
- Attached my kernel config.
->
-> Not sure if it is a problem with the kernel or hardware... I'll check it =
-tomorrow too by running the latest stable kernel provided by Ubuntu.
->
->
-> Regarding powertop version: I tested with latest version from git (tag: v=
-2.10) and powertop 2.9 from Ubuntu 18.10 package.
->
->
-> Same coredump when running powertop without args and with --auto-tune.
->
->
-> Regards,
->
->
-> Pablo
->
->
->
-> On 19/2/19 10:30, Kammela, Gayatri wrote:
->> Hi Pablo,
->> Thanks for reporting! I have tried powertop v2.9 and v2.10 on kernel 4.2=
-0 with Ubuntu generic+ additional config options and didn't notice any core=
- dump issues. I have changed the processor type to Xeon and I couldn't repr=
-oduce it. Could you please share the kernel config that you've used to repr=
-oduce this issue? Also, could you try running latest powertop with latest k=
-ernel to see if it is still reproducible? =
-
->>
->> Thanks,
->> Gayatri
->>
->>> -----Original Message-----
->>> From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of
->>> Pablo Catalina
->>> Sent: Monday, February 18, 2019 1:46 PM
->>> To: powertop(a)lists.01.org
->>> Subject: [Powertop] CoreDump on version 2.9 and git.
->>>
->>> Hi,
->>>
->>> I have an Ubuntu 18.04 with kernel 4.20.10 (compiled manually with defa=
-ult
->>> Ubuntu options but changing the processor type to Xeon)
->>>
->>>
->>> I tested the version 2.9 and the latest code from git (tag 2.10):
->>>
->>> # git log
->>>
->>> e8765b5 (HEAD -> master, tag: v2.10, origin/master, origin/HEAD)
->>> src/wakeup/wakeup.h: Fix a minor issue in the wakeup.h file
->>>
->>>
->>> And I got a coredump when I run it normally and with --auto-tune (I dont
->>> have the coredump with --debug).
->>>
->>>
->>> The same coredump on normal run and with --auto-autotune.
->>>
->>>
->>> See attached the output of gdb (bt, registers, ...) and the coredump.
->>>
->>>
->>> Let me know if I can do anything else to help you to fix the bug, I'm n=
-ot C
->>> developer but I have a minimal knowledge about compiling code, patching,
->>> debug, ...
->>>
->>>
->>>
->>> Regards,
->>>
->>>
->>> Pablo
->>>
->>> _______________________________________________
->>> PowerTop mailing list
->>> PowerTop(a)lists.01.org
->>> https://lists.01.org/mailman/listinfo/powertop
-
-
---===============2872584002553623266==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="signature.asc"
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KCmlIVUVBUkVJQUIwV0lRUnF1eC9FNXVEWmpz
-aGw1NGkwbXpMcG1ldko4Z1VDWEcyTDFRQUtDUkMwbXpMcG1ldkoKOHZ5WUFQOUdKMEQ5UVl1Tmpy
-bjdjMHdBdmlxMXdLWDA4ZlFTNnhhRGpqazIzNWQ2TlFFQW9rdkRMZDRpSGxULwpIWXBYVjZwNng2
-WGhrZnE5V0JFWSs4NlMvZExtdUtJPQo9SkhBNwotLS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0K
-
---===============2872584002553623266==--
+--===============7511687022883868373==--
 
