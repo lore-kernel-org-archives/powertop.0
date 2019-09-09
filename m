@@ -1,70 +1,82 @@
-Content-Type: multipart/mixed; boundary="===============4189591810045872720=="
+Content-Type: multipart/mixed; boundary="===============0889454201132556569=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: Re: [Powertop] RH Bugzilla [Bug 1482649] Logitech USB Unified
- Receiver+M570 need 'waking' up by click after kernel update
-Date: Thu, 07 Sep 2017 13:03:47 -0700
-Message-ID: <419c8d$u57vqs@orsmga003.jf.intel.com>
-In-Reply-To: VI1PR0301MB2510765FF1A9FBAE0EDEFDFD87940@VI1PR0301MB2510.eurprd03.prod.outlook.com
+From: Zane Zakraisek <zakraise at eng.utah.edu>
+Subject: [Powertop] [PATCH] Make the wakeup toggle text clearer.
+Date: Mon, 09 Sep 2019 08:38:28 -0600
+Message-ID: <20190909143828.126826-1-zakraise@eng.utah.edu>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============4189591810045872720==
+--===============0889454201132556569==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 7 Sep 2017 18:09:59 +0000
-Mike Simms <micsim2007(a)outlook.com> wrote:
+The text is currenly "Enable" or "Disable", which makes it seem like
+toggling is needed to get it in that state.
 
-> Then explain why it was never an issue before kernel 4.12 please
+Instead the text should be "Enabled" or "Disabled" which reflects the
+current state.
 
-That's a question for the maintainer of the kernel USB HID driver driver
-community. The Linux kernel is a very large piece of software with many, ma=
-ny
-device drivers supporting still more devices. These drivers can and do chan=
-ge,
-for myriad reasons, from kernel release to kernel release.
+Signed-off-by: Zane Zakraisek <zakraise(a)eng.utah.edu>
+---
+ src/wakeup/wakeup.cpp          | 4 ++--
+ src/wakeup/wakeup_ethernet.cpp | 2 +-
+ src/wakeup/wakeup_usb.cpp      | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-Particular device power management behaviors are implemented by kernel devi=
-ce
-drivers. PowerTOP gives you the ability to toggle (or tune) low-level,
-power-sensitive settings for each device. If by toggling a setting for a
-particular device that device behaves in an undesirable way, you may have a
-kernel device driver bug.
+diff --git a/src/wakeup/wakeup.cpp b/src/wakeup/wakeup.cpp
+index 7ed074b..9d83a9a 100644
+--- a/src/wakeup/wakeup.cpp
++++ b/src/wakeup/wakeup.cpp
+@@ -45,8 +45,8 @@ wakeup::wakeup(void)
+ {
+ 	score =3D 0;
+         desc[0] =3D 0;
+-        pt_strcpy(wakeup_enable, _("Enable"));
+-        pt_strcpy(wakeup_disable, _("Disable"));
++        pt_strcpy(wakeup_enable, _("Enabled"));
++        pt_strcpy(wakeup_disable, _("Disabled"));
+ 	pt_strcpy(wakeup_idle, _("Unknown"));
+ }
+ =
 
-USB HID-- human interface device-- drivers, which include mice and the like,
-have an upstream kernel maintainer. In this specific case, the linux-usb
-mailing list would be a good starting point, or the kernel.org bugzilla.
+diff --git a/src/wakeup/wakeup_ethernet.cpp b/src/wakeup/wakeup_ethernet.cpp
+index 4df7be3..6ce1725 100644
+--- a/src/wakeup/wakeup_ethernet.cpp
++++ b/src/wakeup/wakeup_ethernet.cpp
+@@ -44,7 +44,7 @@
+ #include "../lib.h"
+ #include "wakeup_ethernet.h"
+ =
 
-In the general case, consulting the kernel MAINTAINERS file for the device =
-in
-question should provide a mailing list starting point when issues like these
-arise.
+-ethernet_wakeup::ethernet_wakeup(const char *path, const char *iface) : wa=
+keup("", 0.5, _("Enable"), _("Disable"))
++ethernet_wakeup::ethernet_wakeup(const char *path, const char *iface) : wa=
+keup("", 0.5, _("Enabled"), _("Disabled"))
+ {
+ 	memset(interf, 0, sizeof(interf));
+ 	pt_strcpy(interf, iface);
+diff --git a/src/wakeup/wakeup_usb.cpp b/src/wakeup/wakeup_usb.cpp
+index 30dc3e6..e0e4567 100644
+--- a/src/wakeup/wakeup_usb.cpp
++++ b/src/wakeup/wakeup_usb.cpp
+@@ -44,7 +44,7 @@
+ #include "../lib.h"
+ #include "wakeup_usb.h"
+ =
 
-Here I can only offer general advice, nothing specific. Hope it helps!
+-usb_wakeup::usb_wakeup(const char *path, const char *iface) : wakeup("", 0=
+.5, _("Enable"), _("Disable"))
++usb_wakeup::usb_wakeup(const char *path, const char *iface) : wakeup("", 0=
+.5, _("Enabled"), _("Disabled"))
+ {
+ 	memset(interf, 0, sizeof(interf));
+ 	pt_strcpy(interf, iface);
+-- =
 
---===============4189591810045872720==
-Content-Type: application/pgp-signature
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.sig"
+2.23.0
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KCmlRSXpCQUVCQ0FBZEZpRUVrUS8vcXlmRjdF
-UndpV2hLalloSDFTOUtxbVlGQWxteHBpTUFDZ2tRalloSDFTOUsKcW1aZVJnLy9WQjNSS3dvdkE4
-Q0EvN2VBc1dXSnd4MlMvZmRTVnJjSlkrdFRVUjhZbzBPT3hRaWgxNVo4aTdVQwptK1FHNUx6VVI5
-U0ZQMENzV0hEQ3dCK1d3NXpjZWMwQ2dCOTZQdFRUd2l0cXoya2VIQ3EvUDJVTWlqZ0xYcU1iCkJm
-dldPVjl1cVd3WTFwSmNXWGFxM1gzR1ZvQms2NXNtbWVndjFxalYvSktEQTlnbEpsZnBzNUYxQjlT
-SHRkMk0KbzB0eVJjTy9XTXlhbWNEWXd3NUhNQ2k5M2NweVZHWHJyaFJJaFphWC8ydFFQMlFsUW9w
-bFZJWG5KRnVTMDRYYwpnUlhqbmNIY1VZbmlxRG5qbWh6anJBWlltSWxQUTFQak1OVjI1d3dxelhS
-ZHBOWTE4WTQ4V21DYkJOOUJzNlYrCmJ6SzhDdzUwY25XUmFteTZ5RkY4VTNZaVdYS2wvUHRjeDg1
-UUllR3lDamp3K29YUzBWSE1HM1B6UHFwOHRqb0EKWWw1WHFPMzFKdzJCS2t0VDdZa1F0bjBCaVpI
-aXZqcFlRcDZYZlFzalZrR1pXNXBNSStpaUZVNys1MGpiWld6aQpSVnIwVlFXSVlHZUNUU21MdEND
-MW5Ec3VZVTRLQWxzbm16cEV2SDJRZlp2ZjVaNXZPblVVZTY3K20zNlZUeTc0CjFDWWZUZ2d4ZzRn
-bHFJZ3VBUGNvSVU5eml4aE1wWnhTZ2RFSXRnTm1KR0g3cU5qQ1dOT0YzYjZwMTZRaVowaUQKWDQ1
-NG9TUVI5T0hsU1Y5R0RZWUNySGpoRGZWQzlaR1J5MnoxL2ZwOWFnbEJ4eDRYSUJ0NWxUKyt2bDlQ
-V0lEegp4UGtBRkJkb1hHbzc4U1RGNEhpZXhxSE9aOU50Y3VJSlh3MndnbTJ2cDJEWWdBQmFLcFE9
-Cj1tVmJhCi0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQo=
 
---===============4189591810045872720==--
+--===============0889454201132556569==--
 
