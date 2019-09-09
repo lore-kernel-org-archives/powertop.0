@@ -1,84 +1,93 @@
-Content-Type: multipart/mixed; boundary="===============1088781573171623040=="
+Content-Type: multipart/mixed; boundary="===============7820978369075870509=="
 MIME-Version: 1.0
-From: Jaroslav Skarvada <jskarvad at redhat.com>
-Subject: [Powertop] Don't use intel_cpus if APERF MSR isn't supported
-Date: Tue, 15 May 2018 06:47:03 -0400
-Message-ID: <1961529890.2819749.1526381223415.JavaMail.zimbra@redhat.com>
-In-Reply-To: 1894742732.2819528.1526381127107.JavaMail.zimbra@redhat.com
+From: Auke Kok <auke-jan.h.kok at intel.com>
+Subject: Re: [Powertop] [PATCH] Make the wakeup toggle text clearer.
+Date: Mon, 09 Sep 2019 12:07:16 -0700
+Message-ID: <d3baeea8-8e8d-7e6f-0bbb-c9debb7087cc@intel.com>
+In-Reply-To: 20190909143828.126826-1-zakraise@eng.utah.edu
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1088781573171623040==
+--===============7820978369075870509==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
 
-resending the patch which should allow PowerTOP to run on KVM and
-other VMs not fully supporting MSR
+Ahh yes, +1, this has totally irked me and this is a good solution.
 
-thanks & regards
+Auke
 
-Jaroslav
 
---===============1088781573171623040==
-Content-Type: text/x-patch
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="0001-Don-t-use-intel_cpus-if-APERF-MSR-isn-t-supported.patch"
+On 9/9/19 7:38 AM, Zane Zakraisek wrote:
+> The text is currenly "Enable" or "Disable", which makes it seem like
+> toggling is needed to get it in that state.
+> =
 
-RnJvbSBmM2IyMWQ4YWE0Nzk5ZGI1YjFlYzQxNTQzZmNhZTY4MWMwMmE4Yzg5IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiA9P1VURi04P3E/SmFyb3NsYXY9MjA9QzU9QTBrYXJ2YWRhPz0g
-PGpza2FydmFkQHJlZGhhdC5jb20+CkRhdGU6IEZyaSwgNCBNYXkgMjAxOCAyMzozNjo0NiArMDIw
-MApTdWJqZWN0OiBbUEFUQ0hdIERvbid0IHVzZSBpbnRlbF9jcHVzIGlmIEFQRVJGIE1TUiBpc24n
-dCBzdXBwb3J0ZWQKTUlNRS1WZXJzaW9uOiAxLjAKQ29udGVudC1UeXBlOiB0ZXh0L3BsYWluOyBj
-aGFyc2V0PVVURi04CkNvbnRlbnQtVHJhbnNmZXItRW5jb2Rpbmc6IDhiaXQKClRoZSBpbnRlbF9j
-cHVzIChjbGFzcyBuaG1fcGFja2FnZSkgbmVlZHMgQVBFUkYgTVNSLiBUaGlzIG1heWJlIHByb2Js
-ZW0gb24Kc29tZSB2aXJ0dWFsIG1hY2hpbmVzIChlLmcuIEtWTSkgd2hlcmUgdGhlIEFQRVJGIE1T
-UiBpcyBub3QgaW1wbGVtZW50ZWQuCk9uIHN1Y2ggVk1zIHBvd2VydG9wIGV4aXRzIHdpdGggTVNS
-IHJlYWQgZXJyb3IgYW5kIGRvZXNuJ3Qgd29yay4gUHJldmlvdXNseSwKcG93ZXJ0b3Agd29ya2Vk
-IGluIHN1Y2ggY2FzZXMgKGUuZy4gcG93ZXJ0b3AtMi4zKS4gVGhpcyBwYXRjaCBhZGRzIGNoZWNr
-CndoZXRoZXIgQVBFUkYgTVNSIGlzIHN1cHBvcnRlZCwgaWYgbm90LCBpbnRlbF9jcHVzIGlzIG5v
-dCB1c2VkLgoKU2lnbmVkLW9mZi1ieTogSmFyb3NsYXYgxaBrYXJ2YWRhIDxqc2thcnZhZEByZWRo
-YXQuY29tPgotLS0KIHNyYy9jcHUvY3B1LmNwcCAgICAgICAgfCA2ICsrKy0tLQogc3JjL2NwdS9p
-bnRlbF9jcHVzLmNwcCB8IDYgKysrKy0tCiBzcmMvY3B1L2ludGVsX2NwdXMuaCAgIHwgMiArLQog
-MyBmaWxlcyBjaGFuZ2VkLCA4IGluc2VydGlvbnMoKyksIDYgZGVsZXRpb25zKC0pCgpkaWZmIC0t
-Z2l0IGEvc3JjL2NwdS9jcHUuY3BwIGIvc3JjL2NwdS9jcHUuY3BwCmluZGV4IGYzNzExZjUuLjAx
-OWQ5MjIgMTAwNjQ0Ci0tLSBhL3NyYy9jcHUvY3B1LmNwcAorKysgYi9zcmMvY3B1L2NwdS5jcHAK
-QEAgLTY4LDcgKzY4LDcgQEAgc3RhdGljIGNsYXNzIGFic3RyYWN0X2NwdSAqIG5ld19wYWNrYWdl
-KGludCBwYWNrYWdlLCBpbnQgY3B1LCBjaGFyICogdmVuZG9yLCBpbnQKIAljaGFyIHBhY2thZ2Vu
-YW1lWzEyOF07CiAJaWYgKHN0cmNtcCh2ZW5kb3IsICJHZW51aW5lSW50ZWwiKSA9PSAwKQogCQlp
-ZiAoZmFtaWx5ID09IDYpCi0JCQlpZiAoaXNfc3VwcG9ydGVkX2ludGVsX2NwdShtb2RlbCkpCisJ
-CQlpZiAoaXNfc3VwcG9ydGVkX2ludGVsX2NwdShtb2RlbCwgY3B1KSkKIAkJCQlyZXQgPSBuZXcg
-Y2xhc3MgbmhtX3BhY2thZ2UobW9kZWwpOwogCiAJaWYgKCFyZXQpCkBAIC0xMDUsNyArMTA1LDcg
-QEAgc3RhdGljIGNsYXNzIGFic3RyYWN0X2NwdSAqIG5ld19jb3JlKGludCBjb3JlLCBpbnQgY3B1
-LCBjaGFyICogdmVuZG9yLCBpbnQgZmFtaWwKIAogCWlmIChzdHJjbXAodmVuZG9yLCAiR2VudWlu
-ZUludGVsIikgPT0gMCkKIAkJaWYgKGZhbWlseSA9PSA2KQotCQkJaWYgKGlzX3N1cHBvcnRlZF9p
-bnRlbF9jcHUobW9kZWwpKQorCQkJaWYgKGlzX3N1cHBvcnRlZF9pbnRlbF9jcHUobW9kZWwsIGNw
-dSkpCiAJCQkJcmV0ID0gbmV3IGNsYXNzIG5obV9jb3JlKG1vZGVsKTsKIAogCWlmICghcmV0KQpA
-QCAtMTM0LDcgKzEzNCw3IEBAIHN0YXRpYyBjbGFzcyBhYnN0cmFjdF9jcHUgKiBuZXdfY3B1KGlu
-dCBudW1iZXIsIGNoYXIgKiB2ZW5kb3IsIGludCBmYW1pbHksIGludCBtCiAKIAlpZiAoc3RyY21w
-KHZlbmRvciwgIkdlbnVpbmVJbnRlbCIpID09IDApCiAJCWlmIChmYW1pbHkgPT0gNikKLQkJCWlm
-IChpc19zdXBwb3J0ZWRfaW50ZWxfY3B1KG1vZGVsKSkKKwkJCWlmIChpc19zdXBwb3J0ZWRfaW50
-ZWxfY3B1KG1vZGVsLCBudW1iZXIpKQogCQkJCXJldCA9IG5ldyBjbGFzcyBuaG1fY3B1OwogCiAJ
-aWYgKCFyZXQpCmRpZmYgLS1naXQgYS9zcmMvY3B1L2ludGVsX2NwdXMuY3BwIGIvc3JjL2NwdS9p
-bnRlbF9jcHVzLmNwcAppbmRleCA0YzdiMzE1Li4wMDMwZGJhIDEwMDY0NAotLS0gYS9zcmMvY3B1
-L2ludGVsX2NwdXMuY3BwCisrKyBiL3NyYy9jcHUvaW50ZWxfY3B1cy5jcHAKQEAgLTc3LDEzICs3
-NywxNSBAQCBzdGF0aWMgaW50IGludGVsX2NwdV9tb2RlbHNbXSA9IHsKIAogc3RhdGljIGludCBp
-bnRlbF9wc3RhdGVfZHJpdmVyX2xvYWRlZCA9IC0xOwogCi1pbnQgaXNfc3VwcG9ydGVkX2ludGVs
-X2NwdShpbnQgbW9kZWwpCitpbnQgaXNfc3VwcG9ydGVkX2ludGVsX2NwdShpbnQgbW9kZWwsIGlu
-dCBjcHUpCiB7CiAJaW50IGk7CisJdWludDY0X3QgbXNyOwogCiAJZm9yIChpID0gMDsgaW50ZWxf
-Y3B1X21vZGVsc1tpXSAhPSAwOyBpKyspCiAJCWlmIChtb2RlbCA9PSBpbnRlbF9jcHVfbW9kZWxz
-W2ldKQotCQkJcmV0dXJuIDE7CisJCQlpZiAoY3B1IDwgMCB8fCByZWFkX21zcihjcHUsIE1TUl9B
-UEVSRiwgJm1zcikgPj0gMCkKKwkJCQlyZXR1cm4gMTsKIAogCXJldHVybiAwOwogfQpkaWZmIC0t
-Z2l0IGEvc3JjL2NwdS9pbnRlbF9jcHVzLmggYi9zcmMvY3B1L2ludGVsX2NwdXMuaAppbmRleCBk
-MjBkYjlhLi43OWFmYjk4IDEwMDY0NAotLS0gYS9zcmMvY3B1L2ludGVsX2NwdXMuaAorKysgYi9z
-cmMvY3B1L2ludGVsX2NwdXMuaApAQCAtMTcyLDcgKzE3Miw3IEBAIHB1YmxpYzoKIAogfTsKIAot
-aW50IGlzX3N1cHBvcnRlZF9pbnRlbF9jcHUoaW50IG1vZGVsKTsKK2ludCBpc19zdXBwb3J0ZWRf
-aW50ZWxfY3B1KGludCBtb2RlbCwgaW50IGNwdSk7CiBpbnQgYnl0X2hhc19haGNpKCk7CiAKIGlu
-dCBpc19pbnRlbF9wc3RhdGVfZHJpdmVyX2xvYWRlZCgpOwotLSAKMi4xNC4zCgo=
+> Instead the text should be "Enabled" or "Disabled" which reflects the
+> current state.
+> =
 
---===============1088781573171623040==--
+> Signed-off-by: Zane Zakraisek <zakraise(a)eng.utah.edu>
+> ---
+>  src/wakeup/wakeup.cpp          | 4 ++--
+>  src/wakeup/wakeup_ethernet.cpp | 2 +-
+>  src/wakeup/wakeup_usb.cpp      | 2 +-
+>  3 files changed, 4 insertions(+), 4 deletions(-)
+> =
+
+> diff --git a/src/wakeup/wakeup.cpp b/src/wakeup/wakeup.cpp
+> index 7ed074b..9d83a9a 100644
+> --- a/src/wakeup/wakeup.cpp
+> +++ b/src/wakeup/wakeup.cpp
+> @@ -45,8 +45,8 @@ wakeup::wakeup(void)
+>  {
+>  	score =3D 0;
+>          desc[0] =3D 0;
+> -        pt_strcpy(wakeup_enable, _("Enable"));
+> -        pt_strcpy(wakeup_disable, _("Disable"));
+> +        pt_strcpy(wakeup_enable, _("Enabled"));
+> +        pt_strcpy(wakeup_disable, _("Disabled"));
+>  	pt_strcpy(wakeup_idle, _("Unknown"));
+>  }
+>  =
+
+> diff --git a/src/wakeup/wakeup_ethernet.cpp b/src/wakeup/wakeup_ethernet.=
+cpp
+> index 4df7be3..6ce1725 100644
+> --- a/src/wakeup/wakeup_ethernet.cpp
+> +++ b/src/wakeup/wakeup_ethernet.cpp
+> @@ -44,7 +44,7 @@
+>  #include "../lib.h"
+>  #include "wakeup_ethernet.h"
+>  =
+
+> -ethernet_wakeup::ethernet_wakeup(const char *path, const char *iface) : =
+wakeup("", 0.5, _("Enable"), _("Disable"))
+> +ethernet_wakeup::ethernet_wakeup(const char *path, const char *iface) : =
+wakeup("", 0.5, _("Enabled"), _("Disabled"))
+>  {
+>  	memset(interf, 0, sizeof(interf));
+>  	pt_strcpy(interf, iface);
+> diff --git a/src/wakeup/wakeup_usb.cpp b/src/wakeup/wakeup_usb.cpp
+> index 30dc3e6..e0e4567 100644
+> --- a/src/wakeup/wakeup_usb.cpp
+> +++ b/src/wakeup/wakeup_usb.cpp
+> @@ -44,7 +44,7 @@
+>  #include "../lib.h"
+>  #include "wakeup_usb.h"
+>  =
+
+> -usb_wakeup::usb_wakeup(const char *path, const char *iface) : wakeup("",=
+ 0.5, _("Enable"), _("Disable"))
+> +usb_wakeup::usb_wakeup(const char *path, const char *iface) : wakeup("",=
+ 0.5, _("Enabled"), _("Disabled"))
+>  {
+>  	memset(interf, 0, sizeof(interf));
+>  	pt_strcpy(interf, iface);
+> =
+
+
+
+--===============7820978369075870509==--
 
