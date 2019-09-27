@@ -1,87 +1,246 @@
-Content-Type: multipart/mixed; boundary="===============2525281724501252411=="
+Content-Type: multipart/mixed; boundary="===============7714878835700026453=="
 MIME-Version: 1.0
-From: Magnus Fromreide <magfr at lysator.liu.se>
-Subject: Re: [Powertop] [PATCH 1/4 v1] lib: refactor pci_access checks
-Date: Sat, 09 Sep 2017 09:18:18 +0200
-Message-ID: <20170909071818.GD18791@noemi.bahnhof.se>
-In-Reply-To: 20170908223651.27979-2-joe.konno@linux.intel.com
+From: Kammela, Gayatri <gayatri.kammela at intel.com>
+Subject: [Powertop] PowerTOP V2.11 Release
+Date: Fri, 27 Sep 2019 01:31:24 +0000
+Message-ID: <SN6PR11MB318150339A72C47FB6A8A2B4F2810@SN6PR11MB3181.namprd11.prod.outlook.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2525281724501252411==
+--===============7714878835700026453==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 08, 2017 at 03:36:48PM -0700, Joe Konno wrote:
-> From: Joe Konno <joe.konno(a)intel.com>
-> =
+We are pleased to announce the release of PowerTOP v2.11.
 
-> Pull the libpci initialization bits out and into its own dedicated functi=
-on.
+About PowerTOP:
 
-I think the name you choose for the function is odd since what it does is
-that it creates the pci_access object if it doesn't exist. It certainly ain=
-'t
-checking anything.
+PowerTOP is a Linux tool to diagnose issues with power consumption and powe=
+r management. In addition to being a diagnostic tool, PowerTOP also has an =
+interactive mode you can use to experiment with various power management se=
+ttings, for cases where the Linux distribution has not enabled those settin=
+gs.
 
-Maybe something along the lines of create_pci_access or initialize_pci_acce=
-ss
-would be a better name?
+PowerTOP reports which components in the system are most likely to able for=
+ higher-than-needed power consumption, ranging from software applications t=
+o active components in the system. Detailed screens are available for CPU C=
+ and P states, device activity, and software activity. For many years, Powe=
+rTOP has been used heavily by Intel, Linux distributors, and various parts =
+of the open source community.
 
-> Signed-off-by: Joe Konno <joe.konno(a)intel.com>
-> ---
->  src/lib.cpp | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
-> =
+About PowerTOP v2.11 release:
 
-> diff --git a/src/lib.cpp b/src/lib.cpp
-> index 5e48f375d087..2b95e64f427b 100644
-> --- a/src/lib.cpp
-> +++ b/src/lib.cpp
-> @@ -296,16 +296,21 @@ void format_watts(double W, char *buffer, unsigned =
-int len)
->  #ifndef HAVE_NO_PCI
->  static struct pci_access *pci_access;
->  =
+This release has an important feature to support runtime pm enabling for AH=
+CI. A few bug fixes focusing to support PowerTop to run in newer platforms.=
+ We have also enabled support for Intel's Ice Lake server and Ice Lake clie=
+nt with new Sunny Cove microarchitecture, Tiger Lake mobile and Tiger Lake =
+desktop, and atom based Tremont (Elkhart Lake). There has also been some bu=
+g fixes thanks to the contributors from the open source community.
 
-> +static void check_pci_access(void)
-> +{
-> +	if (!pci_access) {
-> +		pci_access =3D pci_alloc();
-> +		pci_init(pci_access);
-> +	}
-> +}
-> +
->  char *pci_id_to_name(uint16_t vendor, uint16_t device, char *buffer, int=
- len)
->  {
->  	char *ret;
->  =
+Thank you to everyone who contributed to this release!
 
->  	buffer[0] =3D 0;
->  =
+Anthony Wong (1):
+      Add bash command-line completion.
 
-> -	if (!pci_access) {
-> -		pci_access =3D pci_alloc();
-> -		pci_init(pci_access);
-> -	}
-> +	check_pci_access();
->  =
+Fabrice Fontaine(1):
+      wakeup.h: include limits.h
 
->  	ret =3D pci_lookup_name(pci_access, buffer, len, PCI_LOOKUP_VENDOR | PC=
-I_LOOKUP_DEVICE, vendor, device);
->  =
+Gayatri Kammela (5):
+      src/devices/ahci.cpp: fix: Remove the humanname from ahci_data array
+      src/tuning/tuning.cpp: fix: Update the size of tuned_data array
+      runtime_tunables: Add runtime pm enabling support for ahci
+      src/cpu/cpu.cpp: Bug fix: Increase the char buffer size in enumerate_=
+cpus()
+      src/parameters: fix: set the global parameter "global_power_override"=
+ to 1 to get power estimate
 
-> -- =
+Jaroslav Skarvada (1):
+      Fix vertical scrolling in powertop-2.10
 
-> 2.13.5
-> =
+Nivedita Swaminathan (8):
+      Add compatibility for non GNU strerror_r.
+      Add bash command-line completion.
+      Revert "Add bash command-line completion."
+      Enable support for ICL/ICX platform
+      Enable support for TGL platform.
+      Enable support for EHL platform.
+      po: regenerate with new POT and strings
+      powertop.pot: Fix Project-Id-Version
 
-> _______________________________________________
-> PowerTop mailing list
-> PowerTop(a)lists.01.org
-> https://lists.01.org/mailman/listinfo/powertop
+Rosen Penev (2):
+      src/main: Add missing pthread header
+      intel_cpus.cpp: Change open parameter to const char *
 
---===============2525281724501252411==--
+Zane Zakraisek(1):
+      Make the wakeup toggle text clearer
+
+Thanks ,
+Gayatri Kammela
+
+
+--===============7714878835700026453==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
+
+PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
+bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
+YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
+cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
+VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
+bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
+ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTUgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
+PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseToiQ2Ft
+YnJpYSBNYXRoIjsKCXBhbm9zZS0xOjIgNCA1IDMgNSA0IDYgMyAyIDQ7fQpAZm9udC1mYWNlCgl7
+Zm9udC1mYW1pbHk6Q2FsaWJyaTsKCXBhbm9zZS0xOjIgMTUgNSAyIDIgMiA0IDMgMiA0O30KQGZv
+bnQtZmFjZQoJe2ZvbnQtZmFtaWx5OlRhaG9tYTsKCXBhbm9zZS0xOjIgMTEgNiA0IDMgNSA0IDQg
+MiA0O30KLyogU3R5bGUgRGVmaW5pdGlvbnMgKi8KcC5Nc29Ob3JtYWwsIGxpLk1zb05vcm1hbCwg
+ZGl2Lk1zb05vcm1hbAoJe21hcmdpbjowaW47CgltYXJnaW4tYm90dG9tOi4wMDAxcHQ7Cglmb250
+LXNpemU6MTEuMHB0OwoJZm9udC1mYW1pbHk6IkNhbGlicmkiLHNhbnMtc2VyaWY7fQphOmxpbmss
+IHNwYW4uTXNvSHlwZXJsaW5rCgl7bXNvLXN0eWxlLXByaW9yaXR5Ojk5OwoJY29sb3I6IzA1NjND
+MTsKCXRleHQtZGVjb3JhdGlvbjp1bmRlcmxpbmU7fQphOnZpc2l0ZWQsIHNwYW4uTXNvSHlwZXJs
+aW5rRm9sbG93ZWQKCXttc28tc3R5bGUtcHJpb3JpdHk6OTk7Cgljb2xvcjojOTU0RjcyOwoJdGV4
+dC1kZWNvcmF0aW9uOnVuZGVybGluZTt9CnNwYW4uRW1haWxTdHlsZTE3Cgl7bXNvLXN0eWxlLXR5
+cGU6cGVyc29uYWwtY29tcG9zZTsKCWZvbnQtZmFtaWx5OiJDYWxpYnJpIixzYW5zLXNlcmlmOwoJ
+Y29sb3I6d2luZG93dGV4dDt9Ci5Nc29DaHBEZWZhdWx0Cgl7bXNvLXN0eWxlLXR5cGU6ZXhwb3J0
+LW9ubHk7Cglmb250LWZhbWlseToiQ2FsaWJyaSIsc2Fucy1zZXJpZjt9CkBwYWdlIFdvcmRTZWN0
+aW9uMQoJe3NpemU6OC41aW4gMTEuMGluOwoJbWFyZ2luOjEuMGluIDEuMGluIDEuMGluIDEuMGlu
+O30KZGl2LldvcmRTZWN0aW9uMQoJe3BhZ2U6V29yZFNlY3Rpb24xO30KLS0+PC9zdHlsZT48IS0t
+W2lmIGd0ZSBtc28gOV0+PHhtbD4KPG86c2hhcGVkZWZhdWx0cyB2OmV4dD0iZWRpdCIgc3BpZG1h
+eD0iMTAyNiIgLz4KPC94bWw+PCFbZW5kaWZdLS0+PCEtLVtpZiBndGUgbXNvIDldPjx4bWw+Cjxv
+OnNoYXBlbGF5b3V0IHY6ZXh0PSJlZGl0Ij4KPG86aWRtYXAgdjpleHQ9ImVkaXQiIGRhdGE9IjEi
+IC8+CjwvbzpzaGFwZWxheW91dD48L3htbD48IVtlbmRpZl0tLT4KPC9oZWFkPgo8Ym9keSBsYW5n
+PSJFTi1VUyIgbGluaz0iIzA1NjNDMSIgdmxpbms9IiM5NTRGNzIiPgo8ZGl2IGNsYXNzPSJXb3Jk
+U2VjdGlvbjEiPgo8cCBzdHlsZT0iYmFja2dyb3VuZDp3aGl0ZTt2ZXJ0aWNhbC1hbGlnbjpiYXNl
+bGluZSI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMC4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7VGFo
+b21hJnF1b3Q7LHNhbnMtc2VyaWY7Y29sb3I6YmxhY2siPldlIGFyZSBwbGVhc2VkIHRvIGFubm91
+bmNlIHRoZSByZWxlYXNlIG9mIFBvd2VyVE9QIHYyLjExLjxvOnA+PC9vOnA+PC9zcGFuPjwvcD4K
+PHAgc3R5bGU9ImJhY2tncm91bmQ6d2hpdGU7dmVydGljYWwtYWxpZ246YmFzZWxpbmU7bWFyZ2lu
+OjFyZW07Zm9udC12YXJpYW50LWxpZ2F0dXJlczogbm9ybWFsO2ZvbnQtdmFyaWFudC1jYXBzOiBu
+b3JtYWw7Zm9udC12YXJpYW50LW51bWVyaWM6IGluaGVyaXQ7Zm9udC12YXJpYW50LWVhc3QtYXNp
+YW46IGluaGVyaXQ7Zm9udC1zdHJldGNoOiBpbmhlcml0O2xpbmUtaGVpZ2h0OmluaGVyaXQ7b3Zl
+cmZsb3ctd3JhcDogYnJlYWstd29yZDtvcnBoYW5zOiAyO3RleHQtYWxpZ246c3RhcnQ7d2lkb3dz
+OiAyOy13ZWJraXQtdGV4dC1zdHJva2Utd2lkdGg6IDBweDt0ZXh0LWRlY29yYXRpb24tc3R5bGU6
+IGluaXRpYWw7dGV4dC1kZWNvcmF0aW9uLWNvbG9yOiBpbml0aWFsO3dvcmQtc3BhY2luZzowcHgi
+Pgo8c3BhbiBzdHlsZT0iZm9udC1zaXplOjEwLjBwdDtmb250LWZhbWlseTomcXVvdDtUYWhvbWEm
+cXVvdDssc2Fucy1zZXJpZjtjb2xvcjpibGFjayI+QWJvdXQgUG93ZXJUT1A6PG86cD48L286cD48
+L3NwYW4+PC9wPgo8cCBzdHlsZT0iYmFja2dyb3VuZDp3aGl0ZTt2ZXJ0aWNhbC1hbGlnbjpiYXNl
+bGluZTttYXJnaW46MXJlbTtmb250LXZhcmlhbnQtbGlnYXR1cmVzOiBub3JtYWw7Zm9udC12YXJp
+YW50LWNhcHM6IG5vcm1hbDtmb250LXZhcmlhbnQtbnVtZXJpYzogaW5oZXJpdDtmb250LXZhcmlh
+bnQtZWFzdC1hc2lhbjogaW5oZXJpdDtmb250LXN0cmV0Y2g6IGluaGVyaXQ7bGluZS1oZWlnaHQ6
+aW5oZXJpdDtvdmVyZmxvdy13cmFwOiBicmVhay13b3JkO29ycGhhbnM6IDI7dGV4dC1hbGlnbjpz
+dGFydDt3aWRvd3M6IDI7LXdlYmtpdC10ZXh0LXN0cm9rZS13aWR0aDogMHB4O3RleHQtZGVjb3Jh
+dGlvbi1zdHlsZTogaW5pdGlhbDt0ZXh0LWRlY29yYXRpb24tY29sb3I6IGluaXRpYWw7d29yZC1z
+cGFjaW5nOjBweCI+CjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTAuMHB0O2ZvbnQtZmFtaWx5OiZx
+dW90O1RhaG9tYSZxdW90OyxzYW5zLXNlcmlmO2NvbG9yOmJsYWNrIj5Qb3dlclRPUCBpcyBhIExp
+bnV4IHRvb2wgdG8gZGlhZ25vc2UgaXNzdWVzIHdpdGggcG93ZXIgY29uc3VtcHRpb24gYW5kIHBv
+d2VyIG1hbmFnZW1lbnQuIEluIGFkZGl0aW9uIHRvIGJlaW5nIGEgZGlhZ25vc3RpYyB0b29sLCBQ
+b3dlclRPUCBhbHNvIGhhcyBhbiBpbnRlcmFjdGl2ZSBtb2RlIHlvdSBjYW4gdXNlIHRvCiBleHBl
+cmltZW50IHdpdGggdmFyaW91cyBwb3dlciBtYW5hZ2VtZW50IHNldHRpbmdzLCBmb3IgY2FzZXMg
+d2hlcmUgdGhlIExpbnV4IGRpc3RyaWJ1dGlvbiBoYXMgbm90IGVuYWJsZWQgdGhvc2Ugc2V0dGlu
+Z3MuPG86cD48L286cD48L3NwYW4+PC9wPgo8cCBzdHlsZT0iYmFja2dyb3VuZDp3aGl0ZTt2ZXJ0
+aWNhbC1hbGlnbjpiYXNlbGluZTttYXJnaW46MXJlbTtmb250LXZhcmlhbnQtbGlnYXR1cmVzOiBu
+b3JtYWw7Zm9udC12YXJpYW50LWNhcHM6IG5vcm1hbDtmb250LXZhcmlhbnQtbnVtZXJpYzogaW5o
+ZXJpdDtmb250LXZhcmlhbnQtZWFzdC1hc2lhbjogaW5oZXJpdDtmb250LXN0cmV0Y2g6IGluaGVy
+aXQ7bGluZS1oZWlnaHQ6aW5oZXJpdDtvdmVyZmxvdy13cmFwOiBicmVhay13b3JkO29ycGhhbnM6
+IDI7dGV4dC1hbGlnbjpzdGFydDt3aWRvd3M6IDI7LXdlYmtpdC10ZXh0LXN0cm9rZS13aWR0aDog
+MHB4O3RleHQtZGVjb3JhdGlvbi1zdHlsZTogaW5pdGlhbDt0ZXh0LWRlY29yYXRpb24tY29sb3I6
+IGluaXRpYWw7d29yZC1zcGFjaW5nOjBweCI+CjxzcGFuIHN0eWxlPSJmb250LXNpemU6MTAuMHB0
+O2ZvbnQtZmFtaWx5OiZxdW90O1RhaG9tYSZxdW90OyxzYW5zLXNlcmlmO2NvbG9yOmJsYWNrIj5Q
+b3dlclRPUCByZXBvcnRzIHdoaWNoIGNvbXBvbmVudHMgaW4gdGhlIHN5c3RlbSBhcmUgbW9zdCBs
+aWtlbHkgdG8gYWJsZSBmb3IgaGlnaGVyLXRoYW4tbmVlZGVkIHBvd2VyIGNvbnN1bXB0aW9uLCBy
+YW5naW5nIGZyb20gc29mdHdhcmUgYXBwbGljYXRpb25zIHRvIGFjdGl2ZSBjb21wb25lbnRzIGlu
+IHRoZSBzeXN0ZW0uCiBEZXRhaWxlZCBzY3JlZW5zIGFyZSBhdmFpbGFibGUgZm9yIENQVSBDIGFu
+ZCBQIHN0YXRlcywgZGV2aWNlIGFjdGl2aXR5LCBhbmQgc29mdHdhcmUgYWN0aXZpdHkuIEZvciBt
+YW55IHllYXJzLCBQb3dlclRPUCBoYXMgYmVlbiB1c2VkIGhlYXZpbHkgYnkgSW50ZWwsIExpbnV4
+IGRpc3RyaWJ1dG9ycywgYW5kIHZhcmlvdXMgcGFydHMgb2YgdGhlIG9wZW4gc291cmNlIGNvbW11
+bml0eS48bzpwPjwvbzpwPjwvc3Bhbj48L3A+CjxwIHN0eWxlPSJiYWNrZ3JvdW5kOndoaXRlO3Zl
+cnRpY2FsLWFsaWduOmJhc2VsaW5lO21hcmdpbjoxcmVtO2ZvbnQtdmFyaWFudC1saWdhdHVyZXM6
+IG5vcm1hbDtmb250LXZhcmlhbnQtY2Fwczogbm9ybWFsO2ZvbnQtdmFyaWFudC1udW1lcmljOiBp
+bmhlcml0O2ZvbnQtdmFyaWFudC1lYXN0LWFzaWFuOiBpbmhlcml0O2ZvbnQtc3RyZXRjaDogaW5o
+ZXJpdDtsaW5lLWhlaWdodDppbmhlcml0O292ZXJmbG93LXdyYXA6IGJyZWFrLXdvcmQ7b3JwaGFu
+czogMjt0ZXh0LWFsaWduOnN0YXJ0O3dpZG93czogMjstd2Via2l0LXRleHQtc3Ryb2tlLXdpZHRo
+OiAwcHg7dGV4dC1kZWNvcmF0aW9uLXN0eWxlOiBpbml0aWFsO3RleHQtZGVjb3JhdGlvbi1jb2xv
+cjogaW5pdGlhbDt3b3JkLXNwYWNpbmc6MHB4Ij4KPHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMC4w
+cHQ7Zm9udC1mYW1pbHk6JnF1b3Q7VGFob21hJnF1b3Q7LHNhbnMtc2VyaWY7Y29sb3I6YmxhY2si
+PkFib3V0IFBvd2VyVE9QIHYyLjExIHJlbGVhc2U6PG86cD48L286cD48L3NwYW4+PC9wPgo8cCBz
+dHlsZT0iYmFja2dyb3VuZDp3aGl0ZTt2ZXJ0aWNhbC1hbGlnbjpiYXNlbGluZTttYXJnaW46MXJl
+bTtmb250LXZhcmlhbnQtbGlnYXR1cmVzOiBub3JtYWw7Zm9udC12YXJpYW50LWNhcHM6IG5vcm1h
+bDtmb250LXZhcmlhbnQtbnVtZXJpYzogaW5oZXJpdDtmb250LXZhcmlhbnQtZWFzdC1hc2lhbjog
+aW5oZXJpdDtmb250LXN0cmV0Y2g6IGluaGVyaXQ7bGluZS1oZWlnaHQ6aW5oZXJpdDtvdmVyZmxv
+dy13cmFwOiBicmVhay13b3JkO29ycGhhbnM6IDI7dGV4dC1hbGlnbjpzdGFydDt3aWRvd3M6IDI7
+LXdlYmtpdC10ZXh0LXN0cm9rZS13aWR0aDogMHB4O3RleHQtZGVjb3JhdGlvbi1zdHlsZTogaW5p
+dGlhbDt0ZXh0LWRlY29yYXRpb24tY29sb3I6IGluaXRpYWw7d29yZC1zcGFjaW5nOjBweCI+Cjxz
+cGFuIHN0eWxlPSJmb250LXNpemU6MTAuMHB0O2ZvbnQtZmFtaWx5OiZxdW90O1RhaG9tYSZxdW90
+OyxzYW5zLXNlcmlmO2NvbG9yOmJsYWNrIj5UaGlzIHJlbGVhc2UgaGFzIGFuIGltcG9ydGFudCBm
+ZWF0dXJlIHRvIHN1cHBvcnQgcnVudGltZSBwbSBlbmFibGluZyBmb3IgQUhDSS4gQSBmZXcgYnVn
+IGZpeGVzIGZvY3VzaW5nIHRvIHN1cHBvcnQgUG93ZXJUb3AgdG8gcnVuIGluIG5ld2VyIHBsYXRm
+b3Jtcy4gV2UgaGF2ZSBhbHNvIGVuYWJsZWQgc3VwcG9ydCBmb3IKIEludGVsJiM4MjE3O3MgSWNl
+IExha2Ugc2VydmVyIGFuZCBJY2UgTGFrZSBjbGllbnQgd2l0aCBuZXcgU3VubnkgQ292ZSBtaWNy
+b2FyY2hpdGVjdHVyZSwgVGlnZXIgTGFrZSBtb2JpbGUgYW5kIFRpZ2VyIExha2UgZGVza3RvcCwg
+YW5kIGF0b20gYmFzZWQgVHJlbW9udCAoRWxraGFydCBMYWtlKS4gVGhlcmUgaGFzIGFsc28gYmVl
+biBzb21lIGJ1ZyBmaXhlcyB0aGFua3MgdG8gdGhlIGNvbnRyaWJ1dG9ycyBmcm9tIHRoZSBvcGVu
+IHNvdXJjZSBjb21tdW5pdHkuPG86cD48L286cD48L3NwYW4+PC9wPgo8cCBzdHlsZT0iYmFja2dy
+b3VuZDp3aGl0ZTt2ZXJ0aWNhbC1hbGlnbjpiYXNlbGluZSI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6
+ZToxMC4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7VGFob21hJnF1b3Q7LHNhbnMtc2VyaWY7Y29sb3I6
+YmxhY2siPlRoYW5rIHlvdSB0byBldmVyeW9uZSB3aG8gY29udHJpYnV0ZWQgdG8gdGhpcyByZWxl
+YXNlITxvOnA+PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PG86cD4mbmJz
+cDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPkFudGhvbnkgV29uZyAoMSk6PG86cD48
+L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
+YnNwOyBBZGQgYmFzaCBjb21tYW5kLWxpbmUgY29tcGxldGlvbi48bzpwPjwvbzpwPjwvcD4KPHAg
+Y2xhc3M9Ik1zb05vcm1hbCI+PG86cD4mbmJzcDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3Jt
+YWwiPkZhYnJpY2UgRm9udGFpbmUoMSk6PG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3Jt
+YWwiPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyB3YWtldXAuaDogaW5jbHVkZSBsaW1p
+dHMuaDxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpw
+PjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+R2F5YXRyaSBLYW1tZWxhICg1KTo8bzpwPjwvbzpw
+PjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+IHNyYy9kZXZpY2VzL2FoY2kuY3BwOiBmaXg6IFJlbW92ZSB0aGUgaHVtYW5uYW1lIGZyb20gYWhj
+aV9kYXRhIGFycmF5PG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPiZuYnNwOyZu
+YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBzcmMvdHVuaW5nL3R1bmluZy5jcHA6IGZpeDogVXBkYXRl
+IHRoZSBzaXplIG9mIHR1bmVkX2RhdGEgYXJyYXk8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1z
+b05vcm1hbCI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHJ1bnRpbWVfdHVuYWJsZXM6
+IEFkZCBydW50aW1lIHBtIGVuYWJsaW5nIHN1cHBvcnQgZm9yIGFoY2k8bzpwPjwvbzpwPjwvcD4K
+PHAgY2xhc3M9Ik1zb05vcm1hbCI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHNyYy9j
+cHUvY3B1LmNwcDogQnVnIGZpeDogSW5jcmVhc2UgdGhlIGNoYXIgYnVmZmVyIHNpemUgaW4gZW51
+bWVyYXRlX2NwdXMoKTxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj4mbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgc3JjL3BhcmFtZXRlcnM6IGZpeDogc2V0IHRoZSBnbG9i
+YWwgcGFyYW1ldGVyICZxdW90O2dsb2JhbF9wb3dlcl9vdmVycmlkZSZxdW90OyB0byAxIHRvIGdl
+dCBwb3dlciBlc3RpbWF0ZTxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpw
+PiZuYnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+SmFyb3NsYXYgU2thcnZhZGEg
+KDEpOjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj4mbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsgRml4IHZlcnRpY2FsIHNjcm9sbGluZyBpbiBwb3dlcnRvcC0yLjEwPG86
+cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPgo8
+cCBjbGFzcz0iTXNvTm9ybWFsIj5OaXZlZGl0YSBTd2FtaW5hdGhhbiAoOCk6PG86cD48L286cD48
+L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBB
+ZGQgY29tcGF0aWJpbGl0eSBmb3Igbm9uIEdOVSBzdHJlcnJvcl9yLjxvOnA+PC9vOnA+PC9wPgo8
+cCBjbGFzcz0iTXNvTm9ybWFsIj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgQWRkIGJh
+c2ggY29tbWFuZC1saW5lIGNvbXBsZXRpb24uPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29O
+b3JtYWwiPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDtSZXZlcnQgJnF1b3Q7QWRkIGJh
+c2ggY29tbWFuZC1saW5lIGNvbXBsZXRpb24uJnF1b3Q7PG86cD48L286cD48L3A+CjxwIGNsYXNz
+PSJNc29Ob3JtYWwiPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBFbmFibGUgc3VwcG9y
+dCBmb3IgSUNML0lDWCBwbGF0Zm9ybTxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFs
+Ij4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgRW5hYmxlIHN1cHBvcnQgZm9yIFRHTCBw
+bGF0Zm9ybS48bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+Jm5ic3A7Jm5ic3A7
+Jm5ic3A7Jm5ic3A7Jm5ic3A7IEVuYWJsZSBzdXBwb3J0IGZvciBFSEwgcGxhdGZvcm0uPG86cD48
+L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
+YnNwOyBwbzogcmVnZW5lcmF0ZSB3aXRoIG5ldyBQT1QgYW5kIHN0cmluZ3M8bzpwPjwvbzpwPjwv
+cD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHBv
+d2VydG9wLnBvdDogRml4IFByb2plY3QtSWQtVmVyc2lvbjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFz
+cz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+
+Um9zZW4gUGVuZXYgKDIpOjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj4mbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgc3JjL21haW46IEFkZCBtaXNzaW5nIHB0aHJlYWQg
+aGVhZGVyPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPiZuYnNwOyZuYnNwOyZu
+YnNwOyZuYnNwOyZuYnNwOyBpbnRlbF9jcHVzLmNwcDogQ2hhbmdlIG9wZW4gcGFyYW1ldGVyIHRv
+IGNvbnN0IGNoYXIgKjxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpwPiZu
+YnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+WmFuZSBaYWtyYWlzZWsoMSk6PG86
+cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
+OyZuYnNwOyBNYWtlIHRoZSB3YWtldXAgdG9nZ2xlIHRleHQgY2xlYXJlcjxvOnA+PC9vOnA+PC9w
+Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpwPiZuYnNwOzwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1z
+b05vcm1hbCI+VGhhbmtzICw8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+R2F5
+YXRyaSBLYW1tZWxhPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5i
+c3A7PC9vOnA+PC9wPgo8L2Rpdj4KPC9ib2R5Pgo8L2h0bWw+Cg==
+
+--===============7714878835700026453==--
 
