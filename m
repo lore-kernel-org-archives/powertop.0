@@ -1,40 +1,32 @@
-Content-Type: multipart/mixed; boundary="===============5905711240040852050=="
+Content-Type: multipart/mixed; boundary="===============2849945024542831490=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: [Powertop] Gentoo: v2.6.1 breaks packaging traditions
-Date: Fri, 30 May 2014 14:57:04 -0700
-Message-ID: <1401487024.3006.85.camel@jbkonno-mobl1>
+From: kingma at bluewin.ch
+Subject: [Powertop] HIgh power concumption on network interface
+Date: Sat, 28 Sep 2019 02:01:14 +0000
+Message-ID: <19592850.4247.1392276748004.JavaMail.webmail@bluewin.ch>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============5905711240040852050==
+--===============2849945024542831490==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hey gang,
+I observe a sustained high power consumption of 5- 10 W on the ehternet ada=
+ptor e1000e on a lenovo thinkgpad t430s. Such I high power drain cannot be =
+correct can it? the total power consumption is around 25 W which is a conce=
+rn for battery life.
 
-In hacking together a package (ebuild) for Gentoo, two issues
-complicated what should otherwise have been a trivial update.
+--===============2849945024542831490==
+Content-Type: text/html
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="attachment.html"
 
-1) There are two release tarballs for the version. The first of these
-was pointed to by default when I made my initial pass-- assumption was
-that the "powertop-2.6.1.tar.gz" would be hosted on the server. I was
-right. However, that tarball resulted in a broken build.
-
-https://01.org/sites/default/files/downloads/powertop/powertop-2.6.1.tar.gz
-
-https://01.org/sites/default/files/downloads/powertop/powertop-2.6.1.tar_0.=
-gz
-
-2) Further, the second tarball URL (found on 01.org mousing over links)
-ends in "tar_0.gz", which breaks with filename convention and also
-breaks Gentoo's out-of-the-box 'unpack' packaging function.
-
-Are there any plans to remedy this?
-
-Cheers and thanks
-
-
---===============5905711240040852050==--
+SSBvYnNlcnZlIGEgc3VzdGFpbmVkIGhpZ2ggcG93ZXIgY29uc3VtcHRpb24gb2YgNS0gMTAgVyBv
+biB0aGUgZWh0ZXJuZXQgYWRhcHRvciBlMTAwMGUgb24gYSBsZW5vdm8gdGhpbmtncGFkIHQ0MzBz
+LiBTdWNoIEkgaGlnaCBwb3dlciBkcmFpbiBjYW5ub3QgYmUgY29ycmVjdCBjYW4gaXQ/IHRoZSB0
+b3RhbCBwb3dlciBjb25zdW1wdGlvbiBpcyBhcm91bmQgMjUgVyB3aGljaCBpcyBhIGNvbmNlcm4g
+Zm9yIGJhdHRlcnkgbGlmZS48YnI+
+--===============2849945024542831490==--
 
