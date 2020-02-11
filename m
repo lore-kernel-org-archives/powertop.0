@@ -1,127 +1,135 @@
-Content-Type: multipart/mixed; boundary="===============2230888493313176417=="
+Content-Type: multipart/mixed; boundary="===============5201825522044739999=="
 MIME-Version: 1.0
-From: Paranjape, Gautam <gautam.paranjape at intel.com>
-Subject: [Powertop] [PATCH] Modify how line_levels are assigned so c-states
- won't overwrite other c-states
-Date: Mon, 17 Jul 2017 22:39:52 +0000
-Message-ID: <55056A404D4AA94785E70767BB51D122173E12@ORSMSX111.amr.corp.intel.com>
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: [Powertop] [PATCH 1/3 v1] Revert "configure.ac: version strings from
+ git describe"
+Date: Tue, 11 Feb 2020 14:15:40 -0800
+Message-ID: <20200211221542.46228-2-joe.konno@linux.intel.com>
+In-Reply-To: 20200211221542.46228-1-joe.konno@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============2230888493313176417==
+--===============5201825522044739999==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Some c-states exposed by the intel_idle driver are assigned the same line_l=
-evel, which
-means that the most recent one assigned can overwrite another c-state. For
-example, the C1-SKL c-state is overwriten by the C1E-SKL c-state because bo=
-th
-are assigned line_level 1. To fix this, check if a "sub c-state" (ex. C1E-S=
-KL)
-is being inserted. If so, check the vector of c-states if a c-state with si=
-milar name
-(ex. C1-SKL, compared to C1E-SKL), and modify the line level so there is no
-overwriting.
+From: Joe Konno <joe.konno(a)intel.com>
 
-Signed-off-by: Gautam Paranjape <gautam.paranjape(a)intel.com>
+This doesn't work as well as I thought it would. So, let's remove it. As
+a result of the revert, remove a reference to a now-dead preprocessor
+define (PACKAGE_SHORT_VERSION).
+
+This reverts commit 2daaaf54d07340610af759cc7f4c41742abb3277.
+
+Signed-off-by: Joe Konno <joe.konno(a)intel.com>
 ---
- src/cpu/abstract_cpu.cpp | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ .gitignore      |  1 -
+ Makefile.am     |  2 --
+ autogen.sh      |  1 -
+ configure.ac    |  5 +----
+ scripts/version | 13 -------------
+ src/display.cpp |  2 +-
+ 6 files changed, 2 insertions(+), 22 deletions(-)
+ delete mode 100644 scripts/version
 
-diff --git a/src/cpu/abstract_cpu.cpp b/src/cpu/abstract_cpu.cpp
-index bc323368b71f..c59721cb349a 100644
---- a/src/cpu/abstract_cpu.cpp
-+++ b/src/cpu/abstract_cpu.cpp
-@@ -218,6 +218,17 @@ void abstract_cpu::insert_cstate(const char *linux_nam=
-e, const char *human_name,
-         }
-         if (*c >=3D '0' && *c <=3D'9') {
-             state->line_level =3D strtoull(c, NULL, 10);
-+            if(*(c+1) !=3D '-'){
-+                int greater_line_level =3D strtoull(c, NULL, 10);
-+                for(unsigned int pos =3D 0; pos < cstates.size(); pos++){
-+                    if(*c =3D=3D cstates[pos]->human_name[1]){
-+                        if(*(c+1) !=3D cstates[pos]->human_name[2]){
-+                            greater_line_level =3D max(greater_line_level,=
- cstates[pos]->line_level);
-+                            state->line_level =3D greater_line_level + 1;
-+                        }
-+                    }
-+                }
-+            }
-             break;
-         }
-         c++;
---
-2.9.3
+diff --git a/.gitignore b/.gitignore
+index 8358ca4c6c0f..c1fc2be37afe 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -89,5 +89,4 @@ Makefile.in
+ /src/powertop
+ /stamp-h1
+ /stamp-po
+-/version*
+ tags
+diff --git a/Makefile.am b/Makefile.am
+index ffb5e91b2834..22429e0ce562 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -15,6 +15,4 @@ EXTRA_DIST =3D \
+ 	TODO \
+ 	Android.mk \
+ 	COPYING \
+-	version-long \
+-	version-short \
+ 	autogen.sh
+diff --git a/autogen.sh b/autogen.sh
+index 444f9998f806..e210037d70e0 100755
+--- a/autogen.sh
++++ b/autogen.sh
+@@ -1,4 +1,3 @@
+ #!/bin/sh	=
 
---===============2230888493313176417==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+ =
 
-PGh0bWwgZGlyPSJsdHIiPgo8aGVhZD4KPG1ldGEgaHR0cC1lcXVpdj0iQ29udGVudC1UeXBlIiBj
-b250ZW50PSJ0ZXh0L2h0bWw7IGNoYXJzZXQ9aXNvLTg4NTktMSI+CjxzdHlsZSB0eXBlPSJ0ZXh0
-L2NzcyIgaWQ9Im93YVBhcmFTdHlsZSI+UCB7bWFyZ2luLXRvcDowO21hcmdpbi1ib3R0b206MDt9
-PC9zdHlsZT4KPC9oZWFkPgo8Ym9keSBmcHN0eWxlPSIxIiBvY3NpPSIwIj4KPGRpdiBzdHlsZT0i
-ZGlyZWN0aW9uOiBsdHI7Zm9udC1mYW1pbHk6IFRhaG9tYTtjb2xvcjogIzAwMDAwMDtmb250LXNp
-emU6IDEwcHQ7Ij5Tb21lIGMtc3RhdGVzIGV4cG9zZWQgYnkgdGhlIGludGVsX2lkbGUgZHJpdmVy
-IGFyZSBhc3NpZ25lZCB0aGUgc2FtZSBsaW5lX2xldmVsLCB3aGljaDxicj4KbWVhbnMgdGhhdCB0
-aGUgbW9zdCByZWNlbnQgb25lIGFzc2lnbmVkIGNhbiBvdmVyd3JpdGUgYW5vdGhlciBjLXN0YXRl
-LiBGb3I8YnI+CmV4YW1wbGUsIHRoZSBDMS1TS0wgYy1zdGF0ZSBpcyBvdmVyd3JpdGVuIGJ5IHRo
-ZSBDMUUtU0tMIGMtc3RhdGUgYmVjYXVzZSBib3RoPGJyPgphcmUgYXNzaWduZWQgbGluZV9sZXZl
-bCAxLiBUbyBmaXggdGhpcywgY2hlY2sgaWYgYSAmcXVvdDtzdWIgYy1zdGF0ZSZxdW90OyAoZXgu
-IEMxRS1TS0wpPGJyPgppcyBiZWluZyBpbnNlcnRlZC4gSWYgc28sIGNoZWNrIHRoZSB2ZWN0b3Ig
-b2YgYy1zdGF0ZXMgaWYgYSBjLXN0YXRlIHdpdGggc2ltaWxhciBuYW1lPGJyPgooZXguIEMxLVNL
-TCwgY29tcGFyZWQgdG8gQzFFLVNLTCksIGFuZCBtb2RpZnkgdGhlIGxpbmUgbGV2ZWwgc28gdGhl
-cmUgaXMgbm88YnI+Cm92ZXJ3cml0aW5nLjxicj4KPGJyPgpTaWduZWQtb2ZmLWJ5OiBHYXV0YW0g
-UGFyYW5qYXBlICZsdDtnYXV0YW0ucGFyYW5qYXBlQGludGVsLmNvbSZndDs8YnI+Ci0tLTxicj4K
-Jm5ic3A7c3JjL2NwdS9hYnN0cmFjdF9jcHUuY3BwIHwgMTEgJiM0MzsmIzQzOyYjNDM7JiM0Mzsm
-IzQzOyYjNDM7JiM0MzsmIzQzOyYjNDM7JiM0MzsmIzQzOzxicj4KJm5ic3A7MSBmaWxlIGNoYW5n
-ZWQsIDExIGluc2VydGlvbnMoJiM0MzspPGJyPgo8YnI+CmRpZmYgLS1naXQgYS9zcmMvY3B1L2Fi
-c3RyYWN0X2NwdS5jcHAgYi9zcmMvY3B1L2Fic3RyYWN0X2NwdS5jcHA8YnI+CmluZGV4IGJjMzIz
-MzY4YjcxZi4uYzU5NzIxY2IzNDlhIDEwMDY0NDxicj4KLS0tIGEvc3JjL2NwdS9hYnN0cmFjdF9j
-cHUuY3BwPGJyPgomIzQzOyYjNDM7JiM0MzsgYi9zcmMvY3B1L2Fic3RyYWN0X2NwdS5jcHA8YnI+
-CkBAIC0yMTgsNiAmIzQzOzIxOCwxNyBAQCB2b2lkIGFic3RyYWN0X2NwdTo6aW5zZXJ0X2NzdGF0
-ZShjb25zdCBjaGFyICpsaW51eF9uYW1lLCBjb25zdCBjaGFyICpodW1hbl9uYW1lLDxicj4KJm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyB9PGJyPgombmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7Jm5ic3A7IGlmICgqYyAmZ3Q7PSAnMCcgJmFtcDsm
-YW1wOyAqYyAmbHQ7PSc5Jykgezxicj4KJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZu
-YnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgc3RhdGUtJmd0O2xpbmVfbGV2ZWwgPSBzdHJ0
-b3VsbChjLCBOVUxMLCAxMCk7PGJyPgomIzQzOyZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJz
-cDsmbmJzcDsgJm5ic3A7Jm5ic3A7Jm5ic3A7IGlmKCooYyYjNDM7MSkgIT0gJy0nKXs8YnI+CiYj
-NDM7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJz
-cDsgJm5ic3A7Jm5ic3A7Jm5ic3A7IGludCBncmVhdGVyX2xpbmVfbGV2ZWwgPSBzdHJ0b3VsbChj
-LCBOVUxMLCAxMCk7PGJyPgomIzQzOyZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJz
-cDsgJm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyBmb3IodW5zaWduZWQgaW50
-IHBvcyA9IDA7IHBvcyAmbHQ7IGNzdGF0ZXMuc2l6ZSgpOyBwb3MmIzQzOyYjNDM7KXs8YnI+CiYj
-NDM7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJz
-cDsgJm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyBpZigqYyA9PSBjc3RhdGVz
-W3Bvc10tJmd0O2h1bWFuX25hbWVbMV0pezxicj4KJiM0MzsmbmJzcDsmbmJzcDsmbmJzcDsgJm5i
-c3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgJm5i
-c3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyBpZigqKGMmIzQzOzEpICE9IGNzdGF0
-ZXNbcG9zXS0mZ3Q7aHVtYW5fbmFtZVsyXSl7PGJyPgomIzQzOyZuYnNwOyZuYnNwOyZuYnNwOyAm
-bmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAm
-bmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyBn
-cmVhdGVyX2xpbmVfbGV2ZWwgPSBtYXgoZ3JlYXRlcl9saW5lX2xldmVsLCBjc3RhdGVzW3Bvc10t
-Jmd0O2xpbmVfbGV2ZWwpOzxicj4KJiM0MzsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7
-Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7
-Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgc3RhdGUtJmd0O2xp
-bmVfbGV2ZWwgPSBncmVhdGVyX2xpbmVfbGV2ZWwgJiM0MzsgMTs8YnI+CiYjNDM7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5i
-c3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgfTxicj4KJiM0
-MzsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNw
-OyAmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7Jm5ic3A7IH08YnI+CiYjNDM7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7
-Jm5ic3A7Jm5ic3A7IH08YnI+CiYjNDM7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZuYnNwOyZu
-YnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgfTxicj4KJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZu
-YnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgYnJlYWs7PGJyPgombmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsgJm5ic3A7Jm5ic3A7Jm5ic3A7IH08YnI+CiZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsgYyYjNDM7JiM0Mzs7PGJyPgotLSA8YnI+CjIuOS4z
-PGJyPgo8L2Rpdj4KPC9ib2R5Pgo8L2h0bWw+Cg==
+-sh scripts/version
+ autoreconf --install --verbose
+diff --git a/configure.ac b/configure.ac
+index ca7f1d5cefea..b3a6b2ca2639 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2,8 +2,7 @@
+ # Process this file with autoconf to produce a configure script.
+ =
 
---===============2230888493313176417==--
+ AC_PREREQ([2.68])
+-AC_INIT([powertop], m4_esyscmd_s([cat version-long]),
+-	[powertop(a)lists.01.org], [], [https://01.org/powertop])
++AC_INIT([powertop], [2.12-pre], [powertop(a)lists.01.org], [], [https://01=
+.org/powertop])
+ AM_INIT_AUTOMAKE([
+ 	-Wall
+ 	1.12.2
+@@ -152,8 +151,6 @@ AC_SEARCH_LIBS([inet_aton], [resolv], [], [
+ 	AC_MSG_ERROR([libresolv is required but was not found])
+ ], [])
+ =
+
+-AC_DEFINE([PACKAGE_SHORT_VERSION], m4_esyscmd_s([cat version-short]),
+-	[Short package version])
+ =
+
+ AS_IF([`pkg-config --exists bash-completion`], [
+ 	bashcompletiondir=3D`pkg-config --variable=3Dcompletionsdir --define-vari=
+able=3Dprefix=3D${prefix} bash-completion`
+diff --git a/scripts/version b/scripts/version
+deleted file mode 100644
+index 348b13d9f785..000000000000
+--- a/scripts/version
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#!/bin/sh
+-
+-git branch > /dev/null 2>&1
+-if [ "$?" =3D "0" ]; then
+-	LONG=3D$(git describe --abbrev=3D7 --tags --always --dirty 2> /dev/null)
+-	SHORT=3D\"$(git describe --tags --abbrev=3D0 2> /dev/null)\"
+-else
+-	LONG=3D"RUN-VERSION-SCRIPT-IN-GIT-REPOSITORY-ONLY"
+-	SHORT=3D\"$LONG\"
+-fi
+-
+-echo $LONG  > version-long
+-echo $SHORT > version-short
+diff --git a/src/display.cpp b/src/display.cpp
+index 7b3a7a2f2073..71311446728d 100644
+--- a/src/display.cpp
++++ b/src/display.cpp
+@@ -117,7 +117,7 @@ void show_tab(unsigned int tab)
+ =
+
+ 	wattrset(tab_bar, A_REVERSE);
+ 	mvwprintw(tab_bar, 0,0, "%120s", "");
+-	mvwprintw(tab_bar, 0,0, "PowerTOP %s", PACKAGE_SHORT_VERSION);
++	mvwprintw(tab_bar, 0,0, "PowerTOP %s", PACKAGE_VERSION);
+ =
+
+ 	bottom_line =3D newwin(1, 0, LINES-1, 0);
+ 	wattrset(bottom_line, A_REVERSE);
+-- =
+
+2.25.0
+
+--===============5201825522044739999==--
 
