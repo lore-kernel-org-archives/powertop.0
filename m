@@ -1,148 +1,142 @@
-Content-Type: multipart/mixed; boundary="===============1528335620211050948=="
+Content-Type: multipart/mixed; boundary="===============2324730756860465075=="
 MIME-Version: 1.0
-From: Kammela, Gayatri <gayatri.kammela at intel.com>
-Subject: Re: [Powertop] CoreDump on version 2.9 and git.
-Date: Wed, 20 Feb 2019 10:21:48 +0000
-Message-ID: <2824B99DC70CE746926327C52CA42F76487E5BCE@ORSMSX111.amr.corp.intel.com>
-In-Reply-To: 8795bd83-c0ea-2457-de75-ea84b0f4a65b@gmx.de
+From: Anthony Wong <yp at anthonywong.net>
+Subject: [Powertop] Re: [PATCH 1/3 v1] Revert "configure.ac: version strings
+ from git describe"
+Date: Thu, 02 Apr 2020 13:55:07 +0800
+Message-ID: <CAC=0FnGCS7A6uwSeV6SLgb60Qfpv85AKBhH2F1RJb6NMyiX7cw@mail.gmail.com>
+In-Reply-To: 20200211221542.46228-2-joe.konno@linux.intel.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============1528335620211050948==
+--===============2324730756860465075==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Harvey,
-Thanks for the report! I will try and reproduce the issue on ArchLinux. Jus=
-t curious if Archlinux has any issues with PowerTop v2.9 on 4.20 kernel as =
-well. =
+This patch has not been fully applied to the github project, the
+src/display.cpp part has been left out, making the program now fail to
+compile.
+Please see https://github.com/fenrus75/powertop/commit/152a39949691d34e1c6d=
+67272f3b63cbbe61bf81
 
+-- =
 
-Thanks,
-Gayatri
+Anthony
 
-> -----Original Message-----
-> From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of
-> Harvey
-> Sent: Tuesday, February 19, 2019 2:05 AM
-> To: powertop(a)lists.01.org
-> Subject: Re: [Powertop] CoreDump on version 2.9 and git.
-> =
-
-> Hello,
-> =
-
-> please forgive me to chime in here, but...
-> =
-
-> this happens as well on Archlinux with a vanilla kernel 4.20.10-arch1-1-A=
-RCH
-> and powertop 2.10
-> (https://www.archlinux.org/packages/community/x86_64/powertop/)
-> =
-
-> If one starts powertop it bails out with
-> =
-
-> Feb 19 11:03:13 obelix systemd-coredump[14698]: Process 14692 (powertop)
-> of user 0 dumped core.
-> =
-
->                                                 Stack trace of thread 146=
-92:
->                                                 #0  0x000055868ba1d157 n/=
-a (powertop)
->                                                 #1  0x000055868ba1df22 n/=
-a (powertop)
->                                                 #2  0x000055868b9f7cb3 n/=
-a (powertop)
->                                                 #3  0x000055868b9f2556 n/=
-a (powertop)
->                                                 #4  0x000055868b9e8a16 n/=
-a (powertop)
->                                                 #5  0x00007f7215905223 __=
-libc_start_main
-> (libc.so.6)
->                                                 #6  0x000055868b9e9b5e n/=
-a (powertop)
-> =
-
-> =
-
-> HTH
-> =
-
-> Greetings
-> Harvey
-> =
-
-> Am 19.02.19 um 10:30 schrieb Kammela, Gayatri:
-> > Hi Pablo,
-> > Thanks for reporting! I have tried powertop v2.9 and v2.10 on kernel 4.=
-20
-> with Ubuntu generic+ additional config options and didn't notice any core
-> dump issues. I have changed the processor type to Xeon and I couldn't
-> reproduce it. Could you please share the kernel config that you've used to
-> reproduce this issue? Also, could you try running latest powertop with la=
-test
-> kernel to see if it is still reproducible?
-> >
-> > Thanks,
-> > Gayatri
-> >
-> >> -----Original Message-----
-> >> From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of
-> >> Pablo Catalina
-> >> Sent: Monday, February 18, 2019 1:46 PM
-> >> To: powertop(a)lists.01.org
-> >> Subject: [Powertop] CoreDump on version 2.9 and git.
-> >>
-> >> Hi,
-> >>
-> >> I have an Ubuntu 18.04 with kernel 4.20.10 (compiled manually with
-> >> default Ubuntu options but changing the processor type to Xeon)
-> >>
-> >>
-> >> I tested the version 2.9 and the latest code from git (tag 2.10):
-> >>
-> >> # git log
-> >>
-> >> e8765b5 (HEAD -> master, tag: v2.10, origin/master, origin/HEAD)
-> >> src/wakeup/wakeup.h: Fix a minor issue in the wakeup.h file
-> >>
-> >>
-> >> And I got a coredump when I run it normally and with --auto-tune (I
-> >> dont have the coredump with --debug).
-> >>
-> >>
-> >> The same coredump on normal run and with --auto-autotune.
-> >>
-> >>
-> >> See attached the output of gdb (bt, registers, ...) and the coredump.
-> >>
-> >>
-> >> Let me know if I can do anything else to help you to fix the bug, I'm
-> >> not C developer but I have a minimal knowledge about compiling code,
-> >> patching, debug, ...
-> >>
-> >>
-> >>
-> >> Regards,
-> >>
-> >>
-> >> Pablo
-> >
-> > _______________________________________________
-> > PowerTop mailing list
-> > PowerTop(a)lists.01.org
-> > https://lists.01.org/mailman/listinfo/powertop
-> >
-> =
-
+On Wed, 12 Feb 2020 at 06:16, Joe Konno <joe.konno(a)linux.intel.com> wrote:
+>
+> From: Joe Konno <joe.konno(a)intel.com>
+>
+> This doesn't work as well as I thought it would. So, let's remove it. As
+> a result of the revert, remove a reference to a now-dead preprocessor
+> define (PACKAGE_SHORT_VERSION).
+>
+> This reverts commit 2daaaf54d07340610af759cc7f4c41742abb3277.
+>
+> Signed-off-by: Joe Konno <joe.konno(a)intel.com>
+> ---
+>  .gitignore      |  1 -
+>  Makefile.am     |  2 --
+>  autogen.sh      |  1 -
+>  configure.ac    |  5 +----
+>  scripts/version | 13 -------------
+>  src/display.cpp |  2 +-
+>  6 files changed, 2 insertions(+), 22 deletions(-)
+>  delete mode 100644 scripts/version
+>
+> diff --git a/.gitignore b/.gitignore
+> index 8358ca4c6c0f..c1fc2be37afe 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -89,5 +89,4 @@ Makefile.in
+>  /src/powertop
+>  /stamp-h1
+>  /stamp-po
+> -/version*
+>  tags
+> diff --git a/Makefile.am b/Makefile.am
+> index ffb5e91b2834..22429e0ce562 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -15,6 +15,4 @@ EXTRA_DIST =3D \
+>         TODO \
+>         Android.mk \
+>         COPYING \
+> -       version-long \
+> -       version-short \
+>         autogen.sh
+> diff --git a/autogen.sh b/autogen.sh
+> index 444f9998f806..e210037d70e0 100755
+> --- a/autogen.sh
+> +++ b/autogen.sh
+> @@ -1,4 +1,3 @@
+>  #!/bin/sh
+>
+> -sh scripts/version
+>  autoreconf --install --verbose
+> diff --git a/configure.ac b/configure.ac
+> index ca7f1d5cefea..b3a6b2ca2639 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -2,8 +2,7 @@
+>  # Process this file with autoconf to produce a configure script.
+>
+>  AC_PREREQ([2.68])
+> -AC_INIT([powertop], m4_esyscmd_s([cat version-long]),
+> -       [powertop(a)lists.01.org], [], [https://01.org/powertop])
+> +AC_INIT([powertop], [2.12-pre], [powertop(a)lists.01.org], [], [https://=
+01.org/powertop])
+>  AM_INIT_AUTOMAKE([
+>         -Wall
+>         1.12.2
+> @@ -152,8 +151,6 @@ AC_SEARCH_LIBS([inet_aton], [resolv], [], [
+>         AC_MSG_ERROR([libresolv is required but was not found])
+>  ], [])
+>
+> -AC_DEFINE([PACKAGE_SHORT_VERSION], m4_esyscmd_s([cat version-short]),
+> -       [Short package version])
+>
+>  AS_IF([`pkg-config --exists bash-completion`], [
+>         bashcompletiondir=3D`pkg-config --variable=3Dcompletionsdir --def=
+ine-variable=3Dprefix=3D${prefix} bash-completion`
+> diff --git a/scripts/version b/scripts/version
+> deleted file mode 100644
+> index 348b13d9f785..000000000000
+> --- a/scripts/version
+> +++ /dev/null
+> @@ -1,13 +0,0 @@
+> -#!/bin/sh
+> -
+> -git branch > /dev/null 2>&1
+> -if [ "$?" =3D "0" ]; then
+> -       LONG=3D$(git describe --abbrev=3D7 --tags --always --dirty 2> /de=
+v/null)
+> -       SHORT=3D\"$(git describe --tags --abbrev=3D0 2> /dev/null)\"
+> -else
+> -       LONG=3D"RUN-VERSION-SCRIPT-IN-GIT-REPOSITORY-ONLY"
+> -       SHORT=3D\"$LONG\"
+> -fi
+> -
+> -echo $LONG  > version-long
+> -echo $SHORT > version-short
+> diff --git a/src/display.cpp b/src/display.cpp
+> index 7b3a7a2f2073..71311446728d 100644
+> --- a/src/display.cpp
+> +++ b/src/display.cpp
+> @@ -117,7 +117,7 @@ void show_tab(unsigned int tab)
+>
+>         wattrset(tab_bar, A_REVERSE);
+>         mvwprintw(tab_bar, 0,0, "%120s", "");
+> -       mvwprintw(tab_bar, 0,0, "PowerTOP %s", PACKAGE_SHORT_VERSION);
+> +       mvwprintw(tab_bar, 0,0, "PowerTOP %s", PACKAGE_VERSION);
+>
+>         bottom_line =3D newwin(1, 0, LINES-1, 0);
+>         wattrset(bottom_line, A_REVERSE);
 > --
-> I am root. If you see me laughing, you'd better have a backup!
-
-
---===============1528335620211050948==--
+> 2.25.0
+> _______________________________________________
+> PowerTop mailing list -- powertop(a)lists.01.org
+> To unsubscribe send an email to powertop-leave(a)lists.01.org
+--===============2324730756860465075==--
 
