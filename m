@@ -1,152 +1,170 @@
-Content-Type: multipart/mixed; boundary="===============3690293087784456624=="
+Content-Type: multipart/mixed; boundary="===============1951059234805711833=="
 MIME-Version: 1.0
 From: Kammela, Gayatri <gayatri.kammela at intel.com>
-Subject: Re: [Powertop] Update on recent segfault issue with powertop
-Date: Sun, 03 Mar 2019 21:17:10 +0000
-Message-ID: <2824B99DC70CE746926327C52CA42F76487EA099@ORSMSX111.amr.corp.intel.com>
-In-Reply-To: CANp3UNAtHStkfdiRCMob-2SqZ2ZAKJtE8FWQHswBuX_q5SMbWg@mail.gmail.com
+Subject: [Powertop] Re: [PATCH 1/3 v1] Revert "configure.ac: version strings
+ from git describe"
+Date: Thu, 02 Apr 2020 16:27:40 +0000
+Message-ID: <BYAPR11MB36246160B1928CF03416A0A1F2C60@BYAPR11MB3624.namprd11.prod.outlook.com>
+In-Reply-To: CAC=0FnGXZy1YwtR5qOYyS60hnGBOmVxBcuKxuf=9JX7rjxAz3w@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3690293087784456624==
+--===============1951059234805711833==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Yes it was in 5.0-rc7. Thanks for catching that =E2=98=BA
+> -----Original Message-----
+> From: Anthony Wong <yp(a)anthonywong.net>
+> Sent: Thursday, April 2, 2020 12:07 AM
+> To: powertop(a)lists.01.org; Joe Konno <joe.konno(a)linux.intel.com>
+> Subject: [Powertop] Re: [PATCH 1/3 v1] Revert "configure.ac: version stri=
+ngs
+> from git describe"
+> =
 
-From: Sparr [mailto:sparr0(a)gmail.com]
-Sent: Thursday, February 28, 2019 9:39 PM
-To: Kammela, Gayatri <gayatri.kammela(a)intel.com>
-Cc: powertop(a)lists.01.org; Pablo Catalina <xkill(a)locolandia.net>; harv(=
-a)gmx.de; Ivo Nenchev <ivo.n.nenchev(a)gmail.com>
-Subject: Re: Update on recent segfault issue with powertop
+> Also, configure.ac in github uses 2.9-pre, which should really be 2.12-pr=
+e.
+Yeah, I agree
+> =
 
-It appears to also be fixed in 5.0-rc8
+> --
+> Anthony
+> =
 
-On Thu, Feb 28, 2019 at 9:25 PM Kammela, Gayatri <gayatri.kammela(a)intel.c=
-om<mailto:gayatri.kammela(a)intel.com>> wrote:
-Hi,
-
-As suspected, the segfault issue in stable releases (4.20.10/4.20.9/4.20.8)=
- is due to the same patch that caused segfault in mainline 5.0-rc6.
-Here is the original patch https://lkml.org/lkml/2019/1/10/412  that caused=
- the issue. It made in to 4.20.8 (https://kernel.googlesource.com/pub/scm/l=
-inux/kernel/git/stable/linux-stable/+/refs/tags/v4.20.8/kernel/events/ring_=
-buffer.c#737 ) stable release and only fixed in 4.20.11(https://kernel.goog=
-lesource.com/pub/scm/linux/kernel/git/stable/linux-stable/+/refs/tags/v4.20=
-.11/kernel/events/ring_buffer.c#737 ).
-
-Thanks to everyone who tested it and reported!
-
-Thanks ,
-Gayatri Kammela
-
-
---===============3690293087784456624==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
-
-PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
-bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
-YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
-cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
-VFIvUkVDLWh0bWw0MCI+DQo8aGVhZD4NCjxtZXRhIGh0dHAtZXF1aXY9IkNvbnRlbnQtVHlwZSIg
-Y29udGVudD0idGV4dC9odG1sOyBjaGFyc2V0PXV0Zi04Ij4NCjxtZXRhIG5hbWU9IkdlbmVyYXRv
-ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTUgKGZpbHRlcmVkIG1lZGl1bSkiPg0KPHN0eWxl
-PjwhLS0NCi8qIEZvbnQgRGVmaW5pdGlvbnMgKi8NCkBmb250LWZhY2UNCgl7Zm9udC1mYW1pbHk6
-V2luZ2RpbmdzOw0KCXBhbm9zZS0xOjUgMCAwIDAgMCAwIDAgMCAwIDA7fQ0KQGZvbnQtZmFjZQ0K
-CXtmb250LWZhbWlseToiQ2FtYnJpYSBNYXRoIjsNCglwYW5vc2UtMToyIDQgNSAzIDUgNCA2IDMg
-MiA0O30NCkBmb250LWZhY2UNCgl7Zm9udC1mYW1pbHk6Q2FsaWJyaTsNCglwYW5vc2UtMToyIDE1
-IDUgMiAyIDIgNCAzIDIgNDt9DQovKiBTdHlsZSBEZWZpbml0aW9ucyAqLw0KcC5Nc29Ob3JtYWws
-IGxpLk1zb05vcm1hbCwgZGl2Lk1zb05vcm1hbA0KCXttYXJnaW46MGluOw0KCW1hcmdpbi1ib3R0
-b206LjAwMDFwdDsNCglmb250LXNpemU6MTIuMHB0Ow0KCWZvbnQtZmFtaWx5OiJUaW1lcyBOZXcg
-Um9tYW4iLHNlcmlmO30NCmE6bGluaywgc3Bhbi5Nc29IeXBlcmxpbmsNCgl7bXNvLXN0eWxlLXBy
-aW9yaXR5Ojk5Ow0KCWNvbG9yOmJsdWU7DQoJdGV4dC1kZWNvcmF0aW9uOnVuZGVybGluZTt9DQph
-OnZpc2l0ZWQsIHNwYW4uTXNvSHlwZXJsaW5rRm9sbG93ZWQNCgl7bXNvLXN0eWxlLXByaW9yaXR5
-Ojk5Ow0KCWNvbG9yOnB1cnBsZTsNCgl0ZXh0LWRlY29yYXRpb246dW5kZXJsaW5lO30NCnNwYW4u
-RW1haWxTdHlsZTE3DQoJe21zby1zdHlsZS10eXBlOnBlcnNvbmFsLXJlcGx5Ow0KCWZvbnQtZmFt
-aWx5OiJDYWxpYnJpIixzYW5zLXNlcmlmOw0KCWNvbG9yOiMxRjQ5N0Q7fQ0KLk1zb0NocERlZmF1
-bHQNCgl7bXNvLXN0eWxlLXR5cGU6ZXhwb3J0LW9ubHk7DQoJZm9udC1mYW1pbHk6IkNhbGlicmki
-LHNhbnMtc2VyaWY7fQ0KQHBhZ2UgV29yZFNlY3Rpb24xDQoJe3NpemU6OC41aW4gMTEuMGluOw0K
-CW1hcmdpbjoxLjBpbiAxLjBpbiAxLjBpbiAxLjBpbjt9DQpkaXYuV29yZFNlY3Rpb24xDQoJe3Bh
-Z2U6V29yZFNlY3Rpb24xO30NCi0tPjwvc3R5bGU+PCEtLVtpZiBndGUgbXNvIDldPjx4bWw+DQo8
-bzpzaGFwZWRlZmF1bHRzIHY6ZXh0PSJlZGl0IiBzcGlkbWF4PSIxMDI2IiAvPg0KPC94bWw+PCFb
-ZW5kaWZdLS0+PCEtLVtpZiBndGUgbXNvIDldPjx4bWw+DQo8bzpzaGFwZWxheW91dCB2OmV4dD0i
-ZWRpdCI+DQo8bzppZG1hcCB2OmV4dD0iZWRpdCIgZGF0YT0iMSIgLz4NCjwvbzpzaGFwZWxheW91
-dD48L3htbD48IVtlbmRpZl0tLT4NCjwvaGVhZD4NCjxib2R5IGxhbmc9IkVOLVVTIiBsaW5rPSJi
-bHVlIiB2bGluaz0icHVycGxlIj4NCjxkaXYgY2xhc3M9IldvcmRTZWN0aW9uMSI+DQo8cCBjbGFz
-cz0iTXNvTm9ybWFsIj48c3BhbiBzdHlsZT0iZm9udC1zaXplOjExLjBwdDtmb250LWZhbWlseTom
-cXVvdDtDYWxpYnJpJnF1b3Q7LHNhbnMtc2VyaWY7Y29sb3I6IzFGNDk3RCI+WWVzIGl0IHdhcyBp
-biA1LjAtcmM3LiBUaGFua3MgZm9yIGNhdGNoaW5nIHRoYXQNCjwvc3Bhbj48c3BhbiBzdHlsZT0i
-Zm9udC1zaXplOjExLjBwdDtmb250LWZhbWlseTpXaW5nZGluZ3M7Y29sb3I6IzFGNDk3RCI+Sjwv
-c3Bhbj48c3BhbiBzdHlsZT0iZm9udC1zaXplOjExLjBwdDtmb250LWZhbWlseTomcXVvdDtDYWxp
-YnJpJnF1b3Q7LHNhbnMtc2VyaWY7Y29sb3I6IzFGNDk3RCI+PG86cD48L286cD48L3NwYW4+PC9w
-Pg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PGEgbmFtZT0iX01haWxFbmRDb21wb3NlIj48c3BhbiBz
-dHlsZT0iZm9udC1zaXplOjExLjBwdDtmb250LWZhbWlseTomcXVvdDtDYWxpYnJpJnF1b3Q7LHNh
-bnMtc2VyaWY7Y29sb3I6IzFGNDk3RCI+PG86cD4mbmJzcDs8L286cD48L3NwYW4+PC9hPjwvcD4N
-CjxkaXYgc3R5bGU9ImJvcmRlcjpub25lO2JvcmRlci1sZWZ0OnNvbGlkIGJsdWUgMS41cHQ7cGFk
-ZGluZzowaW4gMGluIDBpbiA0LjBwdCI+DQo8ZGl2Pg0KPGRpdiBzdHlsZT0iYm9yZGVyOm5vbmU7
-Ym9yZGVyLXRvcDpzb2xpZCAjRTFFMUUxIDEuMHB0O3BhZGRpbmc6My4wcHQgMGluIDBpbiAwaW4i
-Pg0KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PGI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMS4wcHQ7
-Zm9udC1mYW1pbHk6JnF1b3Q7Q2FsaWJyaSZxdW90OyxzYW5zLXNlcmlmIj5Gcm9tOjwvc3Bhbj48
-L2I+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMS4wcHQ7Zm9udC1mYW1pbHk6JnF1b3Q7Q2FsaWJy
-aSZxdW90OyxzYW5zLXNlcmlmIj4gU3BhcnIgW21haWx0bzpzcGFycjBAZ21haWwuY29tXQ0KPGJy
-Pg0KPGI+U2VudDo8L2I+IFRodXJzZGF5LCBGZWJydWFyeSAyOCwgMjAxOSA5OjM5IFBNPGJyPg0K
-PGI+VG86PC9iPiBLYW1tZWxhLCBHYXlhdHJpICZsdDtnYXlhdHJpLmthbW1lbGFAaW50ZWwuY29t
-Jmd0Ozxicj4NCjxiPkNjOjwvYj4gcG93ZXJ0b3BAbGlzdHMuMDEub3JnOyBQYWJsbyBDYXRhbGlu
-YSAmbHQ7eGtpbGxAbG9jb2xhbmRpYS5uZXQmZ3Q7OyBoYXJ2QGdteC5kZTsgSXZvIE5lbmNoZXYg
-Jmx0O2l2by5uLm5lbmNoZXZAZ21haWwuY29tJmd0Ozxicj4NCjxiPlN1YmplY3Q6PC9iPiBSZTog
-VXBkYXRlIG9uIHJlY2VudCBzZWdmYXVsdCBpc3N1ZSB3aXRoIHBvd2VydG9wPG86cD48L286cD48
-L3NwYW4+PC9wPg0KPC9kaXY+DQo8L2Rpdj4NCjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxvOnA+Jm5i
-c3A7PC9vOnA+PC9wPg0KPGRpdj4NCjxwIGNsYXNzPSJNc29Ob3JtYWwiPkl0IGFwcGVhcnMgdG8g
-YWxzbyBiZSBmaXhlZCBpbiA1LjAtcmM4PG86cD48L286cD48L3A+DQo8L2Rpdj4NCjxwIGNsYXNz
-PSJNc29Ob3JtYWwiPjxvOnA+Jm5ic3A7PC9vOnA+PC9wPg0KPGRpdj4NCjxkaXY+DQo8cCBjbGFz
-cz0iTXNvTm9ybWFsIj5PbiBUaHUsIEZlYiAyOCwgMjAxOSBhdCA5OjI1IFBNIEthbW1lbGEsIEdh
-eWF0cmkgJmx0OzxhIGhyZWY9Im1haWx0bzpnYXlhdHJpLmthbW1lbGFAaW50ZWwuY29tIj5nYXlh
-dHJpLmthbW1lbGFAaW50ZWwuY29tPC9hPiZndDsgd3JvdGU6PG86cD48L286cD48L3A+DQo8L2Rp
-dj4NCjxibG9ja3F1b3RlIHN0eWxlPSJib3JkZXI6bm9uZTtib3JkZXItbGVmdDpzb2xpZCAjQ0ND
-Q0NDIDEuMHB0O3BhZGRpbmc6MGluIDBpbiAwaW4gNi4wcHQ7bWFyZ2luLWxlZnQ6NC44cHQ7bWFy
-Z2luLXJpZ2h0OjBpbiI+DQo8ZGl2Pg0KPGRpdj4NCjxwIGNsYXNzPSJNc29Ob3JtYWwiIHN0eWxl
-PSJtc28tbWFyZ2luLXRvcC1hbHQ6YXV0bzttc28tbWFyZ2luLWJvdHRvbS1hbHQ6YXV0byI+SGks
-PG86cD48L286cD48L3A+DQo8cCBjbGFzcz0iTXNvTm9ybWFsIiBzdHlsZT0ibXNvLW1hcmdpbi10
-b3AtYWx0OmF1dG87bXNvLW1hcmdpbi1ib3R0b20tYWx0OmF1dG8iPiZuYnNwOzxvOnA+PC9vOnA+
-PC9wPg0KPHAgY2xhc3M9Ik1zb05vcm1hbCIgc3R5bGU9Im1zby1tYXJnaW4tdG9wLWFsdDphdXRv
-O21zby1tYXJnaW4tYm90dG9tLWFsdDphdXRvIj5BcyBzdXNwZWN0ZWQsIHRoZSBzZWdmYXVsdCBp
-c3N1ZSBpbiBzdGFibGUgcmVsZWFzZXMgKDQuMjAuMTAvNC4yMC45LzQuMjAuOCkgaXMgZHVlIHRv
-IHRoZSBzYW1lIHBhdGNoIHRoYXQgY2F1c2VkIHNlZ2ZhdWx0IGluIG1haW5saW5lIDUuMC1yYzYu
-DQo8bzpwPjwvbzpwPjwvcD4NCjxwIGNsYXNzPSJNc29Ob3JtYWwiIHN0eWxlPSJtc28tbWFyZ2lu
-LXRvcC1hbHQ6YXV0bzttc28tbWFyZ2luLWJvdHRvbS1hbHQ6YXV0byI+SGVyZSBpcyB0aGUgb3Jp
-Z2luYWwgcGF0Y2gNCjxhIGhyZWY9Imh0dHBzOi8vbGttbC5vcmcvbGttbC8yMDE5LzEvMTAvNDEy
-IiB0YXJnZXQ9Il9ibGFuayI+aHR0cHM6Ly9sa21sLm9yZy9sa21sLzIwMTkvMS8xMC80MTI8L2E+
-ICZuYnNwO3RoYXQgY2F1c2VkIHRoZSBpc3N1ZS4gSXQgbWFkZSBpbiB0byA0LjIwLjggKDxhIGhy
-ZWY9Imh0dHBzOi8va2VybmVsLmdvb2dsZXNvdXJjZS5jb20vcHViL3NjbS9saW51eC9rZXJuZWwv
-Z2l0L3N0YWJsZS9saW51eC1zdGFibGUvJiM0MzsvcmVmcy90YWdzL3Y0LjIwLjgva2VybmVsL2V2
-ZW50cy9yaW5nX2J1ZmZlci5jIzczNyIgdGFyZ2V0PSJfYmxhbmsiPmh0dHBzOi8va2VybmVsLmdv
-b2dsZXNvdXJjZS5jb20vcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L3N0YWJsZS9saW51eC1zdGFi
-bGUvJiM0MzsvcmVmcy90YWdzL3Y0LjIwLjgva2VybmVsL2V2ZW50cy9yaW5nX2J1ZmZlci5jIzcz
-NzwvYT4NCiApIHN0YWJsZSByZWxlYXNlIGFuZCBvbmx5IGZpeGVkIGluIDQuMjAuMTEoPGEgaHJl
-Zj0iaHR0cHM6Ly9rZXJuZWwuZ29vZ2xlc291cmNlLmNvbS9wdWIvc2NtL2xpbnV4L2tlcm5lbC9n
-aXQvc3RhYmxlL2xpbnV4LXN0YWJsZS8mIzQzOy9yZWZzL3RhZ3MvdjQuMjAuMTEva2VybmVsL2V2
-ZW50cy9yaW5nX2J1ZmZlci5jIzczNyIgdGFyZ2V0PSJfYmxhbmsiPmh0dHBzOi8va2VybmVsLmdv
-b2dsZXNvdXJjZS5jb20vcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L3N0YWJsZS9saW51eC1zdGFi
-bGUvJiM0MzsvcmVmcy90YWdzL3Y0LjIwLjExL2tlcm5lbC9ldmVudHMvcmluZ19idWZmZXIuYyM3
-Mzc8L2E+DQogKS4gPG86cD48L286cD48L3A+DQo8cCBjbGFzcz0iTXNvTm9ybWFsIiBzdHlsZT0i
-bXNvLW1hcmdpbi10b3AtYWx0OmF1dG87bXNvLW1hcmdpbi1ib3R0b20tYWx0OmF1dG8iPiZuYnNw
-OzxvOnA+PC9vOnA+PC9wPg0KPHAgY2xhc3M9Ik1zb05vcm1hbCIgc3R5bGU9Im1zby1tYXJnaW4t
-dG9wLWFsdDphdXRvO21zby1tYXJnaW4tYm90dG9tLWFsdDphdXRvIj5UaGFua3MgdG8gZXZlcnlv
-bmUgd2hvIHRlc3RlZCBpdCBhbmQgcmVwb3J0ZWQhPG86cD48L286cD48L3A+DQo8cCBjbGFzcz0i
-TXNvTm9ybWFsIiBzdHlsZT0ibXNvLW1hcmdpbi10b3AtYWx0OmF1dG87bXNvLW1hcmdpbi1ib3R0
-b20tYWx0OmF1dG8iPiZuYnNwOzxvOnA+PC9vOnA+PC9wPg0KPHAgY2xhc3M9Ik1zb05vcm1hbCIg
-c3R5bGU9Im1zby1tYXJnaW4tdG9wLWFsdDphdXRvO21zby1tYXJnaW4tYm90dG9tLWFsdDphdXRv
-Ij5UaGFua3MgLDxvOnA+PC9vOnA+PC9wPg0KPHAgY2xhc3M9Ik1zb05vcm1hbCIgc3R5bGU9Im1z
-by1tYXJnaW4tdG9wLWFsdDphdXRvO21zby1tYXJnaW4tYm90dG9tLWFsdDphdXRvIj5HYXlhdHJp
-IEthbW1lbGE8bzpwPjwvbzpwPjwvcD4NCjxwIGNsYXNzPSJNc29Ob3JtYWwiIHN0eWxlPSJtc28t
-bWFyZ2luLXRvcC1hbHQ6YXV0bzttc28tbWFyZ2luLWJvdHRvbS1hbHQ6YXV0byI+Jm5ic3A7PG86
-cD48L286cD48L3A+DQo8L2Rpdj4NCjwvZGl2Pg0KPC9ibG9ja3F1b3RlPg0KPC9kaXY+DQo8L2Rp
-dj4NCjwvZGl2Pg0KPC9ib2R5Pg0KPC9odG1sPg0K
-
---===============3690293087784456624==--
+> On Thu, 2 Apr 2020 at 13:55, Anthony Wong <yp(a)anthonywong.net> wrote:
+> >
+> > This patch has not been fully applied to the github project, the
+> > src/display.cpp part has been left out, making the program now fail to
+> > compile.
+> > Please see
+> >
+> https://github.com/fenrus75/powertop/commit/152a39949691d34e1c6d672
+> 72f
+> > 3b63cbbe61bf81
+> >
+> > --
+> > Anthony
+> >
+> > On Wed, 12 Feb 2020 at 06:16, Joe Konno <joe.konno(a)linux.intel.com>
+> wrote:
+> > >
+> > > From: Joe Konno <joe.konno(a)intel.com>
+> > >
+> > > This doesn't work as well as I thought it would. So, let's remove
+> > > it. As a result of the revert, remove a reference to a now-dead
+> > > preprocessor define (PACKAGE_SHORT_VERSION).
+> > >
+> > > This reverts commit 2daaaf54d07340610af759cc7f4c41742abb3277.
+> > >
+> > > Signed-off-by: Joe Konno <joe.konno(a)intel.com>
+> > > ---
+> > >  .gitignore      |  1 -
+> > >  Makefile.am     |  2 --
+> > >  autogen.sh      |  1 -
+> > >  configure.ac    |  5 +----
+> > >  scripts/version | 13 -------------
+> > >  src/display.cpp |  2 +-
+> > >  6 files changed, 2 insertions(+), 22 deletions(-)  delete mode
+> > > 100644 scripts/version
+> > >
+> > > diff --git a/.gitignore b/.gitignore index
+> > > 8358ca4c6c0f..c1fc2be37afe 100644
+> > > --- a/.gitignore
+> > > +++ b/.gitignore
+> > > @@ -89,5 +89,4 @@ Makefile.in
+> > >  /src/powertop
+> > >  /stamp-h1
+> > >  /stamp-po
+> > > -/version*
+> > >  tags
+> > > diff --git a/Makefile.am b/Makefile.am index
+> > > ffb5e91b2834..22429e0ce562 100644
+> > > --- a/Makefile.am
+> > > +++ b/Makefile.am
+> > > @@ -15,6 +15,4 @@ EXTRA_DIST =3D \
+> > >         TODO \
+> > >         Android.mk \
+> > >         COPYING \
+> > > -       version-long \
+> > > -       version-short \
+> > >         autogen.sh
+> > > diff --git a/autogen.sh b/autogen.sh index
+> > > 444f9998f806..e210037d70e0 100755
+> > > --- a/autogen.sh
+> > > +++ b/autogen.sh
+> > > @@ -1,4 +1,3 @@
+> > >  #!/bin/sh
+> > >
+> > > -sh scripts/version
+> > >  autoreconf --install --verbose
+> > > diff --git a/configure.ac b/configure.ac index
+> > > ca7f1d5cefea..b3a6b2ca2639 100644
+> > > --- a/configure.ac
+> > > +++ b/configure.ac
+> > > @@ -2,8 +2,7 @@
+> > >  # Process this file with autoconf to produce a configure script.
+> > >
+> > >  AC_PREREQ([2.68])
+> > > -AC_INIT([powertop], m4_esyscmd_s([cat version-long]),
+> > > -       [powertop(a)lists.01.org], [], [https://01.org/powertop])
+> > > +AC_INIT([powertop], [2.12-pre], [powertop(a)lists.01.org], [],
+> > > +[https://01.org/powertop])
+> > >  AM_INIT_AUTOMAKE([
+> > >         -Wall
+> > >         1.12.2
+> > > @@ -152,8 +151,6 @@ AC_SEARCH_LIBS([inet_aton], [resolv], [], [
+> > >         AC_MSG_ERROR([libresolv is required but was not found])  ],
+> > > [])
+> > >
+> > > -AC_DEFINE([PACKAGE_SHORT_VERSION], m4_esyscmd_s([cat version-
+> short]),
+> > > -       [Short package version])
+> > >
+> > >  AS_IF([`pkg-config --exists bash-completion`], [
+> > >         bashcompletiondir=3D`pkg-config --variable=3Dcompletionsdir
+> > > --define-variable=3Dprefix=3D${prefix} bash-completion` diff --git
+> > > a/scripts/version b/scripts/version deleted file mode 100644 index
+> > > 348b13d9f785..000000000000
+> > > --- a/scripts/version
+> > > +++ /dev/null
+> > > @@ -1,13 +0,0 @@
+> > > -#!/bin/sh
+> > > -
+> > > -git branch > /dev/null 2>&1
+> > > -if [ "$?" =3D "0" ]; then
+> > > -       LONG=3D$(git describe --abbrev=3D7 --tags --always --dirty 2>=
+ /dev/null)
+> > > -       SHORT=3D\"$(git describe --tags --abbrev=3D0 2> /dev/null)\"
+> > > -else
+> > > -       LONG=3D"RUN-VERSION-SCRIPT-IN-GIT-REPOSITORY-ONLY"
+> > > -       SHORT=3D\"$LONG\"
+> > > -fi
+> > > -
+> > > -echo $LONG  > version-long
+> > > -echo $SHORT > version-short
+> > > diff --git a/src/display.cpp b/src/display.cpp index
+> > > 7b3a7a2f2073..71311446728d 100644
+> > > --- a/src/display.cpp
+> > > +++ b/src/display.cpp
+> > > @@ -117,7 +117,7 @@ void show_tab(unsigned int tab)
+> > >
+> > >         wattrset(tab_bar, A_REVERSE);
+> > >         mvwprintw(tab_bar, 0,0, "%120s", "");
+> > > -       mvwprintw(tab_bar, 0,0, "PowerTOP %s",
+> PACKAGE_SHORT_VERSION);
+> > > +       mvwprintw(tab_bar, 0,0, "PowerTOP %s", PACKAGE_VERSION);
+> > >
+> > >         bottom_line =3D newwin(1, 0, LINES-1, 0);
+> > >         wattrset(bottom_line, A_REVERSE);
+> > > --
+> > > 2.25.0
+> > > _______________________________________________
+> > > PowerTop mailing list -- powertop(a)lists.01.org To unsubscribe send
+> > > an email to powertop-leave(a)lists.01.org
+> _______________________________________________
+> PowerTop mailing list -- powertop(a)lists.01.org To unsubscribe send an e=
+mail
+> to powertop-leave(a)lists.01.org
+--===============1951059234805711833==--
 
