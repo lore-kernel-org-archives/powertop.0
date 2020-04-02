@@ -1,92 +1,162 @@
-Content-Type: multipart/mixed; boundary="===============8778944334250157556=="
+Content-Type: multipart/mixed; boundary="===============5861427445633503081=="
 MIME-Version: 1.0
 From: Kammela, Gayatri <gayatri.kammela at intel.com>
-Subject: [Powertop] Update on recent segfault issue with powertop
-Date: Fri, 01 Mar 2019 05:25:36 +0000
-Message-ID: <2824B99DC70CE746926327C52CA42F76487E9C08@ORSMSX111.amr.corp.intel.com>
+Subject: [Powertop] Re: [PATCH 1/3 v1] Revert "configure.ac: version strings
+ from git describe"
+Date: Thu, 02 Apr 2020 16:26:53 +0000
+Message-ID: <BYAPR11MB3624114B101771296203D9CBF2C60@BYAPR11MB3624.namprd11.prod.outlook.com>
+In-Reply-To: CAC=0FnGCS7A6uwSeV6SLgb60Qfpv85AKBhH2F1RJb6NMyiX7cw@mail.gmail.com
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8778944334250157556==
+--===============5861427445633503081==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+> -----Original Message-----
+> From: Anthony Wong <yp(a)anthonywong.net>
+> Sent: Wednesday, April 1, 2020 10:55 PM
+> To: powertop(a)lists.01.org; Joe Konno <joe.konno(a)linux.intel.com>
+> Subject: [Powertop] Re: [PATCH 1/3 v1] Revert "configure.ac: version stri=
+ngs
+> from git describe"
+> =
 
-As suspected, the segfault issue in stable releases (4.20.10/4.20.9/4.20.8)=
- is due to the same patch that caused segfault in mainline 5.0-rc6.
-Here is the original patch https://lkml.org/lkml/2019/1/10/412  that caused=
- the issue. It made in to 4.20.8 (https://kernel.googlesource.com/pub/scm/l=
-inux/kernel/git/stable/linux-stable/+/refs/tags/v4.20.8/kernel/events/ring_=
-buffer.c#737 ) stable release and only fixed in 4.20.11(https://kernel.goog=
-lesource.com/pub/scm/linux/kernel/git/stable/linux-stable/+/refs/tags/v4.20=
-.11/kernel/events/ring_buffer.c#737 ).
+> This patch has not been fully applied to the github project, the
+> src/display.cpp part has been left out, making the program now fail to
+> compile.
+> Please see
+> https://github.com/fenrus75/powertop/commit/152a39949691d34e1c6d672
+> 72f3b63cbbe61bf81
 
-Thanks to everyone who tested it and reported!
+Thanks for reporting this Anthony! Joe can you please fix the issue?
 
-Thanks ,
-Gayatri Kammela
+> =
 
+> --
+> Anthony
+> =
 
---===============8778944334250157556==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
-
-PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
-bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
-YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
-cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
-VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
-bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD11cy1hc2NpaSI+CjxtZXRhIG5hbWU9IkdlbmVyYXRv
-ciIgY29udGVudD0iTWljcm9zb2Z0IFdvcmQgMTUgKGZpbHRlcmVkIG1lZGl1bSkiPgo8c3R5bGU+
-PCEtLQovKiBGb250IERlZmluaXRpb25zICovCkBmb250LWZhY2UKCXtmb250LWZhbWlseToiQ2Ft
-YnJpYSBNYXRoIjsKCXBhbm9zZS0xOjIgNCA1IDMgNSA0IDYgMyAyIDQ7fQpAZm9udC1mYWNlCgl7
-Zm9udC1mYW1pbHk6Q2FsaWJyaTsKCXBhbm9zZS0xOjIgMTUgNSAyIDIgMiA0IDMgMiA0O30KLyog
-U3R5bGUgRGVmaW5pdGlvbnMgKi8KcC5Nc29Ob3JtYWwsIGxpLk1zb05vcm1hbCwgZGl2Lk1zb05v
-cm1hbAoJe21hcmdpbjowaW47CgltYXJnaW4tYm90dG9tOi4wMDAxcHQ7Cglmb250LXNpemU6MTEu
-MHB0OwoJZm9udC1mYW1pbHk6IkNhbGlicmkiLHNhbnMtc2VyaWY7fQphOmxpbmssIHNwYW4uTXNv
-SHlwZXJsaW5rCgl7bXNvLXN0eWxlLXByaW9yaXR5Ojk5OwoJY29sb3I6IzA1NjNDMTsKCXRleHQt
-ZGVjb3JhdGlvbjp1bmRlcmxpbmU7fQphOnZpc2l0ZWQsIHNwYW4uTXNvSHlwZXJsaW5rRm9sbG93
-ZWQKCXttc28tc3R5bGUtcHJpb3JpdHk6OTk7Cgljb2xvcjojOTU0RjcyOwoJdGV4dC1kZWNvcmF0
-aW9uOnVuZGVybGluZTt9CnNwYW4uRW1haWxTdHlsZTE3Cgl7bXNvLXN0eWxlLXR5cGU6cGVyc29u
-YWwtY29tcG9zZTsKCWZvbnQtZmFtaWx5OiJDYWxpYnJpIixzYW5zLXNlcmlmOwoJY29sb3I6d2lu
-ZG93dGV4dDt9Ci5Nc29DaHBEZWZhdWx0Cgl7bXNvLXN0eWxlLXR5cGU6ZXhwb3J0LW9ubHk7Cglm
-b250LWZhbWlseToiQ2FsaWJyaSIsc2Fucy1zZXJpZjt9CkBwYWdlIFdvcmRTZWN0aW9uMQoJe3Np
-emU6OC41aW4gMTEuMGluOwoJbWFyZ2luOjEuMGluIDEuMGluIDEuMGluIDEuMGluO30KZGl2Lldv
-cmRTZWN0aW9uMQoJe3BhZ2U6V29yZFNlY3Rpb24xO30KLS0+PC9zdHlsZT48IS0tW2lmIGd0ZSBt
-c28gOV0+PHhtbD4KPG86c2hhcGVkZWZhdWx0cyB2OmV4dD0iZWRpdCIgc3BpZG1heD0iMTAyNiIg
-Lz4KPC94bWw+PCFbZW5kaWZdLS0+PCEtLVtpZiBndGUgbXNvIDldPjx4bWw+CjxvOnNoYXBlbGF5
-b3V0IHY6ZXh0PSJlZGl0Ij4KPG86aWRtYXAgdjpleHQ9ImVkaXQiIGRhdGE9IjEiIC8+Cjwvbzpz
-aGFwZWxheW91dD48L3htbD48IVtlbmRpZl0tLT4KPC9oZWFkPgo8Ym9keSBsYW5nPSJFTi1VUyIg
-bGluaz0iIzA1NjNDMSIgdmxpbms9IiM5NTRGNzIiPgo8ZGl2IGNsYXNzPSJXb3JkU2VjdGlvbjEi
-Pgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5IaSw8bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05v
-cm1hbCI+PG86cD4mbmJzcDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPkFzIHN1c3Bl
-Y3RlZCwgdGhlIHNlZ2ZhdWx0IGlzc3VlIGluIHN0YWJsZSByZWxlYXNlcyAoNC4yMC4xMC80LjIw
-LjkvNC4yMC44KSBpcyBkdWUgdG8gdGhlIHNhbWUgcGF0Y2ggdGhhdCBjYXVzZWQgc2VnZmF1bHQg
-aW4gbWFpbmxpbmUgNS4wLXJjNi4KPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwi
-PkhlcmUgaXMgdGhlIG9yaWdpbmFsIHBhdGNoIDxhIGhyZWY9Imh0dHBzOi8vbGttbC5vcmcvbGtt
-bC8yMDE5LzEvMTAvNDEyIj4KaHR0cHM6Ly9sa21sLm9yZy9sa21sLzIwMTkvMS8xMC80MTI8L2E+
-ICZuYnNwO3RoYXQgY2F1c2VkIHRoZSBpc3N1ZS4gSXQgbWFkZSBpbiB0byA0LjIwLjggKDxhIGhy
-ZWY9Imh0dHBzOi8va2VybmVsLmdvb2dsZXNvdXJjZS5jb20vcHViL3NjbS9saW51eC9rZXJuZWwv
-Z2l0L3N0YWJsZS9saW51eC1zdGFibGUvJiM0MzsvcmVmcy90YWdzL3Y0LjIwLjgva2VybmVsL2V2
-ZW50cy9yaW5nX2J1ZmZlci5jIzczNyI+aHR0cHM6Ly9rZXJuZWwuZ29vZ2xlc291cmNlLmNvbS9w
-dWIvc2NtL2xpbnV4L2tlcm5lbC9naXQvc3RhYmxlL2xpbnV4LXN0YWJsZS8mIzQzOy9yZWZzL3Rh
-Z3MvdjQuMjAuOC9rZXJuZWwvZXZlbnRzL3JpbmdfYnVmZmVyLmMjNzM3PC9hPgogKSBzdGFibGUg
-cmVsZWFzZSBhbmQgb25seSBmaXhlZCBpbiA0LjIwLjExKDxhIGhyZWY9Imh0dHBzOi8va2VybmVs
-Lmdvb2dsZXNvdXJjZS5jb20vcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L3N0YWJsZS9saW51eC1z
-dGFibGUvJiM0MzsvcmVmcy90YWdzL3Y0LjIwLjExL2tlcm5lbC9ldmVudHMvcmluZ19idWZmZXIu
-YyM3MzciPmh0dHBzOi8va2VybmVsLmdvb2dsZXNvdXJjZS5jb20vcHViL3NjbS9saW51eC9rZXJu
-ZWwvZ2l0L3N0YWJsZS9saW51eC1zdGFibGUvJiM0MzsvcmVmcy90YWdzL3Y0LjIwLjExL2tlcm5l
-bC9ldmVudHMvcmluZ19idWZmZXIuYyM3Mzc8L2E+CiApLiA8bzpwPjwvbzpwPjwvcD4KPHAgY2xh
-c3M9Ik1zb05vcm1hbCI+PG86cD4mbmJzcDs8L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwi
-PlRoYW5rcyB0byBldmVyeW9uZSB3aG8gdGVzdGVkIGl0IGFuZCByZXBvcnRlZCE8bzpwPjwvbzpw
-PjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PG86cD4mbmJzcDs8L286cD48L3A+CjxwIGNsYXNz
-PSJNc29Ob3JtYWwiPlRoYW5rcyAsPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwi
-PkdheWF0cmkgS2FtbWVsYTxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48bzpw
-PiZuYnNwOzwvbzpwPjwvcD4KPC9kaXY+CjwvYm9keT4KPC9odG1sPgo=
-
---===============8778944334250157556==--
+> On Wed, 12 Feb 2020 at 06:16, Joe Konno <joe.konno(a)linux.intel.com>
+> wrote:
+> >
+> > From: Joe Konno <joe.konno(a)intel.com>
+> >
+> > This doesn't work as well as I thought it would. So, let's remove it.
+> > As a result of the revert, remove a reference to a now-dead
+> > preprocessor define (PACKAGE_SHORT_VERSION).
+> >
+> > This reverts commit 2daaaf54d07340610af759cc7f4c41742abb3277.
+> >
+> > Signed-off-by: Joe Konno <joe.konno(a)intel.com>
+> > ---
+> >  .gitignore      |  1 -
+> >  Makefile.am     |  2 --
+> >  autogen.sh      |  1 -
+> >  configure.ac    |  5 +----
+> >  scripts/version | 13 -------------
+> >  src/display.cpp |  2 +-
+> >  6 files changed, 2 insertions(+), 22 deletions(-)  delete mode 100644
+> > scripts/version
+> >
+> > diff --git a/.gitignore b/.gitignore
+> > index 8358ca4c6c0f..c1fc2be37afe 100644
+> > --- a/.gitignore
+> > +++ b/.gitignore
+> > @@ -89,5 +89,4 @@ Makefile.in
+> >  /src/powertop
+> >  /stamp-h1
+> >  /stamp-po
+> > -/version*
+> >  tags
+> > diff --git a/Makefile.am b/Makefile.am index
+> > ffb5e91b2834..22429e0ce562 100644
+> > --- a/Makefile.am
+> > +++ b/Makefile.am
+> > @@ -15,6 +15,4 @@ EXTRA_DIST =3D \
+> >         TODO \
+> >         Android.mk \
+> >         COPYING \
+> > -       version-long \
+> > -       version-short \
+> >         autogen.sh
+> > diff --git a/autogen.sh b/autogen.sh
+> > index 444f9998f806..e210037d70e0 100755
+> > --- a/autogen.sh
+> > +++ b/autogen.sh
+> > @@ -1,4 +1,3 @@
+> >  #!/bin/sh
+> >
+> > -sh scripts/version
+> >  autoreconf --install --verbose
+> > diff --git a/configure.ac b/configure.ac index
+> > ca7f1d5cefea..b3a6b2ca2639 100644
+> > --- a/configure.ac
+> > +++ b/configure.ac
+> > @@ -2,8 +2,7 @@
+> >  # Process this file with autoconf to produce a configure script.
+> >
+> >  AC_PREREQ([2.68])
+> > -AC_INIT([powertop], m4_esyscmd_s([cat version-long]),
+> > -       [powertop(a)lists.01.org], [], [https://01.org/powertop])
+> > +AC_INIT([powertop], [2.12-pre], [powertop(a)lists.01.org], [],
+> > +[https://01.org/powertop])
+> >  AM_INIT_AUTOMAKE([
+> >         -Wall
+> >         1.12.2
+> > @@ -152,8 +151,6 @@ AC_SEARCH_LIBS([inet_aton], [resolv], [], [
+> >         AC_MSG_ERROR([libresolv is required but was not found])  ],
+> > [])
+> >
+> > -AC_DEFINE([PACKAGE_SHORT_VERSION], m4_esyscmd_s([cat version-
+> short]),
+> > -       [Short package version])
+> >
+> >  AS_IF([`pkg-config --exists bash-completion`], [
+> >         bashcompletiondir=3D`pkg-config --variable=3Dcompletionsdir
+> > --define-variable=3Dprefix=3D${prefix} bash-completion` diff --git
+> > a/scripts/version b/scripts/version deleted file mode 100644 index
+> > 348b13d9f785..000000000000
+> > --- a/scripts/version
+> > +++ /dev/null
+> > @@ -1,13 +0,0 @@
+> > -#!/bin/sh
+> > -
+> > -git branch > /dev/null 2>&1
+> > -if [ "$?" =3D "0" ]; then
+> > -       LONG=3D$(git describe --abbrev=3D7 --tags --always --dirty 2> /=
+dev/null)
+> > -       SHORT=3D\"$(git describe --tags --abbrev=3D0 2> /dev/null)\"
+> > -else
+> > -       LONG=3D"RUN-VERSION-SCRIPT-IN-GIT-REPOSITORY-ONLY"
+> > -       SHORT=3D\"$LONG\"
+> > -fi
+> > -
+> > -echo $LONG  > version-long
+> > -echo $SHORT > version-short
+> > diff --git a/src/display.cpp b/src/display.cpp index
+> > 7b3a7a2f2073..71311446728d 100644
+> > --- a/src/display.cpp
+> > +++ b/src/display.cpp
+> > @@ -117,7 +117,7 @@ void show_tab(unsigned int tab)
+> >
+> >         wattrset(tab_bar, A_REVERSE);
+> >         mvwprintw(tab_bar, 0,0, "%120s", "");
+> > -       mvwprintw(tab_bar, 0,0, "PowerTOP %s",
+> PACKAGE_SHORT_VERSION);
+> > +       mvwprintw(tab_bar, 0,0, "PowerTOP %s", PACKAGE_VERSION);
+> >
+> >         bottom_line =3D newwin(1, 0, LINES-1, 0);
+> >         wattrset(bottom_line, A_REVERSE);
+> > --
+> > 2.25.0
+> > _______________________________________________
+> > PowerTop mailing list -- powertop(a)lists.01.org To unsubscribe send an
+> > email to powertop-leave(a)lists.01.org
+> _______________________________________________
+> PowerTop mailing list -- powertop(a)lists.01.org To unsubscribe send an e=
+mail
+> to powertop-leave(a)lists.01.org
+--===============5861427445633503081==--
 
