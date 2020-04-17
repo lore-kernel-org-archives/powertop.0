@@ -1,237 +1,707 @@
-Content-Type: multipart/mixed; boundary="===============8237824054876038297=="
+Content-Type: multipart/mixed; boundary="===============8287523533208508896=="
 MIME-Version: 1.0
-From: Wang, Xiaolong <xiaolong.wang at intel.com>
-Subject: Re: [Powertop] [PATCH 2/2] intel_cpus: no pstate Idle pct with
- intel_pstate
-Date: Wed, 15 Jun 2016 01:51:22 +0000
-Message-ID: <3D803AC0BEBB604B9799C45D4E4A14B7113C646C@SHSMSX103.ccr.corp.intel.com>
-In-Reply-To: 20160613160034.29283-3-joe.konno@linux.intel.com
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: [Powertop] [PATCH] po: update translation files and template
+Date: Fri, 17 Apr 2020 10:00:46 -0700
+Message-ID: <20200417170046.21048-1-joe.konno@linux.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============8237824054876038297==
+--===============8287523533208508896==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Joe,
-I just realized a further scenario that would be problematic with your curr=
-ent patch:
-once I'd read from Len Brown's post to Red Hat, that enabling HWP in intel_=
-pstate driver is considered a mistake,
-because enabling HWP only need to write a few msr bits, based on a few simp=
-le policies,
-there's no need to load a whole intel_pstate driver to do that.
-so future upstream kernel would remove that part, and HWP enabling will be =
-put to some CPPC driver,
-and on HWP reinforced platform, intel_pstate driver will not be loaded at a=
-ll.
-
-So, if that happen, the is_intel_pstate_driver_loaded() will return false, =
-and code will go to the old path,
-but the frequency statistics still not exist, then we got nothing.
-
-mmm... maybe you could use 'cpufreq statistics exists or not' to branch you=
-r code,
-  if exist, use it; if not, calculate average freq from msrs.
-there should have been such a function to check that condition.
-
--Wang, Xiaolong =
-
-
------Original Message-----
-From: PowerTop [mailto:powertop-bounces(a)lists.01.org] On Behalf Of Joe Ko=
-nno
-Sent: Tuesday, June 14, 2016 12:01 AM
-To: powertop(a)lists.01.org
-Subject: [Powertop] [PATCH 2/2] intel_cpus: no pstate Idle pct with intel_p=
-state
-
 From: Joe Konno <joe.konno(a)intel.com>
 
-Do not display "percent Idle" in the Frequency Stats tab when the intel_pst=
-ate kernel driver is loaded. This is because Idle time is inferred through =
-kernel PM trace events, which may be insufficient for proper computation in=
- certain scenarios. Therefore, best to display no data than potentially ina=
-ccurate data.
+Use gettext makefile script to update all translation files in
+preparation for next release.
 
-End-users are encouraged to use the Idle Stats tab in the UI or report to a=
-nalyze their system's idle time. When the intel_pstate kernel driver is loa=
-ded, the Frequency Stats tab will only present the end-user with the averag=
-e frequency of each logical core.
+The template (POT) file need not be manually updated as we did in an
+earlier commit, so let gettext update it without manual intervention.
 
+Fixes: 4da1908824f6 ("powertop.pot: Update powertop.pot")
 Signed-off-by: Joe Konno <joe.konno(a)intel.com>
 ---
- src/cpu/intel_cpus.cpp | 50 +++++++++++++++++++++++++++++++++++++++++++---=
-----
- src/cpu/intel_cpus.h   |  2 ++
- 2 files changed, 45 insertions(+), 7 deletions(-)
+ po/ca.po        | 14 +++++++-------
+ po/cs_CZ.po     | 14 +++++++-------
+ po/de_DE.po     | 14 +++++++-------
+ po/en_GB.po     | 14 +++++++-------
+ po/en_US.po     | 14 +++++++-------
+ po/es_ES.po     | 14 +++++++-------
+ po/hu_HU.po     | 14 +++++++-------
+ po/id_ID.po     | 14 +++++++-------
+ po/nl_NL.po     | 14 +++++++-------
+ po/powertop.pot | 12 ++++++------
+ po/zh_TW.po     | 14 +++++++-------
+ 11 files changed, 76 insertions(+), 76 deletions(-)
 
-diff --git a/src/cpu/intel_cpus.cpp b/src/cpu/intel_cpus.cpp index 81512922=
-38ec..330050e37473 100644
---- a/src/cpu/intel_cpus.cpp
-+++ b/src/cpu/intel_cpus.cpp
-@@ -70,6 +70,8 @@ static int intel_cpu_models[] =3D {
- 	0	/* last entry must be zero */
- };
+diff --git a/po/ca.po b/po/ca.po
+index 2c824e2a97c5..acfacfa69432 100644
+--- a/po/ca.po
++++ b/po/ca.po
+@@ -10,7 +10,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PowerTOP\n"
+ "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
+-"POT-Creation-Date: 2019-09-26 15:56-0700\n"
++"POT-Creation-Date: 2020-04-17 09:26-0700\n"
+ "PO-Revision-Date: 2013-11-05 08:40+0000\n"
+ "Last-Translator: Margie Foster <margie(a)linux.intel.com>\n"
+ "Language-Team: Catalan (http://www.transifex.com/projects/p/PowerTOP/"
+@@ -98,7 +98,7 @@ msgstr ""
+ msgid " Core(OS)"
+ msgstr ""
  =
 
-+static int intel_pstate_driver_loaded =3D -1;
-+
- int is_supported_intel_cpu(int model)
- {
- 	int i;
-@@ -81,6 +83,34 @@ int is_supported_intel_cpu(int model)
- 	return 0;
- }
+-#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
++#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
+ #, c-format
+ msgid "  Core"
+ msgstr ""
+@@ -175,7 +175,7 @@ msgstr "C0 sondejant"
+ msgid " CPU(OS) %i"
+ msgstr ""
  =
 
-+int is_intel_pstate_driver_loaded()
-+{
-+	const string filename("/sys/devices/system/cpu/cpu0/cpufreq/scaling_drive=
-r");
-+	const string intel_pstate("intel_pstate");
-+	char line[32] =3D { '\0' };
-+	ifstream file;
-+
-+	if (intel_pstate_driver_loaded > -1)
-+		return intel_pstate_driver_loaded;
-+
-+	file.open(filename, ios::in);
-+
-+	if (!file)
-+		return -1;
-+
-+	file.getline(line, sizeof(line)-1);
-+	file.close();
-+
-+	const string scaling_driver(line);
-+	if (scaling_driver =3D=3D intel_pstate) {
-+		intel_pstate_driver_loaded =3D 1;
-+	} else {
-+		intel_pstate_driver_loaded =3D 0;
-+	}
-+
-+	return intel_pstate_driver_loaded;
-+}
-+
- static uint64_t get_msr(int cpu, uint64_t offset)  {
- 	ssize_t retval;
-@@ -267,10 +297,11 @@ void nhm_core::measurement_end(void)
+-#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
++#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
+ #, c-format
+ msgid " CPU %i"
+ msgstr ""
+@@ -190,21 +190,21 @@ msgstr ""
+ msgid " Pkg(OS)"
+ msgstr ""
  =
 
- char * nhm_core::fill_pstate_line(int line_nr, char *buffer)  {
-+	const int intel_pstate =3D is_intel_pstate_driver_loaded();
- 	buffer[0] =3D 0;
- 	unsigned int i;
+-#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
++#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
+ #, c-format
+ msgid "  Package"
+ msgstr ""
  =
 
--	if (total_stamp =3D=3D0) {
-+	if (!intel_pstate && total_stamp =3D=3D0) {
- 		for (i =3D 0; i < pstates.size(); i++)
- 			total_stamp +=3D pstates[i]->time_after;
- 		if (total_stamp =3D=3D 0)
-@@ -282,10 +313,11 @@ char * nhm_core::fill_pstate_line(int line_nr, char *=
-buffer)
- 		return buffer;
- 	}
+-#: src/cpu/intel_cpus.cpp:135
++#: src/cpu/intel_cpus.cpp:139
+ #, c-format
+ msgid "read_msr cpu%d 0x%llx : "
+ msgstr ""
  =
 
--	if (line_nr >=3D (int)pstates.size() || line_nr < 0)
-+	if (intel_pstate > 0 || line_nr >=3D (int)pstates.size() || line_nr < 0)
- 		return buffer;
+-#: src/cpu/intel_cpus.cpp:598
++#: src/cpu/intel_cpus.cpp:614
+ msgid "C0 active"
+ msgstr "C0 actiu"
  =
 
- 	sprintf(buffer," %5.1f%% ", percentage(1.0* (pstates[line_nr]->time_after=
-) / total_stamp));
-+
- 	return buffer;
- }
+-#: src/cpu/intel_cpus.cpp:656
++#: src/cpu/intel_cpus.cpp:672
+ #, c-format
+ msgid "Average"
+ msgstr ""
+diff --git a/po/cs_CZ.po b/po/cs_CZ.po
+index 731f3697d50c..6386c0c34c16 100644
+--- a/po/cs_CZ.po
++++ b/po/cs_CZ.po
+@@ -9,7 +9,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PowerTOP\n"
+ "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
+-"POT-Creation-Date: 2019-09-26 15:56-0700\n"
++"POT-Creation-Date: 2020-04-17 09:26-0700\n"
+ "PO-Revision-Date: 2013-11-05 08:40+0000\n"
+ "Last-Translator: Margie Foster <margie(a)linux.intel.com>\n"
+ "Language-Team: Czech (Czech Republic) (http://www.transifex.com/projects/=
+p/"
+@@ -97,7 +97,7 @@ msgstr "  J=C3=A1dro"
+ msgid " Core(OS)"
+ msgstr "  J=C3=A1dro"
  =
 
-@@ -342,10 +374,11 @@ nhm_package::nhm_package(int model)
+-#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
++#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
+ #, c-format
+ msgid "  Core"
+ msgstr "  J=C3=A1dro"
+@@ -177,7 +177,7 @@ msgstr "C0 sd=C3=ADlen=C3=AD"
+ msgid " CPU(OS) %i"
+ msgstr " CPU %i"
  =
 
- char * nhm_package::fill_pstate_line(int line_nr, char *buffer)  {
-+	const int intel_pstate =3D is_intel_pstate_driver_loaded();
- 	buffer[0] =3D 0;
- 	unsigned int i;
+-#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
++#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
+ #, c-format
+ msgid " CPU %i"
+ msgstr " CPU %i"
+@@ -192,21 +192,21 @@ msgstr ""
+ msgid " Pkg(OS)"
+ msgstr ""
  =
 
--	if (total_stamp =3D=3D0) {
-+	if (!intel_pstate && total_stamp =3D=3D0) {
- 		for (i =3D 0; i < pstates.size(); i++)
- 			total_stamp +=3D pstates[i]->time_after;
- 		if (total_stamp =3D=3D 0)
-@@ -358,10 +391,11 @@ char * nhm_package::fill_pstate_line(int line_nr, cha=
-r *buffer)
- 		return buffer;
- 	}
+-#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
++#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
+ #, c-format
+ msgid "  Package"
+ msgstr "  Bal=C3=AD=C4=8Dek"
  =
 
--	if (line_nr >=3D (int)pstates.size() || line_nr < 0)
-+	if (intel_pstate > 0 || line_nr >=3D (int)pstates.size() || line_nr < 0)
- 		return buffer;
+-#: src/cpu/intel_cpus.cpp:135
++#: src/cpu/intel_cpus.cpp:139
+ #, c-format
+ msgid "read_msr cpu%d 0x%llx : "
+ msgstr ""
  =
 
- 	sprintf(buffer," %5.1f%% ", percentage(1.0* (pstates[line_nr]->time_after=
-) / total_stamp));
-+
- 	return buffer;
- }
+-#: src/cpu/intel_cpus.cpp:598
++#: src/cpu/intel_cpus.cpp:614
+ msgid "C0 active"
+ msgstr "C0 aktivn=C3=AD"
  =
 
-@@ -581,7 +615,9 @@ char * nhm_cpu::fill_pstate_name(int line_nr, char *buf=
-fer)
+-#: src/cpu/intel_cpus.cpp:656
++#: src/cpu/intel_cpus.cpp:672
+ #, c-format
+ msgid "Average"
+ msgstr ""
+diff --git a/po/de_DE.po b/po/de_DE.po
+index dcf675856900..60506d44a858 100644
+--- a/po/de_DE.po
++++ b/po/de_DE.po
+@@ -10,7 +10,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PowerTOP\n"
+ "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
+-"POT-Creation-Date: 2019-09-26 15:56-0700\n"
++"POT-Creation-Date: 2020-04-17 09:26-0700\n"
+ "PO-Revision-Date: 2013-11-05 19:48+0000\n"
+ "Last-Translator: Ettore Atalan <atalanttore(a)googlemail.com>\n"
+ "Language-Team: German (Germany) (http://www.transifex.com/projects/p/"
+@@ -98,7 +98,7 @@ msgstr "Kern"
+ msgid " Core(OS)"
+ msgstr "Kern"
  =
 
- char * nhm_cpu::fill_pstate_line(int line_nr, char *buffer)  {
--	if (total_stamp =3D=3D0) {
-+	const int intel_pstate =3D is_intel_pstate_driver_loaded();
-+
-+	if (!intel_pstate && total_stamp =3D=3D0) {
- 		unsigned int i;
- 		for (i =3D 0; i < pstates.size(); i++)
- 			total_stamp +=3D pstates[i]->time_after; @@ -600,12 +636,12 @@ char * n=
-hm_cpu::fill_pstate_line(int line_nr, char *buffer)
- 		hz_to_human(F, buffer, 1);
- 		return buffer;
- 	}
--	if (line_nr >=3D (int)pstates.size() || line_nr < 0)
-+	if (intel_pstate > 0 || line_nr >=3D (int)pstates.size() || line_nr < 0)
- 		return buffer;
+-#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
++#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
+ #, c-format
+ msgid "  Core"
+ msgstr "Kern"
+@@ -176,7 +176,7 @@ msgstr "C0 sammeln"
+ msgid " CPU(OS) %i"
+ msgstr "CPU %i"
  =
 
- 	sprintf(buffer," %5.1f%% ", percentage(1.0* (pstates[line_nr]->time_after=
-) / total_stamp));
--	return buffer;
+-#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
++#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
+ #, c-format
+ msgid " CPU %i"
+ msgstr "CPU %i"
+@@ -191,21 +191,21 @@ msgstr ""
+ msgid " Pkg(OS)"
+ msgstr ""
  =
 
-+	return buffer;
- }
+-#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
++#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
+ #, c-format
+ msgid "  Package"
+ msgstr "Paket"
  =
 
+-#: src/cpu/intel_cpus.cpp:135
++#: src/cpu/intel_cpus.cpp:139
+ #, c-format
+ msgid "read_msr cpu%d 0x%llx : "
+ msgstr ""
  =
 
-diff --git a/src/cpu/intel_cpus.h b/src/cpu/intel_cpus.h index 03310692a83b=
-..d20db9ae3986 100644
---- a/src/cpu/intel_cpus.h
-+++ b/src/cpu/intel_cpus.h
-@@ -175,4 +175,6 @@ public:
- int is_supported_intel_cpu(int model);
- int byt_has_ahci();
+-#: src/cpu/intel_cpus.cpp:598
++#: src/cpu/intel_cpus.cpp:614
+ msgid "C0 active"
+ msgstr "C0 aktiv"
  =
 
-+int is_intel_pstate_driver_loaded();
-+
- #endif
---
-2.8.3
+-#: src/cpu/intel_cpus.cpp:656
++#: src/cpu/intel_cpus.cpp:672
+ #, c-format
+ msgid "Average"
+ msgstr ""
+diff --git a/po/en_GB.po b/po/en_GB.po
+index 6f9e94930e03..aa569d8250d2 100644
+--- a/po/en_GB.po
++++ b/po/en_GB.po
+@@ -9,7 +9,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PowerTOP\n"
+ "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
+-"POT-Creation-Date: 2019-09-26 15:56-0700\n"
++"POT-Creation-Date: 2020-04-17 09:26-0700\n"
+ "PO-Revision-Date: 2013-11-05 08:40+0000\n"
+ "Last-Translator: Margie Foster <margie(a)linux.intel.com>\n"
+ "Language-Team: English (United Kingdom) (http://www.transifex.com/project=
+s/p/"
+@@ -97,7 +97,7 @@ msgstr ""
+ msgid " Core(OS)"
+ msgstr ""
+ =
 
-_______________________________________________
-PowerTop mailing list
-PowerTop(a)lists.01.org
-https://lists.01.org/mailman/listinfo/powertop
+-#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
++#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
+ #, c-format
+ msgid "  Core"
+ msgstr ""
+@@ -174,7 +174,7 @@ msgstr "C0 polling"
+ msgid " CPU(OS) %i"
+ msgstr ""
+ =
 
---===============8237824054876038297==--
+-#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
++#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
+ #, c-format
+ msgid " CPU %i"
+ msgstr ""
+@@ -189,21 +189,21 @@ msgstr ""
+ msgid " Pkg(OS)"
+ msgstr ""
+ =
+
+-#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
++#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
+ #, c-format
+ msgid "  Package"
+ msgstr ""
+ =
+
+-#: src/cpu/intel_cpus.cpp:135
++#: src/cpu/intel_cpus.cpp:139
+ #, c-format
+ msgid "read_msr cpu%d 0x%llx : "
+ msgstr ""
+ =
+
+-#: src/cpu/intel_cpus.cpp:598
++#: src/cpu/intel_cpus.cpp:614
+ msgid "C0 active"
+ msgstr "C0 active"
+ =
+
+-#: src/cpu/intel_cpus.cpp:656
++#: src/cpu/intel_cpus.cpp:672
+ #, c-format
+ msgid "Average"
+ msgstr ""
+diff --git a/po/en_US.po b/po/en_US.po
+index 3ce213f2af25..8b4ce6427a93 100644
+--- a/po/en_US.po
++++ b/po/en_US.po
+@@ -8,7 +8,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PowerTOP\n"
+ "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
+-"POT-Creation-Date: 2019-09-26 15:56-0700\n"
++"POT-Creation-Date: 2020-04-17 09:26-0700\n"
+ "PO-Revision-Date: 2013-11-05 08:40+0000\n"
+ "Last-Translator: Margie Foster <margie(a)linux.intel.com>\n"
+ "Language-Team: English (United States) (http://www.transifex.com/projects=
+/p/"
+@@ -96,7 +96,7 @@ msgstr ""
+ msgid " Core(OS)"
+ msgstr ""
+ =
+
+-#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
++#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
+ #, c-format
+ msgid "  Core"
+ msgstr ""
+@@ -173,7 +173,7 @@ msgstr "C0 polling"
+ msgid " CPU(OS) %i"
+ msgstr ""
+ =
+
+-#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
++#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
+ #, c-format
+ msgid " CPU %i"
+ msgstr ""
+@@ -188,21 +188,21 @@ msgstr ""
+ msgid " Pkg(OS)"
+ msgstr ""
+ =
+
+-#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
++#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
+ #, c-format
+ msgid "  Package"
+ msgstr ""
+ =
+
+-#: src/cpu/intel_cpus.cpp:135
++#: src/cpu/intel_cpus.cpp:139
+ #, c-format
+ msgid "read_msr cpu%d 0x%llx : "
+ msgstr ""
+ =
+
+-#: src/cpu/intel_cpus.cpp:598
++#: src/cpu/intel_cpus.cpp:614
+ msgid "C0 active"
+ msgstr "C0 active"
+ =
+
+-#: src/cpu/intel_cpus.cpp:656
++#: src/cpu/intel_cpus.cpp:672
+ #, c-format
+ msgid "Average"
+ msgstr ""
+diff --git a/po/es_ES.po b/po/es_ES.po
+index a862f65fa6ee..0716523a3b53 100644
+--- a/po/es_ES.po
++++ b/po/es_ES.po
+@@ -9,7 +9,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PowerTOP\n"
+ "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
+-"POT-Creation-Date: 2019-09-26 15:56-0700\n"
++"POT-Creation-Date: 2020-04-17 09:26-0700\n"
+ "PO-Revision-Date: 2013-11-05 08:40+0000\n"
+ "Last-Translator: Margie Foster <margie(a)linux.intel.com>\n"
+ "Language-Team: Spanish (Spain) (http://www.transifex.com/projects/p/Power=
+TOP/"
+@@ -97,7 +97,7 @@ msgstr ""
+ msgid " Core(OS)"
+ msgstr ""
+ =
+
+-#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
++#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
+ #, c-format
+ msgid "  Core"
+ msgstr ""
+@@ -175,7 +175,7 @@ msgstr "C0 sondeando"
+ msgid " CPU(OS) %i"
+ msgstr ""
+ =
+
+-#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
++#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
+ #, c-format
+ msgid " CPU %i"
+ msgstr ""
+@@ -190,21 +190,21 @@ msgstr ""
+ msgid " Pkg(OS)"
+ msgstr ""
+ =
+
+-#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
++#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
+ #, c-format
+ msgid "  Package"
+ msgstr ""
+ =
+
+-#: src/cpu/intel_cpus.cpp:135
++#: src/cpu/intel_cpus.cpp:139
+ #, c-format
+ msgid "read_msr cpu%d 0x%llx : "
+ msgstr ""
+ =
+
+-#: src/cpu/intel_cpus.cpp:598
++#: src/cpu/intel_cpus.cpp:614
+ msgid "C0 active"
+ msgstr "C0 activo"
+ =
+
+-#: src/cpu/intel_cpus.cpp:656
++#: src/cpu/intel_cpus.cpp:672
+ #, c-format
+ msgid "Average"
+ msgstr ""
+diff --git a/po/hu_HU.po b/po/hu_HU.po
+index 12bd29021a5b..dded3143ff5e 100644
+--- a/po/hu_HU.po
++++ b/po/hu_HU.po
+@@ -11,7 +11,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PowerTOP\n"
+ "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
+-"POT-Creation-Date: 2019-09-26 15:56-0700\n"
++"POT-Creation-Date: 2020-04-17 09:26-0700\n"
+ "PO-Revision-Date: 2013-11-05 08:40+0000\n"
+ "Last-Translator: Margie Foster <margie(a)linux.intel.com>\n"
+ "Language-Team: Hungarian (Hungary) (http://www.transifex.com/projects/p/"
+@@ -99,7 +99,7 @@ msgstr ""
+ msgid " Core(OS)"
+ msgstr ""
+ =
+
+-#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
++#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
+ #, c-format
+ msgid "  Core"
+ msgstr ""
+@@ -177,7 +177,7 @@ msgstr "C0 ciklikus lek=C3=A9rdez=C3=A9s"
+ msgid " CPU(OS) %i"
+ msgstr ""
+ =
+
+-#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
++#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
+ #, c-format
+ msgid " CPU %i"
+ msgstr ""
+@@ -192,21 +192,21 @@ msgstr ""
+ msgid " Pkg(OS)"
+ msgstr ""
+ =
+
+-#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
++#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
+ #, c-format
+ msgid "  Package"
+ msgstr ""
+ =
+
+-#: src/cpu/intel_cpus.cpp:135
++#: src/cpu/intel_cpus.cpp:139
+ #, c-format
+ msgid "read_msr cpu%d 0x%llx : "
+ msgstr ""
+ =
+
+-#: src/cpu/intel_cpus.cpp:598
++#: src/cpu/intel_cpus.cpp:614
+ msgid "C0 active"
+ msgstr "C0 akt=C3=ADv"
+ =
+
+-#: src/cpu/intel_cpus.cpp:656
++#: src/cpu/intel_cpus.cpp:672
+ #, c-format
+ msgid "Average"
+ msgstr ""
+diff --git a/po/id_ID.po b/po/id_ID.po
+index 994413567cd0..2ccefe790eb3 100644
+--- a/po/id_ID.po
++++ b/po/id_ID.po
+@@ -8,7 +8,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PowerTOP\n"
+ "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
+-"POT-Creation-Date: 2019-09-26 15:56-0700\n"
++"POT-Creation-Date: 2020-04-17 09:26-0700\n"
+ "PO-Revision-Date: 2013-11-05 08:40+0000\n"
+ "Last-Translator: Margie Foster <margie(a)linux.intel.com>\n"
+ "Language-Team: Indonesian (Indonesia) (http://www.transifex.com/projects/=
+p/"
+@@ -96,7 +96,7 @@ msgstr "  Core"
+ msgid " Core(OS)"
+ msgstr "  Core"
+ =
+
+-#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
++#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
+ #, c-format
+ msgid "  Core"
+ msgstr "  Core"
+@@ -174,7 +174,7 @@ msgstr "C0 polling"
+ msgid " CPU(OS) %i"
+ msgstr " CPU %i"
+ =
+
+-#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
++#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
+ #, c-format
+ msgid " CPU %i"
+ msgstr " CPU %i"
+@@ -189,21 +189,21 @@ msgstr ""
+ msgid " Pkg(OS)"
+ msgstr ""
+ =
+
+-#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
++#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
+ #, c-format
+ msgid "  Package"
+ msgstr "Paket"
+ =
+
+-#: src/cpu/intel_cpus.cpp:135
++#: src/cpu/intel_cpus.cpp:139
+ #, c-format
+ msgid "read_msr cpu%d 0x%llx : "
+ msgstr ""
+ =
+
+-#: src/cpu/intel_cpus.cpp:598
++#: src/cpu/intel_cpus.cpp:614
+ msgid "C0 active"
+ msgstr "C0 aktif"
+ =
+
+-#: src/cpu/intel_cpus.cpp:656
++#: src/cpu/intel_cpus.cpp:672
+ #, c-format
+ msgid "Average"
+ msgstr ""
+diff --git a/po/nl_NL.po b/po/nl_NL.po
+index aa5237818c40..7986de5b26fc 100644
+--- a/po/nl_NL.po
++++ b/po/nl_NL.po
+@@ -9,7 +9,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PowerTOP\n"
+ "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
+-"POT-Creation-Date: 2019-09-26 15:56-0700\n"
++"POT-Creation-Date: 2020-04-17 09:26-0700\n"
+ "PO-Revision-Date: 2013-11-05 08:40+0000\n"
+ "Last-Translator: Margie Foster <margie(a)linux.intel.com>\n"
+ "Language-Team: Dutch (Netherlands) (http://www.transifex.com/projects/p/"
+@@ -97,7 +97,7 @@ msgstr ""
+ msgid " Core(OS)"
+ msgstr ""
+ =
+
+-#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
++#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
+ #, c-format
+ msgid "  Core"
+ msgstr ""
+@@ -174,7 +174,7 @@ msgstr "C0 polling"
+ msgid " CPU(OS) %i"
+ msgstr ""
+ =
+
+-#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
++#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
+ #, c-format
+ msgid " CPU %i"
+ msgstr ""
+@@ -189,21 +189,21 @@ msgstr ""
+ msgid " Pkg(OS)"
+ msgstr ""
+ =
+
+-#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
++#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
+ #, c-format
+ msgid "  Package"
+ msgstr ""
+ =
+
+-#: src/cpu/intel_cpus.cpp:135
++#: src/cpu/intel_cpus.cpp:139
+ #, c-format
+ msgid "read_msr cpu%d 0x%llx : "
+ msgstr ""
+ =
+
+-#: src/cpu/intel_cpus.cpp:598
++#: src/cpu/intel_cpus.cpp:614
+ msgid "C0 active"
+ msgstr "C0 active"
+ =
+
+-#: src/cpu/intel_cpus.cpp:656
++#: src/cpu/intel_cpus.cpp:672
+ #, c-format
+ msgid "Average"
+ msgstr ""
+diff --git a/po/powertop.pot b/po/powertop.pot
+index 7e19e080fbbf..caad4750d758 100644
+--- a/po/powertop.pot
++++ b/po/powertop.pot
+@@ -1,17 +1,17 @@
+-# PowerTOP
+-# Copyright (C) 2020 Intel Corporation
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR Intel Corporation
+ # This file is distributed under the same license as the powertop package.
+-# Arjan van de Ven <arjan(a)linux.intel.com>, 2010.
++# FIRST AUTHOR <EMAIL(a)ADDRESS>, YEAR.
+ #
+ #, fuzzy
+ msgid ""
+ msgstr ""
+-"Project-Id-Version: PowerTOP 2.12-rc1\n"
++"Project-Id-Version: powertop 2.12-rc1\n"
+ "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
+-"POT-Creation-Date: 2020-04-02 14:20-0700\n"
++"POT-Creation-Date: 2020-04-17 09:26-0700\n"
+ "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+ "Last-Translator: FULL NAME <EMAIL(a)ADDRESS>\n"
+-"Language-Team: powertop(a)lists.01.org\n"
++"Language-Team: LANGUAGE <LL(a)li.org>\n"
+ "Language: \n"
+ "MIME-Version: 1.0\n"
+ "Content-Type: text/plain; charset=3DCHARSET\n"
+diff --git a/po/zh_TW.po b/po/zh_TW.po
+index 0d248044949e..6f1a5c90fd28 100644
+--- a/po/zh_TW.po
++++ b/po/zh_TW.po
+@@ -8,7 +8,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PowerTOP\n"
+ "Report-Msgid-Bugs-To: \"powertop(a)lists.01.org\"\n"
+-"POT-Creation-Date: 2019-09-26 15:56-0700\n"
++"POT-Creation-Date: 2020-04-17 09:26-0700\n"
+ "PO-Revision-Date: 2013-11-05 08:40+0000\n"
+ "Last-Translator: Margie Foster <margie(a)linux.intel.com>\n"
+ "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/"
+@@ -96,7 +96,7 @@ msgstr "  =E6=A0=B8=E5=BF=83"
+ msgid " Core(OS)"
+ msgstr "  =E6=A0=B8=E5=BF=83"
+ =
+
+-#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:336
++#: src/cpu/cpu_core.cpp:91 src/cpu/intel_cpus.cpp:344
+ #, c-format
+ msgid "  Core"
+ msgstr "  =E6=A0=B8=E5=BF=83"
+@@ -174,7 +174,7 @@ msgstr "C0 =E8=BC=AA=E5=B7=A1"
+ msgid " CPU(OS) %i"
+ msgstr " CPU %i"
+ =
+
+-#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:675
++#: src/cpu/cpu_linux.cpp:341 src/cpu/intel_cpus.cpp:691
+ #, c-format
+ msgid " CPU %i"
+ msgstr " CPU %i"
+@@ -189,21 +189,21 @@ msgstr ""
+ msgid " Pkg(OS)"
+ msgstr ""
+ =
+
+-#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:436
++#: src/cpu/cpu_package.cpp:104 src/cpu/intel_cpus.cpp:452
+ #, c-format
+ msgid "  Package"
+ msgstr "=E4=BB=A3=E8=99=9F"
+ =
+
+-#: src/cpu/intel_cpus.cpp:135
++#: src/cpu/intel_cpus.cpp:139
+ #, c-format
+ msgid "read_msr cpu%d 0x%llx : "
+ msgstr ""
+ =
+
+-#: src/cpu/intel_cpus.cpp:598
++#: src/cpu/intel_cpus.cpp:614
+ msgid "C0 active"
+ msgstr "C0 =E9=81=8B=E4=BD=9C=E4=B8=AD"
+ =
+
+-#: src/cpu/intel_cpus.cpp:656
++#: src/cpu/intel_cpus.cpp:672
+ #, c-format
+ msgid "Average"
+ msgstr ""
+-- =
+
+2.26.0
+
+--===============8287523533208508896==--
 
