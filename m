@@ -1,97 +1,46 @@
-Content-Type: multipart/mixed; boundary="===============3235964489273195659=="
+Content-Type: multipart/mixed; boundary="===============0655205024922895416=="
 MIME-Version: 1.0
-From: Joe Konno <joe.konno at linux.intel.com>
-Subject: Re: [Powertop] [PATCH] Checking whether librt is needed for
- clock_gettime().
-Date: Wed, 03 Aug 2016 08:31:15 -0700
-Message-ID: <20160803083115.44b00021@jbkonno-basil.jf.intel.com>
-In-Reply-To: 20160802032949.GA18501@obsidian
+From: Michael Vetter <mvetter at suse.com>
+Subject: [Powertop] closedir patch
+Date: Tue, 21 Apr 2020 08:18:49 +0200
+Message-ID: <20200421081849.73090b0e@maitreya>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============3235964489273195659==
+--===============0655205024922895416==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2 Aug 2016 06:29:53 +0300
-eSyr <evgsyr(a)gmail.com> wrote:
+In case `dir` is NULL we should not call `closedir()` since it's
+behaviour is implementation specific.
 
-> Commit ef79e28 introduced usage of clock_gettime() function, which,
-> unfortunately, breaks build on some systems, namely Debian Wheezy, due
-> to the fact it should be linked with librt. This commit adds configure
-> check whether additional library is needed in order to use
-> aforementioned function.
-> =
+Patch attached. Please apply with `git am <
+powertop-only-closedir.patch`.
 
-> * configure.ac: using AC_SEARCH_LIBS() for checking whether librt is
->   needed for clock_gettime().
-> ---
->  configure.ac |    2 ++
->  1 file changed, 2 insertions(+)
-> =
-
-> diff --git a/configure.ac b/configure.ac
-> index 088d0de..7573d84 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -106,6 +106,8 @@ AC_CHECK_FUNCS([ \
->  	strtoull \
->  ])
->  =
-
-> +AC_SEARCH_LIBS([clock_gettime], [rt])
-> +
->  PKG_CHECK_MODULES([NCURSES], [ncursesw ncurses], [LIBS=3D"$LIBS $ncurses=
-_LIBS"], [
->  	AC_SEARCH_LIBS([delwin], [ncursesw ncurses], [], [
->  		AC_MSG_ERROR([ncurses is required but was not found])
-
-You have my Acked-by. Pushed, and thanks for your contribution!
-
-commit 25558463a185e8c606bd0a341e18d0996ade5f4e
-Author:     eSyr <evgsyr(a)gmail.com>
-AuthorDate: Tue Aug 2 06:29:53 2016 +0300
-Commit:     Joe Konno <joe.konno(a)intel.com>
-CommitDate: Wed Aug 3 08:26:38 2016 -0700
-
-    Checking whether librt is needed for clock_gettime().
-    =
-
-    Commit ef79e28 introduced usage of clock_gettime() function, which,
-    unfortunately, breaks build on some systems, namely Debian Wheezy, due
-    to the fact it should be linked with librt. This commit adds configure
-    check whether additional library is needed in order to use
-    aforementioned function.
-    =
-
-    * configure.ac: using AC_SEARCH_LIBS() for checking whether librt is
-      needed for clock_gettime().
-    =
-
-    Acked-by: Joe Konno <joe.konno(a)intel.com>
-
---===============3235964489273195659==
-Content-Type: application/pgp-signature
+--===============0655205024922895416==
+Content-Type: text/x-patch
 MIME-Version: 1.0
 Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.sig"
+Content-Disposition: attachment; filename="powertop-only-closedir.patch"
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0KVmVyc2lvbjogR251UEcgdjIuMC4yMiAoR05V
-L0xpbnV4KQoKaVFJY0JBRUJBZ0FHQlFKWG9nNURBQW9KRUkySVI5VXZTcXBtbzBNUUFNYVNQY0w5
-VUZuOEdFNUs4Tm1rM1RPOQp3d2t6V3h1QjVYVkZCc2IvbndCSlNpeGNvaWRlSUpqSG10cWE5eGJj
-cC9nSCs5ZnA5TzlIOTdmTlVvNHQyZ29KCklqdzhacXpHZHVndHJwS0dYUHNIaGdNZFpjVHN1VXBF
-T1A4alcyalRTS2cxTXFTcDBiazhFVWRGYlFiYzNrQlcKemVlMURvVFBJZmw4RVgxeHdnOFgwRUZr
-NEMrUFA4L3p6RW9GOURnaG9OUS9YV1BiRG5xK2Mxbld5aUlDci9UWApBbjhwaGZ6djZyZ2I5dmdL
-ajB5NXJ0bUluMjdnMVZ5L3lqY0p4dkxPcnhYdklXSnlhekp6SHBlT1d1VW1URkZVCjZkdjNtcElX
-T2hpMkZYV2FQSXJSajh3KzRNcDJKZVlPU2FLUTR6UnFsZ2dlZnl3aERXdnlWNlB3WHNUY3ZjOGwK
-OXhOU05GSUJSenpMaTR2bXdBYkg5L3RNNGZzS1dDMGN4T2V4OU9zUG5XSU9ST3NZQUtHWDJrdDZ4
-amNxS29hcwppb2EvTTlHZzFpaVFsQnFWZXY4OWpyakpneEprVFFDbGJqYmgxRmk2QkQ2WExQcVhN
-dmNVTm5Odno4WU03R0MyCjZwUk1OeStKMHFwcG0yY25nVjRGWGN5a3VseFI1dmVRd2Q4NVd1T24r
-cWM0anRETGNzSWpJUWJld2sxVklEd0YKem9Ra2hxcWduLzZzYnlEbHlxdldhQnl5US9QMHZkcXc1
-Q3hwbDNvK1U1S1VTQUJTQTNod2pHNWt4bVhuZWFnSQo4cmFkTnZDSkJLdFhOVWdCK1AvUFFlUjl4
-TW9qQXNIZVlvTlVCbFZsYVBUaU9Yb2sxeW5JcVdyQ1p3SE00ZmFICkpTUDBta3ExVDRlQlVSakdE
-RGFpCj1tbW56Ci0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQo=
+RnJvbSA1NTMyOTQ4MTM2MzVjMDc0MjMwYTlkOGJhMGQ3NzM2YzIzZjE1ZGRkIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBNaWNoYWVsIFZldHRlciA8anViYWxoQGlvZG9ydS5vcmc+CkRh
+dGU6IFR1ZSwgMyBTZXAgMjAxOSAxMjo1NjowNCArMDIwMApTdWJqZWN0OiBbUEFUQ0hdIGludGVs
+X2NwdXMuY3BwOiBPbmx5IGNhbGwgY2xvc2VkaXIoKSBpZiBvcGVuZWQKCkluIGNhc2UgYGRpcmAg
+aXMgTlVMTCB3ZSBzaG91bGQgbm90IGNhbGwgYGNsb3NlZGlyKClgIHNpbmNlIGl0J3MKYmVoYXZp
+b3VyIGlzIGltcGxlbWVudGF0aW9uIHNwZWNpZmljLgotLS0KIHNyYy9jcHUvaW50ZWxfY3B1cy5j
+cHAgfCA5ICsrKysrLS0tLQogMSBmaWxlIGNoYW5nZWQsIDUgaW5zZXJ0aW9ucygrKSwgNCBkZWxl
+dGlvbnMoLSkKCmRpZmYgLS1naXQgYS9zcmMvY3B1L2ludGVsX2NwdXMuY3BwIGIvc3JjL2NwdS9p
+bnRlbF9jcHVzLmNwcAppbmRleCA0ZGZmYWRjLi5hZjQ3M2VlIDEwMDY0NAotLS0gYS9zcmMvY3B1
+L2ludGVsX2NwdXMuY3BwCisrKyBiL3NyYy9jcHUvaW50ZWxfY3B1cy5jcHAKQEAgLTE0MiwxMSAr
+MTQyLDEyIEBAIGludGVsX3V0aWw6OmludGVsX3V0aWwoKQogdm9pZCBpbnRlbF91dGlsOjpieXRf
+aGFzX2FoY2koKQogewogCWRpciA9IG9wZW5kaXIoIi9zeXMvYnVzL3BjaS9kZXZpY2VzLzAwMDA6
+MDA6MTMuMCIpOwotICAgICAgICBpZiAoIWRpcikKLSAgICAgICAgICAgICAgICBieXRfYWhjaV9z
+dXBwb3J0PTA7Ci0JZWxzZQorCWlmICghZGlyKQorCQlieXRfYWhjaV9zdXBwb3J0PTA7CisJZWxz
+ZSB7CiAJCWJ5dF9haGNpX3N1cHBvcnQ9MTsKLSAgICAgICAgY2xvc2VkaXIoZGlyKTsKKwkJY2xv
+c2VkaXIoZGlyKTsKKwl9CiB9CiAKIGludCBpbnRlbF91dGlsOjpnZXRfYnl0X2FoY2lfc3VwcG9y
+dCgpCg==
 
---===============3235964489273195659==--
+--===============0655205024922895416==--
 
