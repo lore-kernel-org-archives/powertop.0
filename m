@@ -1,46 +1,56 @@
-Content-Type: multipart/mixed; boundary="===============9200775687972785604=="
+Content-Type: multipart/mixed; boundary="===============5099588845271244939=="
 MIME-Version: 1.0
-From: Nils Kaiser <mail at nils-kaiser.de>
-Subject: [Powertop] Wrong discharge rate on HP Zbook Studio G5
-Date: Tue, 04 Jun 2019 23:19:16 -0500
-Message-ID: <CAA6E4vNacTOiydWr6ta=DHZQvbSftKTLuoPRRvHORk6d4cWfLQ@mail.gmail.com>
+From: Joe Konno <joe.konno at linux.intel.com>
+Subject: [Powertop] [PATCH 0/3 v1] Rewrite README, and contribution guide
+Date: Mon, 04 May 2020 09:50:11 -0700
+Message-ID: <20200504165014.6409-1-joe.konno@linux.intel.com>
 To: powertop@lists.01.org
 List-ID: <powertop@lists.01.org>
 
---===============9200775687972785604==
+--===============5099588845271244939==
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+From: Joe Konno <joe.konno(a)intel.com>
 
-When I run powertop on my HP Zbook Studio G5 laptop I get a discharge rate
-of ~400 mW (I wish!!).
+This series rewrites the README using markdown syntax and adds a
+contribution guide.
 
-Apparently this has been reported by another HP user here:
-https://bugs.launchpad.net/ubuntu/+source/powertop/+bug/1813496
+Series was submitted as a GitHub pull request as well:
+  * https://github.com/fenrus75/powertop/pull/43
 
-Any info I can provide to help debugging?
+Thanks to my colleague, Doug Martin, for reviewing these changes.
 
-Cheers,
+CONTRIBUTE.md changes up development workflows in (hopefully) a good
+way. In my opinion, these are the key take-aways from that document:
+  * Use GitHub workflows for sharing/collaborating (e.g. PRs, Issues)
+  * Use the Linux kernel coding style
 
-Nils
+The README and CONTRIBUTE documents will continue to evolve, but this
+should get us going in the right direction.
 
---===============9200775687972785604==
-Content-Type: text/html
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="attachment.html"
+PS: PowerTOP's project description on GitHub ("please post patches to
+the mailing list instead of using github pull requests") will be changed
+after this series is merged-- if it is.
 
-PGRpdiBkaXI9Imx0ciI+SGkgYWxsLDxkaXY+PGJyPjwvZGl2PjxkaXY+V2hlbiBJIHJ1biBwb3dl
-cnRvcCBvbiBteSBIUCBaYm9vayBTdHVkaW8gRzUgbGFwdG9wIEkgZ2V0IGEgZGlzY2hhcmdlIHJh
-dGUgb2YgfjQwMCBtVyAoSSB3aXNoISEpLjwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+QXBwYXJl
-bnRseSB0aGlzIGhhcyBiZWVuIHJlcG9ydGVkIGJ5IGFub3RoZXIgSFAgdXNlciBoZXJlOsKgPGEg
-aHJlZj0iaHR0cHM6Ly9idWdzLmxhdW5jaHBhZC5uZXQvdWJ1bnR1Lytzb3VyY2UvcG93ZXJ0b3Av
-K2J1Zy8xODEzNDk2Ij5odHRwczovL2J1Z3MubGF1bmNocGFkLm5ldC91YnVudHUvK3NvdXJjZS9w
-b3dlcnRvcC8rYnVnLzE4MTM0OTY8L2E+PC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj5BbnkgaW5m
-byBJIGNhbiBwcm92aWRlIHRvIGhlbHAgZGVidWdnaW5nPzwvZGl2PjxkaXY+PGJyPjwvZGl2Pjxk
-aXY+Q2hlZXJzLDwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+TmlsczwvZGl2PjwvZGl2Pgo=
 
---===============9200775687972785604==--
+Joe Konno (3):
+  README.md: rename, add md syntax, and major tweaks
+  README.md: Fix a misspelled name
+  Add CONTRIBUTE.md
+
+ CONTRIBUTE.md | 188 ++++++++++++++++++++++++++++++++++++++++++++++
+ README        | 157 --------------------------------------
+ README.md     | 204 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 392 insertions(+), 157 deletions(-)
+ create mode 100644 CONTRIBUTE.md
+ delete mode 100644 README
+ create mode 100644 README.md
+
+-- =
+
+2.26.2
+
+--===============5099588845271244939==--
 
